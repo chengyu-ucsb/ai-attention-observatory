@@ -39,6 +39,7 @@ jobs:
         run: |
           node --check app.js
           node --check lab-play.js
+          node tests/validate_playground.cjs
           test -s lab-play.css
           test -s index.html
           test -s styles.css
