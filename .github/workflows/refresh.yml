@@ -26,6 +26,7 @@ jobs:
     timeout-minutes: 35
     env:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+      OA_ENRICH_LIMIT: 55
       MODE: ${{ inputs.mode || 'weekly' }}
     steps:
       - uses: actions/checkout@v4
@@ -39,8 +40,12 @@ jobs:
         run: python scripts/update.py
       - name: Discover reporting, commentary and practitioner writing
         run: python scripts/discover_editorial.py
+      - name: Seed selected public essays and design arguments
+        run: python scripts/seed_editorial.py
       - name: Retrieve fuller abstracts across DOI registries
         run: python scripts/enrich_metadata.py
+      - name: Locate legal open-access article versions
+        run: python scripts/open_access_links.py
       - name: Extract permitted open-access article sections
         run: python scripts/enrich.py
       - name: Read licensed OpenAlex full texts when credentials are available
@@ -68,7 +73,9 @@ jobs:
               git reset --hard origin/main
               python scripts/update.py
               python scripts/discover_editorial.py
+              python scripts/seed_editorial.py
               python scripts/enrich_metadata.py
+              python scripts/open_access_links.py
               python scripts/enrich.py
               python scripts/enrich_openalex_fulltext.py
               python scripts/build_readings.py
