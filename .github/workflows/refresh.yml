@@ -1,0 +1,42 @@
+name: Update research library
+on:
+  schedule:
+    - cron: '0 12 * * 1'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Search mode
+        type: choice
+        required: true
+        default: backfill
+        options:
+          - backfill
+          - weekly
+permissions:
+  contents: write
+concurrency:
+  group: observatory-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Discover and index new sources
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          MODE: ${{ inputs.mode || 'weekly' }}
+        run: python scripts/update.py
+      - name: Save refreshed library
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if ! git diff --cached --quiet; then
+            git commit -m "Update weekly AI attention research"
+            git push
+          fi
+# Repository stays private. No Pages deployment or public hosting.
