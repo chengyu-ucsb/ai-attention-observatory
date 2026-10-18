@@ -1,5 +1,9 @@
 name: Catch up full-text research backlog
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/backfill-fulltext.yml'
   schedule:
     # Four modest checks per UTC day, with automatic API budget backoff.
     - cron: '17 3,9,15,21 * * *'
