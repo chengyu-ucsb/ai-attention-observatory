@@ -39,7 +39,10 @@ for(const r of db){
  const source=nodeClass(paperContainer,"paper-source-title");
  assert(source&&source.textContent===r.title,"Original source title omitted");
  const details=nodeClass(paperContainer,"paper-detail-excerpts");
- assert(details&&details.open===true,"Substantive source notes should be initially expanded");
+ const editorial=r.kind==="nonacademic";
+ const hasNotes=editorial?!!(r.editorial_notes?.argument||r.editorial_notes?.design_relevance||r.editorial_notes?.caveat):!!(r.reading?.methods||r.reading?.findings||r.reading?.interpretation||r.reading?.limitations);
+ if(hasNotes)assert(details&&details.open===true,"Substantive source notes should be initially expanded for "+r.title);
+ else assert(!details,"Empty structured source notes must not display a pointless panel for "+r.title);
  verified++;
 }
 const good=db.find(x=>x.doi==="10.58304/ijts.260930");
