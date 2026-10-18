@@ -11,6 +11,8 @@ on:
       - 'favicon.svg'
       - 'data/**'
       - 'feed.xml'
+      - 'scripts/build_public.py'
+      - 'scripts/feed.py'
       - 'tests/validate_playground.cjs'
       - '.github/workflows/publish.yml'
   workflow_run:
@@ -31,11 +33,15 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
         with:
           ref: main
+      - name: Build safe public reading library and RSS
+        run: |
+          python scripts/build_public.py
+          python scripts/feed.py
       - name: Validate published application
         run: |
           node --check app.js
@@ -45,14 +51,24 @@ jobs:
           test -s index.html
           test -s styles.css
           test -s favicon.svg
-          test -s data/library.json
-          test -s data/weekly.json
+          test -s data/public-library.json
+          test -s data/public-weekly.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          records=json.loads(Path("data/public-library.json").read_text())
+          assert all(r.get("reading",{}).get("level")!="citation_only" for r in records)
+          print(f"Publishing {len(records)} readings; zero citation-only records.")
+          PY
           test -s feed.xml
       - name: Prepare static website
         run: |
           mkdir -p _site
           cp index.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml _site/
-          cp -R data _site/data
+          mkdir -p _site/data
+          cp data/public-library.json data/public-weekly.json _site/data/
+          if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
+          if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           touch _site/.nojekyll
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
