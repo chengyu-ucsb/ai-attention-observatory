@@ -42,6 +42,8 @@ jobs:
         run: python scripts/discover_editorial.py
       - name: Seed selected public essays and design arguments
         run: python scripts/seed_editorial.py
+      - name: Add official focus-product references
+        run: python scripts/seed_products.py
       - name: Retrieve fuller abstracts across DOI registries
         run: python scripts/enrich_metadata.py
       - name: Locate legal open-access article versions
@@ -74,6 +76,7 @@ jobs:
               python scripts/update.py
               python scripts/discover_editorial.py
               python scripts/seed_editorial.py
+              python scripts/seed_products.py
               python scripts/enrich_metadata.py
               python scripts/open_access_links.py
               python scripts/enrich.py
