@@ -22,7 +22,7 @@ def url_for(pmcid,filename):
  return "https://pmc.ncbi.nlm.nih.gov/articles/"+pmcid+"/bin/"+urllib.parse.quote(name,safe=".-_()+")
 def run():
  data=json.loads(DATA.read_text());budget=int(os.getenv("FIGURE_VERIFY_LIMIT","5"))
- tries=0,found=0,errors=[]
+ tries=0;found=0;errors=[]
  for r in data:
   if tries>=budget:break
   analysis=r.get("analysis") or {}
