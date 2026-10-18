@@ -105,3 +105,19 @@
 .paper-detail-body .reading-section{border-left:0;border-right:0;border-bottom:1px solid #eee2df;margin-bottom:0}
 .paper-detail-body .reading-section:last-child{border-bottom:0}
 @media(max-width:680px){.paper-snapshot{grid-template-columns:1fr}.snapshot-tile{padding:14px 18px}.snapshot-symbol{display:inline-block;margin-bottom:0;margin-right:12px;vertical-align:middle}.snapshot-kicker{display:inline-block;vertical-align:middle;min-height:0}.snapshot-tile p{margin-top:7px}}
+
+
+/* A visual entry point for the playable Lab on the homepage. */
+.play-teaser-inner{display:grid;grid-template-columns:minmax(0,1fr) 225px;gap:32px;align-items:center;padding:30px 37px}
+.play-teaser-copy h2{font:500 37px/1.13 var(--display);margin:7px 0 10px}
+.play-teaser-copy>p:not(.eyebrow){max-width:485px;font-size:12px;line-height:1.7;color:#6f5155}
+.play-teaser-copy .button{margin-top:20px}
+.play-teaser-steps{display:flex;gap:13px;flex-wrap:wrap;margin-top:16px}
+.play-teaser-steps span{font-size:10px;font-weight:800;color:#ac4b5a}
+.play-teaser-demo{background:#fff;border:1px solid #ebc9c9;box-shadow:8px 8px 0 #efcccc;display:flex;flex-direction:column;text-align:center;align-items:center;padding:13px 15px 18px}
+.play-teaser-counter{align-self:flex-start;font-size:9px;font-weight:800;color:#bb8b90;letter-spacing:.04em}
+.play-teaser-rule{margin:17px 0 0;padding:5px 12px;background:#f8e4e4;border-radius:20px;font-size:9px;color:var(--red);font-weight:800;letter-spacing:.05em}
+.play-teaser-demo strong{font:500 89px/1.2 var(--display);color:#3b3031}
+.play-teaser-keys{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
+.play-teaser-keys span{padding:8px 5px;border:1px solid #eddbd9;color:#ab4d5c;font-size:10px;font-weight:800}
+@media(max-width:700px){.play-teaser-inner{grid-template-columns:1fr;padding:24px}.play-teaser-demo{max-width:245px;width:100%;justify-self:center}.play-teaser-copy h2{font-size:32px}}
