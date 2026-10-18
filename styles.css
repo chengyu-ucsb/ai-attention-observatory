@@ -17,3 +17,21 @@
 @media(max-width:850px){.site-header{position:relative}.header-inner{flex-wrap:wrap;padding:13px 0;gap:13px}.main-nav{order:3;width:100%;margin:0;justify-content:space-between;gap:8px}.main-nav a{font-size:11px;padding:9px 0}.header-link{margin-left:auto}.hero-grid{grid-template-columns:1fr .65fr;min-height:410px}.hero h1{font-size:55px}.hero-copy{padding:45px 0}.feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.feature-card.primary{grid-column:1/-1;min-height:260px}.glance-grid,.atlas-grid,.about-grid{grid-template-columns:1fr}.lenses-grid{grid-template-columns:repeat(2,1fr)}.follow-section{grid-template-columns:80px 1fr}.follow-actions{grid-column:2}.footer-grid{grid-template-columns:1fr 1fr}.footer-note{grid-column:1/-1;text-align:left}.paper-columns{grid-template-columns:1fr}.about-grid{gap:30px}.lab-grid{grid-template-columns:1fr 1fr}.lab-card:first-child{grid-column:1/-1}}
 @media(max-width:600px){.shell{width:calc(100% - 34px)}.header-link{display:none}.hero-grid{grid-template-columns:1fr}.hero-copy{padding:42px 0 21px}.hero h1{font-size:53px}.hero-visual{max-height:215px;overflow:hidden}.hero-visual svg{width:260px}.visual-caption{display:none}.hero-credit{margin-top:23px}.issue-inner{flex-wrap:wrap;gap:8px;padding:12px 0}.issue-kicker{flex:1 1 100%}#issue-meta{margin-left:0}.issue-rss{margin-left:auto}.pad-top{padding-top:53px}.section-heading{align-items:start}.section-heading h2{font-size:35px}.section-heading .quiet-link{font-size:10px}.feature-grid,.glance-grid,.lenses-grid,.library-results,.atlas-stat-row,.lab-grid{grid-template-columns:1fr}.feature-card.primary{grid-column:auto}.feature-card{min-height:270px}.glance-section{padding:68px 0}.donut-row{gap:15px}.visual-panel{padding:22px}.soft-section{padding:60px 0}.lens{min-height:185px}.arrivals-section{padding:60px 0}.arrival-table{min-width:650px}.follow-section{grid-template-columns:1fr;padding:27px;gap:15px;margin-bottom:60px}.follow-art{display:none}.follow-actions{grid-column:auto}.inner-hero{padding:46px 0}.inner-hero h1{font-size:46px}.library-section,.atlas-section{padding:30px 0 60px}.atlas-stat-row{grid-template-columns:repeat(2,1fr)}.atlas-stat:nth-child(2){border-right:0}.paper-page{padding:24px 0 60px}.paper-heading{font-size:40px}.reading-section{padding:20px}.reading-lead{padding:20px}.about-grid{padding:45px 0}.about-lead h2{font-size:39px}.about-contact{display:block;padding:25px;margin-bottom:50px}.footer-grid{grid-template-columns:1fr}.footer-note{grid-column:auto}.lab-card:first-child{grid-column:auto}.lab-teaser-inner{grid-template-columns:1fr}.lab-grid{margin:22px 0}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.feature-card,.library-card,.lens,.button{transition:none}}
+
+/* 2026-10-18: independent editorial channel */
+.editorial-section{padding:10px 0 93px}
+.editorial-section .section-heading{margin-bottom:24px}
+.editorial-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.editorial-card{background:#fff;border:1px solid #ebdfdb;border-top:4px solid #b74c59;padding:21px;display:flex;flex-direction:column;min-height:265px}
+.editorial-card:nth-child(2){border-top-color:#9a6e70}.editorial-card:nth-child(3){border-top-color:#db9a94}.editorial-card:nth-child(4){border-top-color:#a53245}
+.editorial-category{font-size:10px;color:#9d4252;font-weight:800;letter-spacing:.05em}
+.editorial-card h3{font:500 22px/1.22 var(--display);margin:13px 0}
+.editorial-card h3 button{font:inherit;color:var(--ink);text-align:left;border:0;background:none;padding:0}
+.editorial-card h3 button:hover{color:var(--red)}
+.editorial-card p{font-size:12px;line-height:1.7;color:#68595d;margin:0}
+.editorial-foot{border-top:1px solid var(--line);padding-top:13px;margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.editorial-foot span{font-size:10px;color:var(--soft)}
+.editorial-cta{background:none;border:0;color:var(--red);font-size:11px;font-weight:800;white-space:nowrap}
+.editorial-disclaimer{font-size:10px;color:#8f7c7c;margin:15px 0 0}
+@media(max-width:950px){.editorial-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.editorial-section{padding:10px 0 65px}.editorial-grid{grid-template-columns:1fr}.editorial-card{min-height:220px}}
