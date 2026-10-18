@@ -4,6 +4,12 @@ ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
 def req(url):
  with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"AIAttentionObservatory/1.2 academic indexing"}),timeout=18) as response:return response.read()
 def clean(t):return " ".join((t or "").split())
+def permitted(licenses):
+ for lic in licenses:
+  val=lic.lower().replace("–","-")
+  if "cc by-nc" in val or "cc-by-nc" in val or "cc by-nd" in val or "cc-by-nd" in val or "noncommercial" in val or "no derivatives" in val or "noderivatives" in val:continue
+  if "cc by" in val or "cc-by" in val or "cc0" in val or "creative commons zero" in val:return True
+ return False
 def extract_sections(root):
  sections={}
  for sec in root.findall(".//body//sec"):
@@ -31,7 +37,7 @@ def run():
    root=ET.fromstring(req("https://www.ebi.ac.uk/europepmc/webservices/rest/"+urllib.parse.quote(pmcid)+"/fullTextXML"))
    licenses=[" ".join(el.itertext()).lower() for el in root.findall(".//license")]
    # Public site cannot republish arbitrary copyrighted article excerpts.
-   if not any("creative commons" in lic or "cc by" in lic for lic in licenses):continue
+   if not permitted(licenses):continue
    extracted=extract_sections(root)
    if not extracted:continue
    figures=[]
