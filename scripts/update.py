@@ -62,7 +62,7 @@ def discover(days=60):
     if not title or not KEYWORDS.search(title+" "+ab) or w.get("is_retracted"):continue
     loc=w.get("primary_location") or {};venue=(loc.get("source") or {}).get("display_name") or "OpenAlex"
     authors=[a.get("author",{}).get("display_name","") for a in w.get("authorships",[])[:8]]
-    found.append({"title":title,"authors":authors,"published":w.get("publication_date") or "","venue":venue,"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("id",""),"preview":ab[:550] or "Abstract unavailable; bibliographic metadata only.","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY})
+    found.append({"title":title,"authors":authors,"published":w.get("publication_date") or "","venue":venue,"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("id",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"OpenAlex abstract index" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY})
    stats["openalex"]+=len(result.get("results",[]))
   except Exception as e:errors.append("OpenAlex "+lane+": "+str(e)[:130])
   time.sleep(.3)
@@ -75,7 +75,7 @@ def discover(days=60):
     title=(w.get("title") or [""])[0];ab=re.sub("<[^>]+>"," ",w.get("abstract") or "")
     if not title or not KEYWORDS.search(title+" "+ab):continue
     doi=w.get("DOI") or "";dp=(w.get("published",{}).get("date-parts") or [[]])[0];datev="-".join(str(z).zfill(2) if i else str(z) for i,z in enumerate(dp+[1,1]) if i<3)
-    found.append({"title":title,"authors":[" ".join(filter(None,[a.get("given"),a.get("family")])) for a in w.get("author",[])[:8]],"published":datev,"venue":(w.get("container-title") or ["Crossref"])[0],"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("URL",""),"preview":ab[:550] or "Abstract unavailable; bibliographic metadata only.","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"Crossref","curated":False,"first_seen":TODAY})
+    found.append({"title":title,"authors":[" ".join(filter(None,[a.get("given"),a.get("family")])) for a in w.get("author",[])[:8]],"published":datev,"venue":(w.get("container-title") or ["Crossref"])[0],"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("URL",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"Crossref abstract" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"Crossref","curated":False,"first_seen":TODAY})
    stats["crossref"]+=len(result.get("message",{}).get("items",[]))
   except Exception as e:errors.append("Crossref "+lane+": "+str(e)[:130])
   time.sleep(.3)
@@ -110,7 +110,11 @@ def main():
   k=key(x)
   if not x["title"] or not x["url"] or not relevant(x):continue
   if k in records:
-   if not records[k].get("preview") or records[k]["preview"].startswith("Abstract unavailable"):records[k]["preview"]=x["preview"]
+   current=records[k]
+   if len(x.get("abstract_text",""))>len(current.get("abstract_text","")):
+    current["abstract_text"]=x["abstract_text"];current["abstract_source"]=x.get("abstract_source","");current["preview"]=x["preview"]
+   elif not current.get("preview") or current["preview"].startswith("Abstract unavailable"):
+    if not x.get("preview","").startswith("Abstract unavailable"):current["preview"]=x["preview"]
    continue
   records[k]=x;new.append(x)
  collection=sorted(records.values(),key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)
