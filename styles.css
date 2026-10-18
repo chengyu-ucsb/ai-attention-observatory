@@ -248,3 +248,21 @@
 .paper-detail-body .reading-section p{font-size:12px;line-height:1.85}
 @media(max-width:1000px){.concept-scene{flex-wrap:wrap;padding:15px}.concept-node{flex:1 1 130px}.concept-center{order:-1}.concept-scene:before{display:none}}
 @media(max-width:650px){.article-concept-art{padding:16px}.concept-scene{gap:8px;min-height:0}.concept-center{width:100%;min-height:55px}.concept-node{flex:1 1 45%;min-height:65px}}
+
+/* Visualizations derived from study-level findings and method counts only. */
+.figure-insight-title{font:500 25px/1.2 var(--display);margin:13px 0 22px;color:#4c343d}
+.profile-visual{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:20px 0}
+.profile-visual-card{border:1px solid #dcbfc0;border-top:4px solid #ae5765;background:white;padding:17px 15px;min-height:149px}
+.profile-visual-card:nth-child(2){border-top-color:#d69895}.profile-visual-card:nth-child(3){border-top-color:#96707c}
+.profile-number{font:500 26px var(--display);color:#bc8490;display:block}
+.profile-visual-card strong{font:500 18px/1.25 var(--display);display:block;color:#59454e;margin-top:12px}
+.profile-visual-card p{font:400 11px/1.6 var(--sans);color:#84757b}
+.categories-visual{display:flex;gap:25px;align-items:center;justify-content:space-evenly;margin:15px 0}
+.categories-count{display:flex;flex-direction:column;align-items:center;gap:5px;max-width:235px;flex:1}
+.categories-count strong{font:500 80px/1 var(--display);color:#a73e50}
+.categories-count span{font-size:11px;font-weight:800;color:#68555d}
+.categories-dots{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;max-width:140px;margin-top:9px}
+.categories-dots i{width:9px;height:9px;background:#d9a5aa;border-radius:50%}
+.categories-dots-big i{width:18px;height:18px;background:#a44054}
+.categories-direction{font:500 42px var(--display);color:#c8a6aa}
+@media(max-width:690px){.profile-visual{grid-template-columns:1fr}.profile-visual-card{min-height:0}.categories-count strong{font-size:65px}.categories-visual{gap:8px}}
