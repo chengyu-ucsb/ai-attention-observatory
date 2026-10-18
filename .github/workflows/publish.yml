@@ -12,6 +12,11 @@ on:
       - 'data/**'
       - 'feed.xml'
       - 'scripts/build_public.py'
+      - 'scripts/build_issue.py'
+      - 'scripts/build_newsletter.py'
+      - 'scripts/condense_readings.py'
+      - 'data/issue-editorial.json'
+      - 'tests/validate_weekly_issue.cjs'
       - 'scripts/feed.py'
       - 'tests/validate_playground.cjs'
       - 'tests/validate_article_ui.cjs'
@@ -42,6 +47,8 @@ jobs:
       - name: Build safe public reading library and RSS
         run: |
           python scripts/build_public.py
+          python scripts/build_issue.py
+          python scripts/build_newsletter.py
           python scripts/feed.py
       - name: Validate published application
         run: |
@@ -49,6 +56,7 @@ jobs:
           node --check lab-play.js
           node tests/validate_playground.cjs
           node tests/validate_article_ui.cjs
+          node tests/validate_weekly_issue.cjs
           test -s lab-play.css
           test -s index.html
           test -s styles.css
@@ -63,12 +71,15 @@ jobs:
           print(f"Publishing {len(records)} readings; zero citation-only records.")
           PY
           test -s feed.xml
+          test -s issue-feed.xml
+          test -s newsletter.html
+          test -s data/public-issue.json
       - name: Prepare static website
         run: |
           mkdir -p _site
-          cp index.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml _site/
+          cp index.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
           mkdir -p _site/data
-          cp data/public-library.json data/public-weekly.json _site/data/
+          cp data/public-library.json data/public-weekly.json data/public-issue.json _site/data/
           if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           touch _site/.nojekyll
