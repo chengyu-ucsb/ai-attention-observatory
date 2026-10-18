@@ -1,11 +1,7 @@
 name: Update research library
 on:
-  # Run on schedule or explicitly. A workflow edit can test it once, but
-  # ordinary code commits must not flood external APIs.
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/refresh.yml'
+  # New-source discovery happens weekly or when manually requested.
+  # Source editing must not start a costly external search.
   schedule:
     - cron: '23 12 * * 1'
   workflow_dispatch:
@@ -18,7 +14,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: observatory-refresh
+  group: observatory-index
   cancel-in-progress: false
 jobs:
   refresh:
@@ -28,7 +24,6 @@ jobs:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OA_ENRICH_LIMIT: 55
       # Backfills make a deeper pass; normal weeks keep the API budget controlled.
-      OPENALEX_FULLTEXT_LIMIT: ${{ inputs.mode == 'backfill' && '100' || '45' }}
       MODE: ${{ inputs.mode || 'weekly' }}
     steps:
       - uses: actions/checkout@v7
@@ -50,12 +45,10 @@ jobs:
         run: python scripts/enrich_metadata.py
       - name: Locate legal open-access article versions
         run: python scripts/open_access_links.py
-      - name: Extract permitted open-access article sections
-        run: python scripts/enrich.py
-      - name: Read licensed OpenAlex full texts when credentials are available
-        run: python scripts/enrich_openalex_fulltext.py
       - name: Build article-specific reading summaries
         run: python scripts/build_readings.py
+      - name: Exclude citation-only metadata from public readings
+        run: python scripts/build_public.py
       - name: Produce RSS
         run: python scripts/feed.py
       - name: Validate data and browser code
@@ -63,6 +56,7 @@ jobs:
           node --check app.js
           python -m compileall -q scripts tests
           python -m json.tool data/library.json > /dev/null
+          python -m json.tool data/public-library.json > /dev/null
           python -m json.tool data/weekly.json > /dev/null
           python -m unittest discover -s tests -v
       - name: Commit and push
