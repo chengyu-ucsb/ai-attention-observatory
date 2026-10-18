@@ -41,7 +41,8 @@ function home(){
 
 function renderEditorial(){
  const list=S.records.filter(x=>x.kind==="nonacademic");
- const featured=list.filter(x=>depth(x)!=="citation_only").sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||"")).slice(0,4);
+ const sorted=list.filter(x=>depth(x)!=="citation_only").sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||""));
+ const featured=[];for(const test of [x=>x.format==="Product & design",x=>x.format==="Policy analysis",x=>x.source==="Publisher RSS / Google News RSS",x=>true]){const next=sorted.find(x=>!featured.includes(x)&&test(x));if(next)featured.push(next)};
  const root=$("#editorial-grid");root.replaceChildren();
  if(!featured.length){root.append(make("div","empty-state","No source-supported perspectives have been indexed yet. The editorial feeds are checked every week."));return}
  for(const x of featured){
@@ -80,10 +81,18 @@ function showPaper(x){
  const chips=make("div","paper-controls");for(const a of [x.lane||"Research",depthName(x),x.kind==="scholarly"?"Scholarly":"Commentary"])chips.append(make("span","paper-label",a));
  const cols=make("div","paper-columns"),left=make("div"),right=make("aside","paper-side"),lead=make("section","reading-lead");
  add(lead,make("p","eyebrow","CENTRAL IDEA"),make("h2","","At a glance"),make("p","",r.overview||cut(excerpt(x),500)));left.append(lead);
- if(r.methods)left.append(section("HOW IT WAS STUDIED",r.methods,r.provenance));
- if(r.findings)left.append(section("WHAT THE PAPER REPORTS",r.findings,r.provenance));
- if(r.limitations)left.append(section("LIMITATIONS",r.limitations,r.provenance));
- if(!r.methods&&!r.findings)left.append(make("div","citation-notice","The accessible source does not contain an identifiable method or result. This is a discovery record, not a verified research summary."));
+ if(x.kind==="nonacademic"){
+  const notes=x.editorial_notes||{};
+  if(notes.argument)left.append(section("THE AUTHOR'S ARGUMENT",notes.argument,"Original editorial synopsis; check the linked article"));
+  if(notes.design_relevance)left.append(section("DESIGN POSSIBILITIES",notes.design_relevance,"A research-to-product interpretation, not a tested intervention"));
+  if(notes.caveat)left.append(section("INTERPRETIVE LIMITS",notes.caveat,"Editorial qualification"));
+  if(!notes.argument)left.append(make("div","citation-notice","This entry currently contains the publisher's feed description, not an article-length critical reading. Open the original source to examine its argument in context."));
+ }else{
+  if(r.methods)left.append(section("HOW IT WAS STUDIED",r.methods,r.provenance));
+  if(r.findings)left.append(section("WHAT THE PAPER REPORTS",r.findings,r.provenance));
+  if(r.limitations)left.append(section("LIMITATIONS",r.limitations,r.provenance));
+  if(!r.methods&&!r.findings)left.append(make("div","citation-notice","The accessible source does not contain an identifiable method or result. This is a discovery record, not a verified research summary."));
+ }
  if(x.abstract_text){const details=make("details"),box=make("section","reading-section");add(details,make("summary","","Show the indexed abstract"),make("p","",x.abstract_text));box.append(details);left.append(box)}
  left.append(make("p","paper-smallprint",r.notice||"Automatically indexed material. Verify the original publication before citing findings."));
  const at=make("section","paper-side-block");add(at,make("p","eyebrow","SOURCE INFORMATION"),make("h3","","Reading details"));
@@ -98,9 +107,9 @@ function showPaper(x){
  if(valid(x.analysis?.fulltext_url))right.append(link("View open-access version ↗",x.analysis.fulltext_url,"paper-extra"));
  if(valid(x.open_access_url))right.append(link("Find available full text ↗",x.open_access_url,"paper-extra"));
  right.append(link("Search on Google Scholar ↗","https://scholar.google.com/scholar?q="+encodeURIComponent(x.title),"paper-extra"));
- let related=S.records.filter(y=>y!==x&&y.lane===x.lane&&depth(y)!=="citation_only").sort((a,b)=>rank(b)-rank(a)).slice(0,3);
+ let related=S.records.filter(y=>y!==x&&y.kind===x.kind&&y.lane===x.lane&&depth(y)!=="citation_only").sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){const panel=make("section","paper-side-block");add(panel,make("p","eyebrow","EXPLORE FURTHER"),make("h3","","Related papers"));for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));right.append(panel)}
- add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow","RESEARCH READING / "+(x.lane||"Research")),make("h1","paper-heading",x.title),make("p","paper-meta",meta),chips,cols)
+ add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",(x.kind==="nonacademic"?"PUBLIC IDEAS / ":"RESEARCH READING / ")+(x.lane||"Research")),make("h1","paper-heading",x.title),make("p","paper-meta",meta),chips,cols)
 }
 function lab(){
  function updateTime(){let m=Math.floor(S.left/60),s=S.left%60;$("#focus-timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
