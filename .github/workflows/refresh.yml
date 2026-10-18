@@ -23,7 +23,7 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     env:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       MODE: ${{ inputs.mode || 'weekly' }}
@@ -37,8 +37,12 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           MODE: ${{ inputs.mode || 'weekly' }}
         run: python scripts/update.py
+      - name: Retrieve fuller abstracts across DOI registries
+        run: python scripts/enrich_metadata.py
       - name: Extract permitted open-access article sections
         run: python scripts/enrich.py
+      - name: Build article-specific reading summaries
+        run: python scripts/build_readings.py
       - name: Produce RSS
         run: python scripts/feed.py
       - name: Validate data and browser code
@@ -59,7 +63,9 @@ jobs:
               git fetch origin main
               git reset --hard origin/main
               python scripts/update.py
+              python scripts/enrich_metadata.py
               python scripts/enrich.py
+              python scripts/build_readings.py
               python scripts/feed.py
               python -m unittest discover -s tests -v
               git add data/ feed.xml
