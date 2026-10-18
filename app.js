@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
-const S={records:[],week:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
+const S={records:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
 const depths=[["full_text","Full-text sections","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
@@ -64,7 +64,7 @@ function ideaInfo(x){
 }
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.findings?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
-function route(){let raw=location.hash.slice(1)||"home";try{raw=decodeURIComponent(raw)}catch{raw="home"}let page=raw.startsWith("paper/")?"paper":raw;if(!["home","library","atlas","lab","paper","about","perspectives"].includes(page))page="home";$$(".view").forEach(v=>v.hidden=v.id!==page);$$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});if(page==="paper")showPaper(record(raw.slice(6)));if(page==="library")showLibrary();if(page==="atlas")showAtlas();window.scrollTo({top:0,behavior:"instant"})}
+function route(){let raw=location.hash.slice(1)||"home";try{raw=decodeURIComponent(raw)}catch{raw="home"}let page=raw.startsWith("paper/")?"paper":raw;if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";$$(".view").forEach(v=>v.hidden=v.id!==page);$$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});if(page==="paper")showPaper(record(raw.slice(6)));if(page==="library")showLibrary();if(page==="atlas")showAtlas();window.scrollTo({top:0,behavior:"instant"})}
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
 function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>{$("#topic-filter").value=t[0];goto("library")},"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
 function donut(){const cc=counts(),total=Math.max(1,S.records.length),legend=$("#depth-legend");$("#record-count").textContent=S.records.length;legend.replaceChildren();let at=0,parts=[];for(const d of depths){let pct=cc[d[0]]/total*100;parts.push(d[2]+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;const r=make("div","legend-item"),sw=make("span","legend-swatch"),copy=make("div");sw.style.background=d[2];add(copy,make("div","legend-title",d[1]+" · "+cc[d[0]]),make("span","legend-caption",Math.round(pct)+"% of records"));add(r,sw,copy);legend.append(r)}$("#evidence-donut").style.background="conic-gradient("+parts.join(",")+")"}
@@ -77,6 +77,63 @@ function featureCoverage(x){
  add(area,row,track);
  return area;
 }
+
+function issueRefs(ids,target){
+ const list=(S.issue.sources||[]),container=target||make("div","issue-references");
+ for(const key of ids||[]){
+   const src=list.find(x=>x.id===key);
+   if(!src)continue;
+   const matches=S.records.find(x=>id(x)===key);
+   const b=matches?btn(src.title,()=>goto("paper",id(matches)),"issue-ref"):link(src.title,src.url||"#library","issue-ref");
+   container.append(b);
+ }
+ return container;
+}
+function renderIssue(){
+ const issue=S.issue||{},published=issue.status==="published";
+ const edition=issue.edition_date||S.week.run?.date||"";
+ const sourceCount=Number(issue.source_count)||0;
+ $("#weekly-kicker").textContent=published?"THE ATTENTION EDIT · ISSUE "+issue.number:"THE ATTENTION EDIT · IN PREPARATION";
+ $("#weekly-title").textContent=published?issue.headline:"This week's synthesis is being reviewed.";
+ $("#weekly-deck").textContent=published?issue.deck:"New research and commentary are indexed; the editorial synthesis will appear after source review.";
+ $("#weekly-scope").textContent=sourceCount+" source-backed readings reviewed for this edition · "+(issue.types?.commentary||0)+" nonacademic perspectives";
+ $("#issue-edition").textContent=published?"THE ATTENTION EDIT / ISSUE "+issue.number+" / "+date(edition):"THE ATTENTION EDIT / IN REVIEW";
+ $("#issue-headline").textContent=published?issue.headline:"The next edition is being prepared.";
+ $("#issue-deck").textContent=published?issue.deck:issue.note||"The editorial synopsis has not been approved yet.";
+ $("#issue-letter-text").textContent=published?issue.letter:"This week's reading set is available below. Editorial themes are awaiting review and won't be fabricated from titles alone.";
+ const strips=$("#weekly-signal-strip"),main=$("#issue-signals");strips.replaceChildren();main.replaceChildren();
+ const signs=published?issue.signals||[]:[];
+ signs.forEach((sig,i)=>{
+   const tile=make("a","weekly-signal");tile.href="#issue";tile.setAttribute("aria-label","Read signal "+(i+1)+": "+sig.short);
+   const mark=make("div","weekly-signal-symbol",["◎","↗","◇"][i%3]);
+   add(tile,mark,make("span","weekly-signal-no",String(i+1).padStart(2,"0")+" · SIGNAL"),make("h4","",sig.short),make("span","weekly-signal-arrow","Explore the thread →"));strips.append(tile);
+   const panel=make("article","issue-signal"),header=make("div","issue-signal-header");
+   add(header,make("span","issue-signal-icon",["◎","↗","◇"][i%3]),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
+   add(panel,header,make("h3","",sig.title),make("p","",sig.text),
+       make("span","issue-cited-label","READINGS BEHIND THIS SIGNAL"),
+       issueRefs(sig.source_ids));
+   main.append(panel);
+ });
+ $("#issue-extras").hidden=!published;
+ $(".issue-closing").hidden=!published;
+ $("#issue-tension-title").textContent=published?issue.tension.title:"";
+ $("#issue-tension-text").textContent=published?issue.tension.text:"";
+ const ref=$("#issue-tension-refs");ref.replaceChildren();if(published)issueRefs(issue.tension.source_ids,ref);
+ $("#issue-experiment-title").textContent=published?issue.experiment.title:"";
+ $("#issue-experiment-text").textContent=published?issue.experiment.text:"";
+ $("#issue-experiment-caution").textContent=published?issue.experiment.caution:"";
+ $("#issue-closer").textContent=published?issue.closer:"";
+ $("#issue-qualification").textContent=published?issue.editorial_note:"";
+ $("#issue-coverage").textContent=sourceCount+" source-backed items in this issue: "+(issue.material?.full_text||0)+" full-text extracts, "+(issue.material?.abstract||0)+" abstract-based readings and "+(issue.material?.publisher_or_editorial||0)+" publisher/editorial synopses. Full-source reviews are not implied.";
+ const shelf=$("#issue-sources");shelf.replaceChildren();
+ for(const [i,src] of (issue.sources||[]).entries()){
+  const r=make("div","issue-shelf-item");let candidate=S.records.find(x=>id(x)===src.id);
+  const title=candidate?btn(src.title,()=>goto("paper",src.id)):link(src.title,src.url||"#library");
+  add(r,make("span","issue-shelf-number",String(i+1).padStart(2,"0")),add(make("div","issue-shelf-content"),title,make("p","",[src.venue,src.reading_level==="full_text"?"Full-text extract":src.reading_level==="abstract"?"Abstract-based":"Publisher/editorial"].filter(Boolean).join(" · "))));
+  shelf.append(r);
+ }
+}
+
 function home(){
  const run=S.week.run||{},all=(S.week.items||[]).map(x=>record(id(x))||S.records.find(r=>r.title===x.title)||x);
  const top=all.filter(x=>x.kind==="scholarly"&&depth(x)!=="citation_only"&&x.reading?.findings).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.findings)).slice(0,3);
@@ -238,13 +295,14 @@ function showProductExamples(){
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
  try{
-  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
+  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-issue.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
   S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
   S.runs=rs[2].ok?await rs[2].json():[];
   S.backlog=rs[3].ok?await rs[3].json():{};
-  home();renderBacklog();showLibrary();showProductExamples();renderPerspectives();route();
+  S.issue=rs[4].ok?await rs[4].json():{};
+  home();renderIssue();renderBacklog();showLibrary();showProductExamples();renderPerspectives();route();
  }catch(e){$("#issue-label").textContent="INDEX OFFLINE";$("#issue-meta").textContent="Research data could not load";$("#feature-grid").replaceChildren(make("div","empty-state","Could not load the research archive: "+e.message));route()}
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
