@@ -17,3 +17,11 @@ This policy is stored in the repository so future assistants working on it can s
 - **Traceability:** Preserve DOI/source link, section provenance, license, and reading level; never infer sample sizes, effect sizes, figures or statistical claims from titles or topic labels.
 - **Rights:** Do not copy full copyrighted papers or images into the public repo. Store only brief excerpts where licensing explicitly permits and link to source originals otherwise.
 - **Operations:** Test a full-text retrieval backfill under API credit limits before reporting numerical improvements. Never rerun the entire external search solely to work around a git push race; rebase existing results where possible. Do not trigger full refreshes on every code edit.
+
+## Public citation quarantine and research-first hierarchy (October 2026)
+
+1. **Never publish or cite a citation-only record as substantive content.** Keep such metadata only in the internal acquisition index; do not include it in the Pages payload, RSS, recommendation logic, research visualizations, weekly highlights, or public counts. Enforce this via `scripts/build_public.py` and regression tests.
+2. Public scholarly summaries require a real substantive abstract or permitted full-text extraction. Label abstract-derived claims and keep Results separate from Discussion and unverified conceptual interpretations.
+3. **The research idea or reported finding is the primary visual headline** on the homepage, library cards, and each reading page. The original publication title is important attribution, but must not visually overpower the contribution.
+4. Weekly discovery and full-text backlog processing are separate schedules. Catch up four times daily only when ready, pause after API quotas, and persist per-paper retry status; do not launch all weekly discovery jobs to catch up full texts.
+5. Full-text acquisition is limited by actual available licensing, machine-readable access, and provider quotas. Report coverage honestly and do not promise that every citation can be transformed into a full-text review.
