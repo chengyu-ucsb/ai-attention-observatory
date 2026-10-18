@@ -52,8 +52,10 @@ def make_note(r):
     licensed=bool(full.get("fulltext_url"))
     if licensed:
         approach=clean(full.get("methods"))[:650]
-        # Discussion interprets findings rather than listing validity statistics in first Results subsection.
-        results=clean(full.get("discussion") or full.get("results"))[:780]
+        # Only the Results/Findings section can populate the reported-results field.
+        # Discussion is interpretation and is kept separate to prevent overstating claims.
+        results=clean(full.get("results"))[:780]
+        interpretation=clean(full.get("discussion"))[:780]
         caveat=clean(full.get("limitations"))[:600]
         abstract=src or clean(r.get("preview"))
         introduction=first_two(sentences(abstract),410) if abstract else ""
@@ -66,6 +68,7 @@ def make_note(r):
         used={introduction}
         approach=excerpt_from(parts,METHOD,450)
         results=excerpt_from(parts,RESULT,520)
+        interpretation=""
         caveat=excerpt_from(parts,LIMIT,360,exclude={approach,results})
         if approach and results and approach==results:approach=""
         if results and re.search(r"remains? (?:unclear|unknown|insufficiently understood)|little is known|this study aims|we hypothesi[sz]ed|prior studies",results,re.I):results=""
@@ -73,7 +76,7 @@ def make_note(r):
         provider=r.get("abstract_source") or r.get("source") or "Bibliographic abstract"
     elif r.get("curated") and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         introduction=clean(r["preview"])[:420]
-        approach=results=caveat=""
+        approach=results=caveat=interpretation=""
         kind="Curated introductory synopsis"
         provider="Initial editorial reference list (not full-text verified)"
     else:
@@ -89,6 +92,7 @@ def make_note(r):
         "overview":introduction,
         "methods":approach,
         "findings":results,
+        "interpretation":interpretation,
         "limitations":caveat,
         "sample":sample,
         "notice":("Excerpts from licensed article sections; automatically selected, not independently reviewed." if licensed else
