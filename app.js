@@ -93,7 +93,7 @@ function home(){
  const grid=$("#lens-grid");grid.replaceChildren();themes.forEach(t=>{const a=link("","#library","lens");a.setAttribute("aria-label","Explore "+t[0]);a.onclick=e=>{e.preventDefault();$("#topic-filter").value=t[0];goto("library")};add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.published||"").localeCompare(a.published||"")).slice(0,7);
- for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(x.title,()=>goto("paper",id(x))));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
+ for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",x.title));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
 }
 
 function renderEditorial(){
@@ -104,10 +104,10 @@ function renderEditorial(){
  if(!featured.length){root.append(make("div","empty-state","No source-supported perspectives have been indexed yet. The editorial feeds are checked every week."));return}
  for(const x of featured){
   const card=make("article","editorial-card"),label=make("span","editorial-category",x.format||"Expert perspective");
-  const articleTitle=make("h3");articleTitle.append(btn(x.title,()=>goto("paper",id(x))));
+  const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x,92),()=>goto("paper",id(x))));
   const foot=make("div","editorial-foot");
   add(foot,make("span","",x.venue||"Original source"),btn("Explore ↗",()=>goto("paper",id(x)),"editorial-cta"));
-  add(card,label,articleTitle,make("p","",cut(x.reading?.overview||x.preview,205)),foot);root.append(card)
+  add(card,label,articleTitle,make("p","editorial-source-title",x.title),foot);root.append(card)
  }
 }
 
@@ -124,8 +124,8 @@ function renderPerspectives(){
     const item=make("article","perspective-item");
     const icon=make("div","perspective-glyph",x.source==="Official product documentation"?"◈":x.format==="Policy analysis"?"◇":"↗");
     const label=make("div","perspective-type",x.format||"Reporting & analysis");
-    const title=make("h3");title.append(btn(x.title,()=>goto("paper",id(x))));
-    const summary=make("p","",cut(x.editorial_notes?.argument||x.reading?.overview||x.preview,220));
+    const title=make("h3");title.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));
+    const summary=make("p","perspective-source-title",x.title);
     const bottom=make("div","perspective-bottom");
     add(bottom,make("span","",x.venue||"Original source"),btn("Read source notes ↗",()=>goto("paper",id(x)),"editorial-cta"));
     add(item,icon,label,title,summary,bottom);container.append(item);
