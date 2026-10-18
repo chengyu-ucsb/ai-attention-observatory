@@ -38,7 +38,7 @@ PUBLISHERS={
 }
 AI=re.compile(r"\b(?:ai|genai|chatgpt|copilot|generative|artificial intelligence|language models?|llms?|claude|algorithmic)\b",re.I)
 FOCUS=re.compile(r"\b(?:attention|focus|distraction|cognitive|offloading|thinking|think|mental effort|memory|learning|workflows?|interruption|notifications?|task.switching|mindful|productivity|deep work|wellbeing|well-being|autonomy)\b",re.I)
-NOISE=re.compile(r"stock (?:price|market)|share price|market cap|latest earnings|price target|football|crypto investment|gambling|celebrity|smartphone deal",re.I)
+NOISE=re.compile(r"stock (?:price|market)|share price|market cap|latest earnings|price target|football|crypto investment|gambling|celebrity|smartphone deal|focus on privacy|focuses on privacy|paying attention to (?:the|a|creative)|(?:ai|artificial intelligence).*museum|museum.*(?:ai|artificial intelligence)",re.I)
 def clean(s):
     s=html.unescape(re.sub(r"<[^>]+>"," ",s or ""))
     return re.sub(r"\s+"," ",s).strip()
@@ -92,7 +92,8 @@ def classify(title,desc):
 def eligible(item):
     title=item["title"]
     description=item["description"]
-    if len(title)<16 or NOISE.search(title):return False
+    if len(title)<16 or NOISE.search(title) or NOISE.search(description[:260]):return False
+    if re.search(r"focus on (?:privacy|market|revenue|policy|security|investment)|paying attention to",title+" "+description[:100],re.I):return False
     if item["date"] and item["date"]>TODAY.isoformat():return False
     body=title+" "+description
     # Require explicit discussion of AI and a human attention/cognition/product-design concept.
@@ -127,6 +128,8 @@ def to_record(item,publisher,format_label):
 def run():
     path=DIR/"library.json"
     data=json.loads(path.read_text())
+    # Remove earlier automatic editorial false positives; never remove manually curated work.
+    data=[r for r in data if r.get("source")!="Publisher RSS / Google News RSS" or eligible({"title":r.get("title",""),"description":r.get("preview",""),"date":r.get("published","")})]
     seen={url_key(x.get("url","")) for x in data if x.get("url")}
     seen_titles={re.sub("[^a-z0-9]","",(x.get("title") or "").lower())[:110] for x in data}
     added=[];errors=[];source_counts={}
