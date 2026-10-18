@@ -163,3 +163,69 @@
 .arrival-source-title{display:block;font-size:10px;font-weight:400;color:#8c7d80;line-height:1.4;margin-top:4px}
 .paper-insight{font-size:clamp(30px,3.5vw,47px);line-height:1.16;max-width:930px;margin:14px 0 23px}
 @media(max-width:650px){.feature-card,.feature-card.primary,.editorial-card,.perspective-item{min-height:205px}.feature-card h3.feature-idea,.feature-card.primary h3.feature-idea{font-size:24px}.paper-insight{font-size:34px}}
+
+
+/* The Attention Edit: editorial, visual, source-traceable weekly synthesis */
+.weekly-cover{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(220px,.7fr);align-items:center;gap:20px;border:1px solid #e6d6d1;background:#f7eae7;padding:37px 42px}
+.weekly-cover-copy h3{font:500 clamp(34px,3.6vw,50px)/1.08 var(--display);color:#3a282d;margin:12px 0 15px;max-width:780px}
+.weekly-cover-copy>p:not(.eyebrow){font-size:13px;line-height:1.75;color:#695558;max-width:660px}
+.weekly-cover-art{width:100%;max-width:320px;height:auto;justify-self:center}
+.weekly-cover-actions{display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-top:24px}
+.weekly-cover .weekly-scope{font-size:10px!important;color:#8d6c72!important;margin-top:23px}
+.weekly-signal-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:15px}
+.weekly-signal{border:1px solid #ead9d5;background:white;padding:19px 22px;min-height:165px;text-decoration:none;color:inherit}
+.weekly-signal:hover{background:#fff5f1;border-color:#cd8b92}
+.weekly-signal-symbol{font:500 32px var(--display);color:#b23d51;float:right}
+.weekly-signal-no{font-size:9px;letter-spacing:.09em;color:#ab5663;font-weight:800}
+.weekly-signal h4{font:500 23px/1.15 var(--display);margin:15px 0;color:#403238}
+.weekly-signal-arrow{font-size:10px;font-weight:800;color:var(--red)}
+.home-source-drawer{margin-top:17px;border-top:1px solid #eadeda;padding-top:14px}
+.home-source-drawer>summary{cursor:pointer;color:#a33d4f;font-size:11px;font-weight:750;list-style:none;padding:13px}
+.home-source-drawer>summary::-webkit-details-marker{display:none}
+.home-source-drawer .feature-grid{padding-top:15px}
+.issue-hero{background:#9f2e43;padding:65px 0 70px;color:#fff1eb;position:relative;overflow:hidden}
+.issue-hero:after{content:"◎";position:absolute;right:7%;top:0;font:500 325px/1 var(--display);color:#e6a7a2;opacity:.15;pointer-events:none}
+.issue-hero-wrap{position:relative;z-index:1}
+.issue-hero h1{font:500 clamp(45px,6vw,79px)/1.06 var(--display);max-width:980px;letter-spacing:-.025em;margin:20px 0}
+.issue-hero p:not(.eyebrow){font:400 17px/1.7 var(--display);max-width:810px;color:#f3d0ce}
+.issue-hero-actions{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:30px}
+.issue-layout{padding:52px 0 90px;max-width:1090px}
+.issue-letter{border-left:4px solid #a73e51;padding:19px 28px;background:#fcf8f6}
+.issue-letter>p:not(.eyebrow){font:400 clamp(18px,2vw,23px)/1.65 var(--display);color:#504047;max-width:900px;margin:15px 0 0}
+.issue-signals-section{margin-top:60px}
+.issue-signals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-top:20px}
+.issue-signal{border:1px solid #e9d9d6;border-top:4px solid #ae4959;background:#fff;padding:23px;display:flex;flex-direction:column}
+.issue-signal:nth-child(2){border-top-color:#d7a0a0}.issue-signal:nth-child(3){border-top-color:#9d7d87}
+.issue-signal-header{display:flex;justify-content:space-between;align-items:center;color:#a54152}
+.issue-signal-icon{font:500 36px/1 var(--display)}.issue-signal-no{font-size:9px;font-weight:800;letter-spacing:.1em}
+.issue-signal h3{font:500 25px/1.15 var(--display);color:#44343a;margin:22px 0 12px}
+.issue-signal>p{font-size:12px;line-height:1.8;color:#77666a;margin:0 0 20px}
+.issue-cited-label{font-size:9px;font-weight:800;color:#ad5665;letter-spacing:.06em;margin-top:auto;padding-top:15px;border-top:1px solid #eee1de}
+.issue-references{display:flex;gap:6px;flex-wrap:wrap;margin-top:11px}
+.issue-ref{border:1px solid #e6d8d4;background:#fcf7f5;color:#a23f50;font-size:10px;font-weight:700;line-height:1.4;padding:6px 8px;text-decoration:none;text-align:left;cursor:pointer}
+.issue-ref:hover{border-color:#b76574;background:#f5e4e4}
+.issue-extras{display:grid;grid-template-columns:1.1fr .9fr;gap:15px;margin-top:25px}
+.issue-tension,.issue-experiment{padding:26px;background:#f4e4e2}
+.issue-experiment{background:#f5f1ed}
+.issue-extras h2{font:500 30px/1.2 var(--display);color:#4a363d;margin:14px 0}
+.issue-extras p:not(.eyebrow){font-size:12px;line-height:1.75;color:#77686b}
+.issue-closing{border-bottom:1px solid #eddfdc;padding:37px 0 20px}
+.issue-closing>p:first-child{font:italic 500 clamp(25px,3vw,39px)/1.3 var(--display);color:#a33e50;margin:0}
+.issue-closing>p:last-child{font-size:10px;color:#938083;line-height:1.8;margin-top:19px}
+.issue-reading-shelf{margin-top:54px}
+.issue-reading-shelf>details{border:1px solid #e7d9d5}
+.issue-reading-shelf>details>summary{cursor:pointer;padding:18px 22px;color:#9b3850;font-weight:800;font-size:12px;list-style:none}
+.issue-reading-shelf>details>summary::-webkit-details-marker{display:none}
+.issue-sources{padding:10px 20px 25px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.issue-shelf-item{display:flex;gap:13px;padding:13px 0;border-top:1px solid #e9dcd9}
+.issue-shelf-number{font:500 23px var(--display);color:#b8898e;min-width:35px}
+.issue-shelf-content{min-width:0}
+.issue-shelf-content button,.issue-shelf-content a{font:500 13px/1.45 var(--display);color:#473339;text-decoration:none;border:0;background:none;text-align:left;padding:0;cursor:pointer}
+.issue-shelf-content button:hover,.issue-shelf-content a:hover{color:var(--red)}
+.issue-shelf-content p{color:#968689;font-size:10px;margin:6px 0}
+.issue-follow{display:flex;align-items:center;justify-content:space-between;gap:36px;background:#f9ede9;padding:32px 34px;margin-top:55px}
+.issue-follow h2{font:500 28px var(--display);margin:8px 0}
+.issue-follow p:not(.eyebrow){font-size:12px;line-height:1.6;color:#7a676a;max-width:620px}
+.issue-follow .quiet-link{font-size:10px;display:block;margin-top:12px}
+@media(max-width:950px){.issue-signals{grid-template-columns:1fr}.issue-signal{min-height:0}.issue-extras{grid-template-columns:1fr}.weekly-cover{grid-template-columns:1fr 220px;padding:25px}.weekly-cover-copy h3{font-size:34px}}
+@media(max-width:650px){.weekly-cover{grid-template-columns:1fr;padding:25px}.weekly-cover-art{max-width:230px}.weekly-signal-strip{grid-template-columns:1fr}.weekly-signal{min-height:0}.issue-hero{padding:45px 0}.issue-hero h1{font-size:45px}.issue-layout{padding:28px 0 60px}.issue-letter{padding:16px 19px}.issue-sources{grid-template-columns:1fr}.issue-follow{display:block;padding:23px}.issue-follow .button{margin-top:16px}}
