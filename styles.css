@@ -84,3 +84,24 @@
 .feature-card .source-meta{font-size:10px}
 .feature-card.primary,.feature-card{min-height:330px}
 @media(max-width:760px){.feature-card.primary,.feature-card{min-height:260px}}
+
+
+/* Research reading: scan-first study anatomy, with original excerpts on demand. */
+.paper-snapshot{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:16px}
+.snapshot-tile{background:#fff;border:1px solid #e7d8d6;border-top:3px solid #b55262;padding:17px 15px;min-width:0}
+.snapshot-tile:nth-child(2){border-top-color:#9c6c78}.snapshot-tile:nth-child(3){border-top-color:#d5a5a5}
+.snapshot-symbol{font:500 27px/1 var(--display);color:var(--red);margin-bottom:13px}
+.snapshot-kicker{color:#9e4050;font-weight:800;font-size:9px;letter-spacing:.08em;display:block;min-height:22px}
+.snapshot-tile p{font:500 11px/1.7 var(--sans);color:#5a4e51;margin:9px 0 0}
+.snapshot-tile.is-missing{background:#f9f7f5;border-top-color:#ded1ce}
+.snapshot-tile.is-missing .snapshot-symbol{color:#c3b7b4}
+.snapshot-tile.is-missing p{font-style:italic;color:#918688}
+.paper-detail-excerpts{background:white;border:1px solid #e7d8d6;margin:15px 0}
+.paper-detail-excerpts>summary{list-style:none;cursor:pointer;padding:16px 20px;color:var(--red);font-size:12px;font-weight:800;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.paper-detail-excerpts>summary::after{content:"+";font:500 21px/1 var(--display)}
+.paper-detail-excerpts[open]>summary::after{content:"−"}
+.paper-detail-excerpts>summary::-webkit-details-marker{display:none}
+.paper-detail-body{padding:0 15px 6px}
+.paper-detail-body .reading-section{border-left:0;border-right:0;border-bottom:1px solid #eee2df;margin-bottom:0}
+.paper-detail-body .reading-section:last-child{border-bottom:0}
+@media(max-width:680px){.paper-snapshot{grid-template-columns:1fr}.snapshot-tile{padding:14px 18px}.snapshot-symbol{display:inline-block;margin-bottom:0;margin-right:12px;vertical-align:middle}.snapshot-kicker{display:inline-block;vertical-align:middle;min-height:0}.snapshot-tile p{margin-top:7px}}
