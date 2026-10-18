@@ -114,11 +114,13 @@ def main():
    continue
   records[k]=x;new.append(x)
  collection=sorted(records.values(),key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)
+ week_start=(datetime.date.fromisoformat(TODAY)-datetime.timedelta(days=6)).isoformat()
+ week_items=[x for x in collection if x.get("first_seen","")>=week_start and not x.get("curated")]
  prior=read(DIR/"runs.json",[])
- run={"date":TODAY,"mode":os.environ.get("MODE","weekly"),"new":len(new),"total":len(collection),"candidates":len(candidates),"stats":dict(stats,errors=errors)}
+ run={"date":TODAY,"mode":os.environ.get("MODE","weekly"),"new":len(new),"total":len(collection),"candidates":len(candidates),"last_seven_days":len(week_items),"stats":dict(stats,errors=errors)}
  if not candidates and errors:raise SystemExit("Discovery did not return records: "+"; ".join(errors[:3]))
  (DIR/"library.json").write_text(json.dumps(collection,ensure_ascii=False,indent=2)+"\n")
- (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":diverse_week(new)},ensure_ascii=False,indent=2)+"\n")
+ (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":diverse_week(week_items)},ensure_ascii=False,indent=2)+"\n")
  (DIR/"runs.json").write_text(json.dumps([r for r in prior if r.get("date")!=TODAY][-51:]+[run],indent=2)+"\n")
  print(json.dumps(run,indent=2))
 if __name__=="__main__":main()
