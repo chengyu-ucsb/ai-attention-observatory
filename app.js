@@ -31,12 +31,28 @@ function home(){
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
  add(c,head,make("h3","",x.title),make("p","feature-quote",cut(excerpt(x),i===0?360:250)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),foot);root.append(c)});
  const alert=$("#research-warning"),errors=run.stats?.errors||[];alert.hidden=errors.length===0;if(errors.length)alert.textContent=errors.length+" discovery provider warning(s); see the repository Actions log.";
+ renderEditorial();
  topicBars("#topic-bars");donut();
  const grid=$("#lens-grid");grid.replaceChildren();themes.forEach(t=>{const a=link("","#library","lens");a.setAttribute("aria-label","Explore "+t[0]);a.onclick=e=>{e.preventDefault();$("#topic-filter").value=t[0];goto("library")};add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.published||"").localeCompare(a.published||"")).slice(0,7);
  for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(x.title,()=>goto("paper",id(x))));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
 }
+
+function renderEditorial(){
+ const list=S.records.filter(x=>x.kind==="nonacademic");
+ const featured=list.filter(x=>depth(x)!=="citation_only").sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||"")).slice(0,4);
+ const root=$("#editorial-grid");root.replaceChildren();
+ if(!featured.length){root.append(make("div","empty-state","No source-supported perspectives have been indexed yet. The editorial feeds are checked every week."));return}
+ for(const x of featured){
+  const card=make("article","editorial-card"),label=make("span","editorial-category",x.format||"Expert perspective");
+  const articleTitle=make("h3");articleTitle.append(btn(x.title,()=>goto("paper",id(x))));
+  const foot=make("div","editorial-foot");
+  add(foot,make("span","",x.venue||"Original source"),btn("Explore ↗",()=>goto("paper",id(x)),"editorial-cta"));
+  add(card,label,articleTitle,make("p","",cut(x.reading?.overview||x.preview,205)),foot);root.append(card)
+ }
+}
+
 function showLibrary(){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value;
  const xs=S.records.filter(x=>(!q||[x.title,x.venue,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,(x.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!t||x.lane===t)&&(!k||x.kind===k)&&(d==="all"||(d==="full_text"?depth(x)==="full_text":depth(x)!=="citation_only"))).sort((a,b)=>(b.published||"").localeCompare(a.published||"")||rank(b)-rank(a));
@@ -112,5 +128,6 @@ async function init(){
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
 ["search","topic-filter","depth-filter","type-filter"].forEach(s=>$("#"+s).addEventListener(s==="search"?"input":"change",showLibrary));
+$("#browse-editorial").addEventListener("click",e=>{e.preventDefault();$("#type-filter").value="nonacademic";$("#depth-filter").value="all";goto("library")});
 window.addEventListener("hashchange",route);
 init();
