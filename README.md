@@ -2,6 +2,18 @@
 
 A public-facing research discovery and reading room curated by [Chengyu Fang](https://chengyufang.org/). It tracks how AI influences attention, cognitive offloading and sustained engagement, together with possible interventions and relevant adjacent research.
 
+## October 2026 — Public redesign
+
+The site now combines three complementary directions:
+
+1. **Editorial Observatory:** a crimson, magazine-like public homepage centered on three source-backed weekly readings rather than lists of unverified article titles.
+2. **Evidence Atlas:** live visual charts and tables generated from the published index, showing topic coverage, publication years, source types and the depth of accessible material. Counts describe the index, not causal effects or the state of the entire field.
+3. **Experimental Lab:** clearly labeled early-stage **interactive design explorations**, including a focus-intention timer, progressive thinking prompts, and an interruption re-entry checkpoint. They do not communicate with AI APIs, collect user data or claim measured effectiveness.
+
+The reading pages retain article methods, reported findings, limitations and source attributions when these exist. All other sections distinguish abstract-derived text from full-text extracts and bibliographic records.
+
+**Site:** https://chengyu-ucsb.github.io/ai-attention-observatory/ (project-specific GitHub Pages address).
+
 ## What the site offers
 
 - **This week:** latest indexed papers and reporting, key-idea excerpts, topic counts, and a publication timeline.

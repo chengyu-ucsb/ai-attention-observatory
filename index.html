@@ -1,109 +1,212 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light">
-<meta name="description" content="Independent research on AI, attention fragmentation, cognitive offloading, and focus-supporting interventions. Updated weekly.">
-<title>AI & Attention Observatory — A research reading room</title>
-<link rel="stylesheet" href="styles.css">
-<link rel="alternate" type="application/rss+xml" title="AI & Attention Research" href="feed.xml">
-<script src="app.js" defer></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#a22c3b">
+  <meta name="description" content="An open research observatory on artificial intelligence, attention, cognitive effort, and the tools that could help us stay focused.">
+  <title>Attention / AI · The Research Observatory</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="alternate" type="application/rss+xml" title="AI & Attention Observatory weekly sources" href="feed.xml">
+  <script src="app.js" defer></script>
 </head>
 <body>
-<header class="masthead">
- <div class="wrap">
-  <a class="brand" href="#weekly"><span class="brand-mark" aria-hidden="true">a</span><span>ATTENTION / AI <small>THE RESEARCH OBSERVATORY</small></span></a>
-  <nav class="mast-nav" aria-label="Site navigation">
-   <a href="#weekly" data-nav="weekly" class="active">This week</a>
-   <a href="#library" data-nav="library">Research library</a>
-   <a href="#about" data-nav="about">About this project</a>
-  </nav>
-  <a class="mast-contact" href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">Chengyu Fang ↗</a>
- </div>
-</header>
-<section class="topband">
- <div class="wrap top-inner">
-  <div>
-   <div class="eyebrow">AN OPEN RESEARCH NOTEBOOK · AI & HUMAN COGNITION</div>
-   <h1>The future of <em>attention.</em></h1>
-   <p>What artificial intelligence changes about the way we focus, think, and work—and which tools might help. A growing record of research, competing explanations, and practical interventions.</p>
-  </div>
-  <div class="ornament" aria-hidden="true"><span>↗</span></div>
- </div>
-</section>
-<div class="wrap microbar"><span><strong id="index-date">Checking the index…</strong> <span id="index-caption">Weekly scholarly and media discovery</span></span><span><strong id="total-count">—</strong> indexed items</span></div>
-<main class="main wrap">
- <div class="warning" id="load-error" hidden role="alert"></div>
- <section data-view id="weekly">
-  <header class="intro">
-   <div>
-    <div class="eyebrow" id="issue-kicker">CURRENT ISSUE</div>
-    <h2 id="issue-heading">What changed this week?</h2>
-    <p id="issue-deck">Recent findings, noteworthy arguments, and tools from the research archive.</p>
-   </div>
-   <span class="issue-date" id="updated-label"></span>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="identity" href="#home" aria-label="Attention / AI home">
+        <span class="identity-mark" aria-hidden="true">a<span>·</span></span>
+        <span class="identity-text"><strong>ATTENTION / AI</strong><small>THE RESEARCH OBSERVATORY</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="#home" data-route="home">Overview</a>
+        <a href="#library" data-route="library">Explore research</a>
+        <a href="#atlas" data-route="atlas">Evidence atlas</a>
+        <a href="#lab" data-route="lab">Experimental Lab <span style="font-size:9px;color:#a52c3e">↗</span></a>
+        <a href="#about" data-route="about">About</a>
+      </nav>
+      <a class="header-link" href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">By Chengyu Fang <span aria-hidden="true">↗</span></a>
+    </div>
   </header>
-  <div class="home-grid">
-   <div><div id="weekly-items" class="journal"></div></div>
-   <aside class="side" aria-label="Research overview">
-    <section class="aside-box ink">
-     <div class="eyebrow">REPORTED IN THE SOURCES</div>
-     <h3>Findings at a glance</h3>
-     <p class="muted">Attributed passages from abstracts or permitted full-text sections. Open each research card to inspect the evidence.</p>
-     <div id="weekly-points"></div>
+
+  <main id="main">
+    <section id="home" class="view">
+      <div class="hero">
+        <div class="shell hero-grid">
+          <div class="hero-copy">
+            <p class="eyebrow light">AN OPEN RESEARCH OBSERVATORY <span class="small-diamond">◆</span> UPDATED WEEKLY</p>
+            <h1>Where attention meets <em>intelligence.</em></h1>
+            <p class="hero-sub">Does AI help us think more deeply—or make it easier to stop thinking? Follow the research on focus, fragmented attention, cognitive offloading, and what might help.</p>
+            <div class="hero-actions">
+              <a class="button button-light" href="#library">Explore the research <span>↗</span></a>
+              <a class="hero-secondary" href="#atlas">See the evidence map <span>↗</span></a>
+            </div>
+            <div class="hero-credit"><span class="hero-credit-line"></span> Research on the relationship between humans, technology, and attention</div>
+          </div>
+          <div class="hero-visual" aria-hidden="true">
+            <svg viewBox="0 0 540 470" role="img" focusable="false" aria-label="Abstract illustration of a focal point surrounded by fragmented and connected circles">
+              <defs><radialGradient id="glow" cx="50%" cy="50%"><stop offset="0%" stop-color="#fff2e8" stop-opacity=".31"/><stop offset="100%" stop-color="#fff2e8" stop-opacity="0"/></radialGradient></defs>
+              <circle cx="275" cy="224" r="212" fill="url(#glow)"/>
+              <g stroke="#f8d5cb" stroke-opacity=".42" fill="none">
+                <circle cx="276" cy="227" r="180" stroke-dasharray="3 8"/><circle cx="276" cy="227" r="137"/>
+                <circle cx="276" cy="227" r="97" stroke-dasharray="2 9"/><circle cx="276" cy="227" r="50"/>
+                <path d="M94 110Q270 20 438 129M72 290Q280 420 485 286M174 66Q470 219 367 418" opacity=".55"/>
+              </g>
+              <g stroke="#ffd8cf" stroke-width="1.3" opacity=".75">
+                <path d="M276 227L121 100M276 227L394 97M276 227L462 223M276 227L379 391M276 227L134 361M276 227L85 252"/>
+                <path d="M121 100L77 155M394 97L447 140M379 391L443 365M134 361L113 414" opacity=".6"/>
+              </g>
+              <g fill="#fbd9cf">
+                <circle cx="121" cy="100" r="7"/><circle cx="394" cy="97" r="10"/><circle cx="462" cy="223" r="7"/><circle cx="379" cy="391" r="9"/><circle cx="134" cy="361" r="8"/><circle cx="85" cy="252" r="5"/>
+                <circle cx="77" cy="155" r="4"/><circle cx="447" cy="140" r="5"/><circle cx="443" cy="365" r="5"/><circle cx="113" cy="414" r="4"/>
+              </g>
+              <circle cx="276" cy="227" r="65" fill="#f6d7cb" opacity=".13"/>
+              <circle cx="276" cy="227" r="38" fill="#ffe5d7"/>
+              <circle cx="276" cy="227" r="21" fill="#ac2e3f"/>
+              <circle cx="276" cy="227" r="5" fill="#fff5ed"/>
+              <g fill="#fff0e6" font-family="Arial,sans-serif" font-size="10" letter-spacing="2.6"><text x="61" y="80">DISTRACTION</text><text x="368" y="67">FOCUS</text><text x="383" y="418">RECOVERY</text><text x="49" y="385">COGNITION</text></g>
+            </svg>
+            <div class="visual-caption">A visual metaphor for the dynamics of attention, not an empirical model.</div>
+          </div>
+        </div>
+      </div>
+
+      <section class="issue-strip">
+        <div class="shell issue-inner">
+          <div class="issue-kicker"><span class="pulse-dot"></span><span id="issue-label">LOADING THE LATEST INDEX</span></div>
+          <div id="issue-meta">Searching indexed research…</div>
+          <a href="feed.xml" class="issue-rss">Follow the weekly feed ↗</a>
+        </div>
+      </section>
+
+      <section class="shell home-edition pad-top">
+        <div class="section-heading">
+          <div><p class="eyebrow">01 / THE WEEKLY EDIT</p><h2>What's new in the research<span class="red-period">.</span></h2><p class="section-deck">A short reading list, selected for relevance and available evidence rather than volume.</p></div>
+          <a class="quiet-link" href="#library">Browse all sources <span>↗</span></a>
+        </div>
+        <div id="feature-grid" class="feature-grid"><div class="loading">Loading this week's reading selection…</div></div>
+        <div id="research-warning" class="service-alert" hidden role="status"></div>
+      </section>
+
+      <section class="shell glance-section">
+        <div class="section-heading"><div><p class="eyebrow">02 / RESEARCH AT A GLANCE</p><h2>See the landscape<span class="red-period">.</span></h2><p class="section-deck">These are counts from the observatory's collection, not estimates of all published research.</p></div><a class="quiet-link" href="#atlas">Explore the atlas ↗</a></div>
+        <div class="glance-grid">
+          <div class="visual-panel topic-panel">
+            <div class="panel-header"><h3>Where the literature clusters</h3><span class="tiny-label">INDEXED SOURCES BY THEME</span></div>
+            <div id="topic-bars" class="topic-bars"></div>
+            <div class="panel-foot">Select a theme to explore its sources <span aria-hidden="true">↗</span></div>
+          </div>
+          <div class="visual-panel depth-panel">
+            <div class="panel-header"><h3>How much can we actually read?</h3><span class="tiny-label">SOURCE COVERAGE</span></div>
+            <div class="donut-row"><div id="evidence-donut" class="donut" aria-label="Distribution of reading material" role="img"><div class="donut-center"><strong id="record-count">–</strong><span>records</span></div></div><div id="depth-legend" class="depth-legend"></div></div>
+            <div class="panel-foot">Coverage is not a measure of research quality.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="soft-section">
+        <div class="shell">
+          <div class="section-heading"><div><p class="eyebrow">03 / FOUR LENSES</p><h2>The questions shaping the field<span class="red-period">.</span></h2></div></div>
+          <div class="lenses-grid" id="lens-grid"></div>
+        </div>
+      </section>
+
+      <section class="shell lab-teaser"><div class="lab-teaser-inner"><div><p class="eyebrow">FROM RESEARCH TO DESIGN / EXPERIMENTAL</p><h2>What might an attention-supporting app actually do?</h2><p>Explore tentative product concepts for focus scaffolding, recovering from interruptions, and more deliberate AI use. These are interactive design sketches, not evidence-based treatments.</p></div><a href="#lab" class="button button-red">Visit the Experimental Lab ↗</a></div></section>
+      <section class="shell arrivals-section">
+        <div class="section-heading"><div><p class="eyebrow">04 / FROM THE INDEX</p><h2>Recently added<span class="red-period">.</span></h2></div><a class="quiet-link" href="#library">Search the full library ↗</a></div>
+        <div class="table-scroll"><table class="arrival-table"><thead><tr><th>Published</th><th>Research / article</th><th>Theme</th><th>Coverage</th><th class="align-right">Read</th></tr></thead><tbody id="arrivals-body"></tbody></table></div>
+      </section>
+
+      <section class="shell follow-section">
+        <div class="follow-art" aria-hidden="true"><span>◎</span><i></i><i></i><i></i></div>
+        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>One considered update<br>at a time.</h2><p>Follow newly indexed research every week. RSS works today; an email newsletter isn't connected yet.</p></div>
+        <div class="follow-actions"><a class="button button-light" href="feed.xml">Subscribe with RSS ↗</a><a class="button button-outline-light" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20newsletter">Ask about email updates ↗</a></div>
+      </section>
     </section>
-    <section class="aside-box">
-     <div class="eyebrow">RESEARCH LANDSCAPE</div>
-     <h3>This update, by theme.</h3>
-     <p class="side-copy">Counts refer to indexed records, not scholarly quality or evidence strength.</p>
-     <div class="distribution" id="distribution"></div>
-     <div class="aside-stat" id="source-tally"></div>
+
+    <section id="library" class="view" hidden>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">THE FULL RESEARCH INDEX / 02</p><h1>A library for thinking <em>clearly.</em></h1><p>Discover studies, commentary, and emerging interventions. Open an article's reading page before leaving for the source.</p></div></div>
+      <div class="shell library-section">
+        <div class="library-controls">
+          <label class="search-wrap"><span class="search-glyph">⌕</span><input id="search" type="search" autocomplete="off" placeholder="Search research topics, methods, or findings…" aria-label="Search research"></label>
+          <select id="topic-filter" aria-label="Choose a research theme"><option value="">All themes</option><option>AI & cognition</option><option>Fragmentation</option><option>Interventions</option><option>Technology & society</option></select>
+          <select id="depth-filter" aria-label="Choose research material depth"><option value="readable">Readable summaries</option><option value="full_text">Full-text excerpt available</option><option value="all">Include citations only</option></select>
+          <select id="type-filter" aria-label="Choose source type"><option value="">All source types</option><option value="scholarly">Academic research</option><option value="nonacademic">Commentary & technology</option></select>
+        </div>
+        <div class="library-count" id="library-count"></div>
+        <div id="library-results" class="library-results"></div>
+      </div>
     </section>
-    <section id="run-alert" class="warning" hidden></section>
-    <section class="aside-box">
-     <div class="eyebrow">EVIDENCE MATTERS</div>
-     <h3>Read the research, not just the headline.</h3>
-     <p class="side-copy">We separate evidence based on full-text sections, abstracts, and citations. Findings are quoted or extracted from available material, not inferred from a title or topic.</p>
-     <a class="text-link" href="#about">How to interpret the evidence ↗</a>
+
+    <section id="atlas" class="view" hidden>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">EVIDENCE ATLAS / 03</p><h1>Patterns, not <em>pronouncements.</em></h1><p>Explore the observatory's coverage across topics, publication years, and accessible source material.</p></div></div>
+      <div class="shell atlas-section">
+        <div class="atlas-stat-row" id="atlas-stats"></div>
+        <div class="atlas-grid">
+          <div class="visual-panel atlas-topic"><div class="panel-header"><h3>Research themes</h3><span class="tiny-label">BASED ON INDEX TAGS</span></div><div id="atlas-topic-bars"></div></div>
+          <div class="visual-panel atlas-years"><div class="panel-header"><h3>Publication timeline</h3><span class="tiny-label">INDEXED ITEMS BY YEAR</span></div><div id="year-chart"></div><p class="chart-note">Counts reflect collection coverage and discovery history, not the growth rate of the field.</p></div>
+          <div class="visual-panel atlas-coverage"><div class="panel-header"><h3>What the index contains</h3><span class="tiny-label">READING DEPTH</span></div><div id="atlas-depth"></div></div>
+          <div class="visual-panel atlas-matrix"><div class="panel-header"><h3>Theme × accessible evidence</h3><span class="tiny-label">RECORD COUNTS</span></div><div class="table-scroll"><table id="matrix-table" class="matrix-table"></table></div></div>
+        </div>
+        <div class="atlas-note">All charts are calculated from the saved index. Categories and labels are screening aids; they do not establish causality, generalizability, or the overall strength of the literature.</div>
+      </div>
     </section>
-   </aside>
-  </div>
-  <section class="subscribe" id="follow">
-   <div><div class="eyebrow">NEVER MISS AN UPDATE</div><h2>Read what matters, once a week.</h2><p>RSS updates automatically. Email delivery isn't active yet, but you can request an invitation when it launches.</p></div>
-   <div class="subscribe-actions">
-    <a class="button primary" href="feed.xml">Subscribe via RSS ↗</a>
-    <a class="button" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20email%20updates">Request email access ↗</a>
-   </div>
-  </section>
- </section>
- <section data-view id="library" hidden>
-  <header class="library-top">
-   <div class="eyebrow">THE RESEARCH ARCHIVE / 02</div>
-   <h2>Browse the evidence.</h2>
-   <p>Explore scholarly papers, practical technologies, and carefully identified commentary. Open a reading card first; the original source is always one click away.</p>
-  </header>
-  <div class="library-controls">
-   <input id="search" type="search" placeholder="Search attention, AI, cognitive offloading…" aria-label="Search the library">
-   <select id="topic-filter" aria-label="Filter by research theme"><option value="">All research themes</option><option value="AI & cognition">AI & cognition</option><option value="Fragmentation">Fragmentation</option><option value="Interventions">Interventions</option><option value="Technology & society">Technology & society</option></select>
-   <select id="type-filter" aria-label="Filter by material type"><option value="">All material types</option><option value="scholarly">Research papers</option><option value="nonacademic">Commentary and technology</option></select>
-   <select id="depth-filter" aria-label="Filter by content availability"><option value="readable">Summaries available</option><option value="all">Include citation-only entries</option><option value="full_text">Full-text excerpts only</option></select>
-  </div>
-  <div class="results-head"><span id="result-count">Loading sources…</span><span>Newest first · click any title</span></div>
-  <div class="library-grid" id="library-items"></div>
- </section>
- <section data-view id="read" hidden class="reading-shell"><div id="article-content"></div></section>
- <section data-view id="about" hidden>
-  <div class="eyebrow">ABOUT THE OBSERVATORY / 03</div>
-  <h2 class="about-title">An evolving research map.</h2>
-  <div class="about-grid">
-   <div class="about-card"><h3>What we're tracking.</h3><p>This project follows how AI and digital systems affect attention allocation, cognitive offloading, sustained focus and critical thinking, together with design interventions that might protect these capacities.</p><p>Direct AI studies and adjacent research on notifications or multitasking are deliberately distinguished.</p></div>
-   <div class="about-card"><h3>What a research card means.</h3><p>Automated records are screened using source metadata. Some open-access papers contain short, labeled excerpts from licensed full-text sections. Concept diagrams are interpretive aids, not reported effect sizes or faithful reconstructions of original figures.</p><p>Always open and evaluate the full publication before treating a result as established.</p></div>
-   <div class="about-card"><h3>Updates & storage.</h3><p>OpenAlex, Crossref, and news RSS are queried each week. The update date records the most recent successful indexing run, not a real-time web search. Source errors can mean partial coverage. The open repository stores metadata and short excerpts rather than publisher PDFs.</p><p><a class="text-link" href="https://github.com/chengyu-ucsb/ai-attention-observatory" target="_blank" rel="noopener noreferrer">View source code and update history ↗</a></p></div>
-   <div class="about-card"><h3>About the editor.</h3><p>Created by Chengyu Fang, a communication researcher interested in how emerging technologies reshape cognition, collaboration and professional work.</p><p><a class="text-link" href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">Personal website ↗</a><br><a class="text-link" href="mailto:fangcu@ucmail.uc.edu">Get in touch ↗</a><br><a class="text-link" href="feed.xml">Subscribe to RSS ↗</a></p></div>
-  </div>
-  <p class="notice">This is an exploratory, open research resource—not a systematic review, comprehensive database, or clinical intervention recommendation.</p>
- </section>
-</main>
-<footer class="footer"><div class="wrap"><div class="footer-left">© 2026 · AI & ATTENTION OBSERVATORY · CHENGYU FANG</div><div><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">Personal website</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a><a href="feed.xml">RSS</a><a href="https://github.com/chengyu-ucsb/ai-attention-observatory" target="_blank" rel="noopener noreferrer">GitHub</a></div></div></footer>
-</body></html>
+
+    <section id="paper" class="view" hidden><div class="shell paper-page"><div id="paper-content"></div></div></section>
+
+
+    <section id="lab" class="view" hidden>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">EXPERIMENTAL LAB / EARLY-STAGE CONCEPTS</p><h1>Design for <em>deliberate attention.</em></h1><p>Research-inspired interaction sketches for a possible future app. Try the mechanics, think through the trade-offs, and help shape the next iteration.</p></div></div>
+      <div class="shell">
+        <p class="lab-intro">The goal isn't another app that simply demands more productivity. These prototypes explore how interfaces might support self-directed focus, reflection, and recovery after interruptions. They are deliberately small and designed for exploration—not validated as interventions.</p>
+        <div class="lab-concept-notice"><strong>Prototype status:</strong> Experimental, browser-based demos. They do not monitor your real attention, access AI services, or submit text to a server. The exercises have not been tested for effectiveness.</div>
+        <div class="lab-grid">
+          <article class="lab-card">
+            <div class="lab-number">01 <span class="lab-chip">FOCUS SCAFFOLDING</span></div><h2>Focus Sprint</h2>
+            <p>Convert an open-ended work session into a clear intention and a short block of uninterrupted time. A focus timer is a design experiment, not proof that timing improves cognition.</p>
+            <div class="lab-workspace">
+              <label for="focus-task">What deserves your attention right now?</label><input id="focus-task" type="text" maxlength="130" placeholder="e.g., outline my paper's argument">
+              <div class="lab-row" role="group" aria-label="Choose a focus duration"><button class="lab-choice selected" data-duration="10">10 min</button><button class="lab-choice" data-duration="20">20 min</button><button class="lab-choice" data-duration="30">30 min</button></div>
+              <div class="lab-screen"><div class="lab-time" id="focus-timer" aria-live="off">10:00</div><p class="lab-caption" id="focus-caption">A small commitment to one task</p></div>
+              <div class="lab-row"><button class="lab-action" id="focus-toggle">Start focus session</button><button class="lab-outline" id="focus-reset">Reset</button></div>
+            </div>
+          </article>
+          <article class="lab-card">
+            <div class="lab-number">02 <span class="lab-chip">COGNITIVE AUTONOMY</span></div><h2>Think before delegating</h2>
+            <p>What if an AI assistant helped you work toward an answer instead of immediately providing it? This demonstration progressively reveals prompts, not AI-generated answers.</p>
+            <div class="lab-workspace">
+              <p class="eyebrow">SAMPLE THINKING TASK</p><p style="font-size:13px;color:var(--ink)">Why might using AI to summarize readings change what students remember?</p>
+              <div class="lab-row" role="group" aria-label="Choose level of assistance"><button class="lab-choice selected" data-scaffold="1">Reflect</button><button class="lab-choice" data-scaffold="2">Hint</button><button class="lab-choice" data-scaffold="3">Outline</button></div>
+              <div class="lab-response" id="scaffold-output" aria-live="polite">Before seeking an explanation, write down one mechanism you suspect is involved. What would count as evidence for it?</div>
+            </div>
+          </article>
+          <article class="lab-card">
+            <div class="lab-number">03 <span class="lab-chip">INTERRUPTION RECOVERY</span></div><h2>Return Point</h2>
+            <p>A lightweight checkpoint preserves where you were and your very next action, so you have somewhere to return after a distraction. Your text remains in this page's temporary state.</p>
+            <div class="lab-workspace">
+              <label for="resume-context">What are you working on?</label><textarea id="resume-context" rows="2" maxlength="250" placeholder="A sentence describing your current task"></textarea>
+              <label for="resume-next" style="margin-top:12px">What's your very next step?</label><input id="resume-next" maxlength="180" placeholder="One concrete next action">
+              <div class="lab-row"><button class="lab-action" id="resume-save">Save checkpoint</button><button class="lab-outline" id="resume-interrupt" disabled>Simulate interruption</button><button class="lab-outline" id="resume-restore" disabled>Resume</button></div>
+              <div class="lab-response" id="resume-output" aria-live="polite">Write your checkpoint, then simulate a distraction to see how an attention re-entry cue could work.</div>
+            </div>
+          </article>
+        </div>
+        <section class="lab-hypothesis"><p class="eyebrow">PRODUCT HYPOTHESES / UNTESTED</p><h2>Three ideas worth studying.</h2><p><strong>Voluntary structure:</strong> Would a lightweight focus intention reduce context switching without becoming another interruption? <strong>Graduated assistance:</strong> Could choosing hints before finished answers encourage active reasoning? <strong>Re-entry cues:</strong> Do captured next steps reduce the effort of resuming work after interruption? These are research questions, not demonstrated benefits.</p><a class="quiet-link" href="mailto:fangcu@ucmail.uc.edu?subject=Attention%20Observatory%20Experimental%20Lab">Share thoughts or collaborate ↗</a></section>
+      </div>
+    </section>
+
+    <section id="about" class="view" hidden>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">ABOUT & METHODOLOGY / 04</p><h1>Making attention <em>legible.</em></h1><p>A public reading room for a fast-moving research problem, not a replacement for critical evaluation of the original literature.</p></div></div>
+      <div class="shell about-grid">
+        <div class="about-lead"><p class="eyebrow">WHY THIS EXISTS</p><h2>Less noise. Better questions. More substantive evidence.</h2><p>AI is changing the conditions under which people work, learn, and direct attention. This observatory brings together empirical studies, conceptual scholarship, interventions, and strong public commentary while preserving the differences between them.</p><a class="button button-red" href="#library">Explore the collection ↗</a></div>
+        <div class="about-steps"><div><span>01</span><section><h3>Discover</h3><p>Search metadata from OpenAlex and Crossref and curated news RSS every week; record update dates and deduplicate results.</p></section></div><div><span>02</span><section><h3>Read what is available</h3><p>Retrieve abstracts and permitted open-access text when accessible. Article cards identify whether claims come from abstracts, full text, or citation-only metadata.</p></section></div><div><span>03</span><section><h3>Show limits</h3><p>Study excerpts are automatically selected rather than expert-reviewed. Lack of an abstract is not evidence of an absent method or result; diagrams illustrate concepts, not measured effects.</p></section></div><div><span>04</span><section><h3>Keep updating</h3><p>Scheduled workflows maintain the public bibliography and an RSS feed. Automation may be affected by source outages or rate limits, so the latest successful index date is displayed.</p></section></div></div>
+      </div>
+      <section class="shell about-contact"><div><p class="eyebrow">EDITOR & COLLABORATION</p><h2>Chengyu Fang</h2><p>Communication scholar interested in human cognition, technology-mediated collaboration, and emerging forms of organizing.</p></div><div class="about-contact-links"><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">Personal website ↗</a><a href="mailto:fangcu@ucmail.uc.edu">Get in touch ↗</a><a href="https://github.com/chengyu-ucsb/ai-attention-observatory" target="_blank" rel="noopener noreferrer">Open-source project ↗</a></div></section>
+    </section>
+  </main>
+
+  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">a<span>·</span></span><div><strong>ATTENTION / AI</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#library">Research library</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Data is an automatically maintained discovery aid, not a systematic review.</div></div></footer>
+  <div class="toast" id="site-toast" hidden role="status"></div>
+</body>
+</html>
