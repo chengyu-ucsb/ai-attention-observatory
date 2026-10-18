@@ -12,7 +12,7 @@ for(const id of ["play-switch","play-recovery","play-assist","switch-start","swi
  assert(html.includes('id="'+id+'"'),"Missing expected Lab DOM id: "+id);
 }
 const usedIds=[...js.matchAll(/\$\("#([^"]+)"\)/g)].map(x=>x[1]);
-for(const id of new Set(usedIds))assert(html.includes('id="'+id+'"'),"Lab script selects nonexistent id "+id);
+for(const id of new Set(usedIds)){const pure=id.split(" ")[0];assert(html.includes('id="'+pure+'"'),"Lab script selects nonexistent id "+pure)}
 const all=[],ids={};
 class FakeElement{
  constructor(tag="div",cls="",id=null){
