@@ -234,6 +234,31 @@ function processedIdea(x){
  return shortIdea(x,145);
 }
 function conceptArtwork(x){
+ const doi=(x.doi||"").toLowerCase();
+ if(doi==="10.3389/feduc.2026.1861548"){
+  const w=make("section","article-concept-art");
+  add(w,make("p","eyebrow","VISUALIZED FINDING / THREE LEARNER PROFILES"),make("h3","figure-insight-title","Not all AI reliance looks alike"));
+  const row=make("div","profile-visual");
+  [
+   ["01","Engaged & literate","Monitoring alongside reliance"],
+   ["02","Uncritical reliant","Heavy reliance, limited monitoring"],
+   ["03","Skeptical minimal","Limited use, but reliance when engaged"]
+  ].forEach(([num,title,descr])=>add(row,add(make("div","profile-visual-card"),make("span","profile-number",num),make("strong","",title),make("p","",descr))));
+  add(w,row,make("p","concept-note","Source-grounded visualization of three profiles identified by the reported cluster analysis. Card sizes do not indicate their prevalence."));
+  return w;
+ }
+ if(doi==="10.3389/fpsyg.2026.1920947"){
+  const w=make("section","article-concept-art");
+  add(w,make("p","eyebrow","VISUALIZED METHOD / QUALITATIVE CODING"),make("h3","figure-insight-title","From initial codes to broader categories"));
+  const row=make("div","categories-visual"),left=make("div","categories-count"),right=make("div","categories-count");
+  const dots=make("div","categories-dots");for(let i=0;i<19;i++)dots.append(make("i",""));
+  add(left,make("strong","","19"),make("span","","Initial categories"),dots);
+  const main=make("div","categories-dots categories-dots-big");for(let i=0;i<5;i++)main.append(make("i",""));
+  add(right,make("strong","","5"),make("span","","Main categories"),main);
+  add(row,left,make("span","categories-direction","→"),right);
+  add(w,row,make("p","concept-note","The extracted Results section reports 19 initial categories organized into five main categories. This is a numerical summary, not a recreation of the study's model figure."));
+  return w;
+ }
  const tags=(x.reading?.digest?.tags||[]).slice(0,3);
  const wrapper=make("section","article-concept-art");
  add(wrapper,make("p","eyebrow","CONCEPT MAP / ORIENTATION, NOT A STUDY FIGURE"));
