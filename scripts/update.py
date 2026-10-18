@@ -54,6 +54,26 @@ def discover(days=60):
    stats["crossref"]+=len(result.get("message",{}).get("items",[]))
   except Exception as e:errors.append("Crossref "+lane+": "+str(e)[:130])
   time.sleep(.3)
+ # News RSS is metadata discovery, not endorsement or full-text analysis.
+ import xml.etree.ElementTree as ET
+ for query,lane in [("AI attention cognitive offloading","AI & cognition"),("AI distraction focus attention technology","Fragmentation"),("artificial intelligence digital wellbeing attention tools","Interventions")]:
+  url="https://news.google.com/rss/search?"+urllib.parse.urlencode({"q":query+" when:30d","hl":"en-US","gl":"US","ceid":"US:en"})
+  try:
+   req=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; AIAttentionObservatory/1.1)"})
+   with urllib.request.urlopen(req,timeout=20) as r:root=ET.fromstring(r.read())
+   for item in root.findall(".//item")[:30]:
+    title=(item.findtext("title") or "").strip()
+    link=(item.findtext("link") or "").strip()
+    pub=(item.findtext("pubDate") or "").strip()
+    desc=re.sub("<[^>]+>"," ",item.findtext("description") or "").strip()
+    if not title or not link or not KEYWORDS.search(title+" "+desc):continue
+    try:
+     from email.utils import parsedate_to_datetime
+     pub=parsedate_to_datetime(pub).date().isoformat()
+    except (TypeError,ValueError):pub=""
+    found.append({"title":title,"authors":[],"published":pub,"venue":(item.findtext("source") or "News RSS"),"doi":"","url":link,"preview":desc[:500] or "News headline indexed via RSS; article not independently reviewed.","kind":"nonacademic","lane":lane,"relation":"AI-related literature","evidence":"News / commentary (not reviewed)","source":"Google News RSS","curated":False,"first_seen":TODAY})
+    stats["news_rss"]=stats.get("news_rss",0)+1
+  except Exception as e:errors.append("News RSS: "+str(e)[:130])
  return found,errors,stats
 def main():
  DIR.mkdir(exist_ok=True)
