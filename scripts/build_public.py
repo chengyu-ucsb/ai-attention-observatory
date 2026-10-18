@@ -6,6 +6,7 @@ The public website, news feed, metrics, and recommended items use only this proj
 from __future__ import annotations
 import json
 from pathlib import Path
+from condense_readings import annotate
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
@@ -26,7 +27,7 @@ def record_id(x):
 
 def build():
     all_records=json.loads((DATA/"library.json").read_text())
-    selected=[x for x in all_records if readable(x)]
+    selected=[annotate(x) for x in all_records if readable(x)]
     selection_ids={record_id(x) for x in selected}
     week=json.loads((DATA/"weekly.json").read_text())
     # Weekly source entries are snapshots and may be older than the final enrichment.
