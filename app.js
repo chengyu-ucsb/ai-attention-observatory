@@ -157,7 +157,7 @@ function lab(){
  $("#resume-restore").onclick=()=>{if(!S.checkpoint)return;$("#resume-context").value=S.checkpoint.task;$("#resume-next").value=S.checkpoint.next;$("#resume-output").textContent="Your task: "+S.checkpoint.task+"\nYour next step: "+S.checkpoint.next;$("#resume-interrupt").disabled=false;$("#resume-restore").disabled=true};
 }
 async function init(){
- lab();
+ // The Experimental Lab initializes independently in lab-play.js.
  try{
   const rs=await Promise.all(["data/library.json","data/weekly.json","data/runs.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
