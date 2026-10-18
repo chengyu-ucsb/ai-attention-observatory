@@ -64,7 +64,6 @@ def main():
         try:
             work=json.loads(get("https://api.openalex.org/works/"+doi,key))
             # Record a completed lookup, not an attempted lookup that may fail transiently.
-            r["oa_grobid_checked"]=TODAY
             oa=work.get("best_oa_location") or {}
             href=oa.get("landing_page_url") or oa.get("pdf_url")
             if href and href.startswith("https://"):r["open_access_url"]=href
@@ -72,6 +71,7 @@ def main():
             locations=[oa]+(work.get("locations") or [])
             licensed=next((loc for loc in locations if (loc.get("license") or "").lower() in ALLOW),None)
             if not licensed:
+                r["oa_grobid_checked"]=TODAY
                 skipped["no_licensed_location"]+=1
                 continue
             license_str=(licensed.get("license") or "").lower()
@@ -79,9 +79,11 @@ def main():
             urls=work.get("content_urls") or {}
             xml_url=urls.get("grobid_xml","")
             if not xml_url.startswith("https://content.openalex.org/works/"):
+                r["oa_grobid_checked"]=TODAY
                 skipped["no_grobid_xml"]+=1
                 continue
             root=ET.fromstring(get(xml_url,key))
+            r["oa_grobid_checked"]=TODAY
             secs=extract(root)
             if not (secs.get("results") or secs.get("discussion")):
                 skipped["missing_sections"]+=1
@@ -97,7 +99,14 @@ def main():
                 "extraction_date":TODAY,
             }
             complete+=1
-        except (ValueError,ET.ParseError,urllib.error.HTTPError,urllib.error.URLError,TimeoutError) as exc:
+        except urllib.error.HTTPError as exc:
+            warnings.append(r.get("doi","")+": HTTP "+str(exc.code))
+            if exc.code==429:
+                # Stop immediately when the current API budget is exhausted.
+                # The remaining papers will be retried in a later scheduled run.
+                warnings.append("OpenAlex rate limit encountered; stopped this batch without marking remaining papers checked.")
+                break
+        except (ValueError,ET.ParseError,urllib.error.URLError,TimeoutError) as exc:
             warnings.append(r.get("doi","")+": "+str(exc)[:100])
         time.sleep(.15)
     DATA.write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n")
