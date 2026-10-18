@@ -37,6 +37,14 @@ def first_two(parts,limit=420):
     return t
 
 def make_note(r):
+    if r.get("kind")=="nonacademic":
+        existing=r.get("reading")
+        if existing and existing.get("overview"):
+            return existing
+        prose=clean(r.get("preview",""))
+        if len(prose)>=70 and not any(s in prose.lower() for s in STOP):
+            return {"level":"curated","provenance":r.get("venue","Publisher")+" supplied synopsis","overview":prose[:330],"methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Short publisher/editorial description, not an independently verified full-article analysis."}
+        return {"level":"citation_only","provenance":"Publisher citation","overview":"","methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Source link and bibliographic metadata only."}
     src=clean(r.get("abstract_text"))
     if len(src)<90 and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         src=clean(r["preview"])
