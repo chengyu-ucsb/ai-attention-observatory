@@ -25,3 +25,12 @@ This policy is stored in the repository so future assistants working on it can s
 3. **The research idea or reported finding is the primary visual headline** on the homepage, library cards, and each reading page. The original publication title is important attribution, but must not visually overpower the contribution.
 4. Weekly discovery and full-text backlog processing are separate schedules. Catch up four times daily only when ready, pause after API quotas, and persist per-paper retry status; do not launch all weekly discovery jobs to catch up full texts.
 5. Full-text acquisition is limited by actual available licensing, machine-readable access, and provider quotas. Report coverage honestly and do not promise that every citation can be transformed into a full-text review.
+
+## Weekly editorial and visualization standards (October 2026)
+
+- Treat the week's source-backed set as a corpus, not a list of blurbs. Lead the site and the newsletter with a concise cross-source thesis, a few carefully grounded themes, tensions and open questions. Every issue needs a complete linked source shelf so nothing is silently omitted.
+- Never manufacture cross-paper consensus or claim source completeness from a search result count. Editorially reviewed issue text lives in `data/issue-editorial.json`; if there is no reviewed issue for a new date, show the editorial-review state instead of an invented synthesis.
+- Newsletter HTML is a public preview until an email provider and opt-in/unsubscribe workflow have actually been connected. Never claim readers are subscribed or that mail was sent from the static website.
+- Raw machine-extracted article sections are provenance-labelled references, not finished summaries. Clean section numbers, table artifacts and citation noise, present compact digest notes up front, and keep long verbatim extracts behind an optional disclosure.
+- Prefer original, meaningful charts and diagrams to decorative filler. Show source figures/images only if reuse is permitted and the actual hosted image URL has been verified. Distinguish verified empirical charts, source figures, and illustrative concept graphics. Never reconstruct an effect size, prevalence or figure from a caption alone.
+- Always inspect publication workflow logs after changes and keep automated tests for editorial citations, article views, extract cleanup and figure provenance.
