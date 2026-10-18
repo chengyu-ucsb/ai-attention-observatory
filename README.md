@@ -1,6 +1,15 @@
 # AI & Attention Observatory
 
-A public-facing research discovery and reading room curated by [Chengyu Fang](https://chengyufang.org/). It tracks how AI influences attention, cognitive offloading and sustained engagement, together with possible interventions and relevant adjacent research.
+**[Explore the website](https://chengyu-ucsb.github.io/ai-attention-observatory/)** · **[Read the Weekly Edit](https://chengyu-ucsb.github.io/ai-attention-observatory/#issue)** · **[Browse past issues](https://chengyu-ucsb.github.io/ai-attention-observatory/issues/)**
+
+## About
+
+An open research and design project exploring how AI shapes attention, cognitive effort, and everyday thinking—and how technologies might help people focus more deliberately. It brings together research, public commentary, a weekly cross-source editorial, and experimental interactive tools.
+
+Curated by [Chengyu Fang](https://chengyufang.org/). The research readings distinguish full-text extracts from abstract-based notes, and the experimental tools are prototypes rather than validated interventions.
+
+**Live site:** https://chengyu-ucsb.github.io/ai-attention-observatory/
+
 
 ## The Attention Edit: weekly synthesis and newsletter (October 2026)
 
