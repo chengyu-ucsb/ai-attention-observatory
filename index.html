@@ -8,8 +8,10 @@
   <title>Attention / AI · The Research Observatory</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="lab-play.css">
   <link rel="alternate" type="application/rss+xml" title="AI & Attention Observatory weekly sources" href="feed.xml">
   <script src="app.js" defer></script>
+  <script src="lab-play.js" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -198,46 +200,106 @@
 
 
     <section id="lab" class="view" hidden>
-      <div class="inner-hero"><div class="shell"><p class="eyebrow">EXPERIMENTAL LAB / EARLY-STAGE CONCEPTS</p><h1>Design for <em>deliberate attention.</em></h1><p>Research-inspired interaction sketches for a possible future app. Try the mechanics, think through the trade-offs, and help shape the next iteration.</p></div></div>
-      <div class="shell">
-        <p class="lab-intro">The goal isn't another app that simply demands more productivity. These prototypes explore how interfaces might support self-directed focus, reflection, and recovery after interruptions. They are deliberately small and designed for exploration—not validated as interventions.</p>
-        <div class="lab-concept-notice"><strong>Prototype status:</strong> Experimental, browser-based demos. They do not monitor your real attention, access AI services, or submit text to a server. The exercises have not been tested for effectiveness.</div>
-        <div class="lab-grid">
-          <article class="lab-card">
-            <div class="lab-number">01 <span class="lab-chip">FOCUS SCAFFOLDING</span></div><h2>Focus Sprint</h2>
-            <p>Convert an open-ended work session into a clear intention and a short block of uninterrupted time. A focus timer is a design experiment, not proof that timing improves cognition.</p>
-            <div class="lab-workspace">
-              <label for="focus-task">What deserves your attention right now?</label><input id="focus-task" type="text" maxlength="130" placeholder="e.g., outline my paper's argument">
-              <div class="lab-row" role="group" aria-label="Choose a focus duration"><button class="lab-choice selected" data-duration="10">10 min</button><button class="lab-choice" data-duration="20">20 min</button><button class="lab-choice" data-duration="30">30 min</button></div>
-              <div class="lab-screen"><div class="lab-time" id="focus-timer" aria-live="off">10:00</div><p class="lab-caption" id="focus-caption">A small commitment to one task</p></div>
-              <div class="lab-row"><button class="lab-action" id="focus-toggle">Start focus session</button><button class="lab-outline" id="focus-reset">Reset</button></div>
-            </div>
-          </article>
-          <article class="lab-card">
-            <div class="lab-number">02 <span class="lab-chip">COGNITIVE AUTONOMY</span></div><h2>Think before delegating</h2>
-            <p>What if an AI assistant helped you work toward an answer instead of immediately providing it? This demonstration progressively reveals prompts, not AI-generated answers.</p>
-            <div class="lab-workspace">
-              <p class="eyebrow">SAMPLE THINKING TASK</p><p style="font-size:13px;color:var(--ink)">Why might using AI to summarize readings change what students remember?</p>
-              <div class="lab-row" role="group" aria-label="Choose level of assistance"><button class="lab-choice selected" data-scaffold="1">Reflect</button><button class="lab-choice" data-scaffold="2">Hint</button><button class="lab-choice" data-scaffold="3">Outline</button></div>
-              <div class="lab-response" id="scaffold-output" aria-live="polite">Before seeking an explanation, write down one mechanism you suspect is involved. What would count as evidence for it?</div>
-            </div>
-          </article>
-          <article class="lab-card">
-            <div class="lab-number">03 <span class="lab-chip">INTERRUPTION RECOVERY</span></div><h2>Return Point</h2>
-            <p>A lightweight checkpoint preserves where you were and your very next action, so you have somewhere to return after a distraction. Your text remains in this page's temporary state.</p>
-            <div class="lab-workspace">
-              <label for="resume-context">What are you working on?</label><textarea id="resume-context" rows="2" maxlength="250" placeholder="A sentence describing your current task"></textarea>
-              <label for="resume-next" style="margin-top:12px">What's your very next step?</label><input id="resume-next" maxlength="180" placeholder="One concrete next action">
-              <div class="lab-row"><button class="lab-action" id="resume-save">Save checkpoint</button><button class="lab-outline" id="resume-interrupt" disabled>Simulate interruption</button><button class="lab-outline" id="resume-restore" disabled>Resume</button></div>
-              <div class="lab-response" id="resume-output" aria-live="polite">Write your checkpoint, then simulate a distraction to see how an attention re-entry cue could work.</div>
-            </div>
-          </article>
+      <div class="play-head">
+        <div class="shell play-head-layout">
+          <div><p class="eyebrow">THE ATTENTION PLAYGROUND · EXPERIMENTAL</p>
+            <h1>Less reading.<br><em>More trying.</em></h1>
+            <p>Three playable sketches for investigating what attention-supporting technology might feel like. No account. No tracking. No performance judgments.</p>
+            <div class="play-status"><span class="play-status-dot"></span> All activities run locally in your browser · early design explorations</div>
+          </div>
+          <svg viewBox="0 0 380 300" class="play-art" role="img" aria-label="Abstract red and cream illustration of focus, task switching, and branching attention">
+            <rect x="25" y="25" width="330" height="250" rx="34" fill="#f9e7e4"/>
+            <circle cx="180" cy="147" r="85" fill="none" stroke="#c87d84" stroke-width="2" stroke-dasharray="4 9"/>
+            <circle cx="180" cy="147" r="51" fill="none" stroke="#af4250" stroke-width="2"/>
+            <path d="M180 147L80 90M180 147L291 95M180 147L283 215M180 147L95 211" stroke="#a33a49" stroke-width="2"/>
+            <circle cx="80" cy="90" r="12" fill="#bd6770"/><circle cx="291" cy="95" r="21" fill="#edb8b4"/><circle cx="283" cy="215" r="13" fill="#b44b5c"/><circle cx="95" cy="211" r="16" fill="#e4a09b"/>
+            <circle cx="180" cy="147" r="29" fill="#9e2b40"/><circle cx="180" cy="147" r="8" fill="#fff"/>
+            <text x="72" y="58" fill="#a34954" font-size="11" font-family="Arial,sans-serif">SWITCH</text><text x="253" y="69" fill="#a34954" font-size="11" font-family="Arial,sans-serif">PAUSE</text><text x="232" y="253" fill="#a34954" font-size="11" font-family="Arial,sans-serif">RETURN</text>
+          </svg>
         </div>
-        <section class="product-landscape">
-          <div class="section-heading"><div><p class="eyebrow">WHAT ALREADY EXISTS / DESIGN PRECEDENTS</p><h2>Four ways to intervene<span class="red-period">.</span></h2><p class="section-deck">Selected official documentation. These comparisons describe mechanisms, not effectiveness.</p></div></div>
-          <div class="table-scroll"><table class="arrival-table product-table"><thead><tr><th>Approach</th><th>Existing feature</th><th>Design question</th><th>Explore</th></tr></thead><tbody id="product-examples"></tbody></table></div>
+      </div>
+      <div class="shell play-wrap">
+        <div class="play-intro-row"><div><p class="eyebrow">CHOOSE AN EXPERIMENT</p><h2>Pick something to play.</h2></div><p>About 1–3 minutes each · exploratory demos, not scientific tests</p></div>
+        <div class="play-tabs" role="tablist" aria-label="Attention activities">
+          <button type="button" class="play-tab is-active" id="tab-switch" data-play-tab="switch" role="tab" aria-selected="true" aria-controls="play-switch"><span class="play-tab-num">01</span><span>Switch Lab<small>How does switching feel?</small></span><span class="play-tab-icon">↗</span></button>
+          <button type="button" class="play-tab" id="tab-recovery" data-play-tab="recovery" role="tab" aria-selected="false" aria-controls="play-recovery" tabindex="-1"><span class="play-tab-num">02</span><span>Return Point<small>Find your way back</small></span><span class="play-tab-icon">↩</span></button>
+          <button type="button" class="play-tab" id="tab-assist" data-play-tab="assist" role="tab" aria-selected="false" aria-controls="play-assist" tabindex="-1"><span class="play-tab-num">03</span><span>Assistance Dial<small>Choose how AI helps</small></span><span class="play-tab-icon">◎</span></button>
+        </div>
+        <div class="play-stage" id="play-switch" role="tabpanel" aria-labelledby="tab-switch">
+          <div class="play-stage-side">
+            <span class="play-kicker">01 / A SHORT COGNITIVE CHALLENGE</span>
+            <h3>The Switch Lab</h3>
+            <p>Respond to a number. At first the rule stays the same; then the cue starts changing. Does switching feel different?</p>
+            <div class="play-rules">
+              <div><span class="rule-label">ODD / EVEN</span><span>1, 3, 7 → <b>LEFT</b><br>2, 4, 8 → <b>RIGHT</b></span></div>
+              <div><span class="rule-label">LOW / HIGH</span><span>1–4 → <b>LEFT</b><br>6–9 → <b>RIGHT</b></span></div>
+            </div>
+            <p class="play-small">Use the two buttons or ← / → arrow keys. There are 20 trials. Accuracy matters more than speed.</p>
+          </div>
+          <div class="play-stage-main">
+            <div class="play-screen switch-screen" id="switch-screen">
+              <div class="play-screen-top"><span id="switch-phase">READY TO PLAY</span><span id="switch-progress">0 / 20</span></div>
+              <div id="switch-track" class="switch-track" aria-hidden="true"></div>
+              <div class="switch-cue" id="switch-cue">TWO RULES · ONE BRAIN</div>
+              <div class="switch-number" id="switch-number">?</div>
+              <div class="switch-note" id="switch-note">Start when you're ready.</div>
+              <div class="switch-buttons">
+                <button type="button" id="switch-left" class="switch-answer" disabled><span>←</span><small>ODD / LOW</small></button>
+                <button type="button" id="switch-right" class="switch-answer" disabled><span>→</span><small>EVEN / HIGH</small></button>
+              </div>
+              <button type="button" id="switch-start" class="play-primary">Start the challenge <span>↗</span></button>
+            </div>
+            <div class="play-results" id="switch-results" hidden aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="play-stage" id="play-recovery" role="tabpanel" aria-labelledby="tab-recovery" hidden>
+          <div class="play-stage-side"><span class="play-kicker">02 / AN INTERRUPTION MINI-GAME</span><h3>Return Point</h3>
+            <p>Remember the next action in a small research task. Complete a distraction, then try to pick up where you left off.</p>
+            <div class="play-mode"><span>Try it</span><button type="button" class="play-mode-option is-active" data-recovery-mode="cue" aria-pressed="true">With a checkpoint</button><button type="button" class="play-mode-option" data-recovery-mode="none" aria-pressed="false">Without a checkpoint</button></div>
+            <p class="play-small">Repeat both conditions to compare your experience. The order isn't controlled, so this isn't a valid experiment.</p>
+          </div>
+          <div class="play-stage-main">
+            <div class="play-screen recovery-screen" id="recovery-screen">
+              <div class="play-screen-top"><span id="recovery-stage-label">THE TASK</span><span id="recovery-progress">STAGE 1 / 3</span></div>
+              <div class="recovery-visual" id="recovery-visual" aria-hidden="true"><span>01</span><i></i><span>02</span><i></i><span>03</span></div>
+              <h4 id="recovery-headline">A half-finished project</h4>
+              <p id="recovery-description">You're writing about AI and attention. You just read two studies. Your next step is to compare how they measured cognitive effort.</p>
+              <div id="recovery-interaction" class="recovery-interaction"></div>
+              <button type="button" class="play-primary" id="recovery-start">Begin interruption <span>↗</span></button>
+            </div>
+            <div id="recovery-history" class="play-results" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="play-stage" id="play-assist" role="tabpanel" aria-labelledby="tab-assist" hidden>
+          <div class="play-stage-side"><span class="play-kicker">03 / AN AI-ASSISTANCE EXPERIMENT</span><h3>Assistance Dial</h3>
+            <p>Same reasoning problem, three ways an assistant might respond. Choose a level of help, then make the call yourself.</p>
+            <div class="assist-modes" role="group" aria-label="Choose assistance level">
+              <button type="button" data-assist-mode="reflect" class="assist-mode is-active" aria-pressed="true"><span>◌</span> Reflection<small>Question first</small></button>
+              <button type="button" data-assist-mode="hint" class="assist-mode" aria-pressed="false"><span>◒</span> Hint<small>One clue</small></button>
+              <button type="button" data-assist-mode="answer" class="assist-mode" aria-pressed="false"><span>●</span> Full answer<small>Immediate resolution</small></button>
+            </div>
+            <p class="play-small">Simulated assistance, not a connected AI model. It's a design hypothesis about autonomy, not evidence that one level is best.</p>
+          </div>
+          <div class="play-stage-main">
+            <div class="play-screen assist-screen">
+              <div class="play-screen-top"><span>REASONING CHALLENGE</span><span id="assist-counter">SCENARIO 1 / 2</span></div>
+              <div class="assist-prompt" id="assist-prompt"></div>
+              <div class="assist-reply" id="assist-reply" aria-live="polite"></div>
+              <p class="assist-pick-label">What do you conclude?</p>
+              <div class="assist-choices" id="assist-choices"></div>
+              <div id="assist-feedback" class="assist-feedback" hidden aria-live="polite"></div>
+              <button type="button" id="assist-next" class="play-primary" hidden>Try another scenario <span>↗</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="play-note">
+          <span class="play-note-icon">✳</span><div><strong>Prototype, not a diagnostic tool.</strong> The demonstrations are simplified, include practice and order effects, and cannot measure your real-world ability to concentrate. No scores or typed content are transmitted or saved. Nothing in this lab establishes an intervention's effectiveness.</div>
+        </div>
+        <section class="play-precedents">
+          <div class="section-heading"><div><p class="eyebrow">OUTSIDE THE LAB / DESIGN PRECEDENTS</p><h2>How products approach focus<span class="red-period">.</span></h2><p class="section-deck">Compare design mechanisms, without mistaking product claims for outcome evidence.</p></div></div>
+          <div class="table-scroll"><table class="arrival-table product-table"><thead><tr><th>Approach</th><th>Existing feature</th><th>Potential comparison</th><th>Explore</th></tr></thead><tbody id="product-examples"></tbody></table></div>
         </section>
-        <section class="lab-hypothesis"><p class="eyebrow">PRODUCT HYPOTHESES / UNTESTED</p><h2>Three ideas worth studying.</h2><p><strong>Voluntary structure:</strong> Would a lightweight focus intention reduce context switching without becoming another interruption? <strong>Graduated assistance:</strong> Could choosing hints before finished answers encourage active reasoning? <strong>Re-entry cues:</strong> Do captured next steps reduce the effort of resuming work after interruption? These are research questions, not demonstrated benefits.</p><a class="quiet-link" href="mailto:fangcu@ucmail.uc.edu?subject=Attention%20Observatory%20Experimental%20Lab">Share thoughts or collaborate ↗</a></section>
+        <div class="play-feedback-link"><div><span class="eyebrow">HELP SHAPE THE RESEARCH</span><h3>Which idea feels promising—and which feels intrusive?</h3></div><a class="button button-red" href="mailto:fangcu@ucmail.uc.edu?subject=Attention%20Observatory%20Experimental%20Lab%20feedback">Share your thoughts ↗</a></div>
       </div>
     </section>
 
