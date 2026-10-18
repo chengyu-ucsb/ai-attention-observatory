@@ -3,7 +3,7 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const S={records:[],week:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
 const depths=[["full_text","Full-text sections","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
-function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined)e.textContent=String(s);return e}
+function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
@@ -14,6 +14,37 @@ function depth(x){return x.reading?.level||"citation_only"}
 function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only")return "Publisher synopsis";return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 function cut(t,n){t=String(t||"").trim();return t.length>n?t.slice(0,n).replace(/\s+\S*$/,"")+"…":t}
+
+// Editorially checked phrases come from the source text, not inferred from a title.
+// Retain the full original passage in each article's reading notes.
+const highlightByDOI={
+ "10.58304/ijts.260930":"AI literacy linked to critical thinking through problem-solving and AI reliance",
+ "10.22158/selt.v14n4p28":"Student AI use emphasized efficiency over deeper engagement",
+ "10.21203/rs.3.rs-9893084/v1":"Unsupervised AI use linked to offloading and weaker self-regulation",
+ "10.3389/fpsyg.2026.1930030":"Stress and social media time predicted academic impact",
+ "10.1186/s12888-026-08635-4":"Insomnia group reacted faster to sleep-related stimuli",
+ "10.3389/fpsyg.2026.1960382":"Algorithmic management associated with challenge and threat appraisals",
+ "10.1609/aies.v9i2.43193":"Parental alerts varied substantially across tested content categories"
+};
+function shortIdea(x,limit=105){
+ const info=ideaInfo(x),r=x.reading||{};
+ // A manually reviewed abstract-based headline must not override later full-text findings.
+ const keyed=(x.doi||"").toLowerCase();
+ if(r.level!=="full_text"&&r.findings&&highlightByDOI[keyed])return highlightByDOI[keyed];
+ let value=info.text;
+ // Remove routine reporting formulae without changing the source's actual claim.
+ value=value.replace(/^(?:the )?(?:quantitative )?(?:results?|findings?|analysis|analyses|data)\s+(?:show(?:ed)?|suggest(?:ed)?|indicat(?:ed|e)?|reveal(?:ed)?|demonstrat(?:ed|e)?|found)\s+(?:that\s+)?/i,"");
+ value=value.replace(/^(?:we (?:found|find|observed|show(?:ed)?)\s+that\s+|this (?:study|paper|article) (?:examines?|investigates?|explores?|argues?|proposes?)\s+(?:that\s+)?)/i,"");
+ value=value.replace(/\s+/g," ").trim();
+ if(value.length<=limit)return value;
+ // Prefer intact first clauses over a long sentence; mark any truncation explicitly.
+ const firstSentence=value.match(/^.{18,150}?[.!?](?=\s|$)/);
+ if(firstSentence&&firstSentence[0].length<=limit)return firstSentence[0];
+ const window=value.slice(0,limit+5);
+ let at=Math.max(window.lastIndexOf("; "),window.lastIndexOf(", "));
+ if(at>45&&at<=limit)return window.slice(0,at).trim()+"…";
+ return cut(value,limit);
+}
 
 function ideaInfo(x){
  const r=x.reading||{},notes=x.editorial_notes||{};
@@ -55,7 +86,7 @@ function home(){
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
  add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","↗","✳"][i]));
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
- add(c,head,make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",cut(ideaInfo(x).text,i===0?220:160)),make("p","feature-source-title",x.title),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
+ add(c,head,make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),make("p","feature-source-title",x.title),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  const alert=$("#research-warning"),errors=run.stats?.errors||[];alert.hidden=errors.length===0;if(errors.length)alert.textContent=errors.length+" discovery provider warning(s); see the repository Actions log.";
  renderEditorial();
  topicBars("#topic-bars");donut();
@@ -122,7 +153,7 @@ function showLibrary(){
  $("#library-count").textContent=xs.length+" results · "+S.records.length+" total sources";
  const box=$("#library-results");box.replaceChildren();
  if(!xs.length){box.append(make("div","empty-state","No source-backed items match those filters. Try a broader search."));return}
- for(const x of xs){const c=make("article","library-card"),h=make("h3"),foot=make("div","card-foot");h.append(btn(cut(ideaInfo(x).text,190),()=>goto("paper",id(x))));add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));add(c,make("span","card-type",ideaInfo(x).label),h,make("p","library-citation",x.title),foot);box.append(c)}
+ for(const x of xs){const c=make("article","library-card"),h=make("h3"),foot=make("div","card-foot");h.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));add(c,make("span","card-type",ideaInfo(x).label),h,make("p","library-citation",x.title),foot);box.append(c)}
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
@@ -161,7 +192,7 @@ function showPaper(x){
   snapshot.append(tile);
  }
  left.append(snapshot);
- const detailed=make("details","paper-detail-excerpts");
+ const detailed=make("details","paper-detail-excerpts");detailed.open=true;
  detailed.append(make("summary","","Open source-based reading notes"));
  const notesArea=make("div","paper-detail-body");let hasNotes=false;
  if(editorial){
@@ -191,7 +222,7 @@ function showPaper(x){
  right.append(link("Search on Google Scholar ↗","https://scholar.google.com/scholar?q="+encodeURIComponent(x.title),"paper-extra"));
  let related=S.records.filter(y=>y!==x&&y.kind===x.kind&&y.lane===x.lane&&depth(y)!=="citation_only").sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){const panel=make("section","paper-side-block");add(panel,make("p","eyebrow","EXPLORE FURTHER"),make("h3","","Related papers"));for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));right.append(panel)}
- add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",ideaInfo(x).label),make("h1","paper-insight",cut(ideaInfo(x).text,340)),make("div","paper-identity",add(make("div","paper-identity-inner"),make("p","eyebrow","THE ORIGINAL PUBLICATION"),make("h2","paper-source-title",x.title),make("p","paper-meta",meta))),chips,cols)
+ add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",ideaInfo(x).label),make("h1","paper-insight",shortIdea(x,145)),add(make("div","paper-identity"),add(make("div","paper-identity-inner"),make("p","eyebrow","THE ORIGINAL PUBLICATION"),make("h2","paper-source-title",x.title),make("p","paper-meta",meta))),chips,cols)
 }
 function showProductExamples(){
  const examples=S.records.filter(x=>x.source==="Official product documentation");
