@@ -111,6 +111,17 @@ function showPaper(x){
  if(related.length){const panel=make("section","paper-side-block");add(panel,make("p","eyebrow","EXPLORE FURTHER"),make("h3","","Related papers"));for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));right.append(panel)}
  add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",(x.kind==="nonacademic"?"PUBLIC IDEAS / ":"RESEARCH READING / ")+(x.lane||"Research")),make("h1","paper-heading",x.title),make("p","paper-meta",meta),chips,cols)
 }
+function showProductExamples(){
+ const examples=S.records.filter(x=>x.source==="Official product documentation");
+ const tbody=$("#product-examples");tbody.replaceChildren();
+ const categories={"one sec":"Deliberate pause","Freedom":"Access restriction","Apple Developer":"Focus integration","Android":"System controls"};
+ if(!examples.length){const tr=make("tr"),td=make("td","","Product design references have not been indexed yet.");td.colSpan=4;tr.append(td);tbody.append(tr);return}
+ examples.forEach(x=>{
+  const tr=make("tr"),go=make("td");
+  go.append(btn("Read notes ↗",()=>goto("paper",id(x))));
+  add(tr,make("td","",categories[x.venue]||x.venue),make("td","",cut(x.reading?.overview||x.preview,110)),make("td","",cut(x.editorial_notes?.design_relevance,125)),go);tbody.append(tr)
+ });
+}
 function lab(){
  function updateTime(){let m=Math.floor(S.left/60),s=S.left%60;$("#focus-timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
  function pause(){if(S.timer)clearInterval(S.timer);S.timer=null;S.running=false;$("#focus-toggle").textContent="Start focus session"}
@@ -132,7 +143,7 @@ async function init(){
   S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
   S.runs=rs[2].ok?await rs[2].json():[];
-  home();showLibrary();route();
+  home();showLibrary();showProductExamples();route();
  }catch(e){$("#issue-label").textContent="INDEX OFFLINE";$("#issue-meta").textContent="Research data could not load";$("#feature-grid").replaceChildren(make("div","empty-state","Could not load the research archive: "+e.message));route()}
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
