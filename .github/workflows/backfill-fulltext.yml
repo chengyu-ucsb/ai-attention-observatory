@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/backfill-fulltext.yml'
+      - 'scripts/enrich_figure_links.py'
   schedule:
     # Four modest checks per UTC day, with automatic API budget backoff.
     - cron: '17 3,9,15,21 * * *'
