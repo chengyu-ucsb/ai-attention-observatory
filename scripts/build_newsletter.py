@@ -10,9 +10,17 @@ def safe(url):
  parts=urllib.parse.urlsplit(url or "")
  return url if parts.scheme=="https" and parts.netloc else "https://chengyu-ucsb.github.io/ai-attention-observatory/"
 def build():
- issue=json.loads((DATA/"public-issue.json").read_text())
+ current=json.loads((DATA/"public-issue.json").read_text())
+ approved=DATA/"approved-issues";approved.mkdir(parents=True,exist_ok=True)
+ if current.get("status")=="published":
+  edition=current.get("edition_date","")
+  if not edition or not edition[:4].isdigit():raise ValueError("Published issue needs a date")
+  (approved/(edition+".json")).write_text(json.dumps(current,indent=2,ensure_ascii=False)+"\\n")
+ archived=sorted(approved.glob("????-??-??.json"),reverse=True)
+ issue=current if current.get("status")=="published" else (json.loads(archived[0].read_text()) if archived else current)
  root="https://chengyu-ucsb.github.io/ai-attention-observatory/"
  published=issue.get("status")=="published"
+ archive_link=root+"issues/"+issue.get("edition_date","")+".html" if published else root+"#issue"
  title=issue.get("subject") if published else "The Attention Edit — issue in review"
  if not published:
   body='<h1>Our next edition is being prepared.</h1><p>New sources are being reviewed before the cross-source newsletter is published.</p>'
@@ -45,12 +53,20 @@ def build():
   body+='</td></tr><tr><td style="padding:0;">'
  wrapper='''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'''+esc(title)+'''</title></head><body style="background:#f9f4f2;margin:0;padding:20px 10px;"><table role="presentation" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;background:white;border-collapse:collapse;border:1px solid #ecdedb;"><tr><td style="background:#a52c3e;padding:20px 30px;color:white;font:800 12px Arial,sans-serif;letter-spacing:1.5px;">ATTENTION / AI <span style="float:right;font-size:11px;font-weight:normal;">THE WEEKLY EDIT</span></td></tr><tr><td style="padding:32px 30px;">'''
  footer='''</td></tr><tr><td style="padding:22px 30px;background:#3a2730;color:#f2d9d7;font:12px/1.7 Arial,sans-serif;">Curated by the Attention Observatory · <a href="https://chengyufang.org/" style="color:#ffe1db;">chengyufang.org</a><br/>Read on the website: <a style="color:#ffe1db;" href="'''+root+'''#issue">Latest issue</a></td></tr></table></body></html>'''
- (ROOT/"newsletter.html").write_text(wrapper+body+footer)
+ rendered=wrapper+body+footer
+ (ROOT/"newsletter.html").write_text(rendered)
+ if published:
+  outdir=ROOT/"issues";outdir.mkdir(exist_ok=True)
+  (outdir/(issue["edition_date"]+".html")).write_text(rendered)
  rss=ET.Element("rss",version="2.0");ch=ET.SubElement(rss,"channel")
  for k,v in [("title","The Attention Edit — Weekly editorial"),("link",root+"#issue"),("description","A concise cross-source editorial from the AI & Attention Observatory")]:ET.SubElement(ch,k).text=v
- if published:
+ for archived_issue in archived[:30]:
+  previous=json.loads(archived_issue.read_text())
+  if previous.get("status")!="published":continue
   item=ET.SubElement(ch,"item")
-  for k,v in [("title",title),("link",root+"#issue"),("guid",issue["edition_date"]),("description",issue["deck"]+" "+issue["closer"])]:ET.SubElement(item,k).text=v
+  for k,v in [("title",previous["subject"]),("link",root+"issues/"+previous["edition_date"]+".html"),
+              ("guid",previous["edition_date"]),("description",previous["deck"]+" "+previous["closer"])]:
+   ET.SubElement(item,k).text=v
  ET.indent(rss);(ROOT/"issue-feed.xml").write_bytes(ET.tostring(rss,encoding="utf-8",xml_declaration=True))
- print(f"Newsletter preview: {'published' if published else 'awaiting editorial review'}; {issue['source_count']} source-backed readings.")
+ print(f"Newsletter preview: {'latest approved issue retained' if current.get('status')!='published' and published else 'published' if published else 'awaiting editorial review'}; {issue['source_count']} source-backed readings.")
 if __name__=="__main__":build()
