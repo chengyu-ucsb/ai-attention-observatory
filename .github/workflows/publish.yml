@@ -81,6 +81,8 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
+          mkdir -p _site/issues
+          cp -R issues/. _site/issues/
           mkdir -p _site/data
           cp data/public-library.json data/public-weekly.json data/public-issue.json _site/data/
           if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
