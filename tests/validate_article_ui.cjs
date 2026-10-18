@@ -36,12 +36,16 @@ for(const r of db){
  assert(!allText.includes("[object Object]"),"Object-to-string rendering for "+r.title);
  const insight=nodeClass(paperContainer,"paper-insight");
  assert(insight&&insight.textContent.length<=148,"Oversized article headline for "+r.title);
+ const drawing=nodeClass(paperContainer,"article-concept-art");
+ assert(drawing,"Missing accessible conceptual visual for "+r.title);
+ const snapshot=nodeClass(paperContainer,"paper-snapshot");
+ assert(snapshot,"Missing processed reading snapshot for "+r.title);
  const source=nodeClass(paperContainer,"paper-source-title");
  assert(source&&source.textContent===r.title,"Original source title omitted");
  const details=nodeClass(paperContainer,"paper-detail-excerpts");
  const editorial=r.kind==="nonacademic";
  const hasNotes=editorial?!!(r.editorial_notes?.argument||r.editorial_notes?.design_relevance||r.editorial_notes?.caveat):!!(r.reading?.methods||r.reading?.findings||r.reading?.interpretation||r.reading?.limitations);
- if(hasNotes)assert(details&&details.open===true,"Substantive source notes should be initially expanded for "+r.title);
+ if(hasNotes)assert(details&&details.open===false,"Raw extracted passages must stay collapsed behind processed notes for "+r.title);
  else assert(!details,"Empty structured source notes must not display a pointless panel for "+r.title);
  verified++;
 }
