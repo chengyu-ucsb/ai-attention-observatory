@@ -233,8 +233,47 @@ function processedIdea(x){
  }
  return shortIdea(x,145);
 }
+function comparisonArtwork(title,columns,caption){
+ const w=make("section","article-concept-art article-data-visual");
+ add(w,make("p","eyebrow","RESEARCH DESIGN / SOURCE-GROUNDED COMPARISON"),make("h3","figure-insight-title",title));
+ const grid=make("div","source-comparison-grid");
+ columns.forEach(([k,label,desc])=>add(grid,add(make("article","source-comparison-card"),make("span","source-comparison-num",k),make("h4","",label),make("p","",desc))));
+ add(w,grid,make("p","concept-note",caption));
+ return w;
+}
+function reviewArtwork(){
+ const w=make("section","article-concept-art article-data-visual");
+ add(w,make("p","eyebrow","REVIEW COVERAGE / REPORTED SOURCE COUNT"),make("h3","figure-insight-title","A literature map, not a controlled intervention"));
+ const row=make("div","review-big-number");
+ add(row,make("strong","", "123"),make("span","","studies included"),make("p","","Two interpretive patterns: agency-supportive and agency-eroding uses of AI. The reviewed studies are heterogeneous."));
+ add(w,row,make("p","concept-note","123 is the included-study count reported in the source's Results, not a count of positive, negative, or causal effects."));
+ return w;
+}
+function wellbeingArtwork(){
+ const w=make("section","article-concept-art article-data-visual");
+ add(w,make("p","eyebrow","REVIEW EVIDENCE / TWO REPORTED ENDPOINTS"),make("h3","figure-insight-title","Interest in digital well-being research grew"));
+ const bars=make("div","review-year-bars");
+ [["2008",2],["2024",43]].forEach(([year,n])=>{
+  const row=make("div","review-year-row");
+  const track=make("div","review-year-track"),bar=make("span","review-year-fill");
+  bar.style.width=(n/43*100)+"%";track.append(bar);
+  add(row,make("span","",year),track,make("strong","",n+" papers"));bars.append(row)
+ });
+ add(w,make("p","review-kicker","240 PUBLICATIONS CONSIDERED IN TOTAL"),bars,make("p","concept-note","The paper reports 2 included publications for 2008 and 43 for 2024; only these two endpoints are shown. The bars do not reconstruct a complete annual time series or demonstrate intervention effectiveness."));
+ return w;
+}
 function conceptArtwork(x){
  const doi=(x.doi||"").toLowerCase();
+ if(doi==="10.3389/fpsyg.2026.1878629")return comparisonArtwork("Two ways of offloading to AI",[
+   ["A","Dependent offloading","Greater reliance on AI output while yielding cognitive authority; in this survey linked to lower intrinsic motivation."],
+   ["B","Autonomous offloading","Delegation with a different pattern of retained agency and motivation, not necessarily the same as dependency."]
+  ],"The three-wave survey reports associations with perceived functioning. This graphic contrasts concepts; it does not reproduce a causal diagram or quantify effect sizes.");
+ if(doi==="10.3390/jintelligence14080182")return comparisonArtwork("Whose work does AI-assisted teaching feel like?",[
+   ["239","Preservice teachers","Survey respondents recruited by convenience sampling in eastern China."],
+   ["↗","Ownership concern","Dependency was associated with concern over the ownership of one's instructional design work."]
+  ],"Source-derived study design and association. The cross-sectional survey cannot establish which came first or prove AI caused the concern.");
+ if(doi==="10.3390/bs16071150")return reviewArtwork();
+ if(doi==="10.2196/69533")return wellbeingArtwork();
  if(doi==="10.3389/feduc.2026.1861548"){
   const w=make("section","article-concept-art");
   add(w,make("p","eyebrow","VISUALIZED FINDING / THREE LEARNER PROFILES"),make("h3","figure-insight-title","Not all AI reliance looks alike"));
