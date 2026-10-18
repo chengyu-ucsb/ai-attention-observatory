@@ -25,7 +25,7 @@ class CondensedReadingTests(unittest.TestCase):
    "reading":{"level":"full_text","methods":"Online survey using Prolific.","findings":"Three learner profiles emerged.","limitations":"Cross-sectional design."}}
   digest=annotate(paper)["reading"]["digest"]
   self.assertIn("Three learner profiles",digest["finding"])
-  self.assertIn("cross-sectional",digest["limitation"]+" "+digest["idea"])
+  self.assertIn("cannot establish the direction",digest["limitation"])
   self.assertEqual(digest["status"],"editorially_written_from_indexed_sections")
  def test_tags_are_source_named_not_unverified_causal_paths(self):
   paper={"kind":"scholarly","title":"GenAI literacy, cognitive offloading and critical thinking",
