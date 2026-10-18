@@ -45,3 +45,29 @@
 .product-table td:first-child{color:var(--red);font-weight:800}
 .product-table td:last-child button{color:var(--red);font-size:11px;font-weight:800;background:none;border:0;white-space:nowrap}
 .product-table td:last-child button:hover{text-decoration:underline}
+
+
+/* Visible Ideas & Tools destination */
+.perspectives-page{padding:46px 0 92px}
+.perspectives-quick-links{display:flex;gap:20px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:23px}
+.perspectives-quick-links a{color:var(--red);font-size:12px;font-weight:800}
+.perspectives-quick-links a:hover{text-decoration:underline}
+.perspectives-intro{max-width:760px;padding:45px 0 24px}
+.perspectives-intro h2{font:500 clamp(30px,3.5vw,45px)/1.15 var(--display);margin:10px 0;color:var(--ink)}
+.perspectives-intro p:not(.eyebrow){font-size:13px;line-height:1.7;color:var(--muted);margin:0}
+.perspectives-subsection{border-top:1px solid var(--line);margin-top:48px}
+.perspectives-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.perspective-item{display:flex;flex-direction:column;min-height:287px;background:white;border:1px solid var(--line);padding:22px 24px 20px;box-shadow:0 1px 4px #6e383907}
+.perspective-glyph{color:var(--red);font:500 36px/1 var(--display);margin-bottom:17px}
+.perspective-type{color:var(--red);font:800 10px var(--sans);letter-spacing:.05em}
+.perspective-item h3{margin:13px 0 10px;font:500 23px/1.24 var(--display)}
+.perspective-item h3 button{color:var(--ink);font:inherit;background:none;border:0;text-align:left;padding:0}
+.perspective-item h3 button:hover{color:var(--red)}
+.perspective-item p{font-size:12px;line-height:1.73;color:#62585a;margin:0}
+.perspective-bottom{display:flex;justify-content:space-between;align-items:center;gap:10px;border-top:1px solid var(--line);padding-top:15px;margin-top:auto}
+.perspective-bottom span{font-size:10px;color:var(--soft)}
+.perspectives-page .editorial-disclaimer{margin-top:18px}
+#perspectives-essays{scroll-margin-top:100px}
+@media(max-width:1000px){.perspectives-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.main-nav{gap:14px}}
+@media(max-width:850px){.main-nav{overflow-x:auto;justify-content:flex-start;gap:20px;scrollbar-width:thin;white-space:nowrap}.main-nav a{flex-shrink:0}}
+@media(max-width:650px){.perspectives-grid{grid-template-columns:1fr}.perspectives-page{padding:30px 0 70px}.perspectives-intro{padding:36px 0 18px}.perspective-item{min-height:230px}.main-nav{gap:18px}}
