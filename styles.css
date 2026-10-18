@@ -121,3 +121,21 @@
 .play-teaser-keys{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%}
 .play-teaser-keys span{padding:8px 5px;border:1px solid #eddbd9;color:#ab4d5c;font-size:10px;font-weight:800}
 @media(max-width:700px){.play-teaser-inner{grid-template-columns:1fr;padding:24px}.play-teaser-demo{max-width:245px;width:100%;justify-self:center}.play-teaser-copy h2{font-size:32px}}
+
+
+/* Issue-led research reading hierarchy: the argument is the headline, source title is metadata. */
+.paper-insight{font:500 clamp(31px,3.8vw,53px)/1.11 var(--display);letter-spacing:-.022em;color:#32292b;max-width:1000px;margin:13px 0 27px;overflow-wrap:break-word}
+.paper-identity{border-top:1px solid #e5d7d4;border-bottom:1px solid #e5d7d4;background:#fbf7f5;padding:20px 25px;margin:0 0 10px}
+.paper-identity .eyebrow{font-size:9px;letter-spacing:.1em;color:#aa5260;margin:0 0 6px}
+.paper-source-title{font:600 clamp(15px,1.65vw,20px)/1.45 var(--sans);letter-spacing:0;color:#695f60;max-width:850px;margin:0 0 9px}
+.paper-identity .paper-meta{margin:0;font-size:11px}
+.feature-idea-label{font-size:9px!important;font-weight:800;letter-spacing:.075em;color:#a32f42!important;text-transform:uppercase;margin:18px 0 0!important}
+.feature-card h3.feature-idea{font:500 24px/1.22 var(--display);color:#34292c;margin:10px 0 12px}
+.feature-card.primary h3.feature-idea{font-size:30px}
+.feature-source-title{font-size:11px!important;font-weight:650;color:#786e70!important;line-height:1.5!important;margin:0 0 3px!important;max-width:100%}
+.library-card h3{font:500 21px/1.24 var(--display);margin:13px 0 10px}
+.library-card .library-citation{font-size:11px;line-height:1.55;color:#7b7070}
+.library-card .card-foot{padding-top:13px}
+.feature-card{min-height:340px}
+@media(max-width:850px){.feature-card h3.feature-idea,.feature-card.primary h3.feature-idea{font-size:25px}}
+@media(max-width:600px){.paper-insight{font-size:35px;margin-bottom:18px}.paper-identity{padding:15px 17px}.feature-card{min-height:260px}.feature-card.primary h3.feature-idea{font-size:25px}}
