@@ -8,7 +8,7 @@ function el(tag, cls, text) { const e=document.createElement(tag); if(cls)e.clas
 function add(parent,...children) { children.forEach(child=>{if(child)parent.append(child)}); return parent; }
 function fmtDate(s) { if(!s)return "Undated";const d=new Date(s.slice(0,10)+"T12:00:00Z");return Number.isNaN(d.valueOf())?"Undated":d.toLocaleDateString("en-US",{timeZone:"UTC",year:"numeric",month:"short",day:"numeric"}); }
 function recordId(x){return String(x.doi||x.url||x.title);}
-function preview(x){return x.analysis?.key_idea||x.preview||"Only the citation is available; no substantive synopsis has been verified.";}
+function preview(x){if(x.reading?.overview)return x.reading.overview;if(x.analysis?.discussion)return x.analysis.discussion.slice(0,360);if(x.preview&&!/abstract unavailable|bibliographic metadata only/i.test(x.preview))return x.preview;return "Citation indexed. A source-based research summary is not available yet.";}
 function tag(text,kind){return el("span","chip"+(kind?" "+kind:""),text);}
 function recordById(id){return state.library.find(x=>recordId(x)===id);}
 function sourceDate(x){return [fmtDate(x.published),x.venue].filter(Boolean).join("  ·  ");}
@@ -21,7 +21,7 @@ function card(x,featured=false){
  const title=el("button","story-title",x.title); title.type="button";title.addEventListener("click",()=>navigate("read",recordId(x)));
  const meta=el("p","meta",sourceDate(x));
  const p=el("p","story-summary",preview(x).slice(0,featured?390:280));
- const foot=el("div","story-foot"); add(foot,tag(x.analysis?"Full-text sections":x.curated?"Curated starter":"Metadata only",x.analysis?"verified":""));
+ const foot=el("div","story-foot"); add(foot,tag(x.reading?.level==="full_text"?"Full-text notes":x.reading?.level==="abstract"?"Abstract-based":x.curated?"Curated overview":"Citation only",x.reading?.level==="full_text"?"verified":""));
  const go=el("button","text-link","Read the research card  ↗");go.type="button";go.onclick=()=>navigate("read",recordId(x));
  add(foot,go);add(article,top,title,meta,p,foot);return article;
 }
@@ -44,29 +44,47 @@ function displayStatus(run){
  const text=$("#index-caption");text.textContent=run?.mode==="curated-starter"?"First live research update not yet completed":"Latest saved search; refreshes weekly, not continuously";
  const count=$("#total-count");count.textContent=state.library.length.toLocaleString();
 }
+function paperPriority(x){
+ const level=x.reading?.level;let v=level==="full_text"?95:level==="abstract"?65:level==="curated"?42:0;
+ if(x.reading?.findings)v+=20;
+ if(x.reading?.methods)v+=10;
+ if(x.reading?.limitations)v+=3;
+ if(x.lane==="AI & cognition"||x.lane==="Interventions")v+=7;
+ if(x.relation==="Adjacent digital-attention evidence")v-=10;
+ return v;
+}
 function renderWeekly(){
  const run=state.weekly?.run||{};displayStatus(run);
  let entries=(state.weekly?.items||[]).map(z=>recordById(recordId(z))||state.library.find(x=>x.title===z.title)||z).filter(x=>x.title);
- const starter=run.mode==="curated-starter";const label=starter?"The starting shelf":"Indexed in the last seven days";
- $("#issue-kicker").textContent=starter?"ISSUE 00 / BASELINE":"LATEST / "+fmtDate(run.date);
- $("#issue-heading").textContent=starter?"An evolving map of AI and attention.":entries.length?"What emerged this week.":"A quieter week for new research.";
- $("#issue-deck").textContent=starter?"This is the initial curated collection. The automated scholarly and news search has not yet populated the weekly index.":"The past seven days added "+entries.length+" indexed items. Records are screened automatically; full-text evidence is separately labeled.";
- $("#updated-label").textContent=starter?"Awaiting first scheduled search":"Last index: "+fmtDate(run.date);
+ const starter=run.mode==="curated-starter";
+ // Weekly homepage features source-rich papers; citation-only entries remain in the library.
+ const readable=entries.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
+ readable.sort((a,b)=>paperPriority(b)-paperPriority(a));
+ const featured=readable.slice(0,5);
+ $("#issue-kicker").textContent=starter?"ISSUE 00 / STARTING COLLECTION":"THE WEEKLY RESEARCH DIGEST / "+fmtDate(run.date);
+ $("#issue-heading").textContent=starter?"A starting map of AI and attention.":featured.length?"Research worth reading this week.":"The index is growing.";
+ $("#issue-deck").textContent=starter?"Initial literature selected for the research library.":"Five source-rich publications selected from "+entries.length+" recent index records. Sections below distinguish reported research from source metadata.";
+ $("#updated-label").textContent=starter?"Awaiting live collection":"Last indexed "+fmtDate(run.date);
  const highlight=$("#weekly-items");highlight.replaceChildren();
- if(!entries.length)highlight.append(el("p","empty","No new indexed items in this cycle. Browse the complete library instead."));
- else entries.slice(0,7).forEach((x,i)=>highlight.append(card(x,i===0)));
+ if(!featured.length)highlight.append(el("p","empty","No sufficiently detailed research summaries have been indexed for this update yet. Explore the complete research library."));
+ else featured.forEach((x,i)=>highlight.append(card(x,i===0)));
  const countMap={};lanes.forEach(l=>countMap[l]=0);entries.forEach(x=>{if(countMap[x.lane]!==undefined)countMap[x.lane]++});
  const distribution=$("#distribution");distribution.replaceChildren();
  const max=Math.max(1,...Object.values(countMap));
  lanes.forEach(l=>{const r=el("div","distribution-row"),label=el("span","axis-label",l),track=el("div","distribution-track"),fill=el("span","distribution-fill"),number=el("span","distribution-count",countMap[l]);fill.style.width=(100*countMap[l]/max)+"%";add(track,fill);add(r,label,track,number);distribution.append(r)});
  const points=$("#weekly-points");points.replaceChildren();
- if(starter)points.append(el("p","side-copy","Initial reading list only. Interpretive weekly summaries will be available after the first successful collector run."));
- else if(!entries.length)points.append(el("p","side-copy","No newly indexed publications in this run. That is not evidence that no relevant work was published."));
- else entries.slice(0,3).forEach(x=>{const p=el("div","brief-point");add(p,el("span","brief-dot","↗"),el("p","",x.analysis?.key_idea||("New "+(x.kind==="scholarly"?"research":"commentary")+": "+x.title)));points.append(p)});
- const tally=$("#source-tally");tally.textContent=state.library.length+" indexed sources • "+entries.length+" in this update";
+ const notes=featured.filter(x=>x.reading?.findings).slice(0,3);
+ if(!notes.length){points.append(el("p","side-copy","No source-backed findings are available for the latest selection. They will appear here when the collector retrieves substantive text."));}
+ else notes.forEach(x=>{
+   const wrap=el("div","brief-point");
+   const link=el("button","brief-finding-title",x.title);link.type="button";link.onclick=()=>navigate("read",recordId(x));
+   const fact=el("p","brief-finding",x.reading.findings.slice(0,260));
+   const src=el("span","brief-source",x.reading.level==="full_text"?"From open-access article sections":"From indexed abstract");
+   add(wrap,link,fact,src);points.append(wrap);
+ });
+ $("#source-tally").textContent=state.library.length+" library records · "+entries.length+" indexed this week";
  const alert=$("#run-alert");alert.replaceChildren();
- if(run.stats?.errors?.length){add(alert,el("strong","","Some sources were unavailable in the last collection."),el("span","",run.stats.errors.length+" provider warning(s); see the GitHub Actions logs."));alert.hidden=false;}
- else alert.hidden=true;
+ if(run.stats?.errors?.length){add(alert,el("strong","","Some data providers were unavailable in this cycle."),el("span","",run.stats.errors.length+" search-provider warning(s). See GitHub Actions logs."));alert.hidden=false;}else alert.hidden=true;
 }
 function renderLibrary(){
  const term=$("#search").value.trim().toLocaleLowerCase();const lane=$("#topic-filter").value;const kind=$("#type-filter").value;
@@ -83,26 +101,41 @@ function contentSection(root,label,text){
 }
 function renderArticle(x){
  const root=$("#article-content");root.replaceChildren();
- const back=el("button","back-link","← Back to the library");back.onclick=()=>navigate("library");
- const head=el("div","reading-head");add(head,el("div","eyebrow","SOURCE READING / "+(x.lane||"Unclassified")),el("h1","reading-title",x.title),el("p","reading-byline",[x.venue,fmtDate(x.published)].join(" · ")));
- const chips=el("div","chips");add(chips,tag(x.kind==="scholarly"?"Academic research":"Commentary / technology"),tag(x.analysis?"Open-access sections extracted":x.curated?"Curated synopsis":"Metadata screening only"));head.append(chips);
- const grid=el("div","reading-grid");
- const main=el("div","reading-main");
- const stand=el("section","reading-section spotlight");add(stand,el("div","eyebrow","THE CENTRAL IDEA"),el("p","standfirst",preview(x)));
- if(!x.analysis){add(stand,el("p","source-notice",x.curated?"Editorial starter note; not a verified extraction of the paper's full methodology or findings.":"Automated title/abstract indexing only. Study design, results, and effect sizes have not been verified."))}
- main.append(stand);
- if(x.analysis){const a=x.analysis;const disclosure=el("p","source-notice","These notes are automatically extracted excerpts from permitted open-access sections, not independent analysis. Verify claims in the linked original.");main.append(disclosure);["methods","results","discussion","limitations"].forEach(k=>contentSection(main,k[0].toUpperCase()+k.slice(1)+" · extracted text",a[k]));}
- else {
- const questions={"AI & cognition":["Which cognitive tasks shift from a person to an AI system?","Does the paper measure attention directly, or another cognitive construct?"],"Fragmentation":["What causes the interruption or switching demand?","Are lasting attention costs measured?","Does the study examine AI specifically?"],"Interventions":["What changes about the intervention design?","Is there a controlled comparison showing improved attention?"],"Technology & society":["Which propositions are descriptive versus normative?","What kind of evidence could test these ideas?"]}[x.lane]||["What is the central claim and supporting evidence?"];
- const section=el("section","reading-section");section.append(el("h3","","Questions worth asking"));const ul=el("ul","question-list");questions.forEach(q=>ul.append(el("li","",q)));section.append(ul);main.append(section);
+ const back=el("button","back-link","← Back to the research library");back.onclick=()=>navigate("library");
+ const head=el("div","reading-head");
+ add(head,el("div","eyebrow","RESEARCH READING / "+(x.lane||"Unclassified")),el("h1","reading-title",x.title),el("p","reading-byline",[(x.authors||[]).slice(0,3).join(", ")+(x.authors?.length>3?" et al.":""),x.venue,fmtDate(x.published)].filter(Boolean).join(" · ")));
+ const rd=x.reading||{},tier=rd.level==="full_text"?"Open-access article excerpts":rd.level==="abstract"?"Source abstract highlights":rd.level==="curated"?"Editorial synopsis":"Citation only";
+ const chips=el("div","chips");add(chips,tag(x.kind==="scholarly"?"Academic publication":"Commentary / technology"),tag(tier,rd.level==="full_text"?"verified":""));head.append(chips);
+ const grid=el("div","reading-grid"),main=el("div","reading-main");
+ const stand=el("section","reading-section spotlight");
+ add(stand,el("div","eyebrow","OVERVIEW"),el("p","standfirst",rd.overview||preview(x)));
+ if(rd.notice)stand.append(el("p","source-notice",rd.notice));main.append(stand);
+ if(rd.level==="citation_only"||!rd.level){
+   const info=el("section","reading-section");
+   add(info,el("h3","","What we have indexed"),el("p","section-text","Citation and original-source links only. No accessible abstract or openly licensed text was found yet, so this record is not presented as a substantive finding."));
+   main.append(info);
+ } else {
+   const sections=[["How the study was conducted",rd.methods],["What the paper reports",rd.findings],["Limitations and qualifications",rd.limitations]];
+   let included=0;
+   sections.forEach(([label,detail])=>{if(detail){contentSection(main,label,detail);included++;}});
+   if(!included&&x.kind==="scholarly")contentSection(main,"Evidence status","The accessible source material does not specify a verifiable method or result. This is an overview, not a complete paper analysis.");
+   if(rd.level==="abstract"&&x.abstract_text){
+     const section=el("section","reading-section");
+     const details=el("details","abstract-expander"),sum=el("summary","","Read the indexed abstract");
+     details.append(sum,el("p","section-text",x.abstract_text));section.append(details);main.append(section);
+   }
  }
- const side=el("aside","reading-aside");
- const meta=el("div","aside-block");add(meta,el("div","eyebrow","AT A GLANCE"),infoRow("Type",x.kind==="scholarly"?"Academic":"Essay / technology"),infoRow("Published",fmtDate(x.published)),infoRow("Coverage",x.analysis?"Selected open-access sections":x.curated?"Curated starter":"Citation / abstract"),infoRow("Relevance",x.relation||"Unclassified"));if(x.doi)meta.append(infoRow("DOI",x.doi));side.append(meta);
- const figure=el("div","aside-block");add(figure,el("div","eyebrow","CONCEPT MAP"),el("p","side-copy","An interpretive pathway to guide reading—not a causal finding or figure from this source."));let paths={"AI & cognition":["AI assistance","Cognitive delegation","Attention & judgment"],"Fragmentation":["Interruptions","Task switching","Focus recovery"],"Interventions":["Design choice","User behavior","Attention outcomes"],"Technology & society":["Technology design","Economic incentives","Human agency"]};let seq=paths[x.lane]||["Technology","Human behavior","Attention"];const blocks=el("div","path-diagram");seq.forEach((v,i)=>{blocks.append(el("div","path-node",v));if(i!==seq.length-1)blocks.append(el("div","path-arrow","↓"))});figure.append(blocks);side.append(figure);
- if(x.analysis?.figures?.length){const f=el("div","aside-block");add(f,el("div","eyebrow","FIGURES IN THE ORIGINAL PAPER"));x.analysis.figures.forEach(z=>{const p=el("div","figure-caption");add(p,el("strong","",z.label||"Figure"),el("p","",z.caption||"No caption extracted"));f.append(p)});side.append(f);}
- const link=validUrl(x.url);if(link){const a=el("a","source-button","Read original publication  ↗");a.href=link;a.target="_blank";a.rel="noopener noreferrer";side.append(a);}
- if(x.analysis?.fulltext_url){const u=validUrl(x.analysis.fulltext_url);if(u){const a=el("a","plain-link","Open licensed full text ↗");a.href=u;a.target="_blank";a.rel="noopener noreferrer";side.append(a)}}
- const find=el("a","plain-link","Find by title on Google Scholar ↗");find.href="https://scholar.google.com/scholar?q="+encodeURIComponent(x.title);find.target="_blank";find.rel="noopener noreferrer";side.append(find);
+ const side=el("aside","reading-aside"),meta=el("div","aside-block");
+ add(meta,el("div","eyebrow","SOURCE INFORMATION"),infoRow("Type",x.kind==="scholarly"?"Academic publication":"Commentary / technology"),infoRow("Date",fmtDate(x.published)),infoRow("Available material",tier),infoRow("Provenance",rd.provenance||x.source||"Unspecified"),infoRow("Connection",x.relation||"Not classified"));
+ if(rd.sample)meta.append(infoRow("Reported sample",rd.sample));if(x.doi)meta.append(infoRow("DOI",x.doi));side.append(meta);
+ if(x.analysis?.figures?.length){
+  const f=el("div","aside-block");add(f,el("div","eyebrow","FIGURES IN THE SOURCE"));
+  x.analysis.figures.forEach(z=>{const p=el("div","figure-caption");add(p,el("strong","",z.label||"Figure"),el("p","",z.caption||"Caption not extracted"));f.append(p)});side.append(f);
+ }
+ const orig=validUrl(x.url);
+ if(orig){const a=el("a","source-button","Read original publication ↗");a.href=orig;a.target="_blank";a.rel="noopener noreferrer";side.append(a);}
+ if(x.analysis?.fulltext_url){const link=validUrl(x.analysis.fulltext_url);if(link){const a=el("a","plain-link","View open-access full text ↗");a.href=link;a.target="_blank";a.rel="noopener noreferrer";side.append(a)}}
+ const find=el("a","plain-link","Find on Google Scholar ↗");find.href="https://scholar.google.com/scholar?q="+encodeURIComponent(x.title);find.target="_blank";find.rel="noopener noreferrer";side.append(find);
  add(grid,main,side);add(root,back,head,grid);
 }
 async function load(){
