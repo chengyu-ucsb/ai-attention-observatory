@@ -28,6 +28,8 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
+      - name: Check Python syntax before external requests
+        run: python -m compileall -q scripts tests
       - name: Try permitted Europe PMC full-text sources
         run: python scripts/enrich.py
       - name: Verify permissible journal figure images
