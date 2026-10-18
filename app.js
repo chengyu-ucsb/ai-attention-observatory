@@ -87,8 +87,8 @@ function renderWeekly(){
  if(run.stats?.errors?.length){add(alert,el("strong","","Some data providers were unavailable in this cycle."),el("span","",run.stats.errors.length+" search-provider warning(s). See GitHub Actions logs."));alert.hidden=false;}else alert.hidden=true;
 }
 function renderLibrary(){
- const term=$("#search").value.trim().toLocaleLowerCase();const lane=$("#topic-filter").value;const kind=$("#type-filter").value;
- let rows=state.library.filter(x=>(!lane||x.lane===lane)&&(!kind||x.kind===kind)&&(!term||[x.title,x.preview,x.venue,(x.authors||[]).join(" "),x.doi].join(" ").toLocaleLowerCase().includes(term)));
+ const term=$("#search").value.trim().toLocaleLowerCase();const lane=$("#topic-filter").value;const kind=$("#type-filter").value;const depth=$("#depth-filter").value;
+ let rows=state.library.filter(x=>(!lane||x.lane===lane)&&(!kind||x.kind===kind)&&(depth==="all"||(depth==="full_text"?x.reading?.level==="full_text":x.reading?.level!=="citation_only"))&&(!term||[x.title,x.preview,x.venue,(x.authors||[]).join(" "),x.doi].join(" ").toLocaleLowerCase().includes(term)));
  rows.sort((a,b)=>dateValue(b).localeCompare(dateValue(a)));
  $("#result-count").textContent=rows.length+" of "+state.library.length+" sources";
  const root=$("#library-items");root.replaceChildren();
@@ -153,6 +153,6 @@ async function load(){
  }
 }
 $$("[data-nav]").forEach(btn=>btn.addEventListener("click",ev=>{ev.preventDefault();navigate(btn.dataset.nav)}));
-$("#search").addEventListener("input",renderLibrary);$("#topic-filter").addEventListener("change",renderLibrary);$("#type-filter").addEventListener("change",renderLibrary);
+$("#search").addEventListener("input",renderLibrary);$("#topic-filter").addEventListener("change",renderLibrary);$("#type-filter").addEventListener("change",renderLibrary);$("#depth-filter").addEventListener("change",renderLibrary);
 window.addEventListener("hashchange",renderRoute);
 load();
