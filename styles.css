@@ -229,3 +229,22 @@
 .issue-follow .quiet-link{font-size:10px;display:block;margin-top:12px}
 @media(max-width:950px){.issue-signals{grid-template-columns:1fr}.issue-signal{min-height:0}.issue-extras{grid-template-columns:1fr}.weekly-cover{grid-template-columns:1fr 220px;padding:25px}.weekly-cover-copy h3{font-size:34px}}
 @media(max-width:650px){.weekly-cover{grid-template-columns:1fr;padding:25px}.weekly-cover-art{max-width:230px}.weekly-signal-strip{grid-template-columns:1fr}.weekly-signal{min-height:0}.issue-hero{padding:45px 0}.issue-hero h1{font-size:45px}.issue-layout{padding:28px 0 60px}.issue-letter{padding:16px 19px}.issue-sources{grid-template-columns:1fr}.issue-follow{display:block;padding:23px}.issue-follow .button{margin-top:16px}}
+
+/* Concept illustrations are source-topic maps, never invented empirical graphs. */
+.article-concept-art{border:1px solid #e8dad6;background:#fbf6f3;margin:20px 0;padding:18px 22px}
+.article-concept-art>.eyebrow{font-size:10px;color:#a44454}
+.concept-scene{position:relative;display:flex;align-items:center;justify-content:center;gap:16px;min-height:192px;padding:24px 15px;margin:12px auto}
+.concept-scene:before{content:"";position:absolute;border:1px dashed #b8828b;border-radius:50%;height:155px;width:155px;top:50%;left:50%;transform:translate(-50%,-50%)}
+.concept-center{position:relative;z-index:2;background:#a43a4c;color:white;padding:16px;min-width:114px;min-height:80px;display:grid;place-items:center;text-align:center;font-size:11px;font-weight:800;letter-spacing:.03em;box-shadow:0 2px 0 #874051}
+.concept-node{position:relative;z-index:2;flex:0 0 135px;max-width:135px;min-height:66px;padding:12px 9px;display:grid;place-items:center;text-align:center;background:white;color:#7b4e5b;border:1px solid #d6acb3;font-size:11px;line-height:1.45;font-weight:800}
+.concept-node-0{border-color:#c07e8b}.concept-node-1{background:#f5e1df}.concept-node-2{border-color:#a56d80}
+.concept-note{font-size:10px;color:#8b797e;line-height:1.7;margin:5px 0 0}
+.paper-snapshot{margin-top:14px}
+.snapshot-tile{padding:18px;min-height:184px}
+.snapshot-tile p{font-size:12px;line-height:1.65}
+.paper-detail-excerpts{border:1px solid #e5d6d4;background:#fff;margin-top:20px}
+.paper-detail-excerpts summary{color:#a2384e;font-weight:800;cursor:pointer;padding:16px}
+.paper-detail-body{padding:5px 18px}
+.paper-detail-body .reading-section p{font-size:12px;line-height:1.85}
+@media(max-width:1000px){.concept-scene{flex-wrap:wrap;padding:15px}.concept-node{flex:1 1 130px}.concept-center{order:-1}.concept-scene:before{display:none}}
+@media(max-width:650px){.article-concept-art{padding:16px}.concept-scene{gap:8px;min-height:0}.concept-center{width:100%;min-height:55px}.concept-node{flex:1 1 45%;min-height:65px}}
