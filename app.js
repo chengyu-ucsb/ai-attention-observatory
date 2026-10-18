@@ -110,19 +110,39 @@ function showPaper(x){
  const r=x.reading||{},meta=[...(x.authors||[]).slice(0,3),x.venue,date(x.published)].filter(Boolean).join(" · ");
  const chips=make("div","paper-controls");for(const a of [x.lane||"Research",depthName(x),x.kind==="scholarly"?"Scholarly":"Commentary"])chips.append(make("span","paper-label",a));
  const cols=make("div","paper-columns"),left=make("div"),right=make("aside","paper-side"),lead=make("section","reading-lead");
- add(lead,make("p","eyebrow","CENTRAL IDEA"),make("h2","","At a glance"),make("p","",r.overview||cut(excerpt(x),500)));left.append(lead);
- if(x.kind==="nonacademic"){
-  const notes=x.editorial_notes||{};
-  if(notes.argument)left.append(section("THE AUTHOR'S ARGUMENT",notes.argument,"Original editorial synopsis; check the linked article"));
-  if(notes.design_relevance)left.append(section("DESIGN POSSIBILITIES",notes.design_relevance,"A research-to-product interpretation, not a tested intervention"));
-  if(notes.caveat)left.append(section("INTERPRETIVE LIMITS",notes.caveat,"Editorial qualification"));
-  if(!notes.argument)left.append(make("div","citation-notice","This entry currently contains the publisher's feed description, not an article-length critical reading. Open the original source to examine its argument in context."));
- }else{
-  if(r.methods)left.append(section("HOW IT WAS STUDIED",r.methods,r.provenance));
-  if(r.findings)left.append(section("WHAT THE PAPER REPORTS",r.findings,r.provenance));
-  if(r.limitations)left.append(section("LIMITATIONS",r.limitations,r.provenance));
-  if(!r.methods&&!r.findings)left.append(make("div","citation-notice","The accessible source does not contain an identifiable method or result. This is a discovery record, not a verified research summary."));
+ add(lead,make("p","eyebrow","CENTRAL IDEA"),make("h2","","At a glance"),make("p","",cut(r.overview||excerpt(x),300)));left.append(lead);
+ // Source-grounded snapshot; the cards are concise but never fill absent methods/results by inference.
+ const editorial=x.kind==="nonacademic",notes=x.editorial_notes||{};
+ const cells=editorial?[
+  ["AUTHOR'S POSITION",notes.argument||r.overview,"◆"],
+  ["PRODUCT POSSIBILITY",notes.design_relevance,"↗"],
+  ["WHAT'S UNTESTED",notes.caveat,"◌"]
+ ]:[
+  ["STUDY APPROACH",r.methods,"◈"],
+  ["REPORTED RESULT",r.findings,"◎"],
+  ["LIMITS / QUALIFIERS",r.limitations,"↗"]
+ ];
+ const snapshot=make("div","paper-snapshot");
+ for(const [title,content,symbol] of cells){
+  const tile=make("article","snapshot-tile"+(content?"":" is-missing"));
+  add(tile,make("div","snapshot-symbol",symbol),make("span","snapshot-kicker",title),make("p","",content?cut(content,140):"Not established in the indexed text."));
+  snapshot.append(tile);
  }
+ left.append(snapshot);
+ const detailed=make("details","paper-detail-excerpts");
+ detailed.append(make("summary","","Open source-based reading notes"));
+ const notesArea=make("div","paper-detail-body");let hasNotes=false;
+ if(editorial){
+  for(const [label,content,source] of [["THE AUTHOR'S ARGUMENT",notes.argument,"Editorial reading note"],["DESIGN POSSIBILITIES",notes.design_relevance,"Research-to-product interpretation (not a tested result)"],["INTERPRETIVE LIMITS",notes.caveat,"Editorial qualification"]]){
+    if(content){notesArea.append(section(label,content,source));hasNotes=true}
+  }
+ }else{
+  for(const [label,content] of [["HOW IT WAS STUDIED",r.methods],["WHAT THE PAPER REPORTS",r.findings],["LIMITATIONS",r.limitations]]){
+    if(content){notesArea.append(section(label,content,r.provenance));hasNotes=true}
+  }
+ }
+ if(hasNotes){detailed.append(notesArea);left.append(detailed)}
+ else left.append(make("div","citation-notice",editorial?"Only a short description is indexed for this commentary. Open the original to read the argument in context.":"No method and result can be identified from the accessible text. This remains a discovery record."));
  if(x.abstract_text){const details=make("details"),box=make("section","reading-section");add(details,make("summary","","Show the indexed abstract"),make("p","",x.abstract_text));box.append(details);left.append(box)}
  left.append(make("p","paper-smallprint",r.notice||"Automatically indexed material. Verify the original publication before citing findings."));
  const at=make("section","paper-side-block");add(at,make("p","eyebrow","SOURCE INFORMATION"),make("h3","","Reading details"));
