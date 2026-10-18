@@ -11,7 +11,7 @@ function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.sli
 function id(x){return String(x.doi||x.url||x.title)}
 function record(k){return S.records.find(x=>id(x)===k)}
 function depth(x){return x.reading?.level||"citation_only"}
-function depthName(x){return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
+function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only")return "Publisher synopsis";return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 function cut(t,n){t=String(t||"").trim();return t.length>n?t.slice(0,n).replace(/\s+\S*$/,"")+"…":t}
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.findings?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
@@ -22,7 +22,7 @@ function topicBars(selector){const root=$(selector);root.replaceChildren();const
 function donut(){const cc=counts(),total=Math.max(1,S.records.length),legend=$("#depth-legend");$("#record-count").textContent=S.records.length;legend.replaceChildren();let at=0,parts=[];for(const d of depths){let pct=cc[d[0]]/total*100;parts.push(d[2]+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;const r=make("div","legend-item"),sw=make("span","legend-swatch"),copy=make("div");sw.style.background=d[2];add(copy,make("div","legend-title",d[1]+" · "+cc[d[0]]),make("span","legend-caption",Math.round(pct)+"% of records"));add(r,sw,copy);legend.append(r)}$("#evidence-donut").style.background="conic-gradient("+parts.join(",")+")"}
 function home(){
  const run=S.week.run||{},all=(S.week.items||[]).map(x=>record(id(x))||S.records.find(r=>r.title===x.title)||x);
- const top=all.filter(x=>depth(x)!=="citation_only"&&x.reading?.findings).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.findings)).slice(0,3);
+ const top=all.filter(x=>x.kind==="scholarly"&&depth(x)!=="citation_only"&&x.reading?.findings).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.findings)).slice(0,3);
  const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??all.length)+" recently indexed · "+S.records.length+" total";
  const root=$("#feature-grid");root.replaceChildren();
  if(!top.length)root.append(make("div","empty-state","The latest index contains no source-rich highlights yet. Browse the research library."));
@@ -80,6 +80,7 @@ function showPaper(x){
  function valid(u){try{const v=new URL(u);return v.protocol==="https:"?u:null}catch{return null}}
  if(valid(x.url))right.append(link("Open original publication ↗",x.url,"paper-original"));
  if(valid(x.analysis?.fulltext_url))right.append(link("View open-access version ↗",x.analysis.fulltext_url,"paper-extra"));
+ if(valid(x.open_access_url))right.append(link("Find available full text ↗",x.open_access_url,"paper-extra"));
  right.append(link("Search on Google Scholar ↗","https://scholar.google.com/scholar?q="+encodeURIComponent(x.title),"paper-extra"));
  let related=S.records.filter(y=>y!==x&&y.lane===x.lane&&depth(y)!=="citation_only").sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){const panel=make("section","paper-side-block");add(panel,make("p","eyebrow","EXPLORE FURTHER"),make("h3","","Related papers"));for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));right.append(panel)}
