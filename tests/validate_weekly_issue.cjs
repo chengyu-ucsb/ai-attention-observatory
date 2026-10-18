@@ -8,6 +8,8 @@ assert.equal(issue.source_count,weekly.items.length,"Issue shelf must cover enti
 assert.deepEqual(new Set(issue.sources.map(s=>s.id)),new Set(weekly.items.map(s=>(s.doi||"").toLowerCase()||s.url||s.title)));
 assert(issue.sources.every(s=>s.reading_level!=="citation_only"),"Citation-only source cannot enter an issue");
 assert(site.includes('id="issue"')&&site.includes('id="weekly-title"'),"Weekly issue not discoverable");
+assert(fs.existsSync(path.join(root,"issues/index.html")),"Missing archived edition directory index");
+assert(site.includes('href="issues/"'),"Newsletter archive navigation missing");
 assert(app.includes("function renderIssue()"),"Missing issue renderer");
 const deployment=text(".github/workflows/publish.yml");
 assert(deployment.includes("Catch up full-text research backlog"),"Catch-up results must trigger a Pages redeployment");
