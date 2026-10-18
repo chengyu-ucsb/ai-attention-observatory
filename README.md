@@ -2,6 +2,18 @@
 
 A public-facing research discovery and reading room curated by [Chengyu Fang](https://chengyufang.org/). It tracks how AI influences attention, cognitive offloading and sustained engagement, together with possible interventions and relevant adjacent research.
 
+## The playable Lab (October 2026)
+
+The Experimental Lab now provides three interactive, entirely browser-local experiences rather than static form prototypes:
+
+- **Switch Lab:** A 20-trial rule-switching number exercise with left/right mouse or keyboard responses, accuracy feedback, and a simple comparison of correct-response median times for a fixed same-rule and alternating-rule sequence. The exercise is **not** a validated task-switching measurement: order, learning, rule demands and sample size are uncontrolled.
+- **Return Point:** A fictional project, brief distraction microtasks and a return-choice exercise that can be replayed with or without a visible checkpoint. The displayed elapsed time measures the local choice delay only. Trial-to-trial differences are not causal evidence for a checkpoint effect.
+- **Assistance Dial:** Two short examples about reading empirical evidence, with three deterministic levels of help (reflection, hint, direct answer). It does not connect to an AI model or evaluate individual intelligence.
+
+The homepage links directly to the Lab and previews a number-rule challenge. Research reading pages open with study-approach, reported-result and qualification snapshots, and keep the full excerpt details expandable. Three-line coverage strips on homepage features indicate available source material, not research strength.
+
+**Data handling:** These prototypes do not call network services, log input, use localStorage or submit session scores. Everything resets on page reload. A build-time smoke test (`node tests/validate_playground.cjs`) exercises the tabs, twenty switching trials, interruption modes, and assistance scenarios; it is a lightweight DOM simulation, not a full browser compatibility or accessibility audit.
+
 ## October 2026 — Public redesign
 
 The site now combines three complementary directions:
