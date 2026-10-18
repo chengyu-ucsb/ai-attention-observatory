@@ -2,6 +2,17 @@
 
 A public-facing research discovery and reading room curated by [Chengyu Fang](https://chengyufang.org/). It tracks how AI influences attention, cognitive offloading and sustained engagement, together with possible interventions and relevant adjacent research.
 
+## The Attention Edit: weekly synthesis and newsletter (October 2026)
+
+The weekly homepage now starts with one editorial thesis and three cross-source themes instead of a sequence of article summaries. The full edition lives at \`#issue\` and contains a cross-source opening letter, cited themes, a productive tension, an experimental prompt, and an expandable complete source shelf.
+
+- **Reviewed editorial copy** is versioned in \`data/issue-editorial.json\`. \`scripts/build_issue.py\` resolves each editorial citation against the full source-backed weekly set; missing or ambiguous citations fail the build. A new week without reviewed text displays a clear "editorial in review" state; the system does not invent new scientific conclusions.
+- **Shareable email-style edition:** \`scripts/build_newsletter.py\` publishes \`newsletter.html\` and \`issue-feed.xml\`. These can be read in the browser and syndicated by RSS. **No addresses are collected, no newsletter is sent, and no mailing-list provider is connected.** A real email subscription requires opt-in, unsubscribe and delivery/bounce handling before launch.
+- **Readable article pages:** \`scripts/condense_readings.py\` cleans extracted section numbers/citation debris and provides short provenance-labelled text. Carefully reviewed readings are explicitly identified; automatically condensed extracts are not described as independently verified. Raw source passages are tucked into expandable details.
+- **Graphics:** Article pages show original conceptual artwork describing the topic, plus specific source-grounded visualizations for identified learner profiles and coding-category totals. These graphics are explicitly distinguished from study-provided empirical figures. For figures in full-text papers, \`scripts/enrich_figure_links.py\` tries to verify licensed source-hosted original image files. Only URLs that pass source, licensing and MIME checks can appear, with attribution; otherwise the website links to the original article. Figure captions alone are not evidence sufficient to reconstruct plotted values.
+
+The issue is intentionally compact, conversational and evidence-conscious: tell readers what the sources *add up to*, where they disagree, what remains uncertain, and one small thing to try. Individual papers supply depth, not the newsletter's page structure.
+
 ## Continuous full-text catch-up and public evidence policy (October 2026)
 
 The observatory uses **two separate schedules**, rather than waiting for weekly searches to process all newly found research:
