@@ -9,6 +9,9 @@ assert.deepEqual(new Set(issue.sources.map(s=>s.id)),new Set(weekly.items.map(s=
 assert(issue.sources.every(s=>s.reading_level!=="citation_only"),"Citation-only source cannot enter an issue");
 assert(site.includes('id="issue"')&&site.includes('id="weekly-title"'),"Weekly issue not discoverable");
 assert(app.includes("function renderIssue()"),"Missing issue renderer");
+const deployment=text(".github/workflows/publish.yml");
+assert(deployment.includes("Catch up full-text research backlog"),"Catch-up results must trigger a Pages redeployment");
+assert(site.includes('id="issue-source-landscape"'),"Weekly source mix visualization missing");
 if(issue.status==="published"){
  assert(issue.signals.length>=3&&issue.signals.length<=4,"A small number of cross-source signals is required");
  for(const sig of issue.signals){
