@@ -20,6 +20,8 @@ EXCLUDE_TITLE=re.compile(r"gaining .*attention|stock price|share price|trading|m
 TRUSTED_OUTLETS=re.compile(r"The Atlantic|WIRED|MIT Technology Review|Nature|Science|The Verge|Tech Policy Press|The Guardian|The Conversation|Ars Technica|Harvard Business Review|New York Times|Financial Times|Bloomberg|BBC|NPR|Vox|IEEE Spectrum|Quanta|The Decoder|Inside Higher Ed|EdSurge|PsyPost|New Scientist|Washington Post|Psychology Today|Communications of the ACM|The Economist|Rest of World",re.I)
 def relevant(x):
  if x.get("curated"):return True
+ if x.get("kind")=="nonacademic" and x.get("source")=="Publisher RSS / Google News RSS":
+  return (not x.get("published") or x["published"]<=TODAY) and bool(AI_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")) and ATTENTION_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")))
  if x.get("published") and x["published"]>TODAY:return False
  title=x.get("title","");blurb=x.get("preview","")
  if EXCLUDE_TITLE.search(title):return False
