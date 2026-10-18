@@ -7,10 +7,10 @@ import json,pathlib,re,html
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 STOP=("abstract unavailable","bibliographic metadata only","no abstract", "abstract not available")
-METHOD=re.compile(r"\b(?:survey|interview|experiment|experimental|trial|randomi[sz]|sample|participants|students|respondents|researchers collected|data were|data was|we collected|recruited|cross.sectional|longitudinal|meta.analysis|systematic review|literature review|qualitative|quantitative|mixed.methods|thematic analysis|regression|structural equation|focus groups|we tested|models? were|analy[sz]ed|using data)\b",re.I)
-RESULT=re.compile(r"\b(?:results? (?:show|suggest|indicat|reveal|demonstrat|found|support)|we (?:found|show|observed)|findings? (?:show|suggest|indicat|reveal|demonstrat)|associated with|positively (?:related|associated)|negatively (?:related|associated)|significantly|outperform|increased|decreased|mediated|moderated|higher than|lower than|effect size|was correlated|were correlated|our analys[ie]s)\b",re.I)
+METHOD=re.compile(r"\b(?:survey|interview|experiment|experimental|trial|randomi[sz]|sample (?:of|comprised)|participants (?:were|included|completed)|recruited|data (?:were|was) (?:collected|drawn|derived)|we collected|cross.sectional|longitudinal|meta.analysis|systematic review|literature review|qualitative|quantitative|mixed.methods|thematic analysis|regression|structural equation|focus groups|we tested|analy[sz]ed (?:data|responses)|using (?:data|a sample)|questionnaire|fMRI|content analysis)\b",re.I)
+RESULT=re.compile(r"\b(?:results? (?:show(?:ed)?|suggest(?:ed)?|indicat(?:e|ed)|reveal(?:ed)?|demonstrat(?:e|ed)|found|support)|we (?:found|find|showed|observed)|our (?:results?|findings?|analysis) (?:show|suggest|indicat|reveal|demonstrat|found)|findings? (?:show|suggest|indicat|reveal|demonstrat)|(?:analysis|analyses) (?:found|revealed|showed)|(?:significant|statistically significant) (?:association|difference|effect|relationship)|was significantly|were significantly|is positively associated|are positively associated|is negatively associated|are negatively associated)\b",re.I)
 AIM=re.compile(r"\b(?:aims? to|investigat|examines?|explores?|seeks? to|the purpose|we study|this (?:study|paper|article|research)|designed to|evaluate)\b",re.I)
-LIMIT=re.compile(r"\b(?:limitation|caution|however|cannot establish|not causal|cross.sectional|self.report|generalizab|future research|small sample|potential bias)\b",re.I)
+LIMIT=re.compile(r"\b(?:limitations? (?:include|involve|are|of this|in this)|important limitation|limitations? of|we (?:acknowledge|recognize) (?:several|these|some) limitations?|cannot establish causal|caution is warranted|findings? (?:should|must) be interpreted with caution|generalizability (?:is|was) limited|further research is needed to)\b",re.I)
 SAMPLE=re.compile(r"\b(?:n\s*=\s*(\d{2,6})|(\d{2,6})\s+(?:participants|students|respondents|workers|people|adults|adolescents|teachers|patients))\b",re.I)
 
 def clean(s):return re.sub(r"\s+"," ",html.unescape(re.sub(r"<[^>]+>"," ",s or ""))).strip()
@@ -60,6 +60,7 @@ def make_note(r):
         results=excerpt_from(parts,RESULT,520)
         caveat=excerpt_from(parts,LIMIT,360,exclude={approach,results})
         if approach and results and approach==results:approach=""
+        if results and re.search(r"remains? (?:unclear|unknown|insufficiently understood)|little is known|this study aims|we hypothesi[sz]ed|prior studies",results,re.I):results=""
         kind="Abstract-derived research notes"
         provider=r.get("abstract_source") or r.get("source") or "Bibliographic abstract"
     elif r.get("curated") and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
@@ -70,7 +71,7 @@ def make_note(r):
     else:
         return {"level":"citation_only","provenance":"Citation only","overview":"","methods":"","findings":"","limitations":"","sample":"","notice":"No accessible abstract or licensed text has been indexed for this record."}
     # Samples appear only if literally stated in the source text, never inferred.
-    sm=SAMPLE.search(src or approach)
+    sm=SAMPLE.search(approach or src)
     sample=sm.group(1) or sm.group(2) if sm else ""
     if sample and not METHOD.search(approach):sample=""  # Require an actual methodological context.
     has_finding=bool(results)
