@@ -15,7 +15,7 @@ def build():
  if current.get("status")=="published":
   edition=current.get("edition_date","")
   if not edition or not edition[:4].isdigit():raise ValueError("Published issue needs a date")
-  (approved/(edition+".json")).write_text(json.dumps(current,indent=2,ensure_ascii=False)+"\\n")
+  (approved/(edition+".json")).write_text(json.dumps(current,indent=2,ensure_ascii=False)+chr(10))
  archived=sorted(approved.glob("????-??-??.json"),reverse=True)
  issue=current if current.get("status")=="published" else (json.loads(archived[0].read_text()) if archived else current)
  root="https://chengyu-ucsb.github.io/ai-attention-observatory/"
@@ -52,7 +52,7 @@ def build():
   body+='<p style="font:11px/1.5 Arial,sans-serif;color:#8a7d80;">This is a publicly viewable preview, not a mailing-list message. No email addresses are collected. Email delivery and unsubscribe controls require a separate opt-in newsletter service.</p>'
   body+='</td></tr><tr><td style="padding:0;">'
  wrapper='''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'''+esc(title)+'''</title></head><body style="background:#f9f4f2;margin:0;padding:20px 10px;"><table role="presentation" align="center" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;background:white;border-collapse:collapse;border:1px solid #ecdedb;"><tr><td style="background:#a52c3e;padding:20px 30px;color:white;font:800 12px Arial,sans-serif;letter-spacing:1.5px;">ATTENTION / AI <span style="float:right;font-size:11px;font-weight:normal;">THE WEEKLY EDIT</span></td></tr><tr><td style="padding:32px 30px;">'''
- footer='''</td></tr><tr><td style="padding:22px 30px;background:#3a2730;color:#f2d9d7;font:12px/1.7 Arial,sans-serif;">Curated by the Attention Observatory · <a href="https://chengyufang.org/" style="color:#ffe1db;">chengyufang.org</a><br/>Read on the website: <a style="color:#ffe1db;" href="'''+root+'''#issue">Latest issue</a></td></tr></table></body></html>'''
+ footer='''</td></tr><tr><td style="padding:22px 30px;background:#3a2730;color:#f2d9d7;font:12px/1.7 Arial,sans-serif;">Curated by the Attention Observatory · <a href="https://chengyufang.org/" style="color:#ffe1db;">chengyufang.org</a><br/>Read on the website: <a style="color:#ffe1db;" href="'''+archive_link+'''">Latest approved issue</a></td></tr></table></body></html>'''
  rendered=wrapper+body+footer
  (ROOT/"newsletter.html").write_text(rendered)
  if published:
