@@ -12,6 +12,7 @@ ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/"data/library.json"
 TODAY=datetime.date.today().isoformat()
 ALLOW={"cc-by","cc-by-sa","cc0","public-domain"}
+RELEVANT=re.compile(r"(?:attention|focus|cognit|think|distract|interrupt|offload|self.regulat|memory|metacognit|task.switch|ai literacy)",re.I)
 SECTION_KEYS={
     "methods":("method","material","procedure","design","data collection","analysis approach","participants"),
     "results":("results","findings"),
@@ -21,7 +22,7 @@ SECTION_KEYS={
 def get(url,key):
     url=url+("&" if "?" in url else "?")+urllib.parse.urlencode({"api_key":key})
     req=urllib.request.Request(url,headers={"User-Agent":"AI-Attention-Observatory/2.1 (fangcu@ucmail.uc.edu)","Accept":"application/xml,application/json"})
-    with urllib.request.urlopen(req,timeout=22) as response:return response.read(1_600_000)
+    with urllib.request.urlopen(req,timeout=22) as response:return response.read(5_000_000)
 def local(tag):return tag.split("}")[-1].lower()
 def content(el):return " ".join(" ".join(el.itertext()).split())
 def extract(root):
@@ -45,9 +46,17 @@ def main():
         return
     records=json.loads(DATA.read_text())
     eligible=[r for r in records if r.get("kind")=="scholarly" and r.get("doi")
-              and not r.get("analysis") and r.get("oa_grobid_checked")!=TODAY]
-    eligible.sort(key=lambda x:(0 if x.get("reading",{}).get("findings") else 1,x.get("published","")),reverse=False)
-    limit=int(os.getenv("OPENALEX_FULLTEXT_LIMIT","10"));complete=0;attempts=0;warnings=[]
+              and not r.get("analysis") and
+              (not r.get("oa_grobid_checked") or (datetime.date.fromisoformat(TODAY)-datetime.date.fromisoformat(r["oa_grobid_checked"])).days>=30)]
+    # Match the observatory's focus first rather than arbitrarily checking unrelated papers.
+    def priority(r):
+        title=r.get("title") or ""
+        title_focus=bool(RELEVANT.search(title))
+        adjacent=r.get("relation")=="Adjacent digital-attention evidence"
+        has_oa=bool(r.get("open_access_url"))
+        return (-int(title_focus),-int(not adjacent),-int(has_oa),r.get("oa_grobid_checked") or "",r.get("published") or "")
+    eligible.sort(key=priority)
+    limit=int(os.getenv("OPENALEX_FULLTEXT_LIMIT","35"));complete=0;attempts=0;warnings=[];skipped={"no_licensed_location":0,"no_grobid_xml":0,"missing_sections":0}
     for r in eligible:
         if attempts>=limit:break
         attempts+=1;r["oa_grobid_checked"]=TODAY
@@ -55,23 +64,33 @@ def main():
         try:
             work=json.loads(get("https://api.openalex.org/works/"+doi,key))
             oa=work.get("best_oa_location") or {}
-            license_str=(oa.get("license") or "").lower()
             href=oa.get("landing_page_url") or oa.get("pdf_url")
             if href and href.startswith("https://"):r["open_access_url"]=href
-            if license_str not in ALLOW:continue
+            # OpenAlex's 'best' location is not necessarily its openly licensed one.
+            locations=[oa]+(work.get("locations") or [])
+            licensed=next((loc for loc in locations if (loc.get("license") or "").lower() in ALLOW),None)
+            if not licensed:
+                skipped["no_licensed_location"]+=1
+                continue
+            license_str=(licensed.get("license") or "").lower()
+            lic_href=licensed.get("landing_page_url") or licensed.get("pdf_url") or href
             urls=work.get("content_urls") or {}
             xml_url=urls.get("grobid_xml","")
-            if not xml_url.startswith("https://content.openalex.org/works/"):continue
+            if not xml_url.startswith("https://content.openalex.org/works/"):
+                skipped["no_grobid_xml"]+=1
+                continue
             root=ET.fromstring(get(xml_url,key))
             secs=extract(root)
-            if not (secs.get("results") or secs.get("discussion")):continue
+            if not (secs.get("results") or secs.get("discussion")):
+                skipped["missing_sections"]+=1
+                continue
             r["analysis"]={
                 "provenance":"OpenAlex open-access GROBID XML (machine-parsed, may contain errors)",
                 "license":license_str,
-                "license_url":oa.get("license_id") or "",
+                "license_url":licensed.get("license_id") or "",
                 "methods":secs.get("methods",""),"results":secs.get("results",""),
                 "discussion":secs.get("discussion",""),"limitations":secs.get("limitations",""),
-                "figures":[],"fulltext_url":href or work.get("doi",""),
+                "figures":[],"fulltext_url":lic_href or work.get("doi",""),
                 "key_idea":(secs.get("discussion") or secs.get("results") or "")[:280],
                 "extraction_date":TODAY,
             }
@@ -80,5 +99,5 @@ def main():
             warnings.append(r.get("doi","")+": "+str(exc)[:100])
         time.sleep(.15)
     DATA.write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n")
-    print(json.dumps({"attempted":attempts,"extracted_fulltext":complete,"warnings":warnings[:8]},indent=2))
+    print(json.dumps({"attempted":attempts,"extracted_fulltext":complete,"skipped":skipped,"warnings":warnings[:8]},indent=2))
 if __name__=="__main__":main()
