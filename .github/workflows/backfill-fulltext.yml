@@ -22,6 +22,7 @@ jobs:
       OPENALEX_FULLTEXT_LIMIT: '24'
       OPENALEX_CONTENT_LIMIT: '8'
       OA_ENRICH_LIMIT: '14'
+      FIGURE_VERIFY_LIMIT: '5'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -29,6 +30,8 @@ jobs:
           python-version: '3.12'
       - name: Try permitted Europe PMC full-text sources
         run: python scripts/enrich.py
+      - name: Verify permissible journal figure images
+        run: python scripts/enrich_figure_links.py
       - name: Resume licensed OpenAlex full-text queue
         run: python scripts/enrich_openalex_fulltext.py
       - name: Rebuild reading notes and public projection
