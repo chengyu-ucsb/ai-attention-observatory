@@ -103,7 +103,7 @@ function showAtlas(){
  const table=$("#matrix-table"),thead=make("thead"),r=make("tr");add(r,make("th","","Theme"),...depths.map(d=>make("th","",d[1])));thead.append(r);
  const body=make("tbody");for(const t of themes){const row=make("tr");row.append(make("td","",t[0]));for(const d of depths)row.append(make("td","count-cell",S.records.filter(x=>x.lane===t[0]&&depth(x)===d[0]).length));body.append(row)}table.replaceChildren(thead,body)
 }
-function section(title,text,origin){const s=make("section","reading-section");add(s,make("p","eyebrow",title),make("h3","",title==="HOW IT WAS STUDIED"?"Method & data":title==="WHAT THE PAPER REPORTS"?"Findings":title==="LIMITATIONS"?"Limitations":"Overview"),make("p","",text));if(origin)s.append(make("div","section-source",origin));return s}
+function section(title,text,origin){const s=make("section","reading-section");add(s,make("p","eyebrow",title),make("h3","",title==="HOW IT WAS STUDIED"?"Method & data":title==="WHAT THE PAPER REPORTS"?"Findings":title==="LIMITATIONS"?"Limitations":title==="AUTHOR INTERPRETATION (DISCUSSION)"?"Authors’ interpretation":"Overview"),make("p","",text));if(origin)s.append(make("div","section-source",origin));return s}
 function paperFact(k,v){return add(make("div","paper-fact"),make("span","",k),make("span","",v))}
 function showPaper(x){
  const area=$("#paper-content");area.replaceChildren();if(!x){area.append(make("div","empty-state","This record could not be located."));return}
@@ -137,7 +137,7 @@ function showPaper(x){
     if(content){notesArea.append(section(label,content,source));hasNotes=true}
   }
  }else{
-  for(const [label,content] of [["HOW IT WAS STUDIED",r.methods],["WHAT THE PAPER REPORTS",r.findings],["LIMITATIONS",r.limitations]]){
+  for(const [label,content] of [["HOW IT WAS STUDIED",r.methods],["WHAT THE PAPER REPORTS",r.findings],["AUTHOR INTERPRETATION (DISCUSSION)",r.interpretation],["LIMITATIONS",r.limitations]]){
     if(content){notesArea.append(section(label,content,r.provenance));hasNotes=true}
   }
  }
