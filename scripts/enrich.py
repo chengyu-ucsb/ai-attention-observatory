@@ -15,10 +15,14 @@ def extract_sections(root):
  for sec in root.findall(".//body//sec"):
   title=clean(" ".join(sec.find("title").itertext()) if sec.find("title") is not None else "").lower()
   if not title:continue
-  if any(k in title for k in ("method","result","discussion","limitation")):
+  if any(k in title for k in ("method","study design","result","finding","discussion","conclusion","limitation")):
+   # Respect Results versus Discussion. Keep an identifiable, longer source excerpt.
+   name=("limitations" if "limitation" in title else
+         "results" if "result" in title or "finding" in title else
+         "discussion" if "discussion" in title or "conclusion" in title else
+         "methods")
    text=clean(" ".join(sec.itertext()))
-   name=next(k for k in ("methods","results","discussion","limitations") if k.rstrip("s") in title or k in title)
-   if name not in sections:sections[name]=text[:500]
+   if name not in sections and len(text)>60:sections[name]=text[:1100]
  return sections
 def run():
  path=DATA/"library.json";records=json.loads(path.read_text());updated=0;attempted=0
