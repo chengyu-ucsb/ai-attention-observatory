@@ -1,0 +1,71 @@
+name: Catch up full-text research backlog
+on:
+  schedule:
+    # Four modest checks per UTC day, with automatic API budget backoff.
+    - cron: '17 3,9,15,21 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: observatory-index
+  cancel-in-progress: false
+jobs:
+  catchup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    env:
+      OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+      OPENALEX_FULLTEXT_LIMIT: '24'
+      OPENALEX_CONTENT_LIMIT: '8'
+      OA_ENRICH_LIMIT: '14'
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Try permitted Europe PMC full-text sources
+        run: python scripts/enrich.py
+      - name: Resume licensed OpenAlex full-text queue
+        run: python scripts/enrich_openalex_fulltext.py
+      - name: Rebuild reading notes and public projection
+        run: |
+          python scripts/build_readings.py
+          python scripts/build_public.py
+          python scripts/feed.py
+      - name: Check that no citation-only records are published
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          python -m json.tool data/fulltext-backfill-state.json >/dev/null
+          python -m json.tool data/public-library.json >/dev/null
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          readings=json.loads(Path("data/public-library.json").read_text())
+          assert all(r["reading"]["level"]!="citation_only" for r in readings)
+          assert all(r["reading"]["level"]!="curated" for r in readings if r["kind"]=="scholarly")
+          print(f"Public index: {len(readings)} source-backed items, no citation-only records.")
+          PY
+      - name: Commit progress without restarting external calls
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ feed.xml
+          if ! git diff --cached --quiet; then
+            git commit -m "Backfill licensed article text and verified reading cards"
+            pushed=false
+            for attempt in 1 2 3; do
+              if git push; then pushed=true; break; fi
+              git fetch origin main
+              if ! git rebase origin/main; then
+                git rebase --abort || true
+                echo "::error::Backfill conflict. Refusing to overwrite library changes."
+                exit 1
+              fi
+              sleep 3
+            done
+            if [ "$pushed" != true ]; then
+              echo "::error::Could not push backfill after three attempts."
+              exit 1
+            fi
+          fi
