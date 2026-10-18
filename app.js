@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
-const S={records:[],week:{},runs:[],duration:10,left:600,timer:null,running:false,checkpoint:null};
+const S={records:[],week:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
 const depths=[["full_text","Full-text sections","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined)e.textContent=String(s);return e}
@@ -101,6 +101,21 @@ function renderPerspectives(){
   }
  }
 }
+function renderBacklog(){
+ const b=S.backlog||{},root=$("#backlog-coverage");
+ root.replaceChildren();
+ const scholarly=Number(b.total_scholarly)||S.records.filter(r=>r.kind==="scholarly").length;
+ const done=Number(b.full_text_extracted)||S.records.filter(r=>r.kind==="scholarly"&&depth(r)==="full_text").length;
+ const pct=scholarly?Math.round(100*done/scholarly):0;
+ const top=make("div","coverage-status-row");
+ add(top,make("strong","",done+" of "+scholarly+" scholarly papers"),make("span","",pct+"% with extracted full-text sections"));
+ const rail=make("div","coverage-status-rail"),bar=make("span","coverage-status-bar");
+ bar.style.width=pct+"%";rail.append(bar);
+ let pending=Number(b.ready_for_attempt)||0;
+ const pause=b.status==="waiting_for_budget"?"Paused by OpenAlex's daily allowance; automatic catch-up will resume after reset.":"Checking the backlog four times daily, within source access and rate limits.";
+ const detail=make("p","",pending+" papers ready for another extraction attempt. "+pause);
+ add(root,top,rail,detail);
+}
 function showLibrary(){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value;
  const xs=S.records.filter(x=>(!q||[x.title,x.venue,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,(x.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!t||x.lane===t)&&(!k||x.kind===k)&&(d!=="full_text"||depth(x)==="full_text")).sort((a,b)=>(b.published||"").localeCompare(a.published||"")||rank(b)-rank(a));
@@ -192,12 +207,13 @@ function showProductExamples(){
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
  try{
-  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
+  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
   S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
   S.runs=rs[2].ok?await rs[2].json():[];
-  home();showLibrary();showProductExamples();renderPerspectives();route();
+  S.backlog=rs[3].ok?await rs[3].json():{};
+  home();renderBacklog();showLibrary();showProductExamples();renderPerspectives();route();
  }catch(e){$("#issue-label").textContent="INDEX OFFLINE";$("#issue-meta").textContent="Research data could not load";$("#feature-grid").replaceChildren(make("div","empty-state","Could not load the research archive: "+e.message));route()}
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
