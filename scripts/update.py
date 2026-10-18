@@ -66,6 +66,11 @@ def discover(days=60):
     authors=[a.get("author",{}).get("display_name","") for a in w.get("authorships",[])[:8]]
     found.append({"title":title,"authors":authors,"published":w.get("publication_date") or "","venue":venue,"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("id",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"OpenAlex abstract index" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY})
    stats["openalex"]+=len(result.get("results",[]))
+  except urllib.error.HTTPError as e:
+   errors.append("OpenAlex "+lane+": HTTP "+str(e.code))
+   if e.code==429:
+    errors.append("OpenAlex quota reached; remaining OpenAlex searches deferred until the next run.")
+    break
   except Exception as e:errors.append("OpenAlex "+lane+": "+str(e)[:130])
   time.sleep(.3)
  # Crossref as complementary discovery, not full-paper content.
