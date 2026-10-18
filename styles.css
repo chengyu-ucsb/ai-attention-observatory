@@ -293,3 +293,22 @@
 .review-year-fill{display:block;height:100%;background:#b34b5c}
 .review-kicker{font-size:10px;font-weight:800;color:#a24051}
 @media(max-width:600px){.source-comparison-grid{grid-template-columns:1fr}.review-big-number{padding:15px}.review-big-number strong{font-size:65px}.review-year-row{grid-template-columns:42px 1fr 85px;gap:6px}}
+
+/* Weekly Edit evidence composition: real counts, not decorative statistics. */
+.issue-material-landscape{margin:32px 0 45px;padding:23px 25px;background:#fbf7f5;border:1px solid #eddfdb}
+.issue-material-landscape h2{font:500 28px/1.2 var(--display);color:#4e3940;margin:9px 0 19px}
+.issue-source-landscape{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+.issue-mix-card{background:#fff;border:1px solid #ecddda;padding:19px}
+.issue-mix-heading{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.issue-mix-heading strong{font:500 21px/1 var(--display);color:#ac4355}
+.issue-mix-bar{display:flex;overflow:hidden;gap:2px;margin:17px 0 15px;height:17px;background:#f0e8e4}
+.issue-mix-segment{display:block;height:100%;min-width:1px}
+.mix-0-0,.mix-1-0{background:#a52c3e}
+.mix-0-1,.mix-1-1{background:#c98a94}
+.mix-1-2{background:#e1bebc}
+.issue-mix-legend{display:grid;gap:7px}
+.issue-mix-legend-item{display:grid;grid-template-columns:13px minmax(0,1fr) 28px;align-items:center;gap:10px;font-size:10px;color:#715c63}
+.issue-mix-key{width:12px;height:12px;display:block}
+.issue-mix-legend-item strong{font-size:12px;text-align:right;color:#a53a50}
+.issue-mix-caveat,.landscape-caption{font-size:10px;line-height:1.55;color:#948188;margin:14px 0 0}
+@media(max-width:720px){.issue-material-landscape{padding:19px}.issue-source-landscape{grid-template-columns:1fr}}
