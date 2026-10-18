@@ -89,10 +89,44 @@ function issueRefs(ids,target){
  }
  return container;
 }
+function renderIssueLandscape(issue){
+ const root=$("#issue-source-landscape");root.replaceChildren();
+ const n=Number(issue.source_count)||0;
+ const groups=[
+  {title:"WHAT WE READ",rows:[["Scholarly literature",Number(issue.types?.scholarly)||0],["Public essays & other sources",Number(issue.types?.commentary)||0]],note:"Material covered by this edition, not evidence of agreement."},
+  {title:"HOW MUCH SOURCE TEXT",rows:[["Full-text extracts",Number(issue.material?.full_text)||0],["Abstract-based",Number(issue.material?.abstract)||0],["Publisher or editorial synopses",Number(issue.material?.publisher_or_editorial)||0]],note:"Coverage depth, not confidence in conclusions."}
+ ];
+ for(const [groupIndex,g] of groups.entries()){
+  const card=make("div","issue-mix-card");
+  const top=make("div","issue-mix-heading");
+  add(top,make("span","eyebrow",g.title),make("strong","",n+" sources"));
+  card.append(top);
+  const bar=make("div","issue-mix-bar");
+  bar.setAttribute("role","img");
+  bar.setAttribute("aria-label",g.rows.map(([name,value])=>name+": "+value).join("; "));
+  g.rows.forEach(([label,value],i)=>{
+    if(value<=0)return;
+    const piece=make("span","issue-mix-segment mix-"+groupIndex+"-"+i);
+    piece.style.width=(n?100*value/n:0)+"%";
+    piece.title=label+": "+value;
+    bar.append(piece)
+  });
+  card.append(bar);
+  const legend=make("div","issue-mix-legend");
+  g.rows.forEach(([label,value],i)=>{
+   const item=make("div","issue-mix-legend-item");
+   add(item,make("span","issue-mix-key mix-"+groupIndex+"-"+i),make("span","",label),make("strong","",String(value)));
+   legend.append(item)
+  });
+  add(card,legend,make("p","issue-mix-caveat",g.note));
+  root.append(card)
+ }
+}
 function renderIssue(){
  const issue=S.issue||{},published=issue.status==="published";
  const edition=issue.edition_date||S.week.run?.date||"";
  const sourceCount=Number(issue.source_count)||0;
+ renderIssueLandscape(issue);
  $("#weekly-kicker").textContent=published?"THE ATTENTION EDIT · ISSUE "+issue.number:"THE ATTENTION EDIT · IN PREPARATION";
  $("#weekly-title").textContent=published?issue.headline:"This week's synthesis is being reviewed.";
  $("#weekly-deck").textContent=published?issue.deck:"New research and commentary are indexed; the editorial synthesis will appear after source review.";
