@@ -1,5 +1,5 @@
 """Create attributable reading notes from permissively licensed OA XML only."""
-import json,re,pathlib,urllib.request,urllib.parse,xml.etree.ElementTree as ET,time
+import json,re,pathlib,urllib.request,urllib.parse,xml.etree.ElementTree as ET,time,datetime,os
 ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
 def req(url):
  with urllib.request.urlopen(urllib.request.Request(url,headers={"User-Agent":"AIAttentionObservatory/1.2 academic indexing"}),timeout=18) as response:return response.read()
@@ -15,9 +15,13 @@ def extract_sections(root):
    if name not in sections:sections[name]=text[:500]
  return sections
 def run():
- path=DATA/"library.json";records=json.loads(path.read_text());updated=0
+ path=DATA/"library.json";records=json.loads(path.read_text());updated=0;attempted=0
+ today=datetime.date.today().isoformat();limit=int(os.getenv("OA_ENRICH_LIMIT","22"))
  for r in records:
+  if attempted>=limit:break
   if r.get("analysis") or not r.get("doi") or r.get("kind")!="scholarly":continue
+  if r.get("oa_checked") and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<45:continue
+  attempted+=1;r["oa_checked"]=today
   try:
    url="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+urllib.parse.urlencode({"query":"DOI:"+r["doi"],"format":"json","pageSize":1})
    obj=json.loads(req(url));matches=obj.get("resultList",{}).get("result",[])
@@ -40,5 +44,5 @@ def run():
   except Exception as e:print("OA extraction skipped",r.get("doi"),str(e)[:100])
   time.sleep(.15)
  path.write_text(json.dumps(records,indent=2,ensure_ascii=False)+"\n")
- print("OA records enriched",updated)
+ print("OA records checked",attempted,"enriched",updated)
 if __name__=="__main__":run()
