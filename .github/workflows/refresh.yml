@@ -24,6 +24,9 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+      MODE: ${{ inputs.mode || 'weekly' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -51,9 +54,18 @@ jobs:
           git add data/ feed.xml
           if ! git diff --cached --quiet; then
             git commit -m "Refresh discovery, reading notes and RSS"
-            for n in 1 2 3; do
-              git pull --rebase && git push && break
-              if [ "$n" -eq 3 ]; then exit 1; fi
-              sleep $((n*5))
-            done
+            if ! git push; then
+              echo "Branch advanced during refresh. Re-running on latest main."
+              git fetch origin main
+              git reset --hard origin/main
+              python scripts/update.py
+              python scripts/enrich.py
+              python scripts/feed.py
+              python -m unittest discover -s tests -v
+              git add data/ feed.xml
+              if ! git diff --cached --quiet; then
+                git commit -m "Refresh discovery after branch update"
+                git push
+              fi
+            fi
           fi
