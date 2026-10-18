@@ -17,7 +17,7 @@ class Element{
 }
 const paperContainer=new Element("div");
 const doc={createElement:t=>new Element(t),querySelector:q=>q==="#paper-content"?paperContainer:null};
-const prefix=app.slice(0,app.indexOf('$$("[data-route]").forEach('));
+const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unexpected app initialization structure");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
 vm.runInContext(prefix+"\nconst TEST={showPaper,make,shortIdea,ideaInfo,S};",ctx);
