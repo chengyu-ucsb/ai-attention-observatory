@@ -317,7 +317,26 @@ function showPaper(x){
  const at=make("section","paper-side-block");add(at,make("p","eyebrow","SOURCE INFORMATION"),make("h3","","Reading details"));
  for(const [k,v] of [["Published",date(x.published)],["Venue",x.venue||"Not supplied"],["Coverage",depthName(x)],["Evidence",x.relation||"Unclassified"],["Provenance",r.provenance||x.source||"Index"]])at.append(paperFact(k,v));
  if(r.sample)at.append(paperFact("Sample",r.sample));if(x.doi)at.append(paperFact("DOI",x.doi));right.append(at);
- if(x.analysis?.figures?.length){const fig=make("section","paper-side-block");add(fig,make("p","eyebrow","FIGURES IN THE ORIGINAL"),make("h3","","Source figures to explore"));for(const f of x.analysis.figures.slice(0,3))fig.append(add(make("div","figure-caption"),make("strong","",f.label||"Figure"),make("p","",cut(f.caption||"Source figure caption unavailable.",150))));fig.append(make("p","paper-smallprint","Captions only. Exact numerical figures have not been recreated because their plotted data have not been verified."));if(x.analysis?.fulltext_url)fig.append(link("Inspect source figures ↗",x.analysis.fulltext_url,"paper-extra"));right.append(fig)}
+ if(x.analysis?.figures?.length){
+ const fig=make("section","paper-side-block");
+ add(fig,make("p","eyebrow","FIGURES FROM THE SOURCE"),make("h3","","See the study's visuals"));
+ let originals=0;
+ for(const f of x.analysis.figures.slice(0,3)){
+   const card=make("div","figure-caption");
+   const verified=typeof f.image_url==="string"&&/^https:\/\/pmc\.ncbi\.nlm\.nih\.gov\/articles\/PMC\d+\/bin\//.test(f.image_url)&&f.attribution;
+   if(verified){
+     const img=make("img","original-figure");img.src=f.image_url;img.loading="lazy";img.alt=(f.label||"Figure")+": "+(f.caption||"Original published figure");
+     img.addEventListener("error",()=>{img.hidden=true});
+     card.append(img);originals++;
+   }
+   add(card,make("strong","",f.label||"Figure"),make("p","",cut(f.caption||"Source figure caption unavailable.",200)));
+   if(verified)card.append(make("p","figure-license","Original open-access figure · "+f.attribution+" · Parent article license checked; third-party credits may impose further conditions."));
+   fig.append(card);
+ }
+ if(!originals)fig.append(make("p","paper-smallprint","No original image has passed the source and license checks yet. Captions are provided as a guide, not as recreated plots."));
+ if(x.analysis?.fulltext_url)fig.append(link("Inspect the figures in the original article ↗",x.analysis.fulltext_url,"paper-extra"));
+ right.append(fig)
+}
  
  function valid(u){try{const v=new URL(u);return v.protocol==="https:"?u:null}catch{return null}}
  if(valid(x.url))right.append(link("Open original publication ↗",x.url,"paper-original"));
