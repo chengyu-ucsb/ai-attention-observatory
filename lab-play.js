@@ -173,7 +173,7 @@
     add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" ROUNDS"),table,E("p","play-chart-caption","These timings begin when the return choices appear. Trials differ in materials and order; they cannot establish whether checkpoints improve performance."));
   }
   $("#recovery-start").addEventListener("click",()=>{
-    const r=practice.recovery;if(r.stage==="done"){r.round++;recoveryPreview();return}
+    const r=practice.recovery;if(r.stage==="done"){r.round++;recoveryPreview();recoveryDistract();return}
     if(r.stage==="ready")recoveryDistract();
   });
   recoveryPreview();
