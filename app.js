@@ -396,7 +396,7 @@ function showPaper(x){
  let originals=0;
  for(const f of x.analysis.figures.slice(0,3)){
    const card=make("div","figure-caption");
-   const verified=typeof f.image_url==="string"&&/^https:\/\/pmc\.ncbi\.nlm\.nih\.gov\/articles\/PMC\d+\/bin\//.test(f.image_url)&&f.attribution;
+   const verified=typeof f.image_url==="string"&&/^https:\/\/pmc-oa-opendata\.s3\.amazonaws\.com\/PMC\d+\.[123]\/[^?#]+\.(?:png|jpg|jpeg|webp|gif)$/.test(f.image_url)&&f.attribution;
    if(verified){
      const img=make("img","original-figure");img.src=f.image_url;img.loading="lazy";img.alt=(f.label||"Figure")+": "+(f.caption||"Original published figure");
      img.addEventListener("error",()=>{img.hidden=true});
