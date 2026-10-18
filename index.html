@@ -9,7 +9,7 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="lab-play.css">
-  <link rel="alternate" type="application/rss+xml" title="AI & Attention Observatory weekly sources" href="feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="The Attention Edit weekly synthesis" href="issue-feed.xml">
   <script src="app.js" defer></script>
   <script src="lab-play.js" defer></script>
 </head>
@@ -23,6 +23,7 @@
       </a>
       <nav class="main-nav" aria-label="Main navigation">
         <a href="#home" data-route="home">Overview</a>
+        <a href="#issue" data-route="issue">Weekly Edit</a>
         <a href="#library" data-route="library">Research</a>
         <a href="#perspectives" data-route="perspectives">Ideas & tools</a>
         <a href="#atlas" data-route="atlas">Evidence atlas</a>
@@ -84,12 +85,21 @@
       </section>
 
       <section class="shell home-edition pad-top">
-        <div class="section-heading">
-          <div><p class="eyebrow">01 / THE WEEKLY EDIT</p><h2>What's new in the research<span class="red-period">.</span></h2><p class="section-deck">A short reading list, selected for relevance and available evidence rather than volume.</p></div>
-          <a class="quiet-link" href="#library">Browse all sources <span>↗</span></a>
+        <div class="section-heading"><div><p class="eyebrow">01 / THE WEEKLY EDIT</p><h2>The week, in one thought<span class="red-period">.</span></h2><p class="section-deck">The ideas emerging across all the readings—not another list of article summaries.</p></div><a class="quiet-link" href="#issue">Read the entire issue ↗</a></div>
+        <div class="weekly-cover">
+          <div class="weekly-cover-copy"><p class="eyebrow" id="weekly-kicker">THE ATTENTION EDIT</p><h3 id="weekly-title">This week's big idea</h3><p id="weekly-deck"></p>
+            <div class="weekly-cover-actions"><a class="button button-red" href="#issue">Read the weekly edit ↗</a><a class="quiet-link" href="newsletter.html">Preview the newsletter ↗</a></div>
+            <p id="weekly-scope" class="weekly-scope"></p>
+          </div>
+          <svg class="weekly-cover-art" viewBox="0 0 330 268" role="img" aria-label="Conceptual illustration of a question branching into ideas and practical experiments">
+            <rect width="330" height="268" rx="8" fill="#f5e5e1"/><path d="M65 190Q145 74 254 83 M65 190Q168 120 255 199" fill="none" stroke="#ba7982" stroke-width="2" stroke-dasharray="3 6"/>
+            <path d="M64 190L165 138L257 83 M165 138L256 198" fill="none" stroke="#9f3c50" stroke-width="2"/><circle cx="65" cy="190" r="32" fill="#a73146"/><circle cx="65" cy="190" r="9" fill="#fff4ee"/>
+            <circle cx="165" cy="138" r="25" fill="#e1afb0"/><circle cx="165" cy="138" r="7" fill="#922b40"/><circle cx="256" cy="83" r="31" fill="#fff8f4" stroke="#be7784" stroke-width="2"/><circle cx="256" cy="198" r="24" fill="#bc6d79"/>
+            <g font-family="Arial,sans-serif" fill="#a64656" font-size="10" letter-spacing="1.3"><text x="28" y="242">QUESTION</text><text x="126" y="99">TENSION</text><text x="221" y="39">IDEAS</text><text x="212" y="238" fill="#fff4ef">TRY</text></g>
+          </svg>
         </div>
-        <div id="feature-grid" class="feature-grid"><div class="loading">Loading this week's reading selection…</div></div>
-        
+        <div id="weekly-signal-strip" class="weekly-signal-strip"></div>
+        <details class="home-source-drawer"><summary>Explore a few of the underlying studies <span>↗</span></summary><div id="feature-grid" class="feature-grid"></div></details>
       </section>
 
       <section class="shell editorial-section" id="beyond-journals">
@@ -133,11 +143,24 @@
 
       <section class="shell follow-section">
         <div class="follow-art" aria-hidden="true"><span>◎</span><i></i><i></i><i></i></div>
-        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>One considered update<br>at a time.</h2><p>Follow newly indexed research every week. RSS works today; an email newsletter isn't connected yet.</p></div>
-        <div class="follow-actions"><a class="button button-light" href="feed.xml">Subscribe with RSS ↗</a><a class="button button-outline-light" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20newsletter">Ask about email updates ↗</a></div>
+        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>One considered update<br>at a time.</h2><p>A considered synthesis of the week: new ideas, open questions and something to try. Newsletter preview and RSS work today; email delivery is not connected yet.</p></div>
+        <div class="follow-actions"><a class="button button-light" href="issue-feed.xml">Follow the weekly edit ↗</a><a class="button button-outline-light" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20newsletter">Ask about email updates ↗</a></div>
       </section>
     </section>
 
+
+    <section id="issue" class="view" hidden>
+      <div class="issue-hero"><div class="shell issue-hero-wrap"><p class="eyebrow light" id="issue-edition">THE ATTENTION EDIT</p><h1 id="issue-headline">A weekly idea worth thinking about.</h1><p id="issue-deck"></p><div class="issue-hero-actions"><a class="button button-light" href="newsletter.html">Read email-style edition ↗</a><a class="hero-secondary" href="issue-feed.xml">Weekly editorial RSS ↗</a></div></div></div>
+      <div class="shell issue-layout">
+        <section class="issue-letter"><p class="eyebrow">THE BIG IDEA THIS WEEK</p><p id="issue-letter-text"></p></section>
+        <section class="issue-signals-section"><div class="section-heading"><div><p class="eyebrow">THREE SIGNALS / THE CROSS-SOURCE VIEW</p><h2>What connects the readings<span class="red-period">.</span></h2></div></div><div id="issue-signals" class="issue-signals"></div></section>
+        <section class="issue-extras" id="issue-extras"><div class="issue-tension"><p class="eyebrow">THE PRODUCTIVE TENSION</p><h2 id="issue-tension-title"></h2><p id="issue-tension-text"></p><div id="issue-tension-refs" class="issue-references"></div></div>
+        <div class="issue-experiment"><p class="eyebrow">ONE TINY EXPERIMENT</p><h2 id="issue-experiment-title"></h2><p id="issue-experiment-text"></p><p id="issue-experiment-caution"></p><a href="#lab" class="quiet-link">Try the Experimental Lab ↗</a></div></section>
+        <section class="issue-closing"><p id="issue-closer"></p><p id="issue-qualification"></p></section>
+        <section class="issue-reading-shelf"><div class="section-heading"><div><p class="eyebrow">SOURCE SHELF / TRACEABLE READING</p><h2>Everything considered this week<span class="red-period">.</span></h2><p id="issue-coverage" class="section-deck"></p></div></div><details><summary>Browse the complete source list and reading pages <span>↗</span></summary><div id="issue-sources" class="issue-sources"></div></details></section>
+        <section class="issue-follow"><div><p class="eyebrow">THE ATTENTION EDIT / STAY CURIOUS</p><h2>A considered letter, not an inbox avalanche.</h2><p>Shareable newsletter preview and RSS are live. Email delivery and sign-up aren't connected to a mailing-list service yet.</p></div><div><a class="button button-red" href="newsletter.html">Preview newsletter ↗</a><p><a class="quiet-link" href="mailto:fangcu@ucmail.uc.edu?subject=The%20Attention%20Edit%20newsletter%20interest">Express interest in future email updates ↗</a></p></div></section>
+      </div>
+    </section>
 
     <section id="perspectives" class="view" hidden>
       <div class="inner-hero">
@@ -314,7 +337,7 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">a<span>·</span></span><div><strong>ATTENTION / AI</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#library">Research library</a><a href="#perspectives">Ideas & tools</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Data is an automatically maintained discovery aid, not a systematic review.</div></div></footer>
+  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">a<span>·</span></span><div><strong>ATTENTION / AI</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#issue">Weekly Edit</a><a href="#library">Research library</a><a href="#perspectives">Ideas & tools</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Data is an automatically maintained discovery aid, not a systematic review.</div></div></footer>
   <div class="toast" id="site-toast" hidden role="status"></div>
 </body>
 </html>
