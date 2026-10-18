@@ -1,5 +1,11 @@
 name: Update research library
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/refresh.yml'
   schedule:
     - cron: '23 12 * * 1'
   workflow_dispatch:
@@ -32,8 +38,9 @@ jobs:
         run: python scripts/enrich.py
       - name: Produce RSS
         run: python scripts/feed.py
-      - name: Validate data
+      - name: Validate data and browser code
         run: |
+          node --check app.js
           python -m json.tool data/library.json > /dev/null
           python -m json.tool data/weekly.json > /dev/null
           python -m unittest discover -s tests -v
