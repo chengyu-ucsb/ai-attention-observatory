@@ -71,3 +71,16 @@
 @media(max-width:1000px){.perspectives-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.main-nav{gap:14px}}
 @media(max-width:850px){.main-nav{overflow-x:auto;justify-content:flex-start;gap:20px;scrollbar-width:thin;white-space:nowrap}.main-nav a{flex-shrink:0}}
 @media(max-width:650px){.perspectives-grid{grid-template-columns:1fr}.perspectives-page{padding:30px 0 70px}.perspectives-intro{padding:36px 0 18px}.perspective-item{min-height:230px}.main-nav{gap:18px}}
+
+
+/* Compact source-coverage strip replaces long homepage excerpts. */
+.feature-evidence{margin-top:17px;padding:10px 0 12px;border-top:1px solid #ead9d7}
+.feature-evidence-row{display:flex;justify-content:space-between;gap:12px;font-size:9px;font-weight:800;letter-spacing:.045em;color:#a18084}
+.feature-evidence-row span:last-child{color:var(--red);letter-spacing:0;font-weight:700;text-align:right}
+.feature-evidence-track{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:9px}
+.feature-evidence-mark{height:5px;background:#efebe8;position:relative}
+.feature-evidence-mark.covered{background:#b45061}
+.feature-card .feature-quote{font-size:12px;line-height:1.65}
+.feature-card .source-meta{font-size:10px}
+.feature-card.primary,.feature-card{min-height:330px}
+@media(max-width:760px){.feature-card.primary,.feature-card{min-height:260px}}
