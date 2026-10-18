@@ -1,5 +1,5 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
-import json, re, os, time, urllib.request, urllib.parse, datetime, pathlib
+import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DIR=ROOT/"data"
 TODAY=datetime.datetime.now(datetime.timezone.utc).date().isoformat()
@@ -12,6 +12,31 @@ SEARCHES=[
 ("Interventions","AI adaptive notifications focus assistant"),
 ("Technology & society","artificial intelligence attention economy cognitive autonomy")]
 KEYWORDS=re.compile(r"attention|cognit|think|interrup|focus|distract|multitask|switch|well.?being|self.regulat|engag|notification|offload",re.I)
+
+AI_TOPIC=re.compile(r"\b(?:ai|genai|chatgpt|artificial intelligence|generative ai|llms?|large language model|machine learning|algorithmic)\b",re.I)
+ATTENTION_TOPIC=re.compile(r"attention|focus|distract|interrupt|offload|critical think|cognit(?:ive)? (?:effort|load|scaffold|control|strain|decline)|human agency|mindful|metacognit|well.?being|notification|self.regulat|task.switch|multitask|information overload|techno.?stress|digital stress|cognitive autonomy",re.I)
+ADJACENT_TOPIC=re.compile(r"attention (?:fragmentation|residue|economy|control|span)|digital distraction|distracted (?:work|learning)|notification(?:s)?|task.switch|multitask|sustained attention|focus(?:ed)? work",re.I)
+EXCLUDE_TITLE=re.compile(r"gaining .*attention|stock price|share price|trading|market investment|marketing personalization|consumer engagement|car.following|warehouse logistics|diabetes mellitus|security tools",re.I)
+TRUSTED_OUTLETS=re.compile(r"The Atlantic|WIRED|MIT Technology Review|Nature|Science|The Verge|Tech Policy Press|The Guardian|The Conversation|Ars Technica|Harvard Business Review|New York Times|Financial Times|Bloomberg|BBC|NPR|Vox|IEEE Spectrum|Quanta|The Decoder|Inside Higher Ed|EdSurge|PsyPost|New Scientist|Washington Post|Psychology Today|Communications of the ACM|The Economist|Rest of World",re.I)
+def relevant(x):
+ if x.get("curated"):return True
+ if x.get("published") and x["published"]>TODAY:return False
+ title=x.get("title","");blurb=x.get("preview","")
+ if EXCLUDE_TITLE.search(title):return False
+ direct=(bool(AI_TOPIC.search(title)) and bool(ATTENTION_TOPIC.search(title+" "+blurb))) or (bool(ATTENTION_TOPIC.search(title)) and bool(AI_TOPIC.search(blurb)))
+ adjacent=bool(ADJACENT_TOPIC.search(title)) and x.get("lane")=="Fragmentation" and x.get("kind")=="scholarly"
+ if not (direct or adjacent):return False
+ if x.get("kind")=="nonacademic" and not TRUSTED_OUTLETS.search(x.get("venue","")):return False
+ return True
+def diverse_week(items,limit=36):
+ items=sorted(items,key=lambda x:x.get("published") or "",reverse=True)
+ batches={lane:[x for x in items if x.get("lane")==lane] for lane in ("AI & cognition","Fragmentation","Interventions","Technology & society")}
+ out=[]
+ while len(out)<limit and any(batches.values()):
+  for lane in batches:
+   if batches[lane] and len(out)<limit:out.append(batches[lane].pop(0))
+ return out
+
 def read(p,default):
  try:return json.loads(p.read_text())
  except (OSError,ValueError):return default
@@ -29,7 +54,7 @@ def discover(days=60):
  found=[];errors=[];stats={"openalex":0,"crossref":0}
  since=(datetime.date.fromisoformat(TODAY)-datetime.timedelta(days=days)).isoformat()
  for lane,q in SEARCHES:
-  params=urllib.parse.urlencode({"search":q,"filter":"from_publication_date:"+since,"per_page":25,**({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})})
+  params=urllib.parse.urlencode({"search":q,"filter":"from_publication_date:"+since+",to_publication_date:"+TODAY,"per_page":25,**({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})})
   try:
    result=request("https://api.openalex.org/works?"+params)
    for w in result.get("results",[]):
@@ -43,7 +68,7 @@ def discover(days=60):
   time.sleep(.3)
  # Crossref as complementary discovery, not full-paper content.
  for lane,q in SEARCHES[:5]:
-  args=urllib.parse.urlencode({"query.bibliographic":q,"filter":"from-pub-date:"+since,"rows":15})
+  args=urllib.parse.urlencode({"query.bibliographic":q,"filter":"from-pub-date:"+since+",until-pub-date:"+TODAY,"rows":15,"mailto":"fangcu@ucmail.uc.edu"})
   try:
    result=request("https://api.crossref.org/works?"+args)
    for w in result.get("message",{}).get("items",[]):
@@ -78,22 +103,22 @@ def discover(days=60):
 def main():
  DIR.mkdir(exist_ok=True)
  previous=read(DIR/"library.json",[])
- records={key(x):x for x in previous}
+ records={key(x):x for x in previous if relevant(x)}
  candidates,errors,stats=discover(150 if os.environ.get("MODE")=="backfill" else 60)
  new=[]
  for x in candidates:
   k=key(x)
-  if not x["title"] or not x["url"]:continue
+  if not x["title"] or not x["url"] or not relevant(x):continue
   if k in records:
    if not records[k].get("preview") or records[k]["preview"].startswith("Abstract unavailable"):records[k]["preview"]=x["preview"]
    continue
   records[k]=x;new.append(x)
- collection=sorted(records.values(),key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)[:2500]
+ collection=sorted(records.values(),key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)
  prior=read(DIR/"runs.json",[])
  run={"date":TODAY,"mode":os.environ.get("MODE","weekly"),"new":len(new),"total":len(collection),"candidates":len(candidates),"stats":dict(stats,errors=errors)}
  if not candidates and errors:raise SystemExit("Discovery did not return records: "+"; ".join(errors[:3]))
  (DIR/"library.json").write_text(json.dumps(collection,ensure_ascii=False,indent=2)+"\n")
- (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":new[:35]},ensure_ascii=False,indent=2)+"\n")
+ (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":diverse_week(new)},ensure_ascii=False,indent=2)+"\n")
  (DIR/"runs.json").write_text(json.dumps([r for r in prior if r.get("date")!=TODAY][-51:]+[run],indent=2)+"\n")
  print(json.dumps(run,indent=2))
 if __name__=="__main__":main()
