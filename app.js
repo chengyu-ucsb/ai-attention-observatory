@@ -14,6 +14,23 @@ function depth(x){return x.reading?.level||"citation_only"}
 function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only")return "Publisher synopsis";return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 function cut(t,n){t=String(t||"").trim();return t.length>n?t.slice(0,n).replace(/\s+\S*$/,"")+"…":t}
+
+function ideaInfo(x){
+ const r=x.reading||{},notes=x.editorial_notes||{};
+ let value="",label="";
+ if(x.kind==="nonacademic"){
+   value=notes.argument||r.overview||"";label=notes.argument?"THE AUTHOR ARGUES":"PUBLISHER SYNOPSIS";
+ }else if(r.findings){
+   value=r.findings;label=depth(x)==="full_text"?"REPORTED RESULT · FULL TEXT":"ABSTRACT-REPORTED RESULT";
+ }else if(r.interpretation){
+   value=r.interpretation;label="AUTHOR INTERPRETATION · NOT RESULTS";
+ }else{
+   value=r.overview||"";label="RESEARCH IDEA · NOT A VERIFIED RESULT";
+ }
+ // Preserve substantive source language; only strip section-name prefixes.
+ value=String(value).replace(/^(?:abstract|results?|discussion|conclusions?)\s*[:.]\s*/i,"").trim();
+ return {text:value||"No substantive source text is available.",label};
+}
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.findings?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
 function route(){let raw=location.hash.slice(1)||"home";try{raw=decodeURIComponent(raw)}catch{raw="home"}let page=raw.startsWith("paper/")?"paper":raw;if(!["home","library","atlas","lab","paper","about","perspectives"].includes(page))page="home";$$(".view").forEach(v=>v.hidden=v.id!==page);$$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});if(page==="paper")showPaper(record(raw.slice(6)));if(page==="library")showLibrary();if(page==="atlas")showAtlas();window.scrollTo({top:0,behavior:"instant"})}
@@ -38,7 +55,7 @@ function home(){
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
  add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","↗","✳"][i]));
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
- add(c,head,make("h3","",x.title),make("p","feature-quote",cut(excerpt(x),i===0?165:135)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
+ add(c,head,make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",cut(ideaInfo(x).text,i===0?220:160)),make("p","feature-source-title",x.title),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  const alert=$("#research-warning"),errors=run.stats?.errors||[];alert.hidden=errors.length===0;if(errors.length)alert.textContent=errors.length+" discovery provider warning(s); see the repository Actions log.";
  renderEditorial();
  topicBars("#topic-bars");donut();
@@ -86,11 +103,11 @@ function renderPerspectives(){
 }
 function showLibrary(){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value;
- const xs=S.records.filter(x=>(!q||[x.title,x.venue,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,(x.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!t||x.lane===t)&&(!k||x.kind===k)&&(d==="all"||(d==="full_text"?depth(x)==="full_text":depth(x)!=="citation_only"))).sort((a,b)=>(b.published||"").localeCompare(a.published||"")||rank(b)-rank(a));
+ const xs=S.records.filter(x=>(!q||[x.title,x.venue,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,(x.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!t||x.lane===t)&&(!k||x.kind===k)&&(d!=="full_text"||depth(x)==="full_text")).sort((a,b)=>(b.published||"").localeCompare(a.published||"")||rank(b)-rank(a));
  $("#library-count").textContent=xs.length+" results · "+S.records.length+" total sources";
  const box=$("#library-results");box.replaceChildren();
- if(!xs.length){box.append(make("div","empty-state","No matches. Try another keyword or include citation-only records."));return}
- for(const x of xs){const c=make("article","library-card"),h=make("h3"),foot=make("div","card-foot");h.append(btn(x.title,()=>goto("paper",id(x))));add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));add(c,make("span","card-type",x.lane||"Research"),h,make("p","",cut(excerpt(x),205)),foot);box.append(c)}
+ if(!xs.length){box.append(make("div","empty-state","No source-backed items match those filters. Try a broader search."));return}
+ for(const x of xs){const c=make("article","library-card"),h=make("h3"),foot=make("div","card-foot");h.append(btn(cut(ideaInfo(x).text,190),()=>goto("paper",id(x))));add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));add(c,make("span","card-type",ideaInfo(x).label),h,make("p","library-citation",x.title),foot);box.append(c)}
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
@@ -110,7 +127,7 @@ function showPaper(x){
  const r=x.reading||{},meta=[...(x.authors||[]).slice(0,3),x.venue,date(x.published)].filter(Boolean).join(" · ");
  const chips=make("div","paper-controls");for(const a of [x.lane||"Research",depthName(x),x.kind==="scholarly"?"Scholarly":"Commentary"])chips.append(make("span","paper-label",a));
  const cols=make("div","paper-columns"),left=make("div"),right=make("aside","paper-side"),lead=make("section","reading-lead");
- add(lead,make("p","eyebrow","CENTRAL IDEA"),make("h2","","At a glance"),make("p","",cut(r.overview||excerpt(x),300)));left.append(lead);
+ add(lead,make("p","eyebrow","RESEARCH CONTEXT"),make("h2","","What this work examines"),make("p","",cut(r.overview||excerpt(x),300)));left.append(lead);
  // Source-grounded snapshot; the cards are concise but never fill absent methods/results by inference.
  const editorial=x.kind==="nonacademic",notes=x.editorial_notes||{};
  const cells=editorial?[
@@ -159,7 +176,7 @@ function showPaper(x){
  right.append(link("Search on Google Scholar ↗","https://scholar.google.com/scholar?q="+encodeURIComponent(x.title),"paper-extra"));
  let related=S.records.filter(y=>y!==x&&y.kind===x.kind&&y.lane===x.lane&&depth(y)!=="citation_only").sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){const panel=make("section","paper-side-block");add(panel,make("p","eyebrow","EXPLORE FURTHER"),make("h3","","Related papers"));for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));right.append(panel)}
- add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",(x.kind==="nonacademic"?"PUBLIC IDEAS / ":"RESEARCH READING / ")+(x.lane||"Research")),make("h1","paper-heading",x.title),make("p","paper-meta",meta),chips,cols)
+ add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",ideaInfo(x).label),make("h1","paper-insight",cut(ideaInfo(x).text,340)),make("div","paper-identity",add(make("div","paper-identity-inner"),make("p","eyebrow","THE ORIGINAL PUBLICATION"),make("h2","paper-source-title",x.title),make("p","paper-meta",meta))),chips,cols)
 }
 function showProductExamples(){
  const examples=S.records.filter(x=>x.source==="Official product documentation");
@@ -175,9 +192,9 @@ function showProductExamples(){
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
  try{
-  const rs=await Promise.all(["data/library.json","data/weekly.json","data/runs.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
+  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
-  S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");
+  S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
   S.runs=rs[2].ok?await rs[2].json():[];
   home();showLibrary();showProductExamples();renderPerspectives();route();
