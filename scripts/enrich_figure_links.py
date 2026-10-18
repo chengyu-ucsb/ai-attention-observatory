@@ -25,8 +25,9 @@ def url_for(pmcid,filename):
  if not name or name in (".","..") or ".." in name or not re.fullmatch(r"[\w.()+\- ]{2,140}",name):return ""
  return "https://pmc.ncbi.nlm.nih.gov/articles/"+pmcid+"/bin/"+urllib.parse.quote(name,safe=".-_()+")
 def safe_filename(filename):
- name=(filename or "").strip().split("/")[-1]
- return name if name and name not in (".","..") and ".." not in name and re.fullmatch(r"[\w.()+\- ]{2,140}",name) else ""
+ raw=(filename or "").strip()
+ if "/" in raw or "\\" in raw or ".." in raw:return ""
+ return raw if raw and raw not in (".","..") and re.fullmatch(r"[\w.()+\- ]{2,140}",raw) else ""
 def s3_candidates(pmcid,version,filename):
  name=safe_filename(filename)
  if not ID.fullmatch(pmcid) or not name or version not in (1,2,3):return []
@@ -46,7 +47,7 @@ def licensed_s3_version(pmcid):
    continue
   if data.get("pmcid")!=pmcid:continue
   license_name=(data.get("license_code") or "").upper().replace("-"," ").strip()
-  if license_name in ("CC BY","CC BY SA","CC0") and data.get("is_pmc_openaccess"):
+  if license_name in ("CC BY","CC BY SA","CC0") and str(data.get("is_pmc_openaccess","")).lower() in ("yes","true","1","y"):
    return version,license_name
  return None,None
 def image_valid(url):
