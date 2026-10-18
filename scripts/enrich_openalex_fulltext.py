@@ -59,10 +59,12 @@ def main():
     limit=int(os.getenv("OPENALEX_FULLTEXT_LIMIT","35"));complete=0;attempts=0;warnings=[];skipped={"no_licensed_location":0,"no_grobid_xml":0,"missing_sections":0}
     for r in eligible:
         if attempts>=limit:break
-        attempts+=1;r["oa_grobid_checked"]=TODAY
+        attempts+=1
         doi=urllib.parse.quote("https://doi.org/"+r["doi"],safe=":")
         try:
             work=json.loads(get("https://api.openalex.org/works/"+doi,key))
+            # Record a completed lookup, not an attempted lookup that may fail transiently.
+            r["oa_grobid_checked"]=TODAY
             oa=work.get("best_oa_location") or {}
             href=oa.get("landing_page_url") or oa.get("pdf_url")
             if href and href.startswith("https://"):r["open_access_url"]=href
