@@ -18,8 +18,19 @@ if(issue.status==="published"){
  assert(issue.tension.source_ids.length>=2,"Tension must compare multiple sources");
  assert(newsletter.includes(issue.headline.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;"))||newsletter.includes(issue.headline),"Newsletter headline not in HTML");
  assert(!newsletter.includes("unsubscribe here"),"Don't fabricate unsubscribe support");
+ const approved="data/approved-issues/"+issue.edition_date+".json";
+ const archived="issues/"+issue.edition_date+".html";
+ assert(fs.existsSync(path.join(root,approved)),"Published issue missing permanently archived JSON");
+ assert(fs.existsSync(path.join(root,archived)),"Published issue missing permanent newsletter HTML");
+ assert(text("issue-feed.xml").includes("issues/"+issue.edition_date+".html"),"RSS must link permanent edition");
 }else{
- assert(!newsletter.includes("SIGNAL 1"),"No invented newsletter content before editorial review");
+ const stored=fs.existsSync(path.join(root,"data/approved-issues"))?fs.readdirSync(path.join(root,"data/approved-issues")).filter(x=>/^\d{4}-\d{2}-\d{2}\.json$/.test(x)).sort().reverse():[];
+ if(stored.length){
+  const approved=JSON.parse(text("data/approved-issues/"+stored[0]));
+  assert(newsletter.includes(approved.headline),"In-review week erased the most recently approved letter");
+ }else{
+  assert(!newsletter.includes("SIGNAL 1"),"No invented newsletter content before editorial review");
+ }
 }
 const rss=text("issue-feed.xml");
 assert(rss.includes("The Attention Edit"),"Missing synthesized editorial feed");
