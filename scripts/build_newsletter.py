@@ -58,6 +58,17 @@ def build():
  if published:
   outdir=ROOT/"issues";outdir.mkdir(exist_ok=True)
   (outdir/(issue["edition_date"]+".html")).write_text(rendered)
+ archive_dir=ROOT/"issues";archive_dir.mkdir(exist_ok=True)
+ cards=[]
+ for old in archived[:50]:
+  previous=json.loads(old.read_text())
+  if previous.get("status")!="published":continue
+  date=previous.get("edition_date") or old.stem
+  cards.append('<a class="issue-card" href="'+esc(date)+'.html"><span>THE ATTENTION EDIT · '+esc(date)+'</span><h2>'+esc(previous.get("headline") or previous.get("subject"))+'</h2><p>'+esc(previous.get("deck",""))+'</p><strong>Read the edition ↗</strong></a>')
+ archive_html='''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Archive · The Attention Edit</title>
+ <style>body{margin:0;background:#f8f2ef;color:#382a30;font:15px/1.65 Arial,sans-serif}header{padding:40px 8%;background:#992c42;color:white}header h1{font:500 clamp(42px,6vw,78px)/1.1 Georgia,serif;margin:8px 0}main{max-width:880px;padding:45px 8%;margin:auto}.issue-card{display:block;background:white;border:1px solid #e7d8d4;border-top:4px solid #af4555;margin:14px 0;padding:25px 30px;color:#412f36;text-decoration:none}.issue-card:hover{background:#fff9f7}.issue-card span{font-size:11px;letter-spacing:.09em;font-weight:800;color:#a03b4f}.issue-card h2{font:500 clamp(24px,3vw,33px)/1.2 Georgia,serif;margin:12px 0}.issue-card p{font-size:13px;color:#79676c}.issue-card strong{font-size:12px;color:#a03b4f}a.back{color:#ffe4de;text-decoration:none;font-weight:bold}</style></head>
+ <body><header><a class="back" href="../#issue">← Back to the Observatory</a><h1>The Attention Edit</h1><p>Past issues, preserved after editorial review.</p></header><main>'''+("".join(cards) if cards else "<p>No approved issues yet.</p>")+"</main></body></html>"
+ (archive_dir/"index.html").write_text(archive_html)
  rss=ET.Element("rss",version="2.0");ch=ET.SubElement(rss,"channel")
  for k,v in [("title","The Attention Edit — Weekly editorial"),("link",root+"#issue"),("description","A concise cross-source editorial from the AI & Attention Observatory")]:ET.SubElement(ch,k).text=v
  for archived_issue in archived[:30]:
