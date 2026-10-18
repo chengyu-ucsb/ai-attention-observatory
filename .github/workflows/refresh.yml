@@ -1,17 +1,14 @@
 name: Update research library
 on:
   schedule:
-    - cron: '0 12 * * 1'
+    - cron: '23 12 * * 1'
   workflow_dispatch:
     inputs:
       mode:
         description: Search mode
         type: choice
-        required: true
         default: backfill
-        options:
-          - backfill
-          - weekly
+        options: [backfill, weekly]
 permissions:
   contents: write
 concurrency:
@@ -20,23 +17,36 @@ concurrency:
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Discover and index new sources
+      - name: Collect metadata
         env:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           MODE: ${{ inputs.mode || 'weekly' }}
         run: python scripts/update.py
-      - name: Save refreshed library
+      - name: Extract permitted open-access article sections
+        run: python scripts/enrich.py
+      - name: Produce RSS
+        run: python scripts/feed.py
+      - name: Validate data
+        run: |
+          python -m json.tool data/library.json > /dev/null
+          python -m json.tool data/weekly.json > /dev/null
+          python -m unittest discover -s tests -v
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
+          git add data/ feed.xml
           if ! git diff --cached --quiet; then
-            git commit -m "Update weekly AI attention research"
-            git push
+            git commit -m "Refresh discovery, reading notes and RSS"
+            for n in 1 2 3; do
+              git pull --rebase && git push && break
+              if [ "$n" -eq 3 ]; then exit 1; fi
+              sleep $((n*5))
+            done
           fi
-# Repository stays private. No Pages deployment or public hosting.
