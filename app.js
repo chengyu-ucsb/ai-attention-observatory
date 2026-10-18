@@ -20,6 +20,15 @@ function route(){let raw=location.hash.slice(1)||"home";try{raw=decodeURICompone
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
 function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>{$("#topic-filter").value=t[0];goto("library")},"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
 function donut(){const cc=counts(),total=Math.max(1,S.records.length),legend=$("#depth-legend");$("#record-count").textContent=S.records.length;legend.replaceChildren();let at=0,parts=[];for(const d of depths){let pct=cc[d[0]]/total*100;parts.push(d[2]+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;const r=make("div","legend-item"),sw=make("span","legend-swatch"),copy=make("div");sw.style.background=d[2];add(copy,make("div","legend-title",d[1]+" · "+cc[d[0]]),make("span","legend-caption",Math.round(pct)+"% of records"));add(r,sw,copy);legend.append(r)}$("#evidence-donut").style.background="conic-gradient("+parts.join(",")+")"}
+function featureCoverage(x){
+ const area=make("div","feature-evidence"),row=make("div","feature-evidence-row");
+ const tiers=["Citation","Abstract","Full text"],active=depth(x)==="full_text"?3:depth(x)==="abstract"?2:1;
+ const track=make("div","feature-evidence-track");
+ for(let i=0;i<3;i++){const mark=make("span","feature-evidence-mark"+(i<active?" covered":""));mark.title=tiers[i];track.append(mark)}
+ add(row,make("span","", "AVAILABLE MATERIAL"),make("span","",depthName(x)));
+ add(area,row,track);
+ return area;
+}
 function home(){
  const run=S.week.run||{},all=(S.week.items||[]).map(x=>record(id(x))||S.records.find(r=>r.title===x.title)||x);
  const top=all.filter(x=>x.kind==="scholarly"&&depth(x)!=="citation_only"&&x.reading?.findings).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.findings)).slice(0,3);
@@ -29,7 +38,7 @@ function home(){
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
  add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","↗","✳"][i]));
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
- add(c,head,make("h3","",x.title),make("p","feature-quote",cut(excerpt(x),i===0?360:250)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),foot);root.append(c)});
+ add(c,head,make("h3","",x.title),make("p","feature-quote",cut(excerpt(x),i===0?165:135)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  const alert=$("#research-warning"),errors=run.stats?.errors||[];alert.hidden=errors.length===0;if(errors.length)alert.textContent=errors.length+" discovery provider warning(s); see the repository Actions log.";
  renderEditorial();
  topicBars("#topic-bars");donut();
@@ -142,19 +151,6 @@ function showProductExamples(){
   go.append(btn("Read notes ↗",()=>goto("paper",id(x))));
   add(tr,make("td","",categories[x.venue]||x.venue),make("td","",cut(x.reading?.overview||x.preview,110)),make("td","",cut(x.editorial_notes?.design_relevance,125)),go);tbody.append(tr)
  });
-}
-function lab(){
- function updateTime(){let m=Math.floor(S.left/60),s=S.left%60;$("#focus-timer").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
- function pause(){if(S.timer)clearInterval(S.timer);S.timer=null;S.running=false;$("#focus-toggle").textContent="Start focus session"}
- function reset(){pause();S.left=S.duration*60;updateTime();$("#focus-caption").textContent="A small commitment to one task"}
- $$("[data-duration]").forEach(b=>b.onclick=()=>{$$("[data-duration]").forEach(x=>x.classList.toggle("selected",x===b));S.duration=Number(b.dataset.duration);reset()});
- $("#focus-reset").onclick=reset;
- $("#focus-toggle").onclick=()=>{if(S.running){pause();return}if(!S.left)reset();S.running=true;$("#focus-toggle").textContent="Pause session";$("#focus-caption").textContent=$("#focus-task").value.trim()||"Stay with your chosen intention";let last=Date.now();S.timer=setInterval(()=>{let now=Date.now(),elapsed=Math.floor((now-last)/1000);if(elapsed<=0)return;last+=elapsed*1000;S.left=Math.max(0,S.left-elapsed);updateTime();if(!S.left){pause();$("#focus-caption").textContent="Focus session complete."}},250)};
- const prompts={1:"Before asking for an explanation, write down one mechanism you suspect is involved. What evidence would disconfirm it?",2:"Consider cognitive offloading: a provided summary may change how much original material the learner processes. What alternative explanations could account for the same result?",3:"A possible reasoning plan:\n1. Define recall versus comprehension.\n2. Compare reading-only, summary-only and mixed conditions.\n3. Measure immediate and delayed outcomes.\n4. Consider prior knowledge and motivation.\n5. Test competing mechanisms."};
- $$("[data-scaffold]").forEach(b=>b.onclick=()=>{$$("[data-scaffold]").forEach(x=>x.classList.toggle("selected",x===b));$("#scaffold-output").textContent=prompts[b.dataset.scaffold]});
- $("#resume-save").onclick=()=>{let task=$("#resume-context").value.trim(),next=$("#resume-next").value.trim();if(!task||!next){$("#resume-output").textContent="Add both a task and a next step first.";return}S.checkpoint={task,next};$("#resume-output").textContent="Checkpoint saved in this page. Now simulate an interruption.";$("#resume-interrupt").disabled=false;$("#resume-restore").disabled=true};
- $("#resume-interrupt").onclick=()=>{if(!S.checkpoint)return;$("#resume-context").value="";$("#resume-next").value="";$("#resume-output").textContent="Interruption simulated. Your checkpoint is hidden. Choose Resume to restore it.";$("#resume-interrupt").disabled=true;$("#resume-restore").disabled=false};
- $("#resume-restore").onclick=()=>{if(!S.checkpoint)return;$("#resume-context").value=S.checkpoint.task;$("#resume-next").value=S.checkpoint.next;$("#resume-output").textContent="Your task: "+S.checkpoint.task+"\nYour next step: "+S.checkpoint.next;$("#resume-interrupt").disabled=false;$("#resume-restore").disabled=true};
 }
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
