@@ -14,6 +14,18 @@ The reading pages retain article methods, reported findings, limitations and sou
 
 **Site:** https://chengyu-ucsb.github.io/ai-attention-observatory/ (project-specific GitHub Pages address).
 
+## October 2026 — fuller source coverage and public commentary
+
+The project has two parallel discovery channels. Scholarly work comes from OpenAlex and Crossref, with abstracts cross-checked against Europe PMC and optional Semantic Scholar. Journalism, independent analysis, and practitioner material come from direct publisher RSS/Atom feeds (The Conversation, Ars Technica, The Verge), narrow Google News publisher searches, and a transparent editorial selection of relevant public essays. The public homepage has a **Beyond the journals** section, and article cards label reporting, opinion and product-oriented material separately from academic research.
+
+**Full-text approach.** For eligible papers, the workflow retrieves permitted machine-readable Europe PMC XML and extracts methods/results/discussion/limitations. It also discovers legitimate open-access copies through OpenAlex. When the repository owner supplies an \`OPENALEX_API_KEY\` GitHub Actions secret, an optional step can read OpenAlex GROBID-XML text **only for records with explicitly permissive open licenses**. It keeps short attributed section extracts in the public JSON, not whole copyrighted PDFs/XML. Machine-extracted summaries can be wrong or incomplete; the original link remains central.
+
+The current repository does **not** have the OpenAlex API key configured (observed from the workflow log on October 18, 2026), so its TEI full-text step was skipped. Add the key under Settings → Secrets and variables → Actions → New repository secret, name it \`OPENALEX_API_KEY\`, then run the research update. Do not put keys into the public code or README.
+
+**Copyright:** Readable on the web does not mean licensed for republication. News articles and design essays are represented using a small feed description or original short editorial synopsis; the website links to the source. We do not copy third-party images or redistribute articles as local files. The Conversation's no-derivatives licensing also restricts reworking republished article text; treat RSS text as an indexing aid, not a license to adapt or republish.
+
+**Editorial quality controls:** Automatic matches can be weak. The media collector filters publisher and subject signals, rejects finance/search-result noise, deduplicates links, and distinguishes editorial opinion from empirically supported findings. Users should verify source claims independently. Both collectors can report partial errors even when some sources succeed.
+
 ## What the site offers
 
 - **This week:** latest indexed papers and reporting, key-idea excerpts, topic counts, and a publication timeline.
@@ -71,7 +83,13 @@ python -m http.server 8000
 To update:
 ```bash
 python scripts/update.py
+python scripts/discover_editorial.py
+python scripts/seed_editorial.py
+python scripts/enrich_metadata.py
+python scripts/open_access_links.py
 python scripts/enrich.py
+python scripts/enrich_openalex_fulltext.py
+python scripts/build_readings.py
 python scripts/feed.py
 python -m unittest discover -s tests -v
 ```
