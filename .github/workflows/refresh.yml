@@ -56,6 +56,7 @@ jobs:
           node --check app.js
           python -m compileall -q scripts tests
           python -m json.tool data/library.json > /dev/null
+          python -m json.tool data/public-issue.json >/dev/null
           python -m json.tool data/public-library.json > /dev/null
           python -m json.tool data/weekly.json > /dev/null
           python -m unittest discover -s tests -v
@@ -63,7 +64,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/ feed.xml
+          git add data/ feed.xml issue-feed.xml newsletter.html
           if ! git diff --cached --quiet; then
             git commit -m "Refresh discovery, reading notes and RSS"
             # Source-code edits can advance main while the collector runs.
