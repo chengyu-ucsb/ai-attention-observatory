@@ -102,6 +102,7 @@ function renderArticle(x){
  if(x.analysis?.figures?.length){const f=el("div","aside-block");add(f,el("div","eyebrow","FIGURES IN THE ORIGINAL PAPER"));x.analysis.figures.forEach(z=>{const p=el("div","figure-caption");add(p,el("strong","",z.label||"Figure"),el("p","",z.caption||"No caption extracted"));f.append(p)});side.append(f);}
  const link=validUrl(x.url);if(link){const a=el("a","source-button","Read original publication  ↗");a.href=link;a.target="_blank";a.rel="noopener noreferrer";side.append(a);}
  if(x.analysis?.fulltext_url){const u=validUrl(x.analysis.fulltext_url);if(u){const a=el("a","plain-link","Open licensed full text ↗");a.href=u;a.target="_blank";a.rel="noopener noreferrer";side.append(a)}}
+ const find=el("a","plain-link","Find by title on Google Scholar ↗");find.href="https://scholar.google.com/scholar?q="+encodeURIComponent(x.title);find.target="_blank";find.rel="noopener noreferrer";side.append(find);
  add(grid,main,side);add(root,back,head,grid);
 }
 async function load(){
