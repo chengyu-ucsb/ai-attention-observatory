@@ -1,0 +1,48 @@
+"""Build an editorially reviewed weekly issue from all source-backed weekly readings.
+
+Do not automatically invent a synthesis for new weeks. If the editor has not written
+an issue, publish a transparent source-count status but no newsletter issue.
+The issue includes citations to the exact source records and a complete source shelf.
+"""
+from __future__ import annotations
+import json,datetime,pathlib,re
+ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
+def source_id(x):return (x.get("doi") or "").lower() or x.get("url") or x.get("title")
+def find(needle,items):
+ hits=[i for i,x in enumerate(items) if needle.casefold() in x.get("title","").casefold()]
+ if len(hits)!=1:raise ValueError("Issue anchor must match exactly one source: "+needle+" (matches "+str(len(hits))+")")
+ return items[hits[0]]
+def build():
+ weekly=json.loads((DATA/"public-weekly.json").read_text())
+ issue_date=(weekly.get("run") or {}).get("date") or ""
+ drafts=json.loads((DATA/"issue-editorial.json").read_text())
+ items=weekly.get("items") or []
+ schema={
+  "edition_date":issue_date,"source_count":len(items),
+  "types":{"scholarly":sum(x.get("kind")=="scholarly" for x in items),"commentary":sum(x.get("kind")!="scholarly" for x in items)},
+  "material":{"full_text":sum(x.get("reading",{}).get("level")=="full_text" for x in items),
+   "abstract":sum(x.get("reading",{}).get("level")=="abstract" for x in items),
+   "publisher_or_editorial":sum(x.get("reading",{}).get("level")=="curated" for x in items)},
+  "sources":[{"id":source_id(x),"title":x.get("title",""),"kind":x.get("kind",""),"venue":x.get("venue",""),
+     "published":x.get("published",""),"reading_level":x.get("reading",{}).get("level",""),
+     "url":x.get("url","")} for x in items],
+  "status":"awaiting_editorial_review",
+  "note":"New source records have been indexed. A cross-source editorial synthesis has not yet been reviewed and published."
+ }
+ draft=drafts.get(issue_date)
+ if draft:
+  if len(items)<3:raise ValueError("Issue must have at least three source-backed items")
+  cards=[]
+  for sig in draft["signals"]:
+   cited=[find(name,items) for name in sig["sources"]]
+   cards.append({**sig,"source_ids":[source_id(x) for x in cited]})
+  tension=draft["tension"].copy()
+  tension["source_ids"]=[source_id(find(name,items)) for name in tension["sources"]]
+  schema.update({k:draft[k] for k in ("number","subject","headline","deck","letter","experiment","closer","editorial_note")})
+  schema["signals"]=cards
+  schema["tension"]=tension
+  schema["status"]="published"
+ (DATA/"public-issue.json").write_text(json.dumps(schema,ensure_ascii=False,indent=2)+"\n")
+ print(json.dumps({"issue_date":issue_date,"status":schema["status"],"sources_in_shelf":len(items),"themes":len(schema.get("signals",[]))}))
+ return schema
+if __name__=="__main__":build()
