@@ -2,6 +2,20 @@
 
 A public-facing research discovery and reading room curated by [Chengyu Fang](https://chengyufang.org/). It tracks how AI influences attention, cognitive offloading and sustained engagement, together with possible interventions and relevant adjacent research.
 
+## Continuous full-text catch-up and public evidence policy (October 2026)
+
+The observatory uses **two separate schedules**, rather than waiting for weekly searches to process all newly found research:
+
+- **Weekly discovery:** \`.github/workflows/refresh.yml\` collects new papers, journalism, abstracts and OA links on Mondays. It does not download full-text content.
+- **Full-text backlog:** \`.github/workflows/backfill-fulltext.yml\` checks the existing queue four times a day (03:17, 09:17, 15:17 and 21:17 UTC) and can be run manually. It tracks which DOI was attempted, when it can be retried, whether open licensing or machine-readable XML was unavailable, and when provider credits will reset. A normal batch tries up to 24 papers and at most eight OpenAlex full-text downloads. The jobs share a concurrency lock to protect the same data.
+- **Rate-limit behavior:** a 429 saves a resume time, instead of starting another full weekly search or repeatedly hammering the API. Missing licenses and missing XML are rechecked after a longer interval. The catch-up job continues checking while eligible work remains; papers behind inaccessible or non-reusable licensing cannot be guaranteed full-text coverage.
+
+**Nothing citation-only appears on the website or RSS.** The internal \`data/library.json\` keeps incomplete bibliographic records for later acquisition, but \`scripts/build_public.py\` creates source-backed \`data/public-library.json\` and \`data/public-weekly.json\` for the site. Scholarly sources require a substantive real abstract or extracted licensed article text; nonacademic items require a meaningful publisher or attributed editorial synopsis. Pages deploys only the public projection, never the raw internal source index. Topic counts, weekly highlights and article recommendations are also computed from the public projection.
+
+**Editorial hierarchy:** The result or research idea is now the main reading headline; the publication title is a smaller citation below it. Labels distinguish reported findings, author interpretation, and research ideas without verified results. Machine extraction is not a substitute for independent scholarly appraisal.
+
+**Progress:** \`data/fulltext-backfill-state.json\` records extraction counts, ready/retry queue sizes, and any provider-budget pause. The homepage displays this as a small coverage graphic. Being "full-text extracted" means some permitted sections were parsed, not that a researcher completed a critical review.
+
 ## The playable Lab (October 2026)
 
 The Experimental Lab now provides three interactive, entirely browser-local experiences rather than static form prototypes:
@@ -20,7 +34,7 @@ The site now combines three complementary directions:
 
 1. **Editorial Observatory:** a crimson, magazine-like public homepage centered on three source-backed weekly readings rather than lists of unverified article titles.
 2. **Evidence Atlas:** live visual charts and tables generated from the published index, showing topic coverage, publication years, source types and the depth of accessible material. Counts describe the index, not causal effects or the state of the entire field.
-3. **Experimental Lab:** clearly labeled early-stage **interactive design explorations**, including a focus-intention timer, progressive thinking prompts, and an interruption re-entry checkpoint. They do not communicate with AI APIs, collect user data or claim measured effectiveness.
+3. **Experimental Lab:** clearly labeled early-stage **interactive design explorations**, including a switching mini-game, interruption re-entry challenge, and graduated assistance simulator. They do not communicate with AI APIs, collect user data or claim measured effectiveness.
 
 The reading pages retain article methods, reported findings, limitations and source attributions when these exist. All other sections distinguish abstract-derived text from full-text extracts and bibliographic records.
 
@@ -30,9 +44,9 @@ The reading pages retain article methods, reported findings, limitations and sou
 
 The project has two parallel discovery channels. Scholarly work comes from OpenAlex and Crossref, with abstracts cross-checked against Europe PMC and optional Semantic Scholar. Journalism, independent analysis, and practitioner material come from direct publisher RSS/Atom feeds (The Conversation, Ars Technica, The Verge), narrow Google News publisher searches, and a transparent editorial selection of relevant public essays. The public homepage has a **Beyond the journals** section, and article cards label reporting, opinion and product-oriented material separately from academic research.
 
-**Full-text approach.** For eligible papers, the workflow retrieves permitted machine-readable Europe PMC XML and extracts methods/results/discussion/limitations. It also discovers legitimate open-access copies through OpenAlex. When the repository owner supplies an \`OPENALEX_API_KEY\` GitHub Actions secret, an optional step can read OpenAlex GROBID-XML text **only for records with explicitly permissive open licenses**. It keeps short attributed section extracts in the public JSON, not whole copyrighted PDFs/XML. Machine-extracted summaries can be wrong or incomplete; the original link remains central.
+**Full-text approach.** The separate backlog workflow retrieves permitted machine-readable Europe PMC XML and extracts methods/results/discussion/limitations. It also discovers legitimate open-access copies through OpenAlex. When the repository owner supplies an \`OPENALEX_API_KEY\` GitHub Actions secret, an optional step can read OpenAlex GROBID-XML text **only for records with explicitly permissive open licenses**. It keeps short attributed section extracts in the public JSON, not whole copyrighted PDFs/XML. Machine-extracted summaries can be wrong or incomplete; the original link remains central.
 
-The current repository does **not** have the OpenAlex API key configured (observed from the workflow log on October 18, 2026), so its TEI full-text step was skipped. Add the key under Settings → Secrets and variables → Actions → New repository secret, name it \`OPENALEX_API_KEY\`, then run the research update. Do not put keys into the public code or README.
+The repository has an `OPENALEX_API_KEY` GitHub Actions secret configured as of October 18, 2026. Keep it in Actions secrets, never in the public code, and respect the free daily download allowance.
 
 **Copyright:** Readable on the web does not mean licensed for republication. News articles and design essays are represented using a small feed description or original short editorial synopsis; the website links to the source. We do not copy third-party images or redistribute articles as local files. The Conversation's no-derivatives licensing also restricts reworking republished article text; treat RSS text as an indexing aid, not a license to adapt or republish.
 
