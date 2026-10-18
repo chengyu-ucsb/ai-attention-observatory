@@ -31,6 +31,38 @@ CURATED={
   "interpretation":"The proposed framework treats AI-mediated offloading and metacognitive calibration as a process rather than a fixed consequence of tool use.",
   "limitation":"The study concerns doctoral learners in Chinese research universities; findings may not generalize to other institutional settings.",
   "tags":["Cognitive offloading","Metacognition","Doctoral learning"]
+ },
+ "10.3389/fpsyg.2026.1878629":{
+  "idea":"The way people delegate tasks to AI matters more than treating all offloading as one behavior.",
+  "approach":"A three-wave time-lagged survey compared dependent and autonomous AI offloading. Measures of cognitive functioning were self-reported.",
+  "finding":"Dependent offloading was associated with ceding more cognitive authority and lower intrinsic motivation. Autonomous offloading was associated with a different pattern of agency and motivation.",
+  "interpretation":"The authors argue that offloading can follow distinct pathways depending on how much cognitive agency users retain.",
+  "limitation":"Time separation does not demonstrate causality. Cognitive functioning was measured by perceived capability, not performance-based tests.",
+  "tags":["Dependent offloading","Autonomous offloading","Perceived capability"]
+ },
+ "10.3390/jintelligence14080182":{
+  "idea":"AI-assisted work can raise questions about whether the result still feels like one's own.",
+  "approach":"A cross-sectional survey of 239 preservice teachers in eastern China, recruited by convenience sampling.",
+  "finding":"The reported model associated AI anxiety and impulsivity with GenAI dependency, and dependency with greater concern about losing ownership of teaching-design work.",
+  "interpretation":"The authors propose that cognitive ownership matters when people delegate the design of educational materials.",
+  "limitation":"Cross-sectional associations cannot establish the temporal order of dependency and ownership concern; the study was not an intervention.",
+  "tags":["239 preservice teachers","Ownership concern","Cross-sectional"]
+ },
+ "10.3390/bs16071150":{
+  "idea":"AI assistance can be understood through competing patterns of learner agency.",
+  "approach":"A scoping review charted research concerning GenAI, learner agency and cognitive offloading in higher education.",
+  "finding":"The review's final evidence base comprised 123 included studies. It identifies agency-supportive and agency-eroding patterns in the literature.",
+  "interpretation":"The authors argue that a simple benefits-versus-risks account obscures differences in learning practices and conditions.",
+  "limitation":"The review restricted its included literature by language, outlet type and publication window; its synthesis cannot establish causal effects.",
+  "tags":["123 included studies","Scoping review","Learner agency"]
+ },
+ "10.2196/69533":{
+  "idea":"Digital well-being tools must consider people's decision-making, not just screen-time control.",
+  "approach":"A systematic research synthesis and conceptual model addressing human-centered AI for digital well-being.",
+  "finding":"The review covers 240 publications between 2008 and 2024; the authors report 2 relevant publications in 2008 versus 43 in 2024.",
+  "interpretation":"The authors propose a human-centered AI model of how system features relate to individual behavioral decisions and digital well-being.",
+  "limitation":"The study's database and selection scope bounds its coverage; changing publication counts are not proof that a particular intervention works.",
+  "tags":["240 publications","Digital well-being","Human-centered AI"]
  }
 }
 HEAD=re.compile(r"(?:^|\s)(?:\d+(?:\.\d+)*\.?\s+)*(?:results?|discussion|methods?|materials and methods|conclusions?|limitations(?: and future research)?|introduction|abstract)\s*(?=(?:\d|[A-Z]))",re.I)
