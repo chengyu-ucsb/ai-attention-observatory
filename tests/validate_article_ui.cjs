@@ -14,6 +14,7 @@ class Element{
  append(...els){for(const e of els){assert(e instanceof Element,"Non-element child");this.children.push(e)}}
  replaceChildren(...els){this.children=[];this.textContent="";this.append(...els)}
  setAttribute(k,v){this.attributes[k]=v}
+ addEventListener(_name,_callback){}
 }
 const paperContainer=new Element("div");
 const doc={createElement:t=>new Element(t),querySelector:q=>q==="#paper-content"?paperContainer:null};
