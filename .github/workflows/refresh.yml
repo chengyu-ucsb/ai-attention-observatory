@@ -37,10 +37,14 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           MODE: ${{ inputs.mode || 'weekly' }}
         run: python scripts/update.py
+      - name: Discover reporting, commentary and practitioner writing
+        run: python scripts/discover_editorial.py
       - name: Retrieve fuller abstracts across DOI registries
         run: python scripts/enrich_metadata.py
       - name: Extract permitted open-access article sections
         run: python scripts/enrich.py
+      - name: Read licensed OpenAlex full texts when credentials are available
+        run: python scripts/enrich_openalex_fulltext.py
       - name: Build article-specific reading summaries
         run: python scripts/build_readings.py
       - name: Produce RSS
@@ -63,8 +67,10 @@ jobs:
               git fetch origin main
               git reset --hard origin/main
               python scripts/update.py
+              python scripts/discover_editorial.py
               python scripts/enrich_metadata.py
               python scripts/enrich.py
+              python scripts/enrich_openalex_fulltext.py
               python scripts/build_readings.py
               python scripts/feed.py
               python -m unittest discover -s tests -v
