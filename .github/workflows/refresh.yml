@@ -26,6 +26,8 @@ jobs:
     env:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OA_ENRICH_LIMIT: 55
+      # Backfills make a deeper pass; normal weeks keep the API budget controlled.
+      OPENALEX_FULLTEXT_LIMIT: ${{ inputs.mode == 'backfill' && '100' || '45' }}
       MODE: ${{ inputs.mode || 'weekly' }}
     steps:
       - uses: actions/checkout@v7
