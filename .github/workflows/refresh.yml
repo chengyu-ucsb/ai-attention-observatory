@@ -1,9 +1,10 @@
 name: Update research library
 on:
+  # Run on schedule or explicitly. A workflow edit can test it once, but
+  # ordinary code commits must not flood external APIs.
   push:
     branches: [main]
     paths:
-      - 'scripts/**'
       - '.github/workflows/refresh.yml'
   schedule:
     - cron: '23 12 * * 1'
@@ -21,7 +22,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   refresh:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
@@ -70,25 +71,23 @@ jobs:
           git add data/ feed.xml
           if ! git diff --cached --quiet; then
             git commit -m "Refresh discovery, reading notes and RSS"
-            if ! git push; then
-              echo "Branch advanced during refresh. Re-running on latest main."
+            # Source-code edits can advance main while the collector runs.
+            # Rebase the completed result instead of making a second wave of
+            # network requests (which previously exhausted the OpenAlex quota).
+            pushed=false
+            for attempt in 1 2 3; do
+              if git push; then pushed=true; break; fi
+              echo "Main advanced; rebasing existing data changes (attempt $attempt)."
               git fetch origin main
-              git reset --hard origin/main
-              python scripts/update.py
-              python scripts/discover_editorial.py
-              python scripts/seed_editorial.py
-              python scripts/seed_products.py
-              python scripts/enrich_metadata.py
-              python scripts/open_access_links.py
-              python scripts/enrich.py
-              python scripts/enrich_openalex_fulltext.py
-              python scripts/build_readings.py
-              python scripts/feed.py
-              python -m unittest discover -s tests -v
-              git add data/ feed.xml
-              if ! git diff --cached --quiet; then
-                git commit -m "Refresh discovery after branch update"
-                git push
+              if ! git rebase origin/main; then
+                git rebase --abort || true
+                echo "::error::Data conflict during rebase; refusing to overwrite manually edited records."
+                exit 1
               fi
+              sleep 2
+            done
+            if [ "$pushed" != true ]; then
+              echo "::error::Could not push after 3 rebase attempts."
+              exit 1
             fi
           fi
