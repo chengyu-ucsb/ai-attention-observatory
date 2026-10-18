@@ -17,6 +17,7 @@ on:
       - 'scripts/condense_readings.py'
       - 'data/issue-editorial.json'
       - 'tests/validate_weekly_issue.cjs'
+      - 'tests/test_condense_readings.py'
       - 'scripts/feed.py'
       - 'tests/validate_playground.cjs'
       - 'tests/validate_article_ui.cjs'
@@ -57,6 +58,7 @@ jobs:
           node tests/validate_playground.cjs
           node tests/validate_article_ui.cjs
           node tests/validate_weekly_issue.cjs
+          python -m unittest discover -s tests -v
           test -s lab-play.css
           test -s index.html
           test -s styles.css
