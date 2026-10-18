@@ -47,10 +47,10 @@ function displayStatus(run){
 function renderWeekly(){
  const run=state.weekly?.run||{};displayStatus(run);
  let entries=(state.weekly?.items||[]).map(z=>recordById(recordId(z))||state.library.find(x=>x.title===z.title)||z).filter(x=>x.title);
- const starter=run.mode==="curated-starter";const label=starter?"The starting shelf":"New since the last search";
+ const starter=run.mode==="curated-starter";const label=starter?"The starting shelf":"Indexed in the last seven days";
  $("#issue-kicker").textContent=starter?"ISSUE 00 / BASELINE":"LATEST / "+fmtDate(run.date);
  $("#issue-heading").textContent=starter?"An evolving map of AI and attention.":entries.length?"What emerged this week.":"A quieter week for new research.";
- $("#issue-deck").textContent=starter?"This is the initial curated collection. The automated scholarly and news search has not yet populated the weekly index.":"The most recent search found "+entries.length+" newly indexed items. Records are screened automatically; individual full-text findings are labeled separately.";
+ $("#issue-deck").textContent=starter?"This is the initial curated collection. The automated scholarly and news search has not yet populated the weekly index.":"The past seven days added "+entries.length+" indexed items. Records are screened automatically; full-text evidence is separately labeled.";
  $("#updated-label").textContent=starter?"Awaiting first scheduled search":"Last index: "+fmtDate(run.date);
  const highlight=$("#weekly-items");highlight.replaceChildren();
  if(!entries.length)highlight.append(el("p","empty","No new indexed items in this cycle. Browse the complete library instead."));
