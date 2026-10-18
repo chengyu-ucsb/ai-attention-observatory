@@ -9,3 +9,11 @@ Before creating, copying, or editing GitHub Actions workflows:
 5. Don't claim deployment or scheduled collection success based only on code changes; verify completed run status and relevant output artifacts.
 
 This policy is stored in the repository so future assistants working on it can see and follow it. It does not override GitHub's documentation or substitute for checking current versions.
+
+## Full-text-first research integrity
+
+- **Source priority:** For each research paper, first look for a lawful full text (publisher OA, Europe PMC, OpenAlex accessible licensed text). Use abstracts when full text is unavailable or extraction fails, and always label that limitation. An OA *link* does not establish that the paper's results were retrieved or reviewed.
+- **Results are not Discussion:** Represent measured or directly stated results from the Results/Findings section. Keep Discussion as the authors' interpretation, and separate future research proposals from observed outcomes. Do not silently convert interpretations into findings.
+- **Traceability:** Preserve DOI/source link, section provenance, license, and reading level; never infer sample sizes, effect sizes, figures or statistical claims from titles or topic labels.
+- **Rights:** Do not copy full copyrighted papers or images into the public repo. Store only brief excerpts where licensing explicitly permits and link to source originals otherwise.
+- **Operations:** Test a full-text retrieval backfill under API credit limits before reporting numerical improvements. Never rerun the entire external search solely to work around a git push race; rebase existing results where possible. Do not trigger full refreshes on every code edit.
