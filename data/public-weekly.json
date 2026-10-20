@@ -24,8 +24,8 @@
     "editorial_selections_added": 0,
     "product_examples": 4,
     "reading_eligible_count": 193,
-    "full_text_count": 48,
-    "abstract_count": 132
+    "full_text_count": 51,
+    "abstract_count": 129
   },
   "items": [
     {
@@ -326,22 +326,22 @@
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "Academic impact associated with digital media use is a topic of considerable concern in the fields of adolescent mental health and education; however, the role of attention status in this context remains largely unknown. The present study aimed to systematically investigate the multidimensional association patterns between attention-related characteristics and academic impact…",
-        "methods": "The present study aimed to systematically investigate the multidimensional association patterns between attention-related characteristics and academic impact among adolescents using data mining approaches. The data were derived from two publicly available cross-sectional survey datasets, and a final sample of 799 adolescents aged 19 years and below was included after age screening.",
-        "findings": "Results showed that LASSO regression identified stress level (coefficient = 0.384) and social media use duration (coefficient = 0.297) as the strongest predictors of academic impact. Network analysis revealed a three-community structure, corresponding to the “digital distraction load,” “psychological-academic exhaustion,” and “academic engagement” dimensions, with academic impact located at the intersection of the first two communities.",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "799",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "Academic impact associated with digital media use is a topic of considerable concern in the fields of adolescent mental health and education; however, the role of attention status in this context remains largely unknown. The present study aimed to systematically investigate the multidimensional association patterns between attention-related characteristics and academic impact among adolescents using data…",
+        "methods": "",
+        "findings": "As shown in the Figure 7 , LASSO regression with tenfold cross-validation identified eight core features with nonzero coefficients. Among the retained features, stress level (coefficient = 0.384) and social media use duration (coefficient = 0.297) exhibited the strongest positive predictive effects on academic impact, indicating that these two factors are the most prominent behavioral signals of impaired academic functioning in adolescents. Number of notifications (coefficient = 0.213) and number of application openings (coefficient = 0.186) also entered the model, suggesting that frequent digital interruptions, rather than total screen time per se, may represent a key mechanism underlying the erosion of academic attention. This finding is consistent with the central pr",
+        "interpretation": "By integrating multiple data mining approaches, including LASSO regression, network analysis, XGBoost predictive modeling with SHAP interpretation, and latent profile analysis, this study systematically examined the multidimensional association patterns between attention status and academic impact among adolescents. Based on the analysis of 799 adolescents, the following main conclusions were drawn. First, stress level and social media use duration were the strongest predictors of academic impact, with coefficients of 0.384 and 0.297, respectively, in the LASSO regression, and they ranked among the highest on centrality indices in the network analysis, indicating that both occupy central hub positions within the attention-academic impact network. Second, the network ana",
+        "limitations": "The present study has several limitations. First, the data were cross-sectional in design, which precludes the establishment of causal directions between variables. For instance, excessive social media use may lead to academic difficulties, but academic difficulties may also drive individuals to escape into social media. Second, the data were derived from self-reports, which may be subject to recall bias and social desirability effects. Third, although the SHAP explanations from the XGBoost model provided both global and local feature contribution information, they have not yet been directly l",
+        "sample": "",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "reported_findings": true,
         "digest": {
           "idea": "Academic impact associated with digital media use is a topic of considerable concern in the fields of adolescent mental health and education; however, the role of attention status in this context remains largely unknown.",
-          "approach": "The data were derived from two publicly available cross-sectional survey datasets, and a final sample of 799 adolescents aged 19 years and below was included after age screening.",
-          "finding": "Results showed that LASSO regression identified stress level (coefficient = 0.384) and social media use duration (coefficient = 0.297) as the strongest predictors of academic impact.",
-          "interpretation": "",
-          "limitation": "",
+          "approach": "",
+          "finding": "As shown in the Figure 7 , LASSO regression with tenfold cross-validation identified eight core features with nonzero coefficients.",
+          "interpretation": "By integrating multiple data mining approaches, including LASSO regression, network analysis, XGBoost predictive modeling with SHAP interpretation, and latent profile analysis, this study systematically examined the multidimensional association patterns between attention status…",
+          "limitation": "The present study has several limitations.",
           "tags": [
             "Attention",
             "Learning",
@@ -354,7 +354,26 @@
       "open_access_url": "https://doi.org/10.3389/fpsyg.2026.1930030",
       "open_access_license": "cc-by",
       "open_access_version": "publishedVersion",
-      "oa_grobid_checked": "2026-10-18"
+      "oa_grobid_checked": "2026-10-20",
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-20T14:18:30+00:00",
+        "status": "full_text",
+        "next_at": null
+      },
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "",
+        "results": "As shown in the Figure 7 , LASSO regression with tenfold cross-validation identified eight core features with nonzero coefficients. Among the retained features, stress level (coefficient = 0.384) and social media use duration (coefficient = 0.297) exhibited the strongest positive predictive effects on academic impact, indicating that these two factors are the most prominent behavioral signals of impaired academic functioning in adolescents. Number of notifications (coefficient = 0.213) and number of application openings (coefficient = 0.186) also entered the model, suggesting that frequent digital interruptions, rather than total screen time per se, may represent a key mechanism underlying the erosion of academic attention. This finding is consistent with the central premise of interruption theory, which posits that frequent task switching and attentional interruptions significantly impair cognitive task efficiency and performance (Oulasvirta and Salovaara, 2004; Oulasvirta and Saariluoma, 2006) . Notably, work and study time (coefficient = -0.152) and sleep duration (coefficient =…",
+        "discussion": "By integrating multiple data mining approaches, including LASSO regression, network analysis, XGBoost predictive modeling with SHAP interpretation, and latent profile analysis, this study systematically examined the multidimensional association patterns between attention status and academic impact among adolescents. Based on the analysis of 799 adolescents, the following main conclusions were drawn. First, stress level and social media use duration were the strongest predictors of academic impact, with coefficients of 0.384 and 0.297, respectively, in the LASSO regression, and they ranked among the highest on centrality indices in the network analysis, indicating that both occupy central hub positions within the attention-academic impact network. Second, the network analysis identified three relatively independent community structures, corresponding to the \"digital distraction load, \" \"psychological-academic exhaustion, \" and \"academic engagement\" dimensions, with academic impact located at the intersection of the first two communities, suggesting that it is jointly associated with…",
+        "limitations": "The present study has several limitations. First, the data were cross-sectional in design, which precludes the establishment of causal directions between variables. For instance, excessive social media use may lead to academic difficulties, but academic difficulties may also drive individuals to escape into social media. Second, the data were derived from self-reports, which may be subject to recall bias and social desirability effects. Third, although the SHAP explanations from the XGBoost model provided both global and local feature contribution information, they have not yet been directly linked to individualized interventions. Future research could adopt longitudinal designs to track the dynamic causal relationships between digital behaviors and academic impact, and integrate ecological momentary assessment to capture real-time changes in attentional states in daily contexts. In addition, efforts could be made to translate the individual-level explanations provided by SHAP into personalized feedback interventions, thereby facilitating the effective translation of research…",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.3389/fpsyg.2026.1930030",
+        "key_idea": "As shown in the Figure 7 , LASSO regression with tenfold cross-validation identified eight core features with nonzero coefficients. Among the retained features, stress level (coefficient = 0.384) and social media use duration (coefficient = 0.297) exhibited the strongest positive",
+        "extraction_date": "2026-10-20"
+      }
     },
     {
       "title": "Algorithmic management and gig workers' workplace wellbeing: the moderating role of psychological resilience",
@@ -597,7 +616,13 @@
       "open_access_url": "https://doi.org/10.1186/s12888-026-08635-4",
       "open_access_license": "cc-by-nc-nd",
       "open_access_version": "publishedVersion",
-      "oa_grobid_checked": "2026-10-18"
+      "oa_grobid_checked": "2026-10-18",
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-20T14:18:30+00:00",
+        "status": "waiting_for_license",
+        "next_at": "2026-11-19T14:18:30+00:00"
+      }
     },
     {
       "title": "Parental Notification Gaps in ChatGPT-5: An Empirical Study",
@@ -866,7 +891,13 @@
       "open_access_url": "https://doi.org/10.56979/1201/2026/1624",
       "open_access_license": "cc-by",
       "open_access_version": "publishedVersion",
-      "oa_grobid_checked": "2026-10-18"
+      "oa_grobid_checked": "2026-10-18",
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-20T14:18:30+00:00",
+        "status": "waiting_for_machine_text",
+        "next_at": "2026-11-03T14:18:30+00:00"
+      }
     },
     {
       "title": "The Prisoner's Dilemma of AI: Cognitive Offloading Among Future Mathematics Teachers",
@@ -981,7 +1012,13 @@
       "open_access_url": "https://doi.org/10.22533/at.ed.131761426091011",
       "open_access_license": "unknown",
       "open_access_version": "publishedVersion",
-      "oa_grobid_checked": "2026-10-18"
+      "oa_grobid_checked": "2026-10-18",
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-20T14:18:29+00:00",
+        "status": "waiting_for_license",
+        "next_at": "2026-11-19T14:18:30+00:00"
+      }
     },
     {
       "title": "THE INFLUENCE OF DIGITAL DISTRACTION ON UNIVERSITY STUDENTS' ENGLISH LEARNING",
