@@ -32,7 +32,8 @@ if(issue.status==="published"){
  const stored=fs.existsSync(path.join(root,"data/approved-issues"))?fs.readdirSync(path.join(root,"data/approved-issues")).filter(x=>/^\d{4}-\d{2}-\d{2}\.json$/.test(x)).sort().reverse():[];
  if(stored.length){
   const approved=JSON.parse(text("data/approved-issues/"+stored[0]));
-  assert(newsletter.includes(approved.headline),"In-review week erased the most recently approved letter");
+  const escaped=approved.headline.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;");
+  assert(newsletter.includes(escaped)||newsletter.includes(approved.headline),"In-review week erased the most recently approved letter");
  }else{
   assert(!newsletter.includes("SIGNAL 1"),"No invented newsletter content before editorial review");
  }
