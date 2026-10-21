@@ -10,6 +10,7 @@ assert(issue.sources.every(s=>s.reading_level!=="citation_only"),"Citation-only 
 assert(site.includes('id="issue"')&&site.includes('id="weekly-title"'),"Weekly issue not discoverable");
 assert(fs.existsSync(path.join(root,"issues/index.html")),"Missing archived edition directory index");
 assert(site.includes('href="issues/"'),"Newsletter archive navigation missing");
+assert(site.includes('href="issue-feed.xml" class="issue-rss"'),"Homepage weekly RSS must point to approved editorials, not record feed");
 assert(app.includes("function renderIssue()"),"Missing issue renderer");
 const deployment=text(".github/workflows/publish.yml");
 assert(deployment.includes("Catch up full-text research backlog"),"Catch-up results must trigger a Pages redeployment");
