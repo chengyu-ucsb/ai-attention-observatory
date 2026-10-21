@@ -44,7 +44,7 @@ for(const r of db){
  const source=nodeClass(paperContainer,"paper-source-title");
  assert(source&&source.tag==="h3"&&source.textContent===r.title,"Original publication must remain available as evidence provenance");
  assert(insight.tag==="h1","The idea must be the primary reading-page heading");
- assert(!/^(?:the authors|the researchers|this study|the paper|we found)\b/i.test(insight.textContent),"Headline should start with the idea, not the authors");
+ assert(!/^(?:the authors|the researchers|this study|the paper|we found)\b/i.test(insight.textContent),"Headline should start with the idea, not the authors: "+r.title+" / "+insight.textContent);
  assert(insight.textContent.length<=186,"Takeaway is too long for an article headline");
  const header=nodeClass(paperContainer,"paper-reading-header");
  assert(header&&nodes(header).includes(insight),"Readers must see the idea before the evidence");
