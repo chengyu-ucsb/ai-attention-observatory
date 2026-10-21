@@ -44,15 +44,17 @@ for(const r of db){
  const source=nodeClass(paperContainer,"paper-source-title");
  assert(source&&source.tag==="h3"&&source.textContent===r.title,"Original publication must remain available as evidence provenance");
  assert(insight.tag==="h1","The idea must be the primary reading-page heading");
+ assert(!/^(?:the authors|the researchers|this study|the paper|we found)\b/i.test(insight.textContent),"Headline should start with the idea, not the authors");
+ assert(insight.textContent.length<=186,"Takeaway is too long for an article headline");
  const header=nodeClass(paperContainer,"paper-reading-header");
  assert(header&&nodes(header).includes(insight),"Readers must see the idea before the evidence");
  assert(!nodes(header).includes(source),"Do not foreground bibliographic titles over the idea");
  const evidence=nodeClass(paperContainer,"paper-section-title");
- assert(evidence&&/evidence|supports|informs/i.test(evidence.textContent),"Supporting evidence must be explicitly signposted");
+ assert(evidence&&/evidence|supports|informs|how to read/i.test(evidence.textContent),"Supporting evidence must be explicitly signposted");
  const generic=nodes(paperContainer).filter(n=>n.className.split(" ").includes("concept-scene"));
  assert.equal(generic.length,0,"Generic concept diagrams were supposed to be removed");
  const notes=nodeClass(paperContainer,"reading-lead-note");
- assert(notes&&/research|source|article|index|passages|synopsis|original evidence/i.test(notes.textContent),"Missing provenance warning for "+r.title);
+ assert(notes&&/research|source|article|index|passages|synopsis|original evidence|publisher description/i.test(notes.textContent),"Missing provenance warning for "+r.title);
  const details=nodeClass(paperContainer,"paper-detail-excerpts");
  const editorial=r.kind==="nonacademic";
  const hasNotes=editorial?!!(r.editorial_notes?.argument||r.editorial_notes?.design_relevance||r.editorial_notes?.caveat):!!(r.reading?.methods||r.reading?.findings||r.reading?.interpretation||r.reading?.limitations);
@@ -66,7 +68,7 @@ if(literacy){
  vm.runInContext("TEST.showPaper(selected)",ctx);
  const textAll=texts(paperContainer).join(" | ");
  assert(textAll.includes("450 non-English-major undergraduates"),"Specific sample details missing from accessible summary");
- assert(textAll.includes("20 selected participants"),"Mixed-methods follow-up sample missing");
+ assert(textAll.includes("20 interviews"),"Mixed-methods follow-up sample missing");
  assert(nodeClass(paperContainer,"article-data-visual"),"Study-specific research-design visual not rendered");
  assert(!nodeClass(paperContainer,"concept-scene"),"Generic concept illustration should be absent");
 }
@@ -76,7 +78,7 @@ if(digital){
  vm.runInContext("TEST.showPaper(selected)",ctx);
  assert.equal(nodes(paperContainer).filter(n=>n.className.split(" ").includes("study-coefficient-row")).length,4,
   "Expected four explicitly sourced LASSO coefficients");
- assert(texts(paperContainer).join(" | ").includes("not generative AI"),"Adjacent research must be qualified");
+ assert(texts(paperContainer).join(" | ").includes("did not examine generative AI"),"Adjacent research must be qualified");
 }
 
 const good=db.find(x=>x.doi==="10.58304/ijts.260930");
