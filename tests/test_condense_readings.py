@@ -1,7 +1,7 @@
 """Readable research digest regression checks. No fabricated findings or figures."""
-import pathlib,sys,unittest
+import pathlib,sys,unittest,json
 ROOT=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/"scripts"))
-from condense_readings import clean,condensed,annotate,concept_tags
+from condense_readings import clean,condensed,annotate,concept_tags,reported_result
 class CondensedReadingTests(unittest.TestCase):
  def test_section_numbers_and_reference_artifacts_removed(self):
   s="4. Results 4.1. Common method bias and discriminant validity of the measurement structure To evaluate the discriminant validity of the four study constructs, nested confirmatory factor analyses were conducted ( Table 3 )."
@@ -34,4 +34,38 @@ class CondensedReadingTests(unittest.TestCase):
   self.assertIn("AI literacy",tags)
   self.assertIn("Critical thinking",tags)
   self.assertLessEqual(len(tags),3)
+ def test_methodological_diagnostics_are_not_presented_as_results(self):
+  diagnostic=("4. Results 4.1. Common method bias. Harman's single-factor test "
+              "indicated that the first factor explained 35 percent of variance. "
+              "The measurement model showed adequate fit with CFI = 0.95. "
+              "Cronbach alpha suggested that all scales had acceptable reliability.")
+  self.assertEqual(reported_result(diagnostic,"AI literacy and critical thinking"),"")
+ def test_real_result_beats_preceding_measurement_checks(self):
+  content=("Harman's single-factor test was conducted to test common method bias. "
+           "Cronbach alpha values indicated adequate reliability. "
+           "Specifically, AI literacy was positively correlated with critical thinking "
+           "and AI-assisted problem-solving among surveyed students.")
+  claim=reported_result(content,"AI literacy and critical thinking")
+  self.assertIn("positively correlated",claim)
+  self.assertNotIn("Cronbach",claim)
+ def test_indexed_papers_have_source_labelled_results_or_explicit_omission(self):
+  records=json.loads((ROOT/"data/library.json").read_text())
+  records={r.get("doi"):r for r in records}
+  # Psychometric diagnostics occur first in the full-text extract.
+  literacy=annotate(records["10.58304/ijts.260930"])["reading"]["digest"]
+  self.assertNotIn("Harman",literacy["finding"])
+  self.assertNotIn("single-factor",literacy["finding"])
+  self.assertIn("AI",literacy["finding"])
+  self.assertIn(literacy["finding_source"],{"full_text","abstract"})
+  # The full-text extract covers instrument reliability; the source abstract
+  # explicitly reports the appraisal paths.
+  workers=annotate(records["10.3389/fpsyg.2026.1960382"])["reading"]["digest"]
+  self.assertEqual(workers["finding_source"],"abstract")
+  self.assertIn("algorithmic management",workers["finding"].lower())
+  self.assertNotIn("Cronbach",workers["finding"])
+  # When both the source extract and the truncated abstract lack a result,
+  # the site must not relabel CFA diagnostics as empirical findings.
+  truncated=annotate(records["10.3389/fpsyg.2026.1939286"])["reading"]["digest"]
+  self.assertEqual(truncated["finding"],"")
+  self.assertEqual(truncated["finding_source"],"none")
 if __name__=="__main__":unittest.main()
