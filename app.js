@@ -362,7 +362,7 @@ function showPaper(x){
   ["WHAT REMAINS OPEN",d.limitation||notes.caveat,"◌"]
  ]:[
   ["THE APPROACH",d.approach||"Not specified in available source text.","◈"],
-  ["REPORTED RESULT",d.finding||"No clearly identifiable empirical result in the indexed text.","◎"],
+  [d.finding_source==="abstract"?"RESULT REPORTED IN ABSTRACT":d.finding_source==="full_text"?"RESULT EXTRACTED FROM FULL TEXT":d.finding?"REPORTED RESULT":"RESULT NOT ESTABLISHED",d.finding||"No substantive empirical result was identifiable in the accessible source text.","◎"],
   ["LIMITS / INTERPRETATION",d.limitation||d.interpretation||"No source-backed qualification available.","↗"]
  ];
  const snapshot=make("div","paper-snapshot");
@@ -381,7 +381,7 @@ function showPaper(x){
     if(content){notesArea.append(section(label,content,source));hasNotes=true}
   }
  }else{
-  for(const [label,content] of [["HOW IT WAS STUDIED",r.methods],["WHAT THE PAPER REPORTS",r.findings],["AUTHOR INTERPRETATION (DISCUSSION)",r.interpretation],["LIMITATIONS",r.limitations]]){
+  for(const [label,content] of [["HOW IT WAS STUDIED",r.methods],["ORIGINAL RESULTS EXTRACT (UNFILTERED)",r.findings],["AUTHOR INTERPRETATION (DISCUSSION)",r.interpretation],["LIMITATIONS",r.limitations]]){
     if(content){notesArea.append(section(label,content,r.provenance));hasNotes=true}
   }
  }
