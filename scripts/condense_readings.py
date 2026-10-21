@@ -273,6 +273,54 @@ def first_source_sentence(text):
  parts=sentence_list(text)
  return parts[0] if parts else clean(text)
 
+# A reader can learn which question a paper asks without mistaking an indexed
+# title for an editorial finding. Topic prompts have no empirical direction.
+TOPIC_QUESTIONS=[
+ (r"notifications?|alerts?|hover effect","When do notifications disrupt attention?"),
+ (r"(?:attention|digital) fragmentation|fragmented attention","What does attention fragmentation mean, and how can it be studied?"),
+ (r"task switching|task.switch|multitask","How does switching between tasks affect attention?"),
+ (r"critical thinking.*offload|offload.*critical thinking","How does offloading thinking to AI relate to critical judgment?"),
+ (r"cognitive offloading|cognitive dependency|ai dependenc","When does AI assistance become cognitive dependence?"),
+ (r"ai literacy|genai literacy|digital literacy","How does knowing more about AI affect the way people use it?"),
+ (r"metacognit|self.regulat","How do people monitor and regulate their thinking with technology?"),
+ (r"cognitive effort|mental effort|cognitive load","How does AI change the effort people invest in thinking?"),
+ (r"critical thinking|critical reason","What happens to critical thinking when people use AI?"),
+ (r"digital distraction|digital multitask|smartphone|social media","How do digital habits relate to distraction and learning?"),
+ (r"focus|sustained attention|attentional control","What makes sustained attention easier or harder?"),
+ (r"well.being|wellbeing|technostress|stress","How does digital technology relate to well-being and strain?"),
+ (r"algorithmic management|gig work|employee|workplace|knowledge work","How does AI reshape work and the people doing it?"),
+ (r"recommendation|platform|synthetic content|attention economy","How do AI platforms shape attention, discovery, and trust?"),
+ (r"interface|app design|digital wellbeing tool|digital well.being tool","How could technology be designed to support better attention?"),
+ (r"policy|governance|regulat|ethic","What governance questions does AI raise for human attention?"),
+ (r"teaching|pedagog|student|learning|education|classroom|university","How might AI change the way people learn?"),
+ (r"mental health|adolescent","What can the research tell us about digital well-being?"),
+]
+def research_question(record):
+ title=clean(record.get("title") or "").lower()
+ for pattern,question in TOPIC_QUESTIONS:
+  if re.search(pattern,title,re.I):
+   return question
+ lane=record.get("lane") or ""
+ return {
+  "Fragmentation":"What fragments attention in digital environments?",
+  "AI & cognition":"How does AI change human thinking?",
+  "Interventions":"What might help people manage digital attention?",
+  "Technology & society":"What does AI change about our digital lives?"
+ }.get(lane,"What question does this source explore?")
+
+def short_source_context(record):
+ """One intact line of the indexed abstract, not an invented answer."""
+ abstract=record.get("abstract_text") or (record.get("reading") or {}).get("overview") or ""
+ # Avoid repeating sweeping scene-setting paragraphs; select an attributable
+ # method or aim that directly concerns this source.
+ for line in sentence_list(abstract):
+  line=readable_excerpt(line,"approach",225)
+  if len(line)>225 or line.endswith("…"):continue
+  if len(line)<45:continue
+  if re.search(r"(?i)\b(?:aims? to|examines?|investigates?|explores?|survey|interviews?|experiment|review|proposes?|framework|model|participants?)\b",line):
+   return line
+ return ""
+
 def annotate(record):
  r=record.get("reading") or {}
  base=dict(record);base["reading"]=dict(r)
@@ -280,10 +328,10 @@ def annotate(record):
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
   idea=readable_excerpt(notes.get("argument") or r.get("overview") or "", "idea",165)
-  if idea.endswith("…"):idea=clean(record.get("title") or "")
+  if idea.endswith("…"):idea=research_question(record)
   base["reading"]["digest"]={
-   "idea":idea or clean(record.get("title") or ""),
-   "explain":"","approach":"","finding":"",
+   "idea":idea or research_question(record),
+   "explain":short_source_context(record),"approach":"","finding":"",
    "finding_source":"none",
    "interpretation":source_snippet(notes.get("design_relevance"),"interpretation",175),
    "limitation":source_snippet(notes.get("caveat"),"limitation",170),
@@ -309,10 +357,10 @@ def annotate(record):
   reported=readable_excerpt(finding,"finding",185) if finding else ""
   if reported.endswith("…") or len(reported)<36:
    reported="";finding_source="none"
-  title=clean(record.get("title") or "")
+  question=research_question(record)
   digest={
-   "idea":reported or title,
-   "explain":"",
+   "idea":reported or question,
+   "explain":short_source_context(record) if not reported else "",
    "approach":source_snippet(r.get("methods") or record.get("abstract_text") or "","approach",175),
    "finding":reported,
    "finding_source":finding_source,
@@ -320,7 +368,8 @@ def annotate(record):
    "limitation":source_snippet(r.get("limitations"),"limitations",170),
    "tags":concept_tags(record),
    "status":"automatically_condensed_source_text",
-   "editorial_basis":"full_text" if fulltext else "abstract"
+   "editorial_basis":"full_text" if fulltext else "abstract",
+   "reading_mode":"finding" if reported else "research_question"
   }
  base["reading"]["digest"]=digest
  return base
