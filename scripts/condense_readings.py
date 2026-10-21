@@ -65,6 +65,28 @@ CURATED={
   "tags":["240 publications","Digital well-being","Human-centered AI"]
  }
 }
+
+# Editorial readings are written from the source's indexed abstract and sections.
+# They are not claims of independent peer review or original figure reproduction.
+CURATED.update({
+ "10.58304/ijts.260930":{
+  "idea":"AI literacy was associated with critical thinking partly through how students used AI to solve language-learning problems. The study does not show that AI use by itself improves thinking.",
+  "approach":"An explanatory sequential study of EFL learning: questionnaires from 450 non-English-major undergraduates across five universities in northern China, followed by interviews with 20 selected participants.",
+  "finding":"AI literacy was positively associated with AI-assisted problem-solving, and the reported statistical model linked AI literacy indirectly to critical thinking through problem-solving and AI reliance. Interviews described different patterns of cognitive control during AI use.",
+  "interpretation":"The authors emphasize critical engagement with AI output rather than simply accepting machine-generated answers. Reliance and critical thinking were positively correlated in this sample, not necessarily opposites.",
+  "limitation":"Survey relationships and interview accounts cannot show that AI literacy caused better critical thinking. The convenience sample is drawn from one EFL-learning context.",
+  "tags":["450 survey respondents","20 interviews","AI literacy"]
+ },
+ "10.3389/fpsyg.2026.1930030":{
+  "idea":"In an adolescent survey analysis, stress and time spent on social media were prominent predictors of reported academic difficulties. This concerns digital distraction, not generative AI specifically.",
+  "approach":"The authors combined two cross-sectional survey datasets comprising 799 adolescents and applied LASSO regression, network analysis, XGBoost, and latent profile analysis.",
+  "finding":"In the reported LASSO analysis, stress level (0.384) and social-media duration (0.297) had larger positive coefficients than notification count (0.213) and app openings (0.186). These are associations in a prediction model.",
+  "interpretation":"The study considers interruptions and stress as potentially useful signals when investigating attention-related academic problems. It cannot establish the mechanism or direction of those relationships.",
+  "limitation":"Cross-sectional, self-reported data cannot show whether digital use preceded academic difficulties or the reverse. Prediction-model variables are not causal effect estimates.",
+  "tags":["799 adolescents","Digital distraction","Predictive analysis"]
+ }
+})
+
 HEAD=re.compile(r"(?:^|\s)(?:\d+(?:\.\d+)*\.?\s+)*(?:results?|discussion|methods?|materials and methods|conclusions?|limitations(?: and future research)?|introduction|abstract)\s*(?=(?:\d|[A-Z]))",re.I)
 SEC=re.compile(r"^\s*(?:\d+(?:\.\d+)*\.?\s+){1,3}(?=[A-Za-z])")
 CITATIONS=re.compile(r"\s*\(\s*(?:Table|Fig(?:ure)?|Section)\s+\d+[a-zA-Z]?\s*\)",re.I)
