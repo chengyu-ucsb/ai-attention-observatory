@@ -62,7 +62,7 @@ class CondensedReadingTests(unittest.TestCase):
   # The full-text extract covers instrument reliability; the source abstract
   # explicitly reports the appraisal paths.
   workers=annotate(records["10.3389/fpsyg.2026.1960382"])["reading"]["digest"]
-  self.assertEqual(workers["finding_source"],"abstract")
+  self.assertEqual(workers["finding_source"],"editorial")
   self.assertIn("algorithmic management",workers["finding"].lower())
   self.assertNotIn("Cronbach",workers["finding"])
   adjacent=annotate(records["10.3389/fpsyg.2026.1930030"])["reading"]["digest"]
@@ -81,7 +81,28 @@ class CondensedReadingTests(unittest.TestCase):
     self.assertLessEqual(len(line),limit,(doi,field,line))
     self.assertNotRegex(line,r"(?i)^\s*(?:the authors|the researchers|this study|we found)\b")
     self.assertNotIn("…",line,(doi,field))
-  self.assertGreaterEqual(len(CURATED),9)
+  self.assertGreaterEqual(len(CURATED),26)
+ def test_editorially_read_abstracts_have_correct_provenance(self):
+  paper={"kind":"scholarly","doi":"10.1007/s44217-026-02332-w","title":"AI and confidence",
+         "reading":{"level":"abstract","overview":"The research involved interviews with 15 postgraduate students."}}
+  note=annotate(paper)["reading"]["digest"]
+  self.assertEqual(note["status"],"editorially_written_from_indexed_sections")
+  self.assertEqual(note["editorial_basis"],"abstract")
+  self.assertIn("Heavy AI reliance",note["idea"])
+  self.assertIn("15",note["approach"])
+ def test_non_editorial_source_is_not_turned_into_fiction(self):
+  paper={"kind":"scholarly","title":"How models explain attention switching",
+         "reading":{"level":"abstract","overview":"This study explores a proposed attention model.",
+                    "findings":"","methods":"","limitations":""}}
+  digest=annotate(paper)["reading"]["digest"]
+  self.assertEqual(digest["finding"],"")
+  self.assertEqual(digest["finding_source"],"none")
+  self.assertEqual(digest["idea"],"How models explain attention switching")
+  self.assertEqual(digest["interpretation"],"")
+ def test_source_snippets_do_not_publish_half_sentences(self):
+  from condense_readings import source_snippet
+  method="The participants completed a wide-ranging, extremely complicated assessment involving artificial intelligence, digital systems and many kinds of workplace behavior in several different conditions in a longitudinal design spanning many years and several organizations."
+  self.assertEqual(source_snippet(method,"approach",90),"")
  def test_automatic_excerpt_removes_author_centred_lead_without_inventing_a_result(self):
   result=readable_excerpt("The authors found that AI usage was positively associated with reported task-switching.",limit=150)
   self.assertEqual(result,"AI usage was positively associated with reported task-switching.")
