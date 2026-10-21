@@ -337,93 +337,171 @@ function conceptArtwork(x){
   add(w,row,make("p","concept-note","The extracted Results section reports 19 initial categories organized into five main categories. This is a numerical summary, not a recreation of the study's model figure."));
   return w;
  }
- const tags=(x.reading?.digest?.tags||[]).slice(0,3);
- const wrapper=make("section","article-concept-art");
- add(wrapper,make("p","eyebrow","CONCEPT MAP / ORIENTATION, NOT A STUDY FIGURE"));
- const scene=make("div","concept-scene");
- const center=make("div","concept-center",x.lane==="AI & cognition"?"AI & THINKING":x.lane==="Fragmentation"?"ATTENTION":x.lane==="Interventions"?"DESIGN & FOCUS":"TECHNOLOGY");
- scene.append(center);
- for(const [i,label] of (tags.length?tags:["Human activity","Technological context","Attention"]).entries()){
-  const branch=make("div","concept-node concept-node-"+i,label);
-  scene.append(branch);
+ if(doi==="10.58304/ijts.260930")return comparisonArtwork("Two sources of evidence in one study",[
+   ["450","University students","Questionnaire responses from five universities, analyzed using structural equation models."],
+   ["20","Follow-up interviews","Selected learners described how they approached AI-assisted problem solving."]
+  ],"The study used an explanatory sequential mixed-methods design. Sample counts are reported by the authors, not estimates of how many students benefited.");
+ if(doi==="10.3389/fpsyg.2026.1930030"){
+  const w=make("figure","article-concept-art article-data-visual article-results-chart");
+  add(w,make("p","eyebrow","REPORTED MODEL COEFFICIENTS"),make("h3","figure-insight-title","Which predictors stood out?"));
+  const chart=make("div","study-coefficients");
+  [
+   ["Stress level",0.384],["Social-media duration",0.297],
+   ["Notifications",0.213],["App openings",0.186]
+  ].forEach(([name,n])=>{
+   const row=make("div","study-coefficient-row");
+   const bar=make("span","study-coefficient-bar"),track=make("div","study-coefficient-track");
+   bar.style.width=(n/0.384*100).toFixed(1)+"%";
+   add(track,bar);add(row,make("span","study-coefficient-name",name),track,make("strong","study-coefficient-value",n.toFixed(3)));
+   chart.append(row);
+  });
+  add(w,chart,make("figcaption","concept-note","Positive LASSO coefficients reported by the authors for associations with academic impact (n = 799). These are model coefficients, not effect sizes or evidence of causation. This study does not test generative AI."));
+  return w;
  }
- add(wrapper,scene,make("p","concept-note","These labels reflect topics in the available source. Their placement is illustrative, not an empirical relationship, path coefficient, or reconstructed source figure."));
- return wrapper;
+ // No generic concept map: a visual is included only when a specific
+ // study's source-backed data or research design can be represented.
+ return null;
 }
 function showPaper(x){
- const area=$("#paper-content");area.replaceChildren();if(!x){area.append(make("div","empty-state","This record could not be located."));return}
- const r=x.reading||{},d=r.digest||{},meta=[...(x.authors||[]).slice(0,3),x.venue,date(x.published)].filter(Boolean).join(" · ");
- const chips=make("div","paper-controls");for(const a of [x.lane||"Research",depthName(x),x.kind==="scholarly"?"Scholarly":"Commentary"])chips.append(make("span","paper-label",a));
- const cols=make("div","paper-columns"),left=make("div"),right=make("aside","paper-side"),lead=make("section","reading-lead");
- add(lead,make("p","eyebrow",d.status==="editorially_written_from_indexed_sections"?"EDITORIAL READING / SOURCE GROUNDED":"AT A GLANCE / SOURCE-DERIVED"),make("h2","","The idea in plain language"),
-   make("p","",d.idea||cut(r.overview||excerpt(x),250)));left.append(lead);
- // High-level source-condensed notes: never invent numbers or treat Discussion as Results.
- const editorial=x.kind==="nonacademic",notes=x.editorial_notes||{};
- const cells=editorial?[
-  ["THE ARGUMENT",d.idea||notes.argument||r.overview,"◆"],
-  ["DESIGN IMPLICATION",d.interpretation||notes.design_relevance,"↗"],
-  ["WHAT REMAINS OPEN",d.limitation||notes.caveat,"◌"]
+ const area=$("#paper-content");
+ area.replaceChildren();
+ if(!x){area.append(make("div","empty-state","This record could not be located."));return;}
+ const r=x.reading||{},d=r.digest||{},isCommentary=x.kind!=="scholarly";
+ const edited=d.status==="editorially_written_from_indexed_sections";
+ const meta=[...(x.authors||[]).slice(0,3),x.venue,date(x.published)].filter(Boolean).join(" · ");
+ const summary=d.idea||r.overview||"A substantive overview was not identified in the available source material.";
+ const summaryLabel=edited?"EDITORIAL READING / SOURCE-GROUNDED":isCommentary?"EDITORIAL OR PUBLISHER SYNOPSIS":"AUTOMATED SOURCE-DERIVED OVERVIEW";
+ const header=make("header","paper-reading-header");
+ const kicker=make("p","eyebrow","THE OBSERVATORY / READING NOTE");
+ const publication=make("h1","paper-source-title",x.title);
+ const metadata=make("p","paper-meta",meta);
+ const chips=make("div","paper-controls");
+ for(const label of [isCommentary?"Commentary":"Scholarly source",depthName(x),x.relation||"Research archive"])
+  chips.append(make("span","paper-label",label));
+ add(header,kicker,publication,metadata,chips);
+ const lead=make("section","reading-lead");
+ add(lead,make("p","eyebrow",summaryLabel),
+    make("h2","paper-insight",edited?summary:cut(summary,340)),
+    make("p","reading-lead-note",edited?
+      "Written from accessible source passages; it is not an independent replication or a causal verdict.":
+      isCommentary?"This is an attributable argument or synopsis, not an empirical research finding.":
+      "Automatically condensed from indexed source text. Check the original for detail and context."));
+ const left=make("div","paper-main"),right=make("aside","paper-side"),cols=make("div","paper-columns");
+ left.append(lead);
+ // Each block has one job: design, result, caveat. Do not conflate author
+ // interpretation, source extraction, and confirmed empirical findings.
+ const cards=make("section","paper-snapshot");
+ cards.append(make("h2","paper-section-title",isCommentary?"The argument, in context":"Inside the study"));
+ const grid=make("div","paper-evidence-grid");
+ const items=isCommentary?[
+   ["01","The author's argument",d.idea||r.overview||"Only a short source synopsis is available."],
+   ["02","Possible implications",d.interpretation||(x.editorial_notes||{}).design_relevance||"No supported design implication has been identified."],
+   ["03","What remains open",d.limitation||(x.editorial_notes||{}).caveat||"This commentary does not establish empirical effects."]
  ]:[
-  ["THE APPROACH",d.approach||"Not specified in available source text.","◈"],
-  [d.finding_source==="abstract"?"RESULT REPORTED IN ABSTRACT":d.finding_source==="full_text"?"RESULT EXTRACTED FROM FULL TEXT":d.finding?"REPORTED RESULT":"RESULT NOT ESTABLISHED",d.finding||"No substantive empirical result was identifiable in the accessible source text.","◎"],
-  ["LIMITS / INTERPRETATION",d.limitation||d.interpretation||"No source-backed qualification available.","↗"]
+   ["01","How it was studied",d.approach||"The accessible text does not establish a reliable account of the method."],
+   ["02",d.finding_source==="abstract"?"What the abstract reports":
+     d.finding_source==="full_text"?"What the results report":
+     d.finding?"What the source reports":"Finding not established",
+     d.finding||"No substantive empirical result could be identified from the available source sections."],
+   ["03","What we cannot conclude",d.limitation||
+     "Specific limitations were not identifiable in the indexed passages. This is not evidence that the study has no limitations."]
  ];
- const snapshot=make("div","paper-snapshot");
- for(const [title,content,symbol] of cells){
-  const tile=make("article","snapshot-tile"+(content?"":" is-missing"));
-  add(tile,make("div","snapshot-symbol",symbol),make("span","snapshot-kicker",title),make("p","",content||"Not established in the indexed text."));
-  snapshot.append(tile);
+ for(const [number,title,body] of items){
+  const card=make("article","snapshot-tile");
+  add(card,make("span","snapshot-number",number),make("h3","snapshot-kicker",title),make("p","",body));
+  grid.append(card);
  }
- left.append(snapshot);
- left.append(conceptArtwork(x));
- const detailed=make("details","paper-detail-excerpts");detailed.open=false;
- detailed.append(make("summary","","Inspect original extracted passages (automated source text)"));
- const notesArea=make("div","paper-detail-body");let hasNotes=false;
- if(editorial){
-  for(const [label,content,source] of [["THE AUTHOR'S ARGUMENT",notes.argument,"Editorial reading note"],["DESIGN POSSIBILITIES",notes.design_relevance,"Research-to-product interpretation (not a tested result)"],["INTERPRETIVE LIMITS",notes.caveat,"Editorial qualification"]]){
-    if(content){notesArea.append(section(label,content,source));hasNotes=true}
-  }
+ cards.append(grid);
+ left.append(cards);
+ if(!isCommentary&&d.interpretation){
+  const note=make("section","reading-interpretation");
+  add(note,make("p","eyebrow","AUTHOR INTERPRETATION / NOT AN ADDITIONAL RESULT"),
+     make("h2","paper-section-title","How to read these findings"),
+     make("p","",d.interpretation));
+  left.append(note);
+ }
+ const art=conceptArtwork(x);
+ if(art)left.append(art);
+ const detailed=make("details","paper-detail-excerpts");
+ detailed.open=false;
+ detailed.append(make("summary","","Inspect indexed source passages"));
+ const notesArea=make("div","paper-detail-body");
+ let hasNotes=false;
+ if(isCommentary){
+  const notes=x.editorial_notes||{};
+  for(const [name,content,source] of [
+   ["AUTHOR'S ARGUMENT",notes.argument,"Attributable editorial note"],
+   ["DESIGN POSSIBILITIES",notes.design_relevance,"Interpretation, not a tested outcome"],
+   ["QUALIFICATIONS",notes.caveat,"Editorial note"]
+  ])if(content){notesArea.append(section(name,content,source));hasNotes=true;}
  }else{
-  for(const [label,content] of [["HOW IT WAS STUDIED",r.methods],["ORIGINAL RESULTS EXTRACT (UNFILTERED)",r.findings],["AUTHOR INTERPRETATION (DISCUSSION)",r.interpretation],["LIMITATIONS",r.limitations]]){
-    if(content){notesArea.append(section(label,content,r.provenance));hasNotes=true}
-  }
+  for(const [name,content] of [
+   ["EXTRACTED METHODS",r.methods],
+   ["RAW RESULTS EXTRACT / MAY INCLUDE MEASUREMENT CHECKS",r.findings],
+   ["DISCUSSION / AUTHOR INTERPRETATION",r.interpretation],
+   ["STATED LIMITATIONS",r.limitations]
+  ])if(content){notesArea.append(section(name,content,r.provenance));hasNotes=true;}
  }
- if(hasNotes){detailed.append(notesArea);left.append(detailed)}
- else left.append(make("div","citation-notice",editorial?"Only a short description is indexed for this commentary. Open the original to read the argument in context.":"No method and result can be identified from the accessible text. This remains a discovery record."));
- if(x.abstract_text){const details=make("details"),box=make("section","reading-section");add(details,make("summary","","Show the indexed abstract"),make("p","",x.abstract_text));box.append(details);left.append(box)}
- left.append(make("p","paper-smallprint",r.notice||"Automatically indexed material. Verify the original publication before citing findings."));
- const at=make("section","paper-side-block");add(at,make("p","eyebrow","SOURCE INFORMATION"),make("h3","","Reading details"));
- for(const [k,v] of [["Published",date(x.published)],["Venue",x.venue||"Not supplied"],["Coverage",depthName(x)],["Evidence",x.relation||"Unclassified"],["Provenance",r.provenance||x.source||"Index"]])at.append(paperFact(k,v));
- if(r.sample)at.append(paperFact("Sample",r.sample));if(x.doi)at.append(paperFact("DOI",x.doi));right.append(at);
+ if(hasNotes){detailed.append(notesArea);left.append(detailed);}
+ if(x.abstract_text){
+  const abstract=make("details","paper-abstract"),body=make("div","paper-abstract-body");
+  add(abstract,make("summary","","Read the indexed abstract"),add(body,make("p","",x.abstract_text)));
+  left.append(abstract);
+ }
+ left.append(make("p","paper-smallprint",r.notice||"Source text was indexed automatically. Verify the original before citing research findings."));
+ const facts=make("section","paper-side-block");
+ add(facts,make("p","eyebrow","ABOUT THIS SOURCE"),make("h2","paper-side-title","Reading details"));
+ for(const [name,value] of [
+  ["Published",date(x.published)],["Venue",x.venue||"Not supplied"],
+  ["Material available",depthName(x)],
+  ["Relevance",x.relation||"Not classified"],
+  ["Note type",edited?"Editorially condensed from source":isCommentary?"Publisher or editorial synopsis":"Automated condensation"],
+  ["Provenance",r.provenance||x.source||"Index"]
+ ])facts.append(paperFact(name,value));
+ if(x.doi)facts.append(paperFact("DOI",x.doi));
+ right.append(facts);
  if(x.analysis?.figures?.length){
- const fig=make("section","paper-side-block");
- add(fig,make("p","eyebrow","FIGURES FROM THE SOURCE"),make("h3","","See the study's visuals"));
- let originals=0;
- for(const f of x.analysis.figures.slice(0,3)){
-   const card=make("div","figure-caption");
+  const figures=make("section","paper-side-block");
+  add(figures,make("p","eyebrow","PUBLISHED FIGURES"),make("h2","paper-side-title","Figures in the original"));
+  let originals=0;
+  for(const f of x.analysis.figures.slice(0,3)){
+   const panel=make("div","figure-caption");
    const verified=typeof f.image_url==="string"&&/^https:\/\/pmc-oa-opendata\.s3\.amazonaws\.com\/PMC\d+\.[123]\/[^?#]+\.(?:png|jpg|jpeg|webp|gif)$/.test(f.image_url)&&f.attribution;
    if(verified){
-     const img=make("img","original-figure");img.src=f.image_url;img.loading="lazy";img.alt=(f.label||"Figure")+": "+(f.caption||"Original published figure");
-     img.addEventListener("error",()=>{img.hidden=true});
-     card.append(img);originals++;
+    const image=make("img","original-figure");
+    image.src=f.image_url;image.loading="lazy";
+    image.alt=(f.label||"Figure")+": "+(f.caption||"Original article figure");
+    image.addEventListener("error",()=>{image.hidden=true;});
+    panel.append(image);originals++;
    }
-   add(card,make("strong","",f.label||"Figure"),make("p","",cut(f.caption||"Source figure caption unavailable.",200)));
-   if(verified)card.append(make("p","figure-license","Original open-access figure · "+f.attribution+" · Parent article license checked; third-party credits may impose further conditions."));
-   fig.append(card);
+   add(panel,make("strong","",f.label||"Figure"),make("p","",cut(f.caption||"Caption not indexed.",190)));
+   if(verified)panel.append(make("p","figure-license","Original open-access figure · "+f.attribution+" · Check third-party credits in the source."));
+   figures.append(panel);
+  }
+  if(!originals)figures.append(make("p","paper-smallprint","The original images are not embedded because their image source or reuse rights are not verified."));
+  if(x.analysis.fulltext_url)figures.append(link("View source figures ↗",x.analysis.fulltext_url,"paper-extra"));
+  right.append(figures);
  }
- if(!originals)fig.append(make("p","paper-smallprint","No original image has passed the source and license checks yet. Captions are provided as a guide, not as recreated plots."));
- if(x.analysis?.fulltext_url)fig.append(link("Inspect the figures in the original article ↗",x.analysis.fulltext_url,"paper-extra"));
- right.append(fig)
-}
- 
- function valid(u){try{const v=new URL(u);return v.protocol==="https:"?u:null}catch{return null}}
- if(valid(x.url))right.append(link("Open original publication ↗",x.url,"paper-original"));
- if(valid(x.analysis?.fulltext_url))right.append(link("View open-access version ↗",x.analysis.fulltext_url,"paper-extra"));
- if(valid(x.open_access_url))right.append(link("Find available full text ↗",x.open_access_url,"paper-extra"));
- right.append(link("Search on Google Scholar ↗","https://scholar.google.com/scholar?q="+encodeURIComponent(x.title),"paper-extra"));
- let related=S.records.filter(y=>y!==x&&y.kind===x.kind&&y.lane===x.lane&&depth(y)!=="citation_only").sort((a,b)=>rank(b)-rank(a)).slice(0,3);
- if(related.length){const panel=make("section","paper-side-block");add(panel,make("p","eyebrow","EXPLORE FURTHER"),make("h3","","Related papers"));for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));right.append(panel)}
- add(cols,left,right);add(area,btn("← Back to the library",()=>goto("library"),"back-button"),make("p","eyebrow paper-eyebrow",ideaInfo(x).label),make("h1","paper-insight",processedIdea(x)),add(make("div","paper-identity"),add(make("div","paper-identity-inner"),make("p","eyebrow","THE ORIGINAL PUBLICATION"),make("h2","paper-source-title",x.title),make("p","paper-meta",meta))),chips,cols)
+ function verifiedUrl(url){
+  try{const value=new URL(url);return value.protocol==="https:"?url:null;}
+  catch{return null;}
+ }
+ const external=make("section","paper-links");
+ if(verifiedUrl(x.url))external.append(link("Read original source ↗",x.url,"paper-original"));
+ if(verifiedUrl(x.analysis?.fulltext_url))external.append(link("Open full-text version ↗",x.analysis.fulltext_url,"paper-extra"));
+ if(verifiedUrl(x.open_access_url))external.append(link("Find accessible article ↗",x.open_access_url,"paper-extra"));
+ external.append(link("Search Google Scholar ↗","https://scholar.google.com/scholar?q="+encodeURIComponent(x.title),"paper-extra"));
+ right.append(external);
+ const related=S.records.filter(y=>y!==x&&y.kind===x.kind&&y.lane===x.lane&&depth(y)!=="citation_only")
+                      .sort((a,b)=>rank(b)-rank(a)).slice(0,3);
+ if(related.length){
+  const panel=make("section","paper-side-block");
+  add(panel,make("p","eyebrow","KEEP EXPLORING"),make("h2","paper-side-title","Related readings"));
+  for(const y of related)panel.append(btn(y.title,()=>goto("paper",id(y)),"paper-extra"));
+  right.append(panel);
+ }
+ add(cols,left,right);
+ add(area,btn("← Research library",()=>goto("library"),"back-button"),header,cols);
 }
 function showProductExamples(){
  const examples=S.records.filter(x=>x.source==="Official product documentation");
