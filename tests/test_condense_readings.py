@@ -1,7 +1,7 @@
 """Readable research digest regression checks. No fabricated findings or figures."""
 import pathlib,sys,unittest,json
 ROOT=pathlib.Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/"scripts"))
-from condense_readings import clean,condensed,annotate,concept_tags,reported_result
+from condense_readings import clean,condensed,annotate,concept_tags,reported_result,readable_excerpt,CURATED
 class CondensedReadingTests(unittest.TestCase):
  def test_section_numbers_and_reference_artifacts_removed(self):
   s="4. Results 4.1. Common method bias and discriminant validity of the measurement structure To evaluate the discriminant validity of the four study constructs, nested confirmatory factor analyses were conducted ( Table 3 )."
@@ -24,8 +24,8 @@ class CondensedReadingTests(unittest.TestCase):
   paper={"kind":"scholarly","doi":"10.3389/feduc.2026.1861548","title":"The illusion of cognitive independence",
    "reading":{"level":"full_text","methods":"Online survey using Prolific.","findings":"Three learner profiles emerged.","limitations":"Cross-sectional design."}}
   digest=annotate(paper)["reading"]["digest"]
-  self.assertIn("Three learner profiles",digest["finding"])
-  self.assertIn("cannot establish the direction",digest["limitation"])
+  self.assertIn("Three patterns emerged",digest["finding"])
+  self.assertIn("cannot establish cause and effect",digest["limitation"])
   self.assertEqual(digest["status"],"editorially_written_from_indexed_sections")
  def test_tags_are_source_named_not_unverified_causal_paths(self):
   paper={"kind":"scholarly","title":"GenAI literacy, cognitive offloading and critical thinking",
@@ -68,10 +68,34 @@ class CondensedReadingTests(unittest.TestCase):
   adjacent=annotate(records["10.3389/fpsyg.2026.1930030"])["reading"]["digest"]
   self.assertEqual(adjacent["finding_source"],"editorial")
   self.assertIn("cross-sectional",adjacent["limitation"].lower())
-  self.assertIn("not generative AI",adjacent["idea"])
+  self.assertIn("did not examine generative AI",adjacent["explain"])
   # When both the source extract and the truncated abstract lack a result,
   # the site must not relabel CFA diagnostics as empirical findings.
   truncated=annotate(records["10.3389/fpsyg.2026.1939286"])["reading"]["digest"]
   self.assertEqual(truncated["finding"],"")
   self.assertEqual(truncated["finding_source"],"none")
+ def test_editorial_summaries_are_short_and_idea_first(self):
+  for doi,note in CURATED.items():
+   for field,limit in [("idea",170),("explain",190),("approach",205),("finding",215),("interpretation",190),("limitation",190)]:
+    line=note.get(field,"")
+    self.assertLessEqual(len(line),limit,(doi,field,line))
+    self.assertNotRegex(line,r"(?i)^\s*(?:the authors|the researchers|this study|we found)\b")
+    self.assertNotIn("…",line,(doi,field))
+  self.assertGreaterEqual(len(CURATED),9)
+ def test_automatic_excerpt_removes_author_centred_lead_without_inventing_a_result(self):
+  result=readable_excerpt("The authors found that AI usage was positively associated with reported task-switching.",limit=150)
+  self.assertEqual(result,"AI usage was positively associated with reported task-switching.")
+  interpret=readable_excerpt("The authors suggest that AI may help workers manage interruptions.",role="interpretation")
+  self.assertIn("One interpretation is that",interpret)
+  self.assertIn("may help",interpret)
+ def test_automatic_digest_preserves_uncertain_language(self):
+  paper={"kind":"scholarly","doi":"10.0000/example","title":"Attention and AI",
+         "abstract_text":"Data suggested that AI use was associated with higher self-reported attention. This survey involved 100 students.",
+         "reading":{"level":"abstract","overview":"The authors found that reported attention was associated with AI use.",
+                    "findings":"The authors found that AI use was positively associated with self-reported attention.",
+                    "methods":"The authors surveyed 100 students.",
+                    "limitations":"These results cannot establish causal effects.","interpretation":""}}
+  digest=annotate(paper)["reading"]["digest"]
+  self.assertIn("associated",digest["finding"])
+  self.assertNotRegex(digest["finding"],r"(?i)^the authors")
 if __name__=="__main__":unittest.main()
