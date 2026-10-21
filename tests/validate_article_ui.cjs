@@ -18,11 +18,13 @@ class Element{
  addEventListener(_name,_callback){}
 }
 const paperContainer=new Element("div");
-const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-content"?paperContainer:null};
+const libraryContainer=new Element("div"),libraryCount=new Element("div");
+const inputs={"#search":{value:""},"#topic-filter":{value:""},"#depth-filter":{value:"readable"},"#type-filter":{value:""}};
+const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-content"?paperContainer:q==="#library-results"?libraryContainer:q==="#library-count"?libraryCount:inputs[q]||null};
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unable to load application functions");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
-vm.runInContext(prefix+"\nconst TEST={showPaper,shortIdea,ideaInfo,make,S};",ctx);
+vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,readableSourceTitle,editorialImage,make,S};",ctx);
 const nodes=root=>[root,...root.children.flatMap(nodes)];
 const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
@@ -38,9 +40,12 @@ for(const r of db){
  assert(page&&headline&&headline.tag==="h1","Missing primary insight heading for "+r.title);
  assert(headline.textContent.length>=10&&headline.textContent.length<=231,"Headline overflows for "+r.title);
  assert(!/^(?:the authors|the researchers|this study|this paper|we found)\b/i.test(headline.textContent),"Paper-centred headline: "+r.title+" / "+headline.textContent);
- assert(source&&source.textContent===r.title,"Source title missing for "+r.title);
+ assert(source&&source.textContent===vm.runInContext("TEST.readableSourceTitle(selected)",ctx),"Source title missing for "+r.title);
  assert(!matching(page,"concept-scene").length,"Decorative generic concept diagram present");
  assert(match(page,"rv-layout")&&match(page,"rv-content"),"Consistent story layout missing");
+ const art=match(page,"story-visual-reading"),image=match(page,"story-image");
+ assert(art&&image&&/^assets\/reading-(?:focus|offloading|fragmentation|learning|interventions|work|society|wellbeing)\.svg$/.test(image.src),"Study-themed artwork missing for "+r.title);
+ assert(/not a visualization of study findings/.test(textContent(art)),"Concept art must not look like empirical evidence");
  assert(match(page,"rv-context-grid"),"Source context and caveats missing");
  assert(match(page,"rv-source"),"Source citation/links missing");
  assert(match(page,"rv-status"),"Reader cannot distinguish edited and automatic content");
@@ -56,6 +61,22 @@ for(const r of db){
  checked++;
 }
 assert(edited>=20,"Expected source-grounded editorial coverage to expand");
+for(const name of ["focus","offloading","fragmentation","learning","interventions","work","society","wellbeing"]){
+ const svg=read("assets/reading-"+name+".svg");
+ assert(svg.includes('<svg')&&svg.includes('viewBox="0 0 880 530"'),"Missing/malformed image asset: "+name);
+}
+const workflow=read(".github/workflows/publish.yml");
+assert(workflow.includes("cp assets/reading-*.svg _site/assets/"),"New images are not included in the published website");
+vm.runInContext("TEST.showLibrary()",ctx);
+const cards=matching(libraryContainer,"library-story");
+assert.equal(cards.length,db.length,"All searchable readings must use the visual library card");
+assert.equal(matching(libraryContainer,"story-visual-card").length,db.length,"Library card illustrations missing");
+for(const r of db.filter(x=>/^[^a-z]*[A-Z][^a-z]*$/.test(x.title)&&x.title.length>25)){
+ const label=vm.runInContext("TEST.readableSourceTitle(database.find(x=>x.title===selectedTitle))",
+   Object.assign(ctx,{selectedTitle:r.title}));
+ assert(!/^[A-Z\s\d\W]+$/.test(label),"All-capitalized source label persists: "+r.title);
+}
+
 const idea=db.find(x=>x.doi==="10.58304/ijts.260930");
 assert(idea,"Literacy reference should appear in the public library");
 ctx.selected=idea;vm.runInContext("TEST.showPaper(selected)",ctx);
