@@ -83,16 +83,87 @@ def clean(source):
 def sentence_list(text):
  s=clean(text)
  return [p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",s) if len(p.strip())>=35]
+# Research findings are different from checks on the measurement instruments.
+# Fail closed when neither the extracted Results nor the source abstract
+# contains a clearly stated substantive result.
+DIAGNOSTIC = re.compile(
+ r"\b(?:Harman(?:'s)?|common method bias|single.factor test|Cronbach|"
+ r"internal consistency|composite reliability|average variance extracted|"
+ r"discriminant validity|convergent validity|measurement model|"
+ r"confirmatory factor analys(?:is|es)|factor loadings?|"
+ r"unrotated factor|normality|skewness|kurtosis|"
+ r"goodness.of.fit|model fit|fit indices|reliability and validity|"
+ r"sampling adequacy|collinearity|multicollinearity|"
+ r"hypothesis testing outcomes|software version)\b",re.I)
+FINDING_VERBS = re.compile(
+ r"\b(?:associat(?:ed|ion|ions)|correlat(?:ed|ion|ions)|predict(?:ed|or|ors|s)?|"
+ r"identif(?:ied|ies|y)|observed|found|show(?:ed|s)?|reveal(?:ed|s)?|"
+ r"indicat(?:ed|es)?|increas(?:ed|es)?|decreas(?:ed|es)?|"
+ r"higher|lower|stronger|weaker|significant(?:ly)?|"
+ r"mediati(?:on|ng)|moderati(?:on|ng)|"
+ r"relationship|differences?|patterns?|profiles?|themes?|"
+ r"positively|negatively|attenuat(?:ed|es)?|buffer(?:ed|s)?)\b",re.I)
+RESULT_CLAIM = re.compile(
+ r"\b(?:results? (?:show(?:ed)?|suggest(?:ed)?|indicat(?:ed|e)?|reveal(?:ed)?|found)|"
+ r"findings? (?:show|suggest|indicat|reveal)|"
+ r"(?:we|the authors) (?:found|find|observed)|"
+ r"(?:was|were|is|are) (?:positively |negatively |significantly )?associated|"
+ r"(?:positively|negatively) (?:associated|correlated)|"
+ r"(?:analysis|analyses) (?:identified|revealed|showed)|"
+ r"(?:was|were) (?:higher|lower)|"
+ r"(?:predicted|increased|decreased|moderated|mediated))\b",re.I)
+UNTESTED = re.compile(
+ r"\b(?:hypothesi[sz]|we (?:propose|expect|aim|seek|explore|test)|"
+ r"the present study (?:examines|investigates|aims)|"
+ r"may (?:be|lead|affect)|future research|should be studied|"
+ r"previous research (?:suggests|shows)|prior studies)\b",re.I)
+STOPWORDS = {"the","and","with","from","into","among","through","between",
+             "about","under","using","used","study","studies","analysis",
+             "effects","effect","model","models","role","research","findings"}
+
+def reported_result(source,title="",maxlen=300):
+ """Select one explicitly source-reported substantive result; never infer a claim.
+
+ Scientific abstracts are a conservative fallback for incomplete full-text
+ extraction. This routine is extractive: it must not invent significance,
+ direction, numeric values or causal language.
+ """
+ words={x for x in re.findall(r"[a-z]{4,}",(title or "").lower())
+        if x not in STOPWORDS}
+ candidates=[]
+ for position,s in enumerate(sentence_list(source or "")):
+  if len(s)<45 or DIAGNOSTIC.search(s) or UNTESTED.search(s):continue
+  if not FINDING_VERBS.search(s):continue
+  # Context words alone ("associated", "effects") are insufficient if the
+  # sentence is merely introducing the research question.
+  if not RESULT_CLAIM.search(s):continue
+  shared=len(words.intersection(re.findall(r"[a-z]{4,}",s.lower())))
+  # Prefer findings that name the question's constructs, not generic model
+  # statistics or statements about analysis procedures.
+  score=shared*3
+  if re.search(r"\b(?:ai|genai|attention|offloading|cogniti(?:on|ve)|"
+               r"wellbeing|critical thinking|learning|performance|agency|"
+               r"workers|participants|students|notifications|stress)\b",s,re.I):
+   score+=2
+  if re.search(r"\b(?:positively|negatively|higher|lower|predict(?:ed|s)?|"
+               r"correlated|associated|moderated|mediated)\b",s,re.I):score+=3
+  if re.search(r"\b(?:we (?:find|found)|results? (?:showed|indicated)|"
+               r"findings? (?:show|indicate)|analysis (?:revealed|identified))\b",s,re.I):score+=2
+  candidates.append((score,-position,s))
+ if not candidates:return ""
+ s=max(candidates)[2]
+ if len(s)>maxlen:
+  clip=s[:maxlen]
+  stop=max(clip.rfind(";"),clip.rfind(","),clip.rfind(" and "))
+  s=(clip[:stop].strip() if stop>maxlen//2 else clip.rsplit(" ",1)[0])+"…"
+ return s
+
 def condensed(text,role,maxlen=295):
  items=sentence_list(text)
  if not items:return ""
  if role=="finding":
-  # Source parser often starts results with scale reliability, headers or tables.
-  candidates=[x for x in items if re.search(r"associat|linked|predict|observ|group|found|suggest|indicat|identified|higher|lower|increase|decrease|effect|relationship|difference|categor|profile|participants",x,re.I)
-              and not re.search(r"(?:table|model fit|Cronbach|discriminant validity|measurement model|factor analys|CFI\s*=|RMSEA\s*=)",x,re.I)]
-  if not candidates:return "" # No substantive finding can be confidently identified.
-  items=candidates
- elif role=="approach":
+  return reported_result(text,maxlen=maxlen)
+ if role=="approach":
   p=[x for x in items if re.search("survey|interview|experiment|design|sample|participants|review|thematic|analysis|qualitative|quantitative",x,re.I)]
   if p:items=p
  elif role=="limitations":
@@ -100,11 +171,11 @@ def condensed(text,role,maxlen=295):
   if p:items=p
  out=items[0]
  if len(out)>maxlen:
-  # Finish at a clause when possible; never imply that the truncated passage is a complete direct quotation.
   clip=out[:maxlen]
   stop=max(clip.rfind(";"),clip.rfind(","),clip.rfind(" and "))
   out=(clip[:stop].strip() if stop>maxlen//2 else clip.rsplit(" ",1)[0])+"…"
  return out
+
 def concept_tags(record):
  text=" ".join([record.get("title",""),(record.get("reading") or {}).get("overview",""),(record.get("reading") or {}).get("findings","")]).lower()
  clusters=[
@@ -130,10 +201,22 @@ def annotate(record):
  if curated and r.get("level")=="full_text":
   digest=dict(curated);digest["status"]="editorially_written_from_indexed_sections"
  else:
+  fulltext=r.get("level")=="full_text"
+  results=(record.get("analysis") or {}).get("results") if fulltext else ""
+  if not results:results=r.get("findings") or ""
+  finding=reported_result(results,record.get("title",""))
+  finding_source="full_text" if finding and fulltext else "abstract" if finding else "none"
+  if not finding and r.get("level") in ("abstract","full_text"):
+   # An extracted Results section can consist entirely of psychometrics.
+   # A substantive result explicitly stated in the abstract is preferable
+   # to presenting Cronbach alpha or CFA diagnostics as the finding.
+   finding=reported_result(record.get("abstract_text") or "",record.get("title",""))
+   finding_source="abstract" if finding else "none"
   digest={
    "idea":condensed(r.get("overview"),"idea",230),
    "approach":condensed(r.get("methods"),"approach",235),
-   "finding":condensed(r.get("findings"),"finding",300),
+   "finding":finding,
+   "finding_source":finding_source,
    "interpretation":condensed(r.get("interpretation"),"interpretation",300),
    "limitation":condensed(r.get("limitations"),"limitations",260),
    "tags":concept_tags(record),
