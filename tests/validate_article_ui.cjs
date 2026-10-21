@@ -58,5 +58,27 @@ if(good){
  assert(!/Harman|single.factor|method bias/i.test(headline),"Methods artifact rendered as a research finding");
  assert(headline.length<96);
 }
+// Raw results can contain validity/reliability diagnostics. Public research
+// headlines and cards must use the screened digest with a truthful source label.
+ctx.selected={
+ kind:"scholarly",doi:"10.1234/methods",title:"AI literacy and attention",
+ reading:{
+  level:"full_text",
+  findings:"Harman's single-factor test showed acceptable common method bias.",
+  digest:{
+   finding:"AI literacy was positively correlated with attention in the survey.",
+   finding_source:"abstract",
+   idea:"The study examined AI literacy and attention.",
+   status:"automatically_condensed_source_text"
+  }
+ }
+};
+const safeInfo=vm.runInContext("TEST.ideaInfo(selected)",ctx);
+assert.equal(safeInfo.label,"RESULT REPORTED IN ABSTRACT");
+assert(safeInfo.text.includes("positively correlated"));
+assert(!/Harman|single.factor|common method bias/i.test(safeInfo.text));
+const safeHeadline=vm.runInContext("TEST.shortIdea(selected,105)",ctx);
+assert(!/Harman|single.factor|common method bias/i.test(safeHeadline));
+
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
 console.log("Article UI passed:",verified,"reading pages render without object strings; concise headline/source-title structure intact.");
