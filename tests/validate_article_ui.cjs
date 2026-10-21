@@ -105,7 +105,7 @@ ctx.selected={
  }
 };
 const safeInfo=vm.runInContext("TEST.ideaInfo(selected)",ctx);
-assert.equal(safeInfo.label,"RESULT REPORTED IN ABSTRACT");
+assert.equal(safeInfo.label,"RESULT FROM ABSTRACT");
 assert(safeInfo.text.includes("positively correlated"));
 assert(!/Harman|single.factor|common method bias/i.test(safeInfo.text));
 const safeHeadline=vm.runInContext("TEST.shortIdea(selected,105)",ctx);
