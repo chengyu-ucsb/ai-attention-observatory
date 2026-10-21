@@ -204,6 +204,44 @@ def condensed(text,role,maxlen=295):
   out=(clip[:stop].strip() if stop>maxlen//2 else clip.rsplit(" ",1)[0])+"…"
  return out
 
+def readable_excerpt(text,role="finding",limit=195):
+ """Make a *source excerpt* more readable without changing its evidentiary claim.
+
+ No abstract claims are rewritten into stronger findings; certainty markers
+ such as 'may', 'associated' and 'suggests' are preserved. When the source
+ cannot be condensed cleanly, a visibly abbreviated excerpt is safer than
+ inventing a narrative.
+ """
+ s=clean(text)
+ if not s:return ""
+ substitutions=[
+  (r"^(?:the authors|the researchers|we) (?:found|observed|reported|showed) that\s+",""),
+  (r"^(?:the study|this study|the research) (?:found|reports|reported|showed) that\s+",""),
+  (r"^(?:our )?(?:results|findings) (?:show|showed|indicate|indicated|suggest|suggested) that\s+",""),
+ ]
+ for pattern,replacement in substitutions:
+  updated=re.sub(pattern,replacement,s,flags=re.I)
+  if updated!=s:
+   s=updated
+   break
+ # Argument and interpretation are not facts; keep attribution/uncertainty.
+ s=re.sub(r"^(?:the authors|the researchers) (?:argue|argued|suggest|suggested|propose|proposed) that\s+",
+          "One interpretation is that ",s,flags=re.I)
+ s=re.sub(r"^(?:the authors|the researchers) (?:describe|described)\s+",
+          "The paper describes ",s,flags=re.I)
+ s=s[0].upper()+s[1:] if s else ""
+ # Prefer an intact first sentence when it communicates a full thought.
+ parts=sentence_list(s)
+ if parts and len(parts[0])<=limit:
+  return parts[0]
+ if len(s)<=limit:return s
+ # Clause boundary preferred; never quietly turn a fragment into a claim.
+ window=s[:limit]
+ breaks=[i for i in (window.rfind("; "),window.rfind(", "),window.rfind(" and ")) if i>=limit//2]
+ if breaks:window=window[:max(breaks)]
+ else:window=window.rsplit(" ",1)[0]
+ return window.rstrip(" ,;")+"…"
+
 def concept_tags(record):
  text=" ".join([record.get("title",""),(record.get("reading") or {}).get("overview",""),(record.get("reading") or {}).get("findings","")]).lower()
  clusters=[
@@ -221,9 +259,11 @@ def annotate(record):
  base=dict(record);base["reading"]=dict(r)
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
-  base["reading"]["digest"]={"idea":notes.get("argument") or condensed(r.get("overview"),"idea",230),
-   "approach":"","finding":"","interpretation":notes.get("design_relevance") or "",
-   "limitation":notes.get("caveat") or "","tags":concept_tags(record),"status":"editorial_or_publisher_synopsis"}
+  base["reading"]["digest"]={"idea":readable_excerpt(notes.get("argument") or condensed(r.get("overview"),"idea",225),"idea",180),
+   "explain":"","approach":"","finding":"",
+   "interpretation":readable_excerpt(notes.get("design_relevance") or "","interpretation",190),
+   "limitation":readable_excerpt(notes.get("caveat") or "","limitation",170),
+   "tags":concept_tags(record),"status":"editorial_or_publisher_synopsis"}
   return base
  curated=CURATED.get((record.get("doi") or "").lower())
  if curated and r.get("level")=="full_text":
@@ -241,12 +281,13 @@ def annotate(record):
    finding=reported_result(record.get("abstract_text") or "",record.get("title",""))
    finding_source="abstract" if finding else "none"
   digest={
-   "idea":condensed(r.get("overview"),"idea",230),
-   "approach":condensed(r.get("methods"),"approach",235),
-   "finding":finding,
+   "idea":readable_excerpt(condensed(r.get("overview"),"idea",245),"idea",185),
+   "explain":"",
+   "approach":readable_excerpt(condensed(r.get("methods"),"approach",245),"approach",190),
+   "finding":readable_excerpt(finding,"finding",195),
    "finding_source":finding_source,
-   "interpretation":condensed(r.get("interpretation"),"interpretation",300),
-   "limitation":condensed(r.get("limitations"),"limitations",260),
+   "interpretation":readable_excerpt(condensed(r.get("interpretation"),"interpretation",245),"interpretation",185),
+   "limitation":readable_excerpt(condensed(r.get("limitations"),"limitations",245),"limitation",185),
    "tags":concept_tags(record),
    "status":"automatically_condensed_source_text"
   }
