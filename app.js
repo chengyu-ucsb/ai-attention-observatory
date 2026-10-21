@@ -32,6 +32,10 @@ function cleanLead(s){
  x=x.replace(/^(?:the authors|the researchers|we) (?:found|observed|reported|showed) that\s+/i,"");
  x=x.replace(/^(?:this study|the study|our results|the findings|the results) (?:found|reported|showed|show|indicate|indicated) that\s+/i,"");
  x=x.replace(/^(?:the authors|the researchers) (?:argue|suggest|propose) that\s+/i,"One interpretation is that ");
+ x=x.replace(/^(?:this study|the study|this paper|the paper) compares?\s+/i,"A comparison of ");
+ x=x.replace(/^(?:this study|the study|this paper|the paper) (?:examines?|investigates?|explores?|assesses?|evaluates?|analy[sz]es?|discusses?|tests?)\s+/i,"");
+ x=x.replace(/^(?:the authors|the researchers)['’] (?:analysis|findings|results)\s+/i,"Results ");
+ x=x.replace(/^(?:the authors|the researchers) (?:describe|discuss|review|consider|examine)\s+/i,"The source describes ");
  return x?x[0].toUpperCase()+x.slice(1):"";
 }
 function shortIdea(x,limit=105){
