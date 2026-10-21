@@ -7,6 +7,7 @@ Original extracts remain linked in the reading object for verification.
 """
 from __future__ import annotations
 import re,html
+from editorial_readings import MORE_EDITORIAL
 CURATED={
  "10.3389/feduc.2026.1861548":{
   "idea":"Knowing more about AI does not always mean relying on it less.",
@@ -90,6 +91,8 @@ CURATED={
   "tags":["799 adolescents","Digital distraction","Predictive analysis"]
  }
 }
+
+CURATED.update(MORE_EDITORIAL)
 
 HEAD=re.compile(r"(?:^|\s)(?:\d+(?:\.\d+)*\.?\s+)*(?:results?|discussion|methods?|materials and methods|conclusions?|limitations(?: and future research)?|introduction|abstract)\s*(?=(?:\d|[A-Z]))",re.I)
 SEC=re.compile(r"^\s*(?:\d+(?:\.\d+)*\.?\s+){1,3}(?=[A-Za-z])")
@@ -254,42 +257,70 @@ def concept_tags(record):
  ]
  tags=[label for label,pattern in clusters if re.search(pattern,text)]
  return tags[:3]
+def source_snippet(text, role, limit=185):
+ """Surface only interpretable source statements, not truncated section dumps."""
+ if not text:return ""
+ phrase=condensed(text,role,maxlen=260) if role!="idea" else first_source_sentence(text)
+ phrase=readable_excerpt(phrase,role,limit)
+ # An ellipsis is honest, but on a reading card it obscures the claim.
+ # Leave the raw source available in the disclosure instead.
+ if phrase.endswith("…") or len(phrase)<30:return ""
+ if re.match(r"^(?:\d+(?:\.\d+)*\s+)?(?:methods?|results?|discussion|conclusions?|limitations?)\b",phrase,re.I):
+  return ""
+ return phrase
+
+def first_source_sentence(text):
+ parts=sentence_list(text)
+ return parts[0] if parts else clean(text)
+
 def annotate(record):
  r=record.get("reading") or {}
  base=dict(record);base["reading"]=dict(r)
+ level=r.get("level")
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
-  base["reading"]["digest"]={"idea":readable_excerpt(notes.get("argument") or condensed(r.get("overview"),"idea",225),"idea",180),
+  idea=readable_excerpt(notes.get("argument") or r.get("overview") or "", "idea",165)
+  if idea.endswith("…"):idea=clean(record.get("title") or "")
+  base["reading"]["digest"]={
+   "idea":idea or clean(record.get("title") or ""),
    "explain":"","approach":"","finding":"",
-   "interpretation":readable_excerpt(notes.get("design_relevance") or "","interpretation",190),
-   "limitation":readable_excerpt(notes.get("caveat") or "","limitation",170),
+   "finding_source":"none",
+   "interpretation":source_snippet(notes.get("design_relevance"),"interpretation",175),
+   "limitation":source_snippet(notes.get("caveat"),"limitation",170),
    "tags":concept_tags(record),"status":"editorial_or_publisher_synopsis"}
   return base
  curated=CURATED.get((record.get("doi") or "").lower())
- if curated and r.get("level")=="full_text":
-  digest=dict(curated);digest["status"]="editorially_written_from_indexed_sections";digest["finding_source"]="editorial"
+ if curated and level in ("abstract","full_text"):
+  digest=dict(curated)
+  digest["status"]="editorially_written_from_indexed_sections"
+  digest["editorial_basis"]="full_text" if level=="full_text" else "abstract"
+  digest["finding_source"]="editorial" if digest.get("finding") else "none"
  else:
-  fulltext=r.get("level")=="full_text"
+  # Never promote an introduction, source section heading, or model-fit check
+  # to an editorial insight. The repository provides a traceable source note.
+  fulltext=level=="full_text"
   results=(record.get("analysis") or {}).get("results") if fulltext else ""
   if not results:results=r.get("findings") or ""
   finding=reported_result(results,record.get("title",""))
   finding_source="full_text" if finding and fulltext else "abstract" if finding else "none"
-  if not finding and r.get("level") in ("abstract","full_text"):
-   # An extracted Results section can consist entirely of psychometrics.
-   # A substantive result explicitly stated in the abstract is preferable
-   # to presenting Cronbach alpha or CFA diagnostics as the finding.
+  if not finding and level in ("abstract","full_text"):
    finding=reported_result(record.get("abstract_text") or "",record.get("title",""))
    finding_source="abstract" if finding else "none"
+  reported=readable_excerpt(finding,"finding",185) if finding else ""
+  if reported.endswith("…") or len(reported)<36:
+   reported="";finding_source="none"
+  title=clean(record.get("title") or "")
   digest={
-   "idea":readable_excerpt(condensed(r.get("overview"),"idea",245),"idea",185),
+   "idea":reported or title,
    "explain":"",
-   "approach":readable_excerpt(condensed(r.get("methods"),"approach",245),"approach",190),
-   "finding":readable_excerpt(finding,"finding",195),
+   "approach":source_snippet(r.get("methods") or record.get("abstract_text") or "","approach",175),
+   "finding":reported,
    "finding_source":finding_source,
-   "interpretation":readable_excerpt(condensed(r.get("interpretation"),"interpretation",245),"interpretation",185),
-   "limitation":readable_excerpt(condensed(r.get("limitations"),"limitations",245),"limitation",185),
+   "interpretation":"",
+   "limitation":source_snippet(r.get("limitations"),"limitations",170),
    "tags":concept_tags(record),
-   "status":"automatically_condensed_source_text"
+   "status":"automatically_condensed_source_text",
+   "editorial_basis":"full_text" if fulltext else "abstract"
   }
  base["reading"]["digest"]=digest
  return base
