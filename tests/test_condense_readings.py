@@ -63,7 +63,8 @@ class CondensedReadingTests(unittest.TestCase):
   # explicitly reports the appraisal paths.
   workers=annotate(records["10.3389/fpsyg.2026.1960382"])["reading"]["digest"]
   self.assertEqual(workers["finding_source"],"editorial")
-  self.assertIn("algorithmic management",workers["finding"].lower())
+  self.assertIn("algorithmic management",workers["idea"].lower())
+  self.assertIn("challenge appraisal",workers["finding"].lower())
   self.assertNotIn("Cronbach",workers["finding"])
   adjacent=annotate(records["10.3389/fpsyg.2026.1930030"])["reading"]["digest"]
   self.assertEqual(adjacent["finding_source"],"editorial")
