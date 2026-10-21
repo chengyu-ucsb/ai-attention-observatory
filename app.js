@@ -230,14 +230,14 @@ function home(){
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
  add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","↗","✳"][i]));
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
- add(c,head,make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),make("p","feature-source-title",x.title),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
+ add(c,head,editorialMedia(x,"feature"),make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),make("p","feature-source-title",readableSourceTitle(x)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
  topicBars("#topic-bars");donut();
  const grid=$("#lens-grid");grid.replaceChildren();themes.forEach(t=>{const a=link("","#library","lens");a.setAttribute("aria-label","Explore "+t[0]);a.onclick=e=>{e.preventDefault();$("#topic-filter").value=t[0];goto("library")};add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.published||"").localeCompare(a.published||"")).slice(0,7);
- for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",x.title));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
+ for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
 }
 
 function renderEditorial(){
@@ -251,7 +251,7 @@ function renderEditorial(){
   const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x,92),()=>goto("paper",id(x))));
   const foot=make("div","editorial-foot");
   add(foot,make("span","",x.venue||"Original source"),btn("Explore ↗",()=>goto("paper",id(x)),"editorial-cta"));
-  add(card,label,articleTitle,make("p","editorial-source-title",x.title),foot);root.append(card)
+  add(card,editorialMedia(x,"editorial"),label,articleTitle,make("p","editorial-source-title",readableSourceTitle(x)),foot);root.append(card)
  }
 }
 
@@ -269,10 +269,10 @@ function renderPerspectives(){
     const icon=make("div","perspective-glyph",x.source==="Official product documentation"?"◈":x.format==="Policy analysis"?"◇":"↗");
     const label=make("div","perspective-type",x.format||"Reporting & analysis");
     const title=make("h3");title.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));
-    const summary=make("p","perspective-source-title",x.title);
+    const summary=make("p","perspective-source-title",readableSourceTitle(x));
     const bottom=make("div","perspective-bottom");
     add(bottom,make("span","",x.venue||"Original source"),btn("Read source notes ↗",()=>goto("paper",id(x)),"editorial-cta"));
-    add(item,icon,label,title,summary,bottom);container.append(item);
+    add(item,editorialMedia(x,"perspective"),icon,label,title,summary,bottom);container.append(item);
   }
  }
 }
