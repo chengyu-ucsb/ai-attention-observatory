@@ -391,3 +391,26 @@
  .study-coefficient-row{grid-template-columns:106px minmax(0,1fr) 40px;gap:7px}
  .study-coefficient-name{font-size:10.5px}
 }
+
+
+/* Idea-first article pages: the evidence earns the headline; the study remains verifiable. */
+.paper-reading-header{max-width:900px;padding:22px 0 38px;border-bottom:1px solid #e6d7d3}
+.paper-reading-header>.eyebrow{margin-bottom:16px;font-size:11px;letter-spacing:.14em}
+.paper-reading-header .reading-lead{background:transparent;border:0;padding:0;margin:0}
+.paper-reading-header .reading-lead>.eyebrow{color:#a93f52;font-size:10px;letter-spacing:.09em;margin:0 0 13px}
+.paper-reading-header .paper-insight{font:500 clamp(33px,4.1vw,55px)/1.15 var(--display);max-width:890px;letter-spacing:-.019em;color:#37272e;margin:0}
+.paper-reading-header .reading-lead-note{max-width:660px;font-size:13px;line-height:1.65;color:#816d72;margin:20px 0 0}
+.paper-reading-header .paper-controls{margin-top:24px}
+.paper-columns{margin-top:35px}
+.paper-snapshot>.eyebrow{margin:0 0 10px;font-size:11px}
+.paper-snapshot .paper-section-title{font:500 clamp(26px,3vw,33px)/1.19 var(--display);margin:0 0 23px}
+.paper-evidence-grid .snapshot-tile:first-child{background:#fff}
+.paper-side-block .paper-source-title{font:500 18px/1.4 var(--display);color:#48373d;letter-spacing:-.005em;max-width:100%;margin:17px 0 10px}
+.paper-side-block .paper-meta{font-size:11px;line-height:1.7;color:#857579;border-bottom:1px solid #e8ddda;padding-bottom:16px;margin-bottom:8px}
+.paper-side-block .paper-side-title{font-size:21px}
+.paper-main .article-concept-art{margin-top:29px}
+@media(max-width:650px){
+ .paper-reading-header{padding-top:14px;padding-bottom:29px}
+ .paper-reading-header .paper-insight{font-size:36px;line-height:1.18}
+ .paper-reading-header .reading-lead-note{font-size:12px}
+}
