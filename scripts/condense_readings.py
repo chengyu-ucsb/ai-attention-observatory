@@ -116,7 +116,9 @@ UNTESTED = re.compile(
  r"\b(?:hypothesi[sz]|we (?:propose|expect|aim|seek|explore|test)|"
  r"the present study (?:examines|investigates|aims)|"
  r"may (?:be|lead|affect)|future research|should be studied|"
- r"previous research (?:suggests|shows)|prior studies)\b",re.I)
+ r"previous research (?:suggests|shows)|prior studies|recent work|"
+ r"evidence on whether|evidence (?:is|remains) (?:mixed|divided)|"
+ r"sharply divided|remains? unclear|little is known)\b",re.I)
 STOPWORDS = {"the","and","with","from","into","among","through","between",
              "about","under","using","used","study","studies","analysis",
              "effects","effect","model","models","role","research","findings"}
