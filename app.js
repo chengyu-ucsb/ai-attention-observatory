@@ -369,41 +369,43 @@ function showPaper(x){
  const r=x.reading||{},d=r.digest||{},isCommentary=x.kind!=="scholarly";
  const edited=d.status==="editorially_written_from_indexed_sections";
  const meta=[...(x.authors||[]).slice(0,3),x.venue,date(x.published)].filter(Boolean).join(" · ");
- const summary=d.idea||r.overview||"A substantive overview was not identified in the available source material.";
- const summaryLabel=edited?"EDITORIAL READING / SOURCE-GROUNDED":isCommentary?"EDITORIAL OR PUBLISHER SYNOPSIS":"AUTOMATED SOURCE-DERIVED OVERVIEW";
+ // The Observatory presents an idea first, then the evidence for that idea.
+ // Automatically condensed source passages must not be presented as original editorial synthesis.
+ const summary=(edited?d.idea||d.finding:isCommentary?d.idea||r.overview:d.finding||d.idea||r.overview)||
+   "No source-grounded idea has been identified in the accessible material.";
+ const summaryLabel=edited?"EDITORIAL TAKEAWAY / SOURCE-GROUNDED":
+   isCommentary?"PERSPECTIVE / NOT EMPIRICAL EVIDENCE":
+   d.finding?"SOURCE-REPORTED FINDING":"RESEARCH QUESTION / FINDING NOT VERIFIED";
  const header=make("header","paper-reading-header");
- const kicker=make("p","eyebrow","THE OBSERVATORY / READING NOTE");
- const publication=make("h1","paper-source-title",x.title);
- const metadata=make("p","paper-meta",meta);
+ const kicker=make("p","eyebrow","THE OBSERVATORY / KEY IDEA");
+ const lead=make("div","reading-lead");
+ const idea=make("h1","paper-insight",edited?cut(summary,350):cut(summary,300));
+ const explanation=make("p","reading-lead-note",edited?
+   "An interpretation of the available research, not proof that this relationship is causal.":
+   isCommentary?"An author's argument or publisher synopsis, not an established research result.":
+   "Drawn from indexed source text; consult the original evidence and limitations below.");
+ add(lead,make("p","eyebrow",summaryLabel),idea,explanation);
  const chips=make("div","paper-controls");
- for(const label of [isCommentary?"Commentary":"Scholarly source",depthName(x),x.relation||"Research archive"])
+ for(const label of [x.lane||"Research",isCommentary?"Commentary":depthName(x),x.relation||"Research archive"])
   chips.append(make("span","paper-label",label));
- add(header,kicker,publication,metadata,chips);
- const lead=make("section","reading-lead");
- add(lead,make("p","eyebrow",summaryLabel),
-    make("h2","paper-insight",edited?summary:cut(summary,340)),
-    make("p","reading-lead-note",edited?
-      "Written from accessible source passages; it is not an independent replication or a causal verdict.":
-      isCommentary?"This is an attributable argument or synopsis, not an empirical research finding.":
-      "Automatically condensed from indexed source text. Check the original for detail and context."));
+ add(header,kicker,lead,chips);
  const left=make("div","paper-main"),right=make("aside","paper-side"),cols=make("div","paper-columns");
- left.append(lead);
  // Each block has one job: design, result, caveat. Do not conflate author
  // interpretation, source extraction, and confirmed empirical findings.
  const cards=make("section","paper-snapshot");
- cards.append(make("h2","paper-section-title",isCommentary?"The argument, in context":"Inside the study"));
+ cards.append(make("p","eyebrow","EVIDENCE AND BOUNDARIES"),make("h2","paper-section-title",isCommentary?"What informs this perspective":"What supports this idea?"));
  const grid=make("div","paper-evidence-grid");
  const items=isCommentary?[
    ["01","The author's argument",d.idea||r.overview||"Only a short source synopsis is available."],
    ["02","Possible implications",d.interpretation||(x.editorial_notes||{}).design_relevance||"No supported design implication has been identified."],
    ["03","What remains open",d.limitation||(x.editorial_notes||{}).caveat||"This commentary does not establish empirical effects."]
  ]:[
-   ["01","How it was studied",d.approach||"The accessible text does not establish a reliable account of the method."],
+   ["01","Where the evidence comes from",d.approach||"The accessible text does not establish a reliable account of the method."],
    ["02",d.finding_source==="abstract"?"What the abstract reports":
      d.finding_source==="full_text"?"What the results report":
      d.finding?"What the source reports":"Finding not established",
      d.finding||"No substantive empirical result could be identified from the available source sections."],
-   ["03","What we cannot conclude",d.limitation||
+   ["03","What the evidence cannot establish",d.limitation||
      "Specific limitations were not identifiable in the indexed passages. This is not evidence that the study has no limitations."]
  ];
  for(const [number,title,body] of items){
@@ -450,7 +452,10 @@ function showPaper(x){
  }
  left.append(make("p","paper-smallprint",r.notice||"Source text was indexed automatically. Verify the original before citing research findings."));
  const facts=make("section","paper-side-block");
- add(facts,make("p","eyebrow","ABOUT THIS SOURCE"),make("h2","paper-side-title","Reading details"));
+ add(facts,make("p","eyebrow","EVIDENCE SOURCE"),
+   make("h2","paper-side-title","Where this idea comes from"),
+   make("h3","paper-source-title",x.title),
+   make("p","paper-meta",meta));
  for(const [name,value] of [
   ["Published",date(x.published)],["Venue",x.venue||"Not supplied"],
   ["Material available",depthName(x)],
@@ -501,7 +506,7 @@ function showPaper(x){
   right.append(panel);
  }
  add(cols,left,right);
- add(area,btn("← Research library",()=>goto("library"),"back-button"),header,cols);
+ add(area,btn("← All ideas",()=>goto("library"),"back-button"),header,cols);
 }
 function showProductExamples(){
  const examples=S.records.filter(x=>x.source==="Official product documentation");
