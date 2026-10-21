@@ -26,46 +26,38 @@ const highlightByDOI={
  "10.3389/fpsyg.2026.1960382":"Algorithmic management associated with challenge and threat appraisals",
  "10.1609/aies.v9i2.43193":"Parental alerts varied substantially across tested content categories"
 };
-function shortIdea(x,limit=105){
- const info=ideaInfo(x),r=x.reading||{};
- // A manually reviewed abstract-based headline must not override later full-text findings.
- const keyed=(x.doi||"").toLowerCase();
- if(r.findings&&highlightByDOI[keyed])return cut(highlightByDOI[keyed],limit);
- const d=r.digest||{};
- if(d.finding)return cut(d.finding,limit);
- if(d.status==="editorially_written_from_indexed_sections"&&d.idea)return cut(d.idea,limit);
- let value=info.text;
- // Remove routine reporting formulae without changing the source's actual claim.
- value=value.replace(/^(?:the )?(?:quantitative )?(?:results?|findings?|analysis|analyses|data)\s+(?:show(?:ed)?|suggest(?:ed)?|indicat(?:ed|e)?|reveal(?:ed)?|demonstrat(?:ed|e)?|found)\s+(?:that\s+)?/i,"");
- value=value.replace(/^(?:we (?:found|find|observed|show(?:ed)?)\s+that\s+|this (?:study|paper|article) (?:examines?|investigates?|explores?|argues?|proposes?)\s+(?:that\s+)?)/i,"");
- value=value.replace(/\s+/g," ").trim();
- if(value.length<=limit)return value;
- // Prefer intact first clauses over a long sentence; mark any truncation explicitly.
- const firstSentence=value.match(/^.{18,150}?[.!?](?=\s|$)/);
- if(firstSentence&&firstSentence[0].length<=limit)return firstSentence[0];
- const window=value.slice(0,limit+5);
- let at=Math.max(window.lastIndexOf("; "),window.lastIndexOf(", "));
- if(at>45&&at<=limit)return window.slice(0,at).trim()+"…";
- return cut(value,limit);
+function cleanLead(s){
+ // Keep claims and qualifiers intact while avoiding paper-centred introductions.
+ let x=String(s||"").replace(/\s+/g," ").trim();
+ x=x.replace(/^(?:the authors|the researchers|we) (?:found|observed|reported|showed) that\s+/i,"");
+ x=x.replace(/^(?:this study|the study|our results|the findings|the results) (?:found|reported|showed|show|indicate|indicated) that\s+/i,"");
+ x=x.replace(/^(?:the authors|the researchers) (?:argue|suggest|propose) that\s+/i,"One interpretation is that ");
+ return x?x[0].toUpperCase()+x.slice(1):"";
 }
-
+function shortIdea(x,limit=105){
+ const r=x.reading||{},d=r.digest||{},key=(x.doi||"").toLowerCase();
+ // Prefer an actual editorial takeaway to a long extracted Results sentence.
+ if(d.status==="editorially_written_from_indexed_sections"&&d.idea)return cut(cleanLead(d.idea),limit);
+ if(d.idea&&x.kind==="nonacademic")return cut(cleanLead(d.idea),limit);
+ if(r.findings&&highlightByDOI[key])return cut(highlightByDOI[key],limit);
+ return cut(cleanLead(d.finding||d.idea||r.overview||x.title),limit);
+}
 function ideaInfo(x){
  const r=x.reading||{},d=r.digest||{},notes=x.editorial_notes||{};
  let value="",label="";
- if(x.kind==="nonacademic"){
-   value=notes.argument||r.overview||"";label=notes.argument?"THE AUTHOR ARGUES":"PUBLISHER SYNOPSIS";
+ if(x.kind!=="scholarly"){
+  value=d.idea||notes.argument||r.overview||"";
+  label=notes.argument?"PERSPECTIVE / ATTRIBUTED":"PUBLISHER SYNOPSIS";
+ }else if(d.status==="editorially_written_from_indexed_sections"&&d.idea){
+  value=d.idea;label="EDITORIAL TAKEAWAY / SOURCE-GROUNDED";
  }else if(d.finding){
-   value=d.finding;
-   label=d.finding_source==="abstract"?"RESULT REPORTED IN ABSTRACT":
-      d.finding_source==="full_text"?"RESULT EXTRACTED FROM FULL TEXT":"EDITORIALLY SOURCED RESULT";
- }else if(d.interpretation){
-   value=d.interpretation;label="AUTHOR INTERPRETATION · NOT RESULTS";
+  value=d.finding;
+  label=d.finding_source==="abstract"?"RESULT FROM ABSTRACT":
+    d.finding_source==="full_text"?"RESULT FROM FULL TEXT":"SOURCE-DERIVED RESULT";
  }else{
-   value=d.idea||r.overview||"";label="RESEARCH IDEA · NOT A VERIFIED RESULT";
+  value=d.idea||r.overview||"";label="RESEARCH TOPIC / NOT AN ESTABLISHED FINDING";
  }
- // Preserve substantive source language; only strip section-name prefixes.
- value=String(value).replace(/^(?:abstract|results?|discussion|conclusions?)\s*[:.]\s*/i,"").trim();
- return {text:value||"No substantive source text is available.",label};
+ return {text:cleanLead(value)||"No substantive source text is available.",label};
 }
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.digest?.finding?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
@@ -369,61 +361,59 @@ function showPaper(x){
  const r=x.reading||{},d=r.digest||{},isCommentary=x.kind!=="scholarly";
  const edited=d.status==="editorially_written_from_indexed_sections";
  const meta=[...(x.authors||[]).slice(0,3),x.venue,date(x.published)].filter(Boolean).join(" · ");
- // The Observatory presents an idea first, then the evidence for that idea.
- // Automatically condensed source passages must not be presented as original editorial synthesis.
- const summary=(edited?d.idea||d.finding:isCommentary?d.idea||r.overview:d.finding||d.idea||r.overview)||
-   "No source-grounded idea has been identified in the accessible material.";
- const summaryLabel=edited?"EDITORIAL TAKEAWAY / SOURCE-GROUNDED":
-   isCommentary?"PERSPECTIVE / NOT EMPIRICAL EVIDENCE":
-   d.finding?"SOURCE-REPORTED FINDING":"RESEARCH QUESTION / FINDING NOT VERIFIED";
+ // Lead with the idea. The detailed source title belongs in the evidence trail.
+ const takeaway=(edited?d.idea||d.finding:isCommentary?d.idea||r.overview:d.finding||d.idea||r.overview)||
+   "No clear research takeaway is available from this source yet.";
+ const headline=cleanLead(takeaway);
+ const summaryLabel=edited?"EDITED INSIGHT":
+   isCommentary?"PERSPECTIVE / NOT A STUDY RESULT":
+   d.finding?"RESULT REPORTED IN THE SOURCE":"RESEARCH QUESTION / NOT A VERIFIED RESULT";
  const header=make("header","paper-reading-header");
- const kicker=make("p","eyebrow","THE OBSERVATORY / KEY IDEA");
  const lead=make("div","reading-lead");
- const idea=make("h1","paper-insight",edited?cut(summary,350):cut(summary,300));
- const explanation=make("p","reading-lead-note",edited?
-   "An interpretation of the available research, not proof that this relationship is causal.":
-   isCommentary?"An author's argument or publisher synopsis, not an established research result.":
-   "Drawn from indexed source text; consult the original evidence and limitations below.");
- add(lead,make("p","eyebrow",summaryLabel),idea,explanation);
+ const idea=make("h1","paper-insight",cut(headline,edited?170:185));
+ add(lead,make("p","eyebrow",summaryLabel),idea);
+ const explanation=d.explain||"";
+ if(explanation)add(lead,make("p","reading-deck",cleanLead(explanation)));
+ const explanationNote=edited?"An edited reading of the source, not a causal verdict.":
+   isCommentary?"A perspective or publisher description, not a tested finding.":
+   "Automatically selected from indexed source text; check the evidence and limitations.";
+ add(lead,make("p","reading-lead-note",explanationNote));
  const chips=make("div","paper-controls");
- for(const label of [x.lane||"Research",isCommentary?"Commentary":depthName(x),x.relation||"Research archive"])
+ for(const label of [x.lane||"Research",isCommentary?"Perspective":depthName(x),x.relation||"Research archive"])
   chips.append(make("span","paper-label",label));
- add(header,kicker,lead,chips);
+ add(header,lead,chips);
  const left=make("div","paper-main"),right=make("aside","paper-side"),cols=make("div","paper-columns");
  // Each block has one job: design, result, caveat. Do not conflate author
  // interpretation, source extraction, and confirmed empirical findings.
  const cards=make("section","paper-snapshot");
- cards.append(make("p","eyebrow","EVIDENCE AND BOUNDARIES"),make("h2","paper-section-title",isCommentary?"What informs this perspective":"What supports this idea?"));
+ cards.append(make("p","eyebrow","THE EVIDENCE"),
+   make("h2","paper-section-title",isCommentary?"How to read this perspective":"What supports this idea?"));
  const grid=make("div","paper-evidence-grid");
  const items=isCommentary?[
-   ["01","The author's argument",d.idea||r.overview||"Only a short source synopsis is available."],
-   ["02","Possible implications",d.interpretation||(x.editorial_notes||{}).design_relevance||"No supported design implication has been identified."],
-   ["03","What remains open",d.limitation||(x.editorial_notes||{}).caveat||"This commentary does not establish empirical effects."]
+  ["01","What this perspective suggests",d.interpretation||(x.editorial_notes||{}).design_relevance||"The source offers a viewpoint, not a tested claim."],
+  ["02","Where it comes from",d.approach||"A published argument or editorial source, rather than a controlled study."],
+  ["03","What remains open",d.limitation||(x.editorial_notes||{}).caveat||"This account does not establish an empirical effect."]
  ]:[
-   ["01","Where the evidence comes from",d.approach||"The accessible text does not establish a reliable account of the method."],
-   ["02",d.finding_source==="abstract"?"What the abstract reports":
-     d.finding_source==="full_text"?"What the results report":
-     d.finding?"What the source reports":"Finding not established",
-     d.finding||"No substantive empirical result could be identified from the available source sections."],
-   ["03","What the evidence cannot establish",d.limitation||
-     "Specific limitations were not identifiable in the indexed passages. This is not evidence that the study has no limitations."]
+  ["01",d.finding_source==="abstract"?"The reported evidence · abstract":
+     d.finding_source==="full_text"?"The reported evidence · full text":
+     d.finding?"The reported evidence":"No verified finding yet",
+   d.finding||"The accessible material does not report a substantive result that can be summarized reliably."],
+  ["02","How it was studied",
+   d.approach||"The indexed text does not establish the study design clearly."],
+  ["03","What to keep in mind",
+   d.limitation||"Specific limitations were not captured by the index. That does not mean the study has none."]
  ];
- for(const [number,title,body] of items){
-  const card=make("article","snapshot-tile");
-  add(card,make("span","snapshot-number",number),make("h3","snapshot-kicker",title),make("p","",body));
-  grid.append(card);
+ const art=conceptArtwork(x);
+ for(const [index,[number,title,body]] of items.entries()){
+  const tile=make("article","snapshot-tile"+(index===0?" snapshot-feature":""));
+  add(tile,make("span","snapshot-number",number),
+    make("h3","snapshot-kicker",title),
+    make("p","",cleanLead(body)));
+  grid.append(tile);
+  if(index===0&&art)grid.append(art);
  }
  cards.append(grid);
  left.append(cards);
- if(!isCommentary&&d.interpretation){
-  const note=make("section","reading-interpretation");
-  add(note,make("p","eyebrow","AUTHOR INTERPRETATION / NOT AN ADDITIONAL RESULT"),
-     make("h2","paper-section-title","How to read these findings"),
-     make("p","",d.interpretation));
-  left.append(note);
- }
- const art=conceptArtwork(x);
- if(art)left.append(art);
  const detailed=make("details","paper-detail-excerpts");
  detailed.open=false;
  detailed.append(make("summary","","Inspect indexed source passages"));
@@ -451,19 +441,24 @@ function showPaper(x){
   left.append(abstract);
  }
  left.append(make("p","paper-smallprint",r.notice||"Source text was indexed automatically. Verify the original before citing research findings."));
- const facts=make("section","paper-side-block");
- add(facts,make("p","eyebrow","EVIDENCE SOURCE"),
-   make("h2","paper-side-title","Where this idea comes from"),
+ const facts=make("section","paper-side-block source-card");
+ add(facts,make("p","eyebrow","SOURCE & TRACEABILITY"),
+   make("h2","paper-side-title","Behind this idea"),
    make("h3","paper-source-title",x.title),
    make("p","paper-meta",meta));
  for(const [name,value] of [
-  ["Published",date(x.published)],["Venue",x.venue||"Not supplied"],
-  ["Material available",depthName(x)],
-  ["Relevance",x.relation||"Not classified"],
-  ["Note type",edited?"Editorially condensed from source":isCommentary?"Publisher or editorial synopsis":"Automated condensation"],
-  ["Provenance",r.provenance||x.source||"Index"]
+  ["Evidence level",depthName(x)],
+  ["Connection",x.relation||"Not classified"]
  ])facts.append(paperFact(name,value));
- if(x.doi)facts.append(paperFact("DOI",x.doi));
+ const more=make("details","source-details");
+ more.append(make("summary","","Full source details"));
+ for(const [name,value] of [
+  ["Published",date(x.published)],["Venue",x.venue||"Not supplied"],
+  ["Note type",edited?"Edited summary":isCommentary?"Publisher/editorial synopsis":"Automatically condensed"],
+  ["Source material",r.provenance||x.source||"Indexed source"]
+ ])more.append(paperFact(name,value));
+ if(x.doi)more.append(paperFact("DOI",x.doi));
+ facts.append(more);
  right.append(facts);
  if(x.analysis?.figures?.length){
   const figures=make("section","paper-side-block");
