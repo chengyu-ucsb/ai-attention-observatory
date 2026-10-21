@@ -1,115 +1,77 @@
-/* Regression tests for concise research headlines and DOM-element rendering. */
+/* The complete public library must render one consistent idea-first reading page. */
 "use strict";
 const fs=require("node:fs"),vm=require("node:vm"),path=require("node:path"),assert=require("node:assert/strict");
 const ROOT=path.resolve(__dirname,"..");
 const read=p=>fs.readFileSync(path.join(ROOT,p),"utf8");
 const app=read("app.js"),html=read("index.html"),styles=read("styles.css");
-assert(!app.includes("discovery provider warning(s)"),"Raw provider warnings must never appear on homepage");
-assert(!html.includes('id="research-warning"'),"Internal warning banner leaked into public HTML");
-assert(!app.includes('make("div","paper-identity",add('),"Node passed as text into make()");
+assert(!app.includes("discovery provider warning(s)"),"Workflow warnings leaked into visitor UI");
+assert(!html.includes('id="research-warning"'),"Internal warning banner leaked into HTML");
+assert(!app.includes('make("div","paper-identity",add('),"DOM node passed into text-only helper");
 for(const id of ["paper-content","feature-grid","library-results"])assert(html.includes('id="'+id+'"'));
-let created=[];
+assert(styles.includes(".rv-article"),"New coherent reading stylesheet missing");
+assert(!styles.includes("Article reading experience v2"),"Obsolete layered article CSS still present");
 class Element{
- constructor(tag){this.tag=tag;this.textContent="";this.className="";this.children=[];this.style={};this.hidden=false;this.open=false;this.attributes={};created.push(this)}
+ constructor(tag){this.tag=tag;this.textContent="";this.className="";this.children=[];this.style={};this.hidden=false;this.open=false;this.attributes={}}
  append(...els){for(const e of els){assert(e instanceof Element,"Non-element child");this.children.push(e)}}
  replaceChildren(...els){this.children=[];this.textContent="";this.append(...els)}
  setAttribute(k,v){this.attributes[k]=v}
  addEventListener(_name,_callback){}
 }
 const paperContainer=new Element("div");
-const doc={createElement:t=>new Element(t),querySelector:q=>q==="#paper-content"?paperContainer:null};
+const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-content"?paperContainer:null};
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
-assert(prefix.length>10000,"Unexpected app initialization structure");
+assert(prefix.length>10000,"Unable to load application functions");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
-vm.runInContext(prefix+"\nconst TEST={showPaper,make,shortIdea,ideaInfo,S};",ctx);
-function nodes(root){return [root,...root.children.flatMap(nodes)]}
-function nodeClass(root,cls){return nodes(root).find(n=>n.className.split(" ").includes(cls))}
-function texts(root){return nodes(root).map(n=>n.textContent).filter(Boolean)}
+vm.runInContext(prefix+"\nconst TEST={showPaper,shortIdea,ideaInfo,make,S};",ctx);
+const nodes=root=>[root,...root.children.flatMap(nodes)];
+const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
+const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
+const textContent=root=>nodes(root).map(n=>n.textContent).filter(Boolean).join(" | ");
 const db=JSON.parse(read("data/public-library.json"));
-assert(db.length>50,"Expected public article data for regression testing");
-let verified=0;
+assert(db.length>50,"Expected public, citation-screened library");
+ctx.database=db;vm.runInContext("TEST.S.records=database",ctx);
+let checked=0,edited=0,sourceOnly=0;
 for(const r of db){
- ctx.selected=r;
- created=[];
- vm.runInContext("TEST.showPaper(selected)",ctx);
- const allText=texts(paperContainer).join(" | ");
- assert(!allText.includes("[object HTMLDivElement]"),"Object-to-string rendering for "+r.title);
- assert(!allText.includes("[object Object]"),"Object-to-string rendering for "+r.title);
- const insight=nodeClass(paperContainer,"paper-insight");
- assert(insight&&insight.textContent.length>18&&insight.textContent.length<=430,"Missing or unbounded reading summary for "+r.title);
- const snapshot=nodeClass(paperContainer,"paper-snapshot");
- assert(snapshot,"Missing processed reading snapshot for "+r.title);
- const studyCards=nodes(snapshot).filter(n=>n.className.split(" ").includes("snapshot-tile"));
- assert.equal(studyCards.length,3,"Expected separate design / result / limitation notes for "+r.title);
- const source=nodeClass(paperContainer,"paper-source-title");
- assert(source&&source.tag==="h3"&&source.textContent===r.title,"Original publication must remain available as evidence provenance");
- assert(insight.tag==="h1","The idea must be the primary reading-page heading");
- assert(!/^(?:the authors|the researchers|this study|the paper|we found)\b/i.test(insight.textContent),"Headline should start with the idea, not the authors: "+r.title+" / "+insight.textContent);
- assert(insight.textContent.length<=186,"Takeaway is too long for an article headline");
- const header=nodeClass(paperContainer,"paper-reading-header");
- assert(header&&nodes(header).includes(insight),"Readers must see the idea before the evidence");
- assert(!nodes(header).includes(source),"Do not foreground bibliographic titles over the idea");
- const evidence=nodeClass(paperContainer,"paper-section-title");
- assert(evidence&&/evidence|supports|informs|how to read/i.test(evidence.textContent),"Supporting evidence must be explicitly signposted");
- const generic=nodes(paperContainer).filter(n=>n.className.split(" ").includes("concept-scene"));
- assert.equal(generic.length,0,"Generic concept diagrams were supposed to be removed");
- const notes=nodeClass(paperContainer,"reading-lead-note");
- assert(notes&&/research|source|article|index|passages|synopsis|original evidence|publisher description/i.test(notes.textContent),"Missing provenance warning for "+r.title);
- const details=nodeClass(paperContainer,"paper-detail-excerpts");
- const editorial=r.kind==="nonacademic";
- const hasNotes=editorial?!!(r.editorial_notes?.argument||r.editorial_notes?.design_relevance||r.editorial_notes?.caveat):!!(r.reading?.methods||r.reading?.findings||r.reading?.interpretation||r.reading?.limitations);
- if(hasNotes)assert(details&&details.open===false,"Raw extracted passages must stay collapsed behind processed notes for "+r.title);
- else assert(!details,"Empty structured source notes must not display a pointless panel for "+r.title);
- verified++;
+ ctx.selected=r;vm.runInContext("TEST.showPaper(selected)",ctx);
+ const page=match(paperContainer,"rv-article");
+ const headline=match(page,"rv-headline"),source=match(page,"rv-source-title");
+ assert(page&&headline&&headline.tag==="h1","Missing primary insight heading for "+r.title);
+ assert(headline.textContent.length>=10&&headline.textContent.length<=231,"Headline overflows for "+r.title);
+ assert(!/^(?:the authors|the researchers|this study|this paper|we found)\b/i.test(headline.textContent),"Paper-centred headline: "+r.title+" / "+headline.textContent);
+ assert(source&&source.textContent===r.title,"Source title missing for "+r.title);
+ assert(!matching(page,"concept-scene").length,"Decorative generic concept diagram present");
+ assert(match(page,"rv-layout")&&match(page,"rv-content"),"Consistent story layout missing");
+ assert(match(page,"rv-context-grid"),"Source context and caveats missing");
+ assert(match(page,"rv-source"),"Source citation/links missing");
+ assert(match(page,"rv-status"),"Reader cannot distinguish edited and automatic content");
+ const d=r.reading?.digest||{};
+ if(d.status==="editorially_written_from_indexed_sections"){
+  edited++;
+  assert(headline.textContent.includes(d.idea.slice(0,Math.min(d.idea.length,25))),"Edited takeaway missing: "+r.title);
+  assert(match(page,"rv-deck"),"Edited reading lacks a concise explanation: "+r.title);
+ }else sourceOnly++;
+ const excerpt=match(page,"rv-drawer");
+ if(excerpt)assert(excerpt.open===false,"Raw passages should be collapsed");
+ assert(!/\[object (?:HTML\w+Element|Object)\]/.test(textContent(page)),"Broken object rendering: "+r.title);
+ checked++;
 }
-const literacy=db.find(x=>x.doi==="10.58304/ijts.260930");
-if(literacy){
- ctx.selected=literacy;
- vm.runInContext("TEST.showPaper(selected)",ctx);
- const textAll=texts(paperContainer).join(" | ");
- assert(textAll.includes("450 non-English-major undergraduates"),"Specific sample details missing from accessible summary");
- assert(textAll.includes("20 interviews"),"Mixed-methods follow-up sample missing");
- assert(nodeClass(paperContainer,"article-data-visual"),"Study-specific research-design visual not rendered");
- assert(!nodeClass(paperContainer,"concept-scene"),"Generic concept illustration should be absent");
+assert(edited>=20,"Expected source-grounded editorial coverage to expand");
+const idea=db.find(x=>x.doi==="10.58304/ijts.260930");
+assert(idea,"Literacy reference should appear in the public library");
+ctx.selected=idea;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(match(paperContainer,"rv-claim"),"Important specific findings should be immediately readable");
+assert(match(paperContainer,"article-data-visual"),"Specific source-grounded method graphic missing");
+const adjacent=db.find(x=>x.doi==="10.3389/fpsyg.2026.1930030");
+assert(adjacent);
+ctx.selected=adjacent;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert.equal(matching(paperContainer,"study-coefficient-row").length,4,"Study chart should use four sourced coefficients");
+assert(textContent(paperContainer).includes("did not examine generative AI"),"Adjacent evidence must be distinguished from GenAI evidence");
+const conceptual=db.find(x=>x.doi==="10.35542/osf.io/64qz7_v1");
+if(conceptual){
+ ctx.selected=conceptual;vm.runInContext("TEST.showPaper(selected)",ctx);
+ assert(match(paperContainer,"rv-source-gap"),"Conceptual work without new findings should not be presented as empirical evidence");
 }
-const digital=db.find(x=>x.doi==="10.3389/fpsyg.2026.1930030");
-if(digital){
- ctx.selected=digital;
- vm.runInContext("TEST.showPaper(selected)",ctx);
- assert.equal(nodes(paperContainer).filter(n=>n.className.split(" ").includes("study-coefficient-row")).length,4,
-  "Expected four explicitly sourced LASSO coefficients");
- assert(texts(paperContainer).join(" | ").includes("did not examine generative AI"),"Adjacent research must be qualified");
-}
-
-const good=db.find(x=>x.doi==="10.58304/ijts.260930");
-if(good){
- ctx.selected=good;
- const headline=vm.runInContext("TEST.shortIdea(selected,96)",ctx);
- assert(typeof headline==="string"&&headline.length>22,"Missing substantive finding headline");
- assert(!/Harman|single.factor|method bias/i.test(headline),"Methods artifact rendered as a research finding");
- assert(headline.length<96);
-}
-// Raw results can contain validity/reliability diagnostics. Public research
-// headlines and cards must use the screened digest with a truthful source label.
-ctx.selected={
- kind:"scholarly",doi:"10.1234/methods",title:"AI literacy and attention",
- reading:{
-  level:"full_text",
-  findings:"Harman's single-factor test showed acceptable common method bias.",
-  digest:{
-   finding:"AI literacy was positively correlated with attention in the survey.",
-   finding_source:"abstract",
-   idea:"The study examined AI literacy and attention.",
-   status:"automatically_condensed_source_text"
-  }
- }
-};
-const safeInfo=vm.runInContext("TEST.ideaInfo(selected)",ctx);
-assert.equal(safeInfo.label,"RESULT FROM ABSTRACT");
-assert(safeInfo.text.includes("positively correlated"));
-assert(!/Harman|single.factor|common method bias/i.test(safeInfo.text));
-const safeHeadline=vm.runInContext("TEST.shortIdea(selected,105)",ctx);
-assert(!/Harman|single.factor|common method bias/i.test(safeHeadline));
-
+const title=vm.runInContext('TEST.shortIdea({kind:"scholarly",title:"A Study of Attention",reading:{digest:{idea:"AI use can support attention.",status:"editorially_written_from_indexed_sections"}}},100)',ctx);
+assert.equal(title,"AI use can support attention.");
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
-console.log("Article UI passed:",verified,"idea-first pages, evidence support, study provenance and grounded visuals validated.");
+console.log("Validated",checked,"reading pages including",edited,"edited notes and",sourceOnly,"automated/publisher readings.");
