@@ -9,83 +9,87 @@ from __future__ import annotations
 import re,html
 CURATED={
  "10.3389/feduc.2026.1861548":{
-  "idea":"AI literacy may support monitoring without preventing dependence on AI outputs.",
-  "approach":"The authors surveyed academic learners online and used cluster analysis to identify patterns of AI use and cognitive engagement.",
-  "finding":"Three learner profiles emerged: engaged and literate, uncritical and reliant, and skeptical but minimally engaged. Critical-ethical awareness was associated with both checking outputs and cognitive shortcuts.",
-  "interpretation":"The authors describe a possible illusion of independence: feeling autonomous while depending on AI without sufficiently checking its outputs.",
-  "limitation":"The design uses self-reports collected at one point in time; it cannot establish the direction of the relationships.",
+  "idea":"Knowing more about AI does not always mean relying on it less.",
+  "explain":"AI literacy went hand in hand with closer checking of outputs, but also with taking cognitive shortcuts.",
+  "approach":"An online survey of 848 academic learners, analyzed using regression and learner profiles.",
+  "finding":"Three patterns emerged: engaged and literate, uncritical and reliant, and skeptical but minimally engaged.",
+  "interpretation":"Feeling independent can coexist with trusting AI too easily. What matters is whether people keep evaluating its answers.",
+  "limitation":"Self-reported behavior at one point in time cannot establish cause and effect.",
   "tags":["AI literacy","Output monitoring","Cognitive reliance"]
  },
  "10.21203/rs.3.rs-10373880/v1":{
-  "idea":"Cognitive offloading is shaped by the learning environment, not simply AI adoption.",
-  "approach":"A conceptual and critical analysis of AI-mediated higher education, especially low-resource settings; not an empirical intervention study.",
+  "idea":"Whether AI replaces thinking depends partly on how learning is organized.",
+  "explain":"Teaching practices and institutional resources shape whether AI becomes a shortcut or a useful scaffold.",
+  "approach":"A conceptual critique of AI-mediated higher education, particularly in low-resource settings.",
   "finding":"",
-  "interpretation":"The authors argue that offloading depends on how cognitive practices, teaching arrangements and institutional conditions interact.",
-  "limitation":"",
+  "interpretation":"Attention to the learning environment matters as much as individual tool use.",
+  "limitation":"This is an argument, not an empirical test of a learning intervention.",
   "tags":["Cognitive offloading","Pedagogy","Institutional context"]
  },
  "10.3389/fpsyg.2026.1920947":{
-  "idea":"Doctoral students' use of AI can involve both offloading work and rebuilding their understanding.",
-  "approach":"A qualitative grounded-theory study examining the process of GenAI-mediated doctoral learning.",
-  "finding":"The authors' analysis organized the empirical material into five main categories derived from 19 initial categories.",
-  "interpretation":"The proposed framework treats AI-mediated offloading and metacognitive calibration as a process rather than a fixed consequence of tool use.",
-  "limitation":"The study concerns doctoral learners in Chinese research universities; findings may not generalize to other institutional settings.",
+  "idea":"AI can make research easier to start without doing the deeper thinking for you.",
+  "explain":"Doctoral learning involves moving from AI-generated starting points toward checking and rebuilding ideas.",
+  "approach":"A grounded-theory study of AI-assisted doctoral research learning.",
+  "finding":"The analysis organized 19 initial categories into five broader stages of AI-assisted learning.",
+  "interpretation":"The key distinction is whether researchers still verify, reconstruct, and take responsibility for their arguments.",
+  "limitation":"The study focuses on doctoral students at Chinese research universities; transfer to other settings is uncertain.",
   "tags":["Cognitive offloading","Metacognition","Doctoral learning"]
  },
  "10.3389/fpsyg.2026.1878629":{
-  "idea":"The way people delegate tasks to AI matters more than treating all offloading as one behavior.",
-  "approach":"A three-wave time-lagged survey compared dependent and autonomous AI offloading. Measures of cognitive functioning were self-reported.",
-  "finding":"Dependent offloading was associated with ceding more cognitive authority and lower intrinsic motivation. Autonomous offloading was associated with a different pattern of agency and motivation.",
-  "interpretation":"The authors argue that offloading can follow distinct pathways depending on how much cognitive agency users retain.",
-  "limitation":"Time separation does not demonstrate causality. Cognitive functioning was measured by perceived capability, not performance-based tests.",
+  "idea":"Delegating work to AI is not the same as giving up control of your thinking.",
+  "explain":"Using AI as a scaffold and depending on it to do the thinking showed different links to motivation and agency.",
+  "approach":"A three-wave survey of 589 students and early-career knowledge workers.",
+  "finding":"Dependent offloading was linked to lower intrinsic motivation; autonomous offloading showed more favorable associations.",
+  "interpretation":"Two approaches can feel equally helpful right away, even when their longer-term self-reported outcomes differ.",
+  "limitation":"The outcomes were self-reported perceptions, not measured gains or losses in cognitive ability. Causation is not established.",
   "tags":["Dependent offloading","Autonomous offloading","Perceived capability"]
  },
  "10.3390/jintelligence14080182":{
-  "idea":"AI-assisted work can raise questions about whether the result still feels like one's own.",
-  "approach":"A cross-sectional survey of 239 preservice teachers in eastern China, recruited by convenience sampling.",
-  "finding":"The reported model associated AI anxiety and impulsivity with GenAI dependency, and dependency with greater concern about losing ownership of teaching-design work.",
-  "interpretation":"The authors propose that cognitive ownership matters when people delegate the design of educational materials.",
-  "limitation":"Cross-sectional associations cannot establish the temporal order of dependency and ownership concern; the study was not an intervention.",
+  "idea":"AI-assisted work can leave people wondering whether the work is still their own.",
+  "explain":"Greater dependency on AI was linked to stronger concerns about ownership of teaching materials.",
+  "approach":"A survey of 239 preservice teachers in eastern China.",
+  "finding":"AI anxiety and impulsivity were associated with dependency; dependency was linked to concern about losing ownership of teaching-design work.",
+  "interpretation":"The concern is not only about productivity, but about who retains responsibility for the ideas.",
+  "limitation":"A cross-sectional convenience sample cannot show which factor came first.",
   "tags":["239 preservice teachers","Ownership concern","Cross-sectional"]
  },
  "10.3390/bs16071150":{
-  "idea":"AI assistance can be understood through competing patterns of learner agency.",
-  "approach":"A scoping review charted research concerning GenAI, learner agency and cognitive offloading in higher education.",
-  "finding":"The review's final evidence base comprised 123 included studies. It identifies agency-supportive and agency-eroding patterns in the literature.",
-  "interpretation":"The authors argue that a simple benefits-versus-risks account obscures differences in learning practices and conditions.",
-  "limitation":"The review restricted its included literature by language, outlet type and publication window; its synthesis cannot establish causal effects.",
+  "idea":"AI can support learner independence or weaken it, depending on how it is used.",
+  "explain":"Across the literature, guided, reflective use looks different from uncritical reliance.",
+  "approach":"A scoping review of 123 studies on AI, cognitive offloading, and agency in higher education.",
+  "finding":"The review identified both agency-supportive and agency-eroding patterns in the existing literature.",
+  "interpretation":"The synthesis suggests focusing on learning practices, rather than treating AI as simply good or bad.",
+  "limitation":"The evidence varies widely and cannot be combined into a single causal effect. The search excluded some languages and publication types.",
   "tags":["123 included studies","Scoping review","Learner agency"]
  },
  "10.2196/69533":{
-  "idea":"Digital well-being tools must consider people's decision-making, not just screen-time control.",
-  "approach":"A systematic research synthesis and conceptual model addressing human-centered AI for digital well-being.",
-  "finding":"The review covers 240 publications between 2008 and 2024; the authors report 2 relevant publications in 2008 versus 43 in 2024.",
-  "interpretation":"The authors propose a human-centered AI model of how system features relate to individual behavioral decisions and digital well-being.",
-  "limitation":"The study's database and selection scope bounds its coverage; changing publication counts are not proof that a particular intervention works.",
+  "idea":"Better digital well-being tools must help with decisions, not just screen time.",
+  "explain":"A human-centered approach asks how people respond to prompts, habits, and digital environments.",
+  "approach":"A systematic synthesis of 240 publications on intelligent computing and digital well-being.",
+  "finding":"The included literature grew from two publications in 2008 to 43 in 2024.",
+  "interpretation":"A proposed design framework links system features, personal decisions, and well-being.",
+  "limitation":"Publication growth does not show that a particular digital well-being intervention works.",
   "tags":["240 publications","Digital well-being","Human-centered AI"]
- }
-}
-
-# Editorial readings are written from the source's indexed abstract and sections.
-# They are not claims of independent peer review or original figure reproduction.
-CURATED.update({
+ },
  "10.58304/ijts.260930":{
-  "idea":"AI literacy was associated with critical thinking partly through how students used AI to solve language-learning problems. The study does not show that AI use by itself improves thinking.",
-  "approach":"An explanatory sequential study of EFL learning: questionnaires from 450 non-English-major undergraduates across five universities in northern China, followed by interviews with 20 selected participants.",
-  "finding":"AI literacy was positively associated with AI-assisted problem-solving, and the reported statistical model linked AI literacy indirectly to critical thinking through problem-solving and AI reliance. Interviews described different patterns of cognitive control during AI use.",
-  "interpretation":"The authors emphasize critical engagement with AI output rather than simply accepting machine-generated answers. Reliance and critical thinking were positively correlated in this sample, not necessarily opposites.",
-  "limitation":"Survey relationships and interview accounts cannot show that AI literacy caused better critical thinking. The convenience sample is drawn from one EFL-learning context.",
+  "idea":"AI literacy may matter most when students use it to solve problems, not just find answers.",
+  "explain":"Better AI literacy was associated with critical thinking through AI-assisted problem-solving and reliance.",
+  "approach":"A survey of 450 non-English-major undergraduates in northern China, followed by 20 interviews.",
+  "finding":"AI literacy was positively linked to AI-assisted problem-solving. The model also found indirect associations with critical thinking.",
+  "interpretation":"Active evaluation of AI responses may be more important than simply limiting reliance on the tool.",
+  "limitation":"Survey associations and interviews do not prove that AI literacy improves critical thinking.",
   "tags":["450 survey respondents","20 interviews","AI literacy"]
  },
  "10.3389/fpsyg.2026.1930030":{
-  "idea":"In an adolescent survey analysis, stress and time spent on social media were prominent predictors of reported academic difficulties. This concerns digital distraction, not generative AI specifically.",
-  "approach":"The authors combined two cross-sectional survey datasets comprising 799 adolescents and applied LASSO regression, network analysis, XGBoost, and latent profile analysis.",
-  "finding":"In the reported LASSO analysis, stress level (0.384) and social-media duration (0.297) had larger positive coefficients than notification count (0.213) and app openings (0.186). These are associations in a prediction model.",
-  "interpretation":"The study considers interruptions and stress as potentially useful signals when investigating attention-related academic problems. It cannot establish the mechanism or direction of those relationships.",
-  "limitation":"Cross-sectional, self-reported data cannot show whether digital use preceded academic difficulties or the reverse. Prediction-model variables are not causal effect estimates.",
+  "idea":"Stress and social-media time stood out as signals of academic difficulty.",
+  "explain":"Digital interruptions may matter for attention, but this study did not examine generative AI.",
+  "approach":"Two cross-sectional survey datasets covering 799 adolescents, analyzed using predictive models.",
+  "finding":"Stress (0.384) and social-media duration (0.297) had the largest positive LASSO coefficients among the factors reported.",
+  "interpretation":"Stress and digital habits may help identify adolescents at risk of academic difficulties.",
+  "limitation":"The surveys were self-reported and cross-sectional. Prediction is not proof of causation.",
   "tags":["799 adolescents","Digital distraction","Predictive analysis"]
  }
-})
+}
 
 HEAD=re.compile(r"(?:^|\s)(?:\d+(?:\.\d+)*\.?\s+)*(?:results?|discussion|methods?|materials and methods|conclusions?|limitations(?: and future research)?|introduction|abstract)\s*(?=(?:\d|[A-Z]))",re.I)
 SEC=re.compile(r"^\s*(?:\d+(?:\.\d+)*\.?\s+){1,3}(?=[A-Za-z])")
