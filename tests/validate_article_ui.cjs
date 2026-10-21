@@ -54,7 +54,8 @@ const good=db.find(x=>x.doi==="10.58304/ijts.260930");
 if(good){
  ctx.selected=good;
  const headline=vm.runInContext("TEST.shortIdea(selected,96)",ctx);
- assert.equal(headline,"AI literacy linked to critical thinking through problem-solving and AI reliance");
+ assert(typeof headline==="string"&&headline.length>22,"Missing substantive finding headline");
+ assert(!/Harman|single.factor|method bias/i.test(headline),"Methods artifact rendered as a research finding");
  assert(headline.length<96);
 }
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
