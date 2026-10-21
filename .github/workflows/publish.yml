@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - 'index.html'
+      - 'subscribe.html'
       - 'app.js'
       - 'lab-play.js'
       - 'lab-play.css'
@@ -76,11 +77,12 @@ jobs:
           test -s feed.xml
           test -s issue-feed.xml
           test -s newsletter.html
+          test -s subscribe.html
           test -s data/public-issue.json
       - name: Prepare static website
         run: |
           mkdir -p _site
-          cp index.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
+          cp index.html subscribe.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
           mkdir -p _site/issues
           cp -R issues/. _site/issues/
           mkdir -p _site/data
