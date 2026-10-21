@@ -56,13 +56,19 @@ class CondensedReadingTests(unittest.TestCase):
   self.assertNotIn("Harman",literacy["finding"])
   self.assertNotIn("single-factor",literacy["finding"])
   self.assertIn("AI",literacy["finding"])
-  self.assertIn(literacy["finding_source"],{"full_text","abstract"})
+  self.assertEqual(literacy["finding_source"],"editorial")
+  self.assertIn("450",literacy["approach"])
+  self.assertIn("20",literacy["approach"])
   # The full-text extract covers instrument reliability; the source abstract
   # explicitly reports the appraisal paths.
   workers=annotate(records["10.3389/fpsyg.2026.1960382"])["reading"]["digest"]
   self.assertEqual(workers["finding_source"],"abstract")
   self.assertIn("algorithmic management",workers["finding"].lower())
   self.assertNotIn("Cronbach",workers["finding"])
+  adjacent=annotate(records["10.3389/fpsyg.2026.1930030"])["reading"]["digest"]
+  self.assertEqual(adjacent["finding_source"],"editorial")
+  self.assertIn("cross-sectional",adjacent["limitation"].lower())
+  self.assertIn("not generative AI",adjacent["idea"])
   # When both the source extract and the truncated abstract lack a result,
   # the site must not relabel CFA diagnostics as empirical findings.
   truncated=annotate(records["10.3389/fpsyg.2026.1939286"])["reading"]["digest"]
