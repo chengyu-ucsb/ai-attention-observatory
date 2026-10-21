@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#a52c3e">
+<title>Subscribe · The Attention Edit</title>
+<meta name="description" content="Subscribe by RSS to The Attention Edit, a weekly synthesis from the AI & Attention Observatory.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="The Attention Edit weekly editorial" href="issue-feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f9f5f3;color:#372b31;font:400 15px/1.65 'DM Sans',Arial,sans-serif}
+a{color:#a52c3e}a:hover{text-decoration-thickness:2px}button{font:inherit;cursor:pointer}
+.shell{width:min(930px,calc(100% - 42px));margin:auto}
+header{background:white;border-bottom:1px solid #e8d9d4;padding:17px 0}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.wordmark{font-size:12px;font-weight:800;letter-spacing:1px;text-decoration:none;color:#403338}
+.back{font-size:12px;font-weight:700;text-decoration:none}
+main{padding:74px 0 90px}
+.kicker{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#a52c3e}
+h1,h2{font-family:'Newsreader',Georgia,serif;font-weight:500}
+h1{font-size:clamp(45px,7vw,77px);line-height:1.05;letter-spacing:-1.8px;max-width:780px;margin:16px 0 23px}
+.intro{font-size:17px;max-width:650px;color:#76676b}
+.subscribe-panel{background:#fff;border:1px solid #e9d9d6;padding:31px 34px;margin-top:38px;box-shadow:0 10px 32px #6c3d4510}
+.subscribe-panel h2{font-size:29px;margin:0 0 11px}
+.subscribe-panel p{color:#75676b;font-size:14px;margin:7px 0 22px}
+.feed-row{display:flex;gap:10px;align-items:stretch}
+.feed-row input{background:#faf6f4;color:#403338;font:600 12px/1.5 'DM Sans',sans-serif;border:1px solid #e5d8d4;border-radius:0;padding:14px 13px;flex:1;min-width:0}
+.feed-row button{background:#a52c3e;color:#fff;padding:12px 22px;border:0;font-size:12px;font-weight:800}
+.feed-row button:hover{background:#862739}
+.actions{display:flex;gap:23px;flex-wrap:wrap;margin-top:19px}
+.actions a{font-size:12px;font-weight:700}
+#copy-state{font-size:12px;color:#8b3549;min-height:18px;margin:8px 0 0}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px}
+.note{padding:24px;border:1px solid #e9d8d5;background:#fff}
+.note h2{font-size:23px;margin:0 0 7px}
+.note p{font-size:13px;color:#796a70;margin:0}
+.note strong{color:#9f394e}
+footer{border-top:1px solid #e5d7d3;padding:24px 0 42px;font-size:12px;color:#87777b}
+footer a{color:#9f3449}
+@media(max-width:680px){main{padding:45px 0 65px}.subscribe-panel{padding:24px 20px}.feed-row{display:block}.feed-row input{width:100%}.feed-row button{width:100%;margin-top:8px}.notes{grid-template-columns:1fr}.intro{font-size:15px}}
+</style>
+</head>
+<body>
+<header><div class="shell header-inner"><a class="wordmark" href="./">ATTENTION / AI</a><a class="back" href="./#issue">← The Weekly Edit</a></div></header>
+<main class="shell">
+<p class="kicker">THE ATTENTION EDIT / RSS</p>
+<h1>One good idea a week.<br><em>Not another feed to chase.</em></h1>
+<p class="intro">Receive new approved editions of our cross-source newsletter in your favorite RSS reader. No account needed, no algorithmic recommendations, and no email address required.</p>
+<section class="subscribe-panel" aria-labelledby="rss-heading">
+<h2 id="rss-heading">Follow the weekly publication</h2>
+<p>Copy this URL into an RSS reader such as Feedly, Inoreader, NetNewsWire, or another reader you already use.</p>
+<div class="feed-row"><input type="text" id="feed-url" readonly aria-label="RSS subscription URL" value="https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml"><button type="button" id="copy-feed">Copy RSS URL</button></div>
+<p id="copy-state" role="status" aria-live="polite"></p>
+<div class="actions"><a href="issue-feed.xml" type="application/rss+xml">View the XML feed ↗</a><a href="issues/">Browse past issues ↗</a><a href="newsletter.html">Preview the current edition ↗</a></div>
+</section>
+<div class="notes">
+<article class="note"><h2>What will I get?</h2><p>One issue whenever an editorial synthesis is approved: a central argument, three cross-source themes, a productive tension, and a brief activity. RSS publishes completed editions, not every incoming research citation.</p></article>
+<article class="note"><h2>Does this send email?</h2><p><strong>Not yet.</strong> The email-style edition is a public preview. There is no mailing-list provider, signup database, or email-delivery service connected.</p></article>
+</div>
+</main>
+<footer><div class="shell">A project by <a href="https://chengyufang.org/">Chengyu Fang ↗</a> · <a href="./">Observatory homepage ↗</a></div></footer>
+<script>
+(function(){
+const button=document.getElementById('copy-feed');
+const field=document.getElementById('feed-url');
+const feedback=document.getElementById('copy-state');
+button.addEventListener('click',async function(){
+  try{
+    if(!navigator.clipboard||!navigator.clipboard.writeText)throw new Error('Clipboard unavailable');
+    await navigator.clipboard.writeText(field.value);
+    feedback.textContent='RSS URL copied. Paste it into your feed reader.';
+  }catch(err){
+    field.focus();field.select();
+    feedback.textContent='Select and copy the highlighted URL, then paste it into your RSS reader.';
+  }
+});
+})();
+</script>
+</body></html>
