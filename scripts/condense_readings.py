@@ -223,7 +223,7 @@ def annotate(record):
   return base
  curated=CURATED.get((record.get("doi") or "").lower())
  if curated and r.get("level")=="full_text":
-  digest=dict(curated);digest["status"]="editorially_written_from_indexed_sections"
+  digest=dict(curated);digest["status"]="editorially_written_from_indexed_sections";digest["finding_source"]="editorial"
  else:
   fulltext=r.get("level")=="full_text"
   results=(record.get("analysis") or {}).get("results") if fulltext else ""
