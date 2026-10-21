@@ -32,7 +32,8 @@ function shortIdea(x,limit=105){
  const keyed=(x.doi||"").toLowerCase();
  if(r.findings&&highlightByDOI[keyed])return cut(highlightByDOI[keyed],limit);
  const d=r.digest||{};
- if(d.status==="editorially_written_from_indexed_sections"&&(d.finding||d.idea))return cut(d.finding||d.idea,limit);
+ if(d.finding)return cut(d.finding,limit);
+ if(d.status==="editorially_written_from_indexed_sections"&&d.idea)return cut(d.idea,limit);
  let value=info.text;
  // Remove routine reporting formulae without changing the source's actual claim.
  value=value.replace(/^(?:the )?(?:quantitative )?(?:results?|findings?|analysis|analyses|data)\s+(?:show(?:ed)?|suggest(?:ed)?|indicat(?:ed|e)?|reveal(?:ed)?|demonstrat(?:ed|e)?|found)\s+(?:that\s+)?/i,"");
@@ -49,22 +50,24 @@ function shortIdea(x,limit=105){
 }
 
 function ideaInfo(x){
- const r=x.reading||{},notes=x.editorial_notes||{};
+ const r=x.reading||{},d=r.digest||{},notes=x.editorial_notes||{};
  let value="",label="";
  if(x.kind==="nonacademic"){
    value=notes.argument||r.overview||"";label=notes.argument?"THE AUTHOR ARGUES":"PUBLISHER SYNOPSIS";
- }else if(r.findings){
-   value=r.findings;label=depth(x)==="full_text"?"REPORTED RESULT · FULL TEXT":"ABSTRACT-REPORTED RESULT";
- }else if(r.interpretation){
-   value=r.interpretation;label="AUTHOR INTERPRETATION · NOT RESULTS";
+ }else if(d.finding){
+   value=d.finding;
+   label=d.finding_source==="abstract"?"RESULT REPORTED IN ABSTRACT":
+      d.finding_source==="full_text"?"RESULT EXTRACTED FROM FULL TEXT":"EDITORIALLY SOURCED RESULT";
+ }else if(d.interpretation){
+   value=d.interpretation;label="AUTHOR INTERPRETATION · NOT RESULTS";
  }else{
-   value=r.overview||"";label="RESEARCH IDEA · NOT A VERIFIED RESULT";
+   value=d.idea||r.overview||"";label="RESEARCH IDEA · NOT A VERIFIED RESULT";
  }
  // Preserve substantive source language; only strip section-name prefixes.
  value=String(value).replace(/^(?:abstract|results?|discussion|conclusions?)\s*[:.]\s*/i,"").trim();
  return {text:value||"No substantive source text is available.",label};
 }
-function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.findings?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
+function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.digest?.finding?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
 function route(){let raw=location.hash.slice(1)||"home";try{raw=decodeURIComponent(raw)}catch{raw="home"}let page=raw.startsWith("paper/")?"paper":raw;if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";$$(".view").forEach(v=>v.hidden=v.id!==page);$$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});if(page==="paper")showPaper(record(raw.slice(6)));if(page==="library")showLibrary();if(page==="atlas")showAtlas();window.scrollTo({top:0,behavior:"instant"})}
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
