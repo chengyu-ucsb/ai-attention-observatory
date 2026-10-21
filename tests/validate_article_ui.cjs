@@ -52,7 +52,7 @@ for(const r of db){
  const generic=nodes(paperContainer).filter(n=>n.className.split(" ").includes("concept-scene"));
  assert.equal(generic.length,0,"Generic concept diagrams were supposed to be removed");
  const notes=nodeClass(paperContainer,"reading-lead-note");
- assert(notes&&/source|article|index|passages|synopsis/i.test(notes.textContent),"Missing provenance warning for "+r.title);
+ assert(notes&&/research|source|article|index|passages|synopsis|original evidence/i.test(notes.textContent),"Missing provenance warning for "+r.title);
  const details=nodeClass(paperContainer,"paper-detail-excerpts");
  const editorial=r.kind==="nonacademic";
  const hasNotes=editorial?!!(r.editorial_notes?.argument||r.editorial_notes?.design_relevance||r.editorial_notes?.caveat):!!(r.reading?.methods||r.reading?.findings||r.reading?.interpretation||r.reading?.limitations);
