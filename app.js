@@ -30,7 +30,9 @@ function shortIdea(x,limit=105){
  const info=ideaInfo(x),r=x.reading||{};
  // A manually reviewed abstract-based headline must not override later full-text findings.
  const keyed=(x.doi||"").toLowerCase();
- if(r.level!=="full_text"&&r.findings&&highlightByDOI[keyed])return highlightByDOI[keyed];
+ if(r.findings&&highlightByDOI[keyed])return cut(highlightByDOI[keyed],limit);
+ const d=r.digest||{};
+ if(d.status==="editorially_written_from_indexed_sections"&&(d.finding||d.idea))return cut(d.finding||d.idea,limit);
  let value=info.text;
  // Remove routine reporting formulae without changing the source's actual claim.
  value=value.replace(/^(?:the )?(?:quantitative )?(?:results?|findings?|analysis|analyses|data)\s+(?:show(?:ed)?|suggest(?:ed)?|indicat(?:ed|e)?|reveal(?:ed)?|demonstrat(?:ed|e)?|found)\s+(?:that\s+)?/i,"");
