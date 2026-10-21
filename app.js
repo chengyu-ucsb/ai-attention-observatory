@@ -26,7 +26,7 @@ const highlightByDOI={
  "10.3389/fpsyg.2026.1960382":"Algorithmic management associated with challenge and threat appraisals",
  "10.1609/aies.v9i2.43193":"Parental alerts varied substantially across tested content categories"
 };
-function cleanLead(s){
+function cleanLead(s,sourceTitle=""){
  // Keep claims and qualifiers intact while avoiding paper-centred introductions.
  let x=String(s||"").replace(/\s+/g," ").trim();
  x=x.replace(/^(?:the authors|the researchers|we) (?:found|observed|reported|showed) that\s+/i,"");
@@ -36,15 +36,20 @@ function cleanLead(s){
  x=x.replace(/^(?:this study|the study|this paper|the paper) (?:examines?|investigates?|explores?|assesses?|evaluates?|analy[sz]es?|discusses?|tests?)\s+/i,"");
  x=x.replace(/^(?:the authors|the researchers)['’] (?:analysis|findings|results)\s+/i,"Results ");
  x=x.replace(/^(?:the authors|the researchers) (?:describe|discuss|review|consider|examine)\s+/i,"The source describes ");
+ // If an abstract never reaches a finding and merely introduces the paper,
+ // show its research topic rather than advertise the introduction as an insight.
+ if(sourceTitle&&/^(?:(?:this|the|our) (?:study|paper|article|research)\b|(?:the authors|the researchers)\b|we (?:found|show|argue)\b)/i.test(x)){
+  return String(sourceTitle).trim();
+ }
  return x?x[0].toUpperCase()+x.slice(1):"";
 }
 function shortIdea(x,limit=105){
  const r=x.reading||{},d=r.digest||{},key=(x.doi||"").toLowerCase();
  // Prefer an actual editorial takeaway to a long extracted Results sentence.
- if(d.status==="editorially_written_from_indexed_sections"&&d.idea)return cut(cleanLead(d.idea),limit);
+ if(d.status==="editorially_written_from_indexed_sections"&&d.idea)return cut(cleanLead(d.idea,x.title),limit);
  if(d.idea&&x.kind==="nonacademic")return cut(cleanLead(d.idea),limit);
  if(r.findings&&highlightByDOI[key])return cut(highlightByDOI[key],limit);
- return cut(cleanLead(d.finding||d.idea||r.overview||x.title),limit);
+ return cut(cleanLead(d.finding||d.idea||r.overview||x.title,x.title),limit);
 }
 function ideaInfo(x){
  const r=x.reading||{},d=r.digest||{},notes=x.editorial_notes||{};
@@ -61,7 +66,7 @@ function ideaInfo(x){
  }else{
   value=d.idea||r.overview||"";label="RESEARCH TOPIC / NOT AN ESTABLISHED FINDING";
  }
- return {text:cleanLead(value)||"No substantive source text is available.",label};
+ return {text:cleanLead(value,x.title)||"No substantive source text is available.",label};
 }
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.digest?.finding?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
@@ -368,7 +373,7 @@ function showPaper(x){
  // Lead with the idea. The detailed source title belongs in the evidence trail.
  const takeaway=(edited?d.idea||d.finding:isCommentary?d.idea||r.overview:d.finding||d.idea||r.overview)||
    "No clear research takeaway is available from this source yet.";
- const headline=cleanLead(takeaway);
+ const headline=cleanLead(takeaway,x.title);
  const summaryLabel=edited?"EDITED INSIGHT":
    isCommentary?"PERSPECTIVE / NOT A STUDY RESULT":
    d.finding?"RESULT REPORTED IN THE SOURCE":"RESEARCH QUESTION / NOT A VERIFIED RESULT";
