@@ -42,7 +42,13 @@ for(const r of db){
  const studyCards=nodes(snapshot).filter(n=>n.className.split(" ").includes("snapshot-tile"));
  assert.equal(studyCards.length,3,"Expected separate design / result / limitation notes for "+r.title);
  const source=nodeClass(paperContainer,"paper-source-title");
- assert(source&&source.tag==="h1"&&source.textContent===r.title,"Original publication should be the main page heading");
+ assert(source&&source.tag==="h3"&&source.textContent===r.title,"Original publication must remain available as evidence provenance");
+ assert(insight.tag==="h1","The idea must be the primary reading-page heading");
+ const header=nodeClass(paperContainer,"paper-reading-header");
+ assert(header&&nodes(header).includes(insight),"Readers must see the idea before the evidence");
+ assert(!nodes(header).includes(source),"Do not foreground bibliographic titles over the idea");
+ const evidence=nodeClass(paperContainer,"paper-section-title");
+ assert(evidence&&/evidence|supports|informs/i.test(evidence.textContent),"Supporting evidence must be explicitly signposted");
  const generic=nodes(paperContainer).filter(n=>n.className.split(" ").includes("concept-scene"));
  assert.equal(generic.length,0,"Generic concept diagrams were supposed to be removed");
  const notes=nodeClass(paperContainer,"reading-lead-note");
@@ -104,4 +110,4 @@ const safeHeadline=vm.runInContext("TEST.shortIdea(selected,105)",ctx);
 assert(!/Harman|single.factor|common method bias/i.test(safeHeadline));
 
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
-console.log("Article UI passed:",verified,"source-first reading pages, evidence cards, provenance labels and study-specific visuals validated.");
+console.log("Article UI passed:",verified,"idea-first pages, evidence support, study provenance and grounded visuals validated.");
