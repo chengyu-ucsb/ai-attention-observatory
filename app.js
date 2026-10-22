@@ -510,6 +510,26 @@ function additionalArtwork(x){
  }
 }
 
+function automaticEvidenceArtwork(x){
+ const spec=x.visual||{};
+ if(x.kind!=="scholarly"||!["evidence_snapshot","research_design"].includes(spec.kind))return null;
+ const blocks=Array.isArray(spec.blocks)?spec.blocks.filter(b=>b&&typeof b.label==="string"&&typeof b.text==="string"&&b.text.length<=230).slice(0,3):[];
+ if(!blocks.length)return null;
+ const figure=make("figure","article-concept-art article-data-visual automatic-evidence");
+ add(figure,make("p","eyebrow",spec.status==="edited"?"RESEARCH SNAPSHOT":"SOURCE-BASED READING"),
+    make("h3","figure-insight-title",spec.kind==="evidence_snapshot"?"What the evidence supports":"How this question was studied"));
+ const board=make("div","auto-evidence-board");
+ blocks.forEach((block,i)=>{
+  const item=make("div","auto-evidence-item");
+  add(item,make("span","auto-evidence-n",String(i+1).padStart(2,"0")),
+    make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
+  board.append(item);
+ });
+ add(figure,board,make("figcaption","concept-note",
+   "Visual summary based on the "+(spec.basis==="full_text"?"indexed full text":"available abstract")+
+   ". Not an effect-size chart, causal model, or reproduction of published figures."));
+ return figure;
+}
 function conceptArtwork(x){
  const doi=(x.doi||"").toLowerCase();
  if(doi==="10.3389/fpsyg.2026.1878629")return comparisonArtwork("Two ways of offloading to AI",[
@@ -568,7 +588,7 @@ function conceptArtwork(x){
   return w;
  }
  // Show a source-grounded explanatory graphic only for validated studies.
- return additionalArtwork(x);
+ return additionalArtwork(x)||automaticEvidenceArtwork(x);
 }
 function showPaper(x){
  const root=$("#paper-content");
