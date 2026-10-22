@@ -48,8 +48,8 @@ def run():
                                0 if r.get("oa_checked") is None else 1,r.get("oa_checked") or ""))
  for r in candidates:
   if attempted>=limit:break
-  if r.get("oa_checked") and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<7:continue
-  attempted+=1;r["oa_checked"]=today
+  if r.get("oa_checked") and r.get("oa_pass_version")==2 and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<7:continue
+  attempted+=1;r["oa_checked"]=today;r["oa_pass_version"]=2
   try:
    url="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+urllib.parse.urlencode({"query":"DOI:"+r["doi"],"format":"json","pageSize":1})
    obj=json.loads(req(url));matches=obj.get("resultList",{}).get("result",[])
