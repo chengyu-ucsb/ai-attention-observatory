@@ -9,6 +9,8 @@ on:
       - 'scripts/enrich_pmc_oai.py'
       - 'scripts/enrich_pdf_fulltext.py'
       - 'scripts/fulltext_recovery_audit.py'
+      - 'scripts/enrich_publisher_html.py'
+      - 'tests/test_publisher_html.py'
       - 'tests/test_pmc_oai.py'
       - 'tests/test_pdf_fulltext.py'
       - 'tests/test_search_plan.py'
@@ -40,6 +42,7 @@ jobs:
       PMC_OAI_XML_LIMIT: '18'
       PDF_FULLTEXT_LOOKUPS: '22'
       PDF_FULLTEXT_DOWNLOADS: '9'
+      PUBLISHER_HTML_LIMIT: '24'
       OPENALEX_CONTENT_LIMIT: '12'
       OA_ENRICH_LIMIT: '46'
       FIGURE_VERIFY_LIMIT: '5'
@@ -62,6 +65,8 @@ jobs:
         run: python scripts/enrich_openalex_fulltext.py
       - name: Extract licensed OA PDF sections missing from XML providers
         run: python scripts/enrich_pdf_fulltext.py
+      - name: Read article sections on explicitly CC-BY publisher websites
+        run: python scripts/enrich_publisher_html.py
       - name: Report actual full-text recovery and provider failures
         run: python scripts/fulltext_recovery_audit.py
       - name: Rebuild reading notes and public projection
