@@ -628,7 +628,7 @@ function showPaper(x){
  const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
  const lead=make("div","rv-section-head");
  add(lead,make("span","rv-section-overline","01 / UNDER THE HOOD"),
-  make("h2","rv-section-title",scholarly?"What the evidence actually says":"The argument in context"));
+  make("h2","rv-section-title",conceptual?"What the paper proposes":scholarly?"What the evidence actually says":"The argument in context"));
  body.append(lead);
  if(editorial&&hasFinding&&!autoGraphic){
   const claim=make("div","rv-claim");
@@ -655,6 +655,24 @@ function showPaper(x){
   lens("Qualifications and unresolved issues",deep.qualification);
   if(deep.basis)reading.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
   body.append(reading);
+ }else if(conceptual){
+  const framework=x.framework_notes||{};
+  const claim=make("div","rv-claim");
+  add(claim,make("span","rv-mini-label","PROPOSED MODEL, NOT A TESTED EFFECT"),
+    make("p","",d.idea||framework.idea||"A theoretical proposal for staging AI use in learning."));
+  body.append(claim);
+  const phases=framework.stages||[];
+  if(phases.length){
+   const stages=make("div","rv-longform");
+   for(const phase of phases){
+    const cutAt=phase.indexOf(":");
+    const section=make("section","rv-longform-part");
+    add(section,make("h3","",cutAt>0?phase.slice(0,cutAt):"Stage"),
+      make("p","",cutAt>0?phase.slice(cutAt+1).trim():phase));
+    stages.append(section);
+   }
+   body.append(stages);
+  }
  }else if(!hasFinding){
   const claim=make("div","rv-source-gap");
   add(claim,make("span","rv-mini-label","EVIDENCE NOT YET ESTABLISHED"),
@@ -668,10 +686,10 @@ function showPaper(x){
  }
  const context=make("div","rv-context-grid");
  const method=make("section","rv-context");
- add(method,make("h3","","How it was studied"),
+ add(method,make("h3","",conceptual?"How the framework was developed":"How it was studied"),
    make("p","",scholarly?d.approach||"Method details are not clear enough in the indexed material.":d.approach||"This is a commentary or editorial account, not a controlled study."));
  const caveat=make("section","rv-context");
- add(caveat,make("h3","","What remains uncertain"),
+ add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),
    make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
  add(context,method,caveat);
  if(scholarly&&!autoGraphic)body.append(context);
