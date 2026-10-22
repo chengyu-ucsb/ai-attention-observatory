@@ -643,16 +643,13 @@ function showPaper(x){
   }
   // Publisher metadata alone cannot justify invented counterarguments or a
   // faux methods section. Only display fields supported by source analysis.
-  lens(deep.source_depth==="publisher_synopsis"?"What the publisher says":"The central argument",deep.thesis||r.overview);
+  lens(deep.source_depth==="publisher_synopsis"?"From the publisher’s description":"The central argument",deep.thesis||r.overview);
   lens("How the argument develops",deep.reasoning);
   lens("Concrete examples and distinctions",deep.examples);
   lens("The central tension",deep.tension);
   lens("What this could mean for attention design",deep.implications);
   lens("A question to investigate",deep.open_question);
   lens("Qualifications and unresolved issues",deep.qualification);
-  if(!hasDepth&&deep.source_depth==="publisher_synopsis"){
-   reading.append(make("p","rv-source-gap","Only a brief publisher description has been indexed. There is not yet enough source text for a responsible in-depth reading."));
-  }
   if(deep.basis)reading.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
   body.append(reading);
  }else if(!hasFinding){
