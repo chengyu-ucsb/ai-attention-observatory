@@ -229,7 +229,7 @@ def run():
  if not work:
   stats["remaining_without_sections"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in records)
   stats["zenodo"]=zenodo_stats
-  LIB.write_text(json.dumps(records,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
+  LIB.write_text(json.dumps(records,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
   print(json.dumps(stats));return stats
  dois=[r["doi"].strip().lower() for r in work]
  s2_error=False
