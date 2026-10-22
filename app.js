@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const S={records:[],companions:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
-const depths=[["full_text","Full-text sections","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
+const depths=[["full_text","Full-article readings","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
@@ -11,7 +11,7 @@ function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.sli
 function id(x){return String(x.doi||x.url||x.title)}
 function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k));return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
 function depth(x){return x.reading?.level||"citation_only"}
-function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
+function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":x.analysis?.original_paraphrases_only?"Reviewed full article":"Full-text sections","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 
 function readableSourceTitle(x){
@@ -330,7 +330,7 @@ function showLibrary(){
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
- for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-text excerpts",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
+ for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-article readings",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
  topicBars("#atlas-topic-bars");
  const years={};for(let y=2023;y<=new Date().getFullYear();y++)years[String(y)]=0;
  S.records.forEach(x=>{const y=(x.published||"").slice(0,4);if(x.source_group==="AI-specific"&&Object.prototype.hasOwnProperty.call(years,y))years[y]++});
