@@ -58,7 +58,11 @@ jobs:
         run: python scripts/build_readings.py
       - name: Exclude citation-only metadata from public readings
         run: python scripts/build_public.py
-      - name: Produce RSS
+      - name: Rebuild approved editorial and newsletter feed
+        run: |
+          python scripts/build_issue.py
+          python scripts/build_newsletter.py
+      - name: Produce research RSS
         run: python scripts/feed.py
       - name: Validate data and browser code
         run: |
