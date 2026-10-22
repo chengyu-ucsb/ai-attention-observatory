@@ -1,16 +1,9 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
 import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
+from search_plan import plan,source_class
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DIR=ROOT/"data"
 TODAY=datetime.datetime.now(datetime.timezone.utc).date().isoformat()
-SEARCHES=[
-("AI & cognition","generative artificial intelligence cognitive offloading attention"),
-("AI & cognition","AI critical thinking cognitive effort"),
-("Fragmentation","AI interruptions attention fragmentation multitasking"),
-("Fragmentation","digital distraction notifications task switching"),
-("Interventions","AI attention management digital wellbeing interventions"),
-("Interventions","AI adaptive notifications focus assistant"),
-("Technology & society","artificial intelligence attention economy cognitive autonomy")]
 KEYWORDS=re.compile(r"attention|cognit|think|interrup|focus|distract|multitask|switch|well.?being|self.regulat|engag|notification|offload",re.I)
 
 AI_TOPIC=re.compile(r"\b(?:ai|genai|chatgpt|artificial intelligence|generative ai|llms?|large language model|machine learning|algorithmic)\b",re.I)
@@ -52,11 +45,12 @@ def request(url):
 def abstract(inv):
  if not isinstance(inv,dict):return ""
  return " ".join(word for _,word in sorted((p,word) for word,ps in inv.items() for p in ps if isinstance(p,int)))[:800]
-def discover(days=60):
+def discover(days=60,mode="weekly"):
  found=[];errors=[];stats={"openalex":0,"crossref":0}
- since=(datetime.date.fromisoformat(TODAY)-datetime.timedelta(days=days)).isoformat()
- for lane,q in SEARCHES:
-  params=urllib.parse.urlencode({"search":q,"filter":"from_publication_date:"+since+",to_publication_date:"+TODAY,"per_page":25,**({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})})
+ scopes=plan(datetime.date.fromisoformat(TODAY),mode)
+ stats["search_scopes"]=[{"theme":lane,"period":scope,"from":start,"to":end,"query":q} for lane,q,start,end,scope in scopes]
+ for lane,q,start,end,scope in scopes:
+  params=urllib.parse.urlencode({"search":q,"filter":"from_publication_date:"+start+",to_publication_date:"+end,"per_page":20,**({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})})
   try:
    result=request("https://api.openalex.org/works?"+params)
    for w in result.get("results",[]):
@@ -64,7 +58,7 @@ def discover(days=60):
     if not title or not KEYWORDS.search(title+" "+ab) or w.get("is_retracted"):continue
     loc=w.get("primary_location") or {};venue=(loc.get("source") or {}).get("display_name") or "OpenAlex"
     authors=[a.get("author",{}).get("display_name","") for a in w.get("authorships",[])[:8]]
-    found.append({"title":title,"authors":authors,"published":w.get("publication_date") or "","venue":venue,"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("id",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"OpenAlex abstract index" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY})
+    found.append({"title":title,"authors":authors,"published":w.get("publication_date") or "","venue":venue,"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("id",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"OpenAlex abstract index" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY,"discovery_scope":scope,"discovery_query":q})
    stats["openalex"]+=len(result.get("results",[]))
   except urllib.error.HTTPError as e:
    errors.append("OpenAlex "+lane+": HTTP "+str(e.code))
@@ -74,15 +68,15 @@ def discover(days=60):
   except Exception as e:errors.append("OpenAlex "+lane+": "+str(e)[:130])
   time.sleep(.3)
  # Crossref as complementary discovery, not full-paper content.
- for lane,q in SEARCHES[:5]:
-  args=urllib.parse.urlencode({"query.bibliographic":q,"filter":"from-pub-date:"+since+",until-pub-date:"+TODAY,"rows":15,"mailto":"fangcu@ucmail.uc.edu"})
+ for lane,q,start,end,scope in (scopes if mode=="backfill" else scopes[:6]):
+  args=urllib.parse.urlencode({"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end,"rows":12,"mailto":"fangcu@ucmail.uc.edu"})
   try:
    result=request("https://api.crossref.org/works?"+args)
    for w in result.get("message",{}).get("items",[]):
     title=(w.get("title") or [""])[0];ab=re.sub("<[^>]+>"," ",w.get("abstract") or "")
     if not title or not KEYWORDS.search(title+" "+ab):continue
     doi=w.get("DOI") or "";dp=(w.get("published",{}).get("date-parts") or [[]])[0];datev="-".join(str(z).zfill(2) if i else str(z) for i,z in enumerate(dp+[1,1]) if i<3)
-    found.append({"title":title,"authors":[" ".join(filter(None,[a.get("given"),a.get("family")])) for a in w.get("author",[])[:8]],"published":datev,"venue":(w.get("container-title") or ["Crossref"])[0],"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("URL",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"Crossref abstract" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"Crossref","curated":False,"first_seen":TODAY})
+    found.append({"title":title,"authors":[" ".join(filter(None,[a.get("given"),a.get("family")])) for a in w.get("author",[])[:8]],"published":datev,"venue":(w.get("container-title") or ["Crossref"])[0],"doi":doi,"url":"https://doi.org/"+doi if doi else w.get("URL",""),"preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.","abstract_text":ab[:3800],"abstract_source":"Crossref abstract" if ab else "","kind":"scholarly","lane":lane,"relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence","evidence":"Metadata screened (unverified)","source":"Crossref","curated":False,"first_seen":TODAY,"discovery_scope":scope,"discovery_query":q})
    stats["crossref"]+=len(result.get("message",{}).get("items",[]))
   except Exception as e:errors.append("Crossref "+lane+": "+str(e)[:130])
   time.sleep(.3)
@@ -111,18 +105,21 @@ def main():
  DIR.mkdir(exist_ok=True)
  previous=read(DIR/"library.json",[])
  records={key(x):x for x in previous if relevant(x)}
- candidates,errors,stats=discover(150 if os.environ.get("MODE")=="backfill" else 60)
+ for record in records.values():record["source_group"]=source_class(record)
+ candidates,errors,stats=discover(mode=os.environ.get("MODE","weekly"))
  new=[]
  for x in candidates:
   k=key(x)
   if not x["title"] or not x["url"] or not relevant(x):continue
   if k in records:
    current=records[k]
+   current["source_group"]=source_class(current)
    if len(x.get("abstract_text",""))>len(current.get("abstract_text","")):
     current["abstract_text"]=x["abstract_text"];current["abstract_source"]=x.get("abstract_source","");current["preview"]=x["preview"]
    elif not current.get("preview") or current["preview"].startswith("Abstract unavailable"):
     if not x.get("preview","").startswith("Abstract unavailable"):current["preview"]=x["preview"]
    continue
+  x["source_group"]=source_class(x)
   records[k]=x;new.append(x)
  collection=sorted(records.values(),key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)
  week_start=(datetime.date.fromisoformat(TODAY)-datetime.timedelta(days=6)).isoformat()
