@@ -29,12 +29,20 @@ function readableSourceTitle(x){
 }
 function artTopic(x){
  const title=String(x?.title||"").toLowerCase(),lane=String(x?.lane||"");
+ if(/notification|alerts?|hover effect|interrupt/.test(title))return "notification";
+ if(/trust|verification|reliability|credib|consent/.test(title))return "trust";
+ if(/measurement|measure|scale develop|construct definition|psychometr/.test(title))return "measurement";
+ if(/reflect|metacognit|self.regulat|deliberat|mindful/.test(title))return "reflection";
+ if(/washout|recover|reversib|skill decay|skill retention/.test(title))return "recovery";
+ if(/creativ|co.creat|writing|content generation|artwork|language model/.test(title))return "creativity";
+ if(/research process|doctoral research|scientific reasoning|knowledge production/.test(title))return "research";
+ if(/critical thinking|reasoning|judgment|judgement/.test(title))return "critical";
  if(/offload|reliance|dependenc|autonom|agency transfer/.test(title))return "offloading";
- if(/notification|distraction|switching|multitask|fragment/.test(title))return "fragmentation";
+ if(/distraction|switching|multitask|fragment/.test(title))return "fragmentation";
  if(/well.being|wellbeing|mental health|technostress|stress|resilien/.test(title))return "wellbeing";
  if(/workplace|employee|gig.work|algorithmic management|workforce|professional/.test(title))return "work";
- if(/intervention|design|interface|tools?|mitigat|protect|recovery|regulat/.test(title))return "interventions";
- if(/critical thinking|pedagog|educat|teaching|student|learning|literacy/.test(title))return "learning";
+ if(/intervention|design|interface|tools?|mitigat|protect|regulat/.test(title))return "interventions";
+ if(/pedagog|educat|teaching|student|learning|literacy/.test(title))return "learning";
  if(/platform|policy|governance|ethic|social media|recommendation|trust economy/.test(title))return "society";
  if(lane==="Fragmentation")return "fragmentation";
  if(lane==="Interventions")return "interventions";
