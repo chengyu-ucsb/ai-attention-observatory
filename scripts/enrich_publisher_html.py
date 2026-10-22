@@ -6,6 +6,8 @@ section passages into the private evidence index. Sites that deny access are
 left unresolved; do not retry aggressively.
 """
 from __future__ import annotations
+from enrich_wiley_html import run as inspect_wiley_html
+from verified_full_article_notes import run as apply_verified_readings
 import datetime as dt
 from html.parser import HTMLParser
 import json
@@ -142,7 +144,12 @@ def run():
    mark(record,"temporary_error",3,date);stats["temporary_errors"]+=1
   time.sleep(.7)
  LIB.write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
- stats["still_without_fulltext"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in records)
+ # The public Wiley site can be READ independently of the reuse terms.
+ # Only verified original paraphrases become public research readings.
+ stats["wiley_html"]=inspect_wiley_html(path=LIB)
+ stats["publisher_source_checked_notes"]=apply_verified_readings(path=LIB)
+ updated=json.loads(LIB.read_text(encoding="utf-8"))
+ stats["still_without_fulltext"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in updated)
  print(json.dumps(stats))
  return stats
 if __name__=="__main__":run()
