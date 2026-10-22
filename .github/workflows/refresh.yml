@@ -1,5 +1,12 @@
 name: Update research library
 on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/update.py'
+      - 'scripts/search_plan.py'
+      - 'scripts/seed_historical.py'
+      - '.github/workflows/refresh.yml'
   # New-source discovery happens weekly or when manually requested.
   # Source editing must not start a costly external search.
   schedule:
@@ -24,7 +31,7 @@ jobs:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OA_ENRICH_LIMIT: 55
       # Backfills make a deeper pass; normal weeks keep the API budget controlled.
-      MODE: ${{ inputs.mode || 'weekly' }}
+      MODE: ${{ inputs.mode || (github.event_name == 'push' && 'backfill') || 'weekly' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -35,6 +42,8 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           MODE: ${{ inputs.mode || 'weekly' }}
         run: python scripts/update.py
+      - name: Verify key earlier research by DOI
+        run: python scripts/seed_historical.py
       - name: Discover reporting, commentary and practitioner writing
         run: python scripts/discover_editorial.py
       - name: Seed selected public essays and design arguments

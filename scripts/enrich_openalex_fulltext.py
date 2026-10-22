@@ -46,7 +46,7 @@ def extract(root):
   if not key or key in sections:continue
   parts=[content(el) for el in div.iter() if local(el.tag)=="p"]
   value=" ".join(x for x in parts if len(x)>40)
-  if value:sections[key]=value[:1100].rsplit(" ",1)[0]+"…" if len(value)>1100 else value
+  if value:sections[key]=value[:4500].rsplit(" ",1)[0] if len(value)>4500 else value
  return sections
 def get(url,key):
  u=url+("&" if "?" in url else "?")+urllib.parse.urlencode({"api_key":key})
@@ -72,11 +72,17 @@ def pause_time(error):
  return iso(target)
 def priority(r):
  title=r.get("title") or ""
- return (-int(bool(FOCUS.search(title))),-int(r.get("relation")!="Adjacent digital-attention evidence"),-int(bool(r.get("open_access_url"))),
+ return (int(bool(r.get("analysis"))),-int(bool(FOCUS.search(title))),-int(r.get("relation")!="Adjacent digital-attention evidence"),-int(bool(r.get("open_access_url"))),
          r.get("fulltext_attempt",{}).get("attempts",0),r.get("published") or "")
 def eligible(r,t):
- if r.get("kind")!="scholarly" or not r.get("doi") or r.get("analysis"):return False
- return parse((r.get("fulltext_attempt") or {}).get("next_at"))<=t
+ if r.get("kind")!="scholarly" or not r.get("doi"):return False
+ existing=r.get("analysis") or {}
+ if existing:
+  return "OpenAlex" in str(existing.get("provenance","")) and not existing.get("reprocess_checked") and existing.get("extraction_version",0)<2
+ attempt=r.get("fulltext_attempt") or {}
+ # Make one targeted pass after changes in retrieval logic; then honor backoff.
+ if attempt.get("pipeline_version")!=2:return True
+ return parse(attempt.get("next_at"))<=t
 def summarize(records,info):
  t=now()
  scholarly=[r for r in records if r.get("kind")=="scholarly"]
@@ -95,7 +101,7 @@ def run():
  records=read_json(LIB,[])
  state=read_json(STATE,{})
  key=os.getenv("OPENALEX_API_KEY","").strip()
- info={"attempted":0,"extracted_this_run":0,"quota_pause_until":state.get("quota_pause_until"),"status":"idle"}
+ info={"attempted":0,"extracted_this_run":0,"refreshed_sections":0,"quota_pause_until":state.get("quota_pause_until"),"status":"idle"}
  if not key:
   info["status"]="missing_api_key"
  elif parse(state.get("quota_pause_until"))>now():
@@ -110,9 +116,12 @@ def run():
   for r in candidates[:max_attempts]:
    if content_calls>=content_limit:break
    info["attempted"]+=1
+   was_read=bool(r.get("analysis"))
+   if was_read:r["analysis"]["reprocess_checked"]=now().date().isoformat()
    entry=r.get("fulltext_attempt") or {}
    entry["attempts"]=entry.get("attempts",0)+1
    entry["last_at"]=iso(now())
+   entry["pipeline_version"]=2
    r["fulltext_attempt"]=entry
    doi=urllib.parse.quote("https://doi.org/"+r["doi"],safe=":")
    try:
@@ -125,11 +134,11 @@ def run():
     href=preferred.get("landing_page_url") or preferred.get("pdf_url")
     if href and href.startswith("https://"):r["open_access_url"]=href
     if not loc:
-     entry.update(status="waiting_for_license",next_at=next_retry(30))
+     entry.update(status="waiting_for_license",next_at=next_retry(14))
      continue
     url=(work.get("content_urls") or {}).get("grobid_xml") or ""
     if not url.startswith("https://content.openalex.org/works/"):
-     entry.update(status="waiting_for_machine_text",next_at=next_retry(14))
+     entry.update(status="waiting_for_machine_text",next_at=next_retry(7))
      continue
     content_calls+=1
     xml,_=get(url,key)
@@ -147,10 +156,12 @@ def run():
       "discussion":secs.get("discussion",""),"limitations":secs.get("limitations",""),
       "figures":[],"fulltext_url":lic_url,
       "key_idea":(secs.get("results") or secs.get("discussion") or "")[:280],
-      "extraction_date":now().date().isoformat()}
+      "extraction_date":now().date().isoformat(),
+      "extraction_version":2,"sections_available":list(secs.keys())}
     r["oa_grobid_checked"]=now().date().isoformat()
     entry.update(status="full_text",next_at=None)
-    info["extracted_this_run"]+=1
+    if was_read:info["refreshed_sections"]+=1
+    else:info["extracted_this_run"]+=1
    except urllib.error.HTTPError as exc:
     if exc.code==429:
      until=pause_time(exc)

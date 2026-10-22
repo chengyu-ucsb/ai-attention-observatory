@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 from condense_readings import annotate
 from build_visuals import visual_spec
+from search_plan import source_class
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
@@ -32,6 +33,7 @@ def build():
     for source in all_records:
         if not readable(source):continue
         published=annotate(source)
+        published["source_group"]=source_class(source)
         published["visual"]=visual_spec(published)
         selected.append(published)
     selection_ids={record_id(x) for x in selected}
@@ -44,6 +46,8 @@ def build():
     run["reading_eligible_count"]=len(selected)
     run["full_text_count"]=sum(x.get("reading",{}).get("level")=="full_text" for x in selected)
     run["abstract_count"]=sum(x.get("reading",{}).get("level")=="abstract" for x in selected)
+    run["ai_specific_count"]=sum(x["source_group"]=="AI-specific" for x in selected)
+    run["historical_foundations_count"]=sum(x["source_group"].startswith(("Earlier","Historical")) for x in selected)
     # Never use unverified records in visitor-facing counts.
     run.pop("candidates",None)
     run["last_seven_days"]=len(items)

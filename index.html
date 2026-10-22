@@ -197,6 +197,7 @@
       <div class="shell library-section">
         <div class="library-controls">
           <label class="search-wrap"><span class="search-glyph">⌕</span><input id="search" type="search" autocomplete="off" placeholder="Search research topics, methods, or findings…" aria-label="Search research"></label>
+          <select id="scope-filter" aria-label="Choose evidence scope"><option value="core" selected>AI-specific research</option><option value="adjacent">Adjacent digital-attention research</option><option value="historical">Earlier foundations</option><option value="all">All sources</option></select>
           <select id="topic-filter" aria-label="Choose a research theme"><option value="">All themes</option><option>AI & cognition</option><option>Fragmentation</option><option>Interventions</option><option>Technology & society</option></select>
           <select id="depth-filter" aria-label="Choose research material depth"><option value="readable">Source-backed readings</option><option value="full_text">Full-text excerpt available</option></select>
           <select id="type-filter" aria-label="Choose source type"><option value="">All source types</option><option value="scholarly">Academic research</option><option value="nonacademic">Commentary & technology</option></select>
@@ -212,7 +213,7 @@
         <div class="atlas-stat-row" id="atlas-stats"></div>
         <div class="atlas-grid">
           <div class="visual-panel atlas-topic"><div class="panel-header"><h3>Research themes</h3><span class="tiny-label">BASED ON INDEX TAGS</span></div><div id="atlas-topic-bars"></div></div>
-          <div class="visual-panel atlas-years"><div class="panel-header"><h3>Publication timeline</h3><span class="tiny-label">INDEXED ITEMS BY YEAR</span></div><div id="year-chart"></div><p class="chart-note">Counts reflect collection coverage and discovery history, not the growth rate of the field.</p></div>
+          <div class="visual-panel atlas-years"><div class="panel-header"><h3>AI-specific research by year</h3><span class="tiny-label">POST-2022 INDEX · NOT FIELD TOTALS</span></div><div id="year-chart"></div><p class="chart-note" id="year-context">AI-specific studies published from 2023 onward. Earlier interruption and digital-attention work remains accessible under Earlier foundations.</p></div>
           <div class="visual-panel atlas-coverage"><div class="panel-header"><h3>What the index contains</h3><span class="tiny-label">READING DEPTH</span></div><div id="atlas-depth"></div></div>
           <div class="visual-panel atlas-matrix"><div class="panel-header"><h3>Theme × accessible evidence</h3><span class="tiny-label">RECORD COUNTS</span></div><div class="table-scroll"><table id="matrix-table" class="matrix-table"></table></div></div>
         </div>

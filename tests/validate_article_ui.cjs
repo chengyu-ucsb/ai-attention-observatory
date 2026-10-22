@@ -19,7 +19,7 @@ class Element{
 }
 const paperContainer=new Element("div");
 const libraryContainer=new Element("div"),libraryCount=new Element("div");
-const inputs={"#search":{value:""},"#topic-filter":{value:""},"#depth-filter":{value:"readable"},"#type-filter":{value:""}};
+const inputs={"#search":{value:""},"#scope-filter":{value:"all"},"#topic-filter":{value:""},"#depth-filter":{value:"readable"},"#type-filter":{value:""}};
 const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-content"?paperContainer:q==="#library-results"?libraryContainer:q==="#library-count"?libraryCount:inputs[q]||null};
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unable to load application functions");
@@ -64,6 +64,18 @@ for(const r of db){
  checked++;
 }
 assert(edited>=20,"Expected source-grounded editorial coverage to expand");
+assert(db.every(x=>["AI-specific","Adjacent digital-attention evidence","Earlier digital-attention foundation","Historical AI context"].includes(x.source_group)),"Source classification missing");
+const earlier=db.filter(x=>Number((x.published||"").slice(0,4))<2023);
+assert(earlier.every(x=>x.source_group.startsWith("Earlier")||x.source_group.startsWith("Historical")),
+ "Earlier digital attention work must not be classified as recent GenAI research");
+assert(html.includes('id="scope-filter"')&&html.includes('id="year-context"'),"Research scope controls and explanation missing");
+assert(app.includes('x.source_group==="AI-specific"'),"AI-specific publication chart must not mix foundational sources");
+inputs["#scope-filter"].value="core";
+vm.runInContext("TEST.showLibrary()",ctx);
+const core=db.filter(x=>x.source_group==="AI-specific").length;
+assert.equal(matching(libraryContainer,"library-story").length,core,"AI-specific library filter must exclude historical and adjacent sources");
+inputs["#scope-filter"].value="all";
+
 assert(db.every(r=>r.visual&&typeof r.visual.kind==="string"),"Future ingestion visual metadata must cover all public records");
 for(const name of ["focus","offloading","fragmentation","learning","interventions","work","society","wellbeing","trust","critical","reflection","notification","measurement","recovery","research","creativity"]){
  const svg=read("assets/reading-"+name+".svg");

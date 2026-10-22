@@ -29,8 +29,16 @@ This policy is stored in the repository so future assistants working on it can s
 ## Weekly editorial and visualization standards (October 2026)
 
 - Treat the week's source-backed set as a corpus, not a list of blurbs. Lead the site and the newsletter with a concise cross-source thesis, a few carefully grounded themes, tensions and open questions. Every issue needs a complete linked source shelf so nothing is silently omitted.
-- Never manufacture cross-paper consensus or claim source completeness from a search result count. Editorially reviewed issue text lives in `data/issue-editorial.json`; if there is no reviewed issue for a new date, show the editorial-review state instead of an invented synthesis.
+- Never manufacture cross-paper consensus or claim source completeness from a search result count. Editorially reviewed issue text lives in `data/issue-editorial.json`. If a new collection week is awaiting review, keep that workflow state backstage and continue displaying the latest published issue.
 - Newsletter HTML is a public preview until an email provider and opt-in/unsubscribe workflow have actually been connected. Never claim readers are subscribed or that mail was sent from the static website.
 - Raw machine-extracted article sections are provenance-labelled references, not finished summaries. Clean section numbers, table artifacts and citation noise, present compact digest notes up front, and keep long verbatim extracts behind an optional disclosure.
 - Prefer original, meaningful charts and diagrams to decorative filler. Show source figures/images only if reuse is permitted and the actual hosted image URL has been verified. Distinguish verified empirical charts, source figures, and illustrative concept graphics. Never reconstruct an effect size, prevalence or figure from a caption alone.
 - Always inspect publication workflow logs after changes and keep automated tests for editorial citations, article views, extract cleanup and figure provenance.
+
+## Source discovery scope and long-form processing
+
+- Maintain a reproducible four-theme discovery plan with a **2023+ generative-AI core** and separately labeled adjacent digital-attention and earlier foundation records. The 2008 interruptions paper is historical evidence about interruptions, never AI-specific evidence. Keep early foundations accessible, but exclude them from AI-specific year charts.
+- Don't confuse the number of indexed items with publication trends or comprehensive literature coverage. Historical backfill must be distinguishable from genuinely newly published material and must not distort the weekly issue.
+- Use DOI and source metadata to check early anchor literature, but never invent an abstract or full-text interpretation when only metadata is available. Bibliographic-only records stay out of the public collection.
+- Full-text processing should try Europe PMC and licensed machine-readable OpenAlex articles, retain substantial Methods, Results, Discussion, and Limitations sections when lawfully accessible, and track the extraction version/depth. Keep Results and author interpretation distinct. Never silently treat an OA link, a short diagnostic excerpt, or an abstract as a complete paper analysis.
+- After editing a discovery or full-text workflow, inspect the real scheduled/push-triggered run, quota/pause information, resulting year mix, and changes in full-text coverage. Report measured gains, not projected ones.
