@@ -8,6 +8,7 @@ on:
       - 'scripts/enrich.py'
       - 'scripts/enrich_pmc_oai.py'
       - 'scripts/enrich_pdf_fulltext.py'
+      - 'scripts/fulltext_recovery_audit.py'
       - 'scripts/enrich_openalex_fulltext.py'
       - 'scripts/build_readings.py'
       - 'scripts/seed_historical.py'
@@ -58,6 +59,8 @@ jobs:
         run: python scripts/enrich_openalex_fulltext.py
       - name: Extract licensed OA PDF sections missing from XML providers
         run: python scripts/enrich_pdf_fulltext.py
+      - name: Report actual full-text recovery and provider failures
+        run: python scripts/fulltext_recovery_audit.py
       - name: Rebuild reading notes and public projection
         run: |
           python scripts/build_readings.py
