@@ -72,10 +72,13 @@ def pause_time(error):
  return iso(target)
 def priority(r):
  title=r.get("title") or ""
- return (-int(bool(FOCUS.search(title))),-int(r.get("relation")!="Adjacent digital-attention evidence"),-int(bool(r.get("open_access_url"))),
+ return (int(bool(r.get("analysis"))),-int(bool(FOCUS.search(title))),-int(r.get("relation")!="Adjacent digital-attention evidence"),-int(bool(r.get("open_access_url"))),
          r.get("fulltext_attempt",{}).get("attempts",0),r.get("published") or "")
 def eligible(r,t):
- if r.get("kind")!="scholarly" or not r.get("doi") or r.get("analysis"):return False
+ if r.get("kind")!="scholarly" or not r.get("doi"):return False
+ existing=r.get("analysis") or {}
+ if existing:
+  return "OpenAlex" in str(existing.get("provenance","")) and not existing.get("reprocess_checked") and existing.get("extraction_version",0)<2
  attempt=r.get("fulltext_attempt") or {}
  # Make one targeted pass after changes in retrieval logic; then honor backoff.
  if attempt.get("pipeline_version")!=2:return True
@@ -98,7 +101,7 @@ def run():
  records=read_json(LIB,[])
  state=read_json(STATE,{})
  key=os.getenv("OPENALEX_API_KEY","").strip()
- info={"attempted":0,"extracted_this_run":0,"quota_pause_until":state.get("quota_pause_until"),"status":"idle"}
+ info={"attempted":0,"extracted_this_run":0,"refreshed_sections":0,"quota_pause_until":state.get("quota_pause_until"),"status":"idle"}
  if not key:
   info["status"]="missing_api_key"
  elif parse(state.get("quota_pause_until"))>now():
@@ -113,6 +116,8 @@ def run():
   for r in candidates[:max_attempts]:
    if content_calls>=content_limit:break
    info["attempted"]+=1
+   was_read=bool(r.get("analysis"))
+   if was_read:r["analysis"]["reprocess_checked"]=now().date().isoformat()
    entry=r.get("fulltext_attempt") or {}
    entry["attempts"]=entry.get("attempts",0)+1
    entry["last_at"]=iso(now())
@@ -151,10 +156,12 @@ def run():
       "discussion":secs.get("discussion",""),"limitations":secs.get("limitations",""),
       "figures":[],"fulltext_url":lic_url,
       "key_idea":(secs.get("results") or secs.get("discussion") or "")[:280],
-      "extraction_date":now().date().isoformat()}
+      "extraction_date":now().date().isoformat(),
+      "extraction_version":2,"sections_available":list(secs.keys())}
     r["oa_grobid_checked"]=now().date().isoformat()
     entry.update(status="full_text",next_at=None)
-    info["extracted_this_run"]+=1
+    if was_read:info["refreshed_sections"]+=1
+    else:info["extracted_this_run"]+=1
    except urllib.error.HTTPError as exc:
     if exc.code==429:
      until=pause_time(exc)
