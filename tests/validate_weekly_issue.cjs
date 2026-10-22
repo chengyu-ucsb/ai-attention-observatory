@@ -14,7 +14,15 @@ assert(site.includes('href="issue-feed.xml" class="issue-rss"'),"Homepage weekly
 assert(app.includes("function renderIssue()"),"Missing issue renderer");
 const deployment=text(".github/workflows/publish.yml");
 assert(deployment.includes("Catch up full-text research backlog"),"Catch-up results must trigger a Pages redeployment");
-assert(site.includes('id="issue-source-landscape"'),"Weekly source mix visualization missing");
+assert(!site.includes('id="issue-source-landscape"'),"Internal source-coverage dashboard should not appear in the public edition");
+assert(!site.includes('THE ATTENTION EDIT · IN PREPARATION'),"Editorial workflow statuses leaked into public markup");
+const featured=JSON.parse(text("data/public-featured-issue.json"));
+assert(featured.status==="published"||featured.status==="none","Only completed editorials may appear as featured issues");
+if(featured.status==="published"){
+ assert(featured.headline&&featured.sources.length>0,"Featured issue must have a published headline and citations");
+ assert(featured.edition_date<=issue.edition_date,"Featured issue cannot be dated after the weekly indexing run");
+ assert(fs.existsSync(path.join(root,"data/approved-issues",featured.edition_date+".json")),"Featured editorial is not archived");
+}
 if(issue.status==="published"){
  assert(issue.signals.length>=3&&issue.signals.length<=4,"A small number of cross-source signals is required");
  for(const sig of issue.signals){
