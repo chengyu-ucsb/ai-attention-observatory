@@ -153,7 +153,7 @@ function issueRefs(ids,target){
  return container;
 }
 function renderIssueLandscape(issue){
- const root=$("#issue-source-landscape");root.replaceChildren();
+ const root=$("#issue-source-landscape");if(!root)return;root.replaceChildren();
  const n=Number(issue.source_count)||0;
  const groups=[
   {title:"WHAT WE READ",rows:[["Scholarly literature",Number(issue.types?.scholarly)||0],["Public essays & other sources",Number(issue.types?.commentary)||0]],note:"Material covered by this edition, not evidence of agreement."},
