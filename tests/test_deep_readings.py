@@ -19,7 +19,7 @@ class DeepReadingTests(unittest.TestCase):
   note=annotate(record)["reading"]["digest"]
   self.assertEqual(note["status"],"edited_perspective")
   self.assertIn("principal",note["longform"]["examples"].lower())
-  self.assertIn("approved",note["longform"]["open_question"])
+  self.assertIn("inspect",note["longform"]["open_question"])
   self.assertIn("focus assistant",note["longform"]["implications"])
   self.assertEqual(note["finding"],"")
 
