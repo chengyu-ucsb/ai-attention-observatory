@@ -6,6 +6,7 @@ Unlicensed/unavailable sources are retained for later reevaluation, NOT republis
 """
 from __future__ import annotations
 import datetime as dt
+import gzip
 import json
 import os
 import pathlib
@@ -38,21 +39,41 @@ def parse(value):
 def local(tag):return tag.split("}")[-1].lower()
 def content(el):return " ".join(" ".join(el.itertext()).split())
 def extract(root):
+ """Read TEI body sections, including older wrapper layouts and subsections.
+
+ OpenAlex TEI is sometimes nested in html/tei and repeated as sibling divs.
+ The former parser stopped at the first heading per category (often mere
+ reliability diagnostics) and dropped the more useful later Results.
+ """
  sections={}
+ counts={}
  for div in root.iter():
   if local(div.tag)!="div":continue
   head=next((content(e).lower() for e in div if local(e.tag)=="head"),"")
+  if not head:continue
   key=next((k for k,words in HEADINGS.items() if any(w in head for w in words)),None)
-  if not key or key in sections:continue
-  parts=[content(el) for el in div.iter() if local(el.tag)=="p"]
-  value=" ".join(x for x in parts if len(x)>40)
-  if value:sections[key]=value[:4500].rsplit(" ",1)[0] if len(value)>4500 else value
+  if not key:continue
+  # Avoid parent and nested heading sections duplicating one another.
+  paras=[content(p) for p in div if local(p.tag)=="p"]
+  if not paras:
+   paras=[content(p) for p in div.iter() if local(p.tag)=="p"][:8]
+  value=" ".join(x for x in paras if len(x)>40)
+  if not value:continue
+  current=sections.get(key,"")
+  if value in current:continue
+  if current:value=current+" "+value
+  if len(value)>7500:value=value[:7500].rsplit(" ",1)[0]
+  sections[key]=value
+  counts[key]=counts.get(key,0)+1
  return sections
+
 def get(url,key):
  u=url+("&" if "?" in url else "?")+urllib.parse.urlencode({"api_key":key})
  req=urllib.request.Request(u,headers={"User-Agent":"AI-Attention-Observatory/3.0 (fangcu@ucmail.uc.edu)","Accept":"application/xml,application/json","Accept-Encoding":"identity"})
  with urllib.request.urlopen(req,timeout=24) as response:
-  return response.read(5_000_000),response.headers
+  payload=response.read(9_000_000)
+  if payload[:2]==b"\x1f\x8b":payload=gzip.decompress(payload)
+  return payload,response.headers
 def read_json(path,default):
  try:return json.loads(path.read_text())
  except (ValueError,OSError):return default
@@ -73,15 +94,16 @@ def pause_time(error):
 def priority(r):
  title=r.get("title") or ""
  return (int(bool(r.get("analysis"))),-int(bool(FOCUS.search(title))),-int(r.get("relation")!="Adjacent digital-attention evidence"),-int(bool(r.get("open_access_url"))),
-         r.get("fulltext_attempt",{}).get("attempts",0),r.get("published") or "")
+         r.get("fulltext_attempt",{}).get("attempts",0),-(int((r.get("published") or "0000")[:4]) if (r.get("published") or "")[:4].isdigit() else 0))
 def eligible(r,t):
  if r.get("kind")!="scholarly" or not r.get("doi"):return False
  existing=r.get("analysis") or {}
  if existing:
-  return "OpenAlex" in str(existing.get("provenance","")) and not existing.get("reprocess_checked") and existing.get("extraction_version",0)<2
+  return ("OpenAlex" in str(existing.get("provenance","")) and
+          existing.get("extraction_version",0)<3 and not existing.get("reprocess_checked_v3"))
  attempt=r.get("fulltext_attempt") or {}
  # Make one targeted pass after changes in retrieval logic; then honor backoff.
- if attempt.get("pipeline_version")!=2:return True
+ if attempt.get("pipeline_version")!=3:return True
  return parse(attempt.get("next_at"))<=t
 def summarize(records,info):
  t=now()
@@ -110,18 +132,18 @@ def run():
   state["quota_pause_until"]=None
   info["quota_pause_until"]=None
   candidates=sorted((r for r in records if eligible(r,now())),key=priority)
-  max_attempts=max(1,min(int(os.getenv("OPENALEX_FULLTEXT_LIMIT","24")),100))
-  content_limit=max(1,min(int(os.getenv("OPENALEX_CONTENT_LIMIT","8")),25))
+  max_attempts=max(1,min(int(os.getenv("OPENALEX_FULLTEXT_LIMIT","36")),100))
+  content_limit=max(1,min(int(os.getenv("OPENALEX_CONTENT_LIMIT","12")),25))
   content_calls=0
   for r in candidates[:max_attempts]:
    if content_calls>=content_limit:break
    info["attempted"]+=1
    was_read=bool(r.get("analysis"))
-   if was_read:r["analysis"]["reprocess_checked"]=now().date().isoformat()
+   if was_read:r["analysis"]["reprocess_checked_v3"]=now().date().isoformat()
    entry=r.get("fulltext_attempt") or {}
    entry["attempts"]=entry.get("attempts",0)+1
    entry["last_at"]=iso(now())
-   entry["pipeline_version"]=2
+   entry["pipeline_version"]=3
    r["fulltext_attempt"]=entry
    doi=urllib.parse.quote("https://doi.org/"+r["doi"],safe=":")
    try:
@@ -157,7 +179,7 @@ def run():
       "figures":[],"fulltext_url":lic_url,
       "key_idea":(secs.get("results") or secs.get("discussion") or "")[:280],
       "extraction_date":now().date().isoformat(),
-      "extraction_version":2,"sections_available":list(secs.keys())}
+      "extraction_version":3,"sections_available":list(secs.keys())}
     r["oa_grobid_checked"]=now().date().isoformat()
     entry.update(status="full_text",next_at=None)
     if was_read:info["refreshed_sections"]+=1
