@@ -183,7 +183,7 @@ def bottom(issue):
       +'<a href="'+permalink+'" style="display:inline-block;background:#a52c3e;color:#fff;text-decoration:none;padding:13px 20px;font:700 12px/1.4 DM Sans,Arial,sans-serif;letter-spacing:.3px">'
       +'Read this edition online&nbsp; ↗</a>'
       +'<p class="bodycopy" style="font:400 11px/1.65 DM Sans,Arial,sans-serif;color:#8e7d82;margin:18px 0 0">'
-      +esc(count)+' source-backed readings were considered. '+esc(issue.get("editorial_note",""))+'</p>'
+      +'Sources for each idea are linked above. Research findings and commentary are identified separately.</p>'
       +'</td></tr>'
       +'<tr><td class="pad footer-links" style="padding:25px 48px 31px;background:#35272f">'
       +'<p style="font:700 12px/1.5 DM Sans,Arial,sans-serif;letter-spacing:1.1px;color:#f5e1df;margin:0 0 10px">THE ATTENTION EDIT</p>'
@@ -200,9 +200,9 @@ def bottom(issue):
 
 def render_issue(issue):
     if issue.get("status")!="published":
-        return (top_html({"subject":"The Attention Edit · In review"})
+        return (top_html({"subject":"The Attention Edit · Ideas about AI and attention"})
                 +'<tr><td class="pad" style="padding:48px"><h1 class="display" style="font:500 42px Georgia,serif">'
-                +'The next edition is in review.</h1><p>We are checking the source material before publishing a new synthesis.</p></td></tr>'
+                +'A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></td></tr>'
                 +'</table></td></tr></table></body></html>')
     return top_html(issue)+opening(issue)+overview(issue)+signal_cards(issue)+question_and_try(issue)+bottom(issue)
 
@@ -253,6 +253,7 @@ def build_rss(issues):
         ET.SubElement(item,"category").text="AI and attention"
     ET.indent(rss)
     xml=ET.tostring(rss,encoding="utf-8",xml_declaration=True)
+    xml=xml.replace(b"?>",b"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"assets/feed.xsl\"?>",1)
     ET.fromstring(xml)
     (ROOT/"issue-feed.xml").write_bytes(xml)
     return len(issues)

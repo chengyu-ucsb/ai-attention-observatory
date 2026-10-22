@@ -443,3 +443,46 @@
  .story-visual-card{height:170px}
  .editorial-card .story-visual-editorial{height:155px}
 }
+
+
+/* Evidence-led figures: qualitative contrasts, process maps, and numeric study facts. */
+#paper-content .rv-artwork>.evidence-graphic{padding:25px 26px 19px;border:1px solid #ddc7c6;background:#fbf5f1}
+#paper-content .evidence-graphic .eyebrow{font:700 10px/1.5 var(--sans);letter-spacing:.12em;color:#9f4455;margin:0 0 8px}
+#paper-content .evidence-graphic .figure-insight-title{font:500 clamp(22px,2.5vw,29px)/1.22 var(--display);letter-spacing:-.01em;color:#392f34;margin:0 0 21px}
+#paper-content .evidence-graphic .concept-note{font:400 11.5px/1.7 var(--sans);color:#776c70;max-width:70ch;margin:16px 0 0}
+#paper-content .evidence-graphic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;min-height:200px}
+#paper-content .evidence-graphic-panel{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;background:#eedcda;border-top:5px solid #b34c60;padding:21px;min-height:195px}
+#paper-content .evidence-graphic-panel:nth-child(even){background:#e5c1c3;border-color:#7f3e58}
+#paper-content .evidence-graphic-panel .graphic-signal{position:absolute;top:13px;right:19px;font:500 50px/1 var(--display);color:#a74558;opacity:.63}
+#paper-content .graphic-panel-2 .graphic-signal{color:#774054}
+#paper-content .graphic-heading{font:600 17px/1.28 var(--display);color:#513b46;max-width:23ch;display:block;margin:36px 0 8px}
+#paper-content .graphic-detail{font:400 12.5px/1.6 var(--sans);color:#5f5356;max-width:31ch;margin:0}
+#paper-content .evidence-flow{display:grid;grid-template-columns:minmax(0,1fr) 18px minmax(0,1fr) 18px minmax(0,1fr);gap:8px;align-items:stretch}
+#paper-content .evidence-flow-step{padding:22px 16px;background:#f3e4e0;border-top:4px solid #a7485b;display:flex;flex-direction:column;gap:9px;min-height:190px;justify-content:flex-start}
+#paper-content .evidence-flow-step:nth-of-type(2){background:#ead1d0}
+#paper-content .evidence-flow-step:nth-of-type(3){background:#e2b9c0}
+#paper-content .graphic-step-index{font:700 38px/1 var(--display);color:#af6f7b}
+#paper-content .evidence-flow-step>strong{font:600 16px/1.2 var(--display);color:#553c45}
+#paper-content .evidence-flow-step>p{font:400 12px/1.6 var(--sans);color:#655258;margin:0}
+#paper-content .graphic-arrow{align-self:center;font:500 23px/1 var(--display);text-align:center;color:#a84c5e}
+#paper-content .evidence-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#paper-content .evidence-stat{background:#f0d9d5;padding:26px 22px;display:flex;flex-direction:column;gap:8px;min-height:183px}
+#paper-content .evidence-stat:nth-child(2){background:#ead0d1}
+#paper-content .evidence-stat-value{font:500 clamp(46px,5vw,67px)/1 var(--display);letter-spacing:-.04em;color:#ad465d}
+#paper-content .evidence-stat-label{font:700 13px/1.35 var(--sans);color:#513e45}
+#paper-content .evidence-stat-detail{font:400 12px/1.6 var(--sans);color:#6d5d62;margin:0}
+@media(max-width:650px){
+ #paper-content .rv-artwork>.evidence-graphic{padding:20px 16px 16px}
+ #paper-content .evidence-graphic-grid{gap:9px;min-height:0}
+ #paper-content .evidence-graphic-panel{padding:17px 13px;min-height:183px}
+ #paper-content .evidence-graphic-panel .graphic-signal{font-size:38px;right:12px}
+ #paper-content .graphic-heading{font-size:15px}
+ #paper-content .graphic-detail{font-size:11.5px}
+ #paper-content .evidence-flow{grid-template-columns:minmax(0,1fr);gap:8px}
+ #paper-content .evidence-flow-step{min-height:0;padding:17px 18px}
+ #paper-content .evidence-flow-step:nth-of-type(n){background:#f0dedc}
+ #paper-content .graphic-step-index{font-size:27px}
+ #paper-content .graphic-arrow{transform:rotate(90deg);font-size:21px}
+ #paper-content .evidence-stat{min-height:170px;padding:21px 14px}
+ #paper-content .evidence-stat-value{font-size:48px}
+}

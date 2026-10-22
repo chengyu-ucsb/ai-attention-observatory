@@ -228,10 +228,13 @@ def readable_excerpt(text,role="finding",limit=195):
    s=updated
    break
  # Argument and interpretation are not facts; keep attribution/uncertainty.
- s=re.sub(r"^(?:the authors|the researchers) (?:argue|argued|suggest|suggested|propose|proposed) that\s+",
-          "One interpretation is that ",s,flags=re.I)
+ # Keep hedging without starting the sentence with the author or paper.
+ # Where a claim lacks uncertainty language, preserve attribution as an
+ # argument rather than converting it into a verified fact.
+ s=re.sub(r"^(?:the authors|the researchers) (?:suggest|suggested|propose|proposed|argue|argued) that\s+",
+          "A possible explanation is that ",s,flags=re.I)
  s=re.sub(r"^(?:the authors|the researchers) (?:describe|described)\s+",
-          "The paper describes ",s,flags=re.I)
+          "",s,flags=re.I)
  s=s[0].upper()+s[1:] if s else ""
  # Prefer an intact first sentence when it communicates a full thought.
  parts=sentence_list(s)
@@ -321,21 +324,56 @@ def short_source_context(record):
    return line
  return ""
 
+# Brief, attributed public-facing readings for non-academic sources; these are
+# descriptions of ideas, not measurements of the ideas' effectiveness.
+PUBLIC_COMMENTARY={
+ "why-calling-for-a-kill-switch":"Shutting down AI with a single switch may be less realistic than designing systems that remain governable.",
+ "what-is-the-socratic-method":"Questioning assumptions can reveal gaps in understanding that fluent AI answers might otherwise conceal.",
+ "heres-how-a-learning-strategy":"Faster answers are not the same as stronger learning. Asking AI for questions and feedback may keep learners engaged.",
+ "what-happens-to-language":"Communication depends on listeners as well as speakers; conversational AI changes both sides of that exchange.",
+ "faster! louder! brighter!":"Children's media raises a design question: how can content engage young viewers without constant stimulation?",
+ "the-internet-was-built-for-human-agency":"AI agents acting on our behalf make accountability and meaningful user choice harder to define.",
+ "when-an-ai-agent-says":"Automated decisions complicate what meaningful user consent looks like.",
+ "the-paradox-of-ai-assistance":"AI can make a completed assignment look better without proving that its author learned more.",
+ "how-ai-powered-emotional-surveillance":"Systems that classify people's emotions or attention can become tools of surveillance and control.",
+ "how-ai-driven-search":"AI search tools change how people discover information and decide which sources to trust.",
+ "new-perspectives-on-ai-agentiality":"User-controlled AI intermediaries could give people more influence over what reaches their attention.",
+ "intention tracking":"Asking why an app is being opened adds a moment of reflection before an automatic habit.",
+ "freedom — app and website blocking":"Blocking distracting apps can create a more predictable work period without measuring anyone's mental state.",
+ "focus filters":"Focus settings let apps adjust their behavior to a user's preferences and chosen context.",
+ "android focus mode":"Device-level focus controls can pause apps and manage interruptions without guessing how attentive someone is.",
+ "the battle for cognitive liberty":"As AI reshapes digital experiences, people may need stronger control over how their attention is influenced."
+}
+def public_commentary_idea(record):
+ url=(record.get("url") or "").lower()
+ title=clean(record.get("title") or "").lower()
+ for key,idea in PUBLIC_COMMENTARY.items():
+  if key in url or key in title:
+   return idea
+ return ""
+
 def annotate(record):
  r=record.get("reading") or {}
  base=dict(record);base["reading"]=dict(r)
  level=r.get("level")
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
-  idea=readable_excerpt(notes.get("argument") or r.get("overview") or "", "idea",165)
-  if idea.endswith("…"):idea=research_question(record)
+  rewritten=public_commentary_idea(record)
+  # An indexed publisher description is not necessarily a useful public
+  # summary. Only use the authored line or a transparent topic prompt.
+  idea=rewritten or research_question(record)
   base["reading"]["digest"]={
-   "idea":idea or research_question(record),
-   "explain":short_source_context(record),"approach":"","finding":"",
+   "idea":idea,
+   "explain":"",
+   "approach":"",
+   "finding":"",
    "finding_source":"none",
-   "interpretation":source_snippet(notes.get("design_relevance"),"interpretation",175),
-   "limitation":source_snippet(notes.get("caveat"),"limitation",170),
-   "tags":concept_tags(record),"status":"editorial_or_publisher_synopsis"}
+   "interpretation":"",
+   "limitation":"",
+   "tags":concept_tags(record),
+   "status":"editorial_or_publisher_synopsis",
+   "editorial_basis":"publisher_or_editorial"
+  }
   return base
  curated=CURATED.get((record.get("doi") or "").lower())
  if curated and level in ("abstract","full_text"):

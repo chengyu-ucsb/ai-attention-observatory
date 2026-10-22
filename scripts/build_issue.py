@@ -43,6 +43,17 @@ def build():
   schema["tension"]=tension
   schema["status"]="published"
  (DATA/"public-issue.json").write_text(json.dumps(schema,ensure_ascii=False,indent=2)+"\n")
+ # Readers see the latest completed issue while the next week's editorial
+ # work stays private. Keep the newest unreviewed source shelf in public-issue
+ # for research coverage checks, but never put editorial queue states on pages.
+ archived=sorted((DATA/"approved-issues").glob("????-??-??.json"),reverse=True) if (DATA/"approved-issues").exists() else []
+ featured=next((json.loads(p.read_text(encoding="utf-8")) for p in archived
+                if json.loads(p.read_text(encoding="utf-8")).get("status")=="published"),None)
+ if schema["status"]=="published":
+  featured=schema
+ if featured is None:
+  featured={"status":"none","headline":"","deck":"","signals":[],"sources":[],"source_count":0}
+ (DATA/"public-featured-issue.json").write_text(json.dumps(featured,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
  print(json.dumps({"issue_date":issue_date,"status":schema["status"],"sources_in_shelf":len(items),"themes":len(schema.get("signals",[]))}))
  return schema
 if __name__=="__main__":build()
