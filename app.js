@@ -88,6 +88,8 @@ function cleanLead(s,sourceTitle=""){
  if(sourceTitle&&/^(?:(?:this|the|our) (?:study|paper|article|research)\b|(?:the authors|the researchers)\b|we (?:found|show|argue)\b)/i.test(x)){
   return String(sourceTitle).trim();
  }
+ const letters=x.match(/[A-Za-z]/g)||[],uppers=x.match(/[A-Z]/g)||[];
+ if(letters.length>17&&uppers.length/letters.length>.80){x=readableSourceTitle({title:x});}
  return x?x[0].toUpperCase()+x.slice(1):"";
 }
 function shortIdea(x,limit=105){
@@ -137,7 +139,7 @@ function issueRefs(ids,target){
    const src=list.find(x=>x.id===key);
    if(!src)continue;
    const matches=S.records.find(x=>id(x)===key);
-   const b=matches?btn(src.title,()=>goto("paper",id(matches)),"issue-ref"):link(src.title,src.url||"#library","issue-ref");
+   const b=matches?btn(readableSourceTitle(src),()=>goto("paper",id(matches)),"issue-ref"):link(readableSourceTitle(src),src.url||"#library","issue-ref");
    container.append(b);
  }
  return container;
@@ -215,7 +217,7 @@ function renderIssue(){
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries()){
   const r=make("div","issue-shelf-item");let candidate=S.records.find(x=>id(x)===src.id);
-  const title=candidate?btn(src.title,()=>goto("paper",src.id)):link(src.title,src.url||"#library");
+  const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",src.id)):link(readableSourceTitle(src),src.url||"#library");
   add(r,make("span","issue-shelf-number",String(i+1).padStart(2,"0")),add(make("div","issue-shelf-content"),title,make("p","",[src.venue,src.reading_level==="full_text"?"Full-text extract":src.reading_level==="abstract"?"Abstract-based":"Publisher/editorial"].filter(Boolean).join(" · "))));
   shelf.append(r);
  }
