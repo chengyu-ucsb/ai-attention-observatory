@@ -99,3 +99,16 @@
 @media(max-width:800px){.play-head-layout{min-height:260px;grid-template-columns:1fr 210px;gap:18px}.play-head h1{font-size:58px}.play-stage{grid-template-columns:1fr}.play-stage-side{border-right:0;border-bottom:1px solid #eadedc;padding:26px}.play-stage-side>p:not(.play-small){max-width:680px}.play-rules{grid-template-columns:1fr 1fr}.play-stage-main{padding:20px}.play-tabs{gap:7px}.play-tab{padding:12px;gap:8px}.play-tab-num{font-size:23px}.play-tab>span:nth-child(2){font-size:12px}.play-tab small{font-size:9px}.play-screen{min-height:320px}.play-art{width:190px}}
 @media(max-width:580px){.play-head-layout{grid-template-columns:1fr;min-height:0;padding:38px 0 25px}.play-head h1{font-size:50px;margin:9px 0}.play-head p:not(.eyebrow){font-size:12px}.play-art{display:none}.play-wrap{padding:36px 0 65px}.play-intro-row{display:block}.play-intro-row h2{font-size:34px}.play-tabs{grid-template-columns:1fr;gap:6px}.play-tab{padding:12px 17px}.play-tab-icon{display:block}.play-tab small{margin-top:0}.play-stage-side{padding:22px}.play-stage-side h3{font-size:32px}.play-stage-main{padding:13px}.play-screen{padding:18px 12px;min-height:320px}.switch-number{font-size:96px}.switch-track{gap:2px}.switch-dot{min-width:4px}.switch-answer{padding:10px 6px;gap:6px}.switch-answer small{font-size:9px}.recovery-options{gap:6px}.recovery-option{font-size:11px;min-height:52px}.recovery-return-options{grid-template-columns:1fr}.assist-prompt{font-size:23px}.play-precedents{margin:55px 0}.play-feedback-link{display:block;padding:23px}.play-feedback-link .button{margin-top:12px}.play-chart-line{grid-template-columns:90px 1fr 65px}.play-chart-sub{margin-left:100px}}
 @media(prefers-reduced-motion:reduce){.play-primary,.play-tab,.recovery-option{transition:none}}
+
+/* Consistent explanatory type with the Observatory reading room. */
+.play-head p:not(.eyebrow),.play-stage-side>p:not(.play-small),
+.play-results p,.play-intro-row>p,.play-rules>div>span:last-child{
+  font-family:var(--sans);font-size:14px;line-height:1.72;
+}
+.play-small,.play-tab small,.play-status,.rule-label{font-family:var(--sans);font-size:11px;line-height:1.6}
+.play-rules>div{grid-template-columns:100px minmax(0,1fr)}
+.play-stage-side h3,.play-head h1,.play-results h4{font-family:var(--display)}
+@media(max-width:600px){
+  .play-head p:not(.eyebrow),.play-stage-side>p:not(.play-small){font-size:14px}
+  .play-rules>div{grid-template-columns:90px minmax(0,1fr)}
+}
