@@ -55,7 +55,7 @@ def build():
   if explain and explain.lower() not in text.lower():
    text+=" "+explain
   kind=x.get("kind") or "scholarly"
-  label="Research finding" if digest.get("finding") else ("Research question" if kind=="scholarly" else "Perspective")
+  label="Conceptual framework" if x.get("research_type")=="conceptual_framework" else "Research finding" if digest.get("finding") else ("Research question" if kind=="scholarly" else "Perspective")
   stable=x.get("doi") or x.get("url") or x.get("title")
   if not stable:continue
   permalink=BASE+"#paper/"+urllib.parse.quote(str(stable),safe="")
