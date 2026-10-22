@@ -278,7 +278,7 @@ def first_source_sentence(text):
 TOPIC_QUESTIONS=[
  (r"notifications?|alerts?|hover effect","When do notifications disrupt attention?"),
  (r"(?:attention|digital) fragmentation|fragmented attention","What does attention fragmentation mean, and how can it be studied?"),
- (r"task switching|task.switch|multitask","How does switching between tasks affect attention?"),
+ (r"attention switching|attentional shifting|switching attention|task switching|task.switch|multitask","How does switching between tasks affect attention?"),
  (r"critical thinking.*offload|offload.*critical thinking","How does offloading thinking to AI relate to critical judgment?"),
  (r"cognitive offloading|cognitive dependency|ai dependenc","When does AI assistance become cognitive dependence?"),
  (r"ai literacy|genai literacy|digital literacy","How does knowing more about AI affect the way people use it?"),
