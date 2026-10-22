@@ -457,6 +457,23 @@ def annotate(record):
    "editorial_basis":depth["basis"]
   }
   return base
+ if record.get("research_type")=="conceptual_framework":
+  framework=record.get("framework_notes") or {}
+  idea=framework.get("idea") or research_question(record)
+  base["reading"]["digest"]={
+   "idea":idea,
+   "explain":"A proposed staged approach to AI use in formal learning; distinguish foundational independent work from guided and selective offloading.",
+   "approach":framework.get("approach") or "Conceptual framework based on published literature.",
+   "finding":"",
+   "finding_source":"none",
+   "interpretation":" ".join(framework.get("stages") or []),
+   "limitation":framework.get("qualification") or "This is a proposal, not a new experimental result.",
+   "tags":concept_tags(record),
+   "status":"conceptual_framework",
+   "editorial_basis":"publisher_source_abstract",
+   "reading_mode":"conceptual_proposal"
+  }
+  return base
  curated=CURATED.get((record.get("doi") or "").lower())
  if curated and level in ("abstract","full_text"):
   digest=dict(curated)
