@@ -550,6 +550,14 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[role="button"]:focus
 }
 .feature-card,.editorial-card,.perspective-item,.library-card{transition:box-shadow .2s ease,transform .2s ease}
 
+/* Large purely decorative motifs are quieter; research information leads. */
+.hero-visual svg{width:min(82%,395px)}
+.weekly-cover-art{max-width:245px}
+@media(max-width:600px){
+  .hero-visual svg{width:min(72%,240px)}
+  .weekly-cover-art{max-width:195px}
+}
+
 /* Illustration is context, never the dominant content. */
 .story-visual{border:1px solid #eadcda;background:#f2e6e2;flex-shrink:0;min-width:0}
 .story-visual .story-image{width:100%;height:100%;display:block;object-fit:cover}
