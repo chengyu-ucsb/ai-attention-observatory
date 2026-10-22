@@ -510,6 +510,26 @@ function additionalArtwork(x){
  }
 }
 
+function automaticEvidenceArtwork(x){
+ const spec=x.visual||{};
+ if(x.kind!=="scholarly"||!["evidence_snapshot","research_design"].includes(spec.kind))return null;
+ const blocks=Array.isArray(spec.blocks)?spec.blocks.filter(b=>b&&typeof b.label==="string"&&typeof b.text==="string"&&b.text.length<=230).slice(0,3):[];
+ if(!blocks.length)return null;
+ const figure=make("figure","article-concept-art article-data-visual automatic-evidence");
+ add(figure,make("p","eyebrow",spec.status==="edited"?"RESEARCH SNAPSHOT":"SOURCE-BASED READING"),
+    make("h3","figure-insight-title",spec.kind==="evidence_snapshot"?"What the evidence supports":"How this question was studied"));
+ const board=make("div","auto-evidence-board");
+ blocks.forEach((block,i)=>{
+  const item=make("div","auto-evidence-item");
+  add(item,make("span","auto-evidence-n",String(i+1).padStart(2,"0")),
+    make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
+  board.append(item);
+ });
+ add(figure,board,make("figcaption","concept-note",
+   "Visual summary based on the "+(spec.basis==="full_text"?"indexed full text":"available abstract")+
+   ". Not an effect-size chart, causal model, or reproduction of published figures."));
+ return figure;
+}
 function conceptArtwork(x){
  const doi=(x.doi||"").toLowerCase();
  if(doi==="10.3389/fpsyg.2026.1878629")return comparisonArtwork("Two ways of offloading to AI",[
@@ -568,7 +588,7 @@ function conceptArtwork(x){
   return w;
  }
  // Show a source-grounded explanatory graphic only for validated studies.
- return additionalArtwork(x);
+ return additionalArtwork(x)||automaticEvidenceArtwork(x);
 }
 function showPaper(x){
  const root=$("#paper-content");
@@ -593,11 +613,13 @@ function showPaper(x){
  main.append(back,head,editorialMedia(x,"reading"));
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
  const body=make("section","rv-content");
+ const art=conceptArtwork(x);
+ const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
  const lead=make("div","rv-section-head");
  add(lead,make("span","rv-section-overline","01 / UNDER THE HOOD"),
   make("h2","rv-section-title",scholarly?"What the evidence actually says":"The argument in context"));
  body.append(lead);
- if(editorial&&hasFinding){
+ if(editorial&&hasFinding&&!autoGraphic){
   const claim=make("div","rv-claim");
   add(claim,make("span","rv-mini-label","REPORTED FINDING"),
      make("p","",d.finding));
@@ -613,7 +635,6 @@ function showPaper(x){
     make("p","","A substantive result has not been identified in the accessible material. This is a research topic, not a verified finding."));
   body.append(claim);
  }
- const art=conceptArtwork(x);
  if(art){
   const visuals=make("div","rv-artwork");
   visuals.append(art);
@@ -627,7 +648,7 @@ function showPaper(x){
  add(caveat,make("h3","","What remains uncertain"),
    make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
  add(context,method,caveat);
- body.append(context);
+ if(!autoGraphic)body.append(context);
  if(editorial&&d.interpretation){
   const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
