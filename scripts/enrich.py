@@ -17,6 +17,7 @@ def extract_sections(root):
  and avoid indexing a references section as a research result.
  """
  sections={}
+ for el in root.iter():el.tag=el.tag.rsplit("}",1)[-1]
  for sec in root.findall(".//body//sec"):
   heading=sec.find("title")
   title=clean(" ".join(heading.itertext()) if heading is not None else "").lower()
@@ -28,15 +29,16 @@ def extract_sections(root):
   if not key:continue
   # Exclude nested sections from a parent if both are labeled; nested text
   # can be added again by its own section if useful.
-  paras=[clean(" ".join(p.itertext())) for p in sec.findall(".//p")]
+  paras=[clean(" ".join(p.itertext())) for p in sec.findall("./p")]
+  if not paras:paras=[clean(" ".join(p.itertext())) for p in sec.findall(".//p")]
   paras=[p for p in paras if len(p)>=50]
   # Method/Results samples should be meaningful, not a single heading.
   if not paras:continue
   old=sections.get(key,"")
   candidate=" ".join(paras)
   if old: candidate=old+" "+candidate
-  if len(candidate)>4800:
-   candidate=candidate[:4800].rsplit(" ",1)[0]
+  if len(candidate)>7000:
+   candidate=candidate[:7000].rsplit(" ",1)[0]
   sections[key]=candidate
  return sections
 def run():
@@ -44,14 +46,14 @@ def run():
  today=datetime.date.today().isoformat();limit=max(1,min(75,int(os.getenv("OA_ENRICH_LIMIT","38"))))
  candidates=[r for r in records if r.get("kind")=="scholarly" and r.get("doi") and (
   not r.get("analysis") or (str((r.get("analysis") or {}).get("provenance","")).startswith("Europe PMC")
-                             and (r.get("analysis") or {}).get("extraction_version",0)<2))]
+                             and (r.get("analysis") or {}).get("extraction_version",0)<3))]
  # A PMC-like open-access link is useful evidence that XML may already exist.
  candidates.sort(key=lambda r:(0 if any(k in (r.get("open_access_url") or "").lower() for k in ("pmc","bmc","frontiers","plos")) else 1,
                                0 if r.get("oa_checked") is None else 1,r.get("oa_checked") or ""))
  for r in candidates:
   if attempted>=limit:break
-  if r.get("oa_checked") and r.get("oa_pass_version")==2 and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<7:continue
-  attempted+=1;r["oa_checked"]=today;r["oa_pass_version"]=2
+  if r.get("oa_checked") and r.get("oa_pass_version")==3 and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<7:continue
+  attempted+=1;r["oa_checked"]=today;r["oa_pass_version"]=3
   try:
    url="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+urllib.parse.urlencode({"query":"DOI:"+r["doi"],"format":"json","pageSize":1})
    obj=json.loads(req(url));matches=obj.get("resultList",{}).get("result",[])
@@ -70,7 +72,7 @@ def run():
     cap=f.find("caption");caption=clean(" ".join(cap.itertext()))[:240] if cap is not None else ""
     figures.append({"label":label,"caption":caption})
    r["analysis"]={"provenance":"Europe PMC open-access fullTextXML; automatically extracted article sections","license":licenses[0][:160],"methods":extracted.get("methods",""),"results":extracted.get("results",""),"discussion":extracted.get("discussion",""),"limitations":extracted.get("limitations",""),"figures":figures,"fulltext_url":"https://europepmc.org/articles/"+pmcid,"key_idea":(extracted.get("results") or extracted.get("discussion") or "")[:280],
-     "extraction_version":2,"sections_available":list(extracted.keys())}
+     "extraction_version":3,"sections_available":list(extracted.keys())}
    updated+=1
   except Exception as e:print("OA extraction skipped",r.get("doi"),str(e)[:100])
   time.sleep(.15)
