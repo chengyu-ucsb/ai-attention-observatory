@@ -362,6 +362,146 @@ function wellbeingArtwork(){
  add(w,make("p","review-kicker","240 PUBLICATIONS CONSIDERED IN TOTAL"),bars,make("p","concept-note","The paper reports 2 included publications for 2008 and 43 for 2024; only these two endpoints are shown. The bars do not reconstruct a complete annual time series or demonstrate intervention effectiveness."));
  return w;
 }
+
+/* Research graphics below are editorial representations of indexed source data.
+   No arrows here imply causal effects; published figures are treated separately. */
+function visualComparison(title,panels,caption,kind="comparison"){
+ const figure=make("figure","article-concept-art article-data-visual evidence-graphic graphic-"+kind);
+ add(figure,make("p","eyebrow","SOURCE-GROUNDED RESEARCH VISUAL"),
+   make("h3","figure-insight-title",title));
+ const graphic=make("div","evidence-graphic-grid");
+ for(const [i,item] of panels.entries()){
+  const [signal,heading,detail]=item;
+  const card=make("div","evidence-graphic-panel graphic-panel-"+(i+1));
+  add(card,make("span","graphic-signal",signal),
+    make("strong","graphic-heading",heading),
+    make("p","graphic-detail",detail));
+  graphic.append(card);
+ }
+ add(figure,graphic,make("figcaption","concept-note",caption));
+ return figure;
+}
+function visualStudyFlow(title,steps,caption){
+ const figure=make("figure","article-concept-art article-data-visual evidence-graphic graphic-flow");
+ add(figure,make("p","eyebrow","ILLUSTRATED RESEARCH DESIGN"),
+   make("h3","figure-insight-title",title));
+ const row=make("div","evidence-flow");
+ for(const [i,step] of steps.entries()){
+  if(i)row.append(make("span","graphic-arrow","→"));
+  const node=make("div","evidence-flow-step");
+  add(node,make("span","graphic-step-index",String(i+1).padStart(2,"0")),
+    make("strong","",step[0]),
+    make("p","",step[1]));
+  row.append(node);
+ }
+ add(figure,row,make("figcaption","concept-note",caption));
+ return figure;
+}
+function visualKeyStats(title,stats,caption){
+ const figure=make("figure","article-concept-art article-data-visual evidence-graphic graphic-stats");
+ add(figure,make("p","eyebrow","REPORTED STUDY DETAILS"),
+   make("h3","figure-insight-title",title));
+ const row=make("div","evidence-stats");
+ for(const [value,label,detail] of stats){
+  const pane=make("div","evidence-stat");
+  add(pane,make("strong","evidence-stat-value",value),
+    make("span","evidence-stat-label",label),
+    make("p","evidence-stat-detail",detail));
+  row.append(pane);
+ }
+ add(figure,row,make("figcaption","concept-note",caption));
+ return figure;
+}
+function additionalArtwork(x){
+ switch((x.doi||"").toLowerCase()){
+  case "10.1007/s44217-026-02332-w":
+   return visualComparison("Students described two ways AI enters their learning",[
+    ["+","Support","AI was seen as helpful when used alongside independent work."],
+    ["?","Overreliance","Students described lower confidence and reduced independent engagement."]
+   ],"Themes from interviews with 15 postgraduate students in Morocco, not measured effects of AI on learning.");
+  case "10.1515/humaff-2026-0011":
+   return visualStudyFlow("How supportive help might become substitution",[
+    ["Complement","AI supports the user's reasoning"],
+    ["Delegate","Trust can expand what is handed to AI"],
+    ["Substitute","Essential reasoning may be practiced less"]
+   ],"A proposed six-step theoretical account simplified into three stages. This is a hypothesis, not an observed longitudinal progression.");
+  case "10.3389/fpsyg.2026.1960382":
+   return visualComparison("Two appraisals of algorithmic management",[
+    ["↗","Challenge","More positive appraisal was associated with better workplace well-being."],
+    ["↘","Threat","More threatening appraisal was associated with poorer well-being."]
+   ],"Survey of 389 food-delivery workers in China. These are reported associations, not causal effects.");
+  case "10.1177/21582440261497404":
+   return visualComparison("Trust in AI was linked to contrasting pathways",[
+    ["+","Perceived usefulness and confidence","These were positively associated with critical thinking."],
+    ["−","Cognitive offloading","This was negatively associated with critical thinking."]
+   ],"Survey-based structural model. Symbols indicate directions of association, not experimental effect sizes.");
+  case "10.1080/17501229.2026.2730676":
+   return visualKeyStats("Patterns of AI-assisted writing",[
+    ["540","English writers","Survey participants"],
+    ["4","Engagement profiles","Different approaches to evaluation and automation"]
+   ],"Reported study design and profile count. The graphic does not indicate the prevalence of each profile.");
+  case "10.3389/feduc.2026.1952725":
+   return visualStudyFlow("The AI-integrated classroom activity",[
+    ["Prepare","Students used AI to prepare short lessons"],
+    ["Teach","Students presented lessons to peers"],
+    ["Discuss","Classroom discussion covered responsible AI use"]
+   ],"Classroom activity undertaken by 104 undergraduates. Students reported positive experiences; this sequence does not prove learning gains.");
+  case "10.48550/arxiv.2609.38029":
+   return visualComparison("The 14-student pilot had mixed learning measures",[
+    ["↗","Course learning and AI literacy","Pre/post scores rose in reported measures."],
+    ["=","Standardized critical thinking","Test percentiles did not change."]
+   ],"Small uncontrolled design-based research pilot; the graphic shows reported directional differences, not comparable effect sizes.");
+  case "10.21203/rs.3.rs-10212076/v1":
+   return visualComparison("Two forms of offloading, different links with processing",[
+    ["+","Scaffolded offloading","Positively associated with deeper processing after the AI answer."],
+    ["−","Substitutive offloading","Negatively associated with deeper processing after the AI answer."]
+   ],"Associations from a 426-student survey and modeled pathways. These are not causal effects.");
+  case "10.3389/fcomm.2026.1828344":
+   return visualComparison("Two ways to think about cultural recommendation",[
+    ["◎","Attention economy","Platforms compete to surface content and capture attention."],
+    ["◇","Trust economy","AI-era discovery raises questions of origin, authenticity, and trust."]
+   ],"Conceptual comparison proposed by the paper; not an empirically documented market-wide shift.");
+  case "10.3390/educsci16091470":
+   return visualKeyStats("What Dutch medical educators discussed",[
+    ["17","Educators interviewed","Qualitative interview study"],
+    ["3","Themes","Value, thinking risks, and responsible integration"]
+   ],"Counts from the source abstract. Themes are reported qualitative categories, not outcome frequencies.");
+  case "10.54359/ps.v19i108.2216":
+   return visualComparison("Interface feedback changed how notifications mattered",[
+    ["✓","Hover feedback","Helped sustained-attention accuracy in some task conditions."],
+    ["~","Notifications with content","The sustained-attention advantage disappeared in this condition."]
+   ],"Findings summarized from five experiments using attention tasks; no universal claim that notifications improve or worsen attention.");
+  case "10.3389/fpsyg.2026.1832219":
+   return visualComparison("What the adolescent smartphone review suggests",[
+    ["↘","Excessive use","Modest associations with some sleep and attentional difficulties."],
+    ["?","School phone restrictions","Some classroom attention improvements; long-term effects unclear."]
+   ],"Narrative review of heterogeneous evidence; not a pooled causal estimate.");
+  case "10.36948/ijfmr.2026.v08i05.87207":
+   return visualKeyStats("What ten digital well-being tools were reviewed for",[
+    ["10","Tools examined","Public documentation and exploratory observations"],
+    ["4","Common approaches","Usage monitoring, blocking, focus tools, and timers"]
+   ],"An exploratory comparison. Four approaches are an editorial grouping, not four exhaustive study-coded categories.");
+  case "10.31234/osf.io/wy8z3_v1":
+   return visualStudyFlow("A proposed research program, not a validated scale",[
+    ["Define","Distinguish fragmentation from related constructs"],
+    ["Develop","Generate measures and proposed dimensions"],
+    ["Validate","Test reliability and validity in future samples"]
+   ],"Proposed program in a conceptual manuscript. No new validation data were reported.");
+  case "10.35542/osf.io/64qz7_v1":
+   return visualStudyFlow("The unanswered question after AI withdrawal",[
+    ["With AI","Performance can differ under assistance"],
+    ["Withdraw","Remove the tool and observe independent work"],
+    ["Follow up","Test whether performance rebounds or persists"]
+   ],"Proposed longitudinal protocol. The recovery paths are hypotheses and have not been observed in this manuscript.");
+  case "10.1007/s10648-026-10224-6":
+   return visualComparison("Which thinking should the learner still do?",[
+    ["✓","Peripheral operations","Offloading nonessential operations may support the main learning goal."],
+    ["!","Constitutive processing","Offloading the very work needed to learn may undermine skill building."]
+   ],"Theoretical framework, not a new experiment. Outcomes depend on the learning goal and subsequent processing.");
+  default:return null;
+ }
+}
+
 function conceptArtwork(x){
  const doi=(x.doi||"").toLowerCase();
  if(doi==="10.3389/fpsyg.2026.1878629")return comparisonArtwork("Two ways of offloading to AI",[
@@ -419,9 +559,8 @@ function conceptArtwork(x){
   add(w,chart,make("figcaption","concept-note","Positive LASSO coefficients reported by the authors for associations with academic impact (n = 799). These are model coefficients, not effect sizes or evidence of causation. This study does not test generative AI."));
   return w;
  }
- // No generic concept map: a visual is included only when a specific
- // study's source-backed data or research design can be represented.
- return null;
+ // Show a source-grounded explanatory graphic only for validated studies.
+ return additionalArtwork(x);
 }
 function showPaper(x){
  const root=$("#paper-content");
