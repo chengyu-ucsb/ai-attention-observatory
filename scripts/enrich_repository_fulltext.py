@@ -46,7 +46,7 @@ def license_name(value):
  v=re.sub(r"[\s]+","-",v)
  v=v.replace("creativecommons.org/licenses/","")
  v=v.replace("creativecommons.org/publicdomain/zero/","cc0/")
- v=v.replace("ccby","cc-by").replace("ccbysa","cc-by-sa")
+ v=v.replace("ccbysa","cc-by-sa").replace("ccby","cc-by")
  if any(x in v for x in ("-nc","-nd","noncommercial","noderivatives","no-derivatives")):return ""
  if v in ("cc-by","cc-by-2.0","cc-by-3.0","cc-by-4.0","cc-by/4.0","cc-by/3.0"):
   return "cc-by"
@@ -125,8 +125,8 @@ def s2_batch(dois):
 
 
 def unpaywall_doi(doi):
- url="https://api.unpaywall.org/v2/"+urllib.parse.quote(doi,safe="/")+"?"+
- urllib.parse.urlencode({"email":EMAIL})
+ url=("https://api.unpaywall.org/v2/"+urllib.parse.quote(doi,safe="/")+"?"+
+  urllib.parse.urlencode({"email":EMAIL}))
  work=metadata_request(url)
  if str(work.get("doi") or "").lower()!=doi.lower():return []
  locations=work.get("oa_locations") or []
