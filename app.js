@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
-const S={records:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
+const S={records:[],companions:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
 const depths=[["full_text","Full-text sections","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
@@ -9,7 +9,7 @@ function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;ret
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
 function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.slice(0,10)+"T12:00:00Z");return isNaN(d.getTime())?"Undated":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
 function id(x){return String(x.doi||x.url||x.title)}
-function record(k){return S.records.find(x=>id(x)===k)}
+function record(k){const found=S.records.find(x=>id(x)===k)||S.companions.find(x=>id(x)===k);return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
 function depth(x){return x.reading?.level||"citation_only"}
 function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
@@ -111,7 +111,10 @@ function shortIdea(x,limit=105){
 function ideaInfo(x){
  const r=x.reading||{},d=r.digest||{},notes=x.editorial_notes||{};
  let value="",label="";
- if(x.kind!=="scholarly"){
+ if(x.research_type==="conceptual_framework"){
+  value=d.idea||r.overview||"";
+  label="CONCEPTUAL FRAMEWORK / NOT AN EMPIRICAL FINDING";
+ }else if(x.kind!=="scholarly"){
   value=d.idea||notes.argument||r.overview||"";
   label=notes.argument?"PERSPECTIVE / ATTRIBUTED":"PUBLISHER SYNOPSIS";
  }else if(d.status==="editorially_written_from_indexed_sections"&&d.idea){
@@ -603,7 +606,7 @@ function showPaper(x){
  root.replaceChildren();
  if(!x){root.append(make("div","empty-state","This reading is no longer in the public index."));return;}
  const r=x.reading||{},d=r.digest||{},editorial=d.status==="editorially_written_from_indexed_sections";
- const scholarly=x.kind==="scholarly",hasFinding=Boolean(d.finding);
+ const scholarly=x.kind==="scholarly",hasFinding=Boolean(d.finding),conceptual=x.research_type==="conceptual_framework";
  const isQuestion=scholarly&&!hasFinding&&!editorial;
  // Unreviewed extracts are identifiable as source notes, not hand-written insight.
  const headline=editorial?d.idea:hasFinding?d.finding:d.idea||x.title;
@@ -613,8 +616,8 @@ function showPaper(x){
  const metadata=make("div","rv-meta");
  add(metadata,make("span","rv-dot",x.lane||"Research"),
   make("span","rv-meta-separator","·"),
-  make("span","",editorial?"Edited reading":scholarly?isQuestion?"Research topic":"Source-reported result":"Perspective"));
- const status=make("p","rv-status", editorial?"Research reading":scholarly?"Based on indexed source material":"Commentary and perspectives");
+  make("span","",conceptual?"Conceptual framework":editorial?"Edited reading":scholarly?isQuestion?"Research topic":"Source-reported result":"Perspective"));
+ const status=make("p","rv-status",conceptual?"Proposed educational framework · not an experimental test":editorial?"Research reading":scholarly?"Based on indexed source material":"Commentary and perspectives");
  const title=make("h1","rv-headline",cut(cleanLead(headline,readableSourceTitle(x)),230));
  const intro=scholarly&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
@@ -763,6 +766,21 @@ function showPaper(x){
   }
   figureSection.append(figureBody);side.append(figureSection);
  }
+ const companions=S.companions.filter(y=>y.companion_to===x.doi);
+ if(companions.length){
+  const origin=make("section","rv-related");
+  add(origin,make("span","rv-section-overline","FROM THE ORIGINAL AUTHOR"),
+    make("h2","","Related explanation and commentary"),
+    make("p","","The author discusses implications of this publication in a public-facing piece. This is not an independent study."));
+  for(const companion of companions){
+   const article=make("div","rv-excerpt");
+   add(article,make("h3","",readableSourceTitle(companion)),
+     make("p","",companion.companion_relation||"Author commentary"));
+   if(/^https:\/\//.test(companion.url||""))article.append(link("Read the commentary ↗",companion.url,"rv-secondary-link"));
+   origin.append(article);
+  }
+  side.append(origin);
+ }
  const related=S.records.filter(y=>y!==x&&y.lane===x.lane&&y.kind===x.kind&&depth(y)!=="citation_only")
                        .sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){
@@ -791,7 +809,7 @@ async function init(){
  try{
   const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-featured-issue.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
-  S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
+  S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");S.companions=S.records.filter(x=>Boolean(x.companion_to));S.records=S.records.filter(x=>!x.companion_to);
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
   S.runs=rs[2].ok?await rs[2].json():[];
   S.backlog=rs[3].ok?await rs[3].json():{};
