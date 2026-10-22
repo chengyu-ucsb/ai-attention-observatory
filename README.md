@@ -160,6 +160,36 @@ can be imported into Zotero to locate missing papers. PDFs need to be
 read/extracted locally under the library's applicable terms, then reviewed
 and summarized before only permissible notes are published.
 
+### Open access is not the same as permission to republish extracted text
+
+For a concrete example, the October 2026 BJET article
+[`10.1111/bjet.70094`](https://doi.org/10.1111/bjet.70094)
+is openly readable at Wiley. The registry identifies a restrictive
+CC BY-NC-ND license. Previously the site stopped at its abstract because
+the automated XML/PDF pipelines required a license allowing reuse and
+the publisher HTML reader supported only Frontiers/MDPI.
+
+The revised publisher-backfill now checks official Wiley article pages
+separately from the license-gated text reproduction path. It records
+whether a public article page is actually accessible and has section
+headings, without saving the copyrighted article text. When a full
+article has been individually reviewed, original, source-grounded
+paraphrases can be added to
+[`data/verified-full-article-notes.json`](data/verified-full-article-notes.json).
+That review is explicitly labeled as editorially verified full-article
+analysis; it is **not** called machine-extracted text or counted as
+new machine-extracted sections. The first reviewed example reports a
+144-student preregistered randomized classroom experiment; knowledge
+improved in all groups, while the treatment interactions for learning
+were not significant. The study's affective and task-level regulation
+results have distinct qualifications.
+
+The Wiley checker does **not** bypass rate limits, publisher restrictions,
+rights terms or anti-bot blocks. If direct HTML fetches fail, it records
+the precise limitation rather than falsely reporting that the paper
+contains no full text. No legal or institutional PDF access is required
+from the user for openly readable source analysis.
+
 ## Research quality and news reading
 
 The public reading library uses a **field-specific venue baseline**, an explicit
