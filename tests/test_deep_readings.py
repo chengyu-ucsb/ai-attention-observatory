@@ -3,7 +3,7 @@ import pathlib, sys, unittest
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 from condense_readings import annotate, deep_perspective
-from enrich_deep_readings import ArticleParser, acceptable, host_allowed, process
+from enrich_deep_readings import ArticleParser, acceptable, host_allowed, process, has_copied_sequence
 
 class DeepReadingTests(unittest.TestCase):
  def test_editorial_essay_has_substantive_argument_parts(self):
@@ -82,11 +82,23 @@ class DeepReadingTests(unittest.TestCase):
         "anchors":["no such phrase exists","another absent phrase"]}
   self.assertFalse(acceptable(note,sample,"nonacademic"))
 
- def test_no_api_key_never_makes_network_requests(self):
+ def test_no_local_model_never_makes_network_requests(self):
   records=[{"kind":"nonacademic","url":"https://www.techpolicy.press/story/",
             "reading":{"level":"curated"}}]
-  stats=process(records,"",limit=1)
-  self.assertTrue(stats["skipped_no_key"])
+  stats=process(records,None,limit=1)
+  self.assertTrue(stats["skipped_no_model"])
   self.assertFalse(records[0].get("deep_analysis"))
+
+ def test_reject_direct_text_copying(self):
+  text="Attention guardians could help people decide what they want to see instead of following someone else's metrics and incentives."
+  answer={"thesis":text, "reasoning":"A distinct argument about how technology affects agency."}
+  self.assertTrue(has_copied_sequence(answer,text))
+
+ def test_accept_source_anchors_but_reject_missing_analysis(self):
+  text=("Digital platforms change what gets attention in everyday life. "
+        "User control should remain meaningful even when agents make decisions. ")*30
+  answer={"thesis":"Some ideas about platforms and humans.", "reasoning":"A generic summary.",
+          "anchors":["Digital platforms change what gets", "User control should remain meaningful"]}
+  self.assertFalse(acceptable(answer,text,"nonacademic"))
 
 if __name__=="__main__": unittest.main()
