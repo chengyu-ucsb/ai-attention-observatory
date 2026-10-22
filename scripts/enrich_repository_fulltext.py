@@ -20,6 +20,7 @@ import urllib.parse
 import urllib.request
 
 from enrich_pdf_fulltext import extract_pdf,clean
+from enrich_zenodo_fulltext import recover_due as recover_zenodo_due
 
 ROOT=Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
@@ -209,6 +210,8 @@ def recover(record,options,today):
 def run():
  records=json.loads(LIB.read_text(encoding="utf-8"))
  today=dt.date.today()
+ # Verify exact-DOI Zenodo deposits before broad scholarly API lookups.
+ zenodo_stats=recover_zenodo_due(records,today)
  candidates=[r for r in records if eligible(r,today)]
  # Prefer previously blocked XML papers, then directly AI-related records.
  candidates.sort(key=lambda r:(
@@ -225,6 +228,8 @@ def run():
         "remaining_without_sections":0}
  if not work:
   stats["remaining_without_sections"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in records)
+  stats["zenodo"]=zenodo_stats
+  LIB.write_text(json.dumps(records,indent=2,ensure_ascii=False)+"\\n",encoding="utf-8")
   print(json.dumps(stats));return stats
  dois=[r["doi"].strip().lower() for r in work]
  s2_error=False
@@ -272,6 +277,7 @@ def run():
   time.sleep(.12)
  LIB.write_text(json.dumps(records,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
  stats["remaining_without_sections"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in records)
+ stats["zenodo"]=zenodo_stats
  print(json.dumps(stats))
  return stats
 
