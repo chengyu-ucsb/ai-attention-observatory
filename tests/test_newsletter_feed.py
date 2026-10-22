@@ -36,6 +36,28 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertEqual(len({item.findtext("guid") for item in items}),len(items))
   self.assertIsNotNone(parsedate_to_datetime(ch.findtext("lastBuildDate")).tzinfo)
 
+ def test_both_feeds_have_browser_view_without_losing_valid_rss(self):
+  for name in ("issue-feed.xml","feed.xml"):
+   raw=(ROOT/name).read_text()
+   self.assertIn('<?xml-stylesheet type="text/xsl" href="assets/feed.xsl"?>',raw)
+   self.assertEqual(ET.fromstring(raw).tag,"rss")
+   items=ET.fromstring(raw).findall("./channel/item")
+   self.assertTrue(items,"RSS should contain readable entries")
+  xsl=ET.parse(ROOT/"assets/feed.xsl").getroot()
+  self.assertEqual(xsl.tag,"{http://www.w3.org/1999/XSL/Transform}stylesheet")
+ def test_record_rss_uses_cleaned_digest_not_raw_method_checks(self):
+  rss=ET.parse(ROOT/"feed.xml").getroot()
+  items=rss.findall("./channel/item")
+  self.assertGreater(len(items),5)
+  self.assertTrue(any("#paper/" in item.findtext("link","") for item in items))
+  for item in items:
+   note=item.findtext("description","")
+   self.assertNotIn("Harman's single-factor",note)
+   self.assertNotIn("Cronbach",note)
+   self.assertNotIn("Plato’s dialogues show",note)
+   self.assertNotIn("The source describes",note)
+   self.assertNotIn("One interpretation is that",note)
+   self.assertIsNotNone(parsedate_to_datetime(item.findtext("pubDate")).tzinfo)
  def test_subscription_page_preserves_direct_machine_readable_link(self):
   doc=(ROOT/"subscribe.html").read_text()
   self.assertIn("issue-feed.xml",doc)
