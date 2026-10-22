@@ -794,3 +794,31 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[role="button"]:focus
   .story-visual .story-image,.feature-card,.library-card,.editorial-card,.perspective-item{transition:none}
   .feature-card:hover,.library-card:hover,.editorial-card:hover,.perspective-item:hover{transform:none}
 }
+
+/* Vertical publication-year axis: one labeled horizontal bar per year.
+   Year order is chronological downward; values remain exact counts. */
+#year-chart.year-chart{
+  display:grid;grid-template-columns:minmax(0,1fr);gap:15px;
+  align-content:center;height:auto;min-height:228px;padding:18px 0 8px;
+  border-bottom:0;border-top:1px solid var(--line);
+}
+#year-chart .year-row{
+  display:grid;grid-template-columns:54px minmax(0,1fr) 38px;
+  align-items:center;column-gap:14px;min-width:0;
+}
+#year-chart .year-label{
+  font:650 12px/1.5 var(--sans);color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+#year-chart .year-track{height:20px;background:#f1e9e6;overflow:hidden}
+#year-chart .year-bar{display:block;height:100%;min-height:0;background:#bf8990}
+#year-chart .year-row:last-child .year-bar{background:var(--red)}
+#year-chart .year-value{
+  font:700 12px/1.4 var(--sans);color:var(--red);
+  text-align:right;font-variant-numeric:tabular-nums;
+}
+@media(max-width:600px){
+ #year-chart.year-chart{gap:13px;padding-top:15px;min-height:0}
+ #year-chart .year-row{grid-template-columns:48px minmax(0,1fr) 31px;column-gap:9px}
+ #year-chart .year-track{height:17px}
+}
