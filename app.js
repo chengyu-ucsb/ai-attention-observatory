@@ -9,7 +9,7 @@ function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;ret
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
 function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.slice(0,10)+"T12:00:00Z");return isNaN(d.getTime())?"Undated":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
 function id(x){return String(x.doi||x.url||x.title)}
-function record(k){const found=S.records.find(x=>id(x)===k)||S.companions.find(x=>id(x)===k);return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
+function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k));return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
 function depth(x){return x.reading?.level||"citation_only"}
 function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
