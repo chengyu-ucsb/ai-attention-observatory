@@ -20,7 +20,7 @@ def run():
    "no_identifier" if not r.get("doi") else
    "licensed_pdf_not_readable" if (r.get("repository_recovery") or {}).get("status")=="pdf_unreadable_or_blocked" else
    "rights_or_license_unverified" if (r.get("repository_recovery") or {}).get("status") in ("license_unverified","pdf_host_unapproved") else
-   "temporary_provider_failure" if (r.get("repository_recovery") or {}).get("status") in ("provider_error","provider_limited") else
+   "temporary_provider_failure" if (r.get("repository_recovery") or {}).get("status") in ("provider_error","provider_limited","provider_incomplete") else
    "no_independent_oa_pdf_found" if (r.get("repository_recovery") or {}).get("status")=="no_oa_pdf_reported" else
    "waiting_for_repository_check"
    for r in pending)),
