@@ -45,6 +45,7 @@ class NewsIntegrityTests(unittest.TestCase):
   self.assertIn("pace",paper["reading"]["overview"])
   self.assertIn("not an experiment",paper["editorial_notes"]["caveat"])
   self.assertNotIn("news.google.com",paper["url"])
+  self.assertIn(GOOGLE,paper.get("legacy_urls",[]))
 
  def test_headline_only_cannot_survive_as_existing_reading(self):
   row={"kind":"nonacademic","title":TITLE,"venue":"The Guardian",
