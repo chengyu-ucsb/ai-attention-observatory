@@ -436,10 +436,12 @@ def annotate(record):
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
   rewritten=public_commentary_idea(record)
-  # An indexed publisher description is not necessarily a useful public
-  # summary. Only use the authored line or a transparent topic prompt.
-  idea=rewritten or research_question(record)
   depth=deep_perspective(record,notes)
+  # When locally read source content exists, use its actual claim rather than
+  # falling back to a generic question inferred from the headline.
+  machine_idea=(depth.get("thesis") or "").split(". ")[0].strip()
+  if len(machine_idea)>195:machine_idea=""
+  idea=rewritten or (machine_idea if depth["source_depth"]=="machine_read_full_article" else "") or research_question(record)
   base["reading"]["digest"]={
    "idea":idea,
    "explain":depth["thesis"] or "",
@@ -450,7 +452,8 @@ def annotate(record):
    "limitation":depth["qualification"],
    "longform":depth,
    "tags":concept_tags(record),
-   "status":"edited_perspective" if depth["source_depth"]=="read_article" else "publisher_or_editorial_synopsis",
+   "status":"edited_perspective" if depth["source_depth"]=="read_article" else
+            "locally_analyzed_article" if depth["source_depth"]=="machine_read_full_article" else "publisher_or_editorial_synopsis",
    "editorial_basis":depth["basis"]
   }
   return base
