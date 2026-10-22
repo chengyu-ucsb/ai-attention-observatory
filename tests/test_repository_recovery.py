@@ -77,7 +77,8 @@ class RepositoryRecoveryTests(unittest.TestCase):
    with patch.object(repo,"LIB",path),patch.object(repo,"s2_batch",side_effect=ValueError("rate limit")):
     with patch.object(repo,"unpaywall_doi",return_value=[]),patch.object(repo.time,"sleep"):
      result=repo.run()
-   self.assertEqual(result["no_oa_pdf_reported"],1)
+   self.assertEqual(result["provider_incomplete"],1)
+   self.assertEqual(result["no_oa_pdf_reported"],0)
  def test_retry_waits_for_due_date(self):
   row={"kind":"scholarly","doi":"10.1000/test"}
   t=dt.date(2026,10,22)
