@@ -17,6 +17,7 @@ on:
       - 'scripts/build_issue.py'
       - 'scripts/build_newsletter.py'
       - 'scripts/condense_readings.py'
+      - 'scripts/editorial_readings.py'
       - 'data/issue-editorial.json'
       - 'tests/validate_weekly_issue.cjs'
       - 'tests/test_condense_readings.py'
@@ -80,16 +81,18 @@ jobs:
           test -s newsletter.html
           test -s subscribe.html
           test -s data/public-issue.json
+          test -s data/public-featured-issue.json
+          test -s assets/feed.xsl
       - name: Prepare static website
         run: |
           mkdir -p _site
           cp index.html subscribe.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
           mkdir -p _site/assets
-          cp assets/reading-*.svg _site/assets/
+          cp assets/reading-*.svg assets/feed.xsl _site/assets/
           mkdir -p _site/issues
           cp -R issues/. _site/issues/
           mkdir -p _site/data
-          cp data/public-library.json data/public-weekly.json data/public-issue.json _site/data/
+          cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json _site/data/
           if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           touch _site/.nojekyll
