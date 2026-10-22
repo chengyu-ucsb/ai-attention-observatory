@@ -12,7 +12,9 @@ ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
 def report():
-    public=json.loads((DATA/"public-library.json").read_text())
+    indexed=json.loads((DATA/"public-library.json").read_text())
+    companions=[r for r in indexed if r.get("companion_to")]
+    public=[r for r in indexed if not r.get("companion_to")]
     core=[r for r in public if r.get("source_group")=="AI-specific"]
     scholarly=[r for r in public if r.get("kind")=="scholarly"]
     years=lambda items:dict(sorted(Counter((r.get("published") or "")[:4] for r in items
@@ -22,6 +24,9 @@ def report():
     fulltext=[r for r in scholarly if (r.get("reading") or {}).get("level")=="full_text"]
     return {
       "public_total":len(public),
+      "linked_explainers":len(companions),
+      "unpaired_commentary":sum(r.get("kind")=="nonacademic" for r in public),
+      "explicit_conceptual_frameworks":sum(r.get("research_type")=="conceptual_framework" for r in scholarly),
       "scholarly":len(scholarly),
       "full_text_extracted":len(fulltext),
       "scholarly_abstract_only":sum((r.get("reading") or {}).get("level")=="abstract" for r in scholarly),
