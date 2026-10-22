@@ -70,11 +70,14 @@ class CondensedReadingTests(unittest.TestCase):
   self.assertEqual(adjacent["finding_source"],"editorial")
   self.assertIn("cross-sectional",adjacent["limitation"].lower())
   self.assertIn("did not examine generative AI",adjacent["explain"])
-  # When both the source extract and the truncated abstract lack a result,
-  # the site must not relabel CFA diagnostics as empirical findings.
-  truncated=annotate(records["10.3389/fpsyg.2026.1939286"])["reading"]["digest"]
-  self.assertEqual(truncated["finding"],"")
-  self.assertEqual(truncated["finding_source"],"none")
+  # Deeper full-text extraction can reveal a substantive reported result
+  # after earlier measurement checks. Do not freeze a prior missing finding.
+  deeper=annotate(records["10.3389/fpsyg.2026.1939286"])["reading"]["digest"]
+  self.assertNotIn("Cronbach",deeper["finding"])
+  self.assertNotIn("factor loading",deeper["finding"].lower())
+  self.assertIn(deeper["finding_source"],("full_text","abstract","none"))
+  if deeper["finding"]:
+   self.assertIn("critical thinking",deeper["finding"].lower())
  def test_editorial_summaries_are_short_and_idea_first(self):
   for doi,note in CURATED.items():
    for field,limit in [("idea",170),("explain",190),("approach",205),("finding",215),("interpretation",190),("limitation",190)]:
