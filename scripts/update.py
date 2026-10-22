@@ -120,10 +120,11 @@ def main():
     if not x.get("preview","").startswith("Abstract unavailable"):current["preview"]=x["preview"]
    continue
   x["source_group"]=source_class(x)
+  x["historical_backfill"]=str(x.get("discovery_scope") or "").startswith("historical:")
   records[k]=x;new.append(x)
  collection=sorted(records.values(),key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)
  week_start=(datetime.date.fromisoformat(TODAY)-datetime.timedelta(days=6)).isoformat()
- week_items=[x for x in collection if x.get("first_seen","")>=week_start and not x.get("curated")]
+ week_items=[x for x in collection if x.get("first_seen","")>=week_start and not x.get("curated") and not x.get("historical_backfill") and not (x.get("discovery_scope") or "").startswith("historical:")]
  prior=read(DIR/"runs.json",[])
  run={"date":TODAY,"mode":os.environ.get("MODE","weekly"),"new":len(new),"total":len(collection),"candidates":len(candidates),"last_seven_days":len(week_items),"stats":dict(stats,errors=errors)}
  if not candidates and errors:raise SystemExit("Discovery did not return records: "+"; ".join(errors[:3]))
