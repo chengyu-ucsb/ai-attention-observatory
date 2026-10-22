@@ -44,6 +44,12 @@ Actions secret ZOTERO_API_KEY. It follows Zotero's supported API v3 endpoints.
    collection_empty, connected_no_doi_overlap, connected_no_synced_fulltext,
    and connected_indexed_fulltext_available.
 
+**Bulk import:** Download the [Zotero RIS bibliography of indexed papers still missing extracted full text](https://chengyu-ucsb.github.io/ai-attention-observatory/exports/zotero-fulltext-backlog.ris).
+Import it into the **AI & Attention Observatory** collection and use Zotero's
+**Find Available PDFs** while authenticated through UC. This file contains
+only already-public bibliographic references. Zotero does not automatically
+gain university access from the API key, and publisher terms still apply.
+
 **Privacy boundary:** This is a *connectivity and available-text audit*,
 not blanket authorization to publish university-subscription content. The
 Zotero API key may cover more of the user's library than the Observatory
