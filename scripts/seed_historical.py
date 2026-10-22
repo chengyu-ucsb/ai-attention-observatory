@@ -11,6 +11,7 @@ import os
 import pathlib
 import urllib.parse
 import urllib.request
+import urllib.error
 from search_plan import source_class
 from update import abstract, key, TODAY
 
@@ -37,8 +38,12 @@ def run():
  req=urllib.request.Request("https://api.openalex.org/works?"+urllib.parse.urlencode(params),
     headers={"User-Agent":"AttentionAIObservatory/4.0 metadata-index (fangcu@ucmail.uc.edu)",
              "Accept":"application/json"})
- with urllib.request.urlopen(req,timeout=35) as response:
-  works=json.load(response).get("results",[])
+ try:
+  with urllib.request.urlopen(req,timeout=35) as response:
+   works=json.load(response).get("results",[])
+ except (urllib.error.URLError,TimeoutError,ValueError) as exc:
+  print(json.dumps({"historical_anchor_added":0,"status":"deferred_api_error","error":str(exc)[:120]}))
+  return
  mapping={(w.get("doi") or "").replace("https://doi.org/","").lower():w for w in works}
  new=[]
  for doi in remaining:
