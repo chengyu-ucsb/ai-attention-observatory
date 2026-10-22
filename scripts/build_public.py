@@ -96,8 +96,8 @@ def build():
         "priority_venues":sum(x.get("source_quality",{}).get("venue_level")=="priority" for x in canonical),
         "specialist_venues":sum(x.get("source_quality",{}).get("venue_level")=="specialist" for x in canonical),
         "note":"Screening is a venue/relevance triage, not peer-review verification or a journal-impact-factor judgment."
-    },ensure_ascii=False,indent=2)+"\\n")
-    (DATA/"public-library.json").write_text(json.dumps(selected,ensure_ascii=False,indent=2)+"\\n")
+    },ensure_ascii=False,indent=2)+"\n")
+    (DATA/"public-library.json").write_text(json.dumps(selected,ensure_ascii=False,indent=2)+"\n")
     (DATA/"public-weekly.json").write_text(json.dumps(projected,ensure_ascii=False,indent=2)+"\n")
     assert all(readable(r) for r in selected)
     assert len(selection_ids)==len({record_id(x) for x in selected})
