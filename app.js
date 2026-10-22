@@ -616,7 +616,7 @@ function showPaper(x){
   make("span","",editorial?"Edited reading":scholarly?isQuestion?"Research topic":"Source-reported result":"Perspective"));
  const status=make("p","rv-status", editorial?"Research reading":scholarly?"Based on indexed source material":"Commentary and perspectives");
  const title=make("h1","rv-headline",cut(cleanLead(headline,readableSourceTitle(x)),230));
- const intro=d.explain?make("p","rv-deck",d.explain):null;
+ const intro=scholarly&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
  main.append(back,head,editorialMedia(x,"reading"));
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
@@ -633,10 +633,28 @@ function showPaper(x){
      make("p","",d.finding));
   body.append(claim);
  }else if(!scholarly){
-  const claim=make("div","rv-claim");
-  add(claim,make("span","rv-mini-label","PERSPECTIVE, NOT AN EMPIRICAL RESULT"),
-     make("p","",d.interpretation||"This source advances an argument rather than measuring the effect of an intervention."));
-  body.append(claim);
+  const deep=d.longform||{},hasDepth=Boolean(deep.reasoning||deep.examples||deep.tension||deep.implications);
+  const reading=make("div","rv-longform");
+  function lens(label,value){
+   if(!value)return;
+   const part=make("section","rv-longform-part");
+   add(part,make("h3","",label),make("p","",value));
+   reading.append(part);
+  }
+  // Publisher metadata alone cannot justify invented counterarguments or a
+  // faux methods section. Only display fields supported by source analysis.
+  lens(deep.source_depth==="publisher_synopsis"?"What the publisher says":"The central argument",deep.thesis||r.overview);
+  lens("How the argument develops",deep.reasoning);
+  lens("Concrete examples and distinctions",deep.examples);
+  lens("The central tension",deep.tension);
+  lens("What this could mean for attention design",deep.implications);
+  lens("A question to investigate",deep.open_question);
+  lens("Qualifications and unresolved issues",deep.qualification);
+  if(!hasDepth&&deep.source_depth==="publisher_synopsis"){
+   reading.append(make("p","rv-source-gap","Only a brief publisher description has been indexed. There is not yet enough source text for a responsible in-depth reading."));
+  }
+  if(deep.basis)reading.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
+  body.append(reading);
  }else if(!hasFinding){
   const claim=make("div","rv-source-gap");
   add(claim,make("span","rv-mini-label","EVIDENCE NOT YET ESTABLISHED"),
@@ -656,8 +674,8 @@ function showPaper(x){
  add(caveat,make("h3","","What remains uncertain"),
    make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
  add(context,method,caveat);
- if(!autoGraphic)body.append(context);
- if(editorial&&d.interpretation){
+ if(scholarly&&!autoGraphic)body.append(context);
+ if(scholarly&&editorial&&d.interpretation){
   const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
     make("h2","rv-section-title","Why this matters"),
@@ -673,8 +691,7 @@ function showPaper(x){
   ["Discussion as indexed",r.interpretation],["Reported limitations",r.limitations],
   ["Abstract",x.abstract_text]
  ]:[
-  ["Source synopsis",r.overview],["Attributable argument",(x.editorial_notes||{}).argument],
-  ["Editorial qualifications",(x.editorial_notes||{}).caveat]
+  ["Publisher or editorial synopsis",r.overview],["Original editorial notes",(x.editorial_notes||{}).argument]
  ];
  for(const [label,content] of fields){
   if(!content)continue;
