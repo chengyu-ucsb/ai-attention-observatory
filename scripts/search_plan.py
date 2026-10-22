@@ -60,7 +60,7 @@ def source_class(record):
     year=(record.get("published") or "")[:4]
     title=(record.get("title") or "").lower()
     text=(title+" "+(record.get("abstract_text") or record.get("preview") or "").lower())
-    direct=bool(re.search(r"\\bai\\b",text)) or any(term in text for term in (
+    direct=bool(re.search(r"\bai\b",text)) or any(term in text for term in (
         "chatgpt","generative ai","generative artificial intelligence",
         "large language model","llm","gpt-4","gpt-3","ai-assisted",
         "ai-based","ai powered","ai-powered","artificial intelligence"))
