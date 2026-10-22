@@ -126,6 +126,41 @@ The internal acquisition database is `data/library.json`. The public reading pro
 
 The newsletter generator is `scripts/build_newsletter.py`. It builds the latest preview (`newsletter.html`), permanent editions (`issues/`), and RSS 2.0 (`issue-feed.xml`) with stable permalinks and publication dates.
 
+## Research quality and news reading
+
+The public reading library uses a **field-specific venue baseline**, an explicit
+relevance check, and minimum standards for substantive source content. The
+editable watchlist is [`data/venue-standards.json`](data/venue-standards.json):
+communication and media research; cognitive psychology; HCI/CSCW; educational
+technology; organizational and information-systems research. Venue matching is
+a *discovery and editorial screening prior*, never a certification of a study's
+methods or findings. This follows [DORA](https://sfdora.org/read/) and
+[COPE/DOAJ transparency principles](https://doaj.org/apply/transparency/).
+Distinctive, highly relevant work from new journals and preprints is retained
+in the internal acquisition index for source and peer-review checks. Unknown
+publisher labels (for example “OpenAlex” and “Crossref”), machine-learning
+“cross-attention” papers unrelated to human cognition, and weak topical matches
+are not automatically treated as substantive attention research. We never
+automatically label an unverified journal predatory or fabricate a quality
+ranking from title metadata.
+
+The audit [`data/source-quality-audit.json`](data/source-quality-audit.json)
+records public research counts and how many candidate records were deferred
+for each reason. Those records are not deleted and a researcher can revisit
+the decision. The source classifications are conservative heuristics—not a
+fully peer-reviewed systematic screening process or an exhaustive journal list.
+
+**News integrity:** Publisher RSS/Atom descriptions are discovery leads, not
+full article text. Google News redirect URLs and headlines repeated as RSS
+descriptions are quarantined rather than displayed as analyses. Some verified
+original publisher articles receive source-specific editorial readings,
+including Natalia Kucirkova's September 2026 Guardian essay on pacing in
+children's media (editorially checked against the original article). Longer
+automated news analyses are only accepted when the original article text can
+actually be retrieved under site rules and supported by source-anchored checks;
+the absence of an accepted reading is displayed as insufficient access, not
+invented content. Original copyrighted texts are not stored in the public repo.
+
 ## Source selection and evidence coverage
 
 The Observatory is a **structured, evolving discovery index**, not an exhaustive
