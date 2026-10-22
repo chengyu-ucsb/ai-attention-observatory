@@ -65,7 +65,7 @@ for(const r of db){
 }
 assert(edited>=20,"Expected source-grounded editorial coverage to expand");
 assert(db.every(x=>["AI-specific","Adjacent digital-attention evidence","Earlier digital-attention foundation","Historical AI context"].includes(x.source_group)),"Source classification missing");
-const earlier=db.filter(x=>Number((x.published||"").slice(0,4))<2023);
+const earlier=db.filter(x=>/^\d{4}$/.test((x.published||"").slice(0,4))&&Number((x.published||"").slice(0,4))<2023);
 assert(earlier.every(x=>x.source_group.startsWith("Earlier")||x.source_group.startsWith("Historical")),
  "Earlier digital attention work must not be classified as recent GenAI research");
 assert(html.includes('id="scope-filter"')&&html.includes('id="year-context"'),"Research scope controls and explanation missing");
