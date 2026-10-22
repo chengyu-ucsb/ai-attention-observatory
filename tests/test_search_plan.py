@@ -59,7 +59,7 @@ class SearchScopeTests(unittest.TestCase):
  def test_old_retry_queue_is_revisited_once_after_pipeline_improvement(self):
   item={"kind":"scholarly","doi":"10.1016/sample","fulltext_attempt":{"status":"waiting_for_license","next_at":"2026-12-01T00:00:00+00:00","attempts":1}}
   self.assertTrue(grobid_eligible(item,dt.datetime(2026,10,21,tzinfo=dt.timezone.utc)))
-  item["fulltext_attempt"]["pipeline_version"]=2
+  item["fulltext_attempt"]["pipeline_version"]=3
   self.assertFalse(grobid_eligible(item,dt.datetime(2026,10,21,tzinfo=dt.timezone.utc)))
 
 if __name__=="__main__":unittest.main()
