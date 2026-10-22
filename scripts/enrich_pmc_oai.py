@@ -22,7 +22,7 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 
-from enrich import extract_sections, permitted
+from enrich import extract_sections
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
@@ -59,6 +59,18 @@ def resolve_ids(dois):
    if ID.fullmatch(pmcid) and doi in batch and not rec.get("errmsg"):resolved[doi]=pmcid
   time.sleep(.36)
  return resolved
+def reusable_jats_license(statements):
+ """Only article-wide CC BY, CC BY-SA or CC0, including canonical license URIs."""
+ for statement in statements:
+  value=statement.lower().replace("_","-")
+  if any(token in value for token in ("/by-nc/","/by-nd/","/by-nc-nd/","/by-nc-sa/",
+                                     "noncommercial","non-commercial","no derivatives",
+                                     "no-derivatives","all rights reserved")):continue
+  if any(token in value for token in (
+       "creativecommons.org/licenses/by/","creativecommons.org/licenses/by-sa/",
+       "creativecommons.org/publicdomain/zero/","creativecommons.org/publicdomain/mark/",
+       "cc-by","cc by","cc0","public domain")):return True
+ return False
 def jats_and_rights(xml):
  """Select the actual article (not OAI envelope) and normalize JATS namespaces."""
  root=ET.fromstring(xml)
@@ -73,7 +85,7 @@ def jats_and_rights(xml):
   refs=" ".join(str(v) for k,v in el.attrib.items() if local(k) in ("href","license-type")).lower()
   # Link-form licenses are common in PMC JATS. Do not assume *all* OA = CC-BY.
   licenses.append(words+" "+refs)
- if not permitted(licenses):return None,"reuse_license_not_verified"
+ if not reusable_jats_license(licenses):return None,"reuse_license_not_verified"
  sections=extract_sections(article)
  if not (sections.get("results") or sections.get("discussion")):
   return None,"missing_results_discussion"
