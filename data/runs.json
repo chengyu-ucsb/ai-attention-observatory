@@ -42,13 +42,13 @@
   {
     "date": "2026-10-22",
     "mode": "weekly",
-    "new": 24,
-    "total": 307,
-    "candidates": 211,
-    "last_seven_days": 232,
+    "new": 19,
+    "total": 330,
+    "candidates": 222,
+    "last_seven_days": 247,
     "stats": {
-      "openalex": 240,
-      "crossref": 72,
+      "openalex": 180,
+      "crossref": 144,
       "search_scopes": [
         {
           "theme": "AI & cognition",
@@ -135,8 +135,23 @@
           "query": "generative AI attention economy"
         }
       ],
-      "news_rss": 10,
-      "errors": []
+      "news_rss": 8,
+      "priority_and_journal_discovery": {
+        "priority_dois_requested": 4,
+        "priority_dois_found": 3,
+        "journal_queries_attempted": 8,
+        "journal_queries_succeeded": 8,
+        "journal_records_seen": 160,
+        "journal_relevant": 2
+      },
+      "discovery_status": "partial",
+      "errors": [
+        "OpenAlex Fragmentation: HTTP 429",
+        "OpenAlex quota reached; remaining OpenAlex searches deferred until the next run.",
+        "Priority DOI metadata mismatch: 10.1016/j.compedu.2026.105576"
+      ],
+      "accepted_new": 19,
+      "source_screen_note": "Discovery yields metadata candidates, not verified full texts or journal-level quality certification."
     }
   }
 ]
