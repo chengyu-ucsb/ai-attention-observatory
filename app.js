@@ -11,7 +11,7 @@ function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.sli
 function id(x){return String(x.doi||x.url||x.title)}
 function record(k){return S.records.find(x=>id(x)===k)}
 function depth(x){return x.reading?.level||"citation_only"}
-function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only")return "Publisher synopsis";return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
+function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 
 function readableSourceTitle(x){
@@ -681,6 +681,32 @@ function showPaper(x){
     make("h2","rv-section-title","Why this matters"),
     make("p","",d.interpretation));
   body.append(relevance);
+ }
+ if(scholarly&&d.longform){
+  const deep=d.longform;
+  const extended=make("section","rv-research-longform");
+  add(extended,make("span","rv-section-overline","02 / CLOSER READING"),
+     make("h2","rv-section-title","A deeper look at the study"));
+  const items=[
+    ["The research question",deep.research_question],
+    ["Design and evidence",deep.study_design],
+    ["What was actually reported",deep.reported_results],
+    ["How the authors interpret it",deep.authors_interpretation],
+    ["How to read this critically",deep.critical_context],
+    ["Limitations",deep.limitations],
+    ["A question worth pursuing",deep.open_question]
+  ];
+  const parts=make("div","rv-longform");
+  for(const [label,value] of items){
+   if(!value)continue;
+   const part=make("section","rv-longform-part");
+   add(part,make("h3","",label),make("p","",value));
+   parts.append(part);
+  }
+  if(deep.basis)parts.append(make("p","rv-longform-basis",
+   "Reading basis: "+deep.basis+" · Machine-generated, not independently reviewed"));
+  extended.append(parts);
+  body.append(extended);
  }
  // Keep the extracted text and metadata in one clearly optional evidence drawer.
  const drawer=make("details","rv-drawer"),summary=make("summary","","Inspect source text and abstract");
