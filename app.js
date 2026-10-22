@@ -13,6 +13,53 @@ function record(k){return S.records.find(x=>id(x)===k)}
 function depth(x){return x.reading?.level||"citation_only"}
 function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only")return "Publisher synopsis";return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
+
+function readableSourceTitle(x){
+ // Preserve the exact bibliographic title in the data, but avoid shouting
+ // ALL-CAPS titles at readers throughout the website.
+ const title=String(x?.title||"").replace(/\s+/g," ").trim();
+ const letters=title.match(/[A-Za-z]/g)||[],upper=title.match(/[A-Z]/g)||[];
+ if(letters.length<12||upper.length/letters.length<.76)return title;
+ let normalized=title.toLowerCase().replace(/\b(?:ai|genai|llm|llms|hci|vr|ar|xr|nlp|ux|stem|ict|it|sem|ml|gpt|chatgpt|lms|eu|usa|us|uk|sdg|covid)\b/gi,m=>({
+  ai:"AI",genai:"GenAI",llm:"LLM",llms:"LLMs",hci:"HCI",vr:"VR",ar:"AR",xr:"XR",
+  nlp:"NLP",ux:"UX",stem:"STEM",ict:"ICT",it:"IT",sem:"SEM",ml:"ML",
+  gpt:"GPT",chatgpt:"ChatGPT",lms:"LMS",eu:"EU",usa:"USA",us:"US",uk:"UK",sdg:"SDG",covid:"COVID"
+ })[m.toLowerCase()]);
+ return normalized.slice(0,1).toUpperCase()+normalized.slice(1);
+}
+function artTopic(x){
+ const title=String(x?.title||"").toLowerCase(),lane=String(x?.lane||"");
+ if(/offload|reliance|dependenc|autonom|agency transfer/.test(title))return "offloading";
+ if(/notification|distraction|switching|multitask|fragment/.test(title))return "fragmentation";
+ if(/well.being|wellbeing|mental health|technostress|stress|resilien/.test(title))return "wellbeing";
+ if(/workplace|employee|gig.work|algorithmic management|workforce|professional/.test(title))return "work";
+ if(/intervention|design|interface|tools?|mitigat|protect|recovery|regulat/.test(title))return "interventions";
+ if(/critical thinking|pedagog|educat|teaching|student|learning|literacy/.test(title))return "learning";
+ if(/platform|policy|governance|ethic|social media|recommendation|trust economy/.test(title))return "society";
+ if(lane==="Fragmentation")return "fragmentation";
+ if(lane==="Interventions")return "interventions";
+ if(lane==="Technology & society")return "society";
+ return "focus";
+}
+function editorialImage(x,context="reading"){
+ const img=make("img","story-image");
+ img.src="assets/reading-"+artTopic(x)+".svg";
+ img.alt="Conceptual editorial illustration for "+(x?.lane||"the research theme")+
+   "; it does not show measured study data";
+ img.loading=context==="reading"?"eager":"lazy";
+ img.decoding="async";
+ img.width=880;img.height=530;
+ return img;
+}
+function editorialMedia(x,context="reading"){
+ const fig=make("figure","story-visual story-visual-"+context);
+ fig.append(editorialImage(x,context));
+ if(context==="reading")
+  fig.append(make("figcaption","story-visual-caption",
+    "Editorial illustration · not a visualization of study findings"));
+ return fig;
+}
+
 function cut(t,n){t=String(t||"").trim();return t.length>n?t.slice(0,n).replace(/\s+\S*$/,"")+"…":t}
 
 // Editorially checked phrases come from the source text, not inferred from a title.
@@ -41,15 +88,17 @@ function cleanLead(s,sourceTitle=""){
  if(sourceTitle&&/^(?:(?:this|the|our) (?:study|paper|article|research)\b|(?:the authors|the researchers)\b|we (?:found|show|argue)\b)/i.test(x)){
   return String(sourceTitle).trim();
  }
+ const letters=x.match(/[A-Za-z]/g)||[],uppers=x.match(/[A-Z]/g)||[];
+ if(letters.length>17&&uppers.length/letters.length>.80){x=readableSourceTitle({title:x});}
  return x?x[0].toUpperCase()+x.slice(1):"";
 }
 function shortIdea(x,limit=105){
- const r=x.reading||{},d=r.digest||{},key=(x.doi||"").toLowerCase();
- // Prefer an actual editorial takeaway to a long extracted Results sentence.
- if(d.status==="editorially_written_from_indexed_sections"&&d.idea)return cut(cleanLead(d.idea,x.title),limit);
- if(d.idea&&x.kind==="nonacademic")return cut(cleanLead(d.idea),limit);
- if(r.findings&&highlightByDOI[key])return cut(highlightByDOI[key],limit);
- return cut(cleanLead(d.finding||d.idea||r.overview||x.title,x.title),limit);
+ const d=x.reading?.digest||{};
+ // Source findings and edited ideas take priority. The common fallback is a
+ // visibly topic-framed question, never an all-caps bibliographic title.
+ const value=d.status==="editorially_written_from_indexed_sections"?
+    d.idea||d.finding:d.finding||d.idea||readableSourceTitle(x);
+ return cut(cleanLead(value,readableSourceTitle(x)),limit);
 }
 function ideaInfo(x){
  const r=x.reading||{},d=r.digest||{},notes=x.editorial_notes||{};
@@ -66,7 +115,7 @@ function ideaInfo(x){
  }else{
   value=d.idea||r.overview||"";label="RESEARCH TOPIC / NOT AN ESTABLISHED FINDING";
  }
- return {text:cleanLead(value,x.title)||"No substantive source text is available.",label};
+ return {text:cleanLead(value,readableSourceTitle(x))||"No substantive source text is available.",label};
 }
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.digest?.finding?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
@@ -90,7 +139,7 @@ function issueRefs(ids,target){
    const src=list.find(x=>x.id===key);
    if(!src)continue;
    const matches=S.records.find(x=>id(x)===key);
-   const b=matches?btn(src.title,()=>goto("paper",id(matches)),"issue-ref"):link(src.title,src.url||"#library","issue-ref");
+   const b=matches?btn(readableSourceTitle(src),()=>goto("paper",id(matches)),"issue-ref"):link(readableSourceTitle(src),src.url||"#library","issue-ref");
    container.append(b);
  }
  return container;
@@ -168,7 +217,7 @@ function renderIssue(){
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries()){
   const r=make("div","issue-shelf-item");let candidate=S.records.find(x=>id(x)===src.id);
-  const title=candidate?btn(src.title,()=>goto("paper",src.id)):link(src.title,src.url||"#library");
+  const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",src.id)):link(readableSourceTitle(src),src.url||"#library");
   add(r,make("span","issue-shelf-number",String(i+1).padStart(2,"0")),add(make("div","issue-shelf-content"),title,make("p","",[src.venue,src.reading_level==="full_text"?"Full-text extract":src.reading_level==="abstract"?"Abstract-based":"Publisher/editorial"].filter(Boolean).join(" · "))));
   shelf.append(r);
  }
@@ -183,14 +232,14 @@ function home(){
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
  add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","↗","✳"][i]));
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
- add(c,head,make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),make("p","feature-source-title",x.title),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
+ add(c,head,editorialMedia(x,"feature"),make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),make("p","feature-source-title",readableSourceTitle(x)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
  topicBars("#topic-bars");donut();
  const grid=$("#lens-grid");grid.replaceChildren();themes.forEach(t=>{const a=link("","#library","lens");a.setAttribute("aria-label","Explore "+t[0]);a.onclick=e=>{e.preventDefault();$("#topic-filter").value=t[0];goto("library")};add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.published||"").localeCompare(a.published||"")).slice(0,7);
- for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",x.title));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
+ for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
 }
 
 function renderEditorial(){
@@ -204,7 +253,7 @@ function renderEditorial(){
   const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x,92),()=>goto("paper",id(x))));
   const foot=make("div","editorial-foot");
   add(foot,make("span","",x.venue||"Original source"),btn("Explore ↗",()=>goto("paper",id(x)),"editorial-cta"));
-  add(card,label,articleTitle,make("p","editorial-source-title",x.title),foot);root.append(card)
+  add(card,editorialMedia(x,"editorial"),label,articleTitle,make("p","editorial-source-title",readableSourceTitle(x)),foot);root.append(card)
  }
 }
 
@@ -222,10 +271,10 @@ function renderPerspectives(){
     const icon=make("div","perspective-glyph",x.source==="Official product documentation"?"◈":x.format==="Policy analysis"?"◇":"↗");
     const label=make("div","perspective-type",x.format||"Reporting & analysis");
     const title=make("h3");title.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));
-    const summary=make("p","perspective-source-title",x.title);
+    const summary=make("p","perspective-source-title",readableSourceTitle(x));
     const bottom=make("div","perspective-bottom");
     add(bottom,make("span","",x.venue||"Original source"),btn("Read source notes ↗",()=>goto("paper",id(x)),"editorial-cta"));
-    add(item,icon,label,title,summary,bottom);container.append(item);
+    add(item,editorialMedia(x,"perspective"),icon,label,title,summary,bottom);container.append(item);
   }
  }
 }
@@ -250,7 +299,18 @@ function showLibrary(){
  $("#library-count").textContent=xs.length+" results · "+S.records.length+" total sources";
  const box=$("#library-results");box.replaceChildren();
  if(!xs.length){box.append(make("div","empty-state","No source-backed items match those filters. Try a broader search."));return}
- for(const x of xs){const c=make("article","library-card"),h=make("h3"),foot=make("div","card-foot");h.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));add(c,make("span","card-type",ideaInfo(x).label),h,make("p","library-citation",x.title),foot);box.append(c)}
+ for(const x of xs){
+  const c=make("article","library-card library-story"),body=make("div","library-story-body"),h=make("h3"),foot=make("div","card-foot");
+  const image=editorialMedia(x,"card");
+  image.onclick=()=>goto("paper",id(x));
+  image.setAttribute("role","button");
+  image.tabIndex=0;
+  image.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();goto("paper",id(x));}});
+  h.append(btn(shortIdea(x,115),()=>goto("paper",id(x))));
+  add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));
+  add(body,make("span","card-type",ideaInfo(x).label),h,make("p","library-citation",readableSourceTitle(x)),foot);
+  add(c,image,body);box.append(c);
+ }
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
@@ -269,7 +329,7 @@ function processedIdea(x){
  const d=x.reading?.digest;
  if(d){
   const idea=d.status==="editorially_written_from_indexed_sections"?(d.idea||d.finding):d.finding||d.idea||d.interpretation;
-  if(idea)return cut(idea,145);
+  if(idea)return cut(cleanLead(idea,readableSourceTitle(x)),145);
  }
  return shortIdea(x,145);
 }
@@ -383,10 +443,10 @@ function showPaper(x){
   editorial?"An editor-written explanation based on the available source.":
   scholarly?"Automatically condensed source material; not an independently checked synthesis.":
   "Publisher or editorial perspective, not a verified empirical result.");
- const title=make("h1","rv-headline",cut(cleanLead(headline,x.title),230));
+ const title=make("h1","rv-headline",cut(cleanLead(headline,readableSourceTitle(x)),230));
  const intro=d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
- main.append(back,head);
+ main.append(back,head,editorialMedia(x,"reading"));
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
  const body=make("section","rv-content");
  const lead=make("div","rv-section-head");
@@ -454,7 +514,7 @@ function showPaper(x){
  const cite=make("section","rv-source");
  add(cite,make("span","rv-section-overline","SOURCE"),
   make("h2","","Behind this reading"),
-  make("h3","rv-source-title",x.title),
+  make("h3","rv-source-title",readableSourceTitle(x)),
   make("p","rv-source-meta",[x.venue,date(x.published)].filter(Boolean).join(" · ")));
  const pills=make("div","rv-source-pills");
  add(pills,make("span","",depthName(x)),
