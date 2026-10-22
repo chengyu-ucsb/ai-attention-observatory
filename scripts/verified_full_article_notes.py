@@ -46,10 +46,11 @@ def apply(rows,manifest=None):
         applied+=1
     return applied
 
-def run():
-    rows=json.loads(LIB.read_text(encoding="utf-8"))
+def run(path=LIB):
+    path=Path(path)
+    rows=json.loads(path.read_text(encoding="utf-8"))
     applied=apply(rows)
-    LIB.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    path.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print(json.dumps({"verified_full_article_notes_attached":applied,"original_source_text_stored":False}))
     return applied
 
