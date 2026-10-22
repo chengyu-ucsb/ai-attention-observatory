@@ -228,10 +228,13 @@ def readable_excerpt(text,role="finding",limit=195):
    s=updated
    break
  # Argument and interpretation are not facts; keep attribution/uncertainty.
- s=re.sub(r"^(?:the authors|the researchers) (?:argue|argued|suggest|suggested|propose|proposed) that\s+",
-          "One interpretation is that ",s,flags=re.I)
+ # Keep hedging without starting the sentence with the author or paper.
+ # Where a claim lacks uncertainty language, preserve attribution as an
+ # argument rather than converting it into a verified fact.
+ s=re.sub(r"^(?:the authors|the researchers) (?:suggest|suggested|propose|proposed|argue|argued) that\s+",
+          "A possible explanation is that ",s,flags=re.I)
  s=re.sub(r"^(?:the authors|the researchers) (?:describe|described)\s+",
-          "The paper describes ",s,flags=re.I)
+          "",s,flags=re.I)
  s=s[0].upper()+s[1:] if s else ""
  # Prefer an intact first sentence when it communicates a full thought.
  parts=sentence_list(s)
