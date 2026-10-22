@@ -15,6 +15,15 @@ def run():
   "pmc_lookup_statuses":dict(collections.Counter((r.get("pmc_oai_attempt") or {}).get("status","not_tried") for r in pending)),
   "openalex_xml_statuses":dict(collections.Counter((r.get("fulltext_attempt") or {}).get("status","not_tried") for r in pending)),
   "openalex_pdf_statuses":dict(collections.Counter((r.get("pdf_fulltext_attempt") or {}).get("status","not_tried") for r in pending)),
+  "independent_repository_statuses":dict(collections.Counter((r.get("repository_recovery") or {}).get("status","not_tried") for r in pending)),
+  "missing_fulltext_triage":dict(collections.Counter(
+   "no_identifier" if not r.get("doi") else
+   "licensed_pdf_not_readable" if (r.get("repository_recovery") or {}).get("status")=="pdf_unreadable_or_blocked" else
+   "rights_or_license_unverified" if (r.get("repository_recovery") or {}).get("status") in ("license_unverified","pdf_host_unapproved") else
+   "temporary_provider_failure" if (r.get("repository_recovery") or {}).get("status") in ("provider_error","provider_limited") else
+   "no_independent_oa_pdf_found" if (r.get("repository_recovery") or {}).get("status")=="no_oa_pdf_reported" else
+   "waiting_for_repository_check"
+   for r in pending)),
   "fulltext_providers":dict(collections.Counter((r.get("analysis") or {}).get("provenance","") for r in scholarly if r.get("analysis"))),
   "warning":"Full-text sections are automatically extracted, not verified article-level full text reviews."
  }
