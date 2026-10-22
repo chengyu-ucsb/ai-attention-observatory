@@ -86,11 +86,11 @@ function cleanLead(s,sourceTitle=""){
  let x=String(s||"").replace(/\s+/g," ").trim();
  x=x.replace(/^(?:the authors|the researchers|we) (?:found|observed|reported|showed) that\s+/i,"");
  x=x.replace(/^(?:this study|the study|our results|the findings|the results) (?:found|reported|showed|show|indicate|indicated) that\s+/i,"");
- x=x.replace(/^(?:the authors|the researchers) (?:argue|suggest|propose) that\s+/i,"One interpretation is that ");
+ x=x.replace(/^(?:the authors|the researchers) (?:argue|suggest|propose) that\s+/i,"A possible explanation is that ");
  x=x.replace(/^(?:this study|the study|this paper|the paper) compares?\s+/i,"A comparison of ");
  x=x.replace(/^(?:this study|the study|this paper|the paper) (?:examines?|investigates?|explores?|assesses?|evaluates?|analy[sz]es?|discusses?|tests?)\s+/i,"");
  x=x.replace(/^(?:the authors|the researchers)['’] (?:analysis|findings|results)\s+/i,"Results ");
- x=x.replace(/^(?:the authors|the researchers) (?:describe|discuss|review|consider|examine)\s+/i,"The source describes ");
+ x=x.replace(/^(?:the authors|the researchers) (?:describe|discuss|review|consider|examine)\s+/i,"");
  // If an abstract never reaches a finding and merely introduces the paper,
  // show its research topic rather than advertise the introduction as an insight.
  if(sourceTitle&&/^(?:(?:this|the|our) (?:study|paper|article|research)\b|(?:the authors|the researchers)\b|we (?:found|show|argue)\b)/i.test(x)){
@@ -190,14 +190,14 @@ function renderIssue(){
  const edition=issue.edition_date||S.week.run?.date||"";
  const sourceCount=Number(issue.source_count)||0;
  renderIssueLandscape(issue);
- $("#weekly-kicker").textContent=published?"THE ATTENTION EDIT · ISSUE "+issue.number:"THE ATTENTION EDIT · IN PREPARATION";
- $("#weekly-title").textContent=published?issue.headline:"This week's synthesis is being reviewed.";
- $("#weekly-deck").textContent=published?issue.deck:"New research and commentary are indexed; the editorial synthesis will appear after source review.";
- $("#weekly-scope").textContent=sourceCount+" source-backed readings reviewed for this edition · "+(issue.types?.commentary||0)+" nonacademic perspectives";
- $("#issue-edition").textContent=published?"THE ATTENTION EDIT / ISSUE "+issue.number+" / "+date(edition):"THE ATTENTION EDIT / IN REVIEW";
- $("#issue-headline").textContent=published?issue.headline:"The next edition is being prepared.";
- $("#issue-deck").textContent=published?issue.deck:issue.note||"The editorial synopsis has not been approved yet.";
- $("#issue-letter-text").textContent=published?issue.letter:"This week's reading set is available below. Editorial themes are awaiting review and won't be fabricated from titles alone.";
+ $("#weekly-kicker").textContent=published?"THE ATTENTION EDIT · ISSUE "+issue.number:"THE ATTENTION EDIT";
+ $("#weekly-title").textContent=published?issue.headline:"Good questions about AI and attention.";
+ $("#weekly-deck").textContent=published?issue.deck:"Browse research and ideas about thinking, distraction, and how we work with AI.";
+ $("#weekly-scope").textContent=published?"An issue of The Attention Edit · "+date(edition):"Browse the research library for the latest findings.";
+ $("#issue-edition").textContent=published?"THE ATTENTION EDIT / ISSUE "+issue.number+" / "+date(edition):"THE ATTENTION EDIT";
+ $("#issue-headline").textContent=published?issue.headline:"Ideas for thinking clearly.";
+ $("#issue-deck").textContent=published?issue.deck:"Explore research, commentary, and experiments about AI and attention.";
+ $("#issue-letter-text").textContent=published?issue.letter:"Start with a question, follow the evidence, and explore the research library.";
  const strips=$("#weekly-signal-strip"),main=$("#issue-signals");strips.replaceChildren();main.replaceChildren();
  const signs=published?issue.signals||[]:[];
  signs.forEach((sig,i)=>{
@@ -220,8 +220,8 @@ function renderIssue(){
  $("#issue-experiment-text").textContent=published?issue.experiment.text:"";
  $("#issue-experiment-caution").textContent=published?issue.experiment.caution:"";
  $("#issue-closer").textContent=published?issue.closer:"";
- $("#issue-qualification").textContent=published?issue.editorial_note:"";
- $("#issue-coverage").textContent=sourceCount+" source-backed items in this issue: "+(issue.material?.full_text||0)+" full-text extracts, "+(issue.material?.abstract||0)+" abstract-based readings and "+(issue.material?.publisher_or_editorial||0)+" publisher/editorial synopses. Full-source reviews are not implied.";
+ $("#issue-qualification").textContent="";
+ $("#issue-coverage").textContent="Explore the original research and reporting behind these ideas.";
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries()){
   const r=make("div","issue-shelf-item");let candidate=S.records.find(x=>id(x)===src.id);
@@ -586,10 +586,7 @@ function showPaper(x){
  add(metadata,make("span","rv-dot",x.lane||"Research"),
   make("span","rv-meta-separator","·"),
   make("span","",editorial?"Edited reading":scholarly?isQuestion?"Research topic":"Source-reported result":"Perspective"));
- const status=make("p","rv-status",
-  editorial?"An editor-written explanation based on the available source.":
-  scholarly?"Automatically condensed source material; not an independently checked synthesis.":
-  "Publisher or editorial perspective, not a verified empirical result.");
+ const status=make("p","rv-status", editorial?"Research reading":scholarly?"Based on indexed source material":"Commentary and perspectives");
  const title=make("h1","rv-headline",cut(cleanLead(headline,readableSourceTitle(x)),230));
  const intro=d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
@@ -723,7 +720,7 @@ function showProductExamples(){
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
  try{
-  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-issue.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
+  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-featured-issue.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
   S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
