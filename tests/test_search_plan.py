@@ -13,11 +13,11 @@ from enrich_openalex_fulltext import extract as extract_grobid,eligible as grobi
 class SearchScopeTests(unittest.TestCase):
  def test_history_backfill_covers_every_early_year_across_four_themes(self):
   tasks=plan(dt.date(2026,10,21),"backfill")
-  self.assertGreaterEqual(len(tasks),20)
+  self.assertGreaterEqual(len(tasks),28)
   for theme in LANES:
    for year in (2023,2024,2025):
     matches=[x for x in tasks if x[0]==theme and x[4]==f"historical:{year}"]
-    self.assertEqual(len(matches),1,(theme,year))
+    self.assertEqual(len(matches),2 if year in (2023,2024) else 1,(theme,year))
   self.assertTrue(all(start<=end for _,_,start,end,_ in tasks))
   self.assertTrue(all(start[:4]>="2023" for _,_,start,_,_ in tasks))
 
