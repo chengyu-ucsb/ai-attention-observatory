@@ -23,6 +23,42 @@ Developed by [Chengyu Fang](https://chengyufang.org/). This is an evolving resea
 
 RSS follows *approved editorial issues*. It does **not** publish every incoming bibliographic record. A new week without reviewed editorial copy leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
 
+## Private Zotero access
+
+The optional GitHub Actions workflow **Check Zotero research access** connects to
+the user's Zotero Web API with the read-only key stored in the repository's
+Actions secret ZOTERO_API_KEY. It follows Zotero's supported API v3 endpoints.
+
+1. In Zotero, create a collection named **AI & Attention Observatory** and
+   move or copy the relevant paper records into it. Nested subcollections are
+   included. Other personal Zotero collections are not read.
+2. Create a Zotero API key with user-library read access and no write
+   permissions, then save it as repository secret ZOTERO_API_KEY. Never paste
+   the key in an issue, chat, README, commit, log or public file.
+3. GitHub Actions checks that the key is valid, locates that exact collection,
+   matches Zotero records to existing Observatory DOIs, and checks whether
+   Zotero has **synced indexed full-text content** for matching PDF attachments.
+   The workflow is read-only and uses no university browser session or cookies.
+4. See [Check Zotero research access](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/workflows/zotero.yml)
+   for status only. Statuses include secret_missing, collection_missing_or_ambiguous,
+   collection_empty, connected_no_doi_overlap, connected_no_synced_fulltext,
+   and connected_indexed_fulltext_available.
+
+**Privacy boundary:** This is a *connectivity and available-text audit*,
+not blanket authorization to publish university-subscription content. The
+Zotero API key may cover more of the user's library than the Observatory
+collection; the program deliberately limits queries to the named collection.
+Raw Zotero text, PDF attachments, private titles, account IDs and item keys
+stay out of the public GitHub repository, GitHub Actions logs, public Pages
+data and workflow artifacts. GitHub-hosted jobs are ephemeral.
+
+If the PDF exists only in the desktop Zotero app or the institution's browser
+session, it might not appear via the Zotero cloud full-text API. Zotero access
+also does not automatically inherit University of Cincinnati library login.
+Institutional terms may restrict text mining or third-party processing even
+when an individual user can read the paper. A separate local-only analysis and
+rights-review workflow is needed before publishing original derived readings.
+
 ## How the research pipeline works
 
 1. **Weekly discovery** (`.github/workflows/refresh.yml`) collects source records from academic and nonacademic publishers.

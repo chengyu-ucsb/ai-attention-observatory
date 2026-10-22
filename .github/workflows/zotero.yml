@@ -1,0 +1,34 @@
+name: Check Zotero research access
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/zotero.yml'
+      - 'scripts/zotero_sync.py'
+      - 'tests/test_zotero_sync.py'
+  schedule:
+    - cron: '47 13 * * 2'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: zotero-private-reader
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Verify privacy and Zotero integration tests
+        run: |
+          python -m compileall -q scripts/zotero_sync.py tests/test_zotero_sync.py
+          python -m unittest discover -s tests -p 'test_zotero_sync.py' -v
+      - name: Check named collection and indexed full-text accessibility
+        env:
+          ZOTERO_API_KEY: ${{ secrets.ZOTERO_API_KEY }}
+          ZOTERO_COLLECTION: AI & Attention Observatory
+        run: python scripts/zotero_sync.py
