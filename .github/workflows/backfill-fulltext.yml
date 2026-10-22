@@ -7,6 +7,7 @@ on:
       - 'scripts/enrich_figure_links.py'
       - 'scripts/enrich.py'
       - 'scripts/enrich_pmc_oai.py'
+      - 'scripts/enrich_pdf_fulltext.py'
       - 'scripts/enrich_openalex_fulltext.py'
       - 'scripts/build_readings.py'
       - 'scripts/seed_historical.py'
@@ -33,6 +34,8 @@ jobs:
       OPENALEX_FULLTEXT_LIMIT: '36'
       PMC_OAI_LIMIT: '58'
       PMC_OAI_XML_LIMIT: '18'
+      PDF_FULLTEXT_LOOKUPS: '22'
+      PDF_FULLTEXT_DOWNLOADS: '9'
       OPENALEX_CONTENT_LIMIT: '12'
       OA_ENRICH_LIMIT: '46'
       FIGURE_VERIFY_LIMIT: '5'
@@ -43,6 +46,8 @@ jobs:
           python-version: '3.12'
       - name: Check Python syntax before external requests
         run: python -m compileall -q scripts tests
+      - name: Install PDF-text extractor
+        run: python -m pip install "pypdf>=6.0,<7.0"
       - name: Try permitted Europe PMC full-text sources
         run: python scripts/enrich.py
       - name: Retrieve licensed PMC full text via DOI-to-PMC and official OAI-PMH
@@ -51,6 +56,8 @@ jobs:
         run: python scripts/enrich_figure_links.py
       - name: Resume licensed OpenAlex full-text queue
         run: python scripts/enrich_openalex_fulltext.py
+      - name: Extract licensed OA PDF sections missing from XML providers
+        run: python scripts/enrich_pdf_fulltext.py
       - name: Rebuild reading notes and public projection
         run: |
           python scripts/build_readings.py
