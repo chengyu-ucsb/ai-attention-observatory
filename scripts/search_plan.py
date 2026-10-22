@@ -7,6 +7,7 @@ not a claim of exhaustive systematic-review retrieval or field-wide trends.
 """
 from __future__ import annotations
 import datetime as dt
+import re
 
 START_YEAR=2023
 LANES={
@@ -34,7 +35,6 @@ LANES={
 
 def plan(today=None, mode="weekly"):
     today=today or dt.date.today()
-    start=max(START_YEAR,today.year-3)
     all_years=list(range(START_YEAR,today.year))
     tasks=[]
     # Current research first; balanced across all four questions rather
@@ -60,7 +60,7 @@ def source_class(record):
     year=(record.get("published") or "")[:4]
     title=(record.get("title") or "").lower()
     text=(title+" "+(record.get("abstract_text") or record.get("preview") or "").lower())
-    direct=any(term in text for term in (
+    direct=bool(re.search(r"\\bai\\b",text)) or any(term in text for term in (
         "chatgpt","generative ai","generative artificial intelligence",
         "large language model","llm","gpt-4","gpt-3","ai-assisted",
         "ai-based","ai powered","ai-powered","artificial intelligence"))
