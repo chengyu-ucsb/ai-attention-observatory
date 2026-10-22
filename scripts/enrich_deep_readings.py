@@ -13,6 +13,7 @@ import html
 import json
 import os
 from pathlib import Path
+from editorial_corrections import apply as apply_editorial_corrections
 import re
 import time
 from urllib.parse import urlsplit
@@ -243,7 +244,7 @@ def process(records, model=None, limit=4):
 
 def main():
     # Absolutely no hosted inference API keys used or read here.
-    records = json.loads(LIB.read_text())
+    records = apply_editorial_corrections(json.loads(LIB.read_text()))
     if not MODEL_FILE.is_file() or MODEL_FILE.stat().st_size < 200_000_000:
         print(json.dumps({"skipped": "Local GGUF model file not available; no inference API calls"}))
         return
