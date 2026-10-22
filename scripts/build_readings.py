@@ -4,6 +4,7 @@ Extractive, provenance-labelled notes only. No generated numerical results, fabr
 methods, or LLM inference. Missing sections stay missing instead of generic prompts.
 """
 import json,pathlib,re,html
+from source_lineage import prepare
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 STOP=("abstract unavailable","bibliographic metadata only","no abstract", "abstract not available")
@@ -49,6 +50,8 @@ def make_note(r):
     if len(src)<90 and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         src=clean(r["preview"])
     full=r.get("analysis") or {}
+    conceptual=r.get("research_type")=="conceptual_framework"
+    framework=r.get("framework_notes") or {}
     licensed=bool(full.get("fulltext_url"))
     if licensed:
         approach=clean(full.get("methods"))[:1500]
@@ -81,10 +84,16 @@ def make_note(r):
         provider="Initial editorial reference list (not full-text verified)"
     else:
         return {"level":"citation_only","provenance":"Citation only","overview":"","methods":"","findings":"","limitations":"","sample":"","notice":"No accessible abstract or licensed text has been indexed for this record."}
+    if conceptual:
+        approach=framework.get("approach") or ""
+        results=""  # A proposed framework cannot be counted as an observed result.
+        interpretation=framework.get("idea") or ""
+        caveat=framework.get("qualification") or ""
     # Samples appear only if literally stated in the source text, never inferred.
     sm=SAMPLE.search(approach or src)
     sample=sm.group(1) or sm.group(2) if sm else ""
     if sample and not METHOD.search(approach):sample=""  # Require an actual methodological context.
+    if conceptual:sample=""
     has_finding=bool(results)
     return {
         "level":"full_text" if licensed else "abstract" if len(src)>=90 else "curated",
@@ -100,11 +109,12 @@ def make_note(r):
         "notice":("Excerpts from licensed article sections; automatically selected, not independently reviewed." if licensed else
                   "Structured highlights selected from the source abstract; not an appraisal of the full paper." if len(src)>=90 else
                   "Initial topic synopsis, not a verified paper-level analysis."),
+        "research_type":"conceptual_framework" if conceptual else r.get("research_type") or "unclassified",
         "reported_findings":has_finding
     }
 
 def main():
-    records=json.loads(LIB.read_text())
+    records=prepare(json.loads(LIB.read_text()))
     counts={}
     for r in records:
         r["reading"]=make_note(r)

@@ -114,6 +114,14 @@ The separate `.github/workflows/deepen-readings.yml` workflow runs **without any
 
 Each generated reading is labeled **local-model, not independently reviewed**. Source-matching anchors and copying checks reject some unsupported or excessively extractive outputs, but **cannot guarantee factual accuracy**. The 0.5B local model may produce less nuanced readings than a larger service. Records from inaccessible, incomplete, or paywalled articles show a short publisher summary (when available) and the source link, never a manufactured article analysis. Future contributions can add editorially verified in-depth readings.
 
+## Original research and derivative commentary
+
+When a news article or expert explainer discusses an identifiable paper, the **original scholarly publication is the canonical research entry**. Its public-facing companion is linked on that reading page rather than counted as another independent research contribution. The research archive preserves the companion's original URL, including older links. Only editor-verified relationships are collapsed; sharing a topic, author, or terminology is insufficient evidence of duplication.
+
+Source links and original-paper records are tracked in `data/source-lineage.json` and resolved by `scripts/source_lineage.py`. The first verified pair is Luke Rowe's October 2026 *The Conversation* explainer and the original August 2026 `Education Sciences` paper (DOI: [10.3390/educsci16081291](https://doi.org/10.3390/educsci16081291)). The primary is a **conceptual framework** proposing staged educational uses of AI, *not* a controlled test of those stages. Its record includes the publisher link and an attributed short account of the proposed framework; a full-text analysis is only marked after actually retrieving and processing permitted article text.
+
+This is an initial, explicit source-lineage system. Not every journalistic reference has yet been traced to the research behind it; unresolved links are kept separate rather than matched by guesswork.
+
 The internal acquisition database is `data/library.json`. The public reading projection lives in `data/public-library.json`. **Citation-only and substantively unsupported records are excluded from the public site and RSS.** Open-access links alone do not count as full-text extraction.
 
 The newsletter generator is `scripts/build_newsletter.py`. It builds the latest preview (`newsletter.html`), permanent editions (`issues/`), and RSS 2.0 (`issue-feed.xml`) with stable permalinks and publication dates.
