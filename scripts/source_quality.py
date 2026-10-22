@@ -13,7 +13,7 @@ ROOT=Path(__file__).resolve().parents[1]
 RULES=ROOT/"data/venue-standards.json"
 
 AI=re.compile(r"\b(?:generative(?:\s+artificial)?\s+ai|chatgpt|genai|copilot|llms?|large language models?|artificial intelligence|ai[- ](?:assisted|based|powered|generated|enabled)|human[- ]ai|\bAI\b)\b",re.I)
-FOCUS=re.compile(r"(?:\battention\b|attentional|sustained focus|distraction|interruptions?|task[- ]switching|multitask|cognitive (?:offload|effort|engagement|load|control|autonomy|process)|critical thinking|metacognit|self[- ]regulat|reasoning|human[- ]ai collaboration|cognitive dependency|ai dependenc|learning (?:engagement|strategy|strategies)|pedagogical scaffolding|digital well[- ]?being|digital distraction|attention economy|epistemic agency)",re.I)
+FOCUS=re.compile(r"(?:\battention\b|attentional|sustained focus|distraction|interruptions?|task[- ]switching|multitask|cognitive (?:offload|effort|engagement|load|control|autonomy|process)|critical thinking|metacognit|self[- ]regulat|reasoning|human[- ]ai collaboration|cognitive dependency|ai dependenc|learning (?:engagement|strategy|strategies)|collaborative prompt|problem.solv|pedagogical scaffolding|digital well[- ]?being|digital distraction|attention economy|epistemic agency)",re.I)
 ADJACENT=re.compile(r"(?:attention|attentional|digital distraction|interruptions?|notification|task[- ]switching|multitask|focus|cognitive control|self[- ]regulat)",re.I)
 ENGINEERING=re.compile(r"(?:cross[- ]attention|transformer|gru|tabtransformer|image recognition|object detection|satellite|convolutional|computer vision)",re.I)
 PREPRINT=re.compile(r"(?:arxiv|research square|zenodo|osf|preprint|ssrn|ed.?arxiv)",re.I)
