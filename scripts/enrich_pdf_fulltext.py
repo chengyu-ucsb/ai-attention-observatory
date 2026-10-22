@@ -20,7 +20,7 @@ import urllib.request
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 ALLOW={"cc-by","cc-by-sa","cc0","public-domain"}
-HEAD=re.compile(r"^\s*(?:(?:\d+(?:\.\d+){0,3})[\s.)-]+)?(materials and methods|methodology|methods?|study design|results?(?: and discussion)?|findings|discussion|general discussion|limitations|conclusions?|concluding remarks|references|bibliography|acknowledgments)\s*[:.]?\s*$",re.I)
+HEAD=re.compile(r"^\s*(?:(?:\d+(?:\.\d+){0,3})[\s.)-]+)?(materials and methods|methodology|methods?|study design|results?(?: and discussion)?|findings|discussion|general discussion|limitations|conclusions?(?: and future work)?|concluding remarks|empirical findings|evaluation results?|experimental results?|materials and methods|references|bibliography|acknowledgments)\s*[:.]?\s*$",re.I)
 PARA=re.compile(r"\s+")
 USER_AGENT="AI-Attention-Observatory/4.1 (fangcu@ucmail.uc.edu)"
 def clean(t):return PARA.sub(" ",str(t or "")).strip()
@@ -37,7 +37,7 @@ def fetch(url,key="",binary=False):
 def section_name(heading):
  text=heading.lower().strip()
  if text.startswith(("material","method","study design")):return "methods"
- if text.startswith(("result","finding")):return "results"
+ if text.startswith(("result","finding","empirical finding","evaluation result","experimental result")):return "results"
  if text.startswith(("discussion","general discussion","conclusion","concluding")):return "discussion"
  if text.startswith("limitation"):return "limitations"
  return None
