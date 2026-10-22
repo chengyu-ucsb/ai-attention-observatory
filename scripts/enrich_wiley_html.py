@@ -74,7 +74,8 @@ def run(path=LIB,today=None,fetch=request,limit=None):
     path=Path(path)
     records=json.loads(path.read_text(encoding="utf-8"))
     due=[r for r in records if eligible(r,today)]
-    due.sort(key=lambda r:(0 if str(r.get("doi") or "").startswith("10.1111/bjet.") else 1,r.get("published") or ""),reverse=False)
+    due.sort(key=lambda r:(0 if str(r.get("doi") or "").startswith("10.1111/bjet.") else 1,
+                            -int(str(r.get("published") or "0000")[:4]) if str(r.get("published") or "")[:4].isdigit() else 0))
     stats={"wiley_due":len(due),"wiley_attempted":0,"public_html_verified":0,
            "publisher_blocked":0,"no_full_article":0}
     for row in due[:limit]:
