@@ -11,26 +11,44 @@ def permitted(licenses):
   if "cc by" in val or "cc-by" in val or "cc0" in val or "creative commons zero" in val:return True
  return False
 def extract_sections(root):
+ """Preserve several substantive paragraphs per article section for synthesis.
+
+ Methods, Results and Discussion remain separate. Avoid copying whole papers,
+ and avoid indexing a references section as a research result.
+ """
  sections={}
  for sec in root.findall(".//body//sec"):
-  title=clean(" ".join(sec.find("title").itertext()) if sec.find("title") is not None else "").lower()
+  heading=sec.find("title")
+  title=clean(" ".join(heading.itertext()) if heading is not None else "").lower()
   if not title:continue
-  if any(k in title for k in ("method","study design","result","finding","discussion","conclusion","limitation")):
-   # Respect Results versus Discussion. Keep an identifiable, longer source excerpt.
-   name=("limitations" if "limitation" in title else
-         "results" if "result" in title or "finding" in title else
-         "discussion" if "discussion" in title or "conclusion" in title else
-         "methods")
-   text=clean(" ".join(sec.itertext()))
-   if name not in sections and len(text)>60:sections[name]=text[:1100]
+  key=("limitations" if "limitation" in title else
+       "results" if "result" in title or "finding" in title else
+       "discussion" if "discussion" in title or "conclusion" in title else
+       "methods" if any(x in title for x in ("method","study design","participant","procedure")) else "")
+  if not key:continue
+  # Exclude nested sections from a parent if both are labeled; nested text
+  # can be added again by its own section if useful.
+  paras=[clean(" ".join(p.itertext())) for p in sec.findall(".//p")]
+  paras=[p for p in paras if len(p)>=50]
+  # Method/Results samples should be meaningful, not a single heading.
+  if not paras:continue
+  old=sections.get(key,"")
+  candidate=" ".join(paras)
+  if old: candidate=old+" "+candidate
+  if len(candidate)>4800:
+   candidate=candidate[:4800].rsplit(" ",1)[0]
+  sections[key]=candidate
  return sections
 def run():
  path=DATA/"library.json";records=json.loads(path.read_text());updated=0;attempted=0
- today=datetime.date.today().isoformat();limit=int(os.getenv("OA_ENRICH_LIMIT","22"))
- for r in records:
+ today=datetime.date.today().isoformat();limit=max(1,min(75,int(os.getenv("OA_ENRICH_LIMIT","38"))))
+ candidates=[r for r in records if r.get("kind")=="scholarly" and r.get("doi") and not r.get("analysis")]
+ # A PMC-like open-access link is useful evidence that XML may already exist.
+ candidates.sort(key=lambda r:(0 if any(k in (r.get("open_access_url") or "").lower() for k in ("pmc","bmc","frontiers","plos")) else 1,
+                               0 if r.get("oa_checked") is None else 1,r.get("oa_checked") or ""))
+ for r in candidates:
   if attempted>=limit:break
-  if r.get("analysis") or not r.get("doi") or r.get("kind")!="scholarly":continue
-  if r.get("oa_checked") and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<45:continue
+  if r.get("oa_checked") and (datetime.date.today()-datetime.date.fromisoformat(r["oa_checked"])).days<7:continue
   attempted+=1;r["oa_checked"]=today
   try:
    url="https://www.ebi.ac.uk/europepmc/webservices/rest/search?"+urllib.parse.urlencode({"query":"DOI:"+r["doi"],"format":"json","pageSize":1})
