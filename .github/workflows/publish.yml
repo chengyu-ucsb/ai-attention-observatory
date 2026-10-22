@@ -15,6 +15,7 @@ on:
       - 'feed.xml'
       - 'scripts/build_public.py'
       - 'scripts/source_audit.py'
+      - 'scripts/export_zotero_backlog.py'
       - 'scripts/build_visuals.py'
       - 'scripts/build_issue.py'
       - 'scripts/build_newsletter.py'
@@ -55,6 +56,7 @@ jobs:
         run: |
           python scripts/build_public.py
           python scripts/source_audit.py
+          python scripts/export_zotero_backlog.py
           python scripts/build_issue.py
           python scripts/build_newsletter.py
           python scripts/feed.py
@@ -93,6 +95,8 @@ jobs:
           cp index.html subscribe.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
           mkdir -p _site/assets
           cp assets/reading-*.svg assets/feed.xsl _site/assets/
+          mkdir -p _site/exports
+          cp exports/zotero-fulltext-backlog.ris _site/exports/
           mkdir -p _site/issues
           cp -R issues/. _site/issues/
           mkdir -p _site/data
