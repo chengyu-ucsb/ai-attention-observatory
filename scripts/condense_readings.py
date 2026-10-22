@@ -352,6 +352,83 @@ def public_commentary_idea(record):
    return idea
  return ""
 
+
+# In-depth, independently written, source-specific readings. These are not
+# generated from headlines: their argument structure was checked against the
+# original public essays. Product notes below are based on published feature
+# descriptions and explicitly make no effectiveness claim.
+DEEP_PERSPECTIVES = {
+ "the-internet-was-built-for-human-agency": {
+  "reasoning": "The authors distinguish an agent's technical capability from the authority it legitimately exercises. Traditional Internet governance tends to focus on identities and network standards; AI governance tends to focus on model behavior. Neither alone answers who approved a particular action, for how long, or whether it can be audited and reversed.",
+  "examples": "They place existing authorization work, including tool-access protocols, agent-to-agent interoperability, and proposals for verifiable delegation, within a broader need for an Internet authority layer. The principal–agent relationship is their organizing analogy.",
+  "tension": "More autonomy can reduce friction for users while increasing the distance between a person's intention and the actions attributed to that person. Technical authorization may prove that a system had permission without establishing that its action reflected informed preferences.",
+  "open_question": "What evidence would show that people understand, can inspect, and can revoke the decisions an attention assistant makes for them?",
+  "basis": "Editorial analysis of the public essay"
+ },
+ "when-an-ai-agent-says": {
+  "reasoning": "The essay arranges delegation along a continuum, from AI preparing a choice for human confirmation to agents orchestrating multi-step transactions. As autonomy expands, the author argues that limits on authority, verifiable mandates, disclosure, and opportunities to review the decision matter more.",
+  "examples": "The article discusses competing claims around AI shopping agents, then considers European legal concepts such as mandates, digital identity attestations, online contracting, and payment authentication. Those examples show why clicking on behalf of someone raises legal as well as interface questions.",
+  "tension": "Convenience may expand available options yet also hide defaults and narrow users' opportunities to intervene. Legal permission and a good user experience are related but not equivalent.",
+  "open_question": "Which decisions can an attention assistant safely automate, and which should always return to the person for explicit approval?",
+  "basis": "Editorial analysis of the public essay"
+ },
+ "new-perspectives-on-ai-agentiality": {
+  "reasoning": "The authors separate agenticity, the capacity to perform increasingly complex tasks, from agentiality, the quality of the agent's relationship to the person it represents. They argue that a technically capable assistant could still serve platform or provider interests rather than its user.",
+  "examples": "Their proposed direction involves interoperable, user-serving intermediaries and attention guardians. The article asks who an agent serves when people's priorities and a platform's incentives are misaligned.",
+  "tension": "An assistant designed around personal preferences still operates within social relationships and competing obligations. Serving an individual well does not automatically settle collective questions about information access and democratic accountability.",
+  "open_question": "Could a user-controlled attention guardian explain whose priorities shape its filtering choices, and allow the person to contest them?",
+  "basis": "Editorial analysis of the public essay"
+ },
+ "how-ai-powered-emotional-surveillance": {
+  "reasoning": "The author argues that emotion-recognition systems threaten more than privacy because their classifications can influence behavior under conditions of institutional power. Improving a classifier's accuracy would not resolve the underlying question of whether an organization should infer private emotional states in the first place.",
+  "examples": "The essay discusses attention-monitoring headbands tested in schools, emotion-detection trials in border screening, and surveillance trials on public transport. These cases show how a stated goal such as safety or productivity can shift into monitoring and pressure.",
+  "tension": "A system that claims to help people pay attention can become coercive when an employer, teacher, or authority defines which mental states count as acceptable. Voluntary self-reflection and involuntary emotional classification are different design choices.",
+  "open_question": "How can an attention-support tool help people reflect on their goals without turning inferred cognitive or emotional states into scores for others?",
+  "basis": "Editorial analysis of the public essay"
+ },
+ "intention-tracking": {
+  "reasoning": "The product introduces a small decision point before an app opens. Its mechanism is deliberate friction and self-reflection, rather than continuous measurement of attention.",
+  "examples": "The described intention picker asks what a person wants to do before entering a distracting app. A design comparison would need to distinguish noticing an intention from actually changing subsequent behavior.",
+  "tension": "Additional friction may discourage automatic use, but can also become irritating or easy to ignore. The product description does not establish which outcome dominates.",
+  "open_question": "Does an intention prompt change what people do next, or merely add an extra tap?",
+  "basis": "Analysis of published product documentation"
+ },
+ "freedom — app and website blocking": {
+  "reasoning": "This is an environment-changing intervention: rather than coaching attention moment by moment, it prevents access to selected digital distractions during a user-defined interval.",
+  "examples": "The product describes blocking selected apps and websites during scheduled sessions, including multi-device use. That makes it a useful comparison condition for a softer reminder or reflection tool.",
+  "tension": "Blocking can simplify choices but may also interfere with legitimate interruptions or make people feel less in control.",
+  "open_question": "When do people prefer firm restrictions to an assistant that helps them make each choice?",
+  "basis": "Analysis of published product documentation"
+ }
+}
+def deep_perspective(record,notes):
+ """Only add interpretive depth when an original source has been examined."""
+ machine=record.get("deep_analysis") or {}
+ # Prefer a source-checked, editorially authored reading when available.
+ key=((record.get("url") or "")+" "+(record.get("title") or "")).lower()
+ extra=next((v for token,v in DEEP_PERSPECTIVES.items() if token in key),{})
+ if machine.get("kind")=="nonacademic" and machine.get("source_depth")=="source_html" and not extra.get("basis","").startswith("Editorial analysis"):
+  return {
+   **{field:machine.get(field,"") for field in ("thesis","reasoning","examples","tension","implications","open_question","qualification")},
+   "basis":machine.get("basis","AI-assisted source analysis"),
+   "source_depth":"machine_read_full_article"
+  }
+ argument=notes.get("argument") or ""
+ overview=(record.get("reading") or {}).get("overview") or ""
+ return {
+  "thesis":argument or overview,
+  "reasoning":extra.get("reasoning",""),
+  "examples":extra.get("examples",""),
+  "tension":extra.get("tension",""),
+  "implications":notes.get("design_relevance") or "",
+  "open_question":extra.get("open_question",""),
+  "qualification":notes.get("caveat") or "",
+  "basis":extra.get("basis") or ("Editorially prepared synopsis" if argument else "Publisher description only"),
+  "source_depth":"read_article" if extra.get("basis","").startswith("Editorial analysis") else
+                 "product_documentation" if extra.get("basis","").startswith("Analysis of published product") else
+                 "editorial_synopsis" if argument else "publisher_synopsis"
+ }
+
 def annotate(record):
  r=record.get("reading") or {}
  base=dict(record);base["reading"]=dict(r)
@@ -362,17 +439,19 @@ def annotate(record):
   # An indexed publisher description is not necessarily a useful public
   # summary. Only use the authored line or a transparent topic prompt.
   idea=rewritten or research_question(record)
+  depth=deep_perspective(record,notes)
   base["reading"]["digest"]={
    "idea":idea,
-   "explain":"",
+   "explain":depth["thesis"] or "",
    "approach":"",
    "finding":"",
    "finding_source":"none",
-   "interpretation":"",
-   "limitation":"",
+   "interpretation":depth["implications"],
+   "limitation":depth["qualification"],
+   "longform":depth,
    "tags":concept_tags(record),
-   "status":"editorial_or_publisher_synopsis",
-   "editorial_basis":"publisher_or_editorial"
+   "status":"edited_perspective" if depth["source_depth"]=="read_article" else "publisher_or_editorial_synopsis",
+   "editorial_basis":depth["basis"]
   }
   return base
  curated=CURATED.get((record.get("doi") or "").lower())
@@ -409,5 +488,13 @@ def annotate(record):
    "editorial_basis":"full_text" if fulltext else "abstract",
    "reading_mode":"finding" if reported else "research_question"
   }
+ machine=record.get("deep_analysis") or {}
+ if (level=="full_text" and machine.get("kind")=="scholarly" and
+     machine.get("source_depth")=="full_text"):
+  digest["longform"]={key:machine.get(key,"") for key in (
+   "research_question","study_design","reported_results","authors_interpretation",
+   "critical_context","limitations","open_question")}
+  digest["longform"]["basis"]=machine.get("basis","AI-assisted analysis of indexed full text")
+  digest["longform"]["review_status"]=machine.get("review_status","automatic_unreviewed")
  base["reading"]["digest"]=digest
  return base

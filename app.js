@@ -11,7 +11,7 @@ function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.sli
 function id(x){return String(x.doi||x.url||x.title)}
 function record(k){return S.records.find(x=>id(x)===k)}
 function depth(x){return x.reading?.level||"citation_only"}
-function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only")return "Publisher synopsis";return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
+function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":"Full-text excerpts","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 
 function readableSourceTitle(x){
@@ -616,7 +616,7 @@ function showPaper(x){
   make("span","",editorial?"Edited reading":scholarly?isQuestion?"Research topic":"Source-reported result":"Perspective"));
  const status=make("p","rv-status", editorial?"Research reading":scholarly?"Based on indexed source material":"Commentary and perspectives");
  const title=make("h1","rv-headline",cut(cleanLead(headline,readableSourceTitle(x)),230));
- const intro=d.explain?make("p","rv-deck",d.explain):null;
+ const intro=scholarly&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
  main.append(back,head,editorialMedia(x,"reading"));
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
@@ -633,10 +633,28 @@ function showPaper(x){
      make("p","",d.finding));
   body.append(claim);
  }else if(!scholarly){
-  const claim=make("div","rv-claim");
-  add(claim,make("span","rv-mini-label","PERSPECTIVE, NOT AN EMPIRICAL RESULT"),
-     make("p","",d.interpretation||"This source advances an argument rather than measuring the effect of an intervention."));
-  body.append(claim);
+  const deep=d.longform||{},hasDepth=Boolean(deep.reasoning||deep.examples||deep.tension||deep.implications);
+  const reading=make("div","rv-longform");
+  function lens(label,value){
+   if(!value)return;
+   const part=make("section","rv-longform-part");
+   add(part,make("h3","",label),make("p","",value));
+   reading.append(part);
+  }
+  // Publisher metadata alone cannot justify invented counterarguments or a
+  // faux methods section. Only display fields supported by source analysis.
+  lens(deep.source_depth==="publisher_synopsis"?"What the publisher says":"The central argument",deep.thesis||r.overview);
+  lens("How the argument develops",deep.reasoning);
+  lens("Concrete examples and distinctions",deep.examples);
+  lens("The central tension",deep.tension);
+  lens("What this could mean for attention design",deep.implications);
+  lens("A question to investigate",deep.open_question);
+  lens("Qualifications and unresolved issues",deep.qualification);
+  if(!hasDepth&&deep.source_depth==="publisher_synopsis"){
+   reading.append(make("p","rv-source-gap","Only a brief publisher description has been indexed. There is not yet enough source text for a responsible in-depth reading."));
+  }
+  if(deep.basis)reading.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
+  body.append(reading);
  }else if(!hasFinding){
   const claim=make("div","rv-source-gap");
   add(claim,make("span","rv-mini-label","EVIDENCE NOT YET ESTABLISHED"),
@@ -656,13 +674,39 @@ function showPaper(x){
  add(caveat,make("h3","","What remains uncertain"),
    make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
  add(context,method,caveat);
- if(!autoGraphic)body.append(context);
- if(editorial&&d.interpretation){
+ if(scholarly&&!autoGraphic)body.append(context);
+ if(scholarly&&editorial&&d.interpretation){
   const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
     make("h2","rv-section-title","Why this matters"),
     make("p","",d.interpretation));
   body.append(relevance);
+ }
+ if(scholarly&&d.longform){
+  const deep=d.longform;
+  const extended=make("section","rv-research-longform");
+  add(extended,make("span","rv-section-overline","02 / CLOSER READING"),
+     make("h2","rv-section-title","A deeper look at the study"));
+  const items=[
+    ["The research question",deep.research_question],
+    ["Design and evidence",deep.study_design],
+    ["What was actually reported",deep.reported_results],
+    ["How the authors interpret it",deep.authors_interpretation],
+    ["How to read this critically",deep.critical_context],
+    ["Limitations",deep.limitations],
+    ["A question worth pursuing",deep.open_question]
+  ];
+  const parts=make("div","rv-longform");
+  for(const [label,value] of items){
+   if(!value)continue;
+   const part=make("section","rv-longform-part");
+   add(part,make("h3","",label),make("p","",value));
+   parts.append(part);
+  }
+  if(deep.basis)parts.append(make("p","rv-longform-basis",
+   "Reading basis: "+deep.basis+" · Machine-generated, not independently reviewed"));
+  extended.append(parts);
+  body.append(extended);
  }
  // Keep the extracted text and metadata in one clearly optional evidence drawer.
  const drawer=make("details","rv-drawer"),summary=make("summary","","Inspect source text and abstract");
@@ -673,8 +717,7 @@ function showPaper(x){
   ["Discussion as indexed",r.interpretation],["Reported limitations",r.limitations],
   ["Abstract",x.abstract_text]
  ]:[
-  ["Source synopsis",r.overview],["Attributable argument",(x.editorial_notes||{}).argument],
-  ["Editorial qualifications",(x.editorial_notes||{}).caveat]
+  ["Publisher or editorial synopsis",r.overview],["Original editorial notes",(x.editorial_notes||{}).argument]
  ];
  for(const [label,content] of fields){
   if(!content)continue;

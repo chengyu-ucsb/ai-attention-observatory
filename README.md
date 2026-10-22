@@ -104,6 +104,16 @@ requires a separately issued API key; it is **not connected** in this iteration.
 4. **Editorial synthesis** (`data/issue-editorial.json`) connects themes across a complete weekly reading set. `scripts/build_issue.py` checks source links before an issue can be approved.
 5. **Publication** (`.github/workflows/publish.yml`) validates the site, newsletters, RSS, and integrity checks before deploying to GitHub Pages.
 
+### How in-depth readings are produced
+
+Source types now follow different reading structures. Journalism and commentary use an **argument map**: central claim, reasoning, concrete examples, a substantive tension, possible design implications, and an open question. Research papers use **evidence analysis**: question, design, reported results, author interpretation, critical context, limitations, and future questions. Sections appear only when source material supports them. Publisher-only blurbs remain explicitly limited rather than being passed off as complete reviews.
+
+Six public essays and product references have been given source-specific extended notes; those are editorially written and distinguish arguments from experimental results. Other nonacademic sources retain their publisher synopses unless fuller accessible content has actually been processed.
+
+The optional `.github/workflows/deepen-readings.yml` workflow runs separately from discovery. It can retrieve publicly accessible article HTML when permitted by robots rules, or use previously indexed licensed full-text research sections, then produce original, structured analytical notes without committing the copyrighted source body. It requires an **explicit opt-in**: set repository variable `DEEP_READINGS_ENABLED=true` and GitHub Actions secret `OPENAI_API_KEY`. API usage may incur charges. The run is bounded to 12 new readings, twice a week (or via manual dispatch), and the model defaults to `gpt-5.4-mini`. Without this opt-in, no paid model processing takes place.
+
+Machine-prepared longform notes are labeled as **not independently reviewed**. The pipeline rejects incomplete outputs and requires short source-matching anchors; those checks support traceability but do not establish that every paraphrase is correct. Original articles and paper excerpts remain linked for verification. No RSS headline, partial paywall, or abstract is silently treated as a complete original work.
+
 The internal acquisition database is `data/library.json`. The public reading projection lives in `data/public-library.json`. **Citation-only and substantively unsupported records are excluded from the public site and RSS.** Open-access links alone do not count as full-text extraction.
 
 The newsletter generator is `scripts/build_newsletter.py`. It builds the latest preview (`newsletter.html`), permanent editions (`issues/`), and RSS 2.0 (`issue-feed.xml`) with stable permalinks and publication dates.

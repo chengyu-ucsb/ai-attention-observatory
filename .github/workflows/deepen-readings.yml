@@ -1,0 +1,75 @@
+name: Deepen source readings
+on:
+  # Separate from discovery and full-text acquisition; never rerun those for summaries.
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/enrich_deep_readings.py'
+      - 'tests/test_deep_readings.py'
+      - '.github/workflows/deepen-readings.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/enrich_deep_readings.py'
+      - 'scripts/condense_readings.py'
+      - 'app.js'
+      - 'styles.css'
+      - 'tests/**'
+      - '.github/workflows/deepen-readings.yml'
+  schedule:
+    - cron: '35 13 * * 2,5'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: observatory-index
+  cancel-in-progress: false
+jobs:
+  deepen:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Validate enrichment code
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_article_ui.cjs
+      - name: Extract and analyze accessible sources (opt-in)
+        if: ${{ github.event_name != 'pull_request' && vars.DEEP_READINGS_ENABLED == 'true' }}
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          DEEP_READING_MODEL: gpt-5.4-mini
+          DEEP_READING_LIMIT: '12'
+        run: python scripts/enrich_deep_readings.py
+      - name: Explain inactive enrichment
+        if: ${{ github.event_name != 'pull_request' && vars.DEEP_READINGS_ENABLED != 'true' }}
+        run: echo 'Deep enrichment not enabled; reviewed notes and publisher synopses remain available.'
+      - name: Save completed readings without rerunning discovery
+        if: ${{ vars.DEEP_READINGS_ENABLED == 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/library.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Add audited in-depth source readings"
+            pushed=false
+            for attempt in 1 2 3; do
+              if git push; then pushed=true; break; fi
+              git fetch origin main
+              if ! git rebase origin/main; then
+                git rebase --abort || true
+                echo "::error::Concurrent data changes require a manual reconciliation."
+                exit 1
+              fi
+              sleep 2
+            done
+            if [ "$pushed" != true ]; then
+              echo "::error::Unable to save completed readings."
+              exit 1
+            fi
+          fi
