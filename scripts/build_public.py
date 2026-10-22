@@ -62,9 +62,9 @@ def build():
     run["reading_eligible_count"]=len(canonical)
     run["companion_count"]=len(selected)-len(canonical)
     run["full_text_count"]=sum(x.get("reading",{}).get("level")=="full_text" for x in canonical)
-    run["abstract_count"]=sum(x.get("reading",{}).get("level")=="abstract" for x in selected)
-    run["ai_specific_count"]=sum(x["source_group"]=="AI-specific" for x in selected)
-    run["historical_foundations_count"]=sum(x["source_group"].startswith(("Earlier","Historical")) for x in selected)
+    run["abstract_count"]=sum(x.get("reading",{}).get("level")=="abstract" for x in canonical)
+    run["ai_specific_count"]=sum(x["source_group"]=="AI-specific" for x in canonical)
+    run["historical_foundations_count"]=sum(x["source_group"].startswith(("Earlier","Historical")) for x in canonical)
     # Never use unverified records in visitor-facing counts.
     run.pop("candidates",None)
     run["last_seven_days"]=len(items)
