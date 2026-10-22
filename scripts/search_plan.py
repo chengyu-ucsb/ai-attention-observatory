@@ -33,6 +33,15 @@ LANES={
  ]
 }
 
+# Broad historical terms recover formative work that used different terminology
+# than the current research literature. Inclusion screening remains separate.
+HISTORICAL_TERMS={
+ "AI & cognition":["ChatGPT critical thinking","generative AI cognitive effort","ChatGPT learning cognition"],
+ "Fragmentation":["generative AI attention","AI cognitive offloading","ChatGPT distraction"],
+ "Interventions":["ChatGPT self regulated learning","generative AI scaffolding","AI learning intervention"],
+ "Technology & society":["ChatGPT human agency","generative AI attention economy","AI information overload"]
+}
+
 def plan(today=None, mode="weekly"):
     today=today or dt.date.today()
     all_years=list(range(START_YEAR,today.year))
@@ -49,9 +58,12 @@ def plan(today=None, mode="weekly"):
     for index,(lane,queries) in enumerate(LANES.items()):
         chosen=all_years if mode=="backfill" else [all_years[(weekly_index+index)%len(all_years)]] if all_years else []
         for year in chosen:
-            # Each year rotates its query to spread substantive coverage.
-            q=queries[(year-START_YEAR+index+weekly_index)%len(queries)]
-            tasks.append((lane,q,f"{year}-01-01",f"{year}-12-31",f"historical:{year}"))
+            options=HISTORICAL_TERMS[lane]
+            start=(year-START_YEAR+index+weekly_index)%len(options)
+            n_queries=2 if mode=="backfill" and year in (2023,2024) else 1
+            for offset in range(n_queries):
+                q=options[(start+offset)%len(options)]
+                tasks.append((lane,q,f"{year}-01-01",f"{year}-12-31",f"historical:{year}"))
     return tasks
 
 
