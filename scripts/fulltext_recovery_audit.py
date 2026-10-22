@@ -9,7 +9,8 @@ def run():
  pending=[r for r in scholarly if not r.get("analysis")]
  diagnostics={
   "scholarly_indexed":len(scholarly),
-  "with_at_least_some_full_text_sections":len(scholarly)-len(pending),
+  "with_at_least_some_full_text_sections":sum(bool(r.get("analysis")) and not (r.get("analysis") or {}).get("original_paraphrases_only") for r in scholarly),
+  "editorially_checked_full_article_summaries":sum(bool((r.get("analysis") or {}).get("original_paraphrases_only")) for r in scholarly),
   "without_full_text_sections":len(pending),
   "without_doi":sum(not r.get("doi") for r in pending),
   "pmc_lookup_statuses":dict(collections.Counter((r.get("pmc_oai_attempt") or {}).get("status","not_tried") for r in pending)),
@@ -25,7 +26,7 @@ def run():
    "waiting_for_repository_check"
    for r in pending)),
   "fulltext_providers":dict(collections.Counter((r.get("analysis") or {}).get("provenance","") for r in scholarly if r.get("analysis"))),
-  "warning":"Full-text sections are automatically extracted, not verified article-level full text reviews."
+  "warning":"Machine-extracted sections are separate from original paraphrases written after a publisher full-article review."
  }
  print(json.dumps(diagnostics,ensure_ascii=False,indent=2))
  return diagnostics
