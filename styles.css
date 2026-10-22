@@ -513,3 +513,276 @@
 .rv-longform-part p { margin: 0; font-size: 1.03rem; line-height: 1.77; max-width: 70ch; }
 .rv-longform-part:first-child { border-left: 3px solid #ad2538; padding: .25rem 0 1.1rem 1.15rem; }
 .rv-longform-basis { font-size: .81rem; color: var(--muted, #746f6a); line-height: 1.5; margin-top: .1rem; }
+
+/* 2026-10-22 design system: disciplined type, quieter illustration, consistent density. */
+/* Editorial rule: Newsreader for headings and the most prominent callouts;
+   DM Sans for ALL explanations, reading notes, controls, and source metadata. */
+:root{
+  --reading-font:var(--sans);
+  --heading-font:var(--display);
+  --reading-size:15px;
+  --reading-leading:1.72;
+  --paper-border:#e7ddda;
+  --paper-subtle:#f9f5f2;
+  --card-gap:18px;
+  --radius-small:4px;
+}
+body{font-family:var(--reading-font);line-height:1.65}
+h1,h2,h3,h4,p,li,figcaption{overflow-wrap:break-word}
+a,button,summary{-webkit-tap-highlight-color:transparent}
+button{font-family:var(--sans)}
+button:focus-visible,a:focus-visible,summary:focus-visible,[role="button"]:focus-visible{
+  outline:2px solid var(--red);outline-offset:3px;
+}
+.shell{width:min(1192px,calc(100% - 56px))}
+.section-heading{margin-bottom:24px}
+.section-heading h2{font-family:var(--heading-font);font-size:clamp(30px,3vw,40px);line-height:1.18}
+.section-deck,.perspectives-intro p:not(.eyebrow){font:400 14px/1.7 var(--reading-font)}
+.eyebrow,.tiny-label,.editorial-category,.perspective-type,.rv-section-overline{
+  font-family:var(--reading-font);letter-spacing:.09em;
+}
+.button,.quiet-link,.editorial-cta,.feature-go{font-family:var(--reading-font)}
+.visual-panel,.feature-card,.library-card,.editorial-card,.perspective-item,.issue-signal,.issue-mix-card{
+  border-color:var(--paper-border);
+}
+.feature-card:hover,.library-card:hover,.editorial-card:hover,.perspective-item:hover{
+  box-shadow:0 8px 26px rgba(77,44,51,.09);
+}
+.feature-card,.editorial-card,.perspective-item,.library-card{transition:box-shadow .2s ease,transform .2s ease}
+
+/* Illustration is context, never the dominant content. */
+.story-visual{border:1px solid #eadcda;background:#f2e6e2;flex-shrink:0;min-width:0}
+.story-visual .story-image{width:100%;height:100%;display:block;object-fit:cover}
+.feature-card .story-visual-feature{
+  width:112px;height:76px;max-height:76px;aspect-ratio:auto;margin:13px 0 14px;
+  border-radius:var(--radius-small);
+}
+.feature-card,.feature-card.primary{min-height:280px}
+.feature-card h3.feature-idea,.feature-card.primary h3.feature-idea{
+  font:500 clamp(22px,2.08vw,27px)/1.25 var(--heading-font);margin:8px 0 13px;
+}
+.feature-card .feature-idea-label{margin-top:2px!important;font-size:10px!important}
+.feature-card .feature-source-title{
+  font:500 12px/1.6 var(--reading-font)!important;color:#75696c!important;
+}
+.feature-card p{font-family:var(--reading-font);line-height:1.66}
+.feature-card .source-meta{font-size:11px}
+.feature-card .feature-evidence{margin-top:12px}
+.feature-card .feature-foot{padding-top:16px}
+
+/* Homepage commentary now reads as compact editorial digests.
+   A two-column set of horizontal cards replaces four large illustrated posters. */
+.editorial-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--card-gap)}
+.editorial-card{
+  display:grid;grid-template-columns:122px minmax(0,1fr);
+  grid-template-rows:auto auto 1fr auto;column-gap:19px;row-gap:0;
+  align-items:start;min-height:190px;padding:20px;
+}
+.editorial-card .story-visual-editorial{
+  grid-column:1;grid-row:1 / 4;width:122px;height:100px;
+  margin:0;border-radius:var(--radius-small);align-self:start;
+}
+.editorial-card .editorial-category{grid-column:2;grid-row:1;margin:0 0 5px;font-size:10px}
+.editorial-card h3{grid-column:2;grid-row:2;margin:2px 0 8px;font:500 22px/1.22 var(--heading-font)}
+.editorial-card h3 button{font:inherit}
+.editorial-card p.editorial-source-title{
+  grid-column:2;grid-row:3;font:400 12px/1.55 var(--reading-font)!important;
+  color:var(--muted)!important;display:-webkit-box;-webkit-box-orient:vertical;
+  -webkit-line-clamp:2;overflow:hidden;
+}
+.editorial-card .editorial-foot{
+  grid-column:1 / -1;grid-row:4;align-self:end;margin-top:18px;padding-top:12px;
+}
+.editorial-card .editorial-foot span{font-size:11px}
+.editorial-card .editorial-cta{font-size:12px}
+.editorial-disclaimer{font:400 12px/1.65 var(--reading-font)}
+
+/* Library listings: readable summaries first; imagery is a small identifying cue. */
+.library-results{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--card-gap)}
+.library-card.library-story{
+  display:grid;grid-template-columns:112px minmax(0,1fr);
+  align-items:start;gap:18px;padding:20px;min-height:176px;
+}
+.library-card.library-story .story-visual-card{
+  width:112px;height:94px;margin:0;border-radius:var(--radius-small);
+}
+.library-card.library-story .library-story-body{min-height:132px}
+.library-card.library-story h3{
+  font:500 21px/1.24 var(--heading-font);margin:7px 0 9px;
+}
+.library-card.library-story .library-citation{
+  font:400 12px/1.58 var(--reading-font)!important;color:var(--muted)!important;
+  overflow-wrap:anywhere;
+}
+.library-card.library-story .card-type{font:700 10px/1.4 var(--reading-font);letter-spacing:.07em}
+.library-card.library-story .card-foot{
+  font:500 11px/1.5 var(--reading-font);padding-top:13px;margin-top:auto;
+}
+
+/* Perspectives: same typography and image grammar as homepage commentary. */
+.perspectives-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--card-gap)}
+.perspective-item{
+  display:grid;grid-template-columns:122px minmax(0,1fr);
+  grid-template-rows:auto auto 1fr auto;column-gap:19px;
+  min-height:190px;padding:20px;align-items:start;
+}
+.perspective-item .story-visual-perspective{
+  grid-column:1;grid-row:1 / 4;width:122px;height:100px;
+  margin:0;border-radius:var(--radius-small);
+}
+.perspective-item .perspective-type{grid-column:2;grid-row:1;font-size:10px;margin-bottom:5px}
+.perspective-item h3{grid-column:2;grid-row:2;margin:2px 0 8px;font:500 22px/1.22 var(--heading-font)}
+.perspective-item h3 button{font:inherit}
+.perspective-item .perspective-source-title{
+  grid-column:2;grid-row:3;font:400 12px/1.55 var(--reading-font)!important;
+  color:var(--muted)!important;
+}
+.perspective-item .perspective-bottom{
+  grid-column:1 / -1;grid-row:4;align-self:end;margin-top:18px;padding-top:12px;
+}
+.perspective-item .perspective-bottom span{font-size:11px}
+.perspective-item .perspective-glyph{display:none}
+
+/* Reading pages: an illustration occupies a thumbnail-sized corner of
+   the introduction. Empirical graphics below remain full-width when useful. */
+#paper-content .rv-head{
+  max-width:1100px;display:grid;
+  grid-template-columns:minmax(0,1fr) 176px;
+  grid-template-rows:auto auto auto auto;
+  align-items:start;column-gap:30px;
+  border-bottom:1px solid var(--paper-border);
+  padding:8px 0 27px;
+}
+#paper-content .rv-head>.rv-meta,
+#paper-content .rv-head>.rv-headline,
+#paper-content .rv-head>.rv-deck,
+#paper-content .rv-head>.rv-status{grid-column:1;min-width:0}
+#paper-content .rv-head>.rv-meta{grid-row:1}
+#paper-content .rv-head>.rv-headline{
+  grid-row:2;font:500 clamp(32px,3.4vw,45px)/1.16 var(--heading-font);
+  margin:13px 0 0;max-width:820px;
+}
+#paper-content .rv-head>.rv-deck{
+  grid-row:3;font:400 16px/1.69 var(--reading-font);
+  max-width:70ch;margin-top:15px;
+}
+#paper-content .rv-head>.rv-status{
+  grid-row:4;font:500 12px/1.6 var(--reading-font);margin:14px 0 0;
+}
+#paper-content .rv-head>.story-visual-reading{
+  grid-column:2;grid-row:1 / span 4;
+  width:176px;max-width:100%;height:auto;max-height:none;
+  aspect-ratio:auto;margin:0;border-radius:var(--radius-small);
+  align-self:start;overflow:visible;background:transparent;
+}
+#paper-content .story-visual-reading .story-image{
+  display:block;width:100%;height:114px;aspect-ratio:auto;
+  object-fit:cover;border-radius:var(--radius-small);
+}
+#paper-content .story-visual-reading .story-visual-caption{
+  position:static;max-width:none;padding:7px 0 0;
+  background:transparent;font:500 10px/1.4 var(--reading-font);
+  color:var(--muted);
+}
+#paper-content .rv-layout{margin-top:30px;gap:clamp(28px,4vw,52px)}
+#paper-content .rv-section-title{font-family:var(--heading-font);font-size:clamp(25px,2.5vw,31px)}
+#paper-content .rv-claim{padding:23px 26px;background:#f9f0ee}
+#paper-content .rv-claim p{font:400 16px/1.72 var(--reading-font)}
+#paper-content .rv-source-gap p{font:400 var(--reading-size)/var(--reading-leading) var(--reading-font)}
+#paper-content .rv-context h3{font:700 14px/1.4 var(--reading-font)}
+#paper-content .rv-context p{font:400 var(--reading-size)/var(--reading-leading) var(--reading-font)}
+#paper-content .rv-take>p{font:400 var(--reading-size)/var(--reading-leading) var(--reading-font)}
+#paper-content .rv-excerpt h3{font:700 13px/1.5 var(--reading-font)}
+#paper-content .rv-excerpt p{font:400 13px/1.75 var(--reading-font)}
+#paper-content .rv-source h2,
+#paper-content .rv-related h2{font-family:var(--heading-font)}
+#paper-content .rv-source-title{font:500 18px/1.38 var(--heading-font)}
+#paper-content .rv-related-item{font:500 16px/1.4 var(--heading-font)}
+#paper-content .rv-source-meta,#paper-content .rv-provenance-body p{font-size:12px}
+#paper-content .rv-source-pills span{font-size:11px}
+#paper-content .rv-artwork{margin:23px 0 30px}
+#paper-content .rv-artwork .concept-note{font:400 12px/1.65 var(--reading-font)}
+
+/* Different source types have a consistent prose size and face.
+   Section headings are sans, not an accidental second headline font. */
+#paper-content .rv-longform,
+#paper-content .rv-research-longform .rv-longform{gap:17px;margin:15px 0 25px}
+#paper-content .rv-longform-part{padding-bottom:16px}
+#paper-content .rv-longform-part h3{
+  font:700 14px/1.45 var(--reading-font);letter-spacing:0;
+  color:var(--ink);margin:0 0 7px;
+}
+#paper-content .rv-longform-part p{
+  font:400 var(--reading-size)/var(--reading-leading) var(--reading-font);
+  color:#554e50;max-width:70ch;margin:0;
+}
+#paper-content .rv-longform-part:first-child{
+  border-left:2px solid var(--red);padding:3px 0 13px 16px;
+}
+#paper-content .rv-longform-basis{
+  font:400 12px/1.6 var(--reading-font);color:var(--muted);margin:0;
+}
+#paper-content .rv-research-longform h2{font-family:var(--heading-font)}
+
+/* Weekly synthesis and support copy use the same readable sans body. */
+.issue-letter>p:not(.eyebrow){
+  font:400 16px/1.78 var(--reading-font);max-width:76ch;
+}
+.issue-signal>p,.issue-extras p:not(.eyebrow),.issue-follow p:not(.eyebrow),
+.weekly-cover-copy>p:not(.eyebrow){
+  font:400 14px/1.72 var(--reading-font);color:#685b5f;
+}
+.issue-shelf-content button,.issue-shelf-content a{font:600 14px/1.42 var(--reading-font)}
+.issue-shelf-content p{font:400 12px/1.55 var(--reading-font)}
+.issue-closing>p:last-child,.issue-material-landscape .landscape-caption{font-size:12px}
+.perspectives-intro p:not(.eyebrow),.about-lead p:not(.eyebrow),.about-steps p,
+.atlas-section p:not(.eyebrow){font-family:var(--reading-font);line-height:1.7}
+.issue-signals,.issue-extras{gap:var(--card-gap)}
+.library-section,.perspectives-page{padding-top:40px}
+.main-nav a,.header-link{font-family:var(--reading-font)}
+
+/* Focused mobile hierarchy: no oversized covers or cramped grids. */
+@media(max-width:1000px){
+  .editorial-grid,.perspectives-grid,.library-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .editorial-card,.perspective-item{grid-template-columns:92px minmax(0,1fr);gap:0 15px}
+  .editorial-card .story-visual-editorial,.perspective-item .story-visual-perspective{width:92px;height:76px}
+  .library-card.library-story{grid-template-columns:88px minmax(0,1fr);gap:14px}
+  .library-card.library-story .story-visual-card{width:88px;height:78px}
+}
+@media(max-width:760px){
+  .shell{width:calc(100% - 36px)}
+  .editorial-grid,.perspectives-grid,.library-results{grid-template-columns:1fr}
+  .editorial-card,.perspective-item{grid-template-columns:112px minmax(0,1fr);gap:0 16px}
+  .editorial-card .story-visual-editorial,.perspective-item .story-visual-perspective{width:112px;height:88px}
+  .library-card.library-story{grid-template-columns:104px minmax(0,1fr);gap:15px}
+  .library-card.library-story .story-visual-card{width:104px;height:87px}
+  #paper-content .rv-head{grid-template-columns:minmax(0,1fr) 132px;column-gap:18px}
+  #paper-content .rv-head>.story-visual-reading{width:132px}
+  #paper-content .story-visual-reading .story-image{height:89px}
+  #paper-content .rv-head>.rv-headline{font-size:clamp(30px,5vw,40px)}
+  .feature-card .story-visual-feature{width:104px;height:70px}
+}
+@media(max-width:540px){
+  .editorial-card,.perspective-item,.library-card.library-story{min-height:0;padding:17px}
+  .editorial-card,.perspective-item{grid-template-columns:87px minmax(0,1fr);column-gap:13px}
+  .editorial-card .story-visual-editorial,.perspective-item .story-visual-perspective{width:87px;height:75px}
+  .editorial-card h3,.perspective-item h3{font-size:20px}
+  .library-card.library-story{grid-template-columns:86px minmax(0,1fr);gap:13px}
+  .library-card.library-story .story-visual-card{width:86px;height:76px}
+  .library-card.library-story h3{font-size:19px}
+  #paper-content .rv-head{grid-template-columns:minmax(0,1fr);padding-bottom:22px}
+  #paper-content .rv-head>.story-visual-reading{
+    grid-column:1;grid-row:5;width:142px;margin:18px 0 0;
+  }
+  #paper-content .story-visual-reading .story-image{height:89px}
+  #paper-content .rv-head>.rv-headline{font-size:clamp(31px,8vw,39px)}
+  #paper-content .rv-head>.rv-deck{font-size:15px}
+  #paper-content .rv-context p,#paper-content .rv-longform-part p{font-size:15px}
+  .issue-letter>p:not(.eyebrow){font-size:15px;line-height:1.76}
+  .section-heading{align-items:flex-start;flex-wrap:wrap;gap:8px}
+  .section-heading h2{font-size:33px}
+}
+@media(prefers-reduced-motion:reduce){
+  .story-visual .story-image,.feature-card,.library-card,.editorial-card,.perspective-item{transition:none}
+  .feature-card:hover,.library-card:hover,.editorial-card:hover,.perspective-item:hover{transform:none}
+}
