@@ -38,6 +38,8 @@ def publisher_url(url):
         return False
 
 def substantive_article(record):
+    if record.get("source")=="Official product documentation":
+        return bool((record.get("reading") or {}).get("overview") or (record.get("editorial_notes") or {}).get("design_relevance")) and publisher_url(record.get("url"))
     # A separately verified companion is worth linking even when its only
     # stored text is a concise attributed publisher synopsis.
     if record.get("companion_to") and publisher_url(record.get("url")):
