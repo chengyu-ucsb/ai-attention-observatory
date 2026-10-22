@@ -46,7 +46,7 @@ def extract(root):
   if not key or key in sections:continue
   parts=[content(el) for el in div.iter() if local(el.tag)=="p"]
   value=" ".join(x for x in parts if len(x)>40)
-  if value:sections[key]=value[:1100].rsplit(" ",1)[0]+"…" if len(value)>1100 else value
+  if value:sections[key]=value[:4500].rsplit(" ",1)[0] if len(value)>4500 else value
  return sections
 def get(url,key):
  u=url+("&" if "?" in url else "?")+urllib.parse.urlencode({"api_key":key})
@@ -76,7 +76,10 @@ def priority(r):
          r.get("fulltext_attempt",{}).get("attempts",0),r.get("published") or "")
 def eligible(r,t):
  if r.get("kind")!="scholarly" or not r.get("doi") or r.get("analysis"):return False
- return parse((r.get("fulltext_attempt") or {}).get("next_at"))<=t
+ attempt=r.get("fulltext_attempt") or {}
+ # Make one targeted pass after changes in retrieval logic; then honor backoff.
+ if attempt.get("pipeline_version")!=2:return True
+ return parse(attempt.get("next_at"))<=t
 def summarize(records,info):
  t=now()
  scholarly=[r for r in records if r.get("kind")=="scholarly"]
@@ -113,6 +116,7 @@ def run():
    entry=r.get("fulltext_attempt") or {}
    entry["attempts"]=entry.get("attempts",0)+1
    entry["last_at"]=iso(now())
+   entry["pipeline_version"]=2
    r["fulltext_attempt"]=entry
    doi=urllib.parse.quote("https://doi.org/"+r["doi"],safe=":")
    try:
@@ -125,11 +129,11 @@ def run():
     href=preferred.get("landing_page_url") or preferred.get("pdf_url")
     if href and href.startswith("https://"):r["open_access_url"]=href
     if not loc:
-     entry.update(status="waiting_for_license",next_at=next_retry(30))
+     entry.update(status="waiting_for_license",next_at=next_retry(14))
      continue
     url=(work.get("content_urls") or {}).get("grobid_xml") or ""
     if not url.startswith("https://content.openalex.org/works/"):
-     entry.update(status="waiting_for_machine_text",next_at=next_retry(14))
+     entry.update(status="waiting_for_machine_text",next_at=next_retry(7))
      continue
     content_calls+=1
     xml,_=get(url,key)
