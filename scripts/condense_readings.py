@@ -481,11 +481,11 @@ def annotate(record):
    "reading_mode":"conceptual_proposal"
   }
   return base
- curated=CURATED.get((record.get("doi") or "").lower())
+ curated=record.get("editorial_digest") or CURATED.get((record.get("doi") or "").lower())
  if curated and level in ("abstract","full_text"):
   digest=dict(curated)
   digest["status"]="editorially_written_from_indexed_sections"
-  digest["editorial_basis"]="full_text" if level=="full_text" else "abstract"
+  digest["editorial_basis"]="publisher_full_article_paraphrased" if (record.get("analysis") or {}).get("original_paraphrases_only") else "full_text" if level=="full_text" else "abstract"
   digest["finding_source"]="editorial" if digest.get("finding") else "none"
  else:
   # Never promote an introduction, source section heading, or model-fit check

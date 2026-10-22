@@ -115,7 +115,8 @@ def summarize(records,info):
  for r in postponed:
   status=(r.get("fulltext_attempt") or {}).get("status","other")
   reasons[status]=reasons.get(status,0)+1
- return {"last_run":iso(t),"total_scholarly":len(scholarly),"full_text_extracted":sum(bool(r.get("analysis")) for r in scholarly),
+ return {"last_run":iso(t),"total_scholarly":len(scholarly),"full_text_extracted":sum(bool(r.get("analysis")) and not (r.get("analysis") or {}).get("original_paraphrases_only") for r in scholarly),
+         "original_full_article_syntheses":sum(bool((r.get("analysis") or {}).get("original_paraphrases_only")) for r in scholarly),
          "ready_for_attempt":len(ready),"retry_scheduled":len(postponed),
          "without_doi":sum(not r.get("doi") for r in remaining),"deferred_by_reason":reasons,**info}
 def run():

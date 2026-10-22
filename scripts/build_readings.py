@@ -64,7 +64,7 @@ def make_note(r):
         caveat=clean(full.get("limitations"))[:1000]
         abstract=src or clean(r.get("preview"))
         introduction=first_two(sentences(abstract),410) if abstract else ""
-        kind="Licensed full-text excerpts"
+        kind="Original full-article editorial reading" if full.get("original_paraphrases_only") else "Licensed full-text excerpts"
         provider=full.get("provenance") or "Europe PMC licensed full text"
     elif len(src)>=90:
         parts=sentences(src)
@@ -108,7 +108,8 @@ def make_note(r):
         "sample":sample,
         "section_coverage":[key for key in ("methods","results","discussion","limitations") if full.get(key)] if licensed else [],
         "extraction_depth":"multi_section" if licensed and sum(bool(full.get(k)) for k in ("methods","results","discussion","limitations"))>=2 else "limited" if licensed else "abstract_only",
-        "notice":("Excerpts from licensed article sections; automatically selected, not independently reviewed." if licensed else
+        "notice":("Full publisher article reviewed and paraphrased; no copied full-text passages are stored." if licensed and full.get("original_paraphrases_only") else
+                  "Excerpts from licensed article sections; automatically selected, not independently reviewed." if licensed else
                   "Structured highlights selected from the source abstract; not an appraisal of the full paper." if len(src)>=90 else
                   "Initial topic synopsis, not a verified paper-level analysis."),
         "research_type":"conceptual_framework" if conceptual else r.get("research_type") or "unclassified",

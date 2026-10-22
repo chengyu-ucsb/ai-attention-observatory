@@ -37,6 +37,20 @@ This policy is stored in the repository so future assistants working on it can s
 - A conceptual/theoretical publication proposes a model; it does not itself supply new empirical effect estimates. Never fabricate sample sizes, tested effects or causal results, and visually distinguish proposals from measured findings. Differentiate systematic reviews from experiments when the source supports that distinction.
 - Prefer accessible, legitimately reusable original article text over publisher snippets; if only an abstract or edited summary is available, label that depth and link directly to the original. Keep paired-publication regression tests up to date.
 
+- **Full text vs reuse:** Open-access full text can be readable under a
+  restrictive license such as CC BY-NC-ND. Distinguish checking the original
+  article from copying protected passages into the public repository.
+  `scripts/enrich_wiley_html.py` only records Wiley full-page access;
+  `scripts/verified_full_article_notes.py` attaches individually verified
+  original paraphrases. Neither is permission to redistribute source text.
+- **Coverage counts:** An editorially synthesized full article is NOT a
+  machine-extracted article. Label reviewed reading depth separately and do
+  not inflate `full_text_extracted` when the underlying saved content is
+  an original paraphrase.
+- **Publication-year graphic:** Plot years vertically as readable rows with
+  horizontal count bars. Counts reflect indexed AI-specific records only,
+  never broad field publication rates.
+
 ## Full-text-first research integrity
 
 - **Source priority:** For each research paper, first look for a lawful full text (publisher OA, Europe PMC, OpenAlex accessible licensed text). Use abstracts when full text is unavailable or extraction fails, and always label that limitation. An OA *link* does not establish that the paper's results were retrieved or reviewed.
