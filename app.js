@@ -613,11 +613,13 @@ function showPaper(x){
  main.append(back,head,editorialMedia(x,"reading"));
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
  const body=make("section","rv-content");
+ const art=conceptArtwork(x);
+ const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
  const lead=make("div","rv-section-head");
  add(lead,make("span","rv-section-overline","01 / UNDER THE HOOD"),
   make("h2","rv-section-title",scholarly?"What the evidence actually says":"The argument in context"));
  body.append(lead);
- if(editorial&&hasFinding){
+ if(editorial&&hasFinding&&!autoGraphic){
   const claim=make("div","rv-claim");
   add(claim,make("span","rv-mini-label","REPORTED FINDING"),
      make("p","",d.finding));
@@ -633,7 +635,6 @@ function showPaper(x){
     make("p","","A substantive result has not been identified in the accessible material. This is a research topic, not a verified finding."));
   body.append(claim);
  }
- const art=conceptArtwork(x);
  if(art){
   const visuals=make("div","rv-artwork");
   visuals.append(art);
@@ -647,7 +648,7 @@ function showPaper(x){
  add(caveat,make("h3","","What remains uncertain"),
    make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
  add(context,method,caveat);
- body.append(context);
+ if(!autoGraphic)body.append(context);
  if(editorial&&d.interpretation){
   const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
