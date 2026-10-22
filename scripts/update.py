@@ -1,13 +1,14 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
 import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
 from search_plan import plan,source_class
+from priority_research import discover as discover_priority
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DIR=ROOT/"data"
 TODAY=datetime.datetime.now(datetime.timezone.utc).date().isoformat()
-KEYWORDS=re.compile(r"attention|cognit|think|interrup|focus|distract|multitask|switch|well.?being|self.regulat|engag|notification|offload",re.I)
+KEYWORDS=re.compile(r"attention|cognit|think|interrup|focus|distract|multitask|switch|well.?being|self.regulat|engag|notification|offload|metacognit|overreliance|problem.solv|dependency",re.I)
 
 AI_TOPIC=re.compile(r"\b(?:ai|genai|chatgpt|artificial intelligence|generative ai|llms?|large language model|machine learning|algorithmic)\b",re.I)
-ATTENTION_TOPIC=re.compile(r"attention|focus|distract|interrupt|offload|critical think|cognit(?:ive)? (?:effort|load|scaffold|control|strain|decline)|human agency|mindful|metacognit|well.?being|notification|self.regulat|task.switch|multitask|information overload|techno.?stress|digital stress|cognitive autonomy",re.I)
+ATTENTION_TOPIC=re.compile(r"attention|focus|distract|interrupt|offload|critical think|cognit(?:ive)? (?:effort|load|scaffold|control|strain|decline)|human agency|mindful|metacognit|well.?being|notification|self.regulat|task.switch|multitask|information overload|techno.?stress|digital stress|cognitive autonomy|problem.solv|epistemic",re.I)
 ADJACENT_TOPIC=re.compile(r"attention (?:fragmentation|residue|economy|control|span)|digital distraction|distracted (?:work|learning)|notification(?:s)?|task.switch|multitask|sustained attention|focus(?:ed)? work",re.I)
 EXCLUDE_TITLE=re.compile(r"gaining .*attention|stock price|share price|trading|market investment|marketing personalization|consumer engagement|car.following|warehouse logistics|diabetes mellitus|security tools",re.I)
 TRUSTED_OUTLETS=re.compile(r"The Atlantic|WIRED|MIT Technology Review|Nature|Science|The Verge|Tech Policy Press|The Guardian|The Conversation|Ars Technica|Harvard Business Review|New York Times|Financial Times|Bloomberg|BBC|NPR|Vox|IEEE Spectrum|Quanta|The Decoder|Inside Higher Ed|EdSurge|PsyPost|New Scientist|Washington Post|Psychology Today|Communications of the ACM|The Economist|Rest of World",re.I)
@@ -68,7 +69,7 @@ def discover(days=60,mode="weekly"):
   except Exception as e:errors.append("OpenAlex "+lane+": "+str(e)[:130])
   time.sleep(.3)
  # Crossref as complementary discovery, not full-paper content.
- for lane,q,start,end,scope in (scopes if mode=="backfill" else scopes[:6]):
+ for lane,q,start,end,scope in scopes:
   args=urllib.parse.urlencode({"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end,"rows":12,"mailto":"fangcu@ucmail.uc.edu"})
   try:
    result=request("https://api.crossref.org/works?"+args)
@@ -104,13 +105,26 @@ def discover(days=60,mode="weekly"):
 def main():
  DIR.mkdir(exist_ok=True)
  previous=read(DIR/"library.json",[])
- records={key(x):x for x in previous if relevant(x)}
+ # Preserve previously found scholarly metadata, including unverified venues,
+ # as internal review candidates; the public selection is a separate gate.
+ records={key(x):x for x in previous if x.get("kind")=="scholarly" or relevant(x)}
  for record in records.values():record["source_group"]=source_class(record)
- candidates,errors,stats=discover(mode=os.environ.get("MODE","weekly"))
+ mode=os.environ.get("MODE","weekly")
+ candidates,errors,stats=discover(mode=mode)
+ priority,priority_errors,priority_stats=discover_priority(
+  request,datetime.date.fromisoformat(TODAY),mode=mode,
+  existing_dois={x.get("doi") for x in records.values() if x.get("doi")}
+ )
+ candidates=priority+candidates
+ errors.extend(priority_errors)
+ stats["priority_and_journal_discovery"]=priority_stats
+ stats["discovery_status"]="partial" if errors else "complete"
+ if errors:
+  print("::warning::Discovery completed with some unavailable provider searches; see run diagnostics.")
  new=[]
  for x in candidates:
   k=key(x)
-  if not x["title"] or not x["url"] or not relevant(x):continue
+  if not x["title"] or not x["url"] or (not relevant(x) and x.get("discovery_scope")!="editorial_priority"):continue
   if k in records:
    current=records[k]
    current["source_group"]=source_class(current)
@@ -128,6 +142,8 @@ def main():
  prior=read(DIR/"runs.json",[])
  run={"date":TODAY,"mode":os.environ.get("MODE","weekly"),"new":len(new),"total":len(collection),"candidates":len(candidates),"last_seven_days":len(week_items),"stats":dict(stats,errors=errors)}
  if not candidates and errors:raise SystemExit("Discovery did not return records: "+"; ".join(errors[:3]))
+ run["stats"]["accepted_new"]=len(new)
+ run["stats"]["source_screen_note"]="Discovery yields metadata candidates, not verified full texts or journal-level quality certification."
  (DIR/"library.json").write_text(json.dumps(collection,ensure_ascii=False,indent=2)+"\n")
  (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":diverse_week(week_items)},ensure_ascii=False,indent=2)+"\n")
  (DIR/"runs.json").write_text(json.dumps([r for r in prior if r.get("date")!=TODAY][-51:]+[run],indent=2)+"\n")

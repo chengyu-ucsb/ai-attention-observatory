@@ -126,6 +126,40 @@ The internal acquisition database is `data/library.json`. The public reading pro
 
 The newsletter generator is `scripts/build_newsletter.py`. It builds the latest preview (`newsletter.html`), permanent editions (`issues/`), and RSS 2.0 (`issue-feed.xml`) with stable permalinks and publication dates.
 
+## Weekly search and PDF intake
+
+Every Monday, the Observatory's GitHub Actions [research refresh](.github/workflows/refresh.yml)
+runs the four-theme OpenAlex/Crossref discovery and an additional field-specific
+journal search. The latter uses DOI-verified priority leads and cross-checks
+journal names before accepting a candidate. The editorially nominated,
+publisher-verified DOI queue is in [`data/priority-research.json`](data/priority-research.json).
+It includes empirical AI-cognition, metacognition and intervention studies
+from *Computers & Education*, *Computers in Human Behavior*, and related
+specialist journals. It is a discovery queue, **not** a set of published
+study reviews. Automatic summaries still require a substantive source abstract
+or lawful full-text extraction. The weekly run now reports if discovery was
+partial because an API was down or throttled. OpenAlex search and Crossref
+search are complementary, not a systematic exhaustive review.
+
+### Importing PDFs already obtained through a library
+
+**Preferred direct workflow:** Attach a batch of PDFs to the Observatory
+conversation. The assistant can match DOI/title, distinguish methods from
+results and interpretations, and prepare short attributed research notes
+without committing PDF bytes to GitHub.
+
+**Repeatable personal-library workflow:** Import the same PDFs into a private
+Zotero collection named exactly `AI & Attention Observatory`. Institutional
+access does not give a public website permission to redistribute PDF files.
+The [private Zotero health check](.github/workflows/zotero.yml) currently checks
+DOI overlap and whether indexed attachment text is available; it does not
+yet ingest articles automatically. Never upload the original PDFs to this public
+repository, store institutional sign-in credentials, or commit indexed text
+under `data/`. The [public RIS backlog](exports/zotero-fulltext-backlog.ris)
+can be imported into Zotero to locate missing papers. PDFs need to be
+read/extracted locally under the library's applicable terms, then reviewed
+and summarized before only permissible notes are published.
+
 ## Research quality and news reading
 
 The public reading library uses a **field-specific venue baseline**, an explicit
