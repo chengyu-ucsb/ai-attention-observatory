@@ -98,7 +98,8 @@ class CondensedReadingTests(unittest.TestCase):
   digest=annotate(paper)["reading"]["digest"]
   self.assertEqual(digest["finding"],"")
   self.assertEqual(digest["finding_source"],"none")
-  self.assertEqual(digest["idea"],"How models explain attention switching")
+  self.assertEqual(digest["idea"],"How does switching between tasks affect attention?")
+  self.assertNotEqual(digest["idea"],paper["title"])
   self.assertEqual(digest["interpretation"],"")
  def test_source_snippets_do_not_publish_half_sentences(self):
   from condense_readings import source_snippet
