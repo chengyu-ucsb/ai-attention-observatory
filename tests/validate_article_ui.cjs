@@ -44,7 +44,7 @@ for(const r of db){
  assert(!matching(page,"concept-scene").length,"Decorative generic concept diagram present");
  assert(match(page,"rv-layout")&&match(page,"rv-content"),"Consistent story layout missing");
  const art=match(page,"story-visual-reading"),image=match(page,"story-image");
- assert(art&&image&&/^assets\/reading-(?:focus|offloading|fragmentation|learning|interventions|work|society|wellbeing)\.svg$/.test(image.src),"Study-themed artwork missing for "+r.title);
+ assert(art&&image&&/^assets\/reading-(?:focus|offloading|fragmentation|learning|interventions|work|society|wellbeing|trust|critical|reflection|notification|measurement|recovery|research|creativity)\.svg$/.test(image.src),"Study-themed artwork missing for "+r.title);
  assert(/not a visualization of study findings/.test(textContent(art)),"Concept art must not look like empirical evidence");
  assert(match(page,"rv-context-grid"),"Source context and caveats missing");
  assert(match(page,"rv-source"),"Source citation/links missing");
@@ -61,12 +61,12 @@ for(const r of db){
  checked++;
 }
 assert(edited>=20,"Expected source-grounded editorial coverage to expand");
-for(const name of ["focus","offloading","fragmentation","learning","interventions","work","society","wellbeing"]){
+for(const name of ["focus","offloading","fragmentation","learning","interventions","work","society","wellbeing","trust","critical","reflection","notification","measurement","recovery","research","creativity"]){
  const svg=read("assets/reading-"+name+".svg");
  assert(svg.includes('<svg')&&svg.includes('viewBox="0 0 880 530"'),"Missing/malformed image asset: "+name);
 }
 const workflow=read(".github/workflows/publish.yml");
-assert(workflow.includes("cp assets/reading-*.svg _site/assets/"),"New images are not included in the published website");
+assert(workflow.includes("cp assets/reading-*.svg assets/feed.xsl _site/assets/"),"New images and RSS stylesheet are not included in the published website");
 vm.runInContext("TEST.showLibrary()",ctx);
 const cards=matching(libraryContainer,"library-story");
 assert.equal(cards.length,db.length,"All searchable readings must use the visual library card");
@@ -77,6 +77,25 @@ for(const r of db.filter(x=>/^[^a-z]*[A-Z][^a-z]*$/.test(x.title)&&x.title.lengt
  assert(!/^[A-Z\s\d\W]+$/.test(label),"All-capitalized source label persists: "+r.title);
 }
 
+const visualDoi=[
+ "10.1007/s44217-026-02332-w","10.1515/humaff-2026-0011",
+ "10.3389/fpsyg.2026.1960382","10.1177/21582440261497404",
+ "10.1080/17501229.2026.2730676","10.3389/feduc.2026.1952725",
+ "10.48550/arxiv.2609.38029","10.21203/rs.3.rs-10212076/v1",
+ "10.3389/fcomm.2026.1828344","10.3390/educsci16091470",
+ "10.54359/ps.v19i108.2216","10.3389/fpsyg.2026.1832219",
+ "10.36948/ijfmr.2026.v08i05.87207","10.31234/osf.io/wy8z3_v1",
+ "10.35542/osf.io/64qz7_v1","10.1007/s10648-026-10224-6"
+];
+for(const doi of visualDoi){
+ const source=db.find(x=>x.doi===doi);
+ if(!source)continue;
+ ctx.selected=source;vm.runInContext("TEST.showPaper(selected)",ctx);
+ const figure=match(paperContainer,"evidence-graphic");
+ assert(figure,"Missing evidence-first graphic for "+doi);
+ assert(match(figure,"concept-note"),"Evidence figure needs explanatory provenance "+doi);
+ assert(match(figure,"article-data-visual"),"Evidence diagram must be labeled "+doi);
+}
 const idea=db.find(x=>x.doi==="10.58304/ijts.260930");
 assert(idea,"Literacy reference should appear in the public library");
 ctx.selected=idea;vm.runInContext("TEST.showPaper(selected)",ctx);
