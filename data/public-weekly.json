@@ -110,8 +110,8 @@
     "editorial_selections_added": 0,
     "product_examples": 4,
     "reading_eligible_count": 300,
-    "full_text_count": 79,
-    "abstract_count": 209,
+    "full_text_count": 86,
+    "abstract_count": 202,
     "ai_specific_count": 247,
     "historical_foundations_count": 1
   },
@@ -224,6 +224,20 @@
       },
       "oa_checked": "2026-10-22",
       "oa_pass_version": 2,
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-22T03:14:06+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_machine_text",
+        "next_at": "2026-10-29T03:14:07+00:00"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-10-22",
+        "next_at": "2026-11-12",
+        "attempts": 1
+      },
       "visual": {
         "kind": "illustration_only",
         "reason": "insufficient_indexed_evidence"
@@ -447,34 +461,38 @@
       "source": "Crossref",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "Further research should evaluate the framework and examine measurable learning outcomes.",
-        "methods": "This exploratory cross-sectional survey examined respondents? reported AI use, perceived educational benefits, and cognitive abilities they considered important to protect. A total of 66 respondents participated in this exploratory cross-sectional survey, which combined descriptive quantitative analysis with summaries of open-ended responses.",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "Artificial intelligence (AI), particularly generative AI, is increasingly used to explain concepts, support research, and provide individualized learning assistance. Its growing presence raises questions about independent reasoning, creativity, verification, and equitable access.",
+        "methods": "The project used an exploratory cross-sectional survey combining descriptive quantitative summaries and openended responses. It was not designed to establish causality or measure changes in intelligence, academic achievement, or cognitive performance. The study included 66 respondents who completed an online questionnaire administered through Google Forms. The questionnaire explored AI use, perceived educational benefits, concerns about AI in learning, and cognitive abilities considered important to protect. The findings are exploratory and should not be interpreted as representative of a wider population.",
         "findings": "",
-        "interpretation": "",
-        "limitations": "",
+        "interpretation": "The findings provide an exploratory picture of AI perceptions: AI assistants were commonly reported as used, personalized learning and difficult-concept explanations were perceived benefits, and critical thinking, creativity, problem-solving, and decision-making were frequently selected as abilities to protect. These observations relate to published discussions of generative AI's opportunities and challenges [3] [4] [5] [6] [7] [8] , but this study does not establish whether AI improves or reduces cognitive abilities. The findings suggest a balance between technological assistance and human cognitive engagement. AI should not be judged only by convenience, speed, or answer production. The study's contribution is to bring together reported AI use, perceived benefits, and priorities for protecting human cognitive engagement in a preliminary framework. The framework provides a basis for investigating independent reasoning, critical evaluation, creativity, equitable access, and teacher involvement. The Future Minds Project explored AI-in-education perceptions among 66 respondents. AI assistants were commonly reported as used; personalized learning and explanations of difficult concepts were perceived benefits; and critical thinking was the most frequently selected skill to protect. Open-ended themes highlighted dependence, verification, equitable access, clear policies, and human guidance. The article proposes a preliminary framework centred on human agency, cognitive engagement, guided AI use, equity, critical AI literacy, and teacher-led accountability. Educational AI should be considered by how it supports meaningful learning and human development, not only speed or convenience. This study does not show that AI protects or harms intelligence; it offers exploratory findin",
+        "limitations": "The study included 66 respondents and may not represent a wider population. Data reflect self-reported perceptions, not direct measures of cognitive ability or academic performance. Formal questionnaire validation and reliability testing are not documented. Incomplete sampling procedures and participant characteristics limit assessment of representativeness and transferability. The design cannot support causal claims about AI's effects on intelligence, critical thinking, creativity, or learning. Qualitative themes require checking against original responses and transparent reporting of the analysis. Sampling details, demographics, and collection dates should be documented where possible. Future research could use larger, more diverse samples, validated instruments, and direct measures of learning and critical thinking. Longitudinal or quasi-experimental studies could examine whether forms of guided AI use relate to learning behaviours or outcomes. The framework could be refined through",
         "sample": "66",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "discussion",
+          "limitations"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "reported_findings": false,
         "digest": {
           "idea": "What happens to critical thinking when people use AI?",
           "explain": "This exploratory cross-sectional survey examined respondents? reported AI use, perceived educational benefits, and cognitive abilities they considered important to protect.",
-          "approach": "This exploratory cross-sectional survey examined respondents? reported AI use, perceived educational benefits, and cognitive abilities they considered important to protect.",
+          "approach": "The project used an exploratory cross-sectional survey combining descriptive quantitative summaries and openended responses.",
           "finding": "",
           "finding_source": "none",
           "interpretation": "",
-          "limitation": "",
+          "limitation": "Data reflect self-reported perceptions, not direct measures of cognitive ability or academic performance.",
           "tags": [
             "Critical thinking",
             "Learning"
           ],
           "status": "automatically_condensed_source_text",
-          "editorial_basis": "abstract",
+          "editorial_basis": "full_text",
           "reading_mode": "research_question"
         }
       },
@@ -482,24 +500,49 @@
       "abstract_text": "Artificial intelligence (AI), particularly generative AI, is increasingly used to explain concepts, support research, and provide individualized learning assistance. Its growing presence raises questions about independent reasoning, creativity, verification, and equitable access. This exploratory cross-sectional survey examined respondents? reported AI use, perceived educational benefits, and cognitive abilities they considered important to protect. A total of 66 respondents participated in this exploratory cross-sectional survey, which combined descriptive quantitative analysis with summaries of open-ended responses. Sixty-four respondents (97.0%) reported using ChatGPT or a similar AI assistant. Personalized learning was selected as an expected benefit by 50 (75.8%), while 48 (72.7%) identified understanding difficult concepts as an AI use or benefit. Critical thinking was the most frequently selected cognitive skill to protect (55; 83.3%), followed by creativity (52; 78.8%), problem-solving (48; 72.7%), and decision-making (47; 71.2%). Reported themes included individualized explanations, convenient information access, dependence concerns, verification, equity, and teacher guidance. Based on these findings and relevant literature, the article proposes a preliminary six-principle Future Minds Framework. The small exploratory sample and self-reported data do not support generalization or causal conclusions about cognition. Further research should evaluate the framework and examine measurable learning outcomes.",
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
-      "oa_grobid_checked": "2026-10-18",
+      "oa_grobid_checked": "2026-10-22",
       "open_access_url": "https://doi.org/10.21275/sr261014061131",
       "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-20T00:19:33+00:00",
-        "status": "source_unavailable",
-        "next_at": "2026-11-10T00:19:34+00:00"
+        "attempts": 2,
+        "last_at": "2026-10-22T03:14:11+00:00",
+        "status": "full_text",
+        "next_at": null,
+        "pipeline_version": 3
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "The project used an exploratory cross-sectional survey combining descriptive quantitative summaries and openended responses. It was not designed to establish causality or measure changes in intelligence, academic achievement, or cognitive performance. The study included 66 respondents who completed an online questionnaire administered through Google Forms. The questionnaire explored AI use, perceived educational benefits, concerns about AI in learning, and cognitive abilities considered important to protect. The findings are exploratory and should not be interpreted as representative of a wider population.",
+        "results": "",
+        "discussion": "The findings provide an exploratory picture of AI perceptions: AI assistants were commonly reported as used, personalized learning and difficult-concept explanations were perceived benefits, and critical thinking, creativity, problem-solving, and decision-making were frequently selected as abilities to protect. These observations relate to published discussions of generative AI's opportunities and challenges [3] [4] [5] [6] [7] [8] , but this study does not establish whether AI improves or reduces cognitive abilities. The findings suggest a balance between technological assistance and human cognitive engagement. AI should not be judged only by convenience, speed, or answer production. The study's contribution is to bring together reported AI use, perceived benefits, and priorities for protecting human cognitive engagement in a preliminary framework. The framework provides a basis for investigating independent reasoning, critical evaluation, creativity, equitable access, and teacher involvement. The Future Minds Project explored AI-in-education perceptions among 66 respondents. AI assistants were commonly reported as used; personalized learning and explanations of difficult concepts were perceived benefits; and critical thinking was the most frequently selected skill to protect. Open-ended themes highlighted dependence, verification, equitable access, clear policies, and human guidance. The article proposes a preliminary framework centred on human agency, cognitive engagement, guided AI use, equity, critical AI literacy, and teacher-led accountability. Educational AI should be considered by how it supports meaningful learning and human development, not only speed or convenience. This study does not show that AI protects or harms intelligence; it offers exploratory findings and a conceptual basis for further research into responsible, equitable, human-centred AI-supported education.",
+        "limitations": "The study included 66 respondents and may not represent a wider population. Data reflect self-reported perceptions, not direct measures of cognitive ability or academic performance. Formal questionnaire validation and reliability testing are not documented. Incomplete sampling procedures and participant characteristics limit assessment of representativeness and transferability. The design cannot support causal claims about AI's effects on intelligence, critical thinking, creativity, or learning. Qualitative themes require checking against original responses and transparent reporting of the analysis. Sampling details, demographics, and collection dates should be documented where possible. Future research could use larger, more diverse samples, validated instruments, and direct measures of learning and critical thinking. Longitudinal or quasi-experimental studies could examine whether forms of guided AI use relate to learning behaviours or outcomes. The framework could be refined through expert review, teacher interviews, classroom pilots, and empirical evaluation.",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.21275/sr261014061131",
+        "key_idea": "The findings provide an exploratory picture of AI perceptions: AI assistants were commonly reported as used, personalized learning and difficult-concept explanations were perceived benefits, and critical thinking, creativity, problem-solving, and decision-making were frequently s",
+        "extraction_date": "2026-10-22",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "discussion",
+          "limitations"
+        ]
+      },
       "visual": {
         "kind": "research_design",
-        "basis": "abstract",
+        "basis": "full_text",
         "status": "indexed",
         "finding_source": "none",
         "blocks": [
           {
             "label": "Research approach",
-            "text": "This exploratory cross-sectional survey examined respondents? reported AI use, perceived educational benefits, and cognitive abilities they considered important to protect."
+            "text": "The project used an exploratory cross-sectional survey combining descriptive quantitative summaries and openended responses."
+          },
+          {
+            "label": "What remains uncertain",
+            "text": "Data reflect self-reported perceptions, not direct measures of cognitive ability or academic performance."
           }
         ]
       }
@@ -529,7 +572,7 @@
       "open_access_url": "https://doi.org/10.1007/s44217-026-02332-w",
       "open_access_license": "cc-by-nc-nd",
       "open_access_version": "publishedVersion",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "reading": {
         "level": "abstract",
         "provenance": "OpenAlex abstract index",
@@ -562,12 +605,14 @@
       },
       "oa_grobid_checked": "2026-10-18",
       "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-20T00:19:34+00:00",
+        "attempts": 2,
+        "last_at": "2026-10-22T03:14:11+00:00",
         "status": "waiting_for_license",
-        "next_at": "2026-11-19T00:19:34+00:00"
+        "next_at": "2026-11-05T03:14:12+00:00",
+        "pipeline_version": 3
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "evidence_snapshot",
         "basis": "abstract",
@@ -606,7 +651,7 @@
       "source": "Crossref",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": " Abstract \n                   The rapid diffusion of generative artificial intelligence (AI) has raised fundamental questions about its effects on critical thinking and cognitive development. Evidence from recent empirical studies suggests a dual pattern: structured forms of AI assistance can sustain users’ cognitive activity and enhance engagement and performance, whereas more substitutive forms of use are associated with reduced autonomous reasoning and poorer subsequent independent performance. This article argues that these findings can be understood by considering how cognitive work is distributed between users and AI systems and how this distribution may evolve over time. In particular, I examine a six-step sequence in which successful complementary assistance can increase trust and delegation; greater delegation can remain complementary or become increasingly substitutive; and increasingly substitutive interactions can reduce the autonomous exercise of critical thinking and potentially hinder the development or maintenance of critical-thinking capacities over time. The available evidence provides substantial support for the first five steps considered individually and substantial, though less direct, support for the sixth. The article concludes by discussing educational, design, and social implications, arguing that preserving cognitive agency requires fostering complementary rather than progressively substitutive forms of interaction. ",
       "abstract_source": "Crossref abstract",
       "reading": {
@@ -648,6 +693,7 @@
         "next_at": "2026-11-19T08:32:13+00:00"
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "research_design",
         "basis": "abstract",
@@ -991,7 +1037,7 @@
       "source": "OpenAlex",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": "Purpose Artificial intelligence (AI) is reshaping higher education by changing how students learn and perform academic tasks. Although AI is associated with greater time efficiency and improved academic performance, its broader effects on student productivity and cognitive effort remain insufficiently understood. This study aims to examine how university students associate AI-led productivity gains with less study time, better grades, better understanding of study material, changes in cognitive effort they put into AI-supported task completion and dependency on AI tools. Design/methodology/approach The authors conducted an exploratory survey among university students in Hanoi in late 2024 and proposed an empirical model that pools self-reported time efficiency, academic performance, academic self-efficacy, change in cognitive effort and AI dependency as dimensions of student productivity. The authors control for AI use intensity and AI use in collaboration, as well as for some other socio-demographic characteristics. Given the exploratory nature of the study and the relatively small sample, the empirical analysis follows a staged specification strategy when the authors first estimate a parsimonious baseline model and subsequently introduce two sets of background controls sequentially. The authors further estimate an interaction between cognitive effort change and AI dependency, first in a parsimonious specification and subsequently with additional controls. Finally, the authors produce a sensitivity analysis of the model to alternative operationalisation of self-efficacy variable. Findings Students associate their AI-led productivity gains primarily with less study time, a bit less so with better grades and better understanding of the study material. They also associate the productivity growth with greater changes of cognitive effort they put into problem-solving while using AI and rising dependency on AI tools. Self-confidence appears to be associated with likelihood to reap significant rather than some productivity gains particularly once the interaction of AI dependency and AI-led cognitive shift is accounted for. The survey data also support the existence of potentially uneven academic benefits from AI use when higher-achieving students are more likely to report further improvements in academic performance, whereas students with weaker prior performance report rather limited gains. Research limitations/implications The findings highlight the need for research design that captures the dynamic evolution of AI-supported learning. The observed differences between daily and weekly users, particularly in critical evaluation and perceived accuracy, suggest that future studies should examine how evaluative skills and cognitive effort develop over time. Longitudinal and experimental designs, combined with objective performance and AI-usage data, would allow researchers to test whether the productivity dimensions proposed here operate causally or how much the fast-paced evolution of AI tools changes the cognitive effort students put into problem-solving and critical thinking when completing academic tasks, and their dependency on AI tools for academic productivity. Practical implications The results provide actionable guidance for universities seeking to integrate AI into teaching and assessment practices. The strong role of time efficiency and self-efficacy, alongside uneven benefits across student groups, indicates the need for structured AI literacy modules that teach source verification and evaluative strategies and effective prompt formulation. Given that daily users show higher critical evaluation but lower perceived accuracy, teaching practices should incorporate reflective assignments that require students to justify, critique a",
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
@@ -1034,6 +1080,7 @@
         "next_at": "2026-11-19T08:32:12+00:00"
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "research_design",
         "basis": "abstract",
@@ -1207,7 +1254,7 @@
       "source": "Crossref",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": "Cognitive flexibility, a core component of executive function, is frequently impaired in individuals with insomnia. However, the neural mechanisms underlying this impairment, particularly in response to sleep-related stimuli, remain unclear. A total of 48 participants, comprising 24 individuals with insomnia disorder (ID) and 24 healthy controls (HC), were recruited to perform a modified task-switching paradigm incorporating sleep-related (e.g., bed) and general stimuli during functional Magnetic Resonance Imaging (fMRI) scanning. Behavioral measures (reaction time, accuracy, and switch cost), task activation and generalized psychophysiological interaction (gPPI)-based task-dependent functional connectivity were analyzed. Two subjective questionaires, the Cognitive Flexibility Inventory and the Insomnia Severity Index were collectely simultaneously. The ID group exhibited significantly lower CFI scores compared to the HC group, indicating subjective cognitive flexibility impairment. Notably, in the task-switching performance, the ID group demonstrated faster reaction times to sleep-related stimuli. fMRI results revealed altered activation in the right precuneus, angular gyrus, and superior temporal gyrus, with interaction effects between group and stimulus type. The gPPI analyses showed that, compared to HC, ID group exhibited enhanced connectivity between the precuneus and cerebellar under sleep stimulus conditions, as well as disrupted connectivity between the angular gyrus and frontal-parietal regions, and reduced integration from the superior temporal gyrus to multiple association regions across networks. These findings suggest that insomnia is characterized by both subjective deficits in cognitive flexibility and altered neural network dynamics during task switching, with sleep-related stimuli exerting a significant modulatory effect. Enhanced attention captured by sleep-related information may interfere with the optimal task-related network coordination, providing a potential mechanism linking insomnia to executive dysfunction. Not applicable.",
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
@@ -1252,6 +1299,7 @@
         "next_at": "2026-11-19T14:18:30+00:00"
       },
       "source_group": "Adjacent digital-attention evidence",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "illustration_only",
         "reason": "insufficient_indexed_evidence"
@@ -1320,6 +1368,20 @@
       },
       "oa_checked": "2026-10-22",
       "oa_pass_version": 2,
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-22T03:14:07+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_machine_text",
+        "next_at": "2026-10-29T03:14:07+00:00"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-10-22",
+        "next_at": "2026-11-12",
+        "attempts": 1
+      },
       "visual": {
         "kind": "illustration_only",
         "reason": "insufficient_indexed_evidence"
@@ -1356,17 +1418,20 @@
       "open_access_license": "cc-by",
       "open_access_version": "publishedVersion",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This study examined the relationships among generative AI-supported learning, cognitive offloading, metacognitive awareness, and students’ learning regulation among university students in Pakistan. Descriptive statistics were used to summarize demographic characteristics, Pearson correlation was applied to examine relationships between variables, and simple linear regression…",
-        "methods": "A quantitative cross-sectional research design was employed, and data were collected from 293 university students through a self-administered online questionnaire distributed using Google Forms. Descriptive statistics were used to summarize demographic characteristics, Pearson correlation was applied to examine relationships between variables, and simple linear regression was conducted to assess predictive relationships.",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "This study examined the relationships among generative AI-supported learning, cognitive offloading, metacognitive awareness, and students’ learning regulation among university students in Pakistan. A quantitative cross-sectional research design was employed, and data were collected from 293 university students through a self-administered online questionnaire distributed using Google Forms.",
+        "methods": "A quantitative cross-sectional research design was used to study the relationships between generative AI-based learning, cognitive offloading, metacognitive awareness, and the way students regulate their learning. Research was conducted on university students and included the collection of quantitative data once. The design helped explore the relationships between study variables and understand whether generative AI-based learning and metacognitive awareness statistically predicted the learning outcomes of interest. Data was collected via an online self-administered questionnaire. The questionnaires were electronically distributed to the participants. As the questionnaires were self-administered, participants were able to respond to the questionnaires without the presence of the researcher. The participants were given a brief explanation about the research and provided i nformation about their right to voluntarily participate or withdraw from the research at any time without giving a reason for doing so. Responses were reviewed to assess their completeness and correctness. The responses were edited for spelling mistakes. The researcher reserved the right to withdraw any response that raised ethical concerns. The intended final sample consisted of 293 Universi ty students. Data collected were organized and analyzed in IBM SPSS Statistics after being entered in Microsoft Excel. Descriptive statistics were computed to summarize characteristics of participants and to interpret re",
         "findings": "",
-        "interpretation": "",
+        "interpretation": "The results of this study show the relationships between generative AI supported learning, cognitive offloading, and metacognitive awareness and students' learning regulation. The results suggest that generative AI tools may serve as cognitive aids while affecting students' learning in a similar way as cognitive offloading. Generative AI supports students' learning by prompting and providing students' assistance and explanation. To a degree, Rahmadiningrum, (2026) argued that cognitive offloading allows students to free up their cognitive resources by utilizing external sources. AI can help student's complete academic task. However, stude nt's may lose opportunities for independent thinking by relying too much on AI. Thus, in an educational context, the value of generative AI lies in its capability to serve students as a support, rather than a substitute, for cognitive effort. The positive association between generative AI-supported learning and metacognitive awareness is significant because metacognition is the understanding of, and the ability to control, one's own thought processes. According to Melanou, (2026), knowing about cognition and regulating cognition are core elements of metacognitive awareness. Using generative AI to clarify difficult concepts and compare and check their understanding may help learners become more aware of their learning processes. Additionally, the relationship between cognitive offloading and learning regulation indicates that students' use of external cognitive support is related to the way students' structure and regulate their learning. However, offloading is not necessarily beneficial in all cases, and its utility may depend on students' ability to evaluate AI-generated information and be actively involved in their learning. The resu",
         "limitations": "",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "discussion"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "reported_findings": false,
         "digest": {
           "idea": "When does AI assistance become cognitive dependence?",
@@ -1382,12 +1447,38 @@
             "Learning"
           ],
           "status": "automatically_condensed_source_text",
-          "editorial_basis": "abstract",
+          "editorial_basis": "full_text",
           "reading_mode": "research_question"
         }
       },
       "oa_checked": "2026-10-22",
       "oa_pass_version": 2,
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-22T03:14:07+00:00",
+        "pipeline_version": 3,
+        "status": "full_text",
+        "next_at": null
+      },
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "A quantitative cross-sectional research design was used to study the relationships between generative AI-based learning, cognitive offloading, metacognitive awareness, and the way students regulate their learning. Research was conducted on university students and included the collection of quantitative data once. The design helped explore the relationships between study variables and understand whether generative AI-based learning and metacognitive awareness statistically predicted the learning outcomes of interest. Data was collected via an online self-administered questionnaire. The questionnaires were electronically distributed to the participants. As the questionnaires were self-administered, participants were able to respond to the questionnaires without the presence of the researcher. The participants were given a brief explanation about the research and provided i nformation about their right to voluntarily participate or withdraw from the research at any time without giving a reason for doing so. Responses were reviewed to assess their completeness and correctness. The responses were edited for spelling mistakes. The researcher reserved the right to withdraw any response that raised ethical concerns. The intended final sample consisted of 293 Universi ty students. Data collected were organized and analyzed in IBM SPSS Statistics after being entered in Microsoft Excel. Descriptive statistics were computed to summarize characteristics of participants and to interpret responses to study variables. Where appropriate, the assumptions of relevant statistical techniques were checked before performing any statistical inference. Pearson correlation was applied to test hypothesis H1 to determine the extent to which generative AI-supported learning and cognitive offloading are related. Simple linear regression was conducted to assess the level of statistically predicting metacognitive awareness by generative AIsupported learning (H2). Pearson correlation was employed to assess the relationship between cognitive offloading and students' learning regulation (H3). Simple linear regression was done to assess the extent to which metacognitive awareness is related to learning regulation (H4). Results of regression analysis were interpreted as statistical predictions rather than evidence of causal relationships. Regression coefficients were described as positive or negative rather than large or small.",
+        "results": "",
+        "discussion": "The results of this study show the relationships between generative AI supported learning, cognitive offloading, and metacognitive awareness and students' learning regulation. The results suggest that generative AI tools may serve as cognitive aids while affecting students' learning in a similar way as cognitive offloading. Generative AI supports students' learning by prompting and providing students' assistance and explanation. To a degree, Rahmadiningrum, (2026) argued that cognitive offloading allows students to free up their cognitive resources by utilizing external sources. AI can help student's complete academic task. However, stude nt's may lose opportunities for independent thinking by relying too much on AI. Thus, in an educational context, the value of generative AI lies in its capability to serve students as a support, rather than a substitute, for cognitive effort. The positive association between generative AI-supported learning and metacognitive awareness is significant because metacognition is the understanding of, and the ability to control, one's own thought processes. According to Melanou, (2026), knowing about cognition and regulating cognition are core elements of metacognitive awareness. Using generative AI to clarify difficult concepts and compare and check their understanding may help learners become more aware of their learning processes. Additionally, the relationship between cognitive offloading and learning regulation indicates that students' use of external cognitive support is related to the way students' structure and regulate their learning. However, offloading is not necessarily beneficial in all cases, and its utility may depend on students' ability to evaluate AI-generated information and be actively involved in their learning. The result that metacognitive awareness is predictive of learning regulation is supportive of the observation that efficient learners envision and structure their learning, and actively monitor their level of comprehension. As Suazo Galdames et al., (2026) noted, although the use of one's own cognition is pivotal in self-regulated learning, other factors such as motivation, affect and environment are also integral in the self-regulation of learning. Therefore, the results of the current study, which encourage students to critique and verify information generated by AI and consider the coherence and the rationality of the information produced, are also vital. Given the cross-sectional design of the study, it only demonstrated statistical relationships, and not causal relationships. Longitudinal research is warranted to establish the impact of long-term use of generative AI by students and what it means for learning regulation and metacognitive awareness (Fitriani et al., 2026) . This study investigated the relationships between generative AI-supported learning, cognitive offloading, metacognitive awareness, and students' regulation of their learning. The results showed that generative AI-supported learning and cognitive offloading affect metacognitive awareness. Further, cognitive offloading and metacognitive awareness impacted students' regulation of their learning. Overall, the findings demonstrate the need to understand students' use of generative AI, their thinking and learning, and the strategies and actions they take to facilitate their academic activities. The study stated that generative AI should be used as a supportive educational resource, and not replace students' independent thinking and learning. Relying too much on AI to produce information will not help students to accomplish academic goals and may negatively impact their performance and academic results. It is important that educators develop students' skills of judgment and discretion so that they can be responsible in their use of AI.",
+        "limitations": "",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.71317/jgst.2.10(s).2026.817",
+        "key_idea": "The results of this study show the relationships between generative AI supported learning, cognitive offloading, and metacognitive awareness and students' learning regulation. The results suggest that generative AI tools may serve as cognitive aids while affecting students' learn",
+        "extraction_date": "2026-10-22",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "discussion"
+        ]
+      },
+      "oa_grobid_checked": "2026-10-22",
       "visual": {
         "kind": "illustration_only",
         "reason": "insufficient_indexed_evidence"
@@ -1551,7 +1642,7 @@
       "source": "OpenAlex",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": "We evaluate how effectively platform-level parental controls moderate a mainstream conversational assistant used by minors. Our two-phase protocol first builds a category-balanced conversation corpus via PAIR-style iterative prompt refinement over API, then has trained human agents replay/refine those prompts in the consumer UI using a designated child account while monitoring the linked parent inbox for alerts. We focus on seven risk areas—physical harm, pornography, privacy violence, health consultation, fraud, hate speech, and malware—and quantify four outcomes: Notification Rate (NR), Leak-Through (LR), Overblocking (OBR), and UI Intervention Rate (UIR). Using an automated judge (with targeted human audit) and comparing the current backend to legacy variants (GPT-4.1/4o), we find that notifications are selective rather than comprehensive: privacy violence, fraud, hate speech, and malware triggered no parental alerts in our runs, whereas physical harm (highest), pornography, and some health queries produced intermittent alerts. The current backend shows lower leak-through than legacy models, yet overblocking of benign, educational queries near sensitive topics remains common and is not surfaced to parents, revealing a policy–product gap between on-screen safeguards and parent-facing telemetry. We propose actionable fixes: broaden/configure the notification taxonomy, couple visible safeguards to privacy-preserving parent summaries, and prefer calibrated, age-appropriate safe rewrites over blanket refusals.",
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
@@ -1595,6 +1686,7 @@
         "next_at": "2026-11-19T23:52:06+00:00"
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "illustration_only",
         "reason": "insufficient_indexed_evidence"
@@ -1618,7 +1710,7 @@
       "source": "Crossref",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": " Generative artificial intelligence (GenAI) allows university teachers to delegate cognitive work while deciding how students should engage with it. Using codebook thematic analysis, we examined multi-source accounts from 25 teachers recruited through an AI-focused learning community and its professional networks in China. Materials comprised interviews with 22 teachers, three documentary cases, self-narratives and reflective essays. Three themes organize the findings: reconstructing the teacher role, defending professional judgment, and managing teachers’ and students’ cognitive participation. Participants described disciplinary expertise as a basis for evaluating AI outputs and reported practices intended to retain human engagement. Instrumental and partnership orientations overlapped; descriptive comparison with later use profiles did not establish a simple relationship between partnership language and usage intensity. Because the protocol introduced several focal topics, we distinguish prompted positions from volunteered formulations. The proposed belief–strategy–practice cycle is a heuristic interpretation of retrospective accounts, not a demonstrated mechanism. The study contributes an account of how teachers connect their own cognitive offloading with their reported organization of students’ learning opportunities. Its claims concern this AI-engaged sample rather than university teachers generally. ",
       "abstract_source": "Crossref abstract",
       "reading": {
@@ -1658,12 +1750,21 @@
       "open_access_version": "publishedVersion",
       "oa_grobid_checked": "2026-10-18",
       "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-20T00:19:32+00:00",
+        "attempts": 2,
+        "last_at": "2026-10-22T03:14:12+00:00",
         "status": "waiting_for_machine_text",
-        "next_at": "2026-11-03T00:19:32+00:00"
+        "next_at": "2026-10-29T03:14:12+00:00",
+        "pipeline_version": 3
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-10-22",
+        "next_at": "2026-11-12",
+        "attempts": 1
+      },
       "visual": {
         "kind": "research_design",
         "basis": "abstract",
@@ -1694,7 +1795,7 @@
       "source": "OpenAlex",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": "In the era of artificial intelligence (AI), sustainable education requires not only the integration of advanced technologies but also the cultivation of key competencies such as critical thinking. This study investigates English major students’ engagement with generative AI tools in translation learning, focusing on their usage patterns, critical thinking behaviors, and ethical awareness. A mixed-methods design combining questionnaire data and semi-structured interviews was employed to examine how students interact with AI in translation contexts. The results show that while students frequently use AI for translation, writing, and language learning, their engagement remains primarily functional and efficiency-driven. Although they display openness and flexibility toward AI, their reasoning confidence, self-regulation, and ethical reflection are underdeveloped, indicating surface-level interaction and overreliance on technological authority. These findings highlight the need to cultivate higher-order cognitive and ethical capacities in translation training. Central to this discussion is the conceptualization of the ideal learner in AI-assisted translation, a reflective, autonomous, and ethically aware individual who engages with AI as a partner in cognitive and moral development. Building on this, the study proposes pedagogical strategies that integrate AI literacy, process-oriented assessment, and teacher training to foster critical thinking and responsible AI use in sustainable translation education.",
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
@@ -1735,12 +1836,14 @@
       "open_access_version": "publishedVersion",
       "oa_grobid_checked": "2026-10-18",
       "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-20T00:19:32+00:00",
+        "attempts": 2,
+        "last_at": "2026-10-22T03:14:12+00:00",
         "status": "waiting_for_license",
-        "next_at": "2026-11-19T00:19:32+00:00"
+        "next_at": "2026-11-05T03:14:12+00:00",
+        "pipeline_version": 3
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "evidence_snapshot",
         "basis": "abstract",
@@ -1776,7 +1879,7 @@
       "source": "Crossref",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": " Employers increasingly deploy artificial-intelligence systems that read employee sentiment from written communication, infer exhaustion from calendar and workload digital exhaust, and flag individuals as at elevated risk of burnout — tools marketed under the language of care rather than control. This paper develops a conceptual model of how AI-mediated wellbeing monitoring reshapes psychological safety, the shared belief that a work environment is safe for interpersonal risk-taking on which voice, dissent and error reporting depend. Integrating psychological-safety theory, the algorithmic-management and workplace-surveillance literatures, and organisational voice research, the paper argues that wellbeing-monitoring intensity depresses psychological safety principally through a mediating perception of surveillance threat, and that this relationship is not fixed but is conditioned by the transparency of the monitoring system, the degree to which employees attribute developmental rather than punitive intent to it, and whether a human manager mediates between algorithmic output and managerial action. Five propositions specify these relationships, including a boundary condition for India's IT-BPM sector, where the Digital Personal Data Protection Act, 2023 supplies a general consent-and-purpose-limitation framework but no sector-specific rule for wellbeing analytics, leaving adoption norms to be set informally inside a high-attrition, always-on operating environment. The paper closes with implications for the design of psychologically safe monitoring architectures and an agenda for empirical validation. ",
       "abstract_source": "Crossref abstract",
       "reading": {
@@ -1820,6 +1923,7 @@
         "next_at": "2026-11-19T23:52:03+00:00"
       },
       "source_group": "AI-specific",
+      "oa_pass_version": 3,
       "visual": {
         "kind": "research_design",
         "basis": "abstract",
@@ -1861,49 +1965,74 @@
       "open_access_license": "cc-by",
       "open_access_version": "publishedVersion",
       "reading": {
-        "level": "abstract",
-        "provenance": "Crossref abstract",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
         "overview": "Generative artificial intelligence (GenAI) is reshaping foreign language education, yet the psychological processes underlying effective learner–AI interaction remain fragmented. This theory-building systematic review synthesizes empirical evidence on metacognition, trust, and human–AI co-regulation in GenAI-supported foreign language learning.",
-        "methods": "This theory-building systematic review synthesizes empirical evidence on metacognition, trust, and human–AI co-regulation in GenAI-supported foreign language learning.",
-        "findings": "The findings show that metacognition shapes learners’ planning, monitoring, regulation, and reflection; trust influences how learners accept, verify, modify, or reject AI-generated information and feedback; and human–AI co-regulation involves the dynamic distribution of cognitive and regulatory activity between learners and GenAI within teacher-mediated instructional contexts.",
-        "interpretation": "",
-        "limitations": "",
+        "methods": "This study employed a theory-building systematic review to synthesize empirical evidence on the psychological processes underlying generative-AI-supported foreign language learning. The review followed PRISMA 2020 for study identification, screening, and reporting and used qualitative thematic and conceptual synthesis to develop a theoretical account. The review focused on three interconnected mechanisms: metacognition, trust, and human-AI co-regulation. Related constructs, including self-regulated learning, learner agency, autonomy, AI literacy, prompt literacy, and feedback literacy, were examined as enabling conditions or associated processes. The aim was to identify recurring relationships among these constructs and explain how learners regulate their interactions with generative AI during foreign language learning.",
+        "findings": "The 51 included studies yielded four overlapping domains: metacognition/self-regulated learning (Lai et al., 2026) , trust (El Hosayny et al., 2026) , human-AI co-regulation/collaboration (Zakaria et al., 2025) , and AI literacy/learner agency (El Hosayny et al., 2026) . Because studies could address multiple constructs, these counts are overlapping contributions and should not be summed. The following sections synthesize evidence within and across these domains. The five research questions are addressed by integrating the empirical evidence synthesized in Section 4 with the theoretical interpretation developed in Sections 5.1-5.3 (Table 2 ). The synthesis indicates that the educational value of GenAI lies not in maximizing AI involvement but in establishing a regulated human-AI relationship in which GenAI extends cognitive resources while learners retain epistemic agency, critical judgment, and responsibility for learning.",
+        "interpretation": "This systematic review examined the psychological processes through which learners engage with generative artificial intelligence (GenAI) in foreign language education. Drawing on 51 empirical studies, it moved beyond whether GenAI improves particular language skills to examine how learners understand, evaluate, regulate, and coordinate their interactions with generative systems. Metacognition, trust, and human-AI co-regulation emerged as interconnected mechanisms underlying GenAI-mediated learning, while AI literacy and learner agency functioned as enabling conditions. The findings conceptualize learning with GenAI as adaptive human-AI partnership. Metacognition supports goal setting, monitoring of AI contributions, evaluation, and subsequent regulation. Trust calibration shapes decisions about whether AI-generated information or feedback should be accepted, verified, modified, or rejected. Human-AI co-regulation captures the distribution and coordination of cognitive and regulatory work between learners and AI. These mechanisms are neither discrete nor strictly sequential; rather, they form a dynamic system in which metacognitive evaluation informs trust and reliance, reliance shapes cognitive distribution, and interaction outcomes provide new information for subsequent regulation. The educational value of GenAI therefore depends less on its capacity to generate language, provide feedback, or perform cognitive tasks than on how learners incorporate these affordances into their regulatory activity. GenAI can augment learning when learners retain responsibility for planning, evaluation, judgment, and reflection. When these functions are increasingly delegated to AI, assistance may become cognitive substitution, potentially weakening independent engagement and learner co",
+        "limitations": "Several limitations qualify the interpretation of the findings. The 51 studies varied substantially in participants, research designs, learning contexts, AI applications, and operationalization's of psychological constructs, which limits direct comparison across studies. Moreover, the evidence base is relatively recent and rapidly evolving; findings associated with particular GenAI systems may therefore change as technologies and patterns of use develop. The review has methodological limitations related to its singleauthor design. Screening, full-text assessment, and thematic coding were conducted by the sole author without independent reviewer or coder verification, which may have introduced selection or interpretive bias despite the use of a structured coding framework and documented screening decisions. No formal risk-of-bias appraisal was conducted, reflecting the theory-building focus and methodological heterogeneity of the included studies. The database coverage also represents a",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "results",
+          "discussion",
+          "limitations"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "reported_findings": true,
         "digest": {
           "idea": "How do people monitor and regulate their thinking with technology?",
           "explain": "This theory-building systematic review synthesizes empirical evidence on metacognition, trust, and human–AI co-regulation in GenAI-supported foreign language learning.",
-          "approach": "This theory-building systematic review synthesizes empirical evidence on metacognition, trust, and human–AI co-regulation in GenAI-supported foreign language learning.",
+          "approach": "",
           "finding": "",
           "finding_source": "none",
           "interpretation": "",
-          "limitation": "",
+          "limitation": "Several limitations qualify the interpretation of the findings.",
           "tags": [
+            "AI literacy",
             "Metacognition",
-            "Learning",
-            "Social context"
+            "Learning"
           ],
           "status": "automatically_condensed_source_text",
-          "editorial_basis": "abstract",
+          "editorial_basis": "full_text",
           "reading_mode": "research_question"
         }
       },
       "oa_checked": "2026-10-22",
       "oa_pass_version": 2,
-      "visual": {
-        "kind": "research_design",
-        "basis": "abstract",
-        "status": "indexed",
-        "finding_source": "none",
-        "blocks": [
-          {
-            "label": "Research approach",
-            "text": "This theory-building systematic review synthesizes empirical evidence on metacognition, trust, and human–AI co-regulation in GenAI-supported foreign language learning."
-          }
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-22T03:14:08+00:00",
+        "pipeline_version": 3,
+        "status": "full_text",
+        "next_at": null
+      },
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "This study employed a theory-building systematic review to synthesize empirical evidence on the psychological processes underlying generative-AI-supported foreign language learning. The review followed PRISMA 2020 for study identification, screening, and reporting and used qualitative thematic and conceptual synthesis to develop a theoretical account. The review focused on three interconnected mechanisms: metacognition, trust, and human-AI co-regulation. Related constructs, including self-regulated learning, learner agency, autonomy, AI literacy, prompt literacy, and feedback literacy, were examined as enabling conditions or associated processes. The aim was to identify recurring relationships among these constructs and explain how learners regulate their interactions with generative AI during foreign language learning.",
+        "results": "The 51 included studies yielded four overlapping domains: metacognition/self-regulated learning (Lai et al., 2026) , trust (El Hosayny et al., 2026) , human-AI co-regulation/collaboration (Zakaria et al., 2025) , and AI literacy/learner agency (El Hosayny et al., 2026) . Because studies could address multiple constructs, these counts are overlapping contributions and should not be summed. The following sections synthesize evidence within and across these domains. The five research questions are addressed by integrating the empirical evidence synthesized in Section 4 with the theoretical interpretation developed in Sections 5.1-5.3 (Table 2 ). The synthesis indicates that the educational value of GenAI lies not in maximizing AI involvement but in establishing a regulated human-AI relationship in which GenAI extends cognitive resources while learners retain epistemic agency, critical judgment, and responsibility for learning.",
+        "discussion": "This systematic review examined the psychological processes through which learners engage with generative artificial intelligence (GenAI) in foreign language education. Drawing on 51 empirical studies, it moved beyond whether GenAI improves particular language skills to examine how learners understand, evaluate, regulate, and coordinate their interactions with generative systems. Metacognition, trust, and human-AI co-regulation emerged as interconnected mechanisms underlying GenAI-mediated learning, while AI literacy and learner agency functioned as enabling conditions. The findings conceptualize learning with GenAI as adaptive human-AI partnership. Metacognition supports goal setting, monitoring of AI contributions, evaluation, and subsequent regulation. Trust calibration shapes decisions about whether AI-generated information or feedback should be accepted, verified, modified, or rejected. Human-AI co-regulation captures the distribution and coordination of cognitive and regulatory work between learners and AI. These mechanisms are neither discrete nor strictly sequential; rather, they form a dynamic system in which metacognitive evaluation informs trust and reliance, reliance shapes cognitive distribution, and interaction outcomes provide new information for subsequent regulation. The educational value of GenAI therefore depends less on its capacity to generate language, provide feedback, or perform cognitive tasks than on how learners incorporate these affordances into their regulatory activity. GenAI can augment learning when learners retain responsibility for planning, evaluation, judgment, and reflection. When these functions are increasingly delegated to AI, assistance may become cognitive substitution, potentially weakening independent engagement and learner control. Productive augmentation and problematic dependence thus depend primarily on how cognitive and regulatory responsibility is organized. The Metacognition-Trust-Co-Regulation (MTC) Framework integrates these processes into a unified theoretical account. It explains how cognitive activity can be distributed between learners and AI while preserving human agency as the organizing principle of learning. AI literacy and learner agency are conceptualized not as additional MTC mechanisms but as enabling conditions that help learners understand GenAI's capabilities and limitations, calibrate reliance, and retain ownership of learning. The framework therefore provides a basis for explaining variation in psychological and learning outcomes, including autonomy, motivation, confidence, engagement, cognitive load, feedback literacy, and agency. The principal contribution of this review is to specify the psychological conditions under which GenAI becomes educationally productive, rather than characterizing it as inherently beneficial or detrimental. This perspective shifts attention from evaluating GenAI primarily as an instructional technology toward understanding how learners regulate its use while preserving the cognitive activities through which learning occurs. Future research should empirically test the MTC Framework across learner populations, language tasks, educational settings, and GenAI systems. Longitudinal, experimental, and processsensitive designs are needed to examine whether the proposed relationships among metacognition, trust, and co-regulation remain robust across contexts and over time. Research should also identify when human-AI cognitive partnerships enhance learning without displacing essential cognitive and regulatory activities. The central challenge for GenAI-enhanced foreign language education is not how much learning can be delegated to AI, but how AI can be integrated while preserving and strengthening learners' capacity to think, evaluate, regulate, and act independently.",
+        "limitations": "Several limitations qualify the interpretation of the findings. The 51 studies varied substantially in participants, research designs, learning contexts, AI applications, and operationalization's of psychological constructs, which limits direct comparison across studies. Moreover, the evidence base is relatively recent and rapidly evolving; findings associated with particular GenAI systems may therefore change as technologies and patterns of use develop. The review has methodological limitations related to its singleauthor design. Screening, full-text assessment, and thematic coding were conducted by the sole author without independent reviewer or coder verification, which may have introduced selection or interpretive bias despite the use of a structured coding framework and documented screening decisions. No formal risk-of-bias appraisal was conducted, reflecting the theory-building focus and methodological heterogeneity of the included studies. The database coverage also represents a limitation. Although Web of Science and Scopus provided broad multidisciplinary coverage, PsycINFO and ERIC were not searched. Future reviews should incorporate education and psychology-specific databases to broaden coverage and reduce potential database-related selection bias. Overall, the MTC Framework should be viewed as a theory-generating account that requires further empirical validation. The evidence also relied substantially on self-reports, interviews, surveys, and relatively short-term interventions. Although these approaches provide valuable insights into learners' perceptions and experiences, they may not fully capture how metacognitive regulation, trust calibration, and cognitive redistribution unfold during actual learner-AI interaction. Future research should therefore incorporate more longitudinal and process-sensitive approaches, including interaction logs, prompt histories, revision records, think-aloud protocols, and screen-based observation. Further research should examine how learner proficiency, prior AI experience, AI literacy, metacognitive ability, task complexity, instructional design, and teacher mediation shape MTC processes. In particular, the proposed framework requires empirical testing. Longitudinal, experimental, and mixed-methods research could examine whether metacognitive engagement is associated with trust calibration, whether calibrated reliance is associated with particular forms of co-regulation, and whether these processes are subsequently related to language-learning and psychological outcomes.",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.3389/fpsyg.2026.1974520",
+        "key_idea": "The 51 included studies yielded four overlapping domains: metacognition/self-regulated learning (Lai et al., 2026) , trust (El Hosayny et al., 2026) , human-AI co-regulation/collaboration (Zakaria et al., 2025) , and AI literacy/learner agency (El Hosayny et al., 2026) . Because ",
+        "extraction_date": "2026-10-22",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "results",
+          "limitations",
+          "discussion"
         ]
+      },
+      "oa_grobid_checked": "2026-10-22",
+      "visual": {
+        "kind": "illustration_only",
+        "reason": "insufficient_indexed_evidence"
       }
     },
     {
@@ -1936,40 +2065,83 @@
       "open_access_license": "cc-by",
       "open_access_version": "publishedVersion",
       "reading": {
-        "level": "abstract",
-        "provenance": "Crossref abstract",
-        "overview": "This study extends the Unified Theory of Acceptance and Use of Technology (UTAUT) by specifying metacognitive awareness (META) and self-regulated learning (SRL) as mediators between the four UTAUT determinants and behavioural intention (BI), and BI predicts self-reported use of GenAI as a cognitive partner (AU).",
-        "methods": "Responses from 451 students at seven Thai Rajabhat universities were analysed with partial least squares structural equation modelling (PLS-SEM; SmartPLS 4; 10,000 bootstrap subsamples). Given the cross-sectional, single-source design and full-collinearity diagnostics indicating possible common-method variance, the findings are interpreted as associations compatible with, but not establishing, the proposed mechanisms.",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "Generative artificial intelligence (GenAI) has diffused through higher education faster than the structures meant to govern it, yet acceptance research still treats adoption as a terminal outcome rather than as an event embedded in students' self-regulation. This study extends the Unified Theory of Acceptance and Use of Technology (UTAUT) by specifying metacognitive awareness (META) and self-regulated…",
+        "methods": "The study employed a cross-sectional, single-administration survey design with a variance-based structural equation model. The design is appropriate for theory extension in which a well-established nomological network is augmented with new mediating constructs, and for the estimation of a complex model containing eight latent variables and forty indicators. Because all constructs were measured at a single time point from a single source, the directional paths represent theoretically specified orderings rather than empirically established causal precedence. Path coefficients and indirect effects are therefore interpreted throughout as model-implied associations, and a significant indirect effect is described as consistent with mediation rather than as evidence that the mediator is the causal mechanism (Maxwell & Cole, 2007; Spector, 2019) . The target population comprised students in higher education at Rajabhat universities in Thailand, the network of public institutions established to serve regional populations. The sample consisted of 451 students enrolled at seven of these universities: Udon Thani Rajabhat University, Rajabhat Maha Sarakham University, Sakon Nakhon Rajabhat University, Roi Et Rajabhat University, Phuket Rajabhat University, Thepsatri Rajabhat University and Surat Thani Rajabhat University. Prior experience of using GenAI tools for learning was an inclusion criterion, screened by a filter item at the start of the questionnaire; respondents indicating no exp",
         "findings": "",
-        "interpretation": "",
-        "limitations": "",
+        "interpretation": "This study asked whether the adoption of generative AI by university students is better understood as a function of expectations about the tool or as a function of learners' regulation of themselves. The pattern of associations is more consistent with the second reading, although with an asymmetry that is theoretically more interesting than a clean confirmation would have been, and with the caveat that a cross-sectional design can show consistency with, but not the direction of, these relationships. Generative AI has been absorbed into undergraduate study with a speed that has left institutions responding to a practice they did not design. This study suggests that the institutional lever that remains available may be guidance rather than access. Among 451 students at seven Thai regional public universities, facilitating conditions, operationalised largely as perceived institutional guidance and support, had no significant direct association with intention to use generative AI, yet were by a considerable margin the strongest correlate of the metacognitive awareness and self-regulation that students reported, and were associated with intention only indirectly, through metacognitive awareness. Social influence, meanwhile, was the strongest direct correlate of intention. If these associations reflect causal processes, which longitudinal and experimental research must establish, students may be carried into generative AI use by the people around them and equipped for it, if at all, by their institutions. The theoretical implication is that acceptance models built for organisational software may require mechanistic revision before they can carry explanatory weight in education, where use is never the terminal outcome of interest and where the same behaviour may be either a pa",
+        "limitations": "Several limitations qualify these findings and, in each case, indicate a specific next step. Design and causality. The data are cross-sectional and self-reported, so the mediation results establish statistical consistency with the hypothesised mechanism rather than causal precedence, and alternative orderings, in which intention and use foster metacognitive awareness and self-regulation, fit the same data equally well (Maxwell & Cole, 2007; Spector, 2019) . The causal vocabulary of UTAUT (determinants, effects) is used in this article to name model positions, not to claim causal effects. The substitution interpretation advanced in Section 5.3 in particular requires longitudinal or experimental evidence. Experience-sampling or trace-based designs that capture regulation during GenAI-mediated study, as advocated by Molenaar (2022b) , would allow the temporal ordering of regulation and use to be observed rather than assumed.",
         "sample": "451",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "discussion",
+          "limitations"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "reported_findings": false,
         "digest": {
           "idea": "How do people monitor and regulate their thinking with technology?",
           "explain": "The model explained 62.1% to 70.9% of endogenous variance and showed out-of-sample predictive relevance.",
-          "approach": "",
+          "approach": "The study employed a cross-sectional, single-administration survey design with a variance-based structural equation model.",
           "finding": "",
           "finding_source": "none",
           "interpretation": "",
-          "limitation": "",
+          "limitation": "Several limitations qualify these findings and, in each case, indicate a specific next step.",
           "tags": [
             "Metacognition",
             "Learning"
           ],
           "status": "automatically_condensed_source_text",
-          "editorial_basis": "abstract",
+          "editorial_basis": "full_text",
           "reading_mode": "research_question"
         }
       },
       "oa_checked": "2026-10-22",
       "oa_pass_version": 2,
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-22T03:14:09+00:00",
+        "pipeline_version": 3,
+        "status": "full_text",
+        "next_at": null
+      },
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "The study employed a cross-sectional, single-administration survey design with a variance-based structural equation model. The design is appropriate for theory extension in which a well-established nomological network is augmented with new mediating constructs, and for the estimation of a complex model containing eight latent variables and forty indicators. Because all constructs were measured at a single time point from a single source, the directional paths represent theoretically specified orderings rather than empirically established causal precedence. Path coefficients and indirect effects are therefore interpreted throughout as model-implied associations, and a significant indirect effect is described as consistent with mediation rather than as evidence that the mediator is the causal mechanism (Maxwell & Cole, 2007; Spector, 2019) . The target population comprised students in higher education at Rajabhat universities in Thailand, the network of public institutions established to serve regional populations. The sample consisted of 451 students enrolled at seven of these universities: Udon Thani Rajabhat University, Rajabhat Maha Sarakham University, Sakon Nakhon Rajabhat University, Roi Et Rajabhat University, Phuket Rajabhat University, Thepsatri Rajabhat University and Surat Thani Rajabhat University. Prior experience of using GenAI tools for learning was an inclusion criterion, screened by a filter item at the start of the questionnaire; respondents indicating no experience were routed out and are not included in the 451. Sampling was purposive with voluntary participation. The realised sample substantially exceeds the minimum required for the most complex regressed construct in the model: with six predictors of behavioural intention, an anticipated effect size of f 2 = .15, α = .05 and power = .95, G*Power 3.1 (Faul et al., 2009) indicates a minimum of 146 cases, and the inverse-square-root rule for PLS-SEM (Hair et al., 2022) indicates approximately 155 cases for the smallest expected path coefficient of .20. The distribution of the sample across gender, year of study, duration and frequency of GenAI use, and preferred tool is reported in Table 1 . Two thirds of respondents were in their first or second year of study, and three quarters had been using GenAI for six months or longer, so the sample is weighted towards students who encountered these tools early in their programme rather than adopting them late. Because all data derive from a single self-report instrument, procedural and statistical remedies were applied. Procedurally, respondent anonymity was guaranteed, no right answers were implied, and predictor and criterion items were separated in the questionnaire (Podsakoff et al., 2003) . Statistically, the full collinearity assessment recommended by Kock (2015) was applied, in which the variance inflation factor of every construct is computed against all remaining constructs; values above 3.3 are taken as a warning sign of possible common method bias (Kock, 2015; Podsakoff et al., 2012) . The results, which are not unambiguous, are reported and discussed in Section 4.3 together with the inner-model collinearity diagnostics. Inner-model collinearity was assessed before the path coefficients were interpreted. In the equations for metacognitive awareness and self-regulated learning, variance inflation factors for the four exogenous predictors ranged from 2.68 (PE) to 3.79 (EE). In the behavioural intention equation, which contains six predictors, they ranged from 2.73 (PE) to 4.86 (SRL), with FC at 4.30 and META at 3.75. Every value therefore falls below the critical threshold of five above which Hair et al. (2019) regard structural estimates as compromised, but several exceed the more conservative benchmark of 3.3 proposed by Kock and Lynn (2012) and none attains the ideal of three. Estimates for the more strongly collinear predictors, and for SRL in particular, should accordingly be read as less stable than those for PE and META. The full collinearity procedure of Kock (2015) returned values between 2.76 (PE) and 4.96 (SRL), with FC at 4.33, AU at 4.21, META at 4.18, SI at 4.11, BI at 3.98 and EE at 3.89. Seven of the eight constructs therefore exceed the 3.3 criterion, and the model does not clear this test of common method bias. We report this without minimising it, and offer three considerations rather than a dismissal. First, the criterion is conservative in models with substantial construct correlations, because it cannot distinguish method-induced covariance from the theoretically expected covariance of proximal constructs; here META and SRL correlate at .841 and BI and AU at .833 for reasons the theory predicts. Second, the indicator redundancy documented in Section 4.1 inflates construct correlations independently of any shared method, so the two diagnostics are not independent of one another. Third, the pattern of results is not what uniform method inflation alone would be expected to produce: six of the fifteen structural paths are non-significant, one carries a negative sign, and the effect sizes are widely dispersed, whereas a dataset dominated by common method variance typically yields uniformly positive and significant estimates. These considerations are, however, arguments rather than tests. The present design cannot distinguish substantive covariance from covariance produced by shared measurement processes, so the magnitudes of the structural coefficients, including the intention-use path, should be treated cautiously and may be inflated by common-method variance (Podsakoff et al., 2012) . A marker-variable or unmeasured latent method construct design is recommended for replication (Podsakoff et al., 2003) .",
+        "results": "",
+        "discussion": "This study asked whether the adoption of generative AI by university students is better understood as a function of expectations about the tool or as a function of learners' regulation of themselves. The pattern of associations is more consistent with the second reading, although with an asymmetry that is theoretically more interesting than a clean confirmation would have been, and with the caveat that a cross-sectional design can show consistency with, but not the direction of, these relationships. Generative AI has been absorbed into undergraduate study with a speed that has left institutions responding to a practice they did not design. This study suggests that the institutional lever that remains available may be guidance rather than access. Among 451 students at seven Thai regional public universities, facilitating conditions, operationalised largely as perceived institutional guidance and support, had no significant direct association with intention to use generative AI, yet were by a considerable margin the strongest correlate of the metacognitive awareness and self-regulation that students reported, and were associated with intention only indirectly, through metacognitive awareness. Social influence, meanwhile, was the strongest direct correlate of intention. If these associations reflect causal processes, which longitudinal and experimental research must establish, students may be carried into generative AI use by the people around them and equipped for it, if at all, by their institutions. The theoretical implication is that acceptance models built for organisational software may require mechanistic revision before they can carry explanatory weight in education, where use is never the terminal outcome of interest and where the same behaviour may be either a partnership or a substitution. The practical implication is narrower and more actionable: the question worth asking of any institutional AI initiative is not whether it increases use, which will increase regardless, but whether it increases the proportion of use in which the student is still doing the thinking.",
+        "limitations": "Several limitations qualify these findings and, in each case, indicate a specific next step. Design and causality. The data are cross-sectional and self-reported, so the mediation results establish statistical consistency with the hypothesised mechanism rather than causal precedence, and alternative orderings, in which intention and use foster metacognitive awareness and self-regulation, fit the same data equally well (Maxwell & Cole, 2007; Spector, 2019) . The causal vocabulary of UTAUT (determinants, effects) is used in this article to name model positions, not to claim causal effects. The substitution interpretation advanced in Section 5.3 in particular requires longitudinal or experimental evidence. Experience-sampling or trace-based designs that capture regulation during GenAI-mediated study, as advocated by Molenaar (2022b) , would allow the temporal ordering of regulation and use to be observed rather than assumed.",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.5539/hes.v16n4p369",
+        "key_idea": "This study asked whether the adoption of generative AI by university students is better understood as a function of expectations about the tool or as a function of learners' regulation of themselves. The pattern of associations is more consistent with the second reading, although",
+        "extraction_date": "2026-10-22",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "discussion",
+          "limitations"
+        ]
+      },
+      "oa_grobid_checked": "2026-10-22",
       "visual": {
-        "kind": "illustration_only",
-        "reason": "insufficient_indexed_evidence"
+        "kind": "research_design",
+        "basis": "full_text",
+        "status": "indexed",
+        "finding_source": "none",
+        "blocks": [
+          {
+            "label": "Research approach",
+            "text": "The study employed a cross-sectional, single-administration survey design with a variance-based structural equation model."
+          },
+          {
+            "label": "What remains uncertain",
+            "text": "Several limitations qualify these findings and, in each case, indicate a specific next step."
+          }
+        ]
       }
     },
     {
@@ -1989,7 +2161,7 @@
       "source": "OpenAlex",
       "curated": false,
       "first_seen": "2026-10-18",
-      "oa_checked": "2026-10-18",
+      "oa_checked": "2026-10-22",
       "abstract_text": "Digital competence among bank employees is an increasingly critical determinant of task efficiency in technology-driven financial service environments. In this study, a hybrid analytical approach is used that combines Fuzzy-Set Qualitative Comparative Analysis (fsQCA) with ten machine learning (ML) classifiers. The combination of these two approaches is designed to predict the Focused vs. Distracted attention status of bank employees based on multimodal behavioural and digital interaction features during task execution. The dataset included 1,000 observations of bank employees, capturing head orientation, facial expression, gaze direction, micro-movements, application usage, notification interruptions, and task completion time during digital work sessions. There was a marked imbalance in the class distribution with 91.2% of bank employees categorized as Distracted and 8.8% of bank employees categorized as Focused, which was consistent with the actual prevalence of digital distraction in professional banking environments. The LightGBM model performed best with all the classifiers, with an accuracy score of 98.9%, an AUC of 0.9998, and an F1 score of 0.989. Random Forest and XGBoost followed closely with an AUC of 0.9996 and 0.9995, respectively. The top 3 explainable features identified by SHAP analysis were Head Orientation, Facial Expression and Micro-Movements. The necessity analysis using the fsQCA method confirmed that forward gaze (consistency = 0.97), straight head posture (0.94) and neutral facial expression (0.99) are almost necessary conditions for focused attention. The results provide actionable insights for intelligent workforce management systems, adaptive digital workplace platforms, and real-time employee performance monitoring systems in banking and financial service organizations.",
       "abstract_source": "OpenAlex abstract index",
       "abstract_updated": "2026-10-18",
@@ -2035,6 +2207,14 @@
         "next_at": "2026-11-03T14:18:30+00:00"
       },
       "source_group": "Adjacent digital-attention evidence",
+      "oa_pass_version": 3,
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-10-22",
+        "next_at": "2026-11-12",
+        "attempts": 1
+      },
       "visual": {
         "kind": "research_design",
         "basis": "abstract",
