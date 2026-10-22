@@ -109,7 +109,7 @@ class CondensedReadingTests(unittest.TestCase):
   result=readable_excerpt("The authors found that AI usage was positively associated with reported task-switching.",limit=150)
   self.assertEqual(result,"AI usage was positively associated with reported task-switching.")
   interpret=readable_excerpt("The authors suggest that AI may help workers manage interruptions.",role="interpretation")
-  self.assertIn("One interpretation is that",interpret)
+  self.assertIn("A possible explanation is that",interpret)
   self.assertIn("may help",interpret)
  def test_automatic_digest_preserves_uncertain_language(self):
   paper={"kind":"scholarly","doi":"10.0000/example","title":"Attention and AI",
@@ -121,4 +121,19 @@ class CondensedReadingTests(unittest.TestCase):
   digest=annotate(paper)["reading"]["digest"]
   self.assertIn("associated",digest["finding"])
   self.assertNotRegex(digest["finding"],r"(?i)^the authors")
+ def test_public_commentary_uses_purposeful_plain_language(self):
+  from condense_readings import PUBLIC_COMMENTARY
+  self.assertEqual(len(PUBLIC_COMMENTARY),16)
+  record={"kind":"nonacademic","title":"What is the Socratic method? Could it be used to test students in an age of AI?",
+          "url":"https://theconversation.com/what-is-the-socratic-method-could-it-be-used-to-test-students-in-an-age-of-ai-287498",
+          "reading":{"level":"curated","overview":"Plato’s dialogues show that learning takes place through reflective thought."}}
+  digest=annotate(record)["reading"]["digest"]
+  self.assertIn("Questioning assumptions",digest["idea"])
+  self.assertNotIn("Plato",digest["idea"])
+  self.assertNotIn("The source describes",digest["idea"])
+  self.assertEqual(digest["finding"],"")
+ def test_attribution_clauses_are_not_written_in_new_commentary_summaries(self):
+  from condense_readings import PUBLIC_COMMENTARY
+  for idea in PUBLIC_COMMENTARY.values():
+   self.assertNotRegex(idea,r"(?i)^(?:the authors|the source|one interpretation is that|the paper)")
 if __name__=="__main__":unittest.main()
