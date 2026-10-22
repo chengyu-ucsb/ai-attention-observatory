@@ -34,10 +34,15 @@ def prepare(records, config=None):
     harvested scholarly record is not overwritten by a manually supplied seed.
     """
     config = config if config is not None else load()
+    urls_present = {canonical_url(x.get("url")) for x in records if canonical_url(x.get("url"))}
+    related_dois = {str(x.get("primary_doi") or "").lower() for x in config.get("connections", [])
+                    if canonical_url(x.get("commentary_url")) in urls_present}
     by_doi = {str(x.get("doi") or "").lower(): x
               for x in records if x.get("kind") == "scholarly" and x.get("doi")}
     for primary in config.get("primary_publications", []):
         doi = str(primary.get("doi") or "").lower()
+        if doi not in related_dois and doi not in by_doi:
+            continue
         if not doi.startswith("10.") or not primary.get("abstract_source") or not primary.get("url"):
             continue
         if doi not in by_doi:
