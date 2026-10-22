@@ -14,6 +14,9 @@ def apply(records,config=None):
         hits=[x for x in records if x.get("kind")=="nonacademic" and
               x.get("title")==edit.get("match_title")]
         for r in hits:
+            legacy=r.get("url")
+            if legacy and legacy != edit.get("canonical_url"):
+                r["legacy_urls"]=list(dict.fromkeys((r.get("legacy_urls") or [])+[legacy]))
             for key,source in (("title","canonical_title"),("url","canonical_url"),
                                ("authors","authors"),("venue","venue"),
                                ("published","published"),("format","format"),
