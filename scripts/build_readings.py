@@ -4,6 +4,8 @@ Extractive, provenance-labelled notes only. No generated numerical results, fabr
 methods, or LLM inference. Missing sections stay missing instead of generic prompts.
 """
 import json,pathlib,re,html
+from editorial_corrections import apply as apply_editorial_corrections
+from news_quality import useful_description
 from source_lineage import prepare
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
@@ -40,10 +42,10 @@ def first_two(parts,limit=420):
 def make_note(r):
     if r.get("kind")=="nonacademic":
         existing=r.get("reading")
-        if existing and existing.get("overview"):
+        if existing and existing.get("overview") and (r.get("content_access")=="editorially_read_source" or r.get("source")!="Publisher RSS / Google News RSS" or useful_description(r.get("title"),existing.get("overview"),r.get("venue"))):
             return existing
         prose=clean(r.get("preview",""))
-        if len(prose)>=70 and not any(s in prose.lower() for s in STOP):
+        if useful_description(r.get("title"),prose,r.get("venue")) and not any(s in prose.lower() for s in STOP):
             return {"level":"curated","provenance":r.get("venue","Publisher")+" supplied synopsis","overview":prose[:330],"methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Short publisher/editorial description, not an independently verified full-article analysis."}
         return {"level":"citation_only","provenance":"Publisher citation","overview":"","methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Source link and bibliographic metadata only."}
     src=clean(r.get("abstract_text"))
