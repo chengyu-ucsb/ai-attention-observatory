@@ -220,16 +220,20 @@ def run():
  work=candidates[:cap]
  stats={"attempted":len(work),"fulltexts_recovered":0,"license_unverified":0,
         "pdf_unreadable_or_blocked":0,"provider_limited":0,
-        "no_oa_pdf_reported":0,"pdf_host_unapproved":0,"provider_error":0,
+        "no_oa_pdf_reported":0,"provider_incomplete":0,"pdf_host_unapproved":0,"provider_error":0,
+        "semantic_scholar_rate_limited":0,
         "remaining_without_sections":0}
  if not work:
   stats["remaining_without_sections"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in records)
   print(json.dumps(stats));return stats
  dois=[r["doi"].strip().lower() for r in work]
+ s2_error=False
  try:
   s2=s2_batch(dois)
  except (urllib.error.HTTPError,urllib.error.URLError,ValueError,TimeoutError) as e:
-  stats["provider_limited"]=len(work) if isinstance(e,urllib.error.HTTPError) and e.code==429 else 0
+  s2_error=True
+  if isinstance(e,urllib.error.HTTPError) and e.code==429:
+   stats["semantic_scholar_rate_limited"]=1
   s2={}
   # A provider outage must not block independent Unpaywall attempts.
   print("Semantic Scholar metadata unavailable; trying alternative OA locations")
@@ -254,6 +258,8 @@ def run():
   opts=candidates_for(doi,s2.get(doi),alternatives)
   try:
    status=recover(paper,opts,today)
+   if not opts and s2_error:
+    status="provider_incomplete"
   except urllib.error.HTTPError as e:
    if e.code==429:
     status="provider_limited";stats["provider_limited"]+=1
@@ -261,7 +267,7 @@ def run():
   except (ValueError,urllib.error.URLError,TimeoutError,TypeError):
    status="provider_error";stats["provider_error"]+=1
   stats[status]=stats.get(status,0)+1 if status!="provider_limited" else stats["provider_limited"]
-  delay=365 if status=="full_text_recovered" else 2 if status in ("provider_error","provider_limited") else 30
+  delay=365 if status=="full_text_recovered" else 2 if status in ("provider_error","provider_limited","provider_incomplete") else 30
   checkpoint(paper,status,delay,today,provider_status)
   time.sleep(.12)
  LIB.write_text(json.dumps(records,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
