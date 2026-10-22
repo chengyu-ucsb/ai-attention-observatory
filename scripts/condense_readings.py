@@ -403,8 +403,16 @@ DEEP_PERSPECTIVES = {
 }
 def deep_perspective(record,notes):
  """Only add interpretive depth when an original source has been examined."""
+ machine=record.get("deep_analysis") or {}
+ # Prefer a source-checked, editorially authored reading when available.
  key=((record.get("url") or "")+" "+(record.get("title") or "")).lower()
  extra=next((v for token,v in DEEP_PERSPECTIVES.items() if token in key),{})
+ if machine.get("kind")=="nonacademic" and machine.get("source_depth")=="source_html" and not extra.get("basis","").startswith("Editorial analysis"):
+  return {
+   **{field:machine.get(field,"") for field in ("thesis","reasoning","examples","tension","implications","open_question","qualification")},
+   "basis":machine.get("basis","AI-assisted source analysis"),
+   "source_depth":"machine_read_full_article"
+  }
  argument=notes.get("argument") or ""
  overview=(record.get("reading") or {}).get("overview") or ""
  return {
@@ -480,5 +488,13 @@ def annotate(record):
    "editorial_basis":"full_text" if fulltext else "abstract",
    "reading_mode":"finding" if reported else "research_question"
   }
+ machine=record.get("deep_analysis") or {}
+ if (level=="full_text" and machine.get("kind")=="scholarly" and
+     machine.get("source_depth")=="full_text"):
+  digest["longform"]={key:machine.get(key,"") for key in (
+   "research_question","study_design","reported_results","authors_interpretation",
+   "critical_context","limitations","open_question")}
+  digest["longform"]["basis"]=machine.get("basis","AI-assisted analysis of indexed full text")
+  digest["longform"]["review_status"]=machine.get("review_status","automatic_unreviewed")
  base["reading"]["digest"]=digest
  return base
