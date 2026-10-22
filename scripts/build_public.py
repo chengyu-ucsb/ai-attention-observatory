@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from condense_readings import annotate
+from build_visuals import visual_spec
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
@@ -27,7 +28,12 @@ def record_id(x):
 
 def build():
     all_records=json.loads((DATA/"library.json").read_text())
-    selected=[annotate(x) for x in all_records if readable(x)]
+    selected=[]
+    for source in all_records:
+        if not readable(source):continue
+        published=annotate(source)
+        published["visual"]=visual_spec(published)
+        selected.append(published)
     selection_ids={record_id(x) for x in selected}
     week=json.loads((DATA/"weekly.json").read_text())
     # Weekly source entries are snapshots and may be older than the final enrichment.
