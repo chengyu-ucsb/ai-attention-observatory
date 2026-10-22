@@ -503,3 +503,13 @@
 #paper-content .auto-evidence-item{padding:18px}
 #paper-content .auto-evidence-n{margin-bottom:10px}
 }
+
+
+/* Source-type-aware longform editorial reading */
+.rv-longform { display: grid; gap: clamp(1.1rem, 2.4vw, 1.7rem); margin: 1.25rem 0 1.9rem; }
+.rv-longform-part { padding: 0 0 1.2rem; border-bottom: 1px solid var(--line, #e5e0d8); }
+.rv-longform-part:last-of-type { border-bottom: 0; }
+.rv-longform-part h3 { margin: 0 0 .55rem; font-size: clamp(1.06rem, 1.7vw, 1.22rem); font-weight: 690; line-height: 1.35; letter-spacing: -.016em; }
+.rv-longform-part p { margin: 0; font-size: 1.03rem; line-height: 1.77; max-width: 70ch; }
+.rv-longform-part:first-child { border-left: 3px solid #ad2538; padding: .25rem 0 1.1rem 1.15rem; }
+.rv-longform-basis { font-size: .81rem; color: var(--muted, #746f6a); line-height: 1.5; margin-top: .1rem; }
