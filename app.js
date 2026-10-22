@@ -621,7 +621,9 @@ function showPaper(x){
  const title=make("h1","rv-headline",cut(cleanLead(headline,readableSourceTitle(x)),230));
  const intro=scholarly&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
- main.append(back,head,editorialMedia(x,"reading"));
+ // Illustration is a small identifying thumbnail in the reading header, not a full-width pseudo-figure.
+ head.append(editorialMedia(x,"reading"));
+ main.append(back,head);
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
  const body=make("section","rv-content");
  const art=conceptArtwork(x);
