@@ -331,7 +331,7 @@ PUBLIC_COMMENTARY={
  "what-is-the-socratic-method":"Questioning assumptions can reveal gaps in understanding that fluent AI answers might otherwise conceal.",
  "heres-how-a-learning-strategy":"Faster answers are not the same as stronger learning. Asking AI for questions and feedback may keep learners engaged.",
  "what-happens-to-language":"Communication depends on listeners as well as speakers; conversational AI changes both sides of that exchange.",
- "faster! louder! brighter!":"Children's media raises a design question: how can content engage young viewers without constant stimulation?",
+  "faster! louder! brighter!":"Fast-moving children’s media can hold the gaze while leaving too little room to think through what is happening.",
  "the-internet-was-built-for-human-agency":"AI agents acting on our behalf make accountability and meaningful user choice harder to define.",
  "when-an-ai-agent-says":"Automated decisions complicate what meaningful user consent looks like.",
  "the-paradox-of-ai-assistance":"AI can make a completed assignment look better without proving that its author learned more.",
@@ -358,6 +358,13 @@ def public_commentary_idea(record):
 # original public essays. Product notes below are based on published feature
 # descriptions and explicitly make no effectiveness claim.
 DEEP_PERSPECTIVES = {
+  "faster! louder! brighter!": {
+   "reasoning":"Kucirkova distinguishes the amount of time spent watching from the time a story gives a child to interpret an event. Rapid cuts, songs, and rewards may continually restart attention; a coherent narrative, repetition, and pauses can leave space for prediction, emotion, and memory. She argues that a screen can look engaging without supporting the reflective work its lesson requires.",
+   "examples":"The essay contrasts the rapid, stimulus-heavy transitions in programmes such as Ask the StoryBots and Paw Patrol with the narrative pacing and moments for interpretation in Bluey, Sesame Street, Daniel Tiger’s Neighbourhood, and Mister Rogers’ Neighborhood. Her Kids’ Slow Media Project develops observational criteria for age-sensitive pacing rather than treating minutes watched as a quality rating.",
+   "tension":"Slow is not always educational, and fast is not necessarily harmful. The appropriate pace depends on the child's age, situation, temperament, and the material; an observational evaluation of programmes does not itself demonstrate lasting causal effects on attention.",
+   "open_question":"Could attention-supporting AI interfaces be evaluated for the time they leave users to interpret, question, and recover a thought—not merely how quickly they deliver an answer?",
+   "basis":"Editorial analysis of the original Guardian long read, September 17, 2026 (also originally published in Aeon)"
+  },
  "the-internet-was-built-for-human-agency": {
   "reasoning": "The authors distinguish an agent's technical capability from the authority it legitimately exercises. Traditional Internet governance tends to focus on identities and network standards; AI governance tends to focus on model behavior. Neither alone answers who approved a particular action, for how long, or whether it can be audited and reversed.",
   "examples": "They place existing authorization work, including tool-access protocols, agent-to-agent interoperability, and proposals for verifiable delegation, within a broader need for an Internet authority layer. The principal–agent relationship is their organizing analogy.",

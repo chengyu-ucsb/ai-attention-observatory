@@ -10,6 +10,25 @@ Before creating, copying, or editing GitHub Actions workflows:
 
 This policy is stored in the repository so future assistants working on it can see and follow it. It does not override GitHub's documentation or substitute for checking current versions.
 
+## Scholarly source screening and news fidelity (October 2026)
+
+- Use `data/venue-standards.json` as a starting disciplinary venue watchlist,
+  not a claim that its journals are uniformly excellent or that unlisted ones
+  are invalid. Apply independent attention/AI topic screening per article.
+- Reject obvious computational `cross-attention` architectures with no
+  human attention outcomes; require article-level evidence for a subject match.
+- Treat unresolved publisher fields, preprint-only deposits, and
+  unverified peer-review status as *review needed*, not as automatically
+  reputable research or automatically discredited work. Keep the full internal
+  index for future scholarly checking.
+- Never count Google News redirect metadata, or a headline repeated as the
+  publisher description, as an actual article reading. Prefer verified
+  canonical publisher URLs and source-checked analysis. Only store original
+  concise paraphrases and lawful excerpts, observing robots, rights and paywalls.
+- Verify that an article is peer-reviewed and methodologically adequate
+  before describing an individual study as strong evidence; venue tiers cannot
+  replace this check.
+
 ## Research-first source lineage (October 2026)
 
 - When an identifiable article is a plain-language explanation of a scholarly work, index the original publication with its DOI, article type and available source text before featuring its derivative account.

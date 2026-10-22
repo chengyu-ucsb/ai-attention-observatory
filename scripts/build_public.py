@@ -5,12 +5,16 @@ The public website, news feed, metrics, and recommended items use only this proj
 """
 from __future__ import annotations
 import json
+from collections import Counter
 from pathlib import Path
 from condense_readings import annotate
 from build_visuals import visual_spec
 from search_plan import source_class
 from source_lineage import prepare
 from build_readings import make_note
+from editorial_corrections import apply as apply_editorial_corrections
+from source_quality import screen as screen_source
+from news_quality import substantive_article
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
@@ -30,13 +34,27 @@ def record_id(x):
     return (x.get("doi") or "").lower() or x.get("url") or x.get("title") or ""
 
 def build():
-    all_records=prepare(json.loads((DATA/"library.json").read_text()))
+    all_records=prepare(apply_editorial_corrections(json.loads((DATA/"library.json").read_text())))
     selected=[]
+    held=Counter()
     for source in all_records:
         if not source.get("reading") or (source.get("research_type")=="conceptual_framework" and source.get("reading",{}).get("research_type")!="conceptual_framework"):
             source["reading"]=make_note(source)
-        if not readable(source):continue
+        if source.get("kind")=="scholarly":
+            quality=screen_source(source)
+            if quality["decision"]!="include":
+                held[quality["reason"]]+=1
+                continue
+        else:
+            if not substantive_article(source):
+                held["news_only_metadata_or_unverified_article_url"]+=1
+                continue
+            quality={"decision":"include","venue_level":"editorial","reason":"substantive_publisher_or_editorial_source"}
+        if not readable(source):
+            held["insufficient_source_text"]+=1
+            continue
         published=annotate(source)
+        published["source_quality"]=quality
         published["source_group"]=source_class(source)
         published["visual"]=visual_spec(published)
         selected.append(published)
@@ -44,6 +62,7 @@ def build():
     canonical=[x for x in selected if not x.get("companion_to")]
     by_id={record_id(x):x for x in canonical}
     week=json.loads((DATA/"weekly.json").read_text())
+    week["items"]=apply_editorial_corrections(week.get("items",[]))
     # Weekly source entries are snapshots and may be older than the final enrichment.
     # A linked explainer brings its original paper into this week's reading set,
     # but does not count as a second independent scholarly contribution.
@@ -69,6 +88,15 @@ def build():
     run.pop("candidates",None)
     run["last_seven_days"]=len(items)
     projected={"run":run,"items":items[:50]}
+    (DATA/"source-quality-audit.json").write_text(json.dumps({
+        "version":1,
+        "internal_scholarly_total":sum(x.get("kind")=="scholarly" for x in all_records),
+        "public_scholarly_total":sum(x.get("kind")=="scholarly" for x in canonical),
+        "withheld_by_reason":dict(sorted(held.items())),
+        "priority_venues":sum(x.get("source_quality",{}).get("venue_level")=="priority" for x in canonical),
+        "specialist_venues":sum(x.get("source_quality",{}).get("venue_level")=="specialist" for x in canonical),
+        "note":"Screening is a venue/relevance triage, not peer-review verification or a journal-impact-factor judgment."
+    },ensure_ascii=False,indent=2)+"\n")
     (DATA/"public-library.json").write_text(json.dumps(selected,ensure_ascii=False,indent=2)+"\n")
     (DATA/"public-weekly.json").write_text(json.dumps(projected,ensure_ascii=False,indent=2)+"\n")
     assert all(readable(r) for r in selected)

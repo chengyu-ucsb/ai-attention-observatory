@@ -46,7 +46,8 @@ class EditorialTests(unittest.TestCase):
  def test_feed_description_labeled_not_full_text(self):
   item=ed.parse_feed(ET.fromstring(ATOM))[0]
   rec=ed.to_record(item,"The Conversation","Expert commentary")
-  self.assertEqual(rec["content_access"],"feed_description")
+  self.assertEqual(rec["content_access"],"headline_only")
+  self.assertEqual(rec["reading"]["level"],"citation_only")
   self.assertNotIn("findings",rec["preview"].lower())
   self.assertFalse(rec["reading"]["findings"])
  def test_reading_not_fake_findings(self):

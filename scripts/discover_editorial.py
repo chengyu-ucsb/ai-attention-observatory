@@ -7,6 +7,8 @@ Only source metadata and short feed descriptions are stored/published.
 import datetime, email.utils, html, json, pathlib, re, time
 import urllib.parse, urllib.request, urllib.error
 import xml.etree.ElementTree as ET
+from news_quality import useful_description, publisher_url
+from editorial_corrections import apply as apply_editorial_corrections
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DIR=ROOT/"data"
@@ -104,7 +106,7 @@ def eligible(item):
 def to_record(item,publisher,format_label):
     title=item["title"]
     desc=item["description"]
-    if not desc or len(desc)<70:
+    if not useful_description(title,desc,publisher) or not publisher_url(item["url"]):
         # A headline alone is not a substantive summary.
         overview=""
         reading_level="citation_only"
@@ -127,7 +129,7 @@ def to_record(item,publisher,format_label):
     }
 def run():
     path=DIR/"library.json"
-    data=json.loads(path.read_text())
+    data=apply_editorial_corrections(json.loads(path.read_text()))
     # Remove earlier automatic editorial false positives; never remove manually curated work.
     data=[r for r in data if r.get("source")!="Publisher RSS / Google News RSS" or eligible({"title":r.get("title",""),"description":r.get("preview",""),"date":r.get("published","")})]
     seen={url_key(x.get("url","")) for x in data if x.get("url")}
@@ -164,6 +166,7 @@ def run():
     limit=80
     added=sorted(added,key=lambda r:r.get("published") or "",reverse=True)[:limit]
     data.extend(added)
+    data=apply_editorial_corrections(data)
     data.sort(key=lambda r:(r.get("published") or "",r.get("first_seen") or ""),reverse=True)
     path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
     weekly_path=DIR/"weekly.json"

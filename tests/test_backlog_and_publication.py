@@ -30,7 +30,7 @@ class PublicReadingTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as tmp:
    folder=pathlib.Path(tmp)
    rows=[
-    {"kind":"scholarly","title":"Report","doi":"10.1/report","abstract_text":"a"*140,"reading":{"level":"abstract","overview":"Overview"}},
+    {"kind":"scholarly","title":"Generative AI and cognitive offloading in learning","venue":"Computers in Human Behavior","doi":"10.1/report","abstract_text":"A study of generative AI use and critical thinking, learning engagement, metacognition and cognitive offloading among university students. The research examines how thinking changes with repeated AI assistance.","reading":{"level":"abstract","overview":"Overview"}},
     {"kind":"scholarly","title":"Citation","doi":"10.1/cite","reading":{"level":"citation_only"}}]
    (folder/"library.json").write_text(json.dumps(rows))
    (folder/"weekly.json").write_text(json.dumps({"run":{"total":2},"items":rows}))
