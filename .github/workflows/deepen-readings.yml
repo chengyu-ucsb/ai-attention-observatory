@@ -7,6 +7,15 @@ on:
       - 'scripts/enrich_deep_readings.py'
       - 'tests/test_deep_readings.py'
       - '.github/workflows/deepen-readings.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/enrich_deep_readings.py'
+      - 'scripts/condense_readings.py'
+      - 'app.js'
+      - 'styles.css'
+      - 'tests/**'
+      - '.github/workflows/deepen-readings.yml'
   schedule:
     - cron: '35 13 * * 2,5'
   workflow_dispatch:
@@ -27,16 +36,18 @@ jobs:
       - name: Validate enrichment code
         run: |
           python -m compileall -q scripts tests
-          python -m unittest discover -s tests -p 'test_deep_readings.py' -v
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_article_ui.cjs
       - name: Extract and analyze accessible sources (opt-in)
-        if: ${{ vars.DEEP_READINGS_ENABLED == 'true' }}
+        if: ${{ github.event_name != 'pull_request' && vars.DEEP_READINGS_ENABLED == 'true' }}
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           DEEP_READING_MODEL: gpt-5.4-mini
           DEEP_READING_LIMIT: '12'
         run: python scripts/enrich_deep_readings.py
       - name: Explain inactive enrichment
-        if: ${{ vars.DEEP_READINGS_ENABLED != 'true' }}
+        if: ${{ github.event_name != 'pull_request' && vars.DEEP_READINGS_ENABLED != 'true' }}
         run: echo 'Deep enrichment not enabled; reviewed notes and publisher synopses remain available.'
       - name: Save completed readings without rerunning discovery
         if: ${{ vars.DEEP_READINGS_ENABLED == 'true' }}
