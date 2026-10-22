@@ -65,6 +65,37 @@ Institutional terms may restrict text mining or third-party processing even
 when an individual user can read the paper. A separate local-only analysis and
 rights-review workflow is needed before publishing original derived readings.
 
+## Independent full-text recovery
+
+The four-times-daily full-text backfill also attempts **independent DOI lookups**
+using [Semantic Scholar's Academic Graph API](https://api.semanticscholar.org/api-docs/)
+and [Unpaywall's per-DOI API](https://data.unpaywall.org/products/api).
+It searches the backlog still lacking substantive article sections; it does not
+require a UCSB or Cincinnati login, LibKey, or Zotero setup.
+
+The job checks for open-access PDFs on a restricted set of scholarly domains.
+**A discovered PDF link is not counted as full text.** Automated processing
+requires a matching DOI, an explicitly recognized permissive license
+(CC BY, CC BY-SA, or CC0/public domain), an accepted HTTPS host, a valid bounded
+PDF, and a substantive results/discussion section extracted from that PDF.
+No unknown-licensed or authenticated PDFs are downloaded in this fallback.
+PDF bytes are discarded after extraction. New content is explicitly labeled
+as automatically parsed and not independently reviewed.
+
+The [full-text backfill workflow](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/workflows/backfill-fulltext.yml)
+prints provider counts and an internal triage of the remaining gap: unverified
+license, unreadable PDF, no independent OA PDF, temporary provider error,
+not-yet-checked, or no DOI. Both providers enforce rate limits, so a successful
+run may recover zero new papers. No counts are invented or estimated from links.
+
+**Configuration:** An optional GitHub Actions secret named
+SEMANTIC_SCHOLAR_API_KEY permits authenticated Semantic Scholar queries;
+anonymous requests are supported where the provider allows them. No key is
+needed for Unpaywall's DOI API, which uses an academic contact address.
+This is a supplementary check, not a guarantee of additional full-text coverage.
+Later, CORE's researcher API could supply more repository versions, but it
+requires a separately issued API key; it is **not connected** in this iteration.
+
 ## How the research pipeline works
 
 1. **Weekly discovery** (`.github/workflows/refresh.yml`) collects source records from academic and nonacademic publishers.
