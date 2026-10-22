@@ -35,6 +35,40 @@ The internal acquisition database is `data/library.json`. The public reading pro
 
 The newsletter generator is `scripts/build_newsletter.py`. It builds the latest preview (`newsletter.html`), permanent editions (`issues/`), and RSS 2.0 (`issue-feed.xml`) with stable permalinks and publication dates.
 
+## Source selection and evidence coverage
+
+The Observatory is a **structured, evolving discovery index**, not an exhaustive
+systematic review or a census of published research. Its collection methods are
+documented and testable:
+
+- **Core AI research:** Searches beginning in 2023 for generative AI, human
+  cognition, offloading, attention, learning, workplace use, and interventions.
+- **Adjacent attention research:** Studies of notifications, interruptions, and
+  digital distraction without a direct generative-AI exposure are distinguished.
+- **Earlier foundations:** Older work, including the 2008 interruptions paper
+  and the 2019 notifications paper, is retained for historical context but
+  excluded from charts showing AI-specific research since 2023.
+- **Historical coverage:** `scripts/search_plan.py` runs four thematic lenses
+  over rotating 2023–2025 periods weekly and the full historical matrix when
+  backfill mode is requested. `scripts/seed_historical.py` resolves a small
+  set of DOI-verified foundational AI papers through bibliographic APIs.
+- **Deduplication and screening:** Papers are deduplicated using DOI, relevance
+  screened using title/abstract and source provenance, then assigned to direct
+  AI, adjacent, or historical groups. These rules are heuristic, not formal
+  independent dual-screening.
+
+Full-text retrieval runs separately, starting with lawful, accessible XML
+sources from Europe PMC and licensed OpenAlex OA GROBID. The system revisits
+previously abbreviated extractions and records which article sections were
+available. Absence of a legally accessible machine-readable full text **never**
+causes an abstract to be represented as a full paper. A paper with a link to
+an open-access landing page does not automatically count as full-text processed.
+
+**Interpretation of visual counts:** Publication-year bars represent only
+the AI-specific papers currently indexed from 2023 onward. They are not
+a bibliometric estimate of the total number of studies or annual publication
+trends. The library provides scope filters for the adjacent and older literature.
+
 ## Research and design standards
 
 - Distinguish **empirical findings**, **author interpretations**, **conceptual ideas**, and **editorial synthesis**.
