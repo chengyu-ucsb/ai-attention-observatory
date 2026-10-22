@@ -42,7 +42,9 @@ def extract_sections(root):
 def run():
  path=DATA/"library.json";records=json.loads(path.read_text());updated=0;attempted=0
  today=datetime.date.today().isoformat();limit=max(1,min(75,int(os.getenv("OA_ENRICH_LIMIT","38"))))
- candidates=[r for r in records if r.get("kind")=="scholarly" and r.get("doi") and not r.get("analysis")]
+ candidates=[r for r in records if r.get("kind")=="scholarly" and r.get("doi") and (
+  not r.get("analysis") or (str((r.get("analysis") or {}).get("provenance","")).startswith("Europe PMC")
+                             and (r.get("analysis") or {}).get("extraction_version",0)<2))]
  # A PMC-like open-access link is useful evidence that XML may already exist.
  candidates.sort(key=lambda r:(0 if any(k in (r.get("open_access_url") or "").lower() for k in ("pmc","bmc","frontiers","plos")) else 1,
                                0 if r.get("oa_checked") is None else 1,r.get("oa_checked") or ""))
@@ -67,7 +69,8 @@ def run():
     label=clean(" ".join(f.find("label").itertext()) if f.find("label") is not None else "Figure")
     cap=f.find("caption");caption=clean(" ".join(cap.itertext()))[:240] if cap is not None else ""
     figures.append({"label":label,"caption":caption})
-   r["analysis"]={"provenance":"Europe PMC open-access fullTextXML; automatically extracted article sections","license":licenses[0][:160],"methods":extracted.get("methods",""),"results":extracted.get("results",""),"discussion":extracted.get("discussion",""),"limitations":extracted.get("limitations",""),"figures":figures,"fulltext_url":"https://europepmc.org/articles/"+pmcid,"key_idea":(extracted.get("results") or extracted.get("discussion") or "")[:280]}
+   r["analysis"]={"provenance":"Europe PMC open-access fullTextXML; automatically extracted article sections","license":licenses[0][:160],"methods":extracted.get("methods",""),"results":extracted.get("results",""),"discussion":extracted.get("discussion",""),"limitations":extracted.get("limitations",""),"figures":figures,"fulltext_url":"https://europepmc.org/articles/"+pmcid,"key_idea":(extracted.get("results") or extracted.get("discussion") or "")[:280],
+     "extraction_version":2,"sections_available":list(extracted.keys())}
    updated+=1
   except Exception as e:print("OA extraction skipped",r.get("doi"),str(e)[:100])
   time.sleep(.15)
