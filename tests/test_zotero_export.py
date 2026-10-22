@@ -36,6 +36,6 @@ class PublicRISExportTests(unittest.TestCase):
       "reading":{"level":"abstract"}}]))
    self.assertEqual(generate(input,output),1)
    ris=output.read_text()
-   self.assertEqual(ris.count("TY  - "),1)
-   self.assertEqual(ris.count("ER  -"),1)
+   self.assertEqual(sum(line.startswith("TY  - ") for line in ris.splitlines()),1)
+   self.assertEqual(sum(line=="ER  -" for line in ris.splitlines()),1)
 if __name__=="__main__":unittest.main()
