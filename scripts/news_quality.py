@@ -38,6 +38,10 @@ def publisher_url(url):
         return False
 
 def substantive_article(record):
+    # A separately verified companion is worth linking even when its only
+    # stored text is a concise attributed publisher synopsis.
+    if record.get("companion_to") and publisher_url(record.get("url")):
+        return bool((record.get("reading") or {}).get("overview"))
     if record.get("content_access")=="editorially_read_source":
         return bool((record.get("editorial_notes") or {}).get("argument")) and publisher_url(record.get("url"))
     if record.get("deep_analysis",{}).get("source_depth")=="source_html":
