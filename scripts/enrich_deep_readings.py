@@ -228,7 +228,7 @@ def process(records, model=None, limit=4):
                 raise ValueError("local_analysis_failed_source_checks")
             record["deep_analysis"] = {
                 **{f: analysis.get(f, "").strip() for f in FIELDS[kind]},
-                "version": 2, "kind": kind, "model": "Qwen2.5-0.5B-Instruct (on-runner)",
+                "version": 2, "kind": kind, "model": "Qwen2.5-1.5B-Instruct (on-runner)",
                 "source_depth": "source_html" if kind == "nonacademic" else "full_text",
                 "source_url": source_url, "source_hash": sha256(source.encode()).hexdigest(),
                 "basis": "Locally generated interpretation of accessible source text (not peer reviewed)",
@@ -260,7 +260,7 @@ def process(records, model=None, limit=4):
 def main():
     # Absolutely no hosted inference API keys used or read here.
     records = apply_source_reviews(apply_editorial_corrections(json.loads(LIB.read_text())))
-    if not MODEL_FILE.is_file() or MODEL_FILE.stat().st_size < 200_000_000:
+    if not MODEL_FILE.is_file() or MODEL_FILE.stat().st_size < 900_000_000:
         print(json.dumps({"skipped": "Local GGUF model file not available; no inference API calls"}))
         return
     from llama_cpp import Llama
