@@ -112,7 +112,7 @@ def to_record(item,publisher,format_label):
         reading_level="citation_only"
     else:
         overview=desc[:320].rsplit(" ",1)[0]+"…" if len(desc)>320 else desc
-        reading_level="curated"
+        reading_level="source_preview"
     lane=classify(title,desc)
     return {
         "title":title,"authors":item["authors"],"published":item["date"],"venue":publisher,
