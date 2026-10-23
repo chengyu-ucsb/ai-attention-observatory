@@ -49,6 +49,9 @@ def build():
                 continue
         else:
             quality={"decision":"include","venue_level":"editorial","reason":"reviewed_full_article_or_documentation"}
+        if (source.get("kind")=="nonacademic" and (source.get("reading") or {}).get("level")=="source_preview"
+                and (source.get("deep_analysis") or {}).get("source_depth")=="source_html"):
+            source["reading"]["level"]="curated"
         published=annotate(source)
         if published.get("kind")=="nonacademic" and not substantive_article(published):
             # Keep a minimal locator so bookmarks remain useful. It must never
