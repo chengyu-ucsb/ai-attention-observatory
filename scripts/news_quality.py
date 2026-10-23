@@ -37,19 +37,33 @@ def publisher_url(url):
     except ValueError:
         return False
 
+def commentary_reading_depth(record):
+    """Measure actual source-specific analysis, never feed-length metadata."""
+    longform=((record.get("reading") or {}).get("digest") or {}).get("longform") or {}
+    source_depth=longform.get("source_depth")
+    if source_depth not in ("read_article","machine_read_full_article"):
+        return False
+    if not publisher_url(record.get("url")):
+        return False
+    if not record.get("source_review") and source_depth=="read_article" and not (
+        (longform.get("basis") or "").startswith("Editorial analysis")):
+        return False
+    lengths={name:len(str(longform.get(name) or "").strip())
+             for name in ("thesis","reasoning","examples","tension","qualification")}
+    # Missing any two layers is not an in-depth article analysis. Require
+    # concrete supporting examples and a source-specific qualification.
+    return (lengths["thesis"]>=70 and lengths["reasoning"]>=150
+            and lengths["examples"]>=100 and lengths["tension"]>=90
+            and lengths["qualification"]>=60)
+
 def substantive_article(record):
     if record.get("source")=="Official product documentation":
-        return bool((record.get("reading") or {}).get("overview") or (record.get("editorial_notes") or {}).get("design_relevance")) and publisher_url(record.get("url"))
-    # A separately verified companion is worth linking even when its only
-    # stored text is a concise attributed publisher synopsis.
-    if record.get("companion_to") and publisher_url(record.get("url")):
-        return bool((record.get("reading") or {}).get("overview"))
-    if record.get("content_access")=="editorially_read_source":
-        return bool((record.get("editorial_notes") or {}).get("argument")) and publisher_url(record.get("url"))
-    if record.get("deep_analysis",{}).get("source_depth")=="source_html":
-        return publisher_url(record.get("url"))
-    if record.get("source")=="Publisher RSS / Google News RSS":
-        return publisher_url(record.get("url")) and useful_description(
-            record.get("title"),(record.get("reading") or {}).get("overview") or record.get("preview"),record.get("venue"))
-    return bool((record.get("editorial_notes") or {}).get("argument") or
-                useful_description(record.get("title"),(record.get("reading") or {}).get("overview") or record.get("preview")))
+        # Product documentation is a separate source category, explicitly
+        # distinguished from researched journalism and empirical evidence.
+        return bool((record.get("reading") or {}).get("overview") or
+                    (record.get("editorial_notes") or {}).get("design_relevance")) and publisher_url(record.get("url"))
+    if record.get("companion_to"):
+        # A verified secondary explainer is preserved ONLY as a companion
+        # to its original research, not counted as an independent reading.
+        return bool((record.get("reading") or {}).get("overview")) and publisher_url(record.get("url"))
+    return commentary_reading_depth(record)
