@@ -50,6 +50,15 @@ class EditorialTests(unittest.TestCase):
   self.assertEqual(rec["reading"]["level"],"citation_only")
   self.assertNotIn("findings",rec["preview"].lower())
   self.assertFalse(rec["reading"]["findings"])
+ def test_long_feed_description_is_still_only_a_preview(self):
+  item={"title":"How AI changes attentive classroom discussion",
+        "url":"https://theconversation.com/article-about-attention",
+        "description":"Researchers discuss how artificial intelligence can alter interactions between learners and teachers, including the attention devoted to questions, feedback, reflection and critical thought across different stages of education.",
+        "date":"2026-10-19","authors":["Writer"]}
+  record=ed.to_record(item,"The Conversation","Expert commentary")
+  self.assertEqual(record["reading"]["level"],"source_preview")
+  self.assertEqual(record["content_access"],"feed_description")
+  self.assertFalse(record["reading"]["findings"])
  def test_reading_not_fake_findings(self):
   item=ed.parse_feed(ET.fromstring(ATOM))[0]
   r=ed.to_record(item,"The Conversation","Expert commentary")

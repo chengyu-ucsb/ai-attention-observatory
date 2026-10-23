@@ -411,6 +411,15 @@ DEEP_PERSPECTIVES = {
 def deep_perspective(record,notes):
  """Only add interpretive depth when an original source has been examined."""
  machine=record.get("deep_analysis") or {}
+ reviewed=record.get("source_review") or {}
+ if reviewed:
+  return {
+   "thesis":reviewed["thesis"],"reasoning":reviewed["reasoning"],
+   "examples":reviewed["examples"],"tension":reviewed["tension"],
+   "implications":reviewed["implications"],"open_question":reviewed["open_question"],
+   "qualification":reviewed["qualification"],"basis":reviewed["reading_basis"],
+   "source_depth":"read_article"
+  }
  # Prefer a source-checked, editorially authored reading when available.
  key=((record.get("url") or "")+" "+(record.get("title") or "")).lower()
  extra=next((v for token,v in DEEP_PERSPECTIVES.items() if token in key),{})
@@ -448,7 +457,7 @@ def annotate(record):
   # falling back to a generic question inferred from the headline.
   machine_idea=(depth.get("thesis") or "").split(". ")[0].strip()
   if len(machine_idea)>195:machine_idea=""
-  idea=rewritten or (machine_idea if depth["source_depth"]=="machine_read_full_article" else "") or research_question(record)
+  idea=record.get("editorial_takeaway") or rewritten or (machine_idea if depth["source_depth"]=="machine_read_full_article" else "") or research_question(record)
   base["reading"]["digest"]={
    "idea":idea,
    "explain":depth["thesis"] or "",

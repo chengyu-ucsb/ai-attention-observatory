@@ -14,6 +14,7 @@ import json
 import os
 from pathlib import Path
 from editorial_corrections import apply as apply_editorial_corrections
+from editorial_source_reviews import apply as apply_source_reviews
 import re
 import time
 from urllib.parse import urlsplit
@@ -176,6 +177,9 @@ def acceptable(answer, content, kind):
     if any(not isinstance(answer.get(f, ""), str) for f in FIELDS[kind]): return False
     required = ("thesis", "reasoning") if kind == "nonacademic" else ("study_design", "reported_results")
     if any(len(answer.get(k, "").strip()) < 60 for k in required): return False
+    if kind=="nonacademic" and any(len(answer.get(k,"").strip())<limit for k,limit in (
+        ("thesis",70),("reasoning",150),("examples",100),("tension",90),
+        ("qualification",60))): return False
     prose = " ".join(answer.get(k, "") for k in FIELDS[kind])
     if len(prose.split()) < 140 or any(phrase in prose.lower() for phrase in BOILERPLATE):
         return False
@@ -190,6 +194,7 @@ def acceptable(answer, content, kind):
     return True
 
 def refreshable(record, today):
+    if record.get("source_review"): return False  # Already fully source-reviewed.
     previous = record.get("deep_analysis") or {}
     if previous.get("version", 0) >= 2 and previous.get("source_depth") in ("source_html", "full_text"):
         return False
@@ -198,8 +203,10 @@ def refreshable(record, today):
 
 def process(records, model=None, limit=4):
     today = date.today().isoformat()
-    stats = dict(eligible=0, attempted=0, added=0, insufficient=0,
-                 access_unavailable=0, model_rejected=0, skipped_no_model=not bool(model))
+    stats = dict(eligible=0, retrieval_attempted=0, source_retrieved=0,
+                 attempted=0, added=0, insufficient=0,
+                 access_unavailable=0, model_rejected=0,
+                 failure_reasons={}, skipped_no_model=not bool(model))
     if model is None: return stats
     candidates = [r for r in records if refreshable(r, today) and (
         (r.get("kind") == "nonacademic" and host_allowed(r.get("url"))) or
@@ -212,17 +219,23 @@ def process(records, model=None, limit=4):
     for record in candidates[:limit]:
         kind = record["kind"]
         try:
+            stats["retrieval_attempted"] += 1
             if kind == "nonacademic": source, source_url = source_html(record["url"])
             else: source, source_url = scholarly_sections(record)
             if not source: raise ValueError("no_meaningful_full_text")
+            stats["source_retrieved"] += 1
             stats["attempted"] += 1
             analysis = model_json(source, record, kind, model)
             if not acceptable(analysis, source, kind):
                 stats["model_rejected"] += 1
                 raise ValueError("local_analysis_failed_source_checks")
+            # Analysis was validated against substantial retrieved source HTML:
+            # only NOW promote an RSS preview into a readable source.
+            if kind=="nonacademic" and (record.get("reading") or {}).get("level")=="source_preview":
+                record["reading"]["level"]="curated"
             record["deep_analysis"] = {
                 **{f: analysis.get(f, "").strip() for f in FIELDS[kind]},
-                "version": 2, "kind": kind, "model": "Qwen2.5-0.5B-Instruct (on-runner)",
+                "version": 2, "kind": kind, "model": "Qwen2.5-1.5B-Instruct (on-runner)",
                 "source_depth": "source_html" if kind == "nonacademic" else "full_text",
                 "source_url": source_url, "source_hash": sha256(source.encode()).hexdigest(),
                 "basis": "Locally generated interpretation of accessible source text (not peer reviewed)",
@@ -233,10 +246,19 @@ def process(records, model=None, limit=4):
         except (ValueError, HTTPError, URLError, TimeoutError, OSError, json.JSONDecodeError) as exc:
             if isinstance(exc, (URLError, HTTPError)): stats["access_unavailable"] += 1
             else: stats["insufficient"] += 1
+            status=("publisher_http_"+str(exc.code) if isinstance(exc,HTTPError) else
+                    "source_network_unavailable" if isinstance(exc,URLError) else
+                    str(exc) if isinstance(exc,ValueError) and str(exc) in (
+                       "robots_disallow_or_unavailable","unapproved_source_host",
+                       "unapproved_redirect","non_html_response","article_too_large",
+                       "insufficient_article_body","no_meaningful_full_text",
+                       "local_analysis_failed_source_checks") else
+                    "source_analysis_unavailable")
+            stats["failure_reasons"][status]=stats["failure_reasons"].get(status,0)+1
             old = record.get("deep_attempt") or {}
             record["deep_attempt"] = {
                 "attempts": old.get("attempts", 0) + 1, "last_at": today,
-                "reason": type(exc).__name__, "next_at": (date.today() + timedelta(days=14)).isoformat()
+                "reason": status, "next_at": (date.today() + timedelta(days=14)).isoformat()
             }
             # Never accidentally write the source text or secrets in errors.
         time.sleep(0.4)
@@ -244,8 +266,8 @@ def process(records, model=None, limit=4):
 
 def main():
     # Absolutely no hosted inference API keys used or read here.
-    records = apply_editorial_corrections(json.loads(LIB.read_text()))
-    if not MODEL_FILE.is_file() or MODEL_FILE.stat().st_size < 200_000_000:
+    records = apply_source_reviews(apply_editorial_corrections(json.loads(LIB.read_text())))
+    if not MODEL_FILE.is_file() or MODEL_FILE.stat().st_size < 900_000_000:
         print(json.dumps({"skipped": "Local GGUF model file not available; no inference API calls"}))
         return
     from llama_cpp import Llama
