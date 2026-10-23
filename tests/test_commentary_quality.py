@@ -79,6 +79,23 @@ class EditorialIntegrityTests(unittest.TestCase):
         self.assertEqual(audit["journalism_awaiting_reading"],1)
         self.assertNotIn("reading",pending[0]) # no fake excerpts on the fallback page
 
+    def test_later_weekly_discovery_retains_source_checked_essay(self):
+        # The original article is policy/rhetoric-focused, so the older
+        # keyword-only eligibility test would have deleted it every Monday.
+        import discover_editorial as ed
+        row=feed(KILL,"Why calling for a ‘kill switch’ is the wrong way to think about reining in AI",
+                 "A kill switch makes control of AI look like a simple emergency button.")
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            (root/"library.json").write_text(json.dumps([row]))
+            (root/"weekly.json").write_text(json.dumps({"run":{},"items":[]}))
+            with patch.object(ed,"DIR",root),patch.object(ed,"FEEDS",[]),patch.object(ed,"GOOGLE_SEARCHES",[]):
+                ed.run()
+            retained=json.loads((root/"library.json").read_text())
+        self.assertEqual(len(retained),1)
+        self.assertEqual(retained[0]["url"],KILL)
+        self.assertIn("black box",retained[0]["source_review"]["reasoning"])
+
     def test_deep_source_analysis_must_have_examples_and_tension(self):
         row=feed(THIN,"An analysis of AI","An article argues that automation reshapes our cognitive priorities.")
         row["deep_analysis"]={"kind":"nonacademic","source_depth":"source_html",
