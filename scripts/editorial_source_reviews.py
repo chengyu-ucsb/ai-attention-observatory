@@ -30,7 +30,7 @@ def apply(records,config=None):
         record["source_review"]["source_relation"]=source.get("source_relation","")
         record["source_review"]["secondary_verification_url"]=source.get("secondary_verification_url","")
         record["source_review"]["evidence_scope"]=source.get("evidence_scope","")
-        record["editorial_takeaway"]=source.get("thesis") or ""
+        record["editorial_takeaway"]=source.get("takeaway") or source.get("thesis") or ""
         record["content_access"]="editorially_read_source"
         record["source_checked"]=source["source_checked"]
     return records
