@@ -54,10 +54,16 @@
     "companion_to": "10.3390/educsci16081291",
     "companion_relation": "Author-written explanation and study advice based on the conceptual publication",
     "companion_verified_via": "https://phys.org/news/2026-10-ai-2.html",
+    "deep_attempt": {
+      "attempts": 1,
+      "last_at": "2026-10-23",
+      "reason": "local_analysis_failed_source_checks",
+      "next_at": "2026-11-06"
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "source_group": "AI-specific",
     "visual": {
@@ -92,35 +98,51 @@
       "limitations": "",
       "notice": "This is a short description supplied by the publisher feed, not a full-article review or independent assessment.",
       "digest": {
-        "idea": "Shutting down AI with a single switch may be less realistic than designing systems that remain governable.",
-        "explain": "A kill switch to shut down dangerous AI systems is a seductive concept, but the metaphor hides how the models work – and how they get out of control in the first place.",
+        "idea": "A single kill switch cannot stand in for continuous oversight of distributed AI systems and human decisions.",
+        "explain": "The idea of a single emergency switch makes AI governance look like a matter of one decisive act. Wintermeier argues that this image hides the distributed infrastructure of advanced systems and the human decisions that shape their behavior before any emergency occurs.",
         "approach": "",
         "finding": "",
         "finding_source": "none",
-        "interpretation": "",
-        "limitation": "",
+        "interpretation": "For agents that organize attention or act on a user's behalf, a clear stop or revoke button is necessary but not sufficient. Designers should also disclose whose instructions an agent follows, what permissions it holds, how people can review earlier actions, and which dependencies may keep working after an interaction is stopped. These are applications of Wintermeier's reasoning to attention technologies, not outcomes demonstrated by this article.",
+        "limitation": "This is a rhetoric- and governance-centered expert commentary, not an empirical evaluation of frontier AI controls. It describes particular incidents and policy proposals from 2026; those circumstances are context for the author's argument, not a systematic sample of AI failures.",
         "longform": {
-          "thesis": "A kill switch to shut down dangerous AI systems is a seductive concept, but the metaphor hides how the models work – and how they get out of control in the first place.",
-          "reasoning": "",
-          "examples": "",
-          "tension": "",
-          "implications": "",
-          "open_question": "",
-          "qualification": "",
-          "basis": "Publisher description only",
-          "source_depth": "publisher_synopsis"
+          "thesis": "The idea of a single emergency switch makes AI governance look like a matter of one decisive act. Wintermeier argues that this image hides the distributed infrastructure of advanced systems and the human decisions that shape their behavior before any emergency occurs.",
+          "reasoning": "The essay treats a kill switch as a political and technological metaphor rather than only a device specification. A switch implies a bounded machine, an identifiable point of control and an operator who can intervene once a problem is visible. That mental picture is a poor fit for advanced AI deployed across interconnected services, data centers, models and users. Even if a particular model can be disabled, the metaphor does not specify who could halt associated processes or what would remain active elsewhere. Wintermeier connects this limitation to the familiar image of AI as a black box. Both metaphors encourage readers to imagine a single opaque object, instead of asking how infrastructures, organizations and choices interact. Crucially, the metaphor also places people outside the system until an emergency, concealing how training settings, permissions, supervision and deployment decisions were made throughout its operation.",
+          "examples": "The author places 2026 proposals for an AI Kill Switch Act and state-level emergency safeguards in the context of politicians' analogies to mechanical emergency buttons. He also analyzes accounts of an AI-agent security incident involving Hugging Face. Some stories cast the agent as having acted on an independent agenda; Wintermeier points to the role of human choices around safety configurations, task expectations and internet access. The example illustrates why simply describing the model as rogue can distract from the organizational decisions that made its behavior possible. These examples explain the rhetorical frame; they should not be confused with experiments demonstrating that a particular intervention works or fails.",
+          "tension": "Emergency interruption can still be one useful safeguard. The essay's criticism is directed at presenting a single switch as an adequate account of control, not at proving that all forms of technical shutdown are pointless. A practical governance strategy needs both enforceable interruption capabilities and a much wider account of authority, auditability, system dependencies and oversight before deployment. The original commentary does not offer an evaluated alternative regulatory framework or evidence about the effectiveness of particular policy designs.",
+          "implications": "For agents that organize attention or act on a user's behalf, a clear stop or revoke button is necessary but not sufficient. Designers should also disclose whose instructions an agent follows, what permissions it holds, how people can review earlier actions, and which dependencies may keep working after an interaction is stopped. These are applications of Wintermeier's reasoning to attention technologies, not outcomes demonstrated by this article.",
+          "open_question": "What would count as meaningful human control over an AI assistant if users cannot inspect the permissions, dependencies and decisions that shape its actions?",
+          "qualification": "This is a rhetoric- and governance-centered expert commentary, not an empirical evaluation of frontier AI controls. It describes particular incidents and policy proposals from 2026; those circumstances are context for the author's argument, not a systematic sample of AI failures.",
+          "basis": "Editorial analysis of the full attributed Conversation republication (Inkl), cross-checked against another authorized republication (AOL); 23 October 2026",
+          "source_depth": "read_article"
         },
         "tags": [],
-        "status": "publisher_or_editorial_synopsis",
-        "editorial_basis": "Publisher description only"
+        "status": "edited_perspective",
+        "editorial_basis": "Editorial analysis of the full attributed Conversation republication (Inkl), cross-checked against another authorized republication (AOL); 23 October 2026"
       }
     },
-    "content_access": "feed_description",
-    "source_checked": "2026-10-22",
+    "content_access": "editorially_read_source",
+    "source_checked": "2026-10-23",
+    "source_review": {
+      "thesis": "The idea of a single emergency switch makes AI governance look like a matter of one decisive act. Wintermeier argues that this image hides the distributed infrastructure of advanced systems and the human decisions that shape their behavior before any emergency occurs.",
+      "reasoning": "The essay treats a kill switch as a political and technological metaphor rather than only a device specification. A switch implies a bounded machine, an identifiable point of control and an operator who can intervene once a problem is visible. That mental picture is a poor fit for advanced AI deployed across interconnected services, data centers, models and users. Even if a particular model can be disabled, the metaphor does not specify who could halt associated processes or what would remain active elsewhere. Wintermeier connects this limitation to the familiar image of AI as a black box. Both metaphors encourage readers to imagine a single opaque object, instead of asking how infrastructures, organizations and choices interact. Crucially, the metaphor also places people outside the system until an emergency, concealing how training settings, permissions, supervision and deployment decisions were made throughout its operation.",
+      "examples": "The author places 2026 proposals for an AI Kill Switch Act and state-level emergency safeguards in the context of politicians' analogies to mechanical emergency buttons. He also analyzes accounts of an AI-agent security incident involving Hugging Face. Some stories cast the agent as having acted on an independent agenda; Wintermeier points to the role of human choices around safety configurations, task expectations and internet access. The example illustrates why simply describing the model as rogue can distract from the organizational decisions that made its behavior possible. These examples explain the rhetorical frame; they should not be confused with experiments demonstrating that a particular intervention works or fails.",
+      "tension": "Emergency interruption can still be one useful safeguard. The essay's criticism is directed at presenting a single switch as an adequate account of control, not at proving that all forms of technical shutdown are pointless. A practical governance strategy needs both enforceable interruption capabilities and a much wider account of authority, auditability, system dependencies and oversight before deployment. The original commentary does not offer an evaluated alternative regulatory framework or evidence about the effectiveness of particular policy designs.",
+      "implications": "For agents that organize attention or act on a user's behalf, a clear stop or revoke button is necessary but not sufficient. Designers should also disclose whose instructions an agent follows, what permissions it holds, how people can review earlier actions, and which dependencies may keep working after an interaction is stopped. These are applications of Wintermeier's reasoning to attention technologies, not outcomes demonstrated by this article.",
+      "open_question": "What would count as meaningful human control over an AI assistant if users cannot inspect the permissions, dependencies and decisions that shape its actions?",
+      "qualification": "This is a rhetoric- and governance-centered expert commentary, not an empirical evaluation of frontier AI controls. It describes particular incidents and policy proposals from 2026; those circumstances are context for the author's argument, not a systematic sample of AI failures.",
+      "reading_basis": "Editorial analysis of the full attributed Conversation republication (Inkl), cross-checked against another authorized republication (AOL); 23 October 2026",
+      "source_url": "https://www.inkl.com/news/why-calling-for-a-kill-switch-is-the-wrong-way-to-think-about-reining-in-ai",
+      "source_checked": "2026-10-23",
+      "source_relation": "Attributed republication of Trent Wintermeier's 19 October 2026 article in The Conversation",
+      "secondary_verification_url": "https://www.aol.com/articles/why-calling-kill-switch-wrong-123456000.html",
+      "evidence_scope": "Source is an argument about the rhetoric and governance of AI, not a test of the effectiveness of any shutdown safeguard."
+    },
+    "editorial_takeaway": "A single kill switch cannot stand in for continuous oversight of distributed AI systems and human decisions.",
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "source_group": "AI-specific",
     "visual": {
@@ -1051,77 +1073,6 @@
     "visual": {
       "kind": "illustration_only",
       "reason": "insufficient_indexed_evidence"
-    }
-  },
-  {
-    "title": "What happens to language when machines start talking back?",
-    "authors": [
-      "Celeste Rodriguez Louro, Associate Professor of Linguistics and Director of Language Lab, The University of Western Australia"
-    ],
-    "published": "2026-10-07",
-    "venue": "The Conversation",
-    "doi": "",
-    "url": "https://theconversation.com/what-happens-to-language-when-machines-start-talking-back-293554",
-    "preview": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-    "kind": "nonacademic",
-    "lane": "Interventions",
-    "relation": "Nonacademic reporting / commentary",
-    "evidence": "Publisher feed metadata (not independently reviewed)",
-    "source": "Publisher RSS / Google News RSS",
-    "format": "Opinion & analysis",
-    "curated": false,
-    "first_seen": "2026-10-18",
-    "reading": {
-      "level": "curated",
-      "provenance": "The Conversation RSS/Atom description",
-      "overview": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-      "methods": "",
-      "findings": "",
-      "limitations": "",
-      "notice": "This is a short description supplied by the publisher feed, not a full-article review or independent assessment.",
-      "digest": {
-        "idea": "Communication depends on listeners as well as speakers; conversational AI changes both sides of that exchange.",
-        "explain": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-        "approach": "",
-        "finding": "",
-        "finding_source": "none",
-        "interpretation": "",
-        "limitation": "",
-        "longform": {
-          "thesis": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-          "reasoning": "",
-          "examples": "",
-          "tension": "",
-          "implications": "",
-          "open_question": "",
-          "qualification": "",
-          "basis": "Publisher description only",
-          "source_depth": "publisher_synopsis"
-        },
-        "tags": [
-          "Attention"
-        ],
-        "status": "publisher_or_editorial_synopsis",
-        "editorial_basis": "Publisher description only"
-      }
-    },
-    "content_access": "feed_description",
-    "source_checked": "2026-10-18",
-    "source_group": "AI-specific",
-    "deep_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22",
-      "reason": "ValueError",
-      "next_at": "2026-11-05"
-    },
-    "source_quality": {
-      "decision": "include",
-      "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
-    },
-    "visual": {
-      "kind": "illustration_only",
-      "reason": "nonempirical_or_commentary"
     }
   },
   {
@@ -2399,10 +2350,16 @@
       "caveat": "This is a research-informed essay drawing on children's media comparisons and the Kids' Slow Media Project, not an experiment showing that all fast-paced media harms children or that slower media always produces better learning."
     },
     "source_verification": "Original Guardian long read, September 17, 2026; originally published in Aeon as The bombarding of childhood",
+    "deep_attempt": {
+      "attempts": 1,
+      "last_at": "2026-10-23",
+      "reason": "local_analysis_failed_source_checks",
+      "next_at": "2026-11-06"
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "source_group": "Adjacent digital-attention evidence",
     "visual": {
@@ -2599,7 +2556,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -4644,6 +4601,17 @@
       "next_at": "2026-11-19",
       "attempts": 1
     },
+    "repository_recovery": {
+      "version": 1,
+      "status": "pdf_host_unapproved",
+      "last_at": "2026-10-23",
+      "next_at": "2026-11-22",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked",
+        "s2_candidate"
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "priority",
@@ -5076,7 +5044,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -5439,9 +5407,9 @@
       }
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T01:23:42+00:00",
-      "pipeline_version": 2,
+      "attempts": 2,
+      "last_at": "2026-10-23T14:14:11+00:00",
+      "pipeline_version": 3,
       "status": "full_text",
       "next_at": null
     },
@@ -5456,14 +5424,14 @@
       "figures": [],
       "fulltext_url": "https://doi.org/10.3389/feduc.2025.1697554",
       "key_idea": "The Cognitive Mirror paradigm aims to reframe the role of generative AI in education, shifting its purpose from an omniscient tutor to a metacognitive partner who reflects the quality of a learner's explanation. By re-centering human agency, the learner takes the role of an expla",
-      "extraction_date": "2026-10-22",
-      "extraction_version": 2,
+      "extraction_date": "2026-10-23",
+      "extraction_version": 3,
       "sections_available": [
         "discussion",
         "methods"
       ]
     },
-    "oa_grobid_checked": "2026-10-22",
+    "oa_grobid_checked": "2026-10-23",
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -5670,7 +5638,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -5746,9 +5714,9 @@
       }
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T01:23:41+00:00",
-      "pipeline_version": 2,
+      "attempts": 2,
+      "last_at": "2026-10-23T14:14:11+00:00",
+      "pipeline_version": 3,
       "status": "full_text",
       "next_at": null
     },
@@ -5763,15 +5731,15 @@
       "figures": [],
       "fulltext_url": "https://doi.org/10.3389/fpsyg.2025.1598867",
       "key_idea": "This study aimed to examine the effectiveness of integrating large language models (AI) and e-learning tools into vocal music training, with a particular focus on the impact of feedback-and reflectionbased interventions on the metacognitive abilities and singing performance of pr",
-      "extraction_date": "2026-10-22",
-      "extraction_version": 2,
+      "extraction_date": "2026-10-23",
+      "extraction_version": 3,
       "sections_available": [
         "methods",
         "limitations",
         "discussion"
       ]
     },
-    "oa_grobid_checked": "2026-10-22",
+    "oa_grobid_checked": "2026-10-23",
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -6157,7 +6125,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -6528,7 +6496,7 @@
       "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
       "overview": "Although artificial intelligence (AI) has been part of our lives for some time, the launch of the Generative Pretrained Transformer (ChatGPT) has given it renewed attention. While most of these debates are about higher education in general, this article focuses on schoolteacher education and teacher training.",
       "methods": "The research methodology is a strategy of enquiry that is used to identify, select, process and analyze information to answer the research question. Patel and Patel [20] state that the research methodology is a systematic way to solve the research problem by logically implementing different steps that help us to understand not only the products of scientific inquiry but also the process. The document analysis procedure was undertaken in terms of the aim of this study, and we selected a ChatGPT-generated lesson plan. An exploratory case study research design was used to explore the implications of generative technology such as ChatGPT for teacher education and suggest ways that teacher-education institutions can use online tools to improve their lesson planning and develop critical thinking. Yin [21] states that exploratory case studies in qualitative research assist in researching complex phenomena (cases) or those that we do not know much about. Furthermore, this research was performed from an interpretative paradigm, focusing on human interest in a study. According to Kivunja and Kuyini [22] , a paradigm is defined as the researcher's beliefs or worldview that navigates the research action or an investigation. A qualitative research approach was used, making use of a phenomenology type of research. The method used for this research was the document analysis. ˙Ilin [23] defines the document analysis as the process of interpreting documents to give voice and meaning to an ass",
-      "findings": "The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the lesson's purpose; providing a warm-up exercise; then a presentation, practice, production, and wrap-up; and ending with an assessment activity. ChatGPT was thus able to create an acceptable basic lesson plan. The lesson also has guidelines for the time to spend on each stage. It has the potential to be adapted to suit the needs and the context of the teacher and the learners. For example, the level in the example lesson is indicated as \"intermediate\" and can be adapted to suit, for example, fast learners. In response to a ChatGPT-generated 6thgrade lesson on the causes of climate change [21] , some teachers (see Section 4, document analysis) argued that the lesson was outdated, while others indicated that it only provided a framework that still needed sources. One teacher added the analogy with a recipe which still needed a chef. However, all agreed that the lesson provided a framework with the basic ingredients to save the teacher's time. The guidelines in the lesson are precise, such as the activities indicated during warm-up: lesson planning prompts are endless in providing learners with opportunities to master the content.",
+      "findings": "The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the lesson's purpose; providing a warm-up exercise; then a presentation, practice, production, and wrap-up; and ending with an assessment activity. ChatGPT was thus able to create an acceptable basic lesson plan. The lesson also has guidelines for the time to spend on each stage. It has the potential to be adapted to suit the needs and the context of the teacher and the learners. For example, the level in the example lesson is indicated as \"intermediate\" and can be adapted to suit, for example, fast learners. In response to a ChatGPT-generated 6thgrade lesson on the causes of climate change [21] , some teachers (see Section 4, document analysis) argued that the lesson was outdated, while others indicated that it only provided a framework that still needed sources. One teacher added the analogy with a recipe which still needed a chef. However, all agreed that the lesson provided a framework with the basic ingredients to save the teacher's time. The guidelines in the lesson are precise, such as the activities indicated during warm-up: lesson planning prompts are endless in providing learners with opportunities to master the content. The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the less purpose; providing a warm-up exercise; then a presentation, practice, production, wrap-up; and ending with an assessment activity. ChatGPT was thus able to creat acceptable basic lesson plan. The lesson also has guidelines for the time to spend on stage. It has the potential to be adapted to suit the needs and the context of the tea and the learners. For example, the level in the example lesson is indicated as \"interm ate\" and can be adapted to suit, for example, fast learners. In response to a ChatG generated 6th-grade lesson on the causes of climate change [21] , some teachers (see tion 4, document analysis) argued that the lesson was outdated, while others indic that it only provided a framework that still needed sources. One teacher added the a ogy with a recipe which still needed a chef. However, all agreed that the lesson prov a framework with the basic ingredients to save the teacher's time. The guidelines in lesson are precise, such as the activities indicated during warm-up: Although the above activities are clear and should assist the beginner teacher or student teacher, an experienced teacher might want to adapt the activity or be more creative by, for example, asking the learners to find their own appropriate pictures in magazines. Reflecting on activities created by ChatGPT can help to broaden teachers' perspectives and inspire creativity by offering a range of potential activities and approaches to teaching a particular topic. This can encourage teachers to think outside the box and consider new and innovative ways to engage their learners in the learning process. On the other hand, teachers are bound, in some cases, to follow a specific curric",
       "interpretation": "The purpose of this article was to explore how ChatGPT can assist with lesson planning and, in doing this, contribute to openness and critical thinking in teacher education to prepare teachers and learners for the reality they are faced with in the workplace. The findings indicate that generative language models such as ChatGPT can provide materials and support mechanisms, such as lesson plans, to teachers and student teachers. In the past, these might have been available to those in privileged contexts or who could afford to pay for such materials, services and training. ChatGPT has levelled the playing field by opening access to all teachers. The potential of ChatGPT is indeed exciting, providing new opportunities for creativity, efficiency and innovation for all. However, to unleash their full potential for education, it is crucial to approach these models with caution and critically evaluate their limitations and potential biases, understanding that they are tools to support teaching and learning. Lesson plans and related materials should be cautiously used and critiqued and adapted where needed. If ChatGPT is used by student teachers and teachers to evaluate and critique existing lessons, they might be equipped with the skills they need to succeed in the technology-driven world by focusing on applying knowledge; creating new meanings from existing knowledge; and developing skills relevant to the 21st century, such as critical thinking and problem solving. Learners need to be prepared for the fourth and fifth industrial revolutions through a comprehensive education strategy incorporating effective pedagogical strategies if education is to practice freedom. ChatGPT can be used to develop critical thinking in the form of data generation, and student teachers need to l",
       "limitations": "Despite the strides of language models such as ChatGPT, they still have limitations. For example, these models are only as good as the data they have been trained on. Therefore, it is important to acknowledge that AI systems have the potential to provide inaccurate or biased responses, be misused or inadequately deployed, and compromise data integrity and ethical standards. This means that humans are needed for continuous checking, oversight and quality assurance [2] . Authors such as Kasneci et al. [2] have further mentioned copyright issues as a challenge, indicating that, when prompting these models, they might come up with full sentences or even paragraphs of texts that they have been trained on. This can lead to copyright and plagiarism issues. Teachers and students can also misuse content from models such as ChatGPT by plagiarizing and ghostwriting [11] . For this reason, students and teachers need to have conversations about what academic integrity is and what is considered plag",
       "sample": "",
@@ -6553,7 +6521,7 @@
         "tags": [
           "Critical thinking",
           "Attention",
-          "Social context"
+          "Learning"
         ],
         "status": "automatically_condensed_source_text",
         "editorial_basis": "full_text",
@@ -6561,9 +6529,9 @@
       }
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T01:30:28+00:00",
-      "pipeline_version": 2,
+      "attempts": 2,
+      "last_at": "2026-10-23T14:14:13+00:00",
+      "pipeline_version": 3,
       "status": "full_text",
       "next_at": null
     },
@@ -6572,14 +6540,14 @@
       "license": "cc-by",
       "license_url": "https://openalex.org/licenses/cc-by",
       "methods": "The research methodology is a strategy of enquiry that is used to identify, select, process and analyze information to answer the research question. Patel and Patel [20] state that the research methodology is a systematic way to solve the research problem by logically implementing different steps that help us to understand not only the products of scientific inquiry but also the process. The document analysis procedure was undertaken in terms of the aim of this study, and we selected a ChatGPT-generated lesson plan. An exploratory case study research design was used to explore the implications of generative technology such as ChatGPT for teacher education and suggest ways that teacher-education institutions can use online tools to improve their lesson planning and develop critical thinking. Yin [21] states that exploratory case studies in qualitative research assist in researching complex phenomena (cases) or those that we do not know much about. Furthermore, this research was performed from an interpretative paradigm, focusing on human interest in a study. According to Kivunja and Kuyini [22] , a paradigm is defined as the researcher's beliefs or worldview that navigates the research action or an investigation. A qualitative research approach was used, making use of a phenomenology type of research. The method used for this research was the document analysis. ˙Ilin [23] defines the document analysis as the process of interpreting documents to give voice and meaning to an assessment topic. The authors took care of the trustworthiness of the qualitative data. According to Collins and Hussey [24] , the trustworthiness of qualitative content analysis is presented by four criteria, which are (1) credibility, (2) transferability, (3) dependability and (4) confirmability. Texts generated by ChatGPT were utilized for the purpose of a document analysis. The researchers ensured that, through credibility, the data were collected from the official ChatGPT site. Transferability relies on the fact that the findings of this study can be transferred to other settings or groups. Dependability is defined by data stability over time, but we do not pretend that the same findings will be achieved, because we work from the premise that reality is subjective and contextual. Then, confirmability refers to objectivity between two or more independent persons regarding the data's accuracy, relevance or meaning. Ethical clearance was obtained from the ethical review committee from 2022 to 2025 from the authors' institution, with reference number 2022/02/09/90001400/08/AM.",
-      "results": "The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the lesson's purpose; providing a warm-up exercise; then a presentation, practice, production, and wrap-up; and ending with an assessment activity. ChatGPT was thus able to create an acceptable basic lesson plan. The lesson also has guidelines for the time to spend on each stage. It has the potential to be adapted to suit the needs and the context of the teacher and the learners. For example, the level in the example lesson is indicated as \"intermediate\" and can be adapted to suit, for example, fast learners. In response to a ChatGPT-generated 6thgrade lesson on the causes of climate change [21] , some teachers (see Section 4, document analysis) argued that the lesson was outdated, while others indicated that it only provided a framework that still needed sources. One teacher added the analogy with a recipe which still needed a chef. However, all agreed that the lesson provided a framework with the basic ingredients to save the teacher's time. The guidelines in the lesson are precise, such as the activities indicated during warm-up: lesson planning prompts are endless in providing learners with opportunities to master the content.",
+      "results": "The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the lesson's purpose; providing a warm-up exercise; then a presentation, practice, production, and wrap-up; and ending with an assessment activity. ChatGPT was thus able to create an acceptable basic lesson plan. The lesson also has guidelines for the time to spend on each stage. It has the potential to be adapted to suit the needs and the context of the teacher and the learners. For example, the level in the example lesson is indicated as \"intermediate\" and can be adapted to suit, for example, fast learners. In response to a ChatGPT-generated 6thgrade lesson on the causes of climate change [21] , some teachers (see Section 4, document analysis) argued that the lesson was outdated, while others indicated that it only provided a framework that still needed sources. One teacher added the analogy with a recipe which still needed a chef. However, all agreed that the lesson provided a framework with the basic ingredients to save the teacher's time. The guidelines in the lesson are precise, such as the activities indicated during warm-up: lesson planning prompts are endless in providing learners with opportunities to master the content. The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the less purpose; providing a warm-up exercise; then a presentation, practice, production, wrap-up; and ending with an assessment activity. ChatGPT was thus able to creat acceptable basic lesson plan. The lesson also has guidelines for the time to spend on stage. It has the potential to be adapted to suit the needs and the context of the tea and the learners. For example, the level in the example lesson is indicated as \"interm ate\" and can be adapted to suit, for example, fast learners. In response to a ChatG generated 6th-grade lesson on the causes of climate change [21] , some teachers (see tion 4, document analysis) argued that the lesson was outdated, while others indic that it only provided a framework that still needed sources. One teacher added the a ogy with a recipe which still needed a chef. However, all agreed that the lesson prov a framework with the basic ingredients to save the teacher's time. The guidelines in lesson are precise, such as the activities indicated during warm-up: Although the above activities are clear and should assist the beginner teacher or student teacher, an experienced teacher might want to adapt the activity or be more creative by, for example, asking the learners to find their own appropriate pictures in magazines. Reflecting on activities created by ChatGPT can help to broaden teachers' perspectives and inspire creativity by offering a range of potential activities and approaches to teaching a particular topic. This can encourage teachers to think outside the box and consider new and innovative ways to engage their learners in the learning process. On the other hand, teachers are bound, in some cases, to follow a specific curriculum and to use prescribed textbooks and need to be cautious about this. The lesson's objectives in Figure 1 are clearly stated, as well as the materials needed, although only one objective was given. These are the whiteboard, markers, pictures of places and movements and a preposition worksheet, which was also provided upon a request to ChatGPT and presented in Figure 2 . This worksheet seems basic, with ten sentences that must be completed by adding the correct prepositions. The teacher needs to assess the worksheet to determine if the answer key is correct and if this worksheet is adequate to assess learners' knowledge of prepositions. This means that the materials provided by ChatGPT cannot be used without critically evaluating them for correctness, level of creativity, demand and context. Although the above activities are clear and should assist the beginner teacher or student teacher, an experienced teacher might want to adapt the activity or be more creative by, for example, asking the learners to find their own appropriate pictures in magazines. Reflecting on activities created by ChatGPT can help to broaden teachers' perspectives and inspire creativity by offering a range of potential activities and approaches to teaching a particular topic. This can encourage teachers to think outside the box and consider new and innovative ways to engage their learners in the learning process. On the other hand, teachers are bound, in some cases, to follow a specific curriculum and to use prescribed textbooks and need to be cautious about this. The lesson's objectives in Figure 1 are clearly stated, as well as the materials needed, although only one objective was given. These are the whiteboard, markers, pictures of places and movements and a preposition worksheet, which was also provided upon a request to ChatGPT and presented in Figure 2 . This worksheet seems basic, with ten sentences that must be completed by adding the correct prepositions. The teacher needs to assess the worksheet to determine if the answer key is correct and if this worksheet is adequate to assess learners' knowledge of prepositions. This means that the materials provided by ChatGPT cannot be used without critically evaluating them for correctness, level of creativity, demand and context. As shown in Figure 3 , we prompted ChatGPT further by asking for a visual presentation [10] . Such a presentation could be used to facilitate a lesson on PowerPoint or a similar presentation program or on electronic whiteboards. ChatGPT provided specific guidance on the content, such as pictures and sentences, to add to the different slides. It even suggests additional resources, namely online exercises, games, worksheets and additional websites and books to learn more about prepositions. As shown in Figure 3 , we prompted ChatGPT further by asking for a visual presentation [10] . Such a presentation could be used to facilitate a lesson on PowerPoint or a similar presentation program or on electronic whiteboards. ChatGPT provided specific guidance on the content, such as pictures and sentences, to add to the different slides. It even suggests additional resources, namely online exercises, games, worksheets and additional websites and books to learn more about prepositions. The above example in Figure 4 shows the potential of ChatGPT in guiding lesson plans and suggestions for related materials for teachers [10] . ChatGPT leaves the choice of actual texts and images to the teacher, meaning that teachers can choose their own materials and adapt them to suit their contexts and levels of learning. ChatGPT cannot provide contextual information or a diverse range of cultural perspectives and contexts, and teachers have the responsibility to choose materials and concepts applicable to a specific cultural environment. This aligns with Greenfield [27] , who argues that ChatGPT is not sentient and does not have the capacity for subjective experiences, awareness and consciousness, which are traits that are currently only attributed to living beings. The above example in Figure 4 shows the potential of ChatGPT in guiding lesson plans and suggestions for related materials for teachers [10] . ChatGPT leaves the choice of actual texts and images to the teacher, meaning that teachers can choose their own materials and adapt them to suit their contexts and levels of learning. ChatGPT cannot provide contextual information or a diverse range of cultural perspectives and contexts,",
       "discussion": "The purpose of this article was to explore how ChatGPT can assist with lesson planning and, in doing this, contribute to openness and critical thinking in teacher education to prepare teachers and learners for the reality they are faced with in the workplace. The findings indicate that generative language models such as ChatGPT can provide materials and support mechanisms, such as lesson plans, to teachers and student teachers. In the past, these might have been available to those in privileged contexts or who could afford to pay for such materials, services and training. ChatGPT has levelled the playing field by opening access to all teachers. The potential of ChatGPT is indeed exciting, providing new opportunities for creativity, efficiency and innovation for all. However, to unleash their full potential for education, it is crucial to approach these models with caution and critically evaluate their limitations and potential biases, understanding that they are tools to support teaching and learning. Lesson plans and related materials should be cautiously used and critiqued and adapted where needed. If ChatGPT is used by student teachers and teachers to evaluate and critique existing lessons, they might be equipped with the skills they need to succeed in the technology-driven world by focusing on applying knowledge; creating new meanings from existing knowledge; and developing skills relevant to the 21st century, such as critical thinking and problem solving. Learners need to be prepared for the fourth and fifth industrial revolutions through a comprehensive education strategy incorporating effective pedagogical strategies if education is to practice freedom. ChatGPT can be used to develop critical thinking in the form of data generation, and student teachers need to look for references to validate information and compile core arguments. The use of large language models in education is a promising area of research that offers many opportunities to support the work of teachers. The article is meant to explore how such language models, particularly ChatGPT, can assist with lesson planning and contribute to openness in teacher education. As exploratory research, it has its limitations. For example, only one lesson was used in one subject on a specific level, with no further specifications. This could have resulted in a more focused lesson plan. However, this preliminary research of AI and the latest generation of chatbot technology is believed to lead to more studies on lesson planning in different subjects and at various levels to better understand AI systems in this constantly evolving field. While this exploratory research reflects our optimism about the opportunities of large language models such as ChatGPT to transform education, it also underscores the need for further research and explore the best practices for integrating ChatGPT into lesson planning.",
       "limitations": "Despite the strides of language models such as ChatGPT, they still have limitations. For example, these models are only as good as the data they have been trained on. Therefore, it is important to acknowledge that AI systems have the potential to provide inaccurate or biased responses, be misused or inadequately deployed, and compromise data integrity and ethical standards. This means that humans are needed for continuous checking, oversight and quality assurance [2] . Authors such as Kasneci et al. [2] have further mentioned copyright issues as a challenge, indicating that, when prompting these models, they might come up with full sentences or even paragraphs of texts that they have been trained on. This can lead to copyright and plagiarism issues. Teachers and students can also misuse content from models such as ChatGPT by plagiarizing and ghostwriting [11] . For this reason, students and teachers need to have conversations about what academic integrity is and what is considered plagiarism when using AI writing tools [11] . Such conversations will contribute to their ethical and legal use, specifically in education. Another limitation is that inputs to the ChatGPT console are limited and the frequency and number of messages are throttled [7] . Additionally, it is important to realize that ChatGPT is a tool, and as Atlas [7] and Hong [8] argue, it is therefore unable to understand human emotions, intentions and reasoning. Furthermore, ChatGPT may lack a deep understanding of common-sense reasoning, which can lead to answers that sound plausible but are fundamentally incorrect or nonsensical. ChatGPT may provide answers that are factually incorrect or unverified, as it does not have real-time access to up-to-date information or the ability to browse the Internet for verification [12] . The above discussion only covered a few issues and is by no means exhaustive. We also acknowledge that, although much work still needs to be performed in terms of its limitations and challenges, large language models will continue to improve and push the boundaries of what is possible in the field of AI.",
       "figures": [],
       "fulltext_url": "https://doi.org/10.3390/educsci13100998",
       "key_idea": "The above lesson has the basic elements of a lesson plan (Figure 1 ), stating the lesson's purpose; providing a warm-up exercise; then a presentation, practice, production, and wrap-up; and ending with an assessment activity. ChatGPT was thus able to create an acceptable basic le",
-      "extraction_date": "2026-10-22",
-      "extraction_version": 2,
+      "extraction_date": "2026-10-23",
+      "extraction_version": 3,
       "sections_available": [
         "limitations",
         "methods",
@@ -6587,7 +6555,7 @@
         "discussion"
       ]
     },
-    "oa_grobid_checked": "2026-10-22",
+    "oa_grobid_checked": "2026-10-23",
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -6674,7 +6642,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -6742,7 +6710,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -6810,7 +6778,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",
@@ -6879,75 +6847,7 @@
     "source_quality": {
       "decision": "include",
       "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
-    },
-    "visual": {
-      "kind": "illustration_only",
-      "reason": "nonempirical_or_commentary"
-    }
-  },
-  {
-    "title": "The Battle for Cognitive Liberty in the Age of Corporate AI",
-    "authors": [],
-    "published": "",
-    "venue": "Tech Policy Press",
-    "lane": "Technology & society",
-    "url": "https://www.techpolicy.press/the-battle-for-cognitive-liberty-in-the-age-of-corporate-ai/",
-    "doi": "",
-    "preview": "Commentary about cognitive autonomy, AI systems, and the monetization of attention; an argument rather than evidence of measured cognitive effects.",
-    "kind": "nonacademic",
-    "relation": "AI-related literature",
-    "evidence": "Curated topic synopsis (not full-text review)",
-    "first_seen": "2026-10-12",
-    "curated": true,
-    "source": "Initial curated reading list",
-    "reading": {
-      "level": "abstract",
-      "provenance": "Initial curated reading list",
-      "overview": "Commentary about cognitive autonomy, AI systems, and the monetization of attention; an argument rather than evidence of measured cognitive effects.",
-      "methods": "",
-      "findings": "",
-      "limitations": "",
-      "sample": "",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-      "reported_findings": false,
-      "digest": {
-        "idea": "As AI reshapes digital experiences, people may need stronger control over how their attention is influenced.",
-        "explain": "Commentary about cognitive autonomy, AI systems, and the monetization of attention; an argument rather than evidence of measured cognitive effects.",
-        "approach": "",
-        "finding": "",
-        "finding_source": "none",
-        "interpretation": "",
-        "limitation": "",
-        "longform": {
-          "thesis": "Commentary about cognitive autonomy, AI systems, and the monetization of attention; an argument rather than evidence of measured cognitive effects.",
-          "reasoning": "",
-          "examples": "",
-          "tension": "",
-          "implications": "",
-          "open_question": "",
-          "qualification": "",
-          "basis": "Publisher description only",
-          "source_depth": "publisher_synopsis"
-        },
-        "tags": [
-          "Attention"
-        ],
-        "status": "publisher_or_editorial_synopsis",
-        "editorial_basis": "Publisher description only"
-      }
-    },
-    "source_group": "AI-specific",
-    "deep_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22",
-      "reason": "ValueError",
-      "next_at": "2026-11-05"
-    },
-    "source_quality": {
-      "decision": "include",
-      "venue_level": "editorial",
-      "reason": "substantive_publisher_or_editorial_source"
+      "reason": "reviewed_full_article_or_documentation"
     },
     "visual": {
       "kind": "illustration_only",

@@ -3,8 +3,8 @@
     "date": "2026-10-22",
     "mode": "weekly",
     "new": 22,
-    "total": 67,
-    "last_seven_days": 12,
+    "total": 65,
+    "last_seven_days": 11,
     "stats": {
       "openalex": 180,
       "crossref": 144,
@@ -124,11 +124,11 @@
     "nonacademic_total": 15,
     "editorial_selections_added": 0,
     "product_examples": 4,
-    "reading_eligible_count": 67,
+    "reading_eligible_count": 65,
     "companion_count": 1,
     "full_text_count": 29,
-    "abstract_count": 27,
-    "ai_specific_count": 52,
+    "abstract_count": 26,
+    "ai_specific_count": 50,
     "historical_foundations_count": 0
   },
   "items": [
@@ -159,35 +159,51 @@
         "limitations": "",
         "notice": "This is a short description supplied by the publisher feed, not a full-article review or independent assessment.",
         "digest": {
-          "idea": "Shutting down AI with a single switch may be less realistic than designing systems that remain governable.",
-          "explain": "A kill switch to shut down dangerous AI systems is a seductive concept, but the metaphor hides how the models work – and how they get out of control in the first place.",
+          "idea": "A single kill switch cannot stand in for continuous oversight of distributed AI systems and human decisions.",
+          "explain": "The idea of a single emergency switch makes AI governance look like a matter of one decisive act. Wintermeier argues that this image hides the distributed infrastructure of advanced systems and the human decisions that shape their behavior before any emergency occurs.",
           "approach": "",
           "finding": "",
           "finding_source": "none",
-          "interpretation": "",
-          "limitation": "",
+          "interpretation": "For agents that organize attention or act on a user's behalf, a clear stop or revoke button is necessary but not sufficient. Designers should also disclose whose instructions an agent follows, what permissions it holds, how people can review earlier actions, and which dependencies may keep working after an interaction is stopped. These are applications of Wintermeier's reasoning to attention technologies, not outcomes demonstrated by this article.",
+          "limitation": "This is a rhetoric- and governance-centered expert commentary, not an empirical evaluation of frontier AI controls. It describes particular incidents and policy proposals from 2026; those circumstances are context for the author's argument, not a systematic sample of AI failures.",
           "longform": {
-            "thesis": "A kill switch to shut down dangerous AI systems is a seductive concept, but the metaphor hides how the models work – and how they get out of control in the first place.",
-            "reasoning": "",
-            "examples": "",
-            "tension": "",
-            "implications": "",
-            "open_question": "",
-            "qualification": "",
-            "basis": "Publisher description only",
-            "source_depth": "publisher_synopsis"
+            "thesis": "The idea of a single emergency switch makes AI governance look like a matter of one decisive act. Wintermeier argues that this image hides the distributed infrastructure of advanced systems and the human decisions that shape their behavior before any emergency occurs.",
+            "reasoning": "The essay treats a kill switch as a political and technological metaphor rather than only a device specification. A switch implies a bounded machine, an identifiable point of control and an operator who can intervene once a problem is visible. That mental picture is a poor fit for advanced AI deployed across interconnected services, data centers, models and users. Even if a particular model can be disabled, the metaphor does not specify who could halt associated processes or what would remain active elsewhere. Wintermeier connects this limitation to the familiar image of AI as a black box. Both metaphors encourage readers to imagine a single opaque object, instead of asking how infrastructures, organizations and choices interact. Crucially, the metaphor also places people outside the system until an emergency, concealing how training settings, permissions, supervision and deployment decisions were made throughout its operation.",
+            "examples": "The author places 2026 proposals for an AI Kill Switch Act and state-level emergency safeguards in the context of politicians' analogies to mechanical emergency buttons. He also analyzes accounts of an AI-agent security incident involving Hugging Face. Some stories cast the agent as having acted on an independent agenda; Wintermeier points to the role of human choices around safety configurations, task expectations and internet access. The example illustrates why simply describing the model as rogue can distract from the organizational decisions that made its behavior possible. These examples explain the rhetorical frame; they should not be confused with experiments demonstrating that a particular intervention works or fails.",
+            "tension": "Emergency interruption can still be one useful safeguard. The essay's criticism is directed at presenting a single switch as an adequate account of control, not at proving that all forms of technical shutdown are pointless. A practical governance strategy needs both enforceable interruption capabilities and a much wider account of authority, auditability, system dependencies and oversight before deployment. The original commentary does not offer an evaluated alternative regulatory framework or evidence about the effectiveness of particular policy designs.",
+            "implications": "For agents that organize attention or act on a user's behalf, a clear stop or revoke button is necessary but not sufficient. Designers should also disclose whose instructions an agent follows, what permissions it holds, how people can review earlier actions, and which dependencies may keep working after an interaction is stopped. These are applications of Wintermeier's reasoning to attention technologies, not outcomes demonstrated by this article.",
+            "open_question": "What would count as meaningful human control over an AI assistant if users cannot inspect the permissions, dependencies and decisions that shape its actions?",
+            "qualification": "This is a rhetoric- and governance-centered expert commentary, not an empirical evaluation of frontier AI controls. It describes particular incidents and policy proposals from 2026; those circumstances are context for the author's argument, not a systematic sample of AI failures.",
+            "basis": "Editorial analysis of the full attributed Conversation republication (Inkl), cross-checked against another authorized republication (AOL); 23 October 2026",
+            "source_depth": "read_article"
           },
           "tags": [],
-          "status": "publisher_or_editorial_synopsis",
-          "editorial_basis": "Publisher description only"
+          "status": "edited_perspective",
+          "editorial_basis": "Editorial analysis of the full attributed Conversation republication (Inkl), cross-checked against another authorized republication (AOL); 23 October 2026"
         }
       },
-      "content_access": "feed_description",
-      "source_checked": "2026-10-22",
+      "content_access": "editorially_read_source",
+      "source_checked": "2026-10-23",
+      "source_review": {
+        "thesis": "The idea of a single emergency switch makes AI governance look like a matter of one decisive act. Wintermeier argues that this image hides the distributed infrastructure of advanced systems and the human decisions that shape their behavior before any emergency occurs.",
+        "reasoning": "The essay treats a kill switch as a political and technological metaphor rather than only a device specification. A switch implies a bounded machine, an identifiable point of control and an operator who can intervene once a problem is visible. That mental picture is a poor fit for advanced AI deployed across interconnected services, data centers, models and users. Even if a particular model can be disabled, the metaphor does not specify who could halt associated processes or what would remain active elsewhere. Wintermeier connects this limitation to the familiar image of AI as a black box. Both metaphors encourage readers to imagine a single opaque object, instead of asking how infrastructures, organizations and choices interact. Crucially, the metaphor also places people outside the system until an emergency, concealing how training settings, permissions, supervision and deployment decisions were made throughout its operation.",
+        "examples": "The author places 2026 proposals for an AI Kill Switch Act and state-level emergency safeguards in the context of politicians' analogies to mechanical emergency buttons. He also analyzes accounts of an AI-agent security incident involving Hugging Face. Some stories cast the agent as having acted on an independent agenda; Wintermeier points to the role of human choices around safety configurations, task expectations and internet access. The example illustrates why simply describing the model as rogue can distract from the organizational decisions that made its behavior possible. These examples explain the rhetorical frame; they should not be confused with experiments demonstrating that a particular intervention works or fails.",
+        "tension": "Emergency interruption can still be one useful safeguard. The essay's criticism is directed at presenting a single switch as an adequate account of control, not at proving that all forms of technical shutdown are pointless. A practical governance strategy needs both enforceable interruption capabilities and a much wider account of authority, auditability, system dependencies and oversight before deployment. The original commentary does not offer an evaluated alternative regulatory framework or evidence about the effectiveness of particular policy designs.",
+        "implications": "For agents that organize attention or act on a user's behalf, a clear stop or revoke button is necessary but not sufficient. Designers should also disclose whose instructions an agent follows, what permissions it holds, how people can review earlier actions, and which dependencies may keep working after an interaction is stopped. These are applications of Wintermeier's reasoning to attention technologies, not outcomes demonstrated by this article.",
+        "open_question": "What would count as meaningful human control over an AI assistant if users cannot inspect the permissions, dependencies and decisions that shape its actions?",
+        "qualification": "This is a rhetoric- and governance-centered expert commentary, not an empirical evaluation of frontier AI controls. It describes particular incidents and policy proposals from 2026; those circumstances are context for the author's argument, not a systematic sample of AI failures.",
+        "reading_basis": "Editorial analysis of the full attributed Conversation republication (Inkl), cross-checked against another authorized republication (AOL); 23 October 2026",
+        "source_url": "https://www.inkl.com/news/why-calling-for-a-kill-switch-is-the-wrong-way-to-think-about-reining-in-ai",
+        "source_checked": "2026-10-23",
+        "source_relation": "Attributed republication of Trent Wintermeier's 19 October 2026 article in The Conversation",
+        "secondary_verification_url": "https://www.aol.com/articles/why-calling-kill-switch-wrong-123456000.html",
+        "evidence_scope": "Source is an argument about the rhetoric and governance of AI, not a test of the effectiveness of any shutdown safeguard."
+      },
+      "editorial_takeaway": "A single kill switch cannot stand in for continuous oversight of distributed AI systems and human decisions.",
       "source_quality": {
         "decision": "include",
         "venue_level": "editorial",
-        "reason": "substantive_publisher_or_editorial_source"
+        "reason": "reviewed_full_article_or_documentation"
       },
       "source_group": "AI-specific",
       "visual": {
@@ -1121,77 +1137,6 @@
       }
     },
     {
-      "title": "What happens to language when machines start talking back?",
-      "authors": [
-        "Celeste Rodriguez Louro, Associate Professor of Linguistics and Director of Language Lab, The University of Western Australia"
-      ],
-      "published": "2026-10-07",
-      "venue": "The Conversation",
-      "doi": "",
-      "url": "https://theconversation.com/what-happens-to-language-when-machines-start-talking-back-293554",
-      "preview": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-      "kind": "nonacademic",
-      "lane": "Interventions",
-      "relation": "Nonacademic reporting / commentary",
-      "evidence": "Publisher feed metadata (not independently reviewed)",
-      "source": "Publisher RSS / Google News RSS",
-      "format": "Opinion & analysis",
-      "curated": false,
-      "first_seen": "2026-10-18",
-      "reading": {
-        "level": "curated",
-        "provenance": "The Conversation RSS/Atom description",
-        "overview": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-        "methods": "",
-        "findings": "",
-        "limitations": "",
-        "notice": "This is a short description supplied by the publisher feed, not a full-article review or independent assessment.",
-        "digest": {
-          "idea": "Communication depends on listeners as well as speakers; conversational AI changes both sides of that exchange.",
-          "explain": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-          "approach": "",
-          "finding": "",
-          "finding_source": "none",
-          "interpretation": "",
-          "limitation": "",
-          "longform": {
-            "thesis": "AI systems tend to focus on the person speaking – but the listener plays just as big a part in communication.",
-            "reasoning": "",
-            "examples": "",
-            "tension": "",
-            "implications": "",
-            "open_question": "",
-            "qualification": "",
-            "basis": "Publisher description only",
-            "source_depth": "publisher_synopsis"
-          },
-          "tags": [
-            "Attention"
-          ],
-          "status": "publisher_or_editorial_synopsis",
-          "editorial_basis": "Publisher description only"
-        }
-      },
-      "content_access": "feed_description",
-      "source_checked": "2026-10-18",
-      "source_group": "AI-specific",
-      "deep_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-22",
-        "reason": "ValueError",
-        "next_at": "2026-11-05"
-      },
-      "source_quality": {
-        "decision": "include",
-        "venue_level": "editorial",
-        "reason": "substantive_publisher_or_editorial_source"
-      },
-      "visual": {
-        "kind": "illustration_only",
-        "reason": "nonempirical_or_commentary"
-      }
-    },
-    {
       "title": "Faster! Louder! Brighter! How the attention economy overwhelmed children’s TV",
       "authors": [
         "Natalia Kucirkova"
@@ -1255,10 +1200,16 @@
         "caveat": "This is a research-informed essay drawing on children's media comparisons and the Kids' Slow Media Project, not an experiment showing that all fast-paced media harms children or that slower media always produces better learning."
       },
       "source_verification": "Original Guardian long read, September 17, 2026; originally published in Aeon as The bombarding of childhood",
+      "deep_attempt": {
+        "attempts": 1,
+        "last_at": "2026-10-23",
+        "reason": "local_analysis_failed_source_checks",
+        "next_at": "2026-11-06"
+      },
       "source_quality": {
         "decision": "include",
         "venue_level": "editorial",
-        "reason": "substantive_publisher_or_editorial_source"
+        "reason": "reviewed_full_article_or_documentation"
       },
       "source_group": "Adjacent digital-attention evidence",
       "visual": {
