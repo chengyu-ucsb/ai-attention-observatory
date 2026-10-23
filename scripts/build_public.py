@@ -29,7 +29,7 @@ def readable(record):
         return level=="abstract" and len(record.get("abstract_text") or "")>=90
     # Nonacademic descriptions and editorial annotations can be used if attributable
     # to the publisher or an editorial summary, not headline-only metadata.
-    return level in ("curated","abstract","full_text") and bool(reading.get("overview") or (record.get("editorial_notes") or {}).get("argument"))
+    return (level in ("curated","abstract","full_text") or (level=="source_preview" and record.get("companion_to"))) and bool(reading.get("overview") or (record.get("editorial_notes") or {}).get("argument"))
 
 def record_id(x):
     return (x.get("doi") or "").lower() or x.get("url") or x.get("title") or ""
@@ -49,9 +49,6 @@ def build():
                 continue
         else:
             quality={"decision":"include","venue_level":"editorial","reason":"reviewed_full_article_or_documentation"}
-        if not readable(source):
-            held["insufficient_source_text"]+=1
-            continue
         published=annotate(source)
         if published.get("kind")=="nonacademic" and not substantive_article(published):
             # Keep a minimal locator so bookmarks remain useful. It must never
@@ -61,6 +58,9 @@ def build():
                             "venue":source.get("venue"),"published":source.get("published"),
                             "source_quality":{"decision":"awaiting_full_article_reading"},
                             "reason":"No article-based analysis has passed the source-depth checks."})
+            continue
+        if not readable(published):
+            held["insufficient_source_text"]+=1
             continue
         published["source_quality"]=quality
         published["source_group"]=source_class(source)
