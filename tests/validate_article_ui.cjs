@@ -33,6 +33,13 @@ const nodes=root=>[root,...root.children.flatMap(nodes)];
 const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
 const textContent=root=>nodes(root).map(n=>n.textContent).filter(Boolean).join(" | ");
+// Previously published links must resolve to an honest pending-source view,
+// not a fabricated one-paragraph reading when the full article was never read.
+const pending={kind:"nonacademic",title:"Not-yet-reviewed commentary",url:"https://theconversation.com/a-source-pending-full-reading",source_quality:{decision:"awaiting_full_article_reading"}};
+ctx.selected=pending;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(match(paperContainer,"rv-awaiting-reading"),"Missing transparent pending-source route");
+assert(textContent(paperContainer).includes("has not been retrieved and verified"),"Pending article falsely presented as analysis");
+assert(!match(paperContainer,"rv-longform"),"RSS snippet must not be dressed up as an article reading");
 const db=JSON.parse(read("data/public-library.json"));
 assert(db.length>50,"Expected public, citation-screened library");
 ctx.database=db;vm.runInContext("TEST.S.records=database",ctx);
