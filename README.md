@@ -190,6 +190,37 @@ the precise limitation rather than falsely reporting that the paper
 contains no full text. No legal or institutional PDF access is required
 from the user for openly readable source analysis.
 
+## Article-level commentary quality gate (October 2026)
+
+**Discovery is not an article reading.** RSS/Atom descriptions are stored as
+`source_preview` and cannot qualify as a full commentary analysis merely
+because a paragraph is longer than a headline. The source-quality screen
+requires a verified publisher article or an explicitly attributed authorized
+republication; a substantive reading must have an actual thesis, chain of
+reasoning, source-specific examples, a tension, and a qualification. If
+retrieval or local synthesis fails, the article stays out of featured cards,
+public research counts and weekly commentary. Old links resolve to a clear
+*Awaiting full-article reading* page rather than an inflated one-sentence
+reading. A separate public locator file `data/public-pending-sources.json`
+contains only titles/URLs and the pending status; the full acquisition
+backlog stays internal to the repository.
+
+Source-checked reviews are in
+[`data/editorial-source-readings.json`](data/editorial-source-readings.json).
+The first case is Trent Wintermeier's October 2026 expert analysis of AI
+"kill switches"; it is based on full attributed republications of The
+Conversation article, with a link to the republication actually reviewed.
+The distinction matters: an argument based on examples of infrastructure and
+human responsibility is not an experimental study of safety interventions.
+
+The twice-weekly deep-reading workflow separately attempts robots-compliant
+publisher HTML retrieval and local source-grounded synthesis with a larger
+Qwen2.5 1.5B model. If source access or validation fails, it records distinct
+retrieval/model status codes and retries within limits. It does not substitute
+a generic title-based commentary. A passing unit test or downloaded model is
+not evidence of successful publisher full-text retrieval; consult actual
+workflow logs and the depth/provenance on each reading.
+
 ## Research quality and news reading
 
 The public reading library uses a **field-specific venue baseline**, an explicit
