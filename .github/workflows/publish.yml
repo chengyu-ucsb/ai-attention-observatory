@@ -74,6 +74,7 @@ jobs:
           test -s styles.css
           test -s favicon.svg
           test -s data/public-library.json
+          test -s data/public-pending-sources.json
           test -s data/public-weekly.json
           python - <<'PY'
           import json
@@ -100,7 +101,7 @@ jobs:
           mkdir -p _site/issues
           cp -R issues/. _site/issues/
           mkdir -p _site/data
-          cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json _site/data/
+          cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json data/public-pending-sources.json _site/data/
           if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           touch _site/.nojekyll
