@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
-const S={records:[],companions:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
+const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
 const depths=[["full_text","Full-article readings","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
@@ -9,7 +9,7 @@ function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;ret
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
 function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.slice(0,10)+"T12:00:00Z");return isNaN(d.getTime())?"Undated":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
 function id(x){return String(x.doi||x.url||x.title)}
-function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k));return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
+function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.pending.find(x=>id(x)===k);return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
 function depth(x){return x.reading?.level||"citation_only"}
 function depthName(x){if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":x.analysis?.original_paraphrases_only?"Reviewed full article":"Full-text sections","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
@@ -604,7 +604,21 @@ function conceptArtwork(x){
 function showPaper(x){
  const root=$("#paper-content");
  root.replaceChildren();
- if(!x){root.append(make("div","empty-state","This reading is no longer in the public index."));return;}
+ if(!x){root.append(make("div","empty-state","This source has not been indexed as a public reading."));return;}
+ if(x.source_quality?.decision==="awaiting_full_article_reading"){
+  const page=make("article","rv-article rv-awaiting-reading");
+  page.append(btn("← Research library",()=>goto("library"),"rv-back"));
+  const head=make("header","rv-head");
+  add(head,make("p","eyebrow","DISCOVERED SOURCE · NOT YET ANALYZED"),
+    make("h1","rv-headline",readableSourceTitle(x)),
+    make("p","rv-deck","This article was identified by the discovery system, but its complete argument has not been retrieved and verified. A feed description is not a research reading, so no analysis is presented here."));
+  page.append(head);
+  const note=make("section","rv-source-gap");
+  add(note,make("h2","","What is missing?"),
+    make("p","","The article still needs source-level review of its reasoning, examples and qualifications before it can appear in the Observatory's editorial library."));
+  if(/^https:\/\//.test(x.url||""))note.append(link("Read the original article ↗",x.url,"rv-secondary-link"));
+  page.append(note);root.append(page);return;
+ }
  const r=x.reading||{},d=r.digest||{},editorial=d.status==="editorially_written_from_indexed_sections";
  const scholarly=x.kind==="scholarly",hasFinding=Boolean(d.finding),conceptual=x.research_type==="conceptual_framework";
  const isQuestion=scholarly&&!hasFinding&&!editorial;
@@ -827,13 +841,14 @@ function showProductExamples(){
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
  try{
-  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-featured-issue.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
+  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-featured-issue.json","data/public-pending-sources.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
   if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
   S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");S.companions=S.records.filter(x=>Boolean(x.companion_to));S.records=S.records.filter(x=>!x.companion_to);
   S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
   S.runs=rs[2].ok?await rs[2].json():[];
   S.backlog=rs[3].ok?await rs[3].json():{};
   S.issue=rs[4].ok?await rs[4].json():{};
+  S.pending=rs[5].ok?await rs[5].json():[];
   home();renderIssue();renderBacklog();showLibrary();showProductExamples();renderPerspectives();route();
  }catch(e){$("#issue-label").textContent="INDEX OFFLINE";$("#issue-meta").textContent="Research data could not load";$("#feature-grid").replaceChildren(make("div","empty-state","Could not load the research archive: "+e.message));route()}
 }
