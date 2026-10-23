@@ -177,6 +177,9 @@ def acceptable(answer, content, kind):
     if any(not isinstance(answer.get(f, ""), str) for f in FIELDS[kind]): return False
     required = ("thesis", "reasoning") if kind == "nonacademic" else ("study_design", "reported_results")
     if any(len(answer.get(k, "").strip()) < 60 for k in required): return False
+    if kind=="nonacademic" and any(len(answer.get(k,"").strip())<limit for k,limit in (
+        ("thesis",70),("reasoning",150),("examples",100),("tension",90),
+        ("qualification",60))): return False
     prose = " ".join(answer.get(k, "") for k in FIELDS[kind])
     if len(prose.split()) < 140 or any(phrase in prose.lower() for phrase in BOILERPLATE):
         return False
@@ -226,6 +229,10 @@ def process(records, model=None, limit=4):
             if not acceptable(analysis, source, kind):
                 stats["model_rejected"] += 1
                 raise ValueError("local_analysis_failed_source_checks")
+            # Analysis was validated against substantial retrieved source HTML:
+            # only NOW promote an RSS preview into a readable source.
+            if kind=="nonacademic" and (record.get("reading") or {}).get("level")=="source_preview":
+                record["reading"]["level"]="curated"
             record["deep_analysis"] = {
                 **{f: analysis.get(f, "").strip() for f in FIELDS[kind]},
                 "version": 2, "kind": kind, "model": "Qwen2.5-1.5B-Instruct (on-runner)",
