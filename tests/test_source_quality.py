@@ -41,7 +41,8 @@ class NewsIntegrityTests(unittest.TestCase):
   paper=rows[0]
   self.assertEqual(paper["authors"],["Natalia Kucirkova"])
   self.assertIn("/news/2026/sep/17/",paper["url"])
-  self.assertTrue(news_quality.substantive_article(paper))
+  from condense_readings import annotate
+  self.assertTrue(news_quality.substantive_article(annotate(paper)))
   self.assertIn("pace",paper["reading"]["overview"])
   self.assertIn("not an experiment",paper["editorial_notes"]["caveat"])
   self.assertNotIn("news.google.com",paper["url"])
