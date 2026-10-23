@@ -773,6 +773,8 @@ function showPaper(x){
  if(x.url&&/^https:\/\//.test(x.url))cite.append(link("Open publication ↗",x.url,"rv-primary-link"));
  if(x.analysis?.fulltext_url&&/^https:\/\//.test(x.analysis.fulltext_url))
   cite.append(link("Read accessible full text ↗",x.analysis.fulltext_url,"rv-secondary-link"));
+ if(x.source_review?.source_url&&/^https:\/\//.test(x.source_review.source_url))
+  cite.append(link("Read verified full-text republication ↗",x.source_review.source_url,"rv-secondary-link"));
  const provenance=make("details","rv-provenance");
  add(provenance,make("summary","","Source details"),
     add(make("div","rv-provenance-body"),
