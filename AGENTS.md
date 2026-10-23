@@ -10,6 +10,24 @@ Before creating, copying, or editing GitHub Actions workflows:
 
 This policy is stored in the repository so future assistants working on it can see and follow it. It does not override GitHub's documentation or substitute for checking current versions.
 
+## Commentary extraction integrity (October 2026)
+
+- RSS descriptions are discovery metadata (`source_preview`), not curated
+  research readings. Do not promote based solely on word count or publisher
+  reputation; the full argument must be independently examined.
+- Only include commentary in reading collections after a substantive verified
+  analysis of its thesis, explanatory reasoning, specific examples, tension
+  and qualifications. Keep original source URL canonical; if relying on an
+  attributed, authorized republication, link the actual edition read and
+  record the relationship and date. Do not copy a full syndicated article.
+- Existing unreviewed links must resolve to an honest pending-source page,
+  NOT a fabricated or duplicated essay. Do not include pending sources in
+  public library/weekly/RSS counts.
+- Distinguish source access failures from model-validation failures; never
+  fabricate paragraphs to meet the quality threshold.
+- Regression-test real and feed-only records at the entire
+  discovery→reading→publication→article-UI boundary.
+
 ## Scholarly source screening and news fidelity (October 2026)
 
 - Use `data/venue-standards.json` as a starting disciplinary venue watchlist,
