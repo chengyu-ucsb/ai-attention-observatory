@@ -21,7 +21,7 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: observatory-index
+  group: ${{ github.event_name == 'pull_request' && format('observatory-check-{0}-{1}', github.workflow, github.ref) || 'observatory-index' }}
   cancel-in-progress: false
 jobs:
   deepen:
