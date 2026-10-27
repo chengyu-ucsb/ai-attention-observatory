@@ -67,6 +67,7 @@ class PipelineTests(unittest.TestCase):
         self.assertNotIn('findings', record)
         self.assertEqual(record['abstract_text'], '')
 
+    @patch.dict('os.environ', {'GITHUB_SHA': ''})
     def test_queue_survives_next_collection_and_clears_after_approval(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp); data = root / 'data'; data.mkdir()
