@@ -24,7 +24,7 @@ class CompositionTests(unittest.TestCase):
                      'also make direct comparisons difficult. Taken together, they frame a question about evaluation '
                      'rather than establish a shared causal effect. Future studies could separate immediate task success '
                      'from later performance on a comparable task completed independently, while observing how participants '
-                     'check suggestions and revise their own explanations.')
+                     'check suggestions and revise their own explanations. These abstract-based accounts require full-text confirmation.')
         section = lambda a,b: dict(short='A theme', title='Assistance and learning', text=paragraph,
             evidence=[{'key':a,'quote':'did not establish lasting independent learning'},
                       {'key':b,'quote':'limited sample and short observation period'}])
@@ -125,6 +125,13 @@ class CompositionTests(unittest.TestCase):
         self.assertTrue(items[0]['id'].endswith('/issues/2026-10-26.html'))
         self.assertEqual(items[0]['content_html'],rss_content(issue))
         self.assertEqual(items[0]['_observatory'],issue)
+
+    def test_source_access_and_commentary_require_explicit_labels(self):
+        for source in ({'level':'abstract'}, {'kind':'nonacademic'}):
+            with self.subTest(source=source), self.assertRaises(ValueError):
+                composer.qualify_section({'text':'The study established a broad improvement.'},[source])
+        composer.qualify_section({'text':'The abstract reports a limited comparison.'},[{'level':'abstract'}])
+        composer.qualify_section({'text':'The commentary proposes a design question.'},[{'kind':'nonacademic'}])
 
 
 if __name__=='__main__': unittest.main()

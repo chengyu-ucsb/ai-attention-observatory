@@ -81,6 +81,8 @@ def validate(draft, packet):
         keys = {a.get('key') for a in anchors}
         if len(keys) < 2 or not keys <= lookup.keys():
             raise ValueError('Each theme must cite at least two eligible sources')
+        if section in signals:
+            qualify_section(section, [lookup[k] for k in keys])
         for anchor in anchors:
             phrase = normalize(anchor.get('quote', ''))
             if len(phrase.split()) < 5 or phrase not in normalize(lookup[anchor['key']]['evidence']):
@@ -130,6 +132,14 @@ Return exactly three signals. Every signal and tension must cite at least two di
 source keys, with exact evidence phrases supporting that section. Cite at least four
 distinct sources overall. Evidence phrases are internal audit data, not public quotations.
 Use 500–850 words overall. Source packet:\n''' + json.dumps(packet, ensure_ascii=False)
+
+
+def qualify_section(section, sources):
+    text = section.get('text', '').lower()
+    if any(p.get('level') == 'abstract' for p in sources) and 'abstract' not in text:
+        raise ValueError('Explicitly label the abstract-only source and limit claims to its abstract')
+    if any(p.get('kind') == 'nonacademic' for p in sources) and not re.search(r'\b(commentary|essay|opinion)\b', text):
+        raise ValueError('Explicitly identify the essay/commentary; do not describe it as an experiment or study')
 
 
 def draft_in_stages(model, packet, audit):
@@ -191,6 +201,7 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
         def check_section(section):
             count=len(section.get('text','').split())
             if count<80: raise ValueError(f'Text has {count} words. Expand to 100–140 words with designs, comparison and limitations.')
+            qualify_section(section,pair)
             anchors=section.get('evidence',[])
             if {a.get('key') for a in anchors} != set(theme['keys']):
                 raise ValueError('Cite BOTH distinct keys: '+', '.join(theme['keys']))
@@ -203,7 +214,8 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
 Use six to eight sentences: describe each source's design and supported observation,
 explain the comparison, then give concrete limitations. Keep each source's limitations
 attached to that source. Do not claim an attention study tested AI unless it did.
-Discussion is author interpretation, not measured results. Label abstract-only evidence.
+Discussion is author interpretation, not measured results. Use the word "abstract" to explicitly label abstract-only evidence.
+Identify nonacademic material as an "essay" or "commentary", never a study or experiment. Attribute its proposals to the author.
 Distinguish assisted performance, independent learning and sustained attention. No broad
 causal or long-term claims. Paraphrase; do not copy long passages. No numeric claims needed.
 Return an object with "text" containing your COMPLETE original paragraph and "evidence" containing two objects. Each evidence object needs "key" (the actual source key) and "quote" (an exact 5–12 word excerpt from THAT source, never from your paragraph or the other source). Do not output placeholders.
@@ -219,6 +231,8 @@ Theme: '''+theme['title']+'\nSources:\n'+json.dumps(pair,ensure_ascii=False),che
     frame=generate('editorial frame', '''Write an opening and unresolved question that CONNECT the three supplied comparisons.
 Use ONLY the claims in these paragraphs; introduce no new factual claims or statistics.
 Keep evidence limitations. Do not equate engagement, learning and sustained attention.
+The comparisons may mix studies and essays; do not call the whole collection "three studies".
+Keep each limitation attached to its own study, rather than claiming all sources share it.
 The tension must be an explicitly unresolved research/design question, not an extra finding.
 Use plain, specific prose, not "delve", "multifaceted", "nuanced" or generic benefits/risks language.
 Return {"headline":"at least five words", "deck":"30–45 words", "letter":"90–120 words",
