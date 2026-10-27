@@ -30,7 +30,9 @@ def build(root=ROOT):
         'featured_issue_date': featured.get('edition_date'),
         'editorial_status': current['status'],
         'pending_editorial_dates': pending,
-        'chat_intake': 'Explicit data/brief-leads.json nominations; no automatic access to ChatGPT conversations',
+        'canonical_source': 'Website repository: discovery → readings → weekly edition → RSS',
+        'delivery_feed': 'https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml',
+        'source_nominations': 'Optional verified DOI/URL leads; routine discovery does not depend on chat',
         'publication': 'Built payload; successful Pages deployment must be verified in Actions',
     }
     intake = data / 'brief-intake-status.json'
@@ -46,7 +48,7 @@ def build(root=ROOT):
     (data / 'pipeline-status.json').write_text(json.dumps(status, indent=2) + '\n', encoding='utf-8')
     print(json.dumps(status))
     if pending:
-        print('::warning::Editorial review pending for ' + ', '.join(pending))
+        print('::warning::Weekly edition not yet published for ' + ', '.join(pending))
     return status
 
 if __name__ == '__main__':

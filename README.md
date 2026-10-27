@@ -21,7 +21,7 @@ Developed by [Chengyu Fang](https://chengyufang.org/). This is an evolving resea
 
 **Direct feed:** https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml
 
-RSS follows *approved editorial issues*. It does **not** publish every incoming bibliographic record. A new week without reviewed editorial copy leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
+RSS follows published weekly editions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
 
 ## Private Zotero access
 
@@ -303,13 +303,39 @@ More detailed assistant-maintenance requirements are in [AGENTS.md](AGENTS.md).
 
 ## Run and contribute
 
-### Weekly brief handoff and publication status
+### Website-owned weekly publication and RSS delivery
 
-The GitHub collector and the ChatGPT weekly brief are separate processes.
-GitHub cannot read a private ChatGPT conversation. A chat response alone does
-not change this repository. Nominate its sources in `data/brief-leads.json`
-with a title, DOI (or canonical arXiv URL), lane, discovery-week date, and
-human-readable origin. Do not add private chat URLs or identifiers.
+The repository is the canonical source: weekly discovery → source-backed
+readings → synthesized edition → website and RSS. Chat is only a downstream
+reader of `issue-feed.xml`; website updates do not need access to a private
+conversation. Optional source nominations can still be added in
+`data/brief-leads.json` with a title, DOI (or canonical arXiv URL), lane,
+discovery-week date and human-readable origin. Do not add private chat URLs.
+
+`Publish weekly edition` runs after successful full-text acquisition, with
+Monday/Tuesday recovery checks. It checks for an existing edition before
+downloading a model or generating anything. For a new week,
+`scripts/compose_issue.py` runs Qwen2.5-7B-Instruct locally on the GitHub runner,
+with no hosted inference service or paid API key. It synthesizes eligible
+readings into three cross-source themes, a tension and a research question.
+The complete weekly source shelf remains attached to the published issue.
+
+Automatic checks require real source identifiers, matching evidence anchors,
+multiple sources per theme, original prose, supported numeric claims and
+substantive content. They do not guarantee factual accuracy or replace an
+independent review. Automatic editions are labeled accordingly. Invalid output
+fails the run, retains evidence and draft in a recovery artifact, and leaves
+the previous edition visible; the next recovery run can retry. Completed
+editions are idempotent. Manual corrections in `data/issue-editorial.json`
+remain supported. The generation audit records the model and source-packet hash.
+
+The edition, archive and full-content RSS are saved in one commit. Successful
+edition and deeper-reading workflows explicitly trigger Pages publication,
+because pushes made with the workflow token do not themselves trigger another
+push workflow. RSS uses stable issue permalinks for downstream deduplication.
+Chat delivery should read this feed after the Monday collection, share the
+published edition, and report an absent or stale edition instead of generating
+a competing research brief. Its delivery schedule is configured outside GitHub.
 
 `scripts/brief_intake.py` verifies identifiers, titles and publication dates
 against Crossref or arXiv. It stores provider metadata, never chat-generated
@@ -329,10 +355,10 @@ Each build saves the eligible source shelf to
 `data/editorial-queue/YYYY-MM-DD.json`. That queue survives the next collection.
 The public `data/pipeline-status.json` reports collection status, the featured
 issue date, pending editorial dates, intake results, and (on Actions) the
-actual checked-out revision and build-run link. Pending review creates an
+actual checked-out revision and build-run link. Pending publication creates an
 Actions warning; a green deployment does not mean a new editorial was written.
 
-To publish an edition, examine its sources and add grounded editorial text
+To manually correct or recover an edition, examine its sources and add grounded editorial text
 under its date in `data/issue-editorial.json`, following the existing schema.
 For an older queued edition:
 
@@ -344,10 +370,11 @@ python scripts/pipeline_status.py
 python -m unittest discover -s tests -v
 ```
 
-Commit the reviewed editorial and generated approved issue/archive together.
-The regular Pages workflow publishes the latest approved edition. Until that
-review is complete, the previous approved issue stays featured. The pipeline
-does not fabricate or automatically approve editorial prose.
+Commit manual editorial corrections and the generated issue/archive together.
+The regular Pages workflow publishes the latest completed edition. Until an
+automatic draft passes its checks or a manual edition is supplied, the previous
+published issue stays featured. Earlier failed weeks remain in the editorial
+queue for recovery; they are not silently filled with invented copy.
 
 Weekly discovery remains Monday at 12:23 UTC (08:23 New York daylight time,
 07:23 standard time); GitHub may delay scheduled starts. Manual runs default
