@@ -303,6 +303,59 @@ More detailed assistant-maintenance requirements are in [AGENTS.md](AGENTS.md).
 
 ## Run and contribute
 
+### Weekly brief handoff and publication status
+
+The GitHub collector and the ChatGPT weekly brief are separate processes.
+GitHub cannot read a private ChatGPT conversation. A chat response alone does
+not change this repository. Nominate its sources in `data/brief-leads.json`
+with a title, DOI (or canonical arXiv URL), lane, discovery-week date, and
+human-readable origin. Do not add private chat URLs or identifiers.
+
+`scripts/brief_intake.py` verifies identifiers, titles and publication dates
+against Crossref or arXiv. It stores provider metadata, never chat-generated
+findings. Existing articles retain their acquired text and reading notes.
+Identity mismatches and provider failures remain in
+`data/brief-intake-status.json`; preprints still require the existing article
+screen before appearing in the public library. No additional API key is needed.
+
+The weekly workflow now finishes all intake stages before
+`scripts/build_weekly.py` freezes the complete discovery-week membership.
+Earlier per-channel display caps no longer truncate the final source shelf.
+Historical backfills remain excluded, and `build_public.py` still quarantines
+citation-only and otherwise ineligible records. This is a discovery week,
+not a claim that every source was published during that week.
+
+Each build saves the eligible source shelf to
+`data/editorial-queue/YYYY-MM-DD.json`. That queue survives the next collection.
+The public `data/pipeline-status.json` reports collection status, the featured
+issue date, pending editorial dates, intake results, and (on Actions) the
+actual checked-out revision and build-run link. Pending review creates an
+Actions warning; a green deployment does not mean a new editorial was written.
+
+To publish an edition, examine its sources and add grounded editorial text
+under its date in `data/issue-editorial.json`, following the existing schema.
+For an older queued edition:
+
+```bash
+python scripts/build_issue.py --edition-date YYYY-MM-DD
+python scripts/build_newsletter.py
+python scripts/build_issue.py
+python scripts/pipeline_status.py
+python -m unittest discover -s tests -v
+```
+
+Commit the reviewed editorial and generated approved issue/archive together.
+The regular Pages workflow publishes the latest approved edition. Until that
+review is complete, the previous approved issue stays featured. The pipeline
+does not fabricate or automatically approve editorial prose.
+
+Weekly discovery remains Monday at 12:23 UTC (08:23 New York daylight time,
+07:23 standard time); GitHub may delay scheduled starts. Manual runs default
+to weekly mode, with backfill still available explicitly. After a change,
+check the discovery and publishing Actions runs, warnings, the deployed
+`data/pipeline-status.json`, and both RSS feeds. Restore the previous commit
+to roll back code; retain source records and approved issue archives.
+
 The site is static HTML, CSS, and JavaScript. To preview it, serve the repository locally:
 
 ```bash

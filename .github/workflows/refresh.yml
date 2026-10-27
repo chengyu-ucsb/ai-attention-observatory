@@ -4,6 +4,9 @@ on:
     branches: [main]
     paths:
       - 'scripts/update.py'
+      - 'scripts/brief_intake.py'
+      - 'scripts/build_weekly.py'
+      - 'data/brief-leads.json'
       - 'scripts/search_plan.py'
       - 'scripts/seed_historical.py'
       - '.github/workflows/refresh.yml'
@@ -16,7 +19,7 @@ on:
       mode:
         description: Search mode
         type: choice
-        default: backfill
+        default: weekly
         options: [backfill, weekly]
 permissions:
   contents: write
@@ -31,7 +34,7 @@ jobs:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OA_ENRICH_LIMIT: 55
       # Backfills make a deeper pass; normal weeks keep the API budget controlled.
-      MODE: ${{ inputs.mode || (github.event_name == 'push' && 'backfill') || 'weekly' }}
+      MODE: ${{ inputs.mode || 'weekly' }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
@@ -40,8 +43,9 @@ jobs:
       - name: Collect metadata
         env:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
-          MODE: ${{ inputs.mode || 'weekly' }}
         run: python scripts/update.py
+      - name: Verify nominated weekly brief leads
+        run: python scripts/brief_intake.py
       - name: Verify key earlier research by DOI
         run: python scripts/seed_historical.py
       - name: Discover reporting, commentary and practitioner writing
@@ -56,12 +60,15 @@ jobs:
         run: python scripts/open_access_links.py
       - name: Build article-specific reading summaries
         run: python scripts/build_readings.py
+      - name: Freeze complete weekly source membership
+        run: python scripts/build_weekly.py
       - name: Exclude citation-only metadata from public readings
         run: python scripts/build_public.py
       - name: Rebuild approved editorial and newsletter feed
         run: |
           python scripts/build_issue.py
           python scripts/build_newsletter.py
+          python scripts/pipeline_status.py
       - name: Produce research RSS
         run: python scripts/feed.py
       - name: Validate data and browser code

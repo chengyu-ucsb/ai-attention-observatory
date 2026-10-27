@@ -14,6 +14,7 @@ on:
       - 'data/**'
       - 'feed.xml'
       - 'scripts/build_public.py'
+      - 'scripts/pipeline_status.py'
       - 'scripts/source_audit.py'
       - 'scripts/export_zotero_backlog.py'
       - 'scripts/build_visuals.py'
@@ -59,6 +60,7 @@ jobs:
           python scripts/export_zotero_backlog.py
           python scripts/build_issue.py
           python scripts/build_newsletter.py
+          python scripts/pipeline_status.py
           python scripts/feed.py
       - name: Validate published application
         run: |
@@ -104,6 +106,7 @@ jobs:
           cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json data/public-pending-sources.json _site/data/
           if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
+          cp data/pipeline-status.json _site/data/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5

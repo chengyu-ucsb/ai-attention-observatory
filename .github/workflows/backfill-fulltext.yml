@@ -82,6 +82,7 @@ jobs:
           python scripts/build_public.py
           python scripts/build_issue.py
           python scripts/build_newsletter.py
+          python scripts/pipeline_status.py
           python scripts/feed.py
       - name: Check that no citation-only records are published
         run: |

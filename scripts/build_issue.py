@@ -7,13 +7,17 @@ The issue includes citations to the exact source records and a complete source s
 from __future__ import annotations
 import json,datetime,pathlib,re
 ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
-def source_id(x):return (x.get("doi") or "").lower() or x.get("url") or x.get("title")
+def source_id(x):return x.get("id") or (x.get("doi") or "").lower() or x.get("url") or x.get("title")
 def find(needle,items):
  hits=[i for i,x in enumerate(items) if needle.casefold() in x.get("title","").casefold()]
  if len(hits)!=1:raise ValueError("Issue anchor must match exactly one source: "+needle+" (matches "+str(len(hits))+")")
  return items[hits[0]]
-def build():
+def build(edition_date=None):
  weekly=json.loads((DATA/"public-weekly.json").read_text())
+ if edition_date:
+  datetime.date.fromisoformat(edition_date)
+  packet=json.loads((DATA/"editorial-queue"/(edition_date+".json")).read_text(encoding="utf-8"))
+  weekly={"run":{"date":edition_date},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
  issue_date=(weekly.get("run") or {}).get("date") or ""
  drafts=json.loads((DATA/"issue-editorial.json").read_text())
  items=weekly.get("items") or []
@@ -49,11 +53,15 @@ def build():
  archived=sorted((DATA/"approved-issues").glob("????-??-??.json"),reverse=True) if (DATA/"approved-issues").exists() else []
  featured=next((json.loads(p.read_text(encoding="utf-8")) for p in archived
                 if json.loads(p.read_text(encoding="utf-8")).get("status")=="published"),None)
- if schema["status"]=="published":
+ if schema["status"]=="published" and (featured is None or schema["edition_date"]>=featured.get("edition_date","")):
   featured=schema
  if featured is None:
   featured={"status":"none","headline":"","deck":"","signals":[],"sources":[],"source_count":0}
  (DATA/"public-featured-issue.json").write_text(json.dumps(featured,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
  print(json.dumps({"issue_date":issue_date,"status":schema["status"],"sources_in_shelf":len(items),"themes":len(schema.get("signals",[]))}))
  return schema
-if __name__=="__main__":build()
+if __name__=="__main__":
+ import argparse
+ parser=argparse.ArgumentParser()
+ parser.add_argument("--edition-date",help="Build a reviewed issue from its saved source shelf")
+ build(parser.parse_args().edition_date)
