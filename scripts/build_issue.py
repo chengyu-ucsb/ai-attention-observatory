@@ -1,7 +1,7 @@
-"""Build an editorially reviewed weekly issue from all source-backed weekly readings.
+"""Build a weekly issue from validated editorial copy and source-backed readings.
 
-Do not automatically invent a synthesis for new weeks. If the editor has not written
-an issue, publish a transparent source-count status but no newsletter issue.
+The website's compose_issue workflow creates automatic drafts with evidence checks.
+Manually edited copy is also supported. Failed drafts never replace a published issue.
 The issue includes citations to the exact source records and a complete source shelf.
 """
 from __future__ import annotations
@@ -30,8 +30,8 @@ def build(edition_date=None):
   "sources":[{"id":source_id(x),"title":x.get("title",""),"kind":x.get("kind",""),"venue":x.get("venue",""),
      "published":x.get("published",""),"reading_level":x.get("reading",{}).get("level",""),
      "url":x.get("url","")} for x in items],
-  "status":"awaiting_editorial_review",
-  "note":"New source records have been indexed. A cross-source editorial synthesis has not yet been reviewed and published."
+  "status":"awaiting_publication",
+  "note":"New source records have been indexed. The website's weekly synthesis has not yet passed publication checks."
  }
  draft=drafts.get(issue_date)
  if draft:

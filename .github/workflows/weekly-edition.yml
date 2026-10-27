@@ -1,0 +1,103 @@
+name: Publish weekly edition
+on:
+  workflow_run:
+    workflows: ["Catch up full-text research backlog"]
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/compose_issue.py'
+      - '.github/workflows/weekly-edition.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/compose_issue.py'
+      - 'tests/test_compose_issue.py'
+      - '.github/workflows/weekly-edition.yml'
+  # Recovery if an upstream run fails before dispatching its successor.
+  schedule:
+    - cron: '40 14 * * 1,2'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: observatory-index
+  cancel-in-progress: false
+jobs:
+  edition:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
+      - name: Validate offline
+        run: python -m unittest discover -s tests -v
+      - name: Check whether this week already has an edition
+        id: edition
+        if: github.event_name != 'pull_request'
+        run: python scripts/compose_issue.py --check
+      - name: Install runner-local inference
+        if: steps.edition.outputs.needed == 'true'
+        run: |
+          python -m pip install --disable-pip-version-check --only-binary=llama-cpp-python \
+            --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+            'llama-cpp-python>=0.3.0,<0.4'
+      - name: Download official open model weights
+        if: steps.edition.outputs.needed == 'true'
+        run: |
+          for part in 00001 00002; do
+            curl --fail --location --retry 2 --connect-timeout 15 --max-time 900 \
+              "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/bb5d59e/qwen2.5-7b-instruct-q4_k_m-${part}-of-00002.gguf" \
+              --output "/tmp/qwen2.5-7b-instruct-q4_k_m-${part}-of-00002.gguf"
+          done
+          test "$(stat -c '%s' /tmp/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf)" -gt 3900000000
+          test "$(stat -c '%s' /tmp/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf)" -gt 680000000
+      - name: Compose and validate the canonical website edition
+        if: steps.edition.outputs.needed == 'true'
+        env:
+          LOCAL_ISSUE_MODEL: /tmp/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf
+        run: |
+          python scripts/compose_issue.py
+          python scripts/build_issue.py
+          python scripts/build_newsletter.py
+          python scripts/pipeline_status.py
+          node tests/validate_weekly_issue.cjs
+          python -m unittest discover -s tests -v
+      - name: Save the edition and RSS together
+        if: steps.edition.outputs.needed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ issue-feed.xml newsletter.html issues/
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish source-grounded weekly edition and RSS"
+            for attempt in 1 2 3; do
+              if git push; then exit 0; fi
+              git fetch origin main
+              if ! git rebase origin/main; then
+                git rebase --abort || true
+                echo "::error::Edition retained in recovery artifact; source conflicts require reconciliation."
+                exit 1
+              fi
+            done
+            exit 1
+          fi
+      - name: Preserve draft and evidence if publication fails
+        if: failure() && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: weekly-edition-recovery-${{ github.run_id }}
+          path: |
+            data/
+            issue-feed.xml
+            newsletter.html
+            issues/
+          retention-days: 7
+          if-no-files-found: warn

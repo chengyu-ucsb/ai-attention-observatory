@@ -31,7 +31,7 @@ on:
       - 'tests/validate_article_ui.cjs'
       - '.github/workflows/publish.yml'
   workflow_run:
-    workflows: ["Update research library", "Catch up full-text research backlog"]
+    workflows: ["Update research library", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
     types: [completed]
     branches: [main]
   workflow_dispatch:

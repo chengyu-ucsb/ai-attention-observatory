@@ -18,6 +18,8 @@ BASE="https://chengyu-ucsb.github.io/ai-attention-observatory/"
 FEED=BASE+"issue-feed.xml"
 ATOM="http://www.w3.org/2005/Atom"
 ET.register_namespace("atom",ATOM)
+CONTENT="http://purl.org/rss/1.0/modules/content/"
+ET.register_namespace("content",CONTENT)
 
 def esc(value):
     return html.escape(str(value or ""),quote=True)
@@ -224,6 +226,22 @@ def render_index(issues):
       +'<main style="max-width:760px;margin:auto;padding:30px 24px 70px">'
       +(''.join(links) if links else '<p>No approved issues yet.</p>')+'</main></body></html>')
 
+def rss_content(issue):
+    """The same published copy, with sources, for downstream RSS/chat delivery."""
+    parts=['<h1>'+esc(issue['headline'])+'</h1>']
+    parts += ['<p>'+esc(issue.get(k,''))+'</p>' for k in ('deck','letter')]
+    for section in issue.get('signals',[]) + [issue.get('tension',{})]:
+        parts += ['<h2>'+esc(section.get('title',''))+'</h2>',
+                  '<p>'+esc(section.get('text',''))+'</p>',
+                  '<p>'+source_links(issue, section.get('source_ids',[]))+'</p>']
+    experiment=issue.get('experiment',{})
+    parts += ['<h2>'+esc(experiment.get('title',''))+'</h2>',
+              '<p>'+esc(experiment.get('text',''))+'</p>',
+              '<p>'+esc(experiment.get('caution',''))+'</p>']
+    parts += ['<p>'+esc(issue.get(k,''))+'</p>' for k in ('closer','editorial_note')]
+    return ''.join(parts)
+
+
 def build_rss(issues):
     rss=ET.Element("rss",{"version":"2.0"})
     channel=ET.SubElement(rss,"channel")
@@ -250,6 +268,7 @@ def build_rss(issues):
         ET.SubElement(item,"pubDate").text=rss_date(published_on(issue["edition_date"]))
         summary=issue.get("deck","")+" "+issue.get("closer","")
         ET.SubElement(item,"description").text=summary.strip()
+        ET.SubElement(item,"{"+CONTENT+"}encoded").text=rss_content(issue)
         ET.SubElement(item,"category").text="AI and attention"
     ET.indent(rss)
     xml=ET.tostring(rss,encoding="utf-8",xml_declaration=True)
