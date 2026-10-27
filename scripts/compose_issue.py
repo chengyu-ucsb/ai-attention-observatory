@@ -34,12 +34,17 @@ def evidence(items):
         fields.update({k: digest.get(k, '') for k in ('finding', 'approach', 'explain', 'limitation')})
         if digest.get('longform', {}).get('source_depth') == 'read_article':
             fields.update({k: digest['longform'].get(k, '') for k in ('thesis', 'reasoning', 'qualification')})
-        text = '\n'.join(f'{k}: {str(v)[:850]}' for k, v in fields.items() if v)
+        # Budget each field separately: a long Results section must never push
+        # Methods or Limitations out of the model's evidence packet.
+        budgets = {'findings':700, 'methods':450, 'interpretation':450, 'limitations':650,
+                   'finding':350, 'approach':300, 'explain':400, 'limitation':400,
+                   'thesis':400, 'reasoning':550, 'qualification':500}
+        text = '\n'.join(f'{k}: {str(v)[:budgets[k]]}' for k, v in fields.items() if v)
         if len(text.split()) < 35:
             continue
         packet.append({'key': f'S{len(packet)+1}', 'id': source_id(item), 'title': item['title'],
                        'kind': item.get('kind'), 'level': reading.get('level'), 'published': item.get('published'),
-                       'research_type': reading.get('research_type', ''), 'evidence': text[:2300]})
+                       'research_type': reading.get('research_type', ''), 'evidence': text})
     return packet
 
 

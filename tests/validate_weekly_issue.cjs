@@ -32,6 +32,7 @@ if(issue.status==="published"){
  assert(issue.tension.source_ids.length>=2,"Tension must compare multiple sources");
  assert(newsletter.includes(issue.headline.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;"))||newsletter.includes(issue.headline),"Newsletter headline not in HTML");
  assert(!newsletter.includes("unsubscribe here"),"Don't fabricate unsubscribe support");
+ assert(newsletter.includes(issue.editorial_note.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")),"Editorial production and evidence limits must be visible");
  const approved="data/approved-issues/"+issue.edition_date+".json";
  const archived="issues/"+issue.edition_date+".html";
  assert(fs.existsSync(path.join(root,approved)),"Published issue missing permanently archived JSON");

@@ -50,6 +50,15 @@ class CompositionTests(unittest.TestCase):
                {'title':'Metadata','url':'https://example.org/2','reading':{'level':'citation_only','findings':'x '*100}}]
         self.assertEqual(composer.evidence(items), [])
 
+    def test_long_results_do_not_displace_design_or_limitations(self):
+        item={'title':'A study','url':'https://example.org/study','reading':{'level':'full_text',
+              'findings':'Reported result. '*300,'methods':'Nonrandom classroom allocation.',
+              'interpretation':'An author interpretation. '*100,
+              'limitations':'Class-level confounding prevents a causal conclusion.'}}
+        packet=composer.evidence([item])[0]['evidence']
+        self.assertIn('Nonrandom classroom allocation.',packet)
+        self.assertIn('Class-level confounding prevents a causal conclusion.',packet)
+
     def test_failure_never_overwrites_published_copy_and_existing_week_is_idempotent(self):
         _, packet = self.fixture()
         with tempfile.TemporaryDirectory() as tmp:
