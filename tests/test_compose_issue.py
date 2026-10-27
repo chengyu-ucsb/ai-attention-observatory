@@ -59,6 +59,23 @@ class CompositionTests(unittest.TestCase):
         self.assertIn('Nonrandom classroom allocation.',packet)
         self.assertIn('Class-level confounding prevents a causal conclusion.',packet)
 
+    def test_each_comparison_receives_only_its_own_source_pair(self):
+        draft,packet=self.fixture()
+        for p in packet: p.update(kind='scholarly',level='abstract',research_type='observational')
+        pairs=[['S1','S2'],['S2','S3'],['S3','S4']]
+        plan={'themes':[{'short':'A theme','title':'Assistance and independent learning','keys':pair} for pair in pairs]}
+        frame={k:copy.deepcopy(v) for k,v in draft.items() if k!='signals'}
+        frame['tension'].pop('evidence')
+        replies=[plan]+draft['signals']+[frame]
+        model=Mock()
+        model.create_chat_completion.side_effect=[{'choices':[{'message':{'content':json.dumps(x)}}]} for x in replies]
+        result=composer.draft_in_stages(model,packet,{})
+        self.assertEqual(len(result['signals']),3)
+        first=model.create_chat_completion.call_args_list[1].kwargs['messages'][1]['content']
+        self.assertIn('Source 1',first)
+        self.assertIn('Source 2',first)
+        self.assertNotIn('Source 3',first)
+
     def test_failure_never_overwrites_published_copy_and_existing_week_is_idempotent(self):
         _, packet = self.fixture()
         with tempfile.TemporaryDirectory() as tmp:
