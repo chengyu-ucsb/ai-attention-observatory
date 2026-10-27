@@ -186,6 +186,7 @@ def bottom(issue):
       +'Read this edition online&nbsp; ↗</a>'
       +'<p class="bodycopy" style="font:400 11px/1.65 DM Sans,Arial,sans-serif;color:#8e7d82;margin:18px 0 0">'
       +'Sources for each idea are linked above. Research findings and commentary are identified separately.</p>'
+      +'<p class="bodycopy" style="font:400 11px/1.65 DM Sans,Arial,sans-serif;color:#8e7d82;margin:12px 0 0">'+esc(issue.get('editorial_note',''))+'</p>'
       +'</td></tr>'
       +'<tr><td class="pad footer-links" style="padding:25px 48px 31px;background:#35272f">'
       +'<p style="font:700 12px/1.5 DM Sans,Arial,sans-serif;letter-spacing:1.1px;color:#f5e1df;margin:0 0 10px">THE ATTENTION EDIT</p>'

@@ -223,7 +223,8 @@ function renderIssue(){
  $("#issue-experiment-text").textContent=published?issue.experiment.text:"";
  $("#issue-experiment-caution").textContent=published?issue.experiment.caution:"";
  $("#issue-closer").textContent=published?issue.closer:"";
- $("#issue-qualification").textContent="";
+ $("#issue-qualification").textContent=published?issue.editorial_note||"":"";
+ $("#issue-qualification").hidden=!published||!issue.editorial_note;
  $("#issue-coverage").textContent="Explore the original research and reporting behind these ideas.";
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries()){
