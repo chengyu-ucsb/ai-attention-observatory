@@ -46,6 +46,7 @@ def build(edition_date=None):
   schema["signals"]=cards
   schema["tension"]=tension
   schema["status"]="published"
+  schema["note"]="Published edition; see editorial_note for evidence and synthesis qualifications."
  (DATA/"public-issue.json").write_text(json.dumps(schema,ensure_ascii=False,indent=2)+"\n")
  # Readers see the latest completed issue while the next week's editorial
  # work stays private. Keep the newest unreviewed source shelf in public-issue
