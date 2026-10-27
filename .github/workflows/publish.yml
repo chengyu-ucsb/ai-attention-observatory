@@ -87,6 +87,7 @@ jobs:
           PY
           test -s feed.xml
           test -s issue-feed.xml
+          test -s data/issue-feed.json
           test -s newsletter.html
           test -s subscribe.html
           test -s data/public-issue.json
@@ -106,7 +107,7 @@ jobs:
           cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json data/public-pending-sources.json _site/data/
           if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
-          cp data/pipeline-status.json _site/data/
+          cp data/pipeline-status.json data/issue-feed.json _site/data/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
