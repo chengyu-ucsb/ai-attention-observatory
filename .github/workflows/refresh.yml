@@ -20,7 +20,7 @@ on:
         description: Search mode
         type: choice
         default: weekly
-        options: [backfill, weekly]
+        options: [backfill, weekly, rebuild]
 permissions:
   contents: write
 concurrency:
@@ -34,29 +34,37 @@ jobs:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OA_ENRICH_LIMIT: 55
       # Backfills make a deeper pass; normal weeks keep the API budget controlled.
-      MODE: ${{ inputs.mode || 'weekly' }}
+      MODE: ${{ inputs.mode || (github.event_name == 'push' && 'rebuild') || 'weekly' }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
       - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
       - name: Collect metadata
+        if: env.MODE != 'rebuild'
         env:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python scripts/update.py
       - name: Verify nominated weekly brief leads
         run: python scripts/brief_intake.py
       - name: Verify key earlier research by DOI
+        if: env.MODE != 'rebuild'
         run: python scripts/seed_historical.py
       - name: Discover reporting, commentary and practitioner writing
+        if: env.MODE != 'rebuild'
         run: python scripts/discover_editorial.py
       - name: Seed selected public essays and design arguments
         run: python scripts/seed_editorial.py
       - name: Add official focus-product references
         run: python scripts/seed_products.py
       - name: Retrieve fuller abstracts across DOI registries
+        if: env.MODE != 'rebuild'
         run: python scripts/enrich_metadata.py
       - name: Locate legal open-access article versions
+        if: env.MODE != 'rebuild'
         run: python scripts/open_access_links.py
       - name: Build article-specific reading summaries
         run: python scripts/build_readings.py
@@ -107,3 +115,16 @@ jobs:
               exit 1
             fi
           fi
+      - name: Preserve results if saving or validation fails
+        if: failure()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: research-recovery-${{ github.run_id }}
+          path: |
+            data/
+            feed.xml
+            issue-feed.xml
+            newsletter.html
+            issues/
+          retention-days: 7
+          if-no-files-found: warn
