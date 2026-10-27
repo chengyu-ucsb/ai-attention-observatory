@@ -47,7 +47,8 @@ class CompositionTests(unittest.TestCase):
 
     def test_preview_and_citation_only_records_are_not_evidence(self):
         items=[{'title':'Feed preview','url':'https://example.org/1','reading':{'level':'curated','overview':'x '*100}},
-               {'title':'Metadata','url':'https://example.org/2','reading':{'level':'citation_only','findings':'x '*100}}]
+               {'title':'Metadata','url':'https://example.org/2','reading':{'level':'citation_only','findings':'x '*100}},
+               {'title':'Design only','url':'https://example.org/3','reading':{'level':'abstract','methods':'x '*100}}]
         self.assertEqual(composer.evidence(items), [])
 
     def test_long_results_do_not_displace_design_or_limitations(self):
@@ -66,7 +67,9 @@ class CompositionTests(unittest.TestCase):
         plan={'themes':[{'short':'A theme','title':'Assistance and independent learning','keys':pair} for pair in pairs]}
         frame={k:copy.deepcopy(v) for k,v in draft.items() if k!='signals'}
         frame['tension'].pop('evidence')
-        replies=[plan]+draft['signals']+[frame]
+        bad=copy.deepcopy(draft['signals'][0])
+        bad['evidence'][0]['quote']='unsupported anchor words from another source'
+        replies=[plan,bad]+draft['signals']+[frame]
         model=Mock()
         model.create_chat_completion.side_effect=[{'choices':[{'message':{'content':json.dumps(x)}}]} for x in replies]
         result=composer.draft_in_stages(model,packet,{})
@@ -75,6 +78,10 @@ class CompositionTests(unittest.TestCase):
         self.assertIn('Source 1',first)
         self.assertIn('Source 2',first)
         self.assertNotIn('Source 3',first)
+        repair=model.create_chat_completion.call_args_list[2].kwargs['messages']
+        self.assertEqual(repair[2]['role'],'assistant')
+        self.assertEqual(json.loads(repair[2]['content'])['text'],bad['text'])
+        self.assertIn('Preserve the substantive prose',repair[3]['content'])
 
     def test_failure_never_overwrites_published_copy_and_existing_week_is_idempotent(self):
         _, packet = self.fixture()
@@ -90,7 +97,7 @@ class CompositionTests(unittest.TestCase):
             fake.create_chat_completion.return_value={'choices':[{'message':{'content':'{}'}}]}
             with self.assertRaises(ValueError): composer.compose(root,fake)
             self.assertEqual(path.read_text(encoding='utf-8'),original)
-            self.assertEqual(fake.create_chat_completion.call_count,2)
+            self.assertEqual(fake.create_chat_completion.call_count,3)
             audit=json.loads((data/'edition-audits/2026-10-26.json').read_text(encoding='utf-8'))
             self.assertEqual(audit['status'],'failed_validation')
             path.write_text(json.dumps({'2026-10-26':{'headline':'Already published'}}),encoding='utf-8')
