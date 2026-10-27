@@ -351,7 +351,13 @@ does not fabricate or automatically approve editorial prose.
 
 Weekly discovery remains Monday at 12:23 UTC (08:23 New York daylight time,
 07:23 standard time); GitHub may delay scheduled starts. Manual runs default
-to weekly mode, with backfill still available explicitly. After a change,
+to weekly mode, with backfill and rebuild available explicitly. Code and lead-file
+pushes use rebuild mode: nominated citations are checked, but the full external
+search and metadata-enrichment sweep are not repeated. Both data-writing jobs
+check out the current main revision after acquiring their shared queue lock,
+with full history for rebasing. On failure they preserve a seven-day recovery
+artifact; inspect and validate it before restoring data rather than rerunning
+external searches to recover from a push conflict. After a change,
 check the discovery and publishing Actions runs, warnings, the deployed
 `data/pipeline-status.json`, and both RSS feeds. Restore the previous commit
 to roll back code; retain source records and approved issue archives.
