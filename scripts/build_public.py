@@ -98,7 +98,7 @@ def build():
     # Never use unverified records in visitor-facing counts.
     run.pop("candidates",None)
     run["last_seven_days"]=len(items)
-    projected={"run":run,"items":items[:50]}
+    projected={"run":run,"items":items}
     (DATA/"source-quality-audit.json").write_text(json.dumps({
         "version":1,
         "internal_scholarly_total":sum(x.get("kind")=="scholarly" for x in all_records),

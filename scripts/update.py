@@ -145,7 +145,7 @@ def main():
  run["stats"]["accepted_new"]=len(new)
  run["stats"]["source_screen_note"]="Discovery yields metadata candidates, not verified full texts or journal-level quality certification."
  (DIR/"library.json").write_text(json.dumps(collection,ensure_ascii=False,indent=2)+"\n")
- (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":diverse_week(week_items)},ensure_ascii=False,indent=2)+"\n")
+ (DIR/"weekly.json").write_text(json.dumps({"run":run,"items":diverse_week(week_items,limit=len(week_items))},ensure_ascii=False,indent=2)+"\n")
  (DIR/"runs.json").write_text(json.dumps([r for r in prior if r.get("date")!=TODAY][-51:]+[run],indent=2)+"\n")
  print(json.dumps(run,indent=2))
 if __name__=="__main__":main()
