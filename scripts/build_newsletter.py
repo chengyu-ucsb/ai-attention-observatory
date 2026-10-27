@@ -278,6 +278,18 @@ def build_rss(issues):
     (ROOT/"issue-feed.xml").write_bytes(xml)
     return len(issues)
 
+def json_feed(issues):
+    """Same published editions and stable IDs for clients that reject XML."""
+    return {'version':'https://jsonfeed.org/version/1.1',
+            'title':'The Attention Edit | AI & Attention Observatory',
+            'home_page_url':BASE+'issues/', 'feed_url':BASE+'data/issue-feed.json',
+            'items':[{'id':BASE+'issues/'+i['edition_date']+'.html',
+                      'url':BASE+'issues/'+i['edition_date']+'.html',
+                      'title':i['subject'], 'date_published':published_on(i['edition_date']).isoformat(),
+                      'summary':i.get('deck',''), 'content_html':rss_content(i),
+                      '_observatory':i} for i in issues[:50] if i.get('status')=='published']}
+
+
 def build():
     current=json.loads((DATA/"public-issue.json").read_text())
     approved=DATA/"approved-issues"
@@ -301,6 +313,7 @@ def build():
         (folder/(issue["edition_date"]+".html")).write_text(render_issue(issue),encoding="utf-8")
     (folder/"index.html").write_text(render_index(issues),encoding="utf-8")
     count=build_rss(issues)
+    (DATA/'issue-feed.json').write_text(json.dumps(json_feed(issues),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({"newsletter_preview":"latest approved" if count else "in review",
                       "published_issues":count,"rss_path":"issue-feed.xml",
                       "archive_path":"issues/index.html"}))

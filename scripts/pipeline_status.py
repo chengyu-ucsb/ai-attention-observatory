@@ -32,6 +32,7 @@ def build(root=ROOT):
         'pending_editorial_dates': pending,
         'canonical_source': 'Website repository: discovery → readings → weekly edition → RSS',
         'delivery_feed': 'https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml',
+        'delivery_json_feed': 'https://chengyu-ucsb.github.io/ai-attention-observatory/data/issue-feed.json',
         'source_nominations': 'Optional verified DOI/URL leads; routine discovery does not depend on chat',
         'publication': 'Built payload; successful Pages deployment must be verified in Actions',
     }

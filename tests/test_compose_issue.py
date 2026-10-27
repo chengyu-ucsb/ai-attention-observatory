@@ -9,7 +9,7 @@ from unittest.mock import Mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import compose_issue as composer
-from build_newsletter import rss_content
+from build_newsletter import rss_content, json_feed
 
 
 class CompositionTests(unittest.TestCase):
@@ -114,6 +114,17 @@ class CompositionTests(unittest.TestCase):
         for content in ('Canonical &amp; safe','The website opening.','A published claim.',
                         'https://example.org/paper','Automatically synthesized'):
             self.assertIn(content,html)
+
+
+    def test_json_delivery_preserves_rss_identity_and_exact_content(self):
+        issue={'edition_date':'2026-10-26','status':'published','subject':'Weekly edition',
+               'headline':'Canonical title','letter':'Published opening','sources':[]}
+        items=json_feed([issue,dict(issue,status='awaiting_publication')])['items']
+        self.assertEqual(len(items),1)
+        self.assertEqual(items[0]['id'],items[0]['url'])
+        self.assertTrue(items[0]['id'].endswith('/issues/2026-10-26.html'))
+        self.assertEqual(items[0]['content_html'],rss_content(issue))
+        self.assertEqual(items[0]['_observatory'],issue)
 
 
 if __name__=='__main__': unittest.main()
