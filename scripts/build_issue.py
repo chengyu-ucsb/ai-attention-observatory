@@ -14,6 +14,13 @@ def find(needle,items):
  return items[hits[0]]
 def build(edition_date=None):
  weekly=json.loads((DATA/"public-weekly.json").read_text())
+ editorial_path=DATA/"editorial-weekly.json"
+ if not edition_date and editorial_path.exists():
+  editorial=json.loads(editorial_path.read_text(encoding="utf-8"))
+  if editorial.get("run",{}).get("date")==weekly.get("run",{}).get("date"):
+   weekly=editorial
+  else:
+   raise ValueError("Editorial evidence packet is stale; rebuild public readings")
  if edition_date:
   datetime.date.fromisoformat(edition_date)
   packet=json.loads((DATA/"editorial-queue"/(edition_date+".json")).read_text(encoding="utf-8"))
@@ -29,7 +36,8 @@ def build(edition_date=None):
    "publisher_or_editorial":sum(x.get("reading",{}).get("level")=="curated" for x in items)},
   "sources":[{"id":source_id(x),"title":x.get("title",""),"kind":x.get("kind",""),"venue":x.get("venue",""),
      "published":x.get("published",""),"reading_level":x.get("reading",{}).get("level",""),
-     "url":x.get("url","")} for x in items],
+     "url":x.get("url",""),
+     "editorial_role":x.get("editorial_role","collection_week")} for x in items],
   "status":"awaiting_publication",
   "note":"New source records have been indexed. The website's weekly synthesis has not yet passed publication checks."
  }

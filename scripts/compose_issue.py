@@ -50,7 +50,9 @@ def evidence(items):
             continue
         packet.append({'key': f'S{len(packet)+1}', 'id': source_id(item), 'title': item['title'],
                        'kind': item.get('kind'), 'level': reading.get('level'), 'published': item.get('published'),
-                       'research_type': reading.get('research_type', ''), 'evidence': text})
+                       'research_type': reading.get('research_type', ''),
+                       'editorial_role': item.get('editorial_role', 'collection_week'),
+                       'evidence': text})
     return packet
 
 
@@ -62,6 +64,12 @@ def collection_week_start(today=None):
 def pending(root=ROOT, today=None):
     data = root / 'data'
     weekly = json.loads((data / 'public-weekly.json').read_text(encoding='utf-8'))
+    editorial_path = data / 'editorial-weekly.json'
+    if editorial_path.exists():
+        editorial = json.loads(editorial_path.read_text(encoding='utf-8'))
+        if editorial['run']['date'] != weekly['run']['date']:
+            raise ValueError('Editorial evidence packet is stale; rebuild public readings')
+        weekly = editorial
     date = weekly['run']['date']
     actual = dt.date.fromisoformat(date)
     now = today or dt.datetime.now(dt.timezone.utc).date()
@@ -292,7 +300,14 @@ def compose(root=ROOT, model=None, today=None):
     draft.update(number=number, subject=f'The Attention Edit #{number} — '+draft['headline'],
         experiment={'title':'Keep one decision visible', 'text':'Before using AI on a task, write down one judgment you want to make yourself. Afterwards, note what evidence changed that judgment.',
                     'caution':'A reflection prompt, not a tested intervention.'},
-        editorial_note='Automatically synthesized from the website’s source-backed readings using a local open model. Citation and source-anchor checks passed; this is not an independently reviewed systematic review. Abstract-based evidence and interpretations retain their limits.')
+        editorial_note=(
+            'Automatically synthesized from the website’s source-backed readings using a local open model. '
+            'Citation and source-anchor checks passed; this is not an independently reviewed systematic review. '
+            'Abstract-based evidence and interpretations retain their limits.'
+            + (' Earlier source-backed readings were carried forward as context, not presented as '
+               'newly discovered or newly published material.'
+               if weekly['run'].get('context_source_count', 0) else '')
+        ))
     audit.update(status='validated', errors=errors, draft=draft)
     (folder / (date + '.json')).write_text(json.dumps(audit, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
     # Do not expose internal source quotations in the public payload.

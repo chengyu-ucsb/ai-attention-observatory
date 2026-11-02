@@ -4,6 +4,7 @@ The internal index (data/library.json) is retained for acquisition and retry.
 The public website, news feed, metrics, and recommended items use only this projection.
 """
 from __future__ import annotations
+import datetime as dt
 import json
 from collections import Counter
 from pathlib import Path
@@ -33,6 +34,51 @@ def readable(record):
 
 def record_id(x):
     return (x.get("doi") or "").lower() or x.get("url") or x.get("title") or ""
+
+def editorial_shelf(weekly, canonical, minimum=8, max_items=12):
+    """Expand a thin new-source week with clearly marked, source-backed context.
+
+    The new-research RSS and public-weekly.json remain strictly the current
+    discovery set. Older readings appear only in the editorial evidence packet.
+    """
+    from compose_issue import evidence
+
+    date=dt.date.fromisoformat(weekly['run']['date'])
+    primary=list(weekly['items'])
+    seen={record_id(x) for x in primary}
+    extra=[]
+    eligible_count=len(evidence(primary))
+    if eligible_count<4:
+        cutoff=(date-dt.timedelta(days=28)).isoformat()
+        candidates=[x for x in canonical if (
+            record_id(x) not in seen
+            and cutoff<=x.get('first_seen','')<=date.isoformat()
+            and not x.get('historical_backfill')
+            and bool(evidence([x]))
+        )]
+        # Prefer substantive AI-specific readings, direct full text, and recent discovery.
+        candidates.sort(key=lambda x: (
+            x.get('source_group')=='AI-specific',
+            (x.get('reading') or {}).get('level')=='full_text',
+            x.get('first_seen',''),
+            x.get('published','')
+        ), reverse=True)
+        for item in candidates:
+            if len(primary)+len(extra)>=max_items or eligible_count>=minimum:
+                break
+            marked={**item,'editorial_role':'previously_indexed_context'}
+            extra.append(marked)
+            eligible_count+=1
+    packet={**weekly,'run':{**weekly['run'],
+        'newly_indexed_source_count':len(primary),
+        'context_source_count':len(extra),
+        'editorial_selection_note':(
+            'New collection-week readings plus explicitly marked earlier source-backed context. '
+            'Context is not newly discovered or newly published material.'
+        ) if extra else 'New collection-week readings only.'},
+        'items':[{**x,'editorial_role':'collection_week'} for x in primary]+extra}
+    return packet
+
 
 def build():
     all_records=prepare(apply_source_reviews(apply_editorial_corrections(json.loads((DATA/"library.json").read_text()))))
@@ -112,9 +158,11 @@ def build():
     (DATA/"public-pending-sources.json").write_text(json.dumps(pending,ensure_ascii=False,indent=2)+"\n")
     (DATA/"public-library.json").write_text(json.dumps(selected,ensure_ascii=False,indent=2)+"\n")
     (DATA/"public-weekly.json").write_text(json.dumps(projected,ensure_ascii=False,indent=2)+"\n")
+    editorial=editorial_shelf(projected,canonical)
+    (DATA/"editorial-weekly.json").write_text(json.dumps(editorial,ensure_ascii=False,indent=2)+"\n")
     assert all(readable(r) for r in selected)
     assert len(selection_ids)==len({record_id(x) for x in selected})
-    print(json.dumps({"public_readable":len(selected),"private_index_only":len(all_records)-len(selected),"weekly_readable":len(items),"fulltext":run["full_text_count"]}))
+    print(json.dumps({"public_readable":len(selected),"private_index_only":len(all_records)-len(selected),"weekly_readable":len(items),"context_readings":len(editorial["items"])-len(items),"fulltext":run["full_text_count"]}))
     return selected,projected
 
 if __name__=="__main__":build()

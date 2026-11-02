@@ -47,6 +47,11 @@ def build(root=ROOT):
         'discovery_date': date,
         'discovery_status': weekly['run'].get('stats', {}).get('discovery_status', 'unknown'),
         'source_backed_weekly_count': len(weekly['items']),
+        'editorial_source_count': len(current.get('sources', [])),
+        'editorial_context_source_count': sum(
+            x.get('editorial_role') == 'previously_indexed_context'
+            for x in current.get('sources', [])
+        ),
         'featured_issue_date': featured.get('edition_date'),
         'editorial_status': current['status'],
         'pending_editorial_dates': pending,
