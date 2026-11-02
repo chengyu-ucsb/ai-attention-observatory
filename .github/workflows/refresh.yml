@@ -12,6 +12,7 @@ on:
       - '.github/workflows/refresh.yml'
   # The extra Monday checks recover a missed/delayed primary GitHub schedule.
   # The guard below prevents duplicate collection after the first successful run.
+  # An explicitly tagged maintenance commit can restart a failed discovery.
   schedule:
     - cron: '23 12 * * 1'
     - cron: '37 15 * * 1'
