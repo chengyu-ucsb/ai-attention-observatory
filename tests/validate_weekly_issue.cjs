@@ -4,8 +4,17 @@ const root=path.resolve(__dirname,".."),text=p=>fs.readFileSync(path.join(root,p
 const issue=JSON.parse(text("data/public-issue.json"));
 const weekly=JSON.parse(text("data/public-weekly.json"));
 const site=text("index.html"),app=text("app.js"),newsletter=text("newsletter.html");
-assert.equal(issue.source_count,weekly.items.length,"Issue shelf must cover entire weekly reading set");
-assert.deepEqual(new Set(issue.sources.map(s=>s.id)),new Set(weekly.items.map(s=>(s.doi||"").toLowerCase()||s.url||s.title)));
+// Every new source must remain in the editorial shelf; older contextual
+// readings are allowed only when explicitly identified as previously indexed.
+const discoveredIds=new Set(weekly.items.map(s=>(s.doi||"").toLowerCase()||s.url||s.title));
+const editorialIds=new Set(issue.sources.map(s=>s.id));
+assert.equal(issue.source_count,issue.sources.length,"Editorial source count must match its actual citations");
+for(const id of discoveredIds)
+ assert(editorialIds.has(id),"Newly indexed source missing from editorial evidence: "+id);
+for(const source of issue.sources)
+ if(!discoveredIds.has(source.id))
+  assert.equal(source.editorial_role,"previously_indexed_context","Older evidence must be transparently marked");
+assert.equal(editorialIds.size,issue.sources.length,"Editorial evidence must not contain duplicate sources");
 assert(issue.sources.every(s=>s.reading_level!=="citation_only"),"Citation-only source cannot enter an issue");
 assert(site.includes('id="issue"')&&site.includes('id="weekly-title"'),"Weekly issue not discoverable");
 assert(fs.existsSync(path.join(root,"issues/index.html")),"Missing archived edition directory index");
