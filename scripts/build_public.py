@@ -43,12 +43,15 @@ def editorial_shelf(weekly, canonical, minimum=8, max_items=12):
     """
     from compose_issue import evidence
 
-    date=dt.date.fromisoformat(weekly['run']['date'])
+    # Offline projection tests may have an undated fixture. Real discovery
+    # always supplies a dated run; undated inputs retain only their own items.
+    raw_date=(weekly.get('run') or {}).get('date')
+    date=dt.date.fromisoformat(raw_date) if raw_date else None
     primary=list(weekly['items'])
     seen={record_id(x) for x in primary}
     extra=[]
     eligible_count=len(evidence(primary))
-    if eligible_count<4:
+    if eligible_count<4 and date is not None:
         cutoff=(date-dt.timedelta(days=28)).isoformat()
         candidates=[x for x in canonical if (
             record_id(x) not in seen
