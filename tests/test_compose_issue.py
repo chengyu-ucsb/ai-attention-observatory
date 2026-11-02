@@ -1,5 +1,6 @@
 """Publication safety at the automatic edition boundary."""
 import copy
+from datetime import date
 import json
 from pathlib import Path
 import sys
@@ -95,15 +96,34 @@ class CompositionTests(unittest.TestCase):
             path.write_text(original,encoding='utf-8')
             fake=Mock()
             fake.create_chat_completion.return_value={'choices':[{'message':{'content':'{}'}}]}
-            with self.assertRaises(ValueError): composer.compose(root,fake)
+            with self.assertRaises(ValueError): composer.compose(root,fake,today=date(2026,10,26))
             self.assertEqual(path.read_text(encoding='utf-8'),original)
             self.assertEqual(fake.create_chat_completion.call_count,3)
             audit=json.loads((data/'edition-audits/2026-10-26.json').read_text(encoding='utf-8'))
             self.assertEqual(audit['status'],'failed_validation')
             path.write_text(json.dumps({'2026-10-26':{'headline':'Already published'}}),encoding='utf-8')
             fake.reset_mock()
-            self.assertFalse(composer.compose(root,fake))
+            self.assertFalse(composer.compose(root,fake,today=date(2026,10,26)))
             fake.create_chat_completion.assert_not_called()
+
+    def test_stale_discovery_fails_instead_of_silently_skipping_the_week(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data = root / 'data'
+            data.mkdir()
+            (data / 'public-weekly.json').write_text(
+                json.dumps({'run': {'date': '2026-10-26'}, 'items': []}), encoding='utf-8')
+            (data / 'issue-editorial.json').write_text(
+                json.dumps({'2026-10-26': {'headline': 'Old issue'}}), encoding='utf-8')
+            fake = Mock()
+            with self.assertRaisesRegex(ValueError, 'Stale weekly discovery'):
+                composer.compose(root, fake, today=date(2026, 11, 2))
+            fake.create_chat_completion.assert_not_called()
+            self.assertEqual(composer.collection_week_start(date(2026, 11, 3)),
+                             date(2026, 11, 2))
+            (data / 'public-weekly.json').write_text(
+                json.dumps({'run': {'date': '2026-11-02'}, 'items': []}), encoding='utf-8')
+            self.assertIsNotNone(composer.pending(root, today=date(2026, 11, 3)))
 
     def test_rss_delivers_the_same_edition_copy_and_citations(self):
         issue={'headline':'Canonical & safe', 'letter':'The website opening.',

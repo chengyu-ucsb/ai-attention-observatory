@@ -10,10 +10,12 @@ on:
       - 'scripts/search_plan.py'
       - 'scripts/seed_historical.py'
       - '.github/workflows/refresh.yml'
-  # New-source discovery happens weekly or when manually requested.
-  # Source editing must not start a costly external search.
+  # The extra Monday checks recover a missed/delayed primary GitHub schedule.
+  # The guard below prevents duplicate collection after the first successful run.
   schedule:
     - cron: '23 12 * * 1'
+    - cron: '37 15 * * 1'
+    - cron: '53 19 * * 1'
   workflow_dispatch:
     inputs:
       mode:
@@ -27,14 +29,45 @@ concurrency:
   group: observatory-index
   cancel-in-progress: false
 jobs:
+  check_due:
+    runs-on: ubuntu-24.04
+    outputs:
+      needed: ${{ steps.check.outputs.needed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+      - name: Skip redundant scheduled discovery
+        id: check
+        env:
+          REFRESH_EVENT: ${{ github.event_name }}
+        run: |
+          python - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          from pathlib import Path
+
+          today = dt.datetime.now(dt.timezone.utc).date()
+          monday = today - dt.timedelta(days=today.weekday())
+          weekly = json.loads(Path('data/weekly.json').read_text(encoding='utf-8'))
+          last = dt.date.fromisoformat(weekly['run']['date'])
+          needed = os.environ['REFRESH_EVENT'] != 'schedule' or last < monday
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
+              out.write('needed=' + str(needed).lower() + '\n')
+          print(f'Discovery checkpoint: {last}; collection week: {monday}; run: {needed}')
+          PY
   refresh:
+    needs: check_due
+    if: needs.check_due.outputs.needed == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OA_ENRICH_LIMIT: 55
-      # Backfills make a deeper pass; normal weeks keep the API budget controlled.
-      MODE: ${{ inputs.mode || (github.event_name == 'push' && 'rebuild') || 'weekly' }}
+      # Normal source-code pushes rebuild only. An explicit [discover-weekly]
+      # commit provides a cloud-only, auditable recovery path after missed schedules.
+      MODE: ${{ inputs.mode || (github.event_name == 'push' && contains(github.event.head_commit.message, '[discover-weekly]') && 'weekly') || (github.event_name == 'push' && 'rebuild') || 'weekly' }}
     steps:
       - uses: actions/checkout@v7
         with:

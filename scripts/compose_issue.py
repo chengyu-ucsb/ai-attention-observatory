@@ -6,6 +6,7 @@ An invalid draft raises an error and leaves published editions untouched.
 """
 from __future__ import annotations
 import argparse
+import datetime as dt
 import hashlib
 import json
 import os
@@ -53,10 +54,24 @@ def evidence(items):
     return packet
 
 
-def pending(root=ROOT):
+def collection_week_start(today=None):
+    today = today or dt.datetime.now(dt.timezone.utc).date()
+    return today - dt.timedelta(days=today.weekday())
+
+
+def pending(root=ROOT, today=None):
     data = root / 'data'
     weekly = json.loads((data / 'public-weekly.json').read_text(encoding='utf-8'))
     date = weekly['run']['date']
+    actual = dt.date.fromisoformat(date)
+    now = today or dt.datetime.now(dt.timezone.utc).date()
+    expected = collection_week_start(now)
+    if actual < expected:
+        raise ValueError(
+            f'Stale weekly discovery: latest {date}, collection week starts {expected}. '
+            'Refresh the research library before composing a new edition.')
+    if actual > now:
+        raise ValueError(f'Weekly discovery date {date} is in the future relative to {now}.')
     drafts = json.loads((data / 'issue-editorial.json').read_text(encoding='utf-8'))
     archived = data / 'approved-issues' / (date + '.json')
     if date in drafts or (archived.exists() and json.loads(archived.read_text(encoding='utf-8')).get('status') == 'published'):
@@ -246,8 +261,8 @@ Return {"headline":"at least five words", "deck":"30â€“45 words", "letter":"90â€
     return validate(frame,packet)
 
 
-def compose(root=ROOT, model=None):
-    weekly = pending(root)
+def compose(root=ROOT, model=None, today=None):
+    weekly = pending(root, today=today)
     if weekly is None:
         print('Current edition already exists; no inference or rewrite.')
         return False

@@ -1,8 +1,28 @@
 """Persist source shelves and expose the discovery/editorial/deployment boundary."""
+import datetime as dt
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def weekly_freshness(discovery_date, published_date, today=None):
+    today = today or dt.datetime.now(dt.timezone.utc).date()
+    monday = today - dt.timedelta(days=today.weekday())
+    start = monday.isoformat()
+    discovery_current = bool(discovery_date and start <= discovery_date <= today.isoformat())
+    publication_current = bool(published_date and start <= published_date <= today.isoformat())
+    return {
+        'expected_collection_week': start,
+        'discovery_current': discovery_current,
+        'publication_current': publication_current,
+        'pipeline_health': (
+            'stale_discovery' if not discovery_current else
+            'awaiting_publication' if not publication_current else
+            'current'
+        ),
+    }
+
 
 def build(root=ROOT):
     data = root / 'data'
@@ -36,6 +56,9 @@ def build(root=ROOT):
         'source_nominations': 'Optional verified DOI/URL leads; routine discovery does not depend on chat',
         'publication': 'Built payload; successful Pages deployment must be verified in Actions',
     }
+    status.update(weekly_freshness(date, featured.get('edition_date')))
+    if status['pipeline_health'] != 'current':
+        print('::warning::Observatory publication health: ' + status['pipeline_health'])
     intake = data / 'brief-intake-status.json'
     if intake.exists():
         from collections import Counter
