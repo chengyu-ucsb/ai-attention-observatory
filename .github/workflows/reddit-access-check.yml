@@ -1,0 +1,60 @@
+name: Check requested research discussion
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/reddit-access-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - name: Read public discussion and report source suggestions
+        run: |
+          python - <<'PY'
+          import json, re, urllib.request, urllib.parse, urllib.error
+          hosts={'www.reddit.com','reddit.com','old.reddit.com'}
+          class Guard(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,req,fp,code,msg,headers,url):
+                  u=urllib.parse.urlsplit(url)
+                  if u.scheme!='https' or u.hostname not in hosts:
+                      raise ValueError('non_reddit_redirect')
+                  return super().redirect_request(req,fp,code,msg,headers,url)
+          opener=urllib.request.build_opener(Guard())
+          url='https://www.reddit.com/r/research/s/NotSVRW5kg'
+          result={'requested_url':url,'authenticated':False,'comments':[]}
+          def get(u):
+              req=urllib.request.Request(u,headers={'User-Agent':'AIAttentionObservatory/1.0 public-source-check'})
+              with opener.open(req,timeout=20) as r:
+                  b=r.read(2000000)
+                  return r.geturl(),b
+          try:
+              final,body=get(url)
+              result['resolved_url']=final
+              result['status']='resolved'
+              p=urllib.parse.urlsplit(final)
+              if '/comments/' in p.path:
+                  endpoint=urllib.parse.urlunsplit((p.scheme,p.netloc,p.path.rstrip('/')+'.json','raw_json=1&limit=50',''))
+                  _,raw=get(endpoint)
+                  listings=json.loads(raw)
+                  post=listings[0]['data']['children'][0]['data']
+                  result['title']=post.get('title')
+                  result['post']=post.get('selftext','')[:6000]
+                  def walk(children):
+                      for item in children:
+                          if item.get('kind')!='t1' or len(result['comments'])>=50: continue
+                          data=item.get('data',{})
+                          result['comments'].append(data.get('body','')[:2500])
+                          replies=data.get('replies')
+                          if isinstance(replies,dict): walk(replies.get('data',{}).get('children',[]))
+                  walk(listings[1]['data']['children'])
+          except urllib.error.HTTPError as e:
+              result['status']='http_'+str(e.code)
+          except Exception as e:
+              result['status']=type(e).__name__
+          print('DISCUSSION_RESULT_BEGIN')
+          print(json.dumps(result,indent=2))
+          print('DISCUSSION_RESULT_END')
+          PY
