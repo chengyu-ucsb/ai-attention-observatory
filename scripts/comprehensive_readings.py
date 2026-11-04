@@ -1,25 +1,23 @@
-"""Coverage-tracked source reading without silent truncation or public excerpts.
+"""Coverage-tracked reading without silent truncation or public source excerpts.
 
 Retrieval, text coverage, model checking and editorial review are distinct states.
 Matching evidence and a second model pass are safeguards, not independent review.
-An oversized/unfinished document is deferred, never silently shortened.
+Oversized or unfinished documents are deferred, never silently shortened.
 """
 from __future__ import annotations
 from datetime import date, timedelta
 from hashlib import sha256
-import argparse
 import json
 import os
 from pathlib import Path
 import re
 import time
-
 from full_document_access import Document, retrieve
 from enrich_deep_readings import FIELDS, has_copied_sequence
+from source_quality import screen as screen_source
 
 ROOT=Path(__file__).resolve().parents[1]
 LIB=ROOT/'data/library.json'
-FIELDS_ALL=set(FIELDS['scholarly']) | set(FIELDS['nonacademic'])
 NUMBERS=re.compile(r'(?<!\w)[+-]?\d+(?:[.,]\d+)*(?:%|\b)')
 
 
@@ -28,7 +26,7 @@ def normalize(s):
 
 
 def chunk_document(document,limit=5500):
-    """Pack all text into bounded chunks, preserving source-unit character ranges."""
+    """Pack all text into chunks, preserving source-unit character ranges."""
     if limit<200: raise ValueError('chunk_limit_too_small')
     chunks=[]; parts=[]; ranges=[]; length=0
     def flush():
@@ -43,7 +41,6 @@ def chunk_document(document,limit=5500):
             space=limit-length-(1 if parts else 0)
             if space<1: flush(); continue
             end=min(len(text),start+space)
-            # Prefer a sentence/paragraph boundary without dropping whitespace.
             if end<len(text):
                 point=max(text.rfind('\n',start,end),text.rfind('. ',start,end))
                 if point>start+space//2: end=point+1
@@ -74,8 +71,7 @@ def coverage_is_complete(document,chunks):
 
 def validate_claim(claim,chunk,kind):
     if not isinstance(claim,dict): raise ValueError('claim_not_object')
-    field=claim.get('field')
-    if field not in FIELDS[kind]: raise ValueError('unsupported_claim_field')
+    if claim.get('field') not in FIELDS[kind]: raise ValueError('unsupported_claim_field')
     text=claim.get('text',''); anchor=claim.get('quote','')
     if not isinstance(text,str) or not 6<=len(text.split())<=90:
         raise ValueError('claim_length_invalid')
@@ -122,7 +118,6 @@ def read_chunk(model,chunk,kind,title):
         raise ValueError('unexplained_empty_segment')
     for claim in claims: validate_claim(claim,chunk,kind)
     if claims:
-        # Second pass reviews every proposed claim against the same original text.
         check=model_json(model,
             'Check each claim against the supplied original source segment. '
             'Reject incorrect quantities, effect directions, causal language unsupported by '
@@ -152,8 +147,8 @@ def synthesize(document,model,kind,title,max_chunks=80,deadline=None):
         for claim in claims:
             notes.append({**claim,'chunk_id':chunk['id'],'locations':chunk['ranges']})
     if not notes: raise ValueError('no_supported_substantive_claims')
-    # All fields are assembled from checked original paraphrases, not an uncited
-    # final generation step. No early/middle/late sampling or final input cutoff.
+    # Assemble checked original paraphrases, without an uncited final generation
+    # step, early/middle/late sampling, or another final input cutoff.
     output={key:[] for key in FIELDS[kind]}
     public_claims=[]; seen=set()
     for note in notes:
@@ -174,7 +169,7 @@ def synthesize(document,model,kind,title,max_chunks=80,deadline=None):
 
 
 def indexed_sections(record):
-    """Fallback consumes ALL retained sections but never calls them a full document."""
+    """Use ALL retained sections, explicitly not the complete source document."""
     analysis=record.get('analysis') or {}
     units=[{'location':'indexed_section:'+key,'text':str(analysis[key])}
            for key in ('methods','results','discussion','limitations') if analysis.get(key)]
@@ -188,8 +183,11 @@ def due(record,today):
     if record.get('source_review') or (record.get('analysis') or {}).get('original_paraphrases_only'):
         return False
     deep=record.get('deep_analysis') or {}
-    if deep.get('version',0)>=3 and deep.get('coverage',{}).get('all_retrieved_text_processed'):
+    coverage=deep.get('coverage',{})
+    if (deep.get('version',0)>=3 and coverage.get('all_retrieved_text_processed')
+            and coverage.get('evidence_status')=='full_document_retrieved'):
         return False
+    # A complete pass over partial input must remain eligible for fuller access.
     return (record.get('complete_reading_attempt') or {}).get('next_at','')<=today
 
 
@@ -198,9 +196,8 @@ def process(records,model,limit=2,retriever=retrieve):
            'failed':0,'failure_reasons':{},'source_text_saved':False,'skipped_no_model':model is None}
     if model is None: return stats
     today=date.today().isoformat()
-    candidates=[r for r in records if r.get('kind') in FIELDS and due(r,today)]
-    # Prioritize the current source set and existing usable evidence, not a
-    # bottomless oldest-first metadata queue.
+    candidates=[r for r in records if r.get('kind') in FIELDS and due(r,today)
+                and (r['kind']!='scholarly' or screen_source(r)['decision']=='include')]
     candidates.sort(key=lambda r:(bool(r.get('analysis')),r.get('first_seen',''),r.get('published','')),reverse=True)
     for record in candidates[:limit]:
         stats['attempted']+=1
@@ -216,18 +213,16 @@ def process(records,model,limit=2,retriever=retrieve):
             result=synthesize(document,model,record['kind'],record.get('title',''),
                               deadline=time.monotonic()+1200)
             complete=document.coverage.get('evidence_status')=='full_document_retrieved'
-            # Compatibility labels never hide the actual source coverage.
-            result.update(version=3,kind=record['kind'],
-                source_depth=('full_text' if complete else 'partial_full_text') if record['kind']=='scholarly' else 'source_html',
+            depth=('full_text' if complete else 'partial_full_text') if record['kind']=='scholarly' else ('source_html' if complete else 'partial_source_html')
+            result.update(version=3,kind=record['kind'],source_depth=depth,
                 source_url=document.url,source_hash=result['coverage']['source_sha256'],
                 model='Qwen2.5-1.5B-Instruct (on-runner; chunked with claim checking)',
                 basis=('Every retrieved text chunk processed; claim-level machine checks. '
                        'Not independently reviewed. Figures, tables and supplements not visually verified. '
                        + ('Whole PDF text retrieved.' if complete else 'Partial source coverage; not a whole-article review.')),
                 review_status='machine_checked_not_independently_reviewed',created_at=today)
-            # Never replace a prior complete document reading with a partial one.
             previous=record.get('deep_analysis') or {}
-            if not complete and previous.get('source_depth')=='full_text':
+            if not complete and previous.get('source_depth') in ('full_text','source_html'):
                 record['partial_reading_candidate']=result
             else: record['deep_analysis']=result
             record['reading_coverage']=result['coverage']
@@ -236,7 +231,6 @@ def process(records,model,limit=2,retriever=retrieve):
                 'provider_diagnostics':diagnostics}
             stats['summaries_completed']+=1
         except Exception as exc:
-            # Exceptions must not leak document text, credentials or API payloads.
             reason=str(exc) if isinstance(exc,ValueError) and re.fullmatch(r'[a-z_]+',str(exc)) else type(exc).__name__
             stats['failed']+=1
             stats['failure_reasons'][reason]=stats['failure_reasons'].get(reason,0)+1
