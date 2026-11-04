@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 import json
 from urllib.error import HTTPError
-
 from full_document_access import (request, fetch_candidate, candidate,
     unpaywall_candidates,core_candidates,semantic_candidates)
 from comprehensive_readings import chunk_document,coverage_is_complete
@@ -25,7 +24,8 @@ def run():
         for name,fn in [('CORE',core_candidates),('Unpaywall',unpaywall_candidates),('Semantic Scholar',semantic_candidates)]:
             row={'site':name,'doi':identifier,'fulltext_retrieved':False}
             try:
-                candidates=fn(identifier)
+                raw=fn(identifier)
+                candidates=list({c['url']:c for c in raw}.values())
                 row.update(status='locator_responded',exact_match_candidates=len(candidates),
                            candidate_locations=candidates[:8])
             except HTTPError as exc: row['status']='http_'+str(exc.code)
@@ -49,7 +49,7 @@ def run():
                     'EconStor','10.2139/ssrn.5383106','working_paper_not_journal_version')
     row={'site':'EconStor','url':route['url'],'fulltext_retrieved':False}
     try:
-        doc=fetch_candidate(route,{'title':'Knowing (Not) to Know: XAI and Human Metacognition',
+        doc=fetch_candidate(route,{'title':'Knowing (Not) to Know: Explainable Artificial Intelligence and Human Metacognition',
                                    'doi':'10.2139/ssrn.5383106','kind':'scholarly'})
         chunks=chunk_document(doc)
         row.update(status='document_text_retrieved_not_reviewed',
