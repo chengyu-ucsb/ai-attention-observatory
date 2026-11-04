@@ -1,16 +1,20 @@
 name: Deepen source readings
 on:
-  # Separate editorial reading from weekly discovery and full-text retrieval.
   push:
     branches: [main]
     paths:
       - 'scripts/enrich_deep_readings.py'
+      - 'scripts/full_document_access.py'
+      - 'scripts/comprehensive_readings.py'
       - 'tests/test_deep_readings.py'
+      - 'tests/test_complete_source_reading.py'
       - '.github/workflows/deepen-readings.yml'
   pull_request:
     branches: [main]
     paths:
       - 'scripts/enrich_deep_readings.py'
+      - 'scripts/full_document_access.py'
+      - 'scripts/comprehensive_readings.py'
       - 'scripts/condense_readings.py'
       - 'app.js'
       - 'tests/**'
@@ -41,40 +45,45 @@ jobs:
           python -m unittest discover -s tests -v
           node --check app.js
           node tests/validate_article_ui.cjs
-      - name: Install local CPU inference (no paid API)
+      - name: Install PDF extraction and local CPU inference
         if: github.event_name != 'pull_request'
         run: |
           python -m pip install --disable-pip-version-check --prefer-binary \
             --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
-            'llama-cpp-python>=0.3.0,<0.4'
-      - name: Download open model weights (no hosted inference)
+            'llama-cpp-python>=0.3.0,<0.4' 'pypdf>=6.0,<7.0'
+      - name: Download open model weights without hosted inference
         if: github.event_name != 'pull_request'
         run: |
           curl --fail --location --retry 2 --connect-timeout 15 --max-time 420 \
             'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf' \
             --output /tmp/attention-model.gguf
           test "$(stat -c '%s' /tmp/attention-model.gguf)" -gt 900000000
-      - name: Analyze up to four accessible sources, entirely on runner
+      - name: Read complete retrieved text and check each claim
         if: github.event_name != 'pull_request'
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
-          DEEP_READING_LIMIT: '4'
-        run: python scripts/enrich_deep_readings.py
-      - name: Save newly read sources without rerunning discovery
+          DEEP_READING_LIMIT: '2'
+        run: python scripts/comprehensive_readings.py
+      - name: Validate completed notes before saving
+        if: github.event_name != 'pull_request'
+        run: |
+          python -m unittest discover -s tests -v
+          python -m json.tool data/library.json >/dev/null
+      - name: Save original notes and coverage only
         if: github.event_name != 'pull_request'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/library.json
           if ! git diff --cached --quiet; then
-            git commit -m "Add local source-grounded readings"
+            git commit -m "Save claim-checked readings with source coverage"
             pushed=false
             for attempt in 1 2 3; do
               if git push; then pushed=true; break; fi
               git fetch origin main
               if ! git rebase origin/main; then
                 git rebase --abort || true
-                echo "::error::Data conflicts require reconciliation; no external search was rerun."
+                echo "::error::Data conflicts require reconciliation; source text is not persisted."
                 exit 1
               fi
               sleep 2
