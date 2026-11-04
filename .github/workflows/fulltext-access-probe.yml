@@ -1,0 +1,159 @@
+name: Test full-article access
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fulltext-access-probe.yml'
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install PDF text reader
+        run: python -m pip install --disable-pip-version-check 'pypdf>=6.0,<7.0'
+      - name: Check public access and extraction coverage without saving articles
+        run: |
+          import_script=$(mktemp)
+          cat > "$import_script" <<'PY'
+          import io
+          import json
+          import os
+          import re
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          import urllib.robotparser
+          from datetime import datetime, timezone
+          from html.parser import HTMLParser
+          from pypdf import PdfReader
+
+          AGENT = 'AIAttentionObservatoryAccessAudit/1.0 (+https://github.com/chengyu-ucsb/ai-attention-observatory)'
+          HOSTS = {'pubsonline.informs.org', 'www.econstor.eu', 'bera-journals.onlinelibrary.wiley.com', 'www.tandfonline.com'}
+          TARGETS = [
+              {'id': '10.1287/isre.2024.1431', 'version': 'publisher_article', 'kind': 'pdf',
+               'url': 'https://pubsonline.informs.org/doi/pdf/10.1287/isre.2024.1431'},
+              {'id': '10.2139/ssrn.5383106', 'version': 'working_paper_not_journal_version', 'kind': 'pdf',
+               'url': 'https://www.econstor.eu/bitstream/10419/334511/1/1947737333.pdf'},
+              {'id': '10.1111/bjet.70094', 'version': 'publisher_article', 'kind': 'html',
+               'url': 'https://bera-journals.onlinelibrary.wiley.com/doi/10.1111/bjet.70094'},
+              {'id': '10.1080/10494820.2026.2744894', 'version': 'publisher_article', 'kind': 'html',
+               'url': 'https://www.tandfonline.com/doi/full/10.1080/10494820.2026.2744894'},
+          ]
+
+          def safe(url):
+              u = urllib.parse.urlsplit(url)
+              return u.scheme == 'https' and u.hostname in HOSTS and not u.username and not u.password and u.port in (None, 443)
+
+          class Guard(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  if not safe(newurl):
+                      raise ValueError('redirect_outside_probe_hosts')
+                  return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+          opener = urllib.request.build_opener(Guard())
+
+          def get(url, limit):
+              if not safe(url):
+                  raise ValueError('unapproved_host')
+              request = urllib.request.Request(url, headers={'User-Agent': AGENT})
+              with opener.open(request, timeout=20) as response:
+                  payload = response.read(limit + 1)
+                  if len(payload) > limit:
+                      raise ValueError('response_too_large')
+                  return payload, response.geturl(), response.headers.get('Content-Type', '')
+
+          def robots_ok(url):
+              u = urllib.parse.urlsplit(url)
+              robots = urllib.robotparser.RobotFileParser()
+              try:
+                  body, _, _ = get(u.scheme + '://' + u.netloc + '/robots.txt', 500000)
+              except urllib.error.HTTPError as exc:
+                  if exc.code == 404:
+                      return True, 'robots_absent_404'
+                  return False, 'robots_http_' + str(exc.code)
+              except Exception as exc:
+                  return False, 'robots_' + type(exc).__name__
+              robots.parse(body.decode('utf-8', 'replace').splitlines())
+              return robots.can_fetch(AGENT, url), 'robots_checked'
+
+          class Prose(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.block = 0
+                  self.parts = []
+              def handle_starttag(self, tag, attrs):
+                  if tag in ('script', 'style', 'noscript'):
+                      self.block += 1
+              def handle_endtag(self, tag):
+                  if tag in ('script', 'style', 'noscript'):
+                      self.block = max(0, self.block - 1)
+              def handle_data(self, value):
+                  if not self.block:
+                      self.parts.append(value)
+
+          rows = []
+          for target in TARGETS:
+              row = dict(target)
+              row.update(source_text_saved=False, full_article_verified=False)
+              try:
+                  allowed, robots_status = robots_ok(target['url'])
+                  row['robots'] = robots_status
+                  if not allowed:
+                      row['status'] = 'not_fetched_robots_disallow_or_unavailable'
+                      rows.append(row)
+                      continue
+                  body, final_url, content_type = get(target['url'], 18000000)
+                  row.update(final_url=final_url, response_bytes=len(body), content_type=content_type)
+                  if target['kind'] == 'pdf':
+                      if not body.startswith(b'%PDF'):
+                          raise ValueError('not_pdf_response')
+                      reader = PdfReader(io.BytesIO(body))
+                      total = len(reader.pages)
+                      texts = [page.extract_text() or '' for page in reader.pages[:100]]
+                      text = '\n'.join(texts)
+                      row.update(pages_total=total, pages_processed=len(texts),
+                                 pages_with_text=sum(bool(x.strip()) for x in texts),
+                                 status='pdf_text_retrieved_not_yet_reviewed')
+                  else:
+                      if 'html' not in content_type.lower():
+                          raise ValueError('not_html_response')
+                      parser = Prose()
+                      parser.feed(body.decode('utf-8', 'replace'))
+                      text = ' '.join(parser.parts)
+                      row['status'] = 'html_retrieved_not_yet_reviewed'
+                  row['extracted_characters'] = len(text)
+                  row['section_word_presence_not_coverage_proof'] = {
+                      heading: bool(re.search(r'\b' + heading + r'\b', text, re.I))
+                      for heading in ('methods', 'results', 'discussion', 'limitations', 'references')
+                  }
+                  # Neither nonempty text nor keyword presence certifies a complete article.
+                  # No text, private credentials, or source excerpts are persisted or logged.
+                  del body, text
+              except urllib.error.HTTPError as exc:
+                  row['status'] = 'article_http_' + str(exc.code)
+              except Exception as exc:
+                  row['status'] = 'retrieval_or_parse_' + type(exc).__name__
+              rows.append(row)
+          report = {
+              'checked_at': datetime.now(timezone.utc).isoformat(),
+              'execution_environment': 'GitHub-hosted Ubuntu runner; unauthenticated public requests',
+              'purpose': 'Access diagnostics only, not article summaries or evidence verification',
+              'institutional_access_used': False,
+              'source_text_saved': False,
+              'probes': rows,
+          }
+          output = json.dumps(report, indent=2)
+          print('FULLTEXT_ACCESS_PROBE_BEGIN')
+          print(output)
+          print('FULLTEXT_ACCESS_PROBE_END')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+              summary.write('# Full-article access probe\n\nDiagnostic only. No article text saved.\n\n```json\n' + output + '\n```\n')
+          PY
+          python "$import_script"
+          rm -f "$import_script"
