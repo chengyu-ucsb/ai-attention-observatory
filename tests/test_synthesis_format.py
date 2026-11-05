@@ -4,9 +4,9 @@ Controlled responses test recovery, not real-model source comprehension.
 """
 import copy
 import json
-import re
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
@@ -17,8 +17,9 @@ from full_document_access import Document
 SOURCE = 'The classroom comparison included 47 students who completed a structured task and did not establish independent transfer.'
 CLAIM = {'field': 'limitations',
          'text': 'Independent learning beyond the classroom was not established in this comparison.',
-         'quote': 'did not establish independent transfer'}
-ANSWER = {'claims': [CLAIM], 'no_claim_reason': ''}
+         'quote': SOURCE}
+PROPOSAL = {'field': CLAIM['field'], 'text': CLAIM['text'], 'source_span': 'C0001:S001'}
+ANSWER = {'claims': [PROPOSAL], 'no_claim_reason': ''}
 CHECK = {'supported': [0], 'rejected': []}
 CHUNK = {'id': 'C0001', 'text': SOURCE}
 
@@ -35,32 +36,93 @@ def model_with(*values):
 
 
 class SynthesisFormatTests(unittest.TestCase):
-    def test_anchor_grammar_bounds_match_existing_word_limits(self):
-        schema = reading.claim_schema('scholarly')['properties']['claims']['items']['properties']['quote']
-        self.assertEqual(schema['pattern'], reading.ANCHOR_PATTERN)
-        for count in (0, 1, 4, 5, 6, 23, 24, 25, 90):
-            text = ' '.join(['word'] * count)
-            self.assertEqual(bool(re.fullmatch(schema['pattern'], text)), 5 <= count <= 24)
-        self.assertTrue(re.fullmatch(schema['pattern'], 'These source words include human–AI co-regulation.'))
-        for text in ('these words contain a "quotation"',
-                     'these words contain a \\backslash',
-                     'these words contain a\nnewline',
-                     ' these source words have padding '):
-            self.assertIsNone(re.fullmatch(schema['pattern'], text))
+    def test_source_spans_preserve_text_and_anchor_bounds(self):
+        for count in (5, 6, 23, 24, 25, 32, 33, 40, 90, 901):
+            text = '  ' + '\n\t'.join('word'+str(n) for n in range(count)) + '  '
+            spans = reading.source_spans({'id': 'C0002', 'text': text})
+            self.assertEqual(''.join(s['text'] for s in spans), text)
+            self.assertTrue(all(5 <= len(s['text'].split()) <= 24 for s in spans))
+            self.assertTrue(all(s['id'].startswith('C0002:') for s in spans))
+            self.assertEqual(spans[0]['start'], 0)
+            self.assertEqual(spans[-1]['end'], len(text))
+        text = 'These source words include human–AI co-regulation and “quoted” terms.'
+        self.assertEqual(''.join(s['text'] for s in reading.source_spans({'id': 'C0001', 'text': text})), text)
 
-    def test_backend_ignoring_anchor_grammar_still_fails_closed(self):
-        for count in (0, 4, 25):
-            bad = dict(CLAIM, quote=' '.join(['word'] * count))
-            model = model_with({'claims': [bad], 'no_claim_reason': ''}, ANSWER, CHECK)
-            with self.assertRaisesRegex(ValueError, '^claim_anchor_invalid$'):
+    def test_too_short_source_is_deferred_not_omitted(self):
+        for count in (0, 1, 4):
+            model = Mock()
+            with self.assertRaisesRegex(ValueError, '^deferred_chunk_without_evidence_span$'):
+                reading.read_chunk(model, {'id':'C0001','text':'word '*count}, 'scholarly', 'Title')
+            model.create_chat_completion.assert_not_called()
+
+    def test_unknown_or_cross_chunk_span_cannot_be_used(self):
+        for ident in ('C9999:S001', 'C0001:S999', None):
+            bad = {'claims':[dict(PROPOSAL, source_span=ident)],'no_claim_reason':''}
+            model = model_with(bad, ANSWER, CHECK)
+            with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
                 reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
             self.assertEqual(model.create_chat_completion.call_count, 1)
+            with patch.object(reading, 'model_json', return_value=bad):
+                with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
+                    reading.read_chunk(Mock(), CHUNK, 'scholarly', 'Title')
+        missing = {'claims':[{'field':PROPOSAL['field'],'text':PROPOSAL['text']}], 'no_claim_reason':''}
+        model = model_with(missing, ANSWER, CHECK)
+        with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
+            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+        self.assertEqual(model.create_chat_completion.call_count, 1)
+        model = Mock()
+        model.create_chat_completion.side_effect = [completion(missing, 'length'), completion(ANSWER), completion(CHECK)]
+        with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
+            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+        self.assertEqual(model.create_chat_completion.call_count, 1)
+
+    def test_valid_span_id_is_not_treated_as_claim_support(self):
+        source = ('Background context describes the classroom setting and explains the historical motivation for studying this learning question. '
+                  'The intervention did not improve delayed retention and the authors explicitly caution against generalizing beyond this sample.')
+        chunk = {'id':'C0001','text':source}
+        spans = reading.source_spans(chunk)
+        proposal = {'field':'reported_results',
+                    'text':'The intervention improved delayed retention in this classroom comparison.',
+                    'source_span':spans[0]['id']}
+        model = model_with({'claims':[proposal],'no_claim_reason':''}, {'supported':[],'rejected':[0]})
+        with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
+            reading.read_chunk(model, chunk, 'scholarly', 'Title')
+        calls = model.create_chat_completion.call_args_list
+        for span in spans:
+            self.assertIn(span['text'], calls[0].kwargs['messages'][-1]['content'])
+        self.assertIn(source, calls[1].kwargs['messages'][-1]['content'])
+        self.assertIn('not an unrelated', calls[1].kwargs['messages'][-1]['content'])
+        self.assertEqual(model.create_chat_completion.call_count, 2)
+
+    def test_context_preflight_uses_full_rendered_template_and_output_budget(self):
+        rendered = SimpleNamespace(prompt='RENDERED SYSTEM + SOURCE + CHAT TOKENS', added_special=False)
+        formatter = Mock(return_value=rendered)
+        module = SimpleNamespace(format_chatml=formatter)
+        model = Mock(chat_format='chatml')
+        model.n_ctx.return_value = 2400
+        model.tokenize.return_value = [1] * 300
+        messages = [{'role':'system','content':'System'}, {'role':'user','content':'Source'}]
+        with patch.dict(sys.modules, {'llama_cpp.llama_chat_format':module}):
+            with self.assertRaisesRegex(ValueError, '^deferred_model_context_budget$'):
+                reading.check_context_budget(model, messages, 2200)
+            model.n_ctx.return_value = 2500
+            reading.check_context_budget(model, messages, 2200)
+        formatter.assert_called_with(messages=messages)
+        model.tokenize.assert_called_with(rendered.prompt.encode(), add_bos=True, special=True)
+        model.create_chat_completion.assert_not_called()
+
+    def test_unverified_chat_format_cannot_skip_context_preflight(self):
+        model = Mock(chat_format='other')
+        model.n_ctx.return_value = 6144
+        with self.assertRaisesRegex(ValueError, '^unverified_model_chat_format$'):
+            reading.check_context_budget(model, [], 2200)
+        model.tokenize.assert_not_called()
 
     def test_generation_and_verification_are_schema_constrained(self):
         model = model_with(ANSWER, CHECK)
         self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         calls = model.create_chat_completion.call_args_list
-        self.assertEqual(calls[0].kwargs['response_format']['schema'], reading.claim_schema('scholarly'))
+        self.assertEqual(calls[0].kwargs['response_format']['schema'], reading.claim_schema('scholarly', reading.source_spans(CHUNK)))
         self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema())
         self.assertEqual(calls[0].kwargs['max_tokens'], 2200)
         self.assertIn('limitations', calls[0].kwargs['response_format']['schema']['properties']['claims']['items']['properties']['field']['enum'])
@@ -76,8 +138,8 @@ class SynthesisFormatTests(unittest.TestCase):
     def test_schema_failure_is_retried_not_coerced(self):
         for bad in ({'claims': 'not a list', 'no_claim_reason': ''},
                     {'summary': 'A different output contract'}, [],
-                    {'claims': [dict(CLAIM, field='invented')], 'no_claim_reason': ''},
-                    {'claims': [CLAIM] * 7, 'no_claim_reason': ''}):
+                    {'claims': [dict(PROPOSAL, field='invented')], 'no_claim_reason': ''},
+                    {'claims': [PROPOSAL] * 7, 'no_claim_reason': ''}):
             with self.subTest(bad=bad):
                 model = model_with(bad, ANSWER, CHECK)
                 self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
@@ -103,12 +165,11 @@ class SynthesisFormatTests(unittest.TestCase):
             reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 2)
 
-    def test_numeric_anchor_copy_and_length_rejections_do_not_retry(self):
+    def test_numeric_copy_and_length_rejections_do_not_retry(self):
         invalid = [
-            (dict(CLAIM, text='The comparison established learning gains in 500 students.'), 'numeric'),
-            (dict(CLAIM, quote='These words never appeared in the source'), 'anchor_absent'),
-            (dict(CLAIM, text=SOURCE), 'copied'),
-            (dict(CLAIM, text='Too short.'), 'length'),
+            (dict(PROPOSAL, text='The comparison established learning gains in 500 students.'), 'numeric'),
+            (dict(PROPOSAL, text=SOURCE), 'copied'),
+            (dict(PROPOSAL, text='Too short.'), 'length'),
         ]
         for claim, reason in invalid:
             with self.subTest(reason=reason):
@@ -118,7 +179,7 @@ class SynthesisFormatTests(unittest.TestCase):
                 self.assertEqual(model.create_chat_completion.call_count, 1)
 
     def test_repaired_format_does_not_bypass_evidence_validation(self):
-        bad = {'claims': [dict(CLAIM, text='The comparison established learning gains in 500 students.')], 'no_claim_reason': ''}
+        bad = {'claims': [dict(PROPOSAL, text='The comparison established learning gains in 500 students.')], 'no_claim_reason': ''}
         model = model_with('{', bad)
         with self.assertRaisesRegex(ValueError, 'unsupported_numeric_claim'):
             reading.read_chunk(model, CHUNK, 'scholarly', 'Title')

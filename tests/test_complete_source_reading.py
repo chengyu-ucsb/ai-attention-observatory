@@ -121,7 +121,9 @@ class CompleteSourceTests(unittest.TestCase):
         chunk={'id':'C0001','text':'The classroom comparison involved students who discussed their decisions after completing the task.'}
         claim={'field':'study_design','text':'Participants discussed decisions after finishing the classroom task in the reported comparison.',
                'quote':'students who discussed their decisions after completing'}
-        with patch.object(reading,'model_json',side_effect=[{'claims':[claim]}, {'supported':[],'rejected':[0]}]):
+        proposal={k:v for k,v in claim.items() if k!='quote'}
+        proposal['source_span']='C0001:S001'
+        with patch.object(reading,'model_json',side_effect=[{'claims':[proposal]}, {'supported':[],'rejected':[0]}]):
             with self.assertRaisesRegex(ValueError,'verification'):
                 reading.read_chunk(Mock(),chunk,'scholarly','A title')
 
@@ -152,3 +154,4 @@ class CompleteSourceTests(unittest.TestCase):
 
 
 if __name__=='__main__': unittest.main()
+
