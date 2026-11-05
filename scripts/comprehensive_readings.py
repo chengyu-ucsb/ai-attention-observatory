@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 import re
 import time
-from full_document_access import Document, retrieve
+from full_document_access import Document, diagnostic_url, retrieve
 from enrich_deep_readings import FIELDS, has_copied_sequence
 from source_quality import screen as screen_source
 
@@ -215,7 +215,7 @@ def process(records,model,limit=2,retriever=retrieve):
             complete=document.coverage.get('evidence_status')=='full_document_retrieved'
             depth=('full_text' if complete else 'partial_full_text') if record['kind']=='scholarly' else ('source_html' if complete else 'partial_source_html')
             result.update(version=3,kind=record['kind'],source_depth=depth,
-                source_url=document.url,source_hash=result['coverage']['source_sha256'],
+                source_url=diagnostic_url(document.url),source_hash=result['coverage']['source_sha256'],
                 model='Qwen2.5-1.5B-Instruct (on-runner; chunked with claim checking)',
                 basis=('Every retrieved text chunk processed; claim-level machine checks. '
                        'Not independently reviewed. Figures, tables and supplements not visually verified. '

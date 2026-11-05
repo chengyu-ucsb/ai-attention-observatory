@@ -82,6 +82,7 @@ class CompleteSourceTests(unittest.TestCase):
         self.assertEqual(diagnostics[0]['status'],'http_429')
         self.assertEqual(diagnostics[1]['status'],'candidates')
 
+    @patch.dict('os.environ',{'UNPAYWALL_EMAIL':'fixture@example.org'})
     def test_unpaywall_retains_all_pdf_and_html_alternatives(self):
         data={'doi':'10.5555/test','oa_locations':[{'url_for_pdf':'https://www.econstor.eu/a.pdf',
                'url_for_landing_page':'https://www.econstor.eu/handle/1','version':'acceptedVersion','license':'cc-by-nc'}]}
@@ -136,6 +137,18 @@ class CompleteSourceTests(unittest.TestCase):
         self.assertNotIn('quote',result['claim_evidence'][0])
         self.assertNotIn(note['quote'],json.dumps(result))
         self.assertIn('not_independently_reviewed',result['coverage']['review_status'])
+
+    def test_saved_reading_does_not_publish_source_query_credentials(self):
+        record={'kind':'scholarly','title':'An explicit scholarly title','doi':'10.5555/example'}
+        doc=access.Document([{'location':'page:1','text':'Source text remains private.'}],
+                            'https://www.econstor.eu/paper.pdf?token=PRIVATE_TOKEN#fragment',
+                            'publishedVersion',{'evidence_status':'full_document_retrieved'})
+        with patch.object(reading,'screen_source',return_value={'decision':'include'}), \
+             patch.object(reading,'synthesize',return_value={'coverage':doc.manifest()}):
+            stats=reading.process([record],Mock(),retriever=lambda row:(doc,[]))
+        self.assertEqual(stats['summaries_completed'],1)
+        self.assertEqual(record['deep_analysis']['source_url'],'https://www.econstor.eu/paper.pdf')
+        self.assertNotIn('PRIVATE_TOKEN',json.dumps(record))
 
 
 if __name__=='__main__': unittest.main()

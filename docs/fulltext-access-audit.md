@@ -1,6 +1,43 @@
 # Full-article access and reading-quality audit
 
-Updated: 2026-11-04. This is the canonical audit note; update this file rather than creating parallel copies.
+Updated: 2026-11-05. This is the canonical audit note; update this file rather than creating parallel copies.
+
+## November 5: reusable acquisition workflow
+
+`scripts/retrieve_articles.py` now accepts a DOI/title bibliography and retrieves documents without loading a language model. It checkpoints each article, records provider and source failures separately, retains version and identity evidence, and skips completed unchanged inputs on a later run. A new verified candidate reopens the corresponding record. Temporary provider failures receive a shorter retry interval than an unresolved search.
+
+The reusable input is a JSON list, or an object with a `records` list. Each record needs `title`, plus a DOI or exact source URL when available. Optional `projects` tags allow one article to serve several projects without duplicate retrieval. `fulltext_candidates` can supply independently verified source URLs. Outputs must be outside this public repository. The command stages files; the caller must verify saving to its authoritative private cloud destination before delivery.
+
+```bash
+python scripts/retrieve_articles.py /private/project/input.json \
+  --report /private/project/retrieval-results.json \
+  --stage-pdfs /private/project/papers \
+  --limit 12
+```
+
+Use `--known-sources-only` to test supplied/registered sources without locator API calls. `--force` deliberately repeats records, for example after correcting a source relationship. The report preserves attempt counts, input fingerprints, next actions, retry dates, source and byte hashes, physical page counts, and limitations. PDF staging is explicitly labeled as awaiting verified cloud saving; it is never reported as an automatic cloud sync.
+
+### Changes supported by actual retrieval
+
+- Known source URLs, `open_access_url`, and DOI-less arXiv records are tried before locator APIs. `data/fulltext-source-hints.json` supplies verified alternatives for existing Observatory papers.
+- OpenAIRE is an additional exact-DOI locator. A live lookup for `10.1016/j.chb.2024.108386` produced several repository alternatives; the LMU Munich PDF worked after other routes failed. The adapter checks the publication's own DOI, not identifiers found in its references, and handles singleton/list response structures.
+- Complete PDF text is preferred when available. If all sources remain partial, the richer partial extraction is retained; a mostly scanned PDF does not displace substantial HTML simply because it is a PDF.
+- Changed-title arXiv versions require a live metadata check of the related journal DOI, source title and arXiv identifier. The earlier version is labeled separately from the journal article.
+- Source manifests and saved reading URLs remove query credentials. `UNPAYWALL_EMAIL` must be explicitly configured for the newer reader; no personal contact address is supplied implicitly. Other providers continue independently when that provider is unconfigured or unavailable.
+
+The November 5 bounded live test retrieved these five Observatory documents through the same acquisition command:
+
+| Paper | Successful source | Physical PDF pages | Version qualification |
+| --- | --- | ---: | --- |
+| The Impact of Generative AI on Critical Thinking, `10.1145/3706598.3713778` | Microsoft Research | 23 | Author-hosted conference version |
+| AI makes you smarter but none the wiser, `10.1016/j.chb.2025.108779` | arXiv `2409.16708v2` | 27 | Earlier title: Performance and Metacognition Disconnect when Reasoning in Human-AI Interaction; not the final journal version |
+| Knowing (Not) to Know, `10.1287/isre.2024.1431` | EconStor | 89 | Working paper, not the journal version |
+| Cognitive ease at a cost, `10.1016/j.chb.2024.108386` | LMU Munich | 7 | Published version |
+| AI Tools in Society, `10.3390/soc15010006` | MDPI, located through DOAJ | 28 | Published version |
+
+The Taylor & Francis route for `10.1080/10494820.2026.2744894` remained blocked. These six selected papers are a route-validation set, not a random sample or corpus-wide success rate. The historical `full_text_extracted` total is unchanged by this acquisition-only command. Retrieved text has not automatically become a reviewed article summary. Figure, table, supplement and semantic completeness checks remain separate.
+
+The larger private test bibliography and its document files belong to the private research workspace and are not included in this repository. Reusable code and public Observatory source hints remain here. Offline tests cover resumability, identity mismatch, multiple-project deduplication, provider failure isolation, partial-source selection and private-output boundaries.
 
 ## Implementation status
 
