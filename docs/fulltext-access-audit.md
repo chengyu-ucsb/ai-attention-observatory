@@ -4,7 +4,7 @@ Updated: 2026-11-05. This is the canonical audit note; update this file rather t
 
 ## November 5: article-synthesis format failures
 
-The latest production reading attempt inspected here, [run 41981146610](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/41981146610), retrieved both attempted documents but completed **zero** summaries. Its separate synthesis failures were `invalid_claim_list` and `JSONDecodeError`. These were not failed downloads. The affected articles were:
+The initial production reading attempt inspected here, [run 41981146610](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/41981146610), retrieved both attempted documents but completed **zero** summaries. Its separate synthesis failures were `invalid_claim_list` and `JSONDecodeError`. These were not failed downloads. The affected articles were:
 
 - Artificial intelligence in language instruction: impact on English learning achievement, L2 motivation, and self-regulated learning, DOI `10.3389/fpsyg.2023.1261955`, retrieved from Frontiers.
 - Challenges and Opportunities of Generative AI for Higher Education as Explained by ChatGPT, DOI `10.3390/educsci13090856`, retrieved from White Rose Research Online.
@@ -35,6 +35,21 @@ The follow-up correction puts the same 5–24-word bound into the quote-generati
 The next correction changes evidence selection rather than relaxing validation: the model selects a chunk-qualified ID for a source span instead of attempting to reproduce a quotation. Deterministic 5–24-word slices partition the entire source segment; concatenating their raw text exactly reconstructs every character, including whitespace and the tail. These labels are not a sample or a claim that every substantive finding was captured. IDs resolve only through the current segment's map. The literal source span then passes the unchanged anchor, numeric and copying checks, followed by the full-source model check, which must reject irrelevant selected evidence or unsupported claims. A valid ID is not itself evidence that the claim is true. Source text and span inventories remain transient; only the existing paraphrases, hashes and source-location metadata are retained.
 
 The existing Qwen model uses explicit ChatML formatting so the reader can tokenize the same fully rendered prompt as the inference handler before reserving the requested output tokens. Inputs exceeding context capacity and fragments too short to supply an anchor are deferred, never shortened or silently declared complete. Offline tests cover exact span coverage, Unicode and short tails, unknown and cross-chunk IDs, irrelevant anchors, complete verifier context, template-aware token limits, and preservation of all prior rejection gates. The full suite passes 240 tests. This remains a proposed recovery mechanism until a real-model whole-document synthesis completes; model checks are not independent editorial review.
+
+### Source-span production outcome and negative drafting comparison
+
+[PR 31](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/31) was merged as `31491000ee20cc4c40ad035fc1af75b516ae55a7`. Its [production run 42119863741](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42119863741) retrieved both attempted full documents but completed **zero summaries**. DOI `10.3389/fpsyg.2026.1955418` failed the copied-source gate; DOI `10.3389/fpsyg.2026.1906199` failed claim verification. Both candidates were withheld. [Pages deployment 42120300153](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42120300153) succeeded without promoting those readings. Valid source-span selection does not establish claim quality.
+
+A bounded, non-publishing comparison in [PR 32](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/32), [run 42123056636](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42123056636), then compared current drafting with evidence-first schema ordering and an explicit concise-original-paraphrase instruction. Each variant received the identical first 5,500-character chunk of each of those same two retrieved documents, confirmed by matching source and chunk hashes. Both used Qwen2.5-1.5B Q4_K_M, llama-cpp-python 0.3.36, ChatML, a 6,144-token context, seed 7, temperature 0.1, and unchanged validation and verifier instructions. The downloaded model SHA-256 was `6a1a2eb6d15622bf3c96857206351ba97e1af16c30d7a74ee38970e434e9407e`.
+
+- `10.3389/fpsyg.2026.1955418`: both current and evidence-first drafting failed `copied_source_passage`.
+- `10.3389/fpsyg.2026.1906199`: current drafting failed `claim_verification_failed`; evidence-first drafting failed `copied_source_passage`.
+- Both variants passed **0 of 2 tested first chunks**. All four attempts completed within the 720-second bound, so this result is not a timeout comparison.
+- The hosted offline suite passed 257 tests, including 17 evaluator regressions. The library-mutation check passed, and the inspected workflow logs contained no Actions warning or error annotations. Source text and generated claims were not saved or logged.
+
+This diagnostic found **no measured benefit** from the candidate instruction and ordering. Different rejection categories do not establish better or worse overall quality: an earlier gate can prevent a later check from running. The first chunks represent only 1 of 15 and 1 of 11 document chunks respectively, not full-article validation, an independent source review, or a corpus-wide success rate.
+
+The candidate is not being promoted to production. All existing gates remain intact, and this negative result does not justify another speculative production run. A useful next evaluation would use a small, lawfully reusable, manually source-reviewed fixture set containing supported paraphrases, misleading claims, irrelevant anchors, and decisive caveats. It should measure false acceptance as well as false rejection before testing a stronger model; a stronger model is an unverified hypothesis, not an established fix.
 
 ## November 5: reusable acquisition workflow
 
