@@ -126,7 +126,7 @@ def check_site_integration(page, url):
     assert "Resumed" in page.locator("#switch-note").inner_text()
     # A failed research-data request must not prevent the independent Lab loading.
     page.route("**/data/public-library.json*", lambda route: route.abort())
-    page.goto(real_url, wait_until="networkidle")
+    page.reload(wait_until="networkidle")
     page.locator("#lab").wait_for(state="visible")
     assert page.locator("#issue-label").inner_text() == "INDEX OFFLINE"
     page.locator("#switch-start").click()
