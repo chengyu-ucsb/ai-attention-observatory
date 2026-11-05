@@ -246,14 +246,18 @@
       <div class="shell play-wrap">
         <details class="play-update">
           <summary><span>November lab update</span><span>Updated <time datetime="2026-11-05">5 Nov 2026</time> · What changed?</span></summary>
-          <p>Four fictional research scenarios in Assistance Dial, four return-point tasks, and more reliable replay and timing. Interrupted responses are excluded from timing summaries.</p>
+          <p>Untimed play, a separate practice round, and a stop/reset control. Clearer keyboard focus and spoken task cues, plus more explicit limits in each session debrief. Four fictional reasoning scenarios and four return-point tasks remain available.</p>
           <p>We review the improvement plan alongside new weekly issues and develop the tools continuously. This date records an actual content and behavior update, not an automatic refresh. <a href="https://github.com/chengyu-ucsb/ai-attention-observatory/blob/main/docs/lab-backlog.md">See the improvement plan ↗</a></p>
         </details>
         <div class="play-intro-row"><div><p class="eyebrow">CHOOSE AN EXPERIMENT</p><h2>Pick something to play.</h2></div><p>About 1–3 minutes each · exploratory demos, not scientific tests</p></div>
+        <div class="play-session-controls">
+          <div><button type="button" id="play-reset" class="play-secondary" aria-describedby="play-reset-description">Stop and reset Lab</button><p id="play-reset-description">Stops every activity and clears this visit’s results. Your selected modes stay unchanged. Nothing is saved or sent.</p></div>
+          <p id="play-session-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
         <div class="play-tabs" role="tablist" aria-label="Attention activities">
-          <button type="button" class="play-tab is-active" id="tab-switch" data-play-tab="switch" role="tab" aria-selected="true" aria-controls="play-switch"><span class="play-tab-num">01</span><span>Switch Lab<small>How does switching feel?</small></span><span class="play-tab-icon">↗</span></button>
-          <button type="button" class="play-tab" id="tab-recovery" data-play-tab="recovery" role="tab" aria-selected="false" aria-controls="play-recovery" tabindex="-1"><span class="play-tab-num">02</span><span>Return Point<small>Find your way back</small></span><span class="play-tab-icon">↩</span></button>
-          <button type="button" class="play-tab" id="tab-assist" data-play-tab="assist" role="tab" aria-selected="false" aria-controls="play-assist" tabindex="-1"><span class="play-tab-num">03</span><span>Assistance Dial<small>Choose how AI helps</small></span><span class="play-tab-icon">◎</span></button>
+          <button type="button" class="play-tab is-active" id="tab-switch" aria-label="Switch Lab" data-play-tab="switch" role="tab" aria-selected="true" aria-controls="play-switch"><span class="play-tab-num">01</span><span>Switch Lab<small>How does switching feel?</small></span><span class="play-tab-icon">↗</span></button>
+          <button type="button" class="play-tab" id="tab-recovery" aria-label="Return Point" data-play-tab="recovery" role="tab" aria-selected="false" aria-controls="play-recovery" tabindex="-1"><span class="play-tab-num">02</span><span>Return Point<small>Find your way back</small></span><span class="play-tab-icon">↩</span></button>
+          <button type="button" class="play-tab" id="tab-assist" aria-label="Assistance Dial" data-play-tab="assist" role="tab" aria-selected="false" aria-controls="play-assist" tabindex="-1"><span class="play-tab-num">03</span><span>Assistance Dial<small>Choose how AI helps</small></span><span class="play-tab-icon">◎</span></button>
         </div>
         <div class="play-stage" id="play-switch" role="tabpanel" aria-labelledby="tab-switch">
           <div class="play-stage-side">
@@ -264,7 +268,8 @@
               <div><span class="rule-label">ODD / EVEN</span><span>1, 3, 7 → <b>LEFT</b><br>2, 4, 8 → <b>RIGHT</b></span></div>
               <div><span class="rule-label">LOW / HIGH</span><span>1–4 → <b>LEFT</b><br>6–9 → <b>RIGHT</b></span></div>
             </div>
-            <p class="play-small">Use the two buttons or ← / → arrow keys. There are 20 trials. Accuracy matters more than speed. Leaving an activity excludes that response from timing.</p>
+            <p class="play-small">Use the buttons or ← / → arrow keys within the number panel. The snapshot has 20 trials with no deadline. Untimed mode lets you read feedback and advance at your own pace; it is useful with spoken cues. Leaving an activity excludes that response from timing.</p>
+            <div class="play-mode"><label for="switch-timing">Snapshot timing</label><select id="switch-timing" aria-describedby="switch-mode-help"><option value="timed">Record response times</option><option value="untimed">Untimed · advance myself</option></select><p class="play-small" id="switch-mode-help">Choose before starting. Practice is always untimed and never enters the snapshot.</p><button type="button" id="switch-practice" class="play-secondary">Try 4 practice turns</button></div>
           </div>
           <div class="play-stage-main">
             <div class="play-screen switch-screen" id="switch-screen">
@@ -272,14 +277,16 @@
               <div id="switch-track" class="switch-track" aria-hidden="true"></div>
               <div class="switch-cue" id="switch-cue">TWO RULES · ONE BRAIN</div>
               <div class="switch-number" id="switch-number">?</div>
+              <p id="switch-announcement" class="play-sr-only" role="status" aria-live="polite" aria-atomic="true"></p>
               <div class="switch-note" id="switch-note">Start when you're ready.</div>
               <div class="switch-buttons">
                 <button type="button" id="switch-left" class="switch-answer" disabled><span>←</span><small>ODD / LOW</small></button>
                 <button type="button" id="switch-right" class="switch-answer" disabled><span>→</span><small>EVEN / HIGH</small></button>
               </div>
-              <button type="button" id="switch-start" class="play-primary">Start the challenge <span>↗</span></button>
+              <button type="button" id="switch-next" class="play-primary" hidden>Next turn ↗</button>
+              <button type="button" id="switch-start" class="play-primary">Start 20-trial snapshot <span>↗</span></button>
             </div>
-            <div class="play-results" id="switch-results" hidden aria-live="polite" tabindex="-1"></div>
+            <div class="play-results" id="switch-results" hidden tabindex="-1"></div>
           </div>
         </div>
         <div class="play-stage" id="play-recovery" role="tabpanel" aria-labelledby="tab-recovery" hidden>
@@ -313,11 +320,11 @@
           <div class="play-stage-main">
             <div class="play-screen assist-screen">
               <div class="play-screen-top"><span>REASONING CHALLENGE</span><span id="assist-counter">SCENARIO 1 / 4</span></div>
-              <div class="assist-prompt" id="assist-prompt"></div>
+              <h4 class="assist-prompt" id="assist-prompt" tabindex="-1" aria-describedby="assist-counter assist-reply"></h4>
               <div class="assist-reply" id="assist-reply" aria-live="polite"></div>
               <p class="assist-pick-label">What do you conclude?</p>
               <div class="assist-choices" id="assist-choices"></div>
-              <div id="assist-feedback" class="assist-feedback" hidden aria-live="polite"></div>
+              <div id="assist-feedback" class="assist-feedback" hidden tabindex="-1"></div>
               <button type="button" id="assist-next" class="play-primary" hidden>Try another scenario <span>↗</span></button>
             </div>
           </div>
@@ -347,3 +354,4 @@
   <div class="toast" id="site-toast" hidden role="status"></div>
 </body>
 </html>
+

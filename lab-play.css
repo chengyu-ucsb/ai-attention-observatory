@@ -123,3 +123,20 @@
 .play-update a{color:var(--red);text-decoration:underline;text-underline-offset:3px}
 .play-update summary:focus-visible,.play-tab:focus-visible,.recovery-option:focus-visible,.assist-option:focus-visible{outline:2px solid var(--red);outline-offset:4px}
 @media(max-width:580px){.play-update summary>span:last-child{display:block;margin:4px 0 0}}
+
+
+/* Session controls preserve the existing quiet, paper-like visual language. */
+.play-session-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px;margin:0 0 24px}
+.play-session-controls p{font-size:12px;line-height:1.65;color:#635658;margin:7px 0 0;max-width:660px}
+.play-secondary{border:1px solid #b9828b;background:#fff8f6;color:#783746;padding:11px 14px;min-height:44px;font-size:12px;font-weight:700}
+.play-secondary:hover:enabled{background:#f4e2e1}.play-secondary:disabled{opacity:.6}
+.play-mode label{font-size:12px;font-weight:700;color:#673f46}
+.play-mode select{font:inherit;font-size:12px;max-width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid #b9828b;background:white;color:#55383d}
+.play-mode .play-small{margin:3px 0 7px}
+.play-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.switch-answer[aria-disabled="true"]{opacity:.6;cursor:default}
+.play-chart-untimed{grid-template-columns:1fr auto}
+#lab button:focus-visible,#lab select:focus-visible,#lab [tabindex="-1"]:focus{outline:2px solid var(--red);outline-offset:4px}
+@media(max-width:580px){.recovery-trial{align-items:flex-start;flex-direction:column;gap:5px}.play-screen-top{gap:8px;flex-wrap:wrap}.play-chart-line{grid-template-columns:75px minmax(0,1fr) 60px}.play-chart-untimed{grid-template-columns:1fr auto}.play-chart-sub{margin-left:85px}.switch-buttons{max-width:100%;min-width:0}.switch-answer{min-width:0}.play-stage-side,.play-stage-main{min-width:0}.play-chart-caption{overflow-wrap:anywhere}}
+/* Keep explanatory text legible against the original cream surfaces. */
+.play-small,.play-chart-sub,.play-chart-caption,.play-screen-top{color:#6d555b}
