@@ -31,8 +31,8 @@ than assuming a scheduled run published an issue.
 
 ### P1 · Complete browser and accessibility coverage
 
-Status: implemented in this change, pending hosted Chromium checks; real Safari,
-Firefox, native browser zoom and assistive-technology review remain open.
+Status: implemented and checked in hosted Chromium; real Safari, Firefox, native
+browser zoom and assistive-technology review remain open.
 Priority: correctness and access before new features.
 
 - Run the new Chromium test at desktop and phone widths, then test real Safari
@@ -51,8 +51,8 @@ Priority: correctness and access before new features.
 
 ### P1 · Give visitors control over a session
 
-Status: implemented in this change; deterministic regressions pass. Hosted
-keyboard/browser verification is required before publication.
+Status: implemented. Deterministic and hosted Chromium keyboard regressions pass.
+Keep these checks green on future changes.
 
 - Add a clear reset/stop action that cancels pending callbacks and clears only
   in-memory results. Explain what will be cleared before activation.
@@ -149,6 +149,13 @@ Pages deployment; this date alone does not assert a live deployment.
   compilation pass. Local Chromium launch is blocked by the execution
   environment's socket restriction; use the actual PR CI outcome below before
   calling browser or visual checks passed. No workflow definitions were changed.
+- [Hosted Chromium verification](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42113488191)
+  passed all four viewport/density configurations, keyboard flows, held-Enter
+  protection and full-app navigation/offline fallback. Desktop, 320 px phone and
+  reflow screenshots were inspected.
+  [Repository checks](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42113488319)
+  passed all 216 Python tests and 69 reading-page checks. Final PR checks and
+  Pages deployment are authoritative for the published revision.
 
 ## Checks for every release
 

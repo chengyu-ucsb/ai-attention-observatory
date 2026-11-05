@@ -84,6 +84,7 @@ by("lab").hidden=false;by("switch-start").click();
 assert.equal(by("switch-progress").textContent,"1 / 20");
 for(let i=0;i<20;i++){answerSwitch();flush()}
 assert.equal(by("switch-phase").textContent,"COMPLETE");
+assert(doc.querySelectorAll(".switch-dot").every(x=>x.classes.has("is-correct")));
 assert.equal(by("switch-results").hidden,false);
 assert(descendants(by("switch-results")).some(x=>x.className==="play-chart"));
 // Controllable timers catch navigation races that an immediate setTimeout mock misses.

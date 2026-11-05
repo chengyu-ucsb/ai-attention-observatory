@@ -104,6 +104,7 @@
     $("#switch-left").disabled=true;$("#switch-right").disabled=true;$("#switch-next").hidden=true;
     $("#switch-timing").disabled=false;$("#switch-practice").disabled=false;
     $("#switch-announcement").textContent="";
+    $$(".switch-dot").forEach((d,i)=>{d.hidden=i>=g.length;d.className="switch-dot";if(i<g.length)d.classList.add(g.results[i].correct?"is-correct":"is-wrong")});
     $("#switch-phase").textContent="COMPLETE";
     $("#switch-progress").textContent=g.length+" / "+g.length;
     $("#switch-cue").textContent="YOUR PLAY SESSION";
@@ -128,7 +129,7 @@
       const note=E("p","play-chart-sub",good+" / "+total+" correct");if(g.timed)chart.append(note);
     });
     const omitted=g.results.filter(x=>x.interrupted).length;
-    if(g.timed&&omitted)chart.append(E("p","play-chart-sub",omitted+" interrupted response(s) excluded from timing."));
+    if(g.timed&&omitted)chart.append(E("p","play-chart-caption",omitted+" interrupted response(s) excluded from timing."));
     add(root,chart,E("p","play-chart-caption",(g.timed?"Medians from uninterrupted correct responses only. Device, browser and input method affect timing. ":"No response times were recorded. ")+"The same rule always comes first (8 turns), followed by alternating rules (12 turns). Fixed order, small samples and practice effects prevent a valid estimate of switch cost or attention. Faster is not necessarily better real-world attention."));
     add(root,E("p","play-chart-caption","Reflect: did keeping the rule in mind, noticing the cue, or choosing a response feel most effortful? This comparison cannot tell those processes apart."));
     if(visible("switch"))root.focus();
