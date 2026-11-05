@@ -57,11 +57,12 @@ const doc={
  createElement(tag){return new FakeElement(tag)},
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
 };
-const timers=[];
+const timers=[];let timerID=0;
 const environment={document:doc,performance:{now:()=>environment.time},time:100,console,
- setTimeout:fn=>{timers.push(fn);return timers.length},
+ setTimeout:fn=>{const id=++timerID;timers.push({id,fn});return id},
+ clearTimeout:id=>{const i=timers.findIndex(x=>x.id===id);if(i>=0)timers.splice(i,1)},
  MutationObserver:class{constructor(callback){this.callback=callback}observe(target){this.target=target;observers.push(this)}}};
-const flush=()=>{environment.time+=500;const fn=timers.shift();assert(fn,"Expected a pending transition");fn()};
+const flush=()=>{environment.time+=500;const fn=timers.shift();assert(fn,"Expected a pending transition");fn.fn()};
 const visibility=hidden=>{doc.hidden=hidden;for(const fn of doc.listeners.visibilitychange||[])fn()};
 const key=(key,target=doc.activeElement,extra={})=>{
  const e={key,defaultPrevented:false,stopped:false,preventDefault(){this.defaultPrevented=true},stopPropagation(){this.stopped=true},...extra};
@@ -83,6 +84,7 @@ by("lab").hidden=false;by("switch-start").click();
 assert.equal(by("switch-progress").textContent,"1 / 20");
 for(let i=0;i<20;i++){answerSwitch();flush()}
 assert.equal(by("switch-phase").textContent,"COMPLETE");
+assert(doc.querySelectorAll(".switch-dot").every(x=>x.classes.has("is-correct")));
 assert.equal(by("switch-results").hidden,false);
 assert(descendants(by("switch-results")).some(x=>x.className==="play-chart"));
 // Controllable timers catch navigation races that an immediate setTimeout mock misses.
@@ -106,6 +108,34 @@ assert(descendants(by("switch-results")).some(x=>x.textContent==="2 interrupted 
 const timings=descendants(by("switch-results")).filter(x=>x.tagName==="STRONG").map(x=>x.textContent);
 assert.deepEqual(timings,["135 ms","135 ms"],"Hidden time must never inflate medians");
 assert.equal(doc.activeElement,by("switch-results"));
+// Reset during feedback cancels pending work, including stale callbacks after replay.
+by("switch-start").click();answerSwitch();
+const stale=timers[0].fn;
+by("play-reset").click();assert.equal(timers.length,0);assert.equal(by("switch-progress").textContent,"0 / 20");
+by("tab-assist").click();stale();assert.equal(by("switch-progress").textContent,"0 / 20");
+assert.equal(doc.activeElement,by("play-reset"));
+by("tab-switch").click();by("switch-start").click();stale();assert.equal(by("switch-progress").textContent,"1 / 20");
+by("play-reset").click();
+// Untimed practice uses explicit progression, records no snapshot and cannot leak trials.
+by("switch-practice").click();assert.equal(by("switch-progress").textContent,"1 / 4");
+assert.equal(doc.activeElement,by("switch-left"));assert.match(by("switch-announcement").textContent,/Turn 1 of 4/);
+for(let i=0;i<4;i++){
+ answerSwitch();assert.equal(timers.length,0);assert.equal(doc.activeElement,by("switch-next"));
+ assert.equal(key("Enter",doc.activeElement,{repeat:true}).defaultPrevented,true);
+ const before=by("switch-progress").textContent;answerSwitch();assert.equal(by("switch-progress").textContent,before);
+ by("switch-next").click();
+}
+assert(descendants(by("switch-results")).some(x=>x.textContent==="PRACTICE COMPLETE"));
+assert(!descendants(by("switch-results")).some(x=>x.className==="play-chart"));
+by("switch-timing").value="untimed";by("switch-start").click();
+assert.equal(by("switch-progress").textContent,"1 / 20");
+for(let i=0;i<20;i++){answerSwitch();assert.equal(timers.length,0);by("switch-next").click()}
+assert(descendants(by("switch-results")).some(x=>x.textContent.startsWith("No response times were recorded.")));
+assert.deepEqual(descendants(by("switch-results")).filter(x=>x.tagName==="STRONG").map(x=>x.textContent),["8 / 8 correct","12 / 12 correct"]);
+// Home/End navigate tabs, never submit. Arrow shortcuts are scoped to answers.
+by("tab-switch").focus();key("End");assert.equal(doc.activeElement,by("tab-assist"));key("Home");assert.equal(doc.activeElement,by("tab-switch"));
+by("switch-timing").value="timed";by("switch-start").click();by("play-reset").focus();key("ArrowLeft");assert.equal(timers.length,0);
+by("play-reset").click();
 // All four return tasks, both modes; replay must stop on the new readable preview.
 by("tab-recovery").click();
 const stories=new Set();
@@ -142,11 +172,18 @@ for(const mode of ["reflect","hint","answer"]){
   const options=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
   assert.equal(options.length,3);options[[1,0,1,2][i]].click();
   assert.equal(by("assist-feedback").hidden,false);
+  assert.equal(doc.activeElement,by("assist-feedback"));
   assert.match(by("assist-feedback").children[0].textContent,/Supported conclusion/);
   assert.equal(by("assist-next").textContent,i===3?"Replay the first scenario ↗":"Try another scenario ↗");
-  by("assist-next").click();
+  by("assist-next").click();assert.equal(doc.activeElement,by("assist-prompt"));
  }
 }
+// Reset clears all activities while retaining explicit mode choices and focus.
+by("play-reset").click();assert.equal(by("recovery-history").children.length,0);
+assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 4");
+assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").value,"timed");
+assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
 assert(html.includes('datetime="2026-11-05"'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
-console.log("Attention Playground regressions passed: switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
+console.log("Attention Playground regressions passed: reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
+

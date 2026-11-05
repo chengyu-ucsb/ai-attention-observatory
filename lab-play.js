@@ -8,7 +8,7 @@
   const button=(label,fn,cls="")=>{const n=E("button",cls,label);n.type="button";n.addEventListener("click",fn);return n};
   const round=n=>Math.round(n);
   const med=xs=>{if(!xs.length)return 0;const a=xs.slice().sort((x,y)=>x-y);return a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2};
-  const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false},assist:{mode:"reflect",scenario:0,chosen:false}};
+  const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false,timer:null,generation:0,kind:"snapshot",timed:true,length:20},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false},assist:{mode:"reflect",scenario:0,chosen:false}};
   function activate(name){
     $$("[data-play-tab]").forEach(b=>{let on=b.dataset.playTab===name;b.classList.toggle("is-active",on);b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
     ["switch","recovery","assist"].forEach(k=>$("#play-"+k).hidden=k!==name);
@@ -16,7 +16,7 @@
   }
   $$("[data-play-tab]").forEach(b=>{
     b.addEventListener("click",()=>activate(b.dataset.playTab));
-    b.addEventListener("keydown",e=>{if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;e.preventDefault();e.stopPropagation();const all=$$("[data-play-tab]");let i=all.indexOf(b);let next=all[(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length];next.focus();activate(next.dataset.playTab)});
+    b.addEventListener("keydown",e=>{if(!["ArrowRight","ArrowLeft","Home","End"].includes(e.key))return;e.preventDefault();e.stopPropagation();const all=$$("[data-play-tab]");let i=all.indexOf(b);let next=all[e.key==="Home"?0:e.key==="End"?all.length-1:(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length];next.focus();activate(next.dataset.playTab)});
   });
   const visible=name=>!document.hidden&&!$("#lab").hidden&&!$("#play-"+name).hidden;
   function syncVisibility(){
@@ -27,7 +27,7 @@
         g.shownAt=null;
       } else if(g.shownAt===null){
         g.shownAt=performance.now();
-        if(g.interrupted)$("#switch-note").textContent="Resumed · this response will not count toward timing.";
+        if(g.interrupted)$("#switch-note").textContent=g.timed?"Resumed · this response will not count toward timing.":"Resumed · continue at your own pace.";
       }
     }
     const r=practice.recovery;
@@ -44,75 +44,107 @@
   for(let i=0;i<challengeLength;i++)switchTrack.append(E("span","switch-dot"));
   function switchCue(rule){return rule==="parity"?"ODD OR EVEN?":"LOW (1–4) OR HIGH (6–9)?"}
   function switchRender(){
-    const g=practice.switch,phase=g.trial<8?"SAME RULE":"SWITCHING RULES";
+    const g=practice.switch,phase=g.kind==="practice"?"PRACTICE · UNTIMED":g.trial<8?"SAME RULE":"SWITCHING RULES";
     $("#switch-phase").textContent=phase;
-    $("#switch-progress").textContent=(g.trial+1)+" / "+challengeLength;
+    $("#switch-progress").textContent=(g.trial+1)+" / "+g.length;
     $("#switch-cue").textContent=switchCue(g.current.rule);
     $("#switch-number").textContent=g.current.value;
     $("#switch-note").textContent=g.current.rule==="parity"?"LEFT = ODD     ·     RIGHT = EVEN":"LEFT = LOW     ·     RIGHT = HIGH";
     $("#switch-left").disabled=false;$("#switch-right").disabled=false;
+    $("#switch-left").setAttribute("aria-disabled","false");$("#switch-right").setAttribute("aria-disabled","false");
+    $("#switch-left").setAttribute("aria-label",g.current.rule==="parity"?"Left: odd":"Left: low, 1 to 4");
+    $("#switch-right").setAttribute("aria-label",g.current.rule==="parity"?"Right: even":"Right: high, 6 to 9");
+    $("#switch-next").hidden=true;
+    $("#switch-announcement").textContent="Turn "+(g.trial+1)+" of "+g.length+". "+(g.current.rule==="parity"?"Odd or even? ":"Low, 1 to 4, or high, 6 to 9? ")+g.current.value+". "+(g.current.rule==="parity"?"Left for odd; right for even.":"Left for low; right for high.");
     $("#switch-start").hidden=true;
-    $$(".switch-dot").forEach((d,i)=>{d.className="switch-dot";if(i<g.trial)d.classList.add(g.results[i].correct?"is-correct":"is-wrong");else if(i===g.trial)d.classList.add("is-now")});
+    $$(".switch-dot").forEach((d,i)=>{d.className="switch-dot";d.hidden=i>=g.length;if(i<g.trial)d.classList.add(g.results[i].correct?"is-correct":"is-wrong");else if(i===g.trial)d.classList.add("is-now")});
     g.locked=false;g.interrupted=false;g.shownAt=visible("switch")?performance.now():null;
   }
   function nextSwitch(){
     const g=practice.switch;
-    if(g.trial>=challengeLength){switchFinish();return}
+    if(g.trial>=g.length){switchFinish();return}
     const value=choices[Math.floor(Math.random()*choices.length)];
-    let rule=g.trial<8?"parity":(g.trial%2===0?"parity":"magnitude");
+    let rule=g.trial<(g.kind==="practice"?2:8)?"parity":(g.trial%2===0?"parity":"magnitude");
     g.current={value,rule};
     switchRender();
   }
-  function startSwitch(){
-    const g=practice.switch;g.active=true;g.trial=0;g.results=[];g.locked=false;
+  function cancelSwitch(){
+    const g=practice.switch;g.generation++;clearTimeout(g.timer);g.timer=null;g.active=false;g.shownAt=null;
+  }
+  function startSwitch(kind="snapshot"){
+    cancelSwitch();
+    const g=practice.switch;g.active=true;g.trial=0;g.results=[];g.locked=false;g.kind=kind;g.length=kind==="practice"?4:challengeLength;g.timed=kind!=="practice"&&$("#switch-timing").value!=="untimed";
+    $("#switch-timing").disabled=true;$("#switch-practice").disabled=true;
+    $("#play-session-status").textContent="";
     $("#switch-results").hidden=true;$("#switch-results").replaceChildren();
-    $("#switch-start").textContent="Play again";nextSwitch();
+    $("#switch-start").textContent="Start 20-trial snapshot";nextSwitch();$("#switch-left").focus();
   }
   function respond(side){
     const g=practice.switch;
     if(!g.active||g.locked||!visible("switch")||g.shownAt===null)return;
     const item=g.current;
     const correctSide=item.rule==="parity"?(item.value%2?"left":"right"):(item.value<5?"left":"right");
-    const rt=g.interrupted?null:Math.max(0,Math.round(performance.now()-g.shownAt));
+    const rt=!g.timed||g.interrupted?null:Math.max(0,Math.round(performance.now()-g.shownAt));
     const correct=correctSide===side;
-    g.results.push({phase:g.trial<8?"repeat":"alternate",rt,correct,rule:item.rule,value:item.value});
-    g.locked=true;$("#switch-left").disabled=true;$("#switch-right").disabled=true;
+    g.results.push({phase:g.trial<8?"repeat":"alternate",rt,correct,rule:item.rule,value:item.value,interrupted:g.interrupted});
+    g.locked=true;$("#switch-left").setAttribute("aria-disabled","true");$("#switch-right").setAttribute("aria-disabled","true");
     $("#switch-note").textContent=correct?"✓ Correct":"↪ Different rule—keep going";
     g.trial+=1;g.shownAt=null;
-    setTimeout(()=>{if(g.active)nextSwitch()},correct?240:480);
+    if(!g.timed){
+      $("#switch-next").hidden=false;$("#switch-next").textContent=g.trial>=g.length?"See debrief ↗":"Next turn ↗";
+      $("#switch-announcement").textContent=(correct?"Correct.":"Different choice. Check the rule.")+" Choose "+(g.trial>=g.length?"See debrief":"Next turn")+" when ready.";
+      $("#switch-next").focus();
+    } else {
+      const generation=g.generation;
+      g.timer=setTimeout(()=>{if(g.active&&g.generation===generation){g.timer=null;nextSwitch()}},correct?240:480);
+    }
   }
   function switchFinish(){
     const g=practice.switch;g.active=false;
+    $("#switch-left").disabled=true;$("#switch-right").disabled=true;$("#switch-next").hidden=true;
+    $("#switch-timing").disabled=false;$("#switch-practice").disabled=false;
+    $("#switch-announcement").textContent="";
+    $$(".switch-dot").forEach((d,i)=>{d.hidden=i>=g.length;d.className="switch-dot";if(i<g.length)d.classList.add(g.results[i].correct?"is-correct":"is-wrong")});
     $("#switch-phase").textContent="COMPLETE";
-    $("#switch-progress").textContent="20 / 20";
+    $("#switch-progress").textContent=g.length+" / "+g.length;
     $("#switch-cue").textContent="YOUR PLAY SESSION";
     $("#switch-number").textContent="✓";
     $("#switch-note").textContent="What did you notice about changing rules?";
-    $("#switch-start").hidden=false;$("#switch-start").textContent="Play again";
+    $("#switch-start").hidden=false;$("#switch-start").textContent="Start 20-trial snapshot";
+    const root=$("#switch-results");root.replaceChildren();root.hidden=false;
+    if(g.kind==="practice"){
+      add(root,E("p","play-kicker","PRACTICE COMPLETE"),E("h4","","Ready for the two rules?"),E("p","play-chart-caption","These four untimed turns only introduced the controls. Practice results are discarded and never enter the 20-trial snapshot. Start a snapshot when you want to explore the change in rules."));
+      g.results=[];if(visible("switch"))root.focus();return;
+    }
     const repeat=g.results.filter(x=>x.phase==="repeat"),mixed=g.results.filter(x=>x.phase==="alternate");
     const rtA=round(med(repeat.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt)));
     const rtB=round(med(mixed.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt)));
     const accA=repeat.filter(x=>x.correct).length,accB=mixed.filter(x=>x.correct).length;
-    const root=$("#switch-results");root.replaceChildren();root.hidden=false;
-    add(root,E("p","play-kicker","SESSION SNAPSHOT"),E("h4","","Repeat vs. switching"));
+    add(root,E("p","play-kicker",g.timed?"SESSION SNAPSHOT":"UNTIMED SESSION SNAPSHOT"),E("h4","","Repeat vs. switching"));
     const chart=E("div","play-chart"),maximum=Math.max(rtA,rtB,1);
     [["Same rule",rtA,accA,8],["Alternating",rtB,accB,12]].forEach(([name,ms,good,total])=>{
       const r=E("div","play-chart-line"),bar=E("div","play-chart-track"),fill=E("span","play-chart-fill");
       fill.style.width=(ms/maximum*100)+"%";bar.append(fill);
-      add(r,E("span","",name),bar,E("strong","",ms?ms+" ms":"—"));chart.append(r);
-      const note=E("p","play-chart-sub",good+" / "+total+" correct");chart.append(note);
+      add(r,E("span","",name),g.timed?bar:null,E("strong","",g.timed?(ms?ms+" ms":"—"):good+" / "+total+" correct"));if(!g.timed)r.classList.add("play-chart-untimed");chart.append(r);
+      const note=E("p","play-chart-sub",good+" / "+total+" correct");if(g.timed)chart.append(note);
     });
-    const omitted=g.results.filter(x=>x.rt===null).length;
-    if(omitted)chart.append(E("p","play-chart-sub",omitted+" interrupted response(s) excluded from timing."));
-    add(root,chart,E("p","play-chart-caption","Medians from uninterrupted correct responses only. Device and browser timing also affect these values. Fixed order, small trial counts and practice effects make this an experience—not a valid measure of switch cost or attention."));
-    root.focus();
+    const omitted=g.results.filter(x=>x.interrupted).length;
+    if(g.timed&&omitted)chart.append(E("p","play-chart-caption",omitted+" interrupted response(s) excluded from timing."));
+    add(root,chart,E("p","play-chart-caption",(g.timed?"Medians from uninterrupted correct responses only. Device, browser and input method affect timing. ":"No response times were recorded. ")+"The same rule always comes first (8 turns), followed by alternating rules (12 turns). Fixed order, small samples and practice effects prevent a valid estimate of switch cost or attention. Faster is not necessarily better real-world attention."));
+    add(root,E("p","play-chart-caption","Reflect: did keeping the rule in mind, noticing the cue, or choosing a response feel most effortful? This comparison cannot tell those processes apart."));
+    if(visible("switch"))root.focus();
   }
-  $("#switch-start").addEventListener("click",startSwitch);
+  $("#switch-start").addEventListener("click",()=>startSwitch());
+  $("#switch-practice").addEventListener("click",()=>startSwitch("practice"));
+  $("#switch-next").addEventListener("click",()=>{const g=practice.switch;if(g.active&&g.locked&&!g.timed){nextSwitch();if(g.active)$("#switch-left").focus()}});
   $("#switch-left").addEventListener("click",()=>respond("left"));
   $("#switch-right").addEventListener("click",()=>respond("right"));
   document.addEventListener("keydown",e=>{
+    // Native Enter activates focused buttons on keydown. Suppress auto-repeat
+    // before returning so held keys cannot answer or advance multiple turns.
+    if(visible("switch")&&e.repeat&&e.key==="Enter"&&["switch-start","switch-practice","switch-left","switch-right","switch-next"].includes(document.activeElement?.id)){e.preventDefault();return}
     if(e.defaultPrevented||e.repeat||document.hidden||$("#lab").hidden||$("#play-switch").hidden||e.altKey||e.ctrlKey||e.metaKey||document.activeElement?.isContentEditable||document.activeElement?.getAttribute?.("role")==="tab"||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||""))return;
-    if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();respond(e.key==="ArrowLeft"?"left":"right")}
+    if(["switch-left","switch-right"].includes(document.activeElement?.id)&&(e.key==="ArrowLeft"||e.key==="ArrowRight")){e.preventDefault();respond(e.key==="ArrowLeft"?"left":"right")}
   });
 
   // 2 / Return Point: contextual resumption after a small distraction.
@@ -125,9 +157,9 @@
     {context:"You're organizing a literature review. Two papers use the word attention for different kinds of tasks.",next:"Record how each paper defines and measures attention",options:["Average all the scores together","Rename the project folder","Record how each paper defines and measures attention"]}
   ];
   const distractions=[
-    {prompt:"Tap the symbol that appears twice",options:["◇","●","◇ ◇"],right:2},
+    {prompt:"Choose the option with two diamonds",options:["◇","●","◇ ◇"],labels:["One diamond","One circle","Two diamonds"],right:2},
     {prompt:"Which number is smallest?",options:["19","7","13"],right:1},
-    {prompt:"Find the different shape",options:["□","□","△"],right:2},
+    {prompt:"Find the different shape",options:["□","□","△"],labels:["Square, first option","Square, second option","Triangle"],right:2},
     {prompt:"Which word has four letters?",options:["focus","plan","think"],right:1}
   ];
   function recoveryPreview(){
@@ -156,12 +188,12 @@
     $("#recovery-start").hidden=true;
     const place=$("#recovery-interaction");place.replaceChildren();
     const options=E("div","recovery-options");
-    stim.options.forEach((t,i)=>options.append(button(t,()=>{
+    stim.options.forEach((t,i)=>{const option=button(t,()=>{
       if(r.stage!=="interrupt")return;
       if(i===stim.right)r.correct++;
       r.interrupt++;
       recoveryDistract();
-    },"recovery-option")));
+    },"recovery-option");if(stim.labels)option.setAttribute("aria-label",stim.labels[i]);options.append(option)});
     add(place,E("p","play-kicker","MICRO-TASK "+(r.interrupt+1)+" / 4"),options);
     $("#recovery-headline").focus();
   }
@@ -184,7 +216,7 @@
   function recoveryFinish(correct){
     const r=practice.recovery;if(r.stage!=="return")return;r.stage="done";
     const elapsed=r.interrupted?null:Math.max(0,round(performance.now()-r.start));
-    r.history.push({mode:r.mode,correct,ms:elapsed});
+    r.history.push({mode:r.mode,correct,ms:elapsed,task:r.round%recoveryCases.length+1,round:r.history.length+1});
     $("#recovery-stage-label").textContent="SESSION COMPLETE";
     $("#recovery-progress").textContent="DONE";
     $("#recovery-headline").textContent=correct?"Found your return point.":"Returning isn't always simple.";
@@ -195,8 +227,8 @@
     $("#recovery-headline").focus();
     const history=$("#recovery-history");history.replaceChildren();
     const table=E("div","recovery-trial-list");
-    r.history.slice(-4).forEach((x,i)=>{let row=E("div","recovery-trial");add(row,E("span","",x.mode==="cue"?"With checkpoint":"Without checkpoint"),E("strong","",(x.ms===null?"timing omitted":round(x.ms/100)/10+" s")+"  ·  "+(x.correct?"correct":"different choice")));table.append(row)});
-    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" ROUNDS"),table,E("p","play-chart-caption","Timings begin when the return choices appear and are omitted after leaving the activity. Trials differ in materials and order; they cannot establish whether checkpoints improve performance."));
+    r.history.slice(-4).forEach((x,i)=>{let row=E("div","recovery-trial");add(row,E("span","","Round "+x.round+" · Task "+x.task+" · "+(x.mode==="cue"?"With checkpoint":"Without checkpoint")),E("strong","",(x.ms===null?"timing omitted":round(x.ms/100)/10+" s")+"  ·  "+(x.correct?"correct":"different choice")));table.append(row)});
+    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" ROUNDS"),table,E("p","play-chart-caption","Timings begin when the return choices appear and are omitted after leaving the activity. Task numbers identify different materials; repeats introduce practice. You choose condition and order, and the checkpoint repeats the intended answer. These rounds cannot establish whether checkpoints improve performance. Reflect: what information would help you resume your own work?"));
   }
   $("#recovery-start").addEventListener("click",()=>{
     const r=practice.recovery;if(r.stage==="done"){r.round++;recoveryPreview();$("#recovery-headline").focus();return}
@@ -252,15 +284,31 @@
     $$("#assist-choices .assist-option").forEach((b,n)=>{b.disabled=true;if(n===data.correct)b.classList.add("correct");if(n===i&&!ok)b.classList.add("incorrect")});
     const root=$("#assist-feedback");root.replaceChildren();
     add(root,E("strong","",ok?"✓ Supported conclusion":"↩ Another interpretation is stronger"),E("p","",data.feedback));
-    root.hidden=false;$("#assist-next").hidden=false;
+    root.hidden=false;$("#assist-next").hidden=false;root.focus();
     $("#assist-next").textContent=r.scenario<scenarios.length-1?"Try another scenario ↗":"Replay the first scenario ↗";
   }
   $$("[data-assist-mode]").forEach(b=>b.addEventListener("click",()=>{
     const r=practice.assist;r.mode=b.dataset.assistMode;
     $$("[data-assist-mode]").forEach(x=>{let active=x===b;x.classList.toggle("is-active",active);x.setAttribute("aria-pressed",String(active))});
-    assistDraw();
+    assistDraw();$("#assist-prompt").focus();
   }));
-  $("#assist-next").addEventListener("click",()=>{practice.assist.scenario=(practice.assist.scenario+1)%scenarios.length;assistDraw()});
+  $("#assist-next").addEventListener("click",()=>{practice.assist.scenario=(practice.assist.scenario+1)%scenarios.length;assistDraw();$("#assist-prompt").focus()});
+  $("#play-reset").addEventListener("click",()=>{
+    cancelSwitch();
+    const g=practice.switch;g.trial=0;g.results=[];g.current=null;g.locked=false;g.interrupted=false;
+    $("#switch-results").replaceChildren();$("#switch-results").hidden=true;
+    $("#switch-start").hidden=false;$("#switch-start").textContent="Start 20-trial snapshot";$("#switch-next").hidden=true;
+    $("#switch-left").disabled=true;$("#switch-right").disabled=true;
+    $("#switch-timing").disabled=false;$("#switch-practice").disabled=false;
+    $("#switch-phase").textContent="READY TO PLAY";$("#switch-progress").textContent="0 / 20";$("#switch-cue").textContent="TWO RULES · ONE BRAIN";$("#switch-number").textContent="?";
+    $("#switch-note").textContent="Start when you're ready.";$("#switch-announcement").textContent="";
+    $$(".switch-dot").forEach(d=>{d.className="switch-dot";d.hidden=false});
+    const r=practice.recovery;r.history=[];r.round=0;recoveryPreview();$("#recovery-history").replaceChildren();
+    practice.assist.scenario=0;assistDraw();
+    $("#play-session-status").textContent="Lab stopped and reset. This visit’s results are cleared. Your selected modes are unchanged.";
+    $("#play-reset").focus();
+  });
   assistDraw();
   activate("switch");
 })();
+

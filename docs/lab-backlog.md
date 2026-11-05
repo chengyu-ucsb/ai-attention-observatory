@@ -31,7 +31,9 @@ than assuming a scheduled run published an issue.
 
 ### P1 · Complete browser and accessibility coverage
 
-Status: ready. Priority: correctness and access before new features.
+Status: implemented and checked in hosted Chromium; real Safari, Firefox, native
+browser zoom and assistive-technology review remain open.
+Priority: correctness and access before new features.
 
 - Run the new Chromium test at desktop and phone widths, then test real Safari
   and Firefox when available. Confirm there is no horizontal overflow and every
@@ -49,7 +51,8 @@ Status: ready. Priority: correctness and access before new features.
 
 ### P1 · Give visitors control over a session
 
-Status: ready.
+Status: implemented. Deterministic and hosted Chromium keyboard regressions pass.
+Keep these checks green on future changes.
 
 - Add a clear reset/stop action that cancels pending callbacks and clears only
   in-memory results. Explain what will be cleared before activation.
@@ -72,7 +75,9 @@ Status: ready after source review. First candidate: performance versus learning.
 
 ### P2 · Improve the comparison design and interpretation
 
-Status: design needed.
+Status: interpretation improved; balanced order and matched-material redesign
+remain open. Current rounds now identify task and round number, explain answer
+repetition and order/practice limits, and include reflection prompts.
 
 - Explore balanced condition order and matched Return Point materials so visitors
   can compare experiences without predictable answers or unnecessary repetition.
@@ -119,6 +124,39 @@ Pages deployment; this date alone does not assert a live deployment.
   handling, all recovery tasks and all assistance modes. Added an optional
   real-browser test with a clearly scoped fixture.
 
+### Session-control and accessibility follow-up
+
+- Added a visit-wide stop/reset with an explanation before activation. It cancels
+  pending Switch callbacks, clears in-memory results across activities and keeps
+  selected modes. A generation guard prevents stale callbacks from reviving play.
+- Added untimed, visitor-paced 20-turn snapshots and a separate four-turn practice
+  introduction. Practice results are discarded; untimed snapshots record no
+  response times. No persistence, account, network request or telemetry was added.
+- Kept answer focus during timed feedback, scoped arrow shortcuts to answer
+  buttons, added Home/End tab navigation and concise rule/number announcements.
+  Assistance Dial moves focus to feedback and then the new prompt; symbolic
+  Return Point choices have spoken labels. No timer values are announced.
+- Clarified fixed order, task identity, answer repetition, device/input timing and
+  small-sample limitations. Added reflection questions without making an
+  intervention-effectiveness or cognitive-assessment claim.
+- Extended deterministic tests for reset races, practice isolation, untimed
+  progression and focus. Expanded hosted Chromium coverage to 320, 390 and
+  1280 px, plus a 640 px viewport at 2x pixel density to approximate zoom/reflow,
+  and keyboard completion. This is not a substitute for checking native browser
+  zoom or real screen readers. CSS body zoom was rejected as a proxy because it
+  does not update viewport media-query breakpoints.
+- Local JavaScript syntax, deterministic regressions and browser-test Python
+  compilation pass. Local Chromium launch is blocked by the execution
+  environment's socket restriction; use the actual PR CI outcome below before
+  calling browser or visual checks passed. No workflow definitions were changed.
+- [Hosted Chromium verification](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42113488191)
+  passed all four viewport/density configurations, keyboard flows, held-Enter
+  protection and full-app navigation/offline fallback. Desktop, 320 px phone and
+  reflow screenshots were inspected.
+  [Repository checks](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42113488319)
+  passed all 216 Python tests and 69 reading-page checks. Final PR checks and
+  Pages deployment are authoritative for the published revision.
+
 ## Checks for every release
 
 1. `node --check lab-play.js`
@@ -140,3 +178,4 @@ passed all 216 Python tests and 69 reading-page checks. Local Chromium launch wa
 unavailable, so browser verification used the repository's hosted test runner.
 The current PR's latest checks and the Pages deployment remain the authoritative
 release status, not this historical record.
+

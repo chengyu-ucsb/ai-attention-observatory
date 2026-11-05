@@ -49,18 +49,22 @@ def server():
         srv.server_close()
 
 
-def check(page, url, width, screenshots):
+def check(page, url, width, screenshots, zoom=1):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
-    page.set_viewport_size({"width": width, "height": 900})
+    # Native page zoom changes the effective CSS viewport. CSS body.zoom does
+    # not change media-query breakpoints, so it is not a faithful substitute.
+    # Pair a smaller layout viewport with higher pixel density in this check.
+    page.set_viewport_size({"width": width // zoom, "height": 900 // zoom})
     page.goto(url, wait_until="networkidle")
     assert page.locator("#lab").is_visible()
+    assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
     page.locator(".play-update summary").click()
     assert page.locator(".play-update p").first.is_visible()
     if screenshots:
         screenshots.mkdir(parents=True, exist_ok=True)
-        page.screenshot(path=str(screenshots / f"lab-{width}.png"), full_page=True)
+        page.screenshot(path=str(screenshots / f"lab-{width}-zoom{zoom}.png"), full_page=True)
     page.locator("#switch-start").click()
     # Real key bubbling: Recovery -> Switch must not answer a trial.
     page.locator("#tab-recovery").focus()
@@ -72,14 +76,60 @@ def check(page, url, width, screenshots):
     page.wait_for_timeout(150)
     page.evaluate("document.querySelector('#lab').hidden=false")
     for trial in range(1, 21):
-        page.wait_for_function("n => document.querySelector('#switch-progress').textContent === n + ' / 20' && !document.querySelector('#switch-left').disabled", arg=trial)
+        page.wait_for_function("n => document.querySelector('#switch-progress').textContent === n + ' / 20' && document.querySelector('#switch-left').getAttribute('aria-disabled') === 'false'", arg=trial)
         cue = page.locator("#switch-cue").inner_text()
         number = int(page.locator("#switch-number").inner_text())
         left = number % 2 == 1 if cue.startswith("ODD") else number < 5
-        page.locator("#switch-left" if left else "#switch-right").click()
+        page.locator("#switch-left").focus()
+        page.keyboard.press("ArrowLeft" if left else "ArrowRight")
     page.wait_for_function("document.querySelector('#switch-phase').textContent === 'COMPLETE'")
     assert "1 interrupted response(s) excluded" in page.locator("#switch-results").inner_text()
     assert page.evaluate("document.activeElement.id") == "switch-results"
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    if screenshots:
+        page.locator("#play-switch").screenshot(path=str(screenshots / f"lab-switch-results-{width}-zoom{zoom}.png"))
+    # Separate practice and untimed snapshots are completable with keyboard only.
+    page.locator("#switch-practice").focus()
+    page.keyboard.press("Enter")
+    for trial in range(1, 5):
+        assert page.locator("#switch-progress").inner_text() == f"{trial} / 4"
+        assert page.evaluate("document.activeElement.id") == "switch-left"
+        assert f"Turn {trial} of 4" in page.locator("#switch-announcement").inner_text()
+        page.keyboard.down("Enter")
+        assert page.evaluate("document.activeElement.id") == "switch-next"
+        page.keyboard.down("Enter")
+        page.keyboard.down("Enter")
+        assert page.evaluate("document.activeElement.id") == "switch-next"
+        page.keyboard.up("Enter")
+        page.wait_for_timeout(550)
+        assert page.locator("#switch-progress").inner_text() == f"{trial} / 4"
+        page.keyboard.press("Enter")
+    assert "PRACTICE COMPLETE" in page.locator("#switch-results").inner_text()
+    assert page.locator("#switch-results .play-chart").count() == 0
+    page.locator("#switch-timing").select_option("untimed")
+    page.locator("#switch-start").focus()
+    page.keyboard.press("Enter")
+    for trial in range(1, 21):
+        assert page.locator("#switch-progress").inner_text() == f"{trial} / 20"
+        page.keyboard.press("ArrowLeft")
+        assert page.evaluate("document.activeElement.id") == "switch-next"
+        page.keyboard.press("Enter")
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    assert "No response times were recorded." in page.locator("#switch-results").inner_text()
+    assert "ms" not in page.locator("#switch-results .play-chart").inner_text()
+    assert page.evaluate("document.activeElement.id") == "switch-results"
+    page.locator("#play-reset").focus()
+    page.keyboard.press("Enter")
+    assert page.locator("#switch-timing").input_value() == "untimed"
+    assert page.locator("#switch-progress").inner_text() == "0 / 20"
+    page.locator("#switch-timing").select_option("timed")
+    page.locator("#switch-start").click()
+    page.keyboard.press("ArrowLeft")
+    page.locator("#play-reset").click()
+    page.wait_for_timeout(600)
+    assert page.locator("#switch-progress").inner_text() == "0 / 20"
+    assert page.locator("#switch-results").is_hidden()
+    assert "results are cleared" in page.locator("#play-session-status").inner_text()
     # All tasks must show their next action before distraction, including replays.
     page.locator("#tab-recovery").click()
     stories = set()
@@ -88,12 +138,18 @@ def check(page, url, width, screenshots):
         stories.add(preview)
         page.locator("#recovery-start").click()
         for correct_index in (2, 1, 2, 1):
-            page.locator(".recovery-option").nth(correct_index).click()
+            page.keyboard.press("Tab")
+            for _ in range(correct_index):
+                page.keyboard.press("Tab")
+            page.keyboard.press("Enter")
+            assert page.evaluate("document.activeElement.id") == "recovery-headline"
         for choice in page.locator(".recovery-option").all():
             if choice.inner_text() in preview:
-                choice.click()
+                choice.focus()
+                page.keyboard.press("Enter")
                 break
         assert page.locator("#recovery-progress").inner_text() == "DONE"
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.locator("#recovery-start").click()
         assert "STAGE 1 / 3" in page.locator("#recovery-progress").inner_text()
         assert page.locator(".recovery-option").count() == 0
@@ -103,12 +159,22 @@ def check(page, url, width, screenshots):
         page.locator(f'[data-assist-mode="{mode}"]').click()
         for i, correct_index in enumerate((1, 0, 1, 2), 1):
             assert page.locator("#assist-counter").inner_text() == f"SCENARIO {i} / 4"
-            page.locator(".assist-option").nth(correct_index).click()
+            page.locator(".assist-option").nth(correct_index).focus()
+            page.keyboard.press("Enter")
+            assert page.evaluate("document.activeElement.id") == "assist-feedback"
             assert "Supported conclusion" in page.locator("#assist-feedback").inner_text()
-            page.locator("#assist-next").click()
+            page.keyboard.press("Tab")
+            assert page.evaluate("document.activeElement.id") == "assist-next"
+            page.keyboard.press("Enter")
+            assert page.evaluate("document.activeElement.id") == "assist-prompt"
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    page.locator("#play-reset").click()
+    assert page.locator("#recovery-history").inner_text() == ""
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 1 / 4"
+    if screenshots:
+        page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
-    print(f"Chromium Lab passed at {width}px: keyboard, route pause, 20 trials, replay, and all scenarios/modes.")
+    print(f"Chromium Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, all scenarios/modes.")
 
 
 def check_site_integration(page, url):
@@ -143,12 +209,13 @@ if __name__ == "__main__":
     with server() as url, sync_playwright() as pw:
         browser = pw.chromium.launch(executable_path=args.executable_path, headless=True)
         try:
-            for width in (1280, 390):
-                page = browser.new_page(reduced_motion="reduce")
-                check(page, url, width, args.screenshots)
+            for width, zoom in ((1280, 1), (390, 1), (320, 1), (1280, 2)):
+                page = browser.new_page(reduced_motion="reduce", device_scale_factor=zoom)
+                check(page, url, width, args.screenshots, zoom)
                 page.close()
             page = browser.new_page()
             check_site_integration(page, url)
             page.close()
         finally:
             browser.close()
+
