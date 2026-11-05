@@ -4,6 +4,7 @@ Controlled responses test recovery, not real-model source comprehension.
 """
 import copy
 import json
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -34,6 +35,27 @@ def model_with(*values):
 
 
 class SynthesisFormatTests(unittest.TestCase):
+    def test_anchor_grammar_bounds_match_existing_word_limits(self):
+        schema = reading.claim_schema('scholarly')['properties']['claims']['items']['properties']['quote']
+        self.assertEqual(schema['pattern'], reading.ANCHOR_PATTERN)
+        for count in (0, 1, 4, 5, 6, 23, 24, 25, 90):
+            text = ' '.join(['word'] * count)
+            self.assertEqual(bool(re.fullmatch(schema['pattern'], text)), 5 <= count <= 24)
+        self.assertTrue(re.fullmatch(schema['pattern'], 'These source words include human–AI co-regulation.'))
+        for text in ('these words contain a "quotation"',
+                     'these words contain a \\backslash',
+                     'these words contain a\nnewline',
+                     ' these source words have padding '):
+            self.assertIsNone(re.fullmatch(schema['pattern'], text))
+
+    def test_backend_ignoring_anchor_grammar_still_fails_closed(self):
+        for count in (0, 4, 25):
+            bad = dict(CLAIM, quote=' '.join(['word'] * count))
+            model = model_with({'claims': [bad], 'no_claim_reason': ''}, ANSWER, CHECK)
+            with self.assertRaisesRegex(ValueError, '^claim_anchor_invalid$'):
+                reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            self.assertEqual(model.create_chat_completion.call_count, 1)
+
     def test_generation_and_verification_are_schema_constrained(self):
         model = model_with(ANSWER, CHECK)
         self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
