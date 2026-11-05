@@ -4,7 +4,8 @@ Requires Playwright and Chromium. Run from the repository root:
     python tests/validate_playground_browser.py --executable-path /usr/bin/chromium
 
 The fixture uses the real page, styles and Lab script, but omits app.js and its
-unrelated research-data fetches. The zero-dependency test covers site integration.
+unrelated research-data fetches. A separate check exercises app.js navigation
+and the Lab fallback when research data cannot load.
 """
 import argparse
 from contextlib import contextmanager
@@ -110,6 +111,29 @@ def check(page, url, width, screenshots):
     print(f"Chromium Lab passed at {width}px: keyboard, route pause, 20 trials, replay, and all scenarios/modes.")
 
 
+def check_site_integration(page, url):
+    errors = []
+    page.on("pageerror", lambda error: errors.append(str(error)))
+    real_url = url.replace("/__lab_test__", "/index.html#lab")
+    page.goto(real_url, wait_until="networkidle")
+    page.locator("#lab").wait_for(state="visible")
+    page.locator("#switch-start").click()
+    page.locator('[data-route="library"]').first.click()
+    page.locator("#lab").wait_for(state="hidden")
+    page.locator('[data-route="lab"]').first.click()
+    page.locator("#lab").wait_for(state="visible")
+    assert page.locator("#switch-progress").inner_text() == "1 / 20"
+    assert "Resumed" in page.locator("#switch-note").inner_text()
+    # A failed research-data request must not prevent the independent Lab loading.
+    page.route("**/data/public-library.json*", lambda route: route.abort())
+    page.goto(real_url, wait_until="networkidle")
+    page.locator("#lab").wait_for(state="visible")
+    page.locator("#switch-start").click()
+    assert page.locator("#switch-progress").inner_text() == "1 / 20"
+    assert not errors, errors
+    print("Full app integration passed: real navigation resumes safely and unavailable research data does not block the Lab.")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--executable-path")
@@ -122,5 +146,8 @@ if __name__ == "__main__":
                 page = browser.new_page(reduced_motion="reduce")
                 check(page, url, width, args.screenshots)
                 page.close()
+            page = browser.new_page()
+            check_site_integration(page, url)
+            page.close()
         finally:
             browser.close()

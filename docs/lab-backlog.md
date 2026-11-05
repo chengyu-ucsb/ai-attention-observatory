@@ -37,9 +37,12 @@ Status: ready. Priority: correctness and access before new features.
   and Firefox when available. Confirm there is no horizontal overflow and every
   choice remains reachable at 200% zoom and a 320 px viewport.
 - Check screen-reader reading order, focus visibility, tab names, task cues and
-  result announcements. Avoid announcing a fast stream of irrelevant timer data.
-- Add browser CI without coupling it to external research fetching. Verify current
-  action versions and runner compatibility under AGENTS.md first.
+  result announcements. Specifically check Switch Lab rule/number announcements
+  and focus after the next Assistance Dial prompt replaces its button. Avoid
+  announcing a fast stream of irrelevant timer data.
+- Extend the new browser CI as coverage grows, without coupling it to external
+  research fetching. Verify current action versions and runner compatibility
+  under AGENTS.md before changing workflows.
 - Acceptance: timed and untimed flows can be completed using keyboard alone;
   reduced-motion mode works; all dynamic transitions retain useful focus; no
   console errors. Keep the zero-dependency suite for rapid CI feedback.
@@ -129,6 +132,11 @@ Pages deployment; this date alone does not assert a live deployment.
    environment could not run them. Verify the real Pages build and public Lab
    after publication; inspect logs for warnings as well as errors.
 
-Initial execution: syntax and zero-dependency Lab regressions passed. Chromium
-launch was blocked by the available execution environment's socket restrictions,
-so visual/browser QA and the full repository suite remain release checks.
+Initial hosted verification on 5 November 2026: [Lab check run 1](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42109717710)
+passed Chromium at 1280 px and 390 px, including all activities and scenarios.
+Desktop and phone screenshots were inspected; the narrow phone rule layout was
+then simplified. [Repository checks](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42109717477)
+passed all 216 Python tests and 69 reading-page checks. Local Chromium launch was
+unavailable, so browser verification used the repository's hosted test runner.
+The current PR's latest checks and the Pages deployment remain the authoritative
+release status, not this historical record.
