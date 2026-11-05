@@ -8,20 +8,35 @@
   const button=(label,fn,cls="")=>{const n=E("button",cls,label);n.type="button";n.addEventListener("click",fn);return n};
   const round=n=>Math.round(n);
   const med=xs=>{if(!xs.length)return 0;const a=xs.slice().sort((x,y)=>x-y);return a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2};
-  const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:0},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0},assist:{mode:"reflect",scenario:0,chosen:false}};
+  const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false},assist:{mode:"reflect",scenario:0,chosen:false}};
   function activate(name){
     $$("[data-play-tab]").forEach(b=>{let on=b.dataset.playTab===name;b.classList.toggle("is-active",on);b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
     ["switch","recovery","assist"].forEach(k=>$("#play-"+k).hidden=k!==name);
-    if(name!=="switch"&&practice.switch.active){
-      // Navigation away should never count as a prolonged reaction-time trial.
-      practice.switch.shownAt=0;
-      $("#switch-note").textContent="Return to the tab and use the buttons to respond.";
-    } else if(name==="switch"&&practice.switch.active&&practice.switch.shownAt===0)practice.switch.shownAt=performance.now();
+    syncVisibility();
   }
   $$("[data-play-tab]").forEach(b=>{
     b.addEventListener("click",()=>activate(b.dataset.playTab));
-    b.addEventListener("keydown",e=>{if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;e.preventDefault();const all=$$("[data-play-tab]");let i=all.indexOf(b);let next=all[(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length];next.focus();activate(next.dataset.playTab)});
+    b.addEventListener("keydown",e=>{if(e.key!=="ArrowRight"&&e.key!=="ArrowLeft")return;e.preventDefault();e.stopPropagation();const all=$$("[data-play-tab]");let i=all.indexOf(b);let next=all[(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length];next.focus();activate(next.dataset.playTab)});
   });
+  const visible=name=>!document.hidden&&!$("#lab").hidden&&!$("#play-"+name).hidden;
+  function syncVisibility(){
+    const g=practice.switch;
+    if(g.active&&!g.locked){
+      if(!visible("switch")){
+        if(g.shownAt!==null)g.interrupted=true;
+        g.shownAt=null;
+      } else if(g.shownAt===null){
+        g.shownAt=performance.now();
+        if(g.interrupted)$("#switch-note").textContent="Resumed · this response will not count toward timing.";
+      }
+    }
+    const r=practice.recovery;
+    if(r.stage==="return"&&!visible("recovery"))r.interrupted=true;
+  }
+  // Include browser tabs and navigation to another Observatory page. A response
+  // seen before an interruption is not a fresh reaction-time observation.
+  document.addEventListener("visibilitychange",syncVisibility);
+  new MutationObserver(syncVisibility).observe($("#lab"),{attributes:true,attributeFilter:["hidden"]});
   // 1 / Switch Lab: repeat a single rule, then alternate parity and magnitude.
   const choices=[1,2,3,4,6,7,8,9];
   const challengeLength=20;
@@ -38,7 +53,7 @@
     $("#switch-left").disabled=false;$("#switch-right").disabled=false;
     $("#switch-start").hidden=true;
     $$(".switch-dot").forEach((d,i)=>{d.className="switch-dot";if(i<g.trial)d.classList.add(g.results[i].correct?"is-correct":"is-wrong");else if(i===g.trial)d.classList.add("is-now")});
-    g.locked=false;g.shownAt=performance.now();
+    g.locked=false;g.interrupted=false;g.shownAt=visible("switch")?performance.now():null;
   }
   function nextSwitch(){
     const g=practice.switch;
@@ -55,15 +70,15 @@
   }
   function respond(side){
     const g=practice.switch;
-    if(!g.active||g.locked||$("#play-switch").hidden||g.shownAt===0)return;
+    if(!g.active||g.locked||!visible("switch")||g.shownAt===null)return;
     const item=g.current;
     const correctSide=item.rule==="parity"?(item.value%2?"left":"right"):(item.value<5?"left":"right");
-    const rt=Math.round(performance.now()-g.shownAt);
+    const rt=g.interrupted?null:Math.max(0,Math.round(performance.now()-g.shownAt));
     const correct=correctSide===side;
     g.results.push({phase:g.trial<8?"repeat":"alternate",rt,correct,rule:item.rule,value:item.value});
     g.locked=true;$("#switch-left").disabled=true;$("#switch-right").disabled=true;
     $("#switch-note").textContent=correct?"✓ Correct":"↪ Different rule—keep going";
-    g.trial+=1;g.shownAt=0;
+    g.trial+=1;g.shownAt=null;
     setTimeout(()=>{if(g.active)nextSwitch()},correct?240:480);
   }
   function switchFinish(){
@@ -75,8 +90,8 @@
     $("#switch-note").textContent="What did you notice about changing rules?";
     $("#switch-start").hidden=false;$("#switch-start").textContent="Play again";
     const repeat=g.results.filter(x=>x.phase==="repeat"),mixed=g.results.filter(x=>x.phase==="alternate");
-    const rtA=round(med(repeat.filter(x=>x.correct).map(x=>x.rt)));
-    const rtB=round(med(mixed.filter(x=>x.correct).map(x=>x.rt)));
+    const rtA=round(med(repeat.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt)));
+    const rtB=round(med(mixed.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt)));
     const accA=repeat.filter(x=>x.correct).length,accB=mixed.filter(x=>x.correct).length;
     const root=$("#switch-results");root.replaceChildren();root.hidden=false;
     add(root,E("p","play-kicker","SESSION SNAPSHOT"),E("h4","","Repeat vs. switching"));
@@ -87,20 +102,27 @@
       add(r,E("span","",name),bar,E("strong","",ms?ms+" ms":"—"));chart.append(r);
       const note=E("p","play-chart-sub",good+" / "+total+" correct");chart.append(note);
     });
-    add(root,chart,E("p","play-chart-caption","Medians from correct responses in this single play session. Fixed order, small trial counts and practice effects make this an experience—not a valid measure of switch cost or attention."));
+    const omitted=g.results.filter(x=>x.rt===null).length;
+    if(omitted)chart.append(E("p","play-chart-sub",omitted+" interrupted response(s) excluded from timing."));
+    add(root,chart,E("p","play-chart-caption","Medians from uninterrupted correct responses only. Device and browser timing also affect these values. Fixed order, small trial counts and practice effects make this an experience—not a valid measure of switch cost or attention."));
+    root.focus();
   }
   $("#switch-start").addEventListener("click",startSwitch);
   $("#switch-left").addEventListener("click",()=>respond("left"));
   $("#switch-right").addEventListener("click",()=>respond("right"));
   document.addEventListener("keydown",e=>{
-    if($("#lab").hidden||$("#play-switch").hidden||e.altKey||e.ctrlKey||e.metaKey||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||""))return;
+    if(e.defaultPrevented||e.repeat||document.hidden||$("#lab").hidden||$("#play-switch").hidden||e.altKey||e.ctrlKey||e.metaKey||document.activeElement?.isContentEditable||document.activeElement?.getAttribute?.("role")==="tab"||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||""))return;
     if(e.key==="ArrowLeft"||e.key==="ArrowRight"){e.preventDefault();respond(e.key==="ArrowLeft"?"left":"right")}
   });
-  document.addEventListener("visibilitychange",()=>{const g=practice.switch;if(document.hidden&&g.active)g.shownAt=0;else if(!document.hidden&&g.active&&!$("#play-switch").hidden)g.shownAt=performance.now()});
+
   // 2 / Return Point: contextual resumption after a small distraction.
+  // Original fictional learning scenarios, not summaries of actual studies.
+  // Edition: 2026-11-05. Update only alongside substantive tested changes.
   const recoveryCases=[
     {context:"You're writing about AI and attention. You've read two studies about cognitive effort.",next:"Compare the two studies' measures",options:["Format the references","Compare the two studies' measures","Export your calendar"]},
-    {context:"You're preparing a group presentation. Your slides are drafted but not yet connected to your argument.",next:"Connect slide evidence to your central claim",options:["Choose a cover color","Connect slide evidence to your central claim","Book next month's room"]}
+    {context:"You're preparing a group presentation. Your slides are drafted but not yet connected to your argument.",next:"Connect slide evidence to your central claim",options:["Choose a cover color","Connect slide evidence to your central claim","Book next month's room"]},
+    {context:"You're checking an AI-generated explanation. You've found the original article, but haven't checked its results yet.",next:"Compare the explanation with the reported results",options:["Compare the explanation with the reported results","Polish the explanation's tone","Share the explanation immediately"]},
+    {context:"You're organizing a literature review. Two papers use the word attention for different kinds of tasks.",next:"Record how each paper defines and measures attention",options:["Average all the scores together","Rename the project folder","Record how each paper defines and measures attention"]}
   ];
   const distractions=[
     {prompt:"Tap the symbol that appears twice",options:["◇","●","◇ ◇"],right:2},
@@ -110,9 +132,9 @@
   ];
   function recoveryPreview(){
     const r=practice.recovery,story=recoveryCases[r.round%recoveryCases.length];
-    r.stage="ready";r.interrupt=0;r.correct=0;r.start=0;
+    r.stage="ready";r.interrupt=0;r.correct=0;r.start=0;r.interrupted=false;
     $("#recovery-stage-label").textContent="THE TASK";
-    $("#recovery-progress").textContent="STAGE 1 / 3";
+    $("#recovery-progress").textContent="TASK "+(r.round%recoveryCases.length+1)+" / "+recoveryCases.length+" · STAGE 1 / 3";
     $("#recovery-headline").textContent="A half-finished project";
     $("#recovery-description").textContent=story.context+" Your next action: "+story.next+".";
     $("#recovery-interaction").replaceChildren();
@@ -141,6 +163,7 @@
       recoveryDistract();
     },"recovery-option")));
     add(place,E("p","play-kicker","MICRO-TASK "+(r.interrupt+1)+" / 4"),options);
+    $("#recovery-headline").focus();
   }
   function recoveryReturn(){
     const r=practice.recovery; r.stage="return";
@@ -155,29 +178,32 @@
     r.start=performance.now();
     story.options.forEach((choice)=>options.append(button(choice,()=>recoveryFinish(choice===story.next), "recovery-option")));
     place.append(options);
+    r.interrupted=!visible("recovery");
+    $("#recovery-headline").focus();
   }
   function recoveryFinish(correct){
     const r=practice.recovery;if(r.stage!=="return")return;r.stage="done";
-    const elapsed=Math.max(0,round(performance.now()-r.start));
+    const elapsed=r.interrupted?null:Math.max(0,round(performance.now()-r.start));
     r.history.push({mode:r.mode,correct,ms:elapsed});
     $("#recovery-stage-label").textContent="SESSION COMPLETE";
     $("#recovery-progress").textContent="DONE";
     $("#recovery-headline").textContent=correct?"Found your return point.":"Returning isn't always simple.";
     $("#recovery-description").textContent=(correct?"You selected the intended next step.":"You selected a different step.")+" How did the checkpoint change the experience?";
     const place=$("#recovery-interaction");place.replaceChildren();
-    add(place,E("div","recovery-outcome",correct?"✓ Correct next action":"↩ Notice what was lost"),E("div","recovery-time",elapsed+" ms to choose"));
+    add(place,E("div","recovery-outcome",correct?"✓ Correct next action":"↩ Notice what was lost"),E("div","recovery-time",elapsed===null?"Timing omitted: you left this activity before choosing.":elapsed+" ms to choose"));
     $("#recovery-start").hidden=false;$("#recovery-start").textContent="Try another round ↗";
+    $("#recovery-headline").focus();
     const history=$("#recovery-history");history.replaceChildren();
     const table=E("div","recovery-trial-list");
-    r.history.slice(-4).forEach((x,i)=>{let row=E("div","recovery-trial");add(row,E("span","",x.mode==="cue"?"With checkpoint":"Without checkpoint"),E("strong","",round(x.ms/100)/10+" s  ·  "+(x.correct?"correct":"different choice")));table.append(row)});
-    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" ROUNDS"),table,E("p","play-chart-caption","These timings begin when the return choices appear. Trials differ in materials and order; they cannot establish whether checkpoints improve performance."));
+    r.history.slice(-4).forEach((x,i)=>{let row=E("div","recovery-trial");add(row,E("span","",x.mode==="cue"?"With checkpoint":"Without checkpoint"),E("strong","",(x.ms===null?"timing omitted":round(x.ms/100)/10+" s")+"  ·  "+(x.correct?"correct":"different choice")));table.append(row)});
+    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" ROUNDS"),table,E("p","play-chart-caption","Timings begin when the return choices appear and are omitted after leaving the activity. Trials differ in materials and order; they cannot establish whether checkpoints improve performance."));
   }
   $("#recovery-start").addEventListener("click",()=>{
-    const r=practice.recovery;if(r.stage==="done"){r.round++;recoveryPreview();recoveryDistract();return}
+    const r=practice.recovery;if(r.stage==="done"){r.round++;recoveryPreview();$("#recovery-headline").focus();return}
     if(r.stage==="ready")recoveryDistract();
   });
   recoveryPreview();
-  // 3 / Assistance Dial: branch through two study-design decisions.
+  // 3 / Assistance Dial: explore four fictional research-interpretation decisions.
   const scenarios=[
     {prompt:"A survey finds that students using AI summaries report spending less time reading. Can we conclude AI caused weaker comprehension?",
       options:["Yes. AI caused the comprehension change.","Not from this survey; cause and comprehension remain untested.","Yes, because the sample includes students."],
@@ -192,7 +218,21 @@
       modes:{reflect:"What does random assignment change? Which outcome was actually reported?",
              hint:"Random assignment helps causal inference; the recorded outcome was stress, not concentration.",
              answer:"The study provides stronger causal evidence for reduced reported stress in that setting, not proof of improved concentration or universal effects."},
-      feedback:"Random assignment is helpful for causal interpretation of the measured outcome, while external validity and whether focus itself improves remain separate questions."}
+      feedback:"Random assignment is helpful for causal interpretation of the measured outcome, while external validity and whether focus itself improves remain separate questions."},
+    {prompt:"An AI assistant gives a fluent, confident explanation of a study. You have not opened the original paper. What is the best next step?",
+      options:["Treat confident language as evidence of accuracy.","Check the original paper's methods and results before relying on the claim.","Reject the claim only because an AI produced it."],
+      correct:1,
+      modes:{reflect:"What evidence could support the explanation, independently of how it sounds?",
+             hint:"Fluency is a feature of the explanation. It does not verify the underlying study.",
+             answer:"Check the original methods and results, including what was measured and what limitations apply. Neither confidence nor AI authorship settles accuracy."},
+      feedback:"A persuasive explanation can be right or wrong. Trace the specific claim to its source rather than using tone as a substitute for evidence."},
+    {prompt:"In a fictional randomized study, students finish a task faster with AI help. There is no later test without help. Does this show that they learned more?",
+      options:["Yes. Faster completion always means deeper learning.","No. It proves AI prevents learning.","Neither conclusion follows; retained learning was not measured."],
+      correct:2,
+      modes:{reflect:"Is performing a task with help the same outcome as remembering how to do it later?",
+             hint:"The measured outcome is completion speed. A later unassisted test would address retention.",
+             answer:"The study supports a conclusion about task speed in that setting, not about retained learning. Both stronger and weaker learning remain untested."},
+      feedback:"Assisted performance and retained learning are distinct outcomes. A delayed, unassisted assessment would help test the learning claim."}
   ];
   function assistDraw(){
     const r=practice.assist,data=scenarios[r.scenario];r.chosen=false;
@@ -213,7 +253,7 @@
     const root=$("#assist-feedback");root.replaceChildren();
     add(root,E("strong","",ok?"✓ Supported conclusion":"↩ Another interpretation is stronger"),E("p","",data.feedback));
     root.hidden=false;$("#assist-next").hidden=false;
-    $("#assist-next").textContent=r.scenario===0?"Try another scenario ↗":"Replay the first scenario ↗";
+    $("#assist-next").textContent=r.scenario<scenarios.length-1?"Try another scenario ↗":"Replay the first scenario ↗";
   }
   $$("[data-assist-mode]").forEach(b=>b.addEventListener("click",()=>{
     const r=practice.assist;r.mode=b.dataset.assistMode;

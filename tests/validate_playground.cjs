@@ -13,7 +13,7 @@ for(const id of ["play-switch","play-recovery","play-assist","switch-start","swi
 }
 const usedIds=[...js.matchAll(/\$\("#([^"]+)"\)/g)].map(x=>x[1]);
 for(const id of new Set(usedIds)){const pure=id.split(" ")[0];assert(html.includes('id="'+pure+'"'),"Lab script selects nonexistent id "+pure)}
-const all=[],ids={};
+const all=[],ids={},observers=[];
 class FakeElement{
  constructor(tag="div",cls="",id=null){
   this.tagName=tag.toUpperCase();this._className=cls;this.classes=new Set(cls.split(/\s+/).filter(Boolean));
@@ -21,6 +21,9 @@ class FakeElement{
   this.classList={add:(...n)=>n.forEach(x=>this.classes.add(x)),remove:(...n)=>n.forEach(x=>this.classes.delete(x)),toggle:(n,v)=>{if(v===undefined)v=!this.classes.has(n);v?this.classes.add(n):this.classes.delete(n);return v},contains:n=>this.classes.has(n)};
   if(id){this.id=id;ids[id]=this}all.push(this);
  }
+ get hidden(){return this._hidden||false}
+ set hidden(value){const changed=this._hidden!==value;this._hidden=value;if(changed)observers.filter(x=>x.target===this).forEach(x=>x.callback())}
+ getAttribute(k){return this.attributes[k]??null}
  get className(){return [...this.classes].join(" ")}
  set className(c){this.classes=new Set(c.split(/\s+/).filter(Boolean))}
  append(...els){els.forEach(x=>{assert(x instanceof FakeElement,"Expected fake DOM node");this.children.push(x)})}
@@ -37,6 +40,7 @@ for(const match of html.matchAll(/<([a-z][a-z0-9]*)\b([^>]*)>/gi)){
  if(!id&&!datas.length)continue;
  const el=new FakeElement(tag,attr(atts,"class")||"",id);
  for(const [,k,v] of datas)el.dataset[k.replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]=v;
+ if(attr(atts,"role"))el.setAttribute("role",attr(atts,"role"));
  el.hidden=/(?:^|\s)hidden(?:\s|$)/.test(atts);
  el.disabled=/(?:^|\s)disabled(?:\s|$)/.test(atts);
 }
@@ -53,7 +57,23 @@ const doc={
  createElement(tag){return new FakeElement(tag)},
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
 };
-const environment={document:doc,performance:{now:()=>{environment.time+=135;return environment.time}},time:0,console,setTimeout:fn=>{fn();return 1},setInterval:()=>1,clearInterval:()=>{}};
+const timers=[];
+const environment={document:doc,performance:{now:()=>environment.time},time:100,console,
+ setTimeout:fn=>{timers.push(fn);return timers.length},
+ MutationObserver:class{constructor(callback){this.callback=callback}observe(target){this.target=target;observers.push(this)}}};
+const flush=()=>{environment.time+=500;const fn=timers.shift();assert(fn,"Expected a pending transition");fn()};
+const visibility=hidden=>{doc.hidden=hidden;for(const fn of doc.listeners.visibilitychange||[])fn()};
+const key=(key,target=doc.activeElement,extra={})=>{
+ const e={key,defaultPrevented:false,stopped:false,preventDefault(){this.defaultPrevented=true},stopPropagation(){this.stopped=true},...extra};
+ for(const fn of target.handlers?.keydown||[])fn(e);
+ if(!e.stopped)for(const fn of doc.listeners.keydown||[])fn(e);
+ return e;
+};
+const answerSwitch=()=>{
+ const num=Number(ids["switch-number"].textContent),left=ids["switch-cue"].textContent.startsWith("ODD")?num%2===1:num<5;
+ environment.time+=135;(left?ids["switch-left"]:ids["switch-right"]).click();
+};
+
 vm.runInNewContext(js,environment,{timeout:4000,filename:"lab-play.js"});
 const by=id=>{assert(ids[id],"No node "+id);return ids[id]};
 assert.equal(doc.querySelectorAll("[data-play-tab]").length,3);
@@ -61,39 +81,72 @@ assert.equal(doc.querySelectorAll(".switch-dot").length,20);
 // Task-switching game: automatically choose correct arrow for the displayed rule.
 by("lab").hidden=false;by("switch-start").click();
 assert.equal(by("switch-progress").textContent,"1 / 20");
-for(let i=0;i<20;i++){
- const rule=by("switch-cue").textContent,num=Number(by("switch-number").textContent);
- const left=rule.startsWith("ODD")?num%2===1:num<5;
- (left?by("switch-left"):by("switch-right")).click();
-}
+for(let i=0;i<20;i++){answerSwitch();flush()}
 assert.equal(by("switch-phase").textContent,"COMPLETE");
 assert.equal(by("switch-results").hidden,false);
 assert(descendants(by("switch-results")).some(x=>x.className==="play-chart"));
-// Interruption recovery trial with checkpoint and without.
+// Controllable timers catch navigation races that an immediate setTimeout mock misses.
+by("switch-start").click();
+visibility(true);environment.time+=60000;
+const trialBefore=by("switch-progress").textContent;
+by("switch-left").click();assert.equal(by("switch-progress").textContent,trialBefore);
+visibility(false);answerSwitch();
+// Leave during the feedback delay. The next trial must not start timing hidden.
+by("lab").hidden=true;flush();environment.time+=60000;by("lab").hidden=false;
+assert.equal(by("switch-progress").textContent,"2 / 20");
+// Keyboard tab navigation must not bubble into an answer on the newly active tab.
+by("tab-switch").focus();key("ArrowRight");assert.equal(by("play-recovery").hidden,false);
+key("ArrowLeft");assert.equal(by("play-switch").hidden,false);
+assert.equal(by("switch-progress").textContent,"2 / 20");assert.equal(timers.length,0);
+by("switch-left").focus();key("ArrowRight",doc.activeElement,{repeat:true});assert.equal(timers.length,0);
+key("ArrowRight",doc.activeElement,{defaultPrevented:true});assert.equal(timers.length,0);
+answerSwitch();flush();
+for(let i=2;i<20;i++){answerSwitch();flush()}
+assert(descendants(by("switch-results")).some(x=>x.textContent==="2 interrupted response(s) excluded from timing."));
+const timings=descendants(by("switch-results")).filter(x=>x.tagName==="STRONG").map(x=>x.textContent);
+assert.deepEqual(timings,["135 ms","135 ms"],"Hidden time must never inflate medians");
+assert.equal(doc.activeElement,by("switch-results"));
+// All four return tasks, both modes; replay must stop on the new readable preview.
 by("tab-recovery").click();
-for(const mode of ["cue","none"]){
- const modeEl=doc.querySelectorAll("[data-recovery-mode]").find(x=>x.dataset.recoveryMode===mode);
- modeEl.click();by("recovery-start").click();
+const stories=new Set();
+for(let i=0;i<8;i++){
+ const mode=i%2===0?"cue":"none";
+ if(i){by("recovery-start").click();assert.match(by("recovery-progress").textContent,/STAGE 1 \/ 3/);assert.equal(by("recovery-start").hidden,false);assert.equal(by("recovery-interaction").children.length,0)}
+ doc.querySelectorAll("[data-recovery-mode]").find(x=>x.dataset.recoveryMode===mode).click();
+ const preview=by("recovery-description").textContent;stories.add(preview);
+ by("recovery-start").click();
  for(const correctIndex of [2,1,2,1]){
   const choices=descendants(by("recovery-interaction")).filter(x=>x.className==="recovery-option");
   assert.equal(choices.length,3);choices[correctIndex].click();
  }
- if(mode==="cue")assert(descendants(by("recovery-interaction")).some(x=>x.className==="recovery-cue"));
+ const hasCue=descendants(by("recovery-interaction")).some(x=>x.className==="recovery-cue");
+ assert.equal(hasCue,mode==="cue");
  const options=descendants(by("recovery-interaction")).filter(x=>x.classes.has("recovery-option"));
  assert.equal(options.length,3);
- const matching=options.find(x=>x.textContent.includes(mode==="cue"?"Compare the two studies":"Compare the two studies"));
- matching.click();
+ if(i===0){by("lab").hidden=true;environment.time+=60000;by("lab").hidden=false}
+ if(i===1){visibility(true);environment.time+=60000;visibility(false)}
+ if(i===2){by("tab-assist").click();environment.time+=60000;by("tab-recovery").click()}
+ options.find(x=>preview.includes(x.textContent)).click();
  assert.equal(by("recovery-progress").textContent,"DONE");
+ if(i<3)assert(descendants(by("recovery-interaction")).some(x=>x.textContent.startsWith("Timing omitted:")));
+ assert.equal(doc.activeElement,by("recovery-headline"));
 }
-assert(descendants(by("recovery-history")).some(x=>x.classes.has("recovery-trial-list")));
-// Assisted reasoning: answer in reflective mode, then change assistance level.
+assert.equal(stories.size,4);
+assert.equal(descendants(by("recovery-history")).filter(x=>x.classes.has("recovery-trial")).length,4);
+// All four fictional scenarios are reachable under all three help settings.
 by("tab-assist").click();
-let options=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
-assert.equal(options.length,3);options[1].click();
-assert.equal(by("assist-feedback").hidden,false);
-by("assist-next").click();
-options=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
-options[0].click();
-const hint=doc.querySelectorAll("[data-assist-mode]").find(x=>x.dataset.assistMode==="hint");
-hint.click();assert(by("assist-reply").children.length>0);
-console.log("Attention Playground smoke test passed: tabs, 20 switching trials, two recovery modes, and both assistance scenarios.");
+for(const mode of ["reflect","hint","answer"]){
+ doc.querySelectorAll("[data-assist-mode]").find(x=>x.dataset.assistMode===mode).click();
+ for(let i=0;i<4;i++){
+  assert.equal(by("assist-counter").textContent,`SCENARIO ${i+1} / 4`);
+  const options=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
+  assert.equal(options.length,3);options[[1,0,1,2][i]].click();
+  assert.equal(by("assist-feedback").hidden,false);
+  assert.match(by("assist-feedback").children[0].textContent,/Supported conclusion/);
+  assert.equal(by("assist-next").textContent,i===3?"Replay the first scenario ↗":"Try another scenario ↗");
+  by("assist-next").click();
+ }
+}
+assert(html.includes('datetime="2026-11-05"'));
+assert(html.includes("Fictional scenarios and scripted assistance"));
+console.log("Attention Playground regressions passed: switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
