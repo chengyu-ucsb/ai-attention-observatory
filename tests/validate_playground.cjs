@@ -120,6 +120,7 @@ by("switch-practice").click();assert.equal(by("switch-progress").textContent,"1 
 assert.equal(doc.activeElement,by("switch-left"));assert.match(by("switch-announcement").textContent,/Turn 1 of 4/);
 for(let i=0;i<4;i++){
  answerSwitch();assert.equal(timers.length,0);assert.equal(doc.activeElement,by("switch-next"));
+ assert.equal(key("Enter",doc.activeElement,{repeat:true}).defaultPrevented,true);
  const before=by("switch-progress").textContent;answerSwitch();assert.equal(by("switch-progress").textContent,before);
  by("switch-next").click();
 }

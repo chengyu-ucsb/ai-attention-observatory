@@ -139,6 +139,9 @@
   $("#switch-left").addEventListener("click",()=>respond("left"));
   $("#switch-right").addEventListener("click",()=>respond("right"));
   document.addEventListener("keydown",e=>{
+    // Native Enter activates focused buttons on keydown. Suppress auto-repeat
+    // before returning so held keys cannot answer or advance multiple turns.
+    if(visible("switch")&&e.repeat&&e.key==="Enter"&&["switch-start","switch-practice","switch-left","switch-right","switch-next"].includes(document.activeElement?.id)){e.preventDefault();return}
     if(e.defaultPrevented||e.repeat||document.hidden||$("#lab").hidden||$("#play-switch").hidden||e.altKey||e.ctrlKey||e.metaKey||document.activeElement?.isContentEditable||document.activeElement?.getAttribute?.("role")==="tab"||/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||""))return;
     if(["switch-left","switch-right"].includes(document.activeElement?.id)&&(e.key==="ArrowLeft"||e.key==="ArrowRight")){e.preventDefault();respond(e.key==="ArrowLeft"?"left":"right")}
   });

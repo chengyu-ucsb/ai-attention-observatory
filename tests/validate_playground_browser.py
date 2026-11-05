@@ -91,8 +91,12 @@ def check(page, url, width, screenshots, zoom=1):
         assert page.locator("#switch-progress").inner_text() == f"{trial} / 4"
         assert page.evaluate("document.activeElement.id") == "switch-left"
         assert f"Turn {trial} of 4" in page.locator("#switch-announcement").inner_text()
-        page.keyboard.press("ArrowLeft")
+        page.keyboard.down("Enter")
         assert page.evaluate("document.activeElement.id") == "switch-next"
+        page.keyboard.down("Enter")
+        page.keyboard.down("Enter")
+        assert page.evaluate("document.activeElement.id") == "switch-next"
+        page.keyboard.up("Enter")
         page.wait_for_timeout(550)
         assert page.locator("#switch-progress").inner_text() == f"{trial} / 4"
         page.keyboard.press("Enter")
