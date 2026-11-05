@@ -128,6 +128,7 @@ def check_site_integration(page, url):
     page.route("**/data/public-library.json*", lambda route: route.abort())
     page.goto(real_url, wait_until="networkidle")
     page.locator("#lab").wait_for(state="visible")
+    assert page.locator("#issue-label").inner_text() == "INDEX OFFLINE"
     page.locator("#switch-start").click()
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert not errors, errors
