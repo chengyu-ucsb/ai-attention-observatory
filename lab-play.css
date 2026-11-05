@@ -112,3 +112,13 @@
   .play-head p:not(.eyebrow),.play-stage-side>p:not(.play-small){font-size:14px}
   .play-rules>div{grid-template-columns:90px minmax(0,1fr)}
 }
+
+
+/* An explicit release note, never a clock-based freshness badge. */
+.play-update{border:1px solid #e7dad8;background:#fff8f6;padding:15px 18px;margin-bottom:26px;color:#635658;font-size:13px;line-height:1.65}
+.play-update summary{cursor:pointer;display:list-item;font-weight:700;color:#673f46}
+.play-update summary>span:last-child{font-size:11px;font-weight:500;margin-left:15px}
+.play-update p{max-width:850px;margin:12px 0 0}
+.play-update a{color:var(--red);text-decoration:underline;text-underline-offset:3px}
+.play-update summary:focus-visible,.play-tab:focus-visible,.recovery-option:focus-visible,.assist-option:focus-visible{outline:2px solid var(--red);outline-offset:4px}
+@media(max-width:580px){.play-update summary>span:last-child{display:block;margin:4px 0 0}}
