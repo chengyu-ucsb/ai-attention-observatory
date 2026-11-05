@@ -29848,6 +29848,76 @@
       "last_at": "2026-11-02",
       "next_at": "2027-11-02",
       "attempts": 1
+    },
+    "complete_reading_attempt": {
+      "status": "invalid_claim_list",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10658009/",
+          "retryable": false,
+          "status": "access_challenge_not_article"
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 3,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.3389/fpsyg.2023.1261955",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/38023040",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doaj.org/article/93a83cbb1538431aa6b6f4d06d768293",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/articles/10.3389/fpsyg.2023.1261955/pdf",
+          "status": "full_document_retrieved",
+          "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2023.1261955/pdf",
+          "retryable": false
+        }
+      ]
     }
   },
   {
@@ -30780,6 +30850,28 @@
       "last_at": "2026-10-27",
       "reason": "local_analysis_failed_source_checks",
       "next_at": "2026-11-10"
+    },
+    "complete_reading_attempt": {
+      "status": "JSONDecodeError",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 6,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://eprints.whiterose.ac.uk/id/eprint/202974/1/education-13-00856.pdf",
+          "status": "full_document_retrieved",
+          "final_url": "https://eprints.whiterose.ac.uk/id/eprint/202974/1/education-13-00856.pdf",
+          "retryable": false
+        }
+      ]
     }
   },
   {
