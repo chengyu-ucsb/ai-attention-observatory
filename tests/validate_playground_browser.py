@@ -52,11 +52,12 @@ def server():
 def check(page, url, width, screenshots, zoom=1):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
-    page.set_viewport_size({"width": width, "height": 900})
+    # Native page zoom changes the effective CSS viewport. CSS body.zoom does
+    # not change media-query breakpoints, so it is not a faithful substitute.
+    # Pair a smaller layout viewport with higher pixel density in this check.
+    page.set_viewport_size({"width": width // zoom, "height": 900 // zoom})
     page.goto(url, wait_until="networkidle")
     assert page.locator("#lab").is_visible()
-    if zoom != 1:
-        page.evaluate("zoom => document.body.style.zoom = zoom", zoom)
     assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
     page.locator(".play-update summary").click()
@@ -84,6 +85,9 @@ def check(page, url, width, screenshots, zoom=1):
     page.wait_for_function("document.querySelector('#switch-phase').textContent === 'COMPLETE'")
     assert "1 interrupted response(s) excluded" in page.locator("#switch-results").inner_text()
     assert page.evaluate("document.activeElement.id") == "switch-results"
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    if screenshots:
+        page.locator("#play-switch").screenshot(path=str(screenshots / f"lab-switch-results-{width}-zoom{zoom}.png"))
     # Separate practice and untimed snapshots are completable with keyboard only.
     page.locator("#switch-practice").focus()
     page.keyboard.press("Enter")
@@ -110,6 +114,7 @@ def check(page, url, width, screenshots, zoom=1):
         page.keyboard.press("ArrowLeft")
         assert page.evaluate("document.activeElement.id") == "switch-next"
         page.keyboard.press("Enter")
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     assert "No response times were recorded." in page.locator("#switch-results").inner_text()
     assert "ms" not in page.locator("#switch-results .play-chart").inner_text()
     assert page.evaluate("document.activeElement.id") == "switch-results"
@@ -144,6 +149,7 @@ def check(page, url, width, screenshots, zoom=1):
                 page.keyboard.press("Enter")
                 break
         assert page.locator("#recovery-progress").inner_text() == "DONE"
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.locator("#recovery-start").click()
         assert "STAGE 1 / 3" in page.locator("#recovery-progress").inner_text()
         assert page.locator(".recovery-option").count() == 0
@@ -168,7 +174,7 @@ def check(page, url, width, screenshots, zoom=1):
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
-    print(f"Chromium Lab passed at {width}px / {zoom}x CSS zoom: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, all scenarios/modes.")
+    print(f"Chromium Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, all scenarios/modes.")
 
 
 def check_site_integration(page, url):
@@ -204,7 +210,7 @@ if __name__ == "__main__":
         browser = pw.chromium.launch(executable_path=args.executable_path, headless=True)
         try:
             for width, zoom in ((1280, 1), (390, 1), (320, 1), (1280, 2)):
-                page = browser.new_page(reduced_motion="reduce")
+                page = browser.new_page(reduced_motion="reduce", device_scale_factor=zoom)
                 check(page, url, width, args.screenshots, zoom)
                 page.close()
             page = browser.new_page()

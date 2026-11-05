@@ -141,8 +141,10 @@ Pages deployment; this date alone does not assert a live deployment.
   intervention-effectiveness or cognitive-assessment claim.
 - Extended deterministic tests for reset races, practice isolation, untimed
   progression and focus. Expanded hosted Chromium coverage to 320, 390 and
-  1280 px, plus a 2x CSS zoom approximation and keyboard completion. CSS zoom is
-  not a substitute for checking native browser zoom or real screen readers.
+  1280 px, plus a 640 px viewport at 2x pixel density to approximate zoom/reflow,
+  and keyboard completion. This is not a substitute for checking native browser
+  zoom or real screen readers. CSS body zoom was rejected as a proxy because it
+  does not update viewport media-query breakpoints.
 - Local JavaScript syntax, deterministic regressions and browser-test Python
   compilation pass. Local Chromium launch is blocked by the execution
   environment's socket restriction; use the actual PR CI outcome below before
