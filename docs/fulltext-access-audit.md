@@ -2,6 +2,21 @@
 
 Updated: 2026-11-05. This is the canonical audit note; update this file rather than creating parallel copies.
 
+## November 5: article-synthesis format failures
+
+The latest production reading attempt inspected here, [run 41981146610](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/41981146610), retrieved both attempted documents but completed **zero** summaries. Its separate synthesis failures were `invalid_claim_list` and `JSONDecodeError`. These were not failed downloads. The affected articles were:
+
+- Artificial intelligence in language instruction: impact on English learning achievement, L2 motivation, and self-regulated learning, DOI `10.3389/fpsyg.2023.1261955`, retrieved from Frontiers.
+- Challenges and Opportunities of Generative AI for Higher Education as Explained by ChatGPT, DOI `10.3390/educsci13090856`, retrieved from White Rose Research Online.
+
+[Run 41796490716](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/41796490716) also completed zero summaries with the same two failure categories, using partial inputs. Both workflows exited successfully because the pipeline saved per-record failures; a green workflow is not evidence of successful article synthesis.
+
+The reader requested a generic JSON object, but did not constrain its keys, claim-array shape, or field names. It allowed six claims of up to 90 words plus evidence anchors within only 1,100 output tokens, and did not inspect the completion reason or retry malformed responses. The saved logs do not contain model output, so truncation is a plausible failure route, not an established explanation of the historical JSON error.
+
+The focused repair supplies JSON schemas for both claim generation and source verification, checks the returned shape independently, allows 2,200 generation tokens, and rejects truncated or otherwise unfinished responses even if their text parses as JSON. It permits one format-only retry using the same complete source segment, bounded by the existing document deadline. Missing anchors, unsupported numbers, copied passages, unexplained empty segments, and second-pass evidence rejections still fail closed without an evidence-validation retry. No incomplete JSON prefix or partial set of accepted claims is published. Failure records now distinguish `retrieval` from `synthesis`.
+
+Eighteen new offline regressions reproduce malformed JSON, missing or invalid claim lists, truncation, exhausted retries, deadlines, and preservation of prior readings. They also confirm that format recovery cannot bypass anchor, numeric, copying, or second-pass checks and does not persist source quotations. The complete offline suite passes 234 tests; article and weekly-issue validators also pass. These use controlled model outputs. A new successful real-model whole-document synthesis and independent source-level review have **not** been verified by these tests, and no historical coverage count is increased.
+
 ## November 5: reusable acquisition workflow
 
 `scripts/retrieve_articles.py` now accepts a DOI/title bibliography and retrieves documents without loading a language model. It checkpoints each article, records provider and source failures separately, retains version and identity evidence, and skips completed unchanged inputs on a later run. A new verified candidate reopens the corresponding record. Temporary provider failures receive a shorter retry interval than an unresolved search.
@@ -132,3 +147,4 @@ The most concrete result is now a tested chain: exact-DOI discovery can identify
 - [Crossref full-text/TDM locators](https://www.crossref.org/documentation/retrieve-metadata/text-and-data-mining/)
 - [Zotero indexed full-text and coverage API](https://www.zotero.org/support/dev/web_api/v3/fulltext_content)
 - [UCSB Library text and data mining support](https://guides.library.ucsb.edu/text-data-mining/home)
+
