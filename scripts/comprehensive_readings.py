@@ -19,6 +19,10 @@ from source_quality import screen as screen_source
 ROOT=Path(__file__).resolve().parents[1]
 LIB=ROOT/'data/library.json'
 NUMBERS=re.compile(r'(?<!\w)[+-]?\d+(?:[.,]\d+)*(?:%|\b)')
+# The inference backend's regex-to-grammar converter supports character classes
+# and bounded groups, not \s/\S or non-capturing groups. Single spaces are safe:
+# source matching already normalizes whitespace. Avoid JSON escapes in anchors.
+ANCHOR_PATTERN=r'^[^ \t\n\r"\\]+( [^ \t\n\r"\\]+){4,23}$'
 
 
 class ModelFormatError(ValueError):
@@ -32,7 +36,8 @@ def claim_schema(kind):
                 'type':'object','additionalProperties':False,
                 'required':['field','text','quote'],'properties':{
                     'field':{'type':'string','enum':list(FIELDS[kind])},
-                    'text':{'type':'string'},'quote':{'type':'string'}}}},
+                    'text':{'type':'string'},
+                    'quote':{'type':'string','pattern':ANCHOR_PATTERN}}}},
             'no_claim_reason':{'type':'string'}}}
 
 
@@ -195,7 +200,10 @@ def read_chunk(model,chunk,kind,title,deadline=None):
         'Return {"claims":[{"field":"one allowed field","text":"original paraphrase",'
         '"quote":"exact 5-24 word evidence anchor from this segment"}],'
         '"no_claim_reason":"explain empty claims, otherwise an empty string"}. '
-        'Use at most six claims, each 6-90 words. Do not paraphrase references as findings. '
+        'Use at most six claims, each 6-90 words. Copy a short, exact 5-24 word '
+        'source span as each quote; use single spaces and choose a span without '
+        'quotation marks or backslashes. Never use a whole long sentence as the '
+        'anchor if it exceeds 24 words. Do not paraphrase references as findings. '
         'Every claim must be supported by THIS segment. Leave unsupported fields absent. '
         'Allowed fields: '+fields+'\nTitle: '+title+'\nSegment '+chunk['id']+':\n'+chunk['text'])
     answer=model_json(model,instruction,2200,schema=claim_schema(kind),deadline=deadline)
