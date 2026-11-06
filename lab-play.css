@@ -163,3 +163,17 @@
 .precedent-links a{color:#9d253e;font-size:12px;font-weight:700;line-height:1.6;min-height:48px;flex-shrink:0;display:inline-flex;align-items:center;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
 .precedent-links a:focus-visible{outline:2px solid var(--red);outline-offset:4px}
 @media(max-width:700px){.precedent-grid{grid-template-columns:1fr}.precedent-card{padding:22px}.precedent-card h3{font-size:25px}.precedent-links{flex-direction:column;align-items:flex-start}}
+
+/* Rich detail stays available without overwhelming the first scan. */
+.precedent-evidence>span{display:block;color:#783746;font-weight:700;margin-bottom:4px}
+.precedent-flow{display:flex;align-items:center;gap:6px;margin:0 0 16px;color:#783746}
+.precedent-flow span{flex:1;min-width:0;border:1px solid #ddc4c8;background:#f4e2e1;text-align:center;padding:9px 4px;font-size:11px;font-weight:700;line-height:1.4}
+.precedent-flow b{font-size:16px;font-weight:400}
+.precedent-card .precedent-access-summary{font-size:11px;font-weight:700;color:#783746;background:#fff;border-left:3px solid #b9828b;padding:7px 9px;margin:0 0 8px}
+.precedent-card>.precedent-links{margin-top:auto}
+.precedent-details{border-top:1px solid #e7dad8;margin-top:4px}
+.precedent-details summary{cursor:pointer;min-height:48px;padding:14px 0;font-size:12px;font-weight:700;line-height:20px;color:#783746}
+.precedent-details summary:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.precedent-details-body{padding:4px 0 0}
+.precedent-details-body .precedent-links{margin-top:0}
+@media(prefers-reduced-motion:no-preference){.precedent-details summary:hover{color:var(--red)}}

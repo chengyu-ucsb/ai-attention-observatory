@@ -69,14 +69,40 @@ def check_deadline(deadline):
         raise ValueError('deferred_document_time_budget')
 
 
-def reject_negative_verdict(answer,claim_count):
-    """A discernible rejection must not become eligible for a format retry."""
-    if 'rejected' in answer and answer['rejected']!=[]:
-        raise ValueError('claim_verification_failed')
+def validate_verdict(answer,claim_count):
+    """Require a complete index partition before interpreting support decisions.
+
+    These are final gate failures, not ModelFormatError: callers must not retry
+    an invalid verdict here or accept only the supported subset of its claims.
+    """
+    try: validate_response_shape(answer,verification_schema())
+    except ModelFormatError:
+        raise ValueError('verifier_schema_invalid') from None
+    supported=answer['supported']; rejected=answer['rejected']
+    if (len(set(supported))!=len(supported) or len(set(rejected))!=len(rejected)
+            or set(supported)&set(rejected)
+            or set(supported)|set(rejected)!=set(range(claim_count))):
+        raise ValueError('verifier_indices_invalid')
+    if rejected: raise ValueError('claim_verification_failed')
+
+
+def reject_negative_verdict(answer,claim_count,finish_reason='stop'):
+    """Keep parsed negative/incomplete verdicts final, with honest diagnostics.
+
+    Malformed negative-looking values and incomplete integer support lists
+    already prohibit retries. Duplicate support indexes now fail closed too.
+    Only complete, schema-valid index partitions can be semantic rejections.
+    Undecodable JSON is not interpreted here and retains the bounded format
+    path; no incomplete JSON prefix is salvaged as a verdict.
+    """
     accepted=answer.get('supported')
-    if (isinstance(accepted,list) and all(type(x) is int for x in accepted)
-            and set(accepted)!=set(range(claim_count))):
-        raise ValueError('claim_verification_failed')
+    discernible_rejection=('rejected' in answer and answer['rejected']!=[])
+    invalid_support=(isinstance(accepted,list) and all(type(x) is int for x in accepted)
+        and (set(accepted)!=set(range(claim_count)) or len(set(accepted))!=len(accepted)))
+    if not (discernible_rejection or invalid_support): return
+    if finish_reason=='length': raise ValueError('verifier_output_truncated')
+    if finish_reason!='stop': raise ValueError('verifier_output_incomplete')
+    validate_verdict(answer,claim_count)
 
 
 def reject_unknown_spans(answer,allowed):
@@ -219,7 +245,7 @@ def model_json(model,instruction,max_tokens=900,*,schema=None,deadline=None,
                 reason='model_output_truncated' if choice.get('finish_reason')=='length' else 'model_json_invalid'
                 raise ModelFormatError(reason) from None
             if isinstance(answer,dict) and claim_count is not None:
-                reject_negative_verdict(answer,claim_count)
+                reject_negative_verdict(answer,claim_count,choice.get('finish_reason'))
             if isinstance(answer,dict) and source_span_ids is not None:
                 reject_unknown_spans(answer,source_span_ids)
             if choice.get('finish_reason')=='length':
@@ -282,10 +308,7 @@ def read_chunk(model,chunk,kind,title,deadline=None):
             '\nCLAIMS:\n'+json.dumps(claims,ensure_ascii=False)+
             '\nORIGINAL SOURCE:\n'+chunk['text'],500,
             schema=verification_schema(),deadline=deadline,claim_count=len(claims))
-        accepted=check.get('supported')
-        if (not isinstance(accepted,list) or any(type(x) is not int for x in accepted)
-                or set(accepted)!=set(range(len(claims))) or check.get('rejected')!=[]):
-            raise ValueError('claim_verification_failed')
+        validate_verdict(check,len(claims))
     return claims
 
 

@@ -10,7 +10,9 @@ const precedentMarkup=html.slice(html.indexOf('<ul id="product-examples"'),html.
 assert.equal((precedentMarkup.match(/class="precedent-card"/g)||[]).length,4,"Four verified precedents must be available without archive data");
 assert.equal((precedentMarkup.match(/<a href="https:\/\//g)||[]).length,7,"Precedents need direct feature and access sources");
 for(const label of ["Intention Tracking guide","Freedom setup guide","Apple Focus setup guide","Android Digital Wellbeing guide"]){assert(precedentMarkup.includes(label),"Missing source guide: "+label)}
-assert(html.includes("not independent evidence of improved attention"),"Product documentation must not imply outcome evidence");
+assert(html.includes("not independent outcome evidence"),"Product documentation must not imply outcome evidence");
+assert.equal((precedentMarkup.match(/<details class="precedent-details">/g)||[]).length,4,"Full source and access details must remain available in native disclosures");
+assert.equal((precedentMarkup.match(/<strong>Access:<\/strong>/g)||[]).length,4,"Keep the complete access notes, not just short labels");
 assert(!fs.readFileSync(path.join(root,"app.js"),"utf8").includes("showProductExamples"),"Archive rendering must not replace the static, source-checked precedents");
 for(const p of ["lab-play.js","lab-play.css"])assert(html.includes(p),"Missing linked asset "+p);
 for(const p of ["lab-play.js","lab-play.css"])assert(publish.includes(p),"File not included in GitHub Pages publish workflow: "+p);

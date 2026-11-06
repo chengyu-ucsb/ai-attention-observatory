@@ -17,6 +17,9 @@ validated cognitive assessments or evidence that an intervention works.
 - Inspect main and open PRs first. Keep full-text acquisition and weekly issue
   publication independent of Lab development. Do not launch discovery/backfill
   jobs just to publish a Lab change.
+- Keep information rich without burying visitors in prose. Use visual hierarchy,
+  mechanism sketches, meaningful grouping and progressive disclosure; do not
+  achieve a shorter page by silently dropping evidence or access caveats.
 - Take the highest-value ready item below, implement it, add regression checks,
   and record the actual changes and checks. Ship small, reviewable changes.
 - Leave the current public release date unchanged until substantive changes have
@@ -217,7 +220,10 @@ determine publication status, not this date.
 ### 6 November 2026 · Source-linked design precedents
 
 - Replaced truncated, horizontally scrolling product rows with four readable
-  cards in the existing cream/red visual style. Official feature guides and
+  cards in the existing cream/red visual style. Mechanism sketches and key
+  access limits support a quick scan. Complete access notes, design questions
+  and supplementary sources remain in keyboard-operable native disclosures.
+  The main official guide stays visible on each card. Official feature guides and
   plan references are ordinary links with distinct labels, visible focus and
   48 px minimum-height targets (checked against a 44 px rendered threshold).
 - Kept the cards in the page so unavailable archive data does not remove them.
@@ -233,7 +239,8 @@ determine publication status, not this date.
   retrieved through its official redirect after an initial rate limit; later
   requests were again rate-limited. The guide was not treated as unavailable
   or as proof that every Apple device supports the feature.
-- Added deterministic card/link checks plus keyboard order, target size,
+- Added deterministic card/link/detail-preservation checks plus keyboard
+  disclosure opening/closing, control order, target size,
   viewport bounds and offline-archive checks to the browser suite. Local syntax,
   deterministic tests and Python compilation pass. Chromium and WebKit checks
   passed at all four viewport/density configurations on the review branch;
