@@ -33,6 +33,10 @@ POSITIVE = 'The classroom comparison did not establish independent learning outs
 NEGATIVE = 'The classroom comparison established lasting improvements in independent attention outside its original setting.'
 CHECK = {'supported': [0], 'rejected': []}
 REJECT = {'supported': [], 'rejected': [0]}
+FOCUSED_SUPPORT = {'number_check': 'No numerical value appears in the claim.',
+                   'scope_check': 'The claim follows the explicitly limited scope.',
+                   'anchor_check': 'The selected passage supports this limitation.', 'verdict': 'supported'}
+FOCUSED_REJECT = dict(FOCUSED_SUPPORT, scope_check='The claimed outcome was not established.', verdict='rejected')
 
 
 def fixtures():
@@ -227,9 +231,9 @@ class EvaluationTests(unittest.TestCase):
 
     def test_candidate_backend_ignoring_grammar_still_excludes_malformed_and_truncated_negative(self):
         for response, code in (
-            (completion({'supported': [], 'rejected': 'BROKEN'}), 'model_schema_invalid'),
-            (completion(REJECT, finish='length'), 'model_output_truncated'),
-            (completion({'supported': [0], 'rejected': [0]}), 'model_verdict_indices_invalid'),
+            (completion({'supported': [], 'rejected': 'BROKEN'}), 'verifier_schema_invalid'),
+            (completion(REJECT, finish='length'), 'verifier_output_truncated'),
+            (completion({'supported': [0], 'rejected': [0]}), 'verifier_indices_invalid'),
         ):
             model = Model([response, response])
             rows = self.evaluate(model, variant='exact_partition')
@@ -295,9 +299,9 @@ class EvaluationTests(unittest.TestCase):
     def test_discernible_negative_verdict_never_retries_even_if_other_fields_invalid(self):
         for answer, code in (
             (REJECT, 'claim_verification_failed'),
-            ({'supported': [], 'rejected': [0], 'private_output': SOURCE}, 'model_schema_invalid'),
-            ({'supported': [], 'rejected': []}, 'model_verdict_indices_invalid'),
-            ({'supported': [0], 'rejected': [0]}, 'model_verdict_indices_invalid'),
+            ({'supported': [], 'rejected': [0], 'private_output': SOURCE}, 'verifier_schema_invalid'),
+            ({'supported': [], 'rejected': []}, 'verifier_indices_invalid'),
+            ({'supported': [0], 'rejected': [0]}, 'verifier_indices_invalid'),
         ):
             model = Model([answer, answer])
             rows = self.evaluate(model)
@@ -307,14 +311,14 @@ class EvaluationTests(unittest.TestCase):
 
     def test_malformed_truncated_incomplete_or_invalid_index_negative_is_not_quality_rejection(self):
         for response, code in (
-            (completion({'supported': [], 'rejected': 'BROKEN'}), 'model_schema_invalid'),
-            (completion(REJECT, finish='length'), 'model_output_truncated'),
-            (completion(REJECT, finish=None), 'model_output_incomplete'),
-            (completion({'supported': [], 'rejected': [0, 0]}), 'model_verdict_indices_invalid'),
-            (completion({'supported': [], 'rejected': [1]}), 'model_verdict_indices_invalid'),
-            (completion({'supported': [-1], 'rejected': []}), 'model_verdict_indices_invalid'),
-            (completion({'supported': [0], 'rejected': [0]}), 'model_verdict_indices_invalid'),
-            (completion({'supported': [False], 'rejected': [0]}), 'model_schema_invalid'),
+            (completion({'supported': [], 'rejected': 'BROKEN'}), 'verifier_schema_invalid'),
+            (completion(REJECT, finish='length'), 'verifier_output_truncated'),
+            (completion(REJECT, finish=None), 'verifier_output_incomplete'),
+            (completion({'supported': [], 'rejected': [0, 0]}), 'verifier_indices_invalid'),
+            (completion({'supported': [], 'rejected': [1]}), 'verifier_indices_invalid'),
+            (completion({'supported': [-1], 'rejected': []}), 'verifier_indices_invalid'),
+            (completion({'supported': [0], 'rejected': [0]}), 'verifier_indices_invalid'),
+            (completion({'supported': [False], 'rejected': [0]}), 'verifier_schema_invalid'),
         ):
             with self.subTest(code=code, response=response):
                 model = Model([response, response])
@@ -328,7 +332,114 @@ class EvaluationTests(unittest.TestCase):
         model = Model([{'supported': [0, 0], 'rejected': []}] * 2)
         rows = self.evaluate(model)
         self.assertEqual(len(model.calls), 2)
-        self.assertTrue(all(row['code'] == 'model_verdict_indices_invalid' and row['outcome'] is None for row in rows))
+        self.assertTrue(all(row['code'] == 'verifier_indices_invalid' and row['outcome'] is None for row in rows))
+
+    def test_focused_checks_accept_only_after_both_passes_and_leave_original_call_unchanged(self):
+        reference = Model([CHECK, CHECK])
+        self.evaluate(reference, variant='exact_partition')
+        model = Model([CHECK, FOCUSED_SUPPORT, CHECK, FOCUSED_SUPPORT])
+        rows = self.evaluate(model, variant='focused_checks')
+        self.assertEqual(len(model.calls), 4)
+        self.assertEqual([row['outcome'] for row in rows], ['true_acceptance', 'false_acceptance'])
+        self.assertTrue(all(row['stage'] == 'focused_verifier' for row in rows))
+        self.assertEqual(model.calls[::2], reference.calls)
+        for call in model.calls[1::2]:
+            self.assertEqual(call['max_tokens'], 900)
+            self.assertEqual(call['seed'], 7)
+            self.assertEqual(call['temperature'], 0.1)
+            schema = call['response_format']['schema']
+            self.assertEqual(list(schema['properties']), ['number_check', 'scope_check', 'anchor_check', 'verdict'])
+            self.assertEqual(schema['required'], list(schema['properties']))
+            self.assertFalse(schema['additionalProperties'])
+            self.assertEqual(schema['properties']['verdict']['enum'], ['supported', 'rejected'])
+
+    def test_original_rejection_invalid_verdict_or_copy_gate_never_gets_focused_recovery(self):
+        for answer, code in ((REJECT, 'claim_verification_failed'),
+                             ({'supported': [], 'rejected': []}, 'verifier_indices_invalid')):
+            model = Model([answer, answer])
+            rows = self.evaluate(model, variant='focused_checks')
+            self.assertEqual(len(model.calls), 2)
+            self.assertTrue(all(row['code'] == code for row in rows))
+            self.assertTrue(all('verdict' not in call['response_format']['schema']['properties'] for call in model.calls))
+        data = fixtures()
+        data['sources'][0]['cases'][1]['text'] = ' '.join(SOURCE.split()[:20])
+        model = Model([CHECK, FOCUSED_SUPPORT])
+        rows = self.evaluate(model, data, variant='focused_checks')
+        self.assertEqual(rows[1]['code'], 'copied_source_passage')
+        self.assertEqual(len(model.calls), 2)
+
+    def test_focused_semantic_negative_is_final_without_retry_or_resurrection(self):
+        model = Model([CHECK, FOCUSED_REJECT, CHECK, FOCUSED_REJECT, FOCUSED_SUPPORT])
+        rows = self.evaluate(model, variant='focused_checks')
+        self.assertEqual(len(model.calls), 4)
+        self.assertTrue(all(row['code'] == 'focused_verification_failed' for row in rows))
+        self.assertTrue(all(row['stage'] == 'focused_verifier' for row in rows))
+        self.assertEqual([row['outcome'] for row in rows], ['false_rejection', 'true_rejection'])
+
+    def test_malformed_negative_or_incomplete_focused_checks_are_excluded_without_retry(self):
+        invalid_json = {'choices': [{'finish_reason': 'stop', 'message': {'content': 'PRIVATE INVALID RESPONSE'}}]}
+        for response, code in (
+            (completion(FOCUSED_REJECT, finish='length'), 'model_output_truncated'),
+            (completion(FOCUSED_REJECT, finish=None), 'model_output_incomplete'),
+            (completion(dict(FOCUSED_REJECT, number_check='')), 'model_schema_invalid'),
+            (completion(dict(FOCUSED_REJECT, number_check=3)), 'model_schema_invalid'),
+            (completion(dict(FOCUSED_REJECT, scope_check='too many words ' * 40)), 'model_schema_invalid'),
+            (completion(dict(FOCUSED_REJECT, extra='PRIVATE TEXT')), 'model_schema_invalid'),
+            (completion({'verdict': 'rejected', **FOCUSED_REJECT}), 'model_schema_invalid'),
+            (completion({'verdict': 'rejected'}), 'model_schema_invalid'),
+            (invalid_json, 'model_json_invalid'),
+        ):
+            with self.subTest(code=code):
+                model = Model([CHECK, response, CHECK, response])
+                rows = self.evaluate(model, variant='focused_checks')
+                self.assertEqual(len(model.calls), 4)
+                self.assertTrue(all(row['code'] == code and row['outcome'] is None for row in rows))
+                self.assertEqual(evaluation.metrics(rows)['quality_evaluated'], 0)
+
+    def test_focused_context_and_deadline_checks_precede_and_follow_extra_call(self):
+        model = Model([CHECK, FOCUSED_SUPPORT, CHECK, FOCUSED_SUPPORT])
+        with patch.object(reading, 'check_context_budget') as context:
+            self.evaluate(model, variant='focused_checks')
+        self.assertEqual([call.args[2] for call in context.call_args_list], [2200, 500, 900] * 2)
+        for call in context.call_args_list[2::3]:
+            self.assertIs(call.args[0], model)
+        model = Model([CHECK, CHECK])
+        def context_block(model, messages, max_tokens):
+            if max_tokens == 900:
+                raise ValueError('deferred_model_context_budget')
+        with patch.object(reading, 'check_context_budget', side_effect=context_block):
+            rows = self.evaluate(model, variant='focused_checks')
+        self.assertEqual(len(model.calls), 2)
+        self.assertTrue(all(row['status'] == 'context_error' and row['outcome'] is None for row in rows))
+        case = fixtures()['sources'][0]['cases'][0]
+        for fail_at in (0, 1, 2):
+            model = Model([FOCUSED_SUPPORT])
+            effects = [None] * fail_at + [evaluation.DeadlineExceeded()]
+            with patch.object(evaluation, 'check_deadline', side_effect=effects), self.assertRaises(evaluation.DeadlineExceeded):
+                evaluation.focused_verification(model, case, SOURCE, 1)
+            self.assertEqual(len(model.calls), 1 if fail_at == 2 else 0)
+
+    def test_focused_prompt_uses_no_labels_or_rationales_and_saves_no_transient_checks(self):
+        data = fixtures()
+        before = copy.deepcopy(data)
+        private = 'PRIVATE TRANSIENT CHECK never save this explanation'
+        answer = dict(FOCUSED_SUPPORT, number_check=private)
+        model = Model([CHECK, answer, CHECK, answer])
+        rows = self.evaluate(model, data, variant='focused_checks')
+        changed = copy.deepcopy(data)
+        for case in changed['sources'][0]['cases']:
+            case['expected_supported'] = not case['expected_supported']
+            case['rationale'] = 'Different private annotation never supplied to model.'
+        other = Model([CHECK, answer, CHECK, answer])
+        self.evaluate(other, changed, variant='focused_checks')
+        self.assertEqual(model.calls, other.calls)
+        self.assertEqual(data, before)
+        self.assertNotIn(private, json.dumps(rows))
+        self.assertNotIn(SOURCE, json.dumps(rows))
+        for case in data['sources'][0]['cases']:
+            self.assertNotIn(case['rationale'], json.dumps(model.calls))
+            self.assertNotIn(case['id'], json.dumps(model.calls))
+        self.assertNotIn('expected_supported', json.dumps(model.calls))
 
     def test_format_retry_then_valid_rejection_only_counts_valid_final_verdict(self):
         invalid = {'supported': [0]}
@@ -416,6 +527,25 @@ class EvaluationTests(unittest.TestCase):
 
 
 class BoundedWorkerAndCliTests(unittest.TestCase):
+    def test_focused_report_identifies_additional_budget_without_changing_first_pass_settings(self):
+        reports = {}
+        for variant in ('exact_partition', 'focused_checks'):
+            context = Mock()
+            context.Process.return_value.is_alive.return_value = False
+            context.Queue.return_value.get.return_value = {'worker_failed': True}
+            reports[variant] = evaluation.run_bounded(fixtures(), '/never-loaded.gguf', 1, context=context,
+                                                      variant=variant, model_profile='qwen2.5-7b')
+        focused = reports['focused_checks']
+        self.assertEqual(focused['variant'], 'focused_checks')
+        self.assertEqual(focused['model_profile'], 'qwen2.5-7b')
+        self.assertEqual(focused['settings']['focused_verification_max_tokens'], 900)
+        self.assertEqual(focused['settings']['focused_max_calls_per_accepted_claim'], 1)
+        self.assertEqual(focused['settings']['focused_format_retries'], 0)
+        self.assertEqual(focused['settings']['verification_max_tokens'], 500)
+        for key in ('seed', 'n_ctx', 'chat_format', 'temperature', 'generation', 'n_threads', 'deadline_seconds'):
+            self.assertEqual(focused['settings'][key], reports['exact_partition']['settings'][key])
+        self.assertEqual(reports['exact_partition']['settings']['focused_verification_max_tokens'], 0)
+
     def test_worker_loads_same_model_seed_and_reports_file_hash_not_verified_identity(self):
         model = Model([CHECK, REJECT])
         backend = Mock()

@@ -1,14 +1,7 @@
 name: Deepen source readings
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'scripts/enrich_deep_readings.py'
-      - 'scripts/full_document_access.py'
-      - 'scripts/comprehensive_readings.py'
-      - 'tests/test_deep_readings.py'
-      - 'tests/test_complete_source_reading.py'
-      - '.github/workflows/deepen-readings.yml'
+  # Code changes receive offline PR checks, not extra production model runs.
+  # Keep the regular production schedule and manual runs available below.
   pull_request:
     branches: [main]
     paths:
@@ -93,3 +86,4 @@ jobs:
               exit 1
             fi
           fi
+

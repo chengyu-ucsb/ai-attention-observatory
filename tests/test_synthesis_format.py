@@ -125,6 +125,7 @@ class SynthesisFormatTests(unittest.TestCase):
         self.assertEqual(calls[0].kwargs['response_format']['schema'], reading.claim_schema('scholarly', reading.source_spans(CHUNK)))
         self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema())
         self.assertEqual(calls[0].kwargs['max_tokens'], 2200)
+        self.assertEqual(calls[1].kwargs['max_tokens'], 500)
         self.assertIn('limitations', calls[0].kwargs['response_format']['schema']['properties']['claims']['items']['properties']['field']['enum'])
 
     def test_malformed_json_can_recover_once_before_all_evidence_checks(self):
@@ -186,13 +187,14 @@ class SynthesisFormatTests(unittest.TestCase):
         self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_second_pass_rejection_and_missing_indexes_do_not_retry(self):
-        for verdict in ({'supported': [], 'rejected': [0]},
-                        {'supported': [], 'rejected': []},
-                        {'supported': [1], 'rejected': []}):
+        for verdict, reason in (({'supported': [], 'rejected': [0]}, 'claim_verification_failed'),
+                                ({'supported': [], 'rejected': []}, 'verifier_indices_invalid'),
+                                ({'supported': [1], 'rejected': []}, 'verifier_indices_invalid')):
             with self.subTest(verdict=verdict):
-                model = model_with(ANSWER, verdict)
-                with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
+                model = model_with(ANSWER, verdict, CHECK)
+                with self.assertRaisesRegex(ValueError, '^'+reason+'$') as raised:
                     reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
                 self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_second_pass_format_repair_still_requires_all_indexes(self):
@@ -203,20 +205,143 @@ class SynthesisFormatTests(unittest.TestCase):
     def test_explicit_verifier_rejection_cannot_be_retried_as_malformed(self):
         for verdict in ({'supported': [True], 'rejected': [0]},
                         {'supported': [], 'rejected': [], 'extra': 'malformed'},
-                        {'supported': [0], 'rejected': 'claim is unsupported'}):
+                        {'supported': [0], 'rejected': 'claim is unsupported'},
+                        {'supported': [0], 'rejected': None},
+                        {'supported': [0], 'rejected': False},
+                        {'supported': [0], 'rejected': [False]},
+                        {'supported': 'not indexes', 'rejected': [0]},
+                        {'rejected': [0]},
+                        {'supported': []}):
             with self.subTest(verdict=verdict):
                 model = model_with(ANSWER, verdict, CHECK)
-                with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
+                with self.assertRaisesRegex(ValueError, '^verifier_schema_invalid$') as raised:
                     reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
                 self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_explicit_rejection_is_final_even_when_completion_reports_length(self):
-        model = Mock()
-        model.create_chat_completion.side_effect = [completion(ANSWER),
-            completion({'supported': [], 'rejected': [0]}, 'length'), completion(CHECK)]
-        with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
+        for verdict in ({'supported': [], 'rejected': [0]},
+                        {'supported': [], 'rejected': []},
+                        {'supported': [0], 'rejected': [0]},
+                        {'rejected': [0]}):
+            for finish, reason in (('length', 'verifier_output_truncated'),
+                                   ('content_filter', 'verifier_output_incomplete'),
+                                   (None, 'verifier_output_incomplete')):
+                with self.subTest(verdict=verdict, finish=finish):
+                    model = Mock()
+                    model.create_chat_completion.side_effect = [completion(ANSWER),
+                        completion(verdict, finish), completion(CHECK)]
+                    with self.assertRaisesRegex(ValueError, '^'+reason+'$') as raised:
+                        reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                    self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
+                    self.assertEqual(model.create_chat_completion.call_count, 2)
+
+    def test_verifier_partitions_require_unique_in_range_disjoint_and_all_indexes(self):
+        for count, verdict in (
+            (1, {'supported': [0, 0], 'rejected': []}),
+            (1, {'supported': [], 'rejected': [0, 0]}),
+            (1, {'supported': [0], 'rejected': [0]}),
+            (1, {'supported': [0, 1], 'rejected': []}),
+            (1, {'supported': [], 'rejected': [1]}),
+            (1, {'supported': [-1], 'rejected': [0]}),
+            (1, {'supported': [0], 'rejected': [-1]}),
+            (2, {'supported': [0], 'rejected': []}),
+            (2, {'supported': [], 'rejected': [0]}),
+            (3, {'supported': [0], 'rejected': [1]}),
+        ):
+            with self.subTest(count=count, verdict=verdict):
+                model = model_with(verdict, {'supported': list(range(count)), 'rejected': []})
+                with self.assertRaisesRegex(ValueError, '^verifier_indices_invalid$') as raised:
+                    reading.model_json(model, 'Verify claims', schema=reading.verification_schema(),
+                                       claim_count=count)
+                self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
+                self.assertEqual(model.create_chat_completion.call_count, 1)
+
+    def test_only_complete_valid_negative_partitions_are_semantic_rejections(self):
+        for verdict in ({'supported': [2, 0], 'rejected': [1]},
+                        {'supported': [], 'rejected': [2, 0, 1]},
+                        {'supported': [0], 'rejected': [2, 1]}):
+            with self.subTest(verdict=verdict):
+                model = model_with(verdict)
+                with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
+                    reading.model_json(model, 'Verify claims', schema=reading.verification_schema(),
+                                       claim_count=3)
+                self.assertEqual(model.create_chat_completion.call_count, 1)
+        accepted = {'supported': [2, 0, 1], 'rejected': []}
+        model = model_with(accepted)
+        self.assertEqual(reading.model_json(model, 'Verify claims',
+                         schema=reading.verification_schema(), claim_count=3), accepted)
+        self.assertEqual(model.create_chat_completion.call_count, 1)
+
+    def test_final_read_chunk_gate_rechecks_schema_and_exact_partition(self):
+        for verdict, reason in (({'supported': [0, 0], 'rejected': []}, 'verifier_indices_invalid'),
+                                ({'supported': [], 'rejected': []}, 'verifier_indices_invalid'),
+                                ({'supported': [0]}, 'verifier_schema_invalid'),
+                                ({'supported': [], 'rejected': [0]}, 'claim_verification_failed')):
+            with self.subTest(verdict=verdict):
+                with patch.object(reading, 'model_json', side_effect=[ANSWER, verdict]):
+                    with self.assertRaisesRegex(ValueError, '^'+reason+'$'):
+                        reading.read_chunk(Mock(), CHUNK, 'scholarly', 'Title')
+
+    def test_every_complete_partition_accepts_only_unanimous_support(self):
+        for count in range(1, 7):
+            for mask in range(1 << count):
+                verdict = {'supported': [i for i in range(count) if mask & (1 << i)],
+                           'rejected': [i for i in range(count) if not mask & (1 << i)]}
+                with self.subTest(count=count, mask=mask):
+                    model = model_with(verdict)
+                    if verdict['rejected']:
+                        with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
+                            reading.model_json(model, 'Verify claims',
+                                schema=reading.verification_schema(), claim_count=count)
+                    else:
+                        self.assertEqual(reading.model_json(model, 'Verify claims',
+                            schema=reading.verification_schema(), claim_count=count), verdict)
+                    self.assertEqual(model.create_chat_completion.call_count, 1)
+
+    def test_pure_verifier_format_errors_keep_only_one_retry(self):
+        for verdict, reason in (({'supported': [True], 'rejected': []}, 'model_schema_invalid'),
+                                ({'supported': [0]}, 'model_schema_invalid'),
+                                ({'rejected': []}, 'model_schema_invalid'),
+                                ({**CHECK, 'extra': 'malformed'}, 'model_schema_invalid'),
+                                ([], 'model_schema_invalid'),
+                                ('{"supported": [], "rejected": [0]', 'model_json_invalid')):
+            with self.subTest(verdict=verdict):
+                # Undecodable JSON is never mined for a partial verdict, even
+                # when its prefix contains text resembling rejected indexes.
+                model = model_with(ANSWER, verdict, CHECK)
+                self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+                self.assertEqual(model.create_chat_completion.call_count, 3)
+                self.assertIn('FORMAT RETRY: '+reason,
+                              model.create_chat_completion.call_args_list[2].kwargs['messages'][-1]['content'])
+                model = model_with(ANSWER, verdict, verdict, CHECK)
+                with self.assertRaisesRegex(reading.ModelFormatError, '^'+reason+'$'):
+                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                self.assertEqual(model.create_chat_completion.call_count, 3)
+
+    def test_pure_verifier_truncation_or_incomplete_output_keeps_bounded_retry(self):
+        for finish, reason in (('length', 'model_output_truncated'),
+                               (None, 'model_output_incomplete')):
+            with self.subTest(finish=finish):
+                model = Mock()
+                model.create_chat_completion.side_effect = [completion(ANSWER),
+                    completion(CHECK, finish), completion(CHECK)]
+                self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+                self.assertEqual(model.create_chat_completion.call_count, 3)
+                model = Mock()
+                model.create_chat_completion.side_effect = [completion(ANSWER),
+                    completion(CHECK, finish), completion(CHECK, finish), completion(CHECK)]
+                with self.assertRaisesRegex(reading.ModelFormatError, '^'+reason+'$'):
+                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                self.assertEqual(model.create_chat_completion.call_count, 3)
+
+    def test_verifier_format_retry_cannot_retry_a_later_invalid_partition(self):
+        model = model_with(ANSWER, {'supported': [True], 'rejected': []},
+                           {'supported': [0], 'rejected': [0]}, CHECK)
+        with self.assertRaisesRegex(ValueError, '^verifier_indices_invalid$') as raised:
             reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
-        self.assertEqual(model.create_chat_completion.call_count, 2)
+        self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
+        self.assertEqual(model.create_chat_completion.call_count, 3)
 
     def test_empty_claims_need_a_substantive_explanation(self):
         model = model_with({'claims': [], 'no_claim_reason': ''})
@@ -254,6 +379,23 @@ class SynthesisFormatTests(unittest.TestCase):
         self.assertEqual(record['deep_analysis'], previous)
         self.assertNotIn(SOURCE, json.dumps(record))
         self.assertNotIn(CLAIM['quote'], json.dumps(record))
+
+    def test_invalid_verifier_is_recorded_without_semantic_rejection_or_rewrite(self):
+        previous = {'version': 2, 'source_depth': 'full_text', 'limitations': 'Existing note.'}
+        record = {'kind': 'scholarly', 'title': 'Title', 'deep_analysis': copy.deepcopy(previous)}
+        doc = Document([{'location': 'page:1', 'text': SOURCE}], 'https://www.econstor.eu/paper.pdf',
+                       coverage={'evidence_status': 'full_document_retrieved'})
+        model = model_with(ANSWER, {'supported': [0], 'rejected': [0]}, CHECK)
+        with patch.object(reading, 'screen_source', return_value={'decision': 'include'}):
+            stats = reading.process([record], model, retriever=lambda row: (doc, []))
+        self.assertEqual(stats['summaries_completed'], 0)
+        self.assertEqual(stats['failure_stages'], {'synthesis': 1})
+        self.assertEqual(stats['failure_reasons'], {'verifier_indices_invalid': 1})
+        self.assertEqual(record['complete_reading_attempt']['status'], 'verifier_indices_invalid')
+        self.assertEqual(record['deep_analysis'], previous)
+        self.assertNotIn('claim_verification_failed', json.dumps(record))
+        self.assertNotIn(SOURCE, json.dumps(record))
+        self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_no_source_is_retrieval_failure_and_never_calls_model(self):
         record = {'kind': 'scholarly', 'title': 'Title'}

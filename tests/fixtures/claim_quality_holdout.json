@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "review_status": "assistant_source_reviewed_not_independent_expert_review",
+  "review_scope": "Assistant inspection of canonical publisher passages, article-specific license notices, bibliographic details, and claim/anchor relationships on 2026-11-06. Independently source-checked holdout preparation without viewing model outputs or candidate prompts and without running inference. Not independent expert review, a statistically representative benchmark, or validation of the studies themselves. These two sources are distinct from the diagnostic fixture sources; hold them out from current diagnostic prompt development.",
+  "label_definition": "A supported case requires the entire claim to follow from the selected source text AND the selected production source span to provide relevant evidence. An unrelated_anchor negative deliberately pairs an otherwise true claim with an irrelevant literal span. Every positive and negative case passes the deterministic production claim gate, so the intended differences require semantic judgment. Case IDs, expected labels, categories, and rationales are evaluation-only annotations and must be excluded from model input.",
+  "sources": [
+    {
+      "id": "ozcelik_2024_writing",
+      "title": "Cultivating writing skills: the role of ChatGPT as a learning assistant—a case study",
+      "doi": "10.1186/s40561-024-00296-8",
+      "url": "https://link.springer.com/article/10.1186/s40561-024-00296-8",
+      "authors": [
+        "Nermin Punar Özçelik",
+        "Gonca Yangın Ekşi"
+      ],
+      "published": "2024-03-18",
+      "year": 2024,
+      "library_match": "data/library.json DOI match",
+      "section": "Methodology; Methodology / Participants; Methodology / Treatment and data collection process; Results and discussion / Research question 2; Conclusion",
+      "license_verification_basis": "Canonical Springer Nature article, Rights and permissions section, explicitly licenses this article under Creative Commons Attribution 4.0 International, allowing use, sharing, adaptation, distribution and reproduction with author/source credit and an indication of changes. The article-specific license link was followed and resolved to https://creativecommons.org/licenses/by/4.0/. Author names and publication date were checked in the article header and About this article.",
+      "review_note": "Primary one-shot qualitative case study of ChatGPT-assisted writing. Methods establish 11 volunteers and a two-week lesson period. Results and discussion report participant perceptions; these are not measured durable writing gains. The selected Conclusion sentence explicitly limits assessment of long-term effects. The fixture checks faithful representation, not the validity or generalizability of this study.",
+      "reuse_note": "Attribution: Nermin Punar Özçelik and Gonca Yangın Ekşi (2024), Cultivating writing skills: the role of ChatGPT as a learning assistant—a case study, Smart Learning Environments 11, article 10, https://doi.org/10.1186/s40561-024-00296-8. Reused under CC BY 4.0. No author endorsement of these annotations is implied.",
+      "excerpt_note": "Brief, non-contiguous author-written prose excerpts, not the full paper. Selected complete sentences retain their wording; whitespace, including nonbreaking spaces around durations, is normalized. Blank lines separate selections. Location start/end values are zero-based character offsets into text, with end exclusive. Production source-span quotes are whitespace-normalized literal spans. Claims and rationales are original fixture annotations, not author statements.",
+      "kind": "scholarly",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_verified_at": "2026-11-06",
+      "source_verified_at": "2026-11-06",
+      "review_status": "assistant_source_reviewed_not_independent_expert_review",
+      "text": "In the present study, a one-shot case study which is a pre-experimental design has been administered.\n\nA total of 11 students from different departments with an English language level above B1 were included in this study on a voluntary basis.\n\nAccording to the lesson plan, a writing lesson was held with the participants via Google Meet for 2 weeks, with two weekly lessons consisting of 50 min.\n\nChatGPT was perceived as more beneficial for formal text corrections. It was criticized for making changes without providing explanations. Students felt that ChatGPT focused more on grammar and punctuation than vocabulary.\n\nFurthermore, the length and scope of the study might not have permitted a thorough assessment of the long-term impacts of ChatGPT use on writing development.",
+      "excerpt_locations": [
+        {
+          "section": "Methodology",
+          "locator": "Opening paragraph, first sentence, beginning In the present study.",
+          "start": 0,
+          "end": 101
+        },
+        {
+          "section": "Methodology / Participants",
+          "locator": "First paragraph, third sentence, beginning A total of 11 students.",
+          "start": 103,
+          "end": 242
+        },
+        {
+          "section": "Methodology / Treatment and data collection process",
+          "locator": "First paragraph, second sentence, beginning According to the lesson plan.",
+          "start": 244,
+          "end": 396
+        },
+        {
+          "section": "Results and discussion / Research question 2",
+          "locator": "Paragraph beginning The results under the opinion theme; second through fourth sentences.",
+          "start": 398,
+          "end": 620
+        },
+        {
+          "section": "Conclusion",
+          "locator": "Paragraph beginning Furthermore, it's possible; second sentence, beginning Furthermore, the length and scope.",
+          "start": 622,
+          "end": 779
+        }
+      ],
+      "cases": [
+        {
+          "id": "ozcelik_2024_writing_sample_duration_supported",
+          "field": "study_design",
+          "text": "The writing lessons involved 11 volunteers and ran over 2 weeks.",
+          "quote": "A total of 11 students from different departments with an English language level above B1 were",
+          "source_span": "C0001:S002",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The Participants passage gives 11 voluntary students, and Treatment and data collection process gives a two-week lesson period. The selected span directly establishes the sample count; the complete excerpt supplies the duration."
+        },
+        {
+          "id": "ozcelik_2024_writing_perceptions_supported",
+          "field": "reported_results",
+          "text": "Students described ChatGPT as especially useful for editing formal writing, while criticizing its unexplained revisions.",
+          "quote": "of 50 min. ChatGPT was perceived as more beneficial for formal text corrections. It was criticized",
+          "source_span": "C0001:S005",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The Results and discussion selection reports perceived usefulness for formal corrections and criticism of unexplained changes. The claim keeps these as student perceptions rather than an objective or lasting learning effect; the anchor directly supports the formal-writing benefit."
+        },
+        {
+          "id": "ozcelik_2024_writing_sample_duration_role_swap",
+          "field": "study_design",
+          "text": "The writing lessons involved 2 volunteers and ran over 11 weeks.",
+          "quote": "A total of 11 students from different departments with an English language level above B1 were",
+          "source_span": "C0001:S002",
+          "expected_supported": false,
+          "category": "numeric",
+          "rationale": "The numbers both appear in the selected source text, but the claim interchanges their roles: 11 is the participant count and 2 is the duration in weeks."
+        },
+        {
+          "id": "ozcelik_2024_writing_long_term_gain_overclaim",
+          "field": "reported_results",
+          "text": "The study established that ChatGPT use produces lasting improvements in students' writing development.",
+          "quote": "than vocabulary. Furthermore, the length and scope of the study might not have permitted a thorough",
+          "source_span": "C0001:S007",
+          "expected_supported": false,
+          "category": "omitted_caveat",
+          "rationale": "The Conclusion specifically says that the study length and scope might not permit a thorough assessment of long-term writing effects. The claim removes that decisive caveat and upgrades a limited qualitative study to an established lasting effect."
+        },
+        {
+          "id": "ozcelik_2024_writing_sample_duration_unrelated_anchor",
+          "field": "study_design",
+          "text": "The writing lessons involved 11 volunteers and ran over 2 weeks.",
+          "quote": "for making changes without providing explanations. Students felt that ChatGPT focused more on grammar and punctuation",
+          "source_span": "C0001:S006",
+          "expected_supported": false,
+          "category": "unrelated_anchor",
+          "rationale": "This is the same source-supported claim as sample_duration_supported, but the selected span concerns unexplained revisions and students' views about grammar and punctuation. It supplies neither the participant count nor the lesson duration."
+        }
+      ]
+    },
+    {
+      "id": "grinschgl_2023_dual_task",
+      "title": "Mutual interplay between cognitive offloading and secondary task performance",
+      "doi": "10.3758/s13423-023-02312-3",
+      "url": "https://link.springer.com/article/10.3758/s13423-023-02312-3",
+      "authors": [
+        "Sandra Grinschgl",
+        "Frank Papenmeier",
+        "Hauke S. Meyerhoff"
+      ],
+      "published": "2023-06-13",
+      "year": 2023,
+      "library_match": "No DOI match in data/library.json on 2026-11-06; independently selected adjacent cognitive-offloading primary study. No library record was added or changed.",
+      "section": "Results / Secondary task performance; Method / Apparatus",
+      "license_verification_basis": "Canonical Springer Nature article, Rights and permissions section, explicitly licenses this article under Creative Commons Attribution 4.0 International, allowing use, sharing, adaptation, distribution and reproduction with author/source credit and an indication of changes. The article-specific license link was followed and resolved to https://creativecommons.org/licenses/by/4.0/. Author names and publication date were checked in the article header and About this article.",
+      "review_note": "Primary preregistered dual-task experiment about cognitive offloading, not generative AI. The selected Results sentences distinguish N-back sensitivity from response time when comparing lockout conditions. The sensitivity comparison reports p = .011; the response-time comparison reports p = .206 and no difference. Apparatus prose supplies a deliberately irrelevant anchor. No long-term transfer or GenAI outcome is inferred.",
+      "reuse_note": "Attribution: Sandra Grinschgl, Frank Papenmeier and Hauke S. Meyerhoff (2023), Mutual interplay between cognitive offloading and secondary task performance, Psychonomic Bulletin & Review 30, 2250–2261, https://doi.org/10.3758/s13423-023-02312-3. Reused under CC BY 4.0. No author endorsement of these annotations is implied.",
+      "excerpt_note": "Brief, non-contiguous author-written prose excerpts, not the full paper. The first and third sentences of the opening Secondary task performance paragraph are selected; its intervening preregistration sentence is omitted. Its following response-time sentence and one Apparatus sentence are retained. Whitespace and hyperlink formatting are normalized; partial eta squared is rendered as ηp², flattening the publisher subscript p and superscript 2. Statistical values and wording are unchanged. Blank lines separate selections. Location start/end values are zero-based character offsets into text, with end exclusive. Production source-span quotes are whitespace-normalized literal spans. Claims and rationales are original fixture annotations, not author statements.",
+      "kind": "scholarly",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_verified_at": "2026-11-06",
+      "source_verified_at": "2026-11-06",
+      "review_status": "assistant_source_reviewed_not_independent_expert_review",
+      "text": "We analyzed secondary task performance in the conditions in which participants responded to the N-back task.\n\nWe observed a higher sensitivity in the no lockout than lockout condition, t(84) = −2.60, p = .011, ηp² = .07, 95% CI [.01, .19] (see Fig. 3).\n\nRegarding response time, there was no difference between these conditions, t(84) = 1.27, p = .206, ηp² = .02, 95% CI [.00, .11].\n\nThe auditory stimuli for the secondary task (N-back task) were presented via headphones, and a foot pedal served as an input device for this task.",
+      "excerpt_locations": [
+        {
+          "section": "Results / Secondary task performance",
+          "locator": "Opening paragraph, first sentence, beginning We analyzed secondary task performance.",
+          "start": 0,
+          "end": 108
+        },
+        {
+          "section": "Results / Secondary task performance",
+          "locator": "Opening paragraph, third sentence, beginning We observed a higher sensitivity; retains the parenthetical Figure 3 reference.",
+          "start": 110,
+          "end": 252
+        },
+        {
+          "section": "Results / Secondary task performance",
+          "locator": "Following paragraph, complete sentence beginning Regarding response time.",
+          "start": 254,
+          "end": 382
+        },
+        {
+          "section": "Method / Apparatus",
+          "locator": "Opening paragraph, fourth sentence, beginning The auditory stimuli for the secondary task.",
+          "start": 384,
+          "end": 530
+        }
+      ],
+      "cases": [
+        {
+          "id": "grinschgl_2023_dual_task_pvalues_supported",
+          "field": "reported_results",
+          "text": "The sensitivity comparison produced p = .011, while the response-time comparison produced p = .206.",
+          "quote": "= .011, ηp² = .07, 95% CI [.01, .19] (see Fig. 3). Regarding response time, there",
+          "source_span": "C0001:S003",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The Results attach .011 to sensitivity and .206 to response time. The anchor includes the sensitivity p value and introduces the response-time comparison, which the next span completes. This claim reports the tests, not effect magnitudes."
+        },
+        {
+          "id": "grinschgl_2023_dual_task_outcomes_supported",
+          "field": "reported_results",
+          "text": "N-back sensitivity was higher without a lockout, while response time did not differ between lockout conditions.",
+          "quote": "We observed a higher sensitivity in the no lockout than lockout condition, t(84) = −2.60, p",
+          "source_span": "C0001:S002",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The two Results sentences report higher sensitivity in the no-lockout condition and no response-time difference. The selected span establishes the direction for sensitivity, and the full excerpt states the separate null response-time result."
+        },
+        {
+          "id": "grinschgl_2023_dual_task_pvalues_role_swap",
+          "field": "reported_results",
+          "text": "The sensitivity comparison produced p = .206, while the response-time comparison produced p = .011.",
+          "quote": "= .011, ηp² = .07, 95% CI [.01, .19] (see Fig. 3). Regarding response time, there",
+          "source_span": "C0001:S003",
+          "expected_supported": false,
+          "category": "numeric",
+          "rationale": "The claim reverses the outcomes associated with the source-present p values: .011 belongs to sensitivity and .206 to response time. Numeric membership alone cannot detect the reassignment."
+        },
+        {
+          "id": "grinschgl_2023_dual_task_speed_improvement_overclaim",
+          "field": "reported_results",
+          "text": "Removing the lockout improved N-back sensitivity and made participants respond significantly faster.",
+          "quote": "We observed a higher sensitivity in the no lockout than lockout condition, t(84) = −2.60, p",
+          "source_span": "C0001:S002",
+          "expected_supported": false,
+          "category": "omitted_caveat",
+          "rationale": "The sensitivity advantage is supported, but the additional speed improvement contradicts the explicitly reported absence of a response-time difference. The claim is false as a whole despite its partially supported first clause and relevant sensitivity anchor."
+        },
+        {
+          "id": "grinschgl_2023_dual_task_outcomes_unrelated_anchor",
+          "field": "reported_results",
+          "text": "N-back sensitivity was higher without a lockout, while response time did not differ between lockout conditions.",
+          "quote": "and a foot pedal served as an input device for this task.",
+          "source_span": "C0001:S006",
+          "expected_supported": false,
+          "category": "unrelated_anchor",
+          "rationale": "The claim text is identical to outcomes_supported, but the selected literal span describes the foot-pedal response device. It provides no comparison of sensitivity or response time between lockout conditions."
+        }
+      ]
+    }
+  ]
+}
