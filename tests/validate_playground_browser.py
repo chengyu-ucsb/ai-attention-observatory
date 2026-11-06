@@ -265,7 +265,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
-    print(f"{browser_name} Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, all scenarios/modes.")
+    print(f"{browser_name} Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, source-linked precedents, all scenarios/modes.")
 
 
 def check_site_integration(page, url):
@@ -291,7 +291,7 @@ def check_site_integration(page, url):
     page.locator("#switch-start").click()
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert not errors, errors
-    print("Full app integration passed: real navigation resumes safely and unavailable research data does not block the Lab.")
+    print("Full app integration passed: real navigation resumes safely and unavailable research data does not block the Lab or source-linked precedents.")
 
 
 if __name__ == "__main__":

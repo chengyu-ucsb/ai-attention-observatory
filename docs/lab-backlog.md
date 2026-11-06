@@ -31,9 +31,11 @@ than assuming a scheduled run published an issue.
 
 ### P1 · Complete browser and accessibility coverage
 
-Status: cross-engine CI extension in review for Playwright Chromium, Firefox and
-WebKit. Installed Safari/Firefox, native browser zoom and assistive-technology
-review remain open; patched automation builds do not replace those checks.
+Status: automated coverage now includes Playwright Chromium, Firefox and WebKit.
+Installed Safari/Firefox, native browser zoom and assistive-technology review
+remain open; patched automation builds do not replace those checks. See the
+[verification PR](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/35)
+for run outcomes and the final merged revision.
 Priority: correctness and access before new features.
 
 - Run the new Chromium test at desktop and phone widths, then test real Safari
@@ -91,9 +93,10 @@ real assistive-technology review and more rigorous material design remain open.
 
 ### P2 · Make design precedents easier to explore
 
-Status: source-checked mobile cards prepared for review. Four official feature
-guides and relevant access limits replace the truncated table. Browser checks
-and publication still need verification.
+Status: four source-checked mobile cards implemented. Official feature guides
+and relevant access limits replace the truncated table. See the
+[design-precedent PR](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/36)
+for browser checks and publication verification.
 
 - Check current product feature links and distinguish a product's own claims from
   independent evidence. Add a useful mobile comparison layout if needed.
@@ -192,7 +195,7 @@ determine publication status, not this date.
 
 ### 6 November 2026 · Cross-engine verification
 
-- Prepared independent Chromium, Firefox and WebKit jobs with failure isolation
+- Added independent Chromium, Firefox and WebKit jobs with failure isolation
   and separate screenshots. Each runs every Lab flow at desktop/phone widths and
   the effective-viewport/density reflow approximation, including paired rounds.
 - Added computed accessible-name/description assertions for activity tabs and the
@@ -207,7 +210,8 @@ determine publication status, not this date.
   [1.64.1](https://github.com/microsoft/playwright-python/releases/tag/v1.64.1),
   the current official release, including its Node 24.22.1 security update.
 - Local deterministic regressions, Python compilation and workflow structure
-  checks pass. Hosted engine outcomes must be checked before publication. No
+  checks pass. Final hosted engine outcomes are recorded in the verification PR;
+  actual run logs, not the presence of a workflow, establish a passed check. No
   research acquisition, external inference or public release-date change.
 
 ### 6 November 2026 · Source-linked design precedents
@@ -230,8 +234,10 @@ determine publication status, not this date.
   or as proof that every Apple device supports the feature.
 - Added deterministic card/link checks plus keyboard order, target size,
   viewport bounds and offline-archive checks to the browser suite. Local syntax,
-  deterministic tests and Python compilation pass; hosted browser results and
-  actual Pages deployment must still be verified.
+  deterministic tests and Python compilation pass. Chromium and WebKit checks
+  passed at all four viewport/density configurations on the review branch;
+  desktop and 320 px WebKit card screenshots were inspected. The final PR
+  checks and actual Pages deployment remain authoritative for the release.
 
 ## Checks for every release
 
