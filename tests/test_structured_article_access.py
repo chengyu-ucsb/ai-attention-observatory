@@ -112,7 +112,10 @@ class XMLParsingTests(unittest.TestCase):
         records=json.loads((root/'data/free-access-candidates.json').read_text())['records']
         self.assertEqual(len(records),11)
         for record in records:
-            rows=access.known_candidates(record)
+            # Remove manifest candidates so this exercises the persisted source
+            # register rather than merely echoing the supplied candidate.
+            source={k:v for k,v in record.items() if k!='fulltext_candidates'}
+            rows=access.known_candidates(source)
             self.assertEqual(rows[0]['url'],record['fulltext_candidates'][0]['url'])
             self.assertFalse(record['web_retrieval']['runner_extraction_verified'])
             self.assertFalse(record['web_retrieval']['summary_completed'])
