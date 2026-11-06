@@ -152,6 +152,7 @@ for(let i=0;i<8;i++){
  }
  const hasCue=descendants(by("recovery-interaction")).some(x=>x.className==="recovery-cue");
  assert.equal(hasCue,mode==="cue");
+ assert.equal(by("recovery-headline").getAttribute("aria-describedby").includes("recovery-checkpoint"),hasCue);
  const options=descendants(by("recovery-interaction")).filter(x=>x.classes.has("recovery-option"));
  assert.equal(options.length,3);
  if(i===0){by("lab").hidden=true;environment.time+=60000;by("lab").hidden=false}
@@ -190,8 +191,12 @@ for(const [caseIndex,seeds] of [[.1,.1],[.1,.9],[.9,.1],[.9,.9]].entries()){
   const correctIndex=options.findIndex(x=>preview.includes(x.textContent));positionSet.add(correctIndex);assert(correctIndex>=0);
   const hasCue=descendants(by("recovery-interaction")).some(x=>x.className==="recovery-cue");
   assert.equal(hasCue,step===0?seeds[0]<.5:seeds[0]>=.5);
+  assert.equal(by("recovery-headline").getAttribute("aria-describedby").includes("recovery-checkpoint"),hasCue);
+  if(hasCue)assert(descendants(by("recovery-interaction")).some(x=>x.id==="recovery-checkpoint"&&x.textContent.includes(options[correctIndex].textContent)));
   if(caseIndex===0&&step===0){by("tab-assist").click();environment.time+=60000;by("tab-recovery").click()}
   options[step===0?correctIndex:(correctIndex+1)%3].click();
+  assert(!by("recovery-headline").getAttribute("aria-describedby").includes("recovery-checkpoint"));
+  assert(by("recovery-description").textContent.includes("What helped you decide"));
   assert.equal(descendants(by("recovery-history")).map(x=>x.textContent).join("|"),historyBefore);
   if(step===0){
    assert.equal(by("recovery-comparison-results").hidden,true);

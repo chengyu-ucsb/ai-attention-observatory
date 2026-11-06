@@ -173,6 +173,9 @@ def check(page, url, width, screenshots, zoom=1):
                 for _ in range(correct_index + 1):
                     page.keyboard.press("Tab")
                 page.keyboard.press("Enter")
+            cue_present = page.locator("#recovery-checkpoint").count() == 1
+            assert cue_present == ("With checkpoint" in contexts[-1])
+            assert ("recovery-checkpoint" in page.locator("#recovery-headline").get_attribute("aria-describedby")) == cue_present
             choices = page.locator(".recovery-option")
             correct = next(i for i, choice in enumerate(choices.all()) if choice.inner_text() in preview)
             if step == 1:

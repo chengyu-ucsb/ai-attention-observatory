@@ -209,6 +209,7 @@
     $("#recovery-round-context").textContent=c?"COMPARISON "+c.id+" · ROUND "+(c.step+1)+" / 2 · PAIR "+(c.pairIndex+1)+" · TASK "+"AB"[c.variants[c.step]]+" · "+modeName(recoveryMode()):"SINGLE ROUND · "+modeName(r.mode);
     $("#recovery-stage-label").textContent="THE TASK";
     $("#recovery-progress").textContent=(c?"ROUND "+(c.step+1)+" / 2":"TASK "+(r.round%recoveryCases.length+1)+" / "+recoveryCases.length)+" · STAGE 1 / 3";
+    $("#recovery-headline").setAttribute("aria-describedby","recovery-round-context recovery-description");
     $("#recovery-headline").textContent="A half-finished project";
     $("#recovery-description").textContent=story.context+" Your next action: "+story.next+".";
     $("#recovery-interaction").replaceChildren();
@@ -248,7 +249,9 @@
     $("#recovery-headline").textContent="What was your next step?";
     $("#recovery-description").textContent="Choose the step that continues your project.";
     const place=$("#recovery-interaction");place.replaceChildren();
-    if(recoveryMode()==="cue"){add(place,E("div","recovery-cue","↩  CHECKPOINT   ·   "+story.next))}
+    const hasCue=recoveryMode()==="cue";
+    if(hasCue){const cue=E("div","recovery-cue","↩  CHECKPOINT   ·   "+story.next);cue.id="recovery-checkpoint";place.append(cue)}
+    $("#recovery-headline").setAttribute("aria-describedby","recovery-round-context recovery-description"+(hasCue?" recovery-checkpoint":""));
     const options=E("div","recovery-options recovery-return-options");
     r.start=performance.now();
     shuffled(story.options).forEach((choice)=>options.append(button(choice,()=>recoveryFinish(choice===story.next), "recovery-option")));
@@ -265,7 +268,8 @@
     $("#recovery-stage-label").textContent="SESSION COMPLETE";
     $("#recovery-progress").textContent="DONE";
     $("#recovery-headline").textContent=correct?"Found your return point.":"Returning isn't always simple.";
-    $("#recovery-description").textContent=(correct?"You selected the intended next step.":"You selected a different step.")+" How did the checkpoint change the experience?";
+    $("#recovery-description").textContent=(correct?"You selected the intended next step.":"You selected a different step.")+" What helped you decide where to resume?";
+    $("#recovery-headline").setAttribute("aria-describedby","recovery-round-context recovery-description");
     const place=$("#recovery-interaction");place.replaceChildren();
     add(place,E("div","recovery-outcome",correct?"✓ Correct next action":"↩ Notice what was lost"),E("div","recovery-time",elapsed===null?"Timing omitted: you left this activity before choosing.":elapsed+" ms to choose"));
     $("#recovery-start").hidden=false;$("#recovery-start").textContent=c?(c.step===0?"Preview second round ↗":"Try another comparison ↗"):"Try another round ↗";
