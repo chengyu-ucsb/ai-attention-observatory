@@ -80,7 +80,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
         expect(link).to_be_focused()
         box = link.bounding_box()
         assert box and box["x"] >= 0 and box["x"] + box["width"] <= width // zoom, "Precedent link overflow"
-        assert box["height"] >= 44, "Precedent links need generous targets"
+        assert box["height"] >= 44, f"Precedent target below 44px: {link.inner_text()} {box}"
         assert link.get_attribute("href").startswith("https://")
     if screenshots:
         screenshots.mkdir(parents=True, exist_ok=True)

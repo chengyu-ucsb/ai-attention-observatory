@@ -218,7 +218,8 @@ determine publication status, not this date.
 
 - Replaced truncated, horizontally scrolling product rows with four readable
   cards in the existing cream/red visual style. Official feature guides and
-  plan references are ordinary links with distinct labels and visible focus.
+  plan references are ordinary links with distinct labels, visible focus and
+  48 px minimum-height targets (checked against a 44 px rendered threshold).
 - Kept the cards in the page so unavailable archive data does not remove them.
   Existing research records and their reading pages remain unchanged.
 - Checked official documentation on 6 November: one sec Intention Tracking is
