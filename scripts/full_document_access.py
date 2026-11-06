@@ -15,7 +15,7 @@ import os
 from pathlib import Path
 import re
 import time
-from urllib.parse import urlsplit, urlencode, quote, urljoin
+from urllib.parse import urlsplit, urlencode, quote, urljoin, unquote
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from urllib.robotparser import RobotFileParser
@@ -35,9 +35,10 @@ ARTICLE_HOSTS=set(LEGACY_HOSTS) | set(EDITORIAL_HOSTS) | {
     # Individually checked institutional/author sources, not a blanket .edu rule.
     'www.microsoft.com','research.aalto.fi','epub.ub.uni-muenchen.de','iagen.unam.mx',
     'opus.lib.uts.edu.au','www.martinreimann.com','ndownloader.figshare.com',
+    'ijlter.org','www.ijlter.org',
 }
 API_HOSTS={'api.unpaywall.org','api.core.ac.uk','api.semanticscholar.org',
-           'api.crossref.org','api.openaire.eu'}
+           'api.crossref.org','api.openaire.eu','api.openalex.org','www.ebi.ac.uk'}
 BLOCKED=re.compile(r'making sure you.re not a bot|verify you are human|enable javascript.*continue|access denied|captcha|anubis',re.I)
 DOI=re.compile(r'^10\.\d{4,9}/\S+$',re.I)
 MAX_BYTES=20_000_000
@@ -172,6 +173,44 @@ class CitationMetadata(HTMLParser):
                 self.values[name]=attrs.get('content','')
 
 
+SUPPLEMENT=re.compile(r'(?:supplement(?:ary|al)?|supporting[ _-]*(?:information|material)|appendi(?:x|ces)|(?:^|[/_. -])esm(?:[/_. -]|$)|erratum|corrigendum)',re.I)
+
+
+class PublisherPDFLinks(CitationMetadata):
+    """Follow publisher-declared PDF links, never guessed article URL suffixes."""
+    def __init__(self):
+        super().__init__(); self.links=[]; self.anchor=None
+    def handle_starttag(self,tag,attrs):
+        super().handle_starttag(tag,attrs)
+        attrs=dict(attrs)
+        if tag=='a': self.anchor={'href':attrs.get('href',''),'label':''}
+        if tag=='link' and attrs.get('type','').lower()=='application/pdf':
+            href=attrs.get('href','')
+            if not SUPPLEMENT.search(unquote(href)): self.links.append(href)
+    def handle_data(self,text):
+        if self.anchor is not None: self.anchor['label']+=text
+    def handle_endtag(self,tag):
+        if tag=='a' and self.anchor is not None:
+            href=self.anchor['href']; label=' '.join(self.anchor['label'].lower().split())
+            if not SUPPLEMENT.search(label+' '+unquote(href)) and (('pdf' in label and any(word in label for word in ('download','view','full'))) or label=='pdf'):
+                self.links.append(href)
+            self.anchor=None
+
+
+def publisher_pdf_links(page,url,record,candidate_doi=''):
+    parser=PublisherPDFLinks(); parser.feed(page)
+    if not identity_matches(record,page[:60000],candidate_doi,parser.values): return []
+    values=[]
+    explicit=parser.values.get('citation_pdf_url')
+    if explicit and not SUPPLEMENT.search(unquote(explicit)): values.append(urljoin(url,explicit))
+    for raw in parser.links:
+        link=urljoin(url,raw)
+        # Generic Download links may not move onto another host. Cross-host
+        # sources require an explicit citation URL or a verified source hint.
+        if urlsplit(link).hostname==urlsplit(url).hostname: values.append(link)
+    return list(dict.fromkeys(x for x in values if safe_url(x)))[:2]
+
+
 def identity_matches(record,front,candidate_doi='',metadata=None):
     metadata=metadata or {}
     expected=doi(candidate_doi or record.get('doi'))
@@ -264,6 +303,9 @@ def candidate_identity(option,record):
 
 
 def fetch_candidate(candidate,record):
+    if candidate.get('structured_format'):
+        from structured_article_access import fetch_structured
+        return fetch_structured(candidate,record)
     url=candidate['url']
     if not safe_url(url): raise ValueError('host_requires_review')
     if not robots_allowed(url): raise ValueError('robots_disallow_or_unavailable')
@@ -282,17 +324,28 @@ def fetch_candidate(candidate,record):
     if raw.startswith(b'%PDF'):
         return finish(document_from_pdf(raw,identity,final,version,target))
     if 'html' not in kind: raise ValueError('unsupported_content_type')
-    meta=CitationMetadata(); meta.feed(raw.decode('utf-8','replace'))
-    pdf=meta.values.get('citation_pdf_url')
-    if pdf:
-        pdf=urljoin(final,pdf)
-        if safe_url(pdf) and robots_allowed(pdf):
+    page=raw.decode('utf-8','replace')
+    if BLOCKED.search(page[:18000]): raise ValueError('access_challenge_not_article')
+    partial_pdf=None
+    for pdf in publisher_pdf_links(page,final,identity,target):
+        if robots_allowed(pdf):
             try:
                 body,pdfurl,_=request(pdf)
-                return finish(document_from_pdf(body,identity,pdfurl,version,target))
+                document=document_from_pdf(body,identity,pdfurl,version,target)
+                if document.coverage.get('evidence_status')=='full_document_retrieved':
+                    return finish(document)
+                if partial_pdf is None or sum(len(u['text']) for u in document.units)>sum(len(u['text']) for u in partial_pdf.units):
+                    partial_pdf=document
             except Exception:
                 pass
-    return finish(document_from_html(raw,identity,final,version,target))
+    try:
+        html=document_from_html(raw,identity,final,version,target)
+    except Exception:
+        if partial_pdf is not None: return finish(partial_pdf)
+        raise
+    if partial_pdf is not None and sum(len(u['text']) for u in partial_pdf.units)>sum(len(u['text']) for u in html.units):
+        return finish(partial_pdf)
+    return finish(html)
 
 
 def candidate(url,provider,identifier,version='unspecified',license_value=None):
@@ -347,7 +400,8 @@ def openaire_candidates(identifier,get=json_request):
 
 
 def default_providers():
-    return [('OpenAIRE',openaire_candidates),('Unpaywall',unpaywall_candidates),
+    from structured_article_access import europe_pmc_candidates, openalex_candidates
+    return [('Europe PMC XML',europe_pmc_candidates),('OpenAlex XML',openalex_candidates),('OpenAIRE',openaire_candidates),('Unpaywall',unpaywall_candidates),
             ('CORE',core_candidates),('Semantic Scholar',semantic_candidates)]
 
 
@@ -383,7 +437,7 @@ def known_candidates(record):
         option=candidate(row['url'],str(row.get('provider') or 'explicit_source'),
                          doi(row.get('doi') or identifier),row.get('version') or 'unspecified',
                          row.get('license'))
-        for key in ('title','related_doi','identity_verification_url'):
+        for key in ('title','related_doi','identity_verification_url','structured_format'):
             if row.get(key): option[key]=row[key]
         arxiv=arxiv_identifier(option['url'])
         additions=[]
@@ -506,3 +560,4 @@ def retrieve(record,max_candidates=8,providers=None):
         diagnostics.append({'stage':'retrieval','status':'candidate_budget_exhausted',
                             'candidates_attempted':attempted,'retryable':False})
     return partial,diagnostics
+
