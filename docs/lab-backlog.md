@@ -75,8 +75,7 @@ Status: ready after source review. First candidate: performance versus learning.
 
 ### P2 · Improve the comparison design and interpretation
 
-Status: guided paired comparisons implemented in the next change, pending hosted
-verification. Each pair presents both conditions once using parallel fictional
+Status: guided paired comparisons implemented and verified in hosted Chromium. Each pair presents both conditions once using parallel fictional
 materials, with independently randomized starting condition and task variant.
 Answer positions are shuffled. These templates are not validated equivalents;
 real assistive-technology review and more rigorous material design remain open.
@@ -161,8 +160,8 @@ Pages deployment; this date alone does not assert a live deployment.
 
 ### 6 November 2026 · Paired Return Point comparisons
 
-Prepared for review; the PR checks and actual Pages deployment determine release
-status, not this date.
+Verified in the review branch; the final PR checks and actual Pages deployment
+determine publication status, not this date.
 
 - Added an optional guided two-round comparison with two pairs of original,
   parallel fictional tasks. Each pair uses a different task variant in each
@@ -179,8 +178,14 @@ status, not this date.
 - Extended deterministic regressions across all four condition/material order
   combinations, all answer positions, both pairs, interrupted timing, exit and
   mid-comparison reset. Extended hosted keyboard/viewport checks for both pairs.
-- Local syntax, deterministic regressions and Python compilation pass. Hosted
-  browser checks and screenshot review are required before publication.
+- Local syntax, deterministic regressions and Python compilation pass.
+  [Hosted Chromium checks](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42143224572)
+  passed at 1280, 390 and 320 px and the 640 px/2x-density reflow approximation.
+  Desktop/phone comparison screenshots were inspected. The focused prompt now
+  includes the visible checkpoint in its accessible description; actual screen
+  reader testing remains open.
+  [Repository checks](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42143224586)
+  passed 240 Python tests and 69 reading-page checks with no Actions warnings.
 
 ## Checks for every release
 

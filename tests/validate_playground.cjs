@@ -248,7 +248,7 @@ by("play-reset").click();assert.equal(by("recovery-history").children.length,0);
 assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 4");
 assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").value,"timed");
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
-assert(html.includes('datetime="2026-11-05"'));
+assert(html.includes('datetime="2026-11-06"'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
 console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
 

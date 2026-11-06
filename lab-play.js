@@ -149,7 +149,7 @@
 
   // 2 / Return Point: contextual resumption after a small distraction.
   // Original fictional learning scenarios, not summaries of actual studies.
-  // Edition: 2026-11-05. Update only alongside substantive tested changes.
+  // Edition: 2026-11-06. Update only alongside substantive tested changes.
   const recoveryCases=[
     {context:"You're writing about AI and attention. You've read two studies about cognitive effort.",next:"Compare the two studies' measures",options:["Format the references","Compare the two studies' measures","Export your calendar"]},
     {context:"You're preparing a group presentation. Your slides are drafted but not yet connected to your argument.",next:"Connect slide evidence to your central claim",options:["Choose a cover color","Connect slide evidence to your central claim","Book next month's room"]},
