@@ -75,9 +75,11 @@ Status: ready after source review. First candidate: performance versus learning.
 
 ### P2 · Improve the comparison design and interpretation
 
-Status: interpretation improved; balanced order and matched-material redesign
-remain open. Current rounds now identify task and round number, explain answer
-repetition and order/practice limits, and include reflection prompts.
+Status: guided paired comparisons implemented in the next change, pending hosted
+verification. Each pair presents both conditions once using parallel fictional
+materials, with independently randomized starting condition and task variant.
+Answer positions are shuffled. These templates are not validated equivalents;
+real assistive-technology review and more rigorous material design remain open.
 
 - Explore balanced condition order and matched Return Point materials so visitors
   can compare experiences without predictable answers or unnecessary repetition.
@@ -157,6 +159,29 @@ Pages deployment; this date alone does not assert a live deployment.
   passed all 216 Python tests and 69 reading-page checks. Final PR checks and
   Pages deployment are authoritative for the published revision.
 
+### 6 November 2026 · Paired Return Point comparisons
+
+Prepared for review; the PR checks and actual Pages deployment determine release
+status, not this date.
+
+- Added an optional guided two-round comparison with two pairs of original,
+  parallel fictional tasks. Each pair uses a different task variant in each
+  condition. Starting condition and task variant are randomized independently;
+  correct answer positions are shuffled in all Return Point rounds.
+- Showed the assigned condition, task, pair and round throughout the flow.
+  The second task remains readable until the visitor starts its interruption.
+- Kept comparison results separate from single-round history. Exit discards only
+  the comparison and restores the selected manual mode; stop/reset clears all
+  visit results. Replays start a fresh pair rather than adding to an old result.
+- Added a chronological two-response debrief with no difference score. It explains
+  unvalidated task equivalence, repeated distractions, answer-revealing cues,
+  reading/input time and order/practice effects. No causal or diagnostic claim.
+- Extended deterministic regressions across all four condition/material order
+  combinations, all answer positions, both pairs, interrupted timing, exit and
+  mid-comparison reset. Extended hosted keyboard/viewport checks for both pairs.
+- Local syntax, deterministic regressions and Python compilation pass. Hosted
+  browser checks and screenshot review are required before publication.
+
 ## Checks for every release
 
 1. `node --check lab-play.js`
@@ -178,4 +203,5 @@ passed all 216 Python tests and 69 reading-page checks. Local Chromium launch wa
 unavailable, so browser verification used the repository's hosted test runner.
 The current PR's latest checks and the Pages deployment remain the authoritative
 release status, not this historical record.
+
 

@@ -292,18 +292,27 @@
         <div class="play-stage" id="play-recovery" role="tabpanel" aria-labelledby="tab-recovery" hidden>
           <div class="play-stage-side"><span class="play-kicker">02 / AN INTERRUPTION MINI-GAME</span><h3>Return Point</h3>
             <p>Remember the next action in a small research task. Complete a distraction, then try to pick up where you left off.</p>
-            <div class="play-mode"><span>Try it</span><button type="button" class="play-mode-option is-active" data-recovery-mode="cue" aria-pressed="true">With a checkpoint</button><button type="button" class="play-mode-option" data-recovery-mode="none" aria-pressed="false">Without a checkpoint</button></div>
-            <p class="play-small">Repeat both conditions to compare your experience. The order isn't controlled, so this isn't a valid experiment.</p>
+            <div class="play-mode"><span>Single-round mode</span><button type="button" class="play-mode-option is-active" data-recovery-mode="cue" aria-pressed="true">With a checkpoint</button><button type="button" class="play-mode-option" data-recovery-mode="none" aria-pressed="false">Without a checkpoint</button></div>
+            <p class="play-small">Single rounds let you explore freely. For a structured comparison, try one round in each condition with parallel fictional tasks.</p>
+            <div class="play-mode recovery-comparison-controls">
+              <button type="button" id="recovery-compare" class="play-secondary" aria-describedby="recovery-compare-help">Compare two rounds</button>
+              <p class="play-small" id="recovery-compare-help">Starts a fresh pair. Unfinished play is replaced; earlier single-round history stays. Starting condition and task order are randomized.</p>
+              <p id="recovery-comparison-plan" class="recovery-comparison-plan" hidden></p>
+              <button type="button" id="recovery-exit-comparison" class="play-secondary" aria-describedby="recovery-exit-help" hidden>Return to single rounds</button>
+              <p class="play-small" id="recovery-exit-help" hidden>Leaving discards this comparison only. Your earlier single rounds and selected mode stay.</p>
+            </div>
           </div>
           <div class="play-stage-main">
             <div class="play-screen recovery-screen" id="recovery-screen">
               <div class="play-screen-top"><span id="recovery-stage-label">THE TASK</span><span id="recovery-progress">STAGE 1 / 3</span></div>
               <div class="recovery-visual" id="recovery-visual" aria-hidden="true"><span>01</span><i></i><span>02</span><i></i><span>03</span></div>
-              <h4 id="recovery-headline" tabindex="-1">A half-finished project</h4>
+              <p id="recovery-round-context" class="recovery-round-context"></p>
+              <h4 id="recovery-headline" tabindex="-1" aria-describedby="recovery-round-context recovery-description">A half-finished project</h4>
               <p id="recovery-description">You're writing about AI and attention. You just read two studies. Your next step is to compare how they measured cognitive effort.</p>
               <div id="recovery-interaction" class="recovery-interaction"></div>
               <button type="button" class="play-primary" id="recovery-start">Begin interruption <span>↗</span></button>
             </div>
+            <div id="recovery-comparison-results" class="play-results" tabindex="-1" hidden></div>
             <div id="recovery-history" class="play-results" aria-live="polite"></div>
           </div>
         </div>
@@ -354,4 +363,5 @@
   <div class="toast" id="site-toast" hidden role="status"></div>
 </body>
 </html>
+
 

@@ -58,7 +58,8 @@ const doc={
  addEventListener(type,fn){(this.listeners[type]??=[]).push(fn)}
 };
 const timers=[];let timerID=0;
-const environment={document:doc,performance:{now:()=>environment.time},time:100,console,
+const randomQueue=[],testMath=Object.create(Math);testMath.random=()=>randomQueue.length?randomQueue.shift():.42;
+const environment={Math:testMath,document:doc,performance:{now:()=>environment.time},time:100,console,
  setTimeout:fn=>{const id=++timerID;timers.push({id,fn});return id},
  clearTimeout:id=>{const i=timers.findIndex(x=>x.id===id);if(i>=0)timers.splice(i,1)},
  MutationObserver:class{constructor(callback){this.callback=callback}observe(target){this.target=target;observers.push(this)}}};
@@ -163,6 +164,65 @@ for(let i=0;i<8;i++){
 }
 assert.equal(stories.size,4);
 assert.equal(descendants(by("recovery-history")).filter(x=>x.classes.has("recovery-trial")).length,4);
+// Guided comparisons cover every starting-condition/material combination.
+// Paired results must never be pooled into exploratory single-round history.
+const historyBefore=descendants(by("recovery-history")).map(x=>x.textContent).join("|");
+const positionSet=new Set(),pairSet=new Set();
+for(const [caseIndex,seeds] of [[.1,.1],[.1,.9],[.9,.1],[.9,.9]].entries()){
+ randomQueue.push(...seeds);by("recovery-compare").click();
+ assert.equal(randomQueue.length,0);assert.equal(doc.activeElement,by("recovery-headline"));
+ assert.equal(by("recovery-compare").disabled,true);
+ assert(doc.querySelectorAll("[data-recovery-mode]").every(x=>x.disabled));
+ const firstMode=seeds[0]<.5?"With checkpoint":"Without checkpoint",firstVariant=seeds[1]<.5?"A":"B";
+ assert(by("recovery-round-context").textContent.includes(firstMode));
+ assert(by("recovery-round-context").textContent.includes("TASK "+firstVariant));
+ pairSet.add(by("recovery-comparison-plan").textContent.split(" · ")[0]);
+ const previews=[];
+ for(let step=0;step<2;step++){
+  const preview=by("recovery-description").textContent;previews.push(preview);
+  by("recovery-start").click();
+  for(const [j,correctIndex] of [2,1,2,1].entries()){
+   if(j===3)randomQueue.push(...[[0,0],[.99,.99],[.5,.99]][(caseIndex+step)%3]);
+   descendants(by("recovery-interaction")).filter(x=>x.className==="recovery-option")[correctIndex].click();
+  }
+  const options=descendants(by("recovery-interaction")).filter(x=>x.classes.has("recovery-option"));
+  assert.equal(new Set(options.map(x=>x.textContent)).size,3);
+  const correctIndex=options.findIndex(x=>preview.includes(x.textContent));positionSet.add(correctIndex);assert(correctIndex>=0);
+  const hasCue=descendants(by("recovery-interaction")).some(x=>x.className==="recovery-cue");
+  assert.equal(hasCue,step===0?seeds[0]<.5:seeds[0]>=.5);
+  if(caseIndex===0&&step===0){by("tab-assist").click();environment.time+=60000;by("tab-recovery").click()}
+  options[step===0?correctIndex:(correctIndex+1)%3].click();
+  assert.equal(descendants(by("recovery-history")).map(x=>x.textContent).join("|"),historyBefore);
+  if(step===0){
+   assert.equal(by("recovery-comparison-results").hidden,true);
+   assert.match(by("recovery-start").textContent,/Preview second/);by("recovery-start").click();
+   assert.match(by("recovery-progress").textContent,/ROUND 2 \/ 2.*STAGE 1 \/ 3/);
+   assert.equal(by("recovery-interaction").children.length,0,"Second task must wait for explicit start");
+  }
+ }
+ assert.notEqual(previews[0],previews[1]);
+ const result=by("recovery-comparison-results");assert.equal(result.hidden,false);assert.equal(doc.activeElement,result);
+ const rows=descendants(result).filter(x=>x.classes.has("recovery-comparison-result"));assert.equal(rows.length,2);
+ assert(rows[0].children[0].textContent.includes(firstMode));
+ assert.match(rows[0].children[1].textContent,/Intended next step/);assert.match(rows[1].children[1].textContent,/Different choice/);
+ if(caseIndex===0)assert.match(rows[0].children[1].textContent,/timing omitted/);
+ assert(descendants(result).some(x=>x.textContent.startsWith("Two responses do not estimate a checkpoint effect.")));
+ by("recovery-exit-comparison").click();
+ assert.equal(result.hidden,true);assert.equal(result.children.length,0);
+ assert.equal(by("recovery-compare").disabled,false);
+ assert(doc.querySelectorAll("[data-recovery-mode]").every(x=>!x.disabled));
+ assert.equal(doc.querySelectorAll("[data-recovery-mode]").find(x=>x.dataset.recoveryMode==="none").getAttribute("aria-pressed"),"true");
+}
+assert.equal(pairSet.size,2);assert.deepEqual([...positionSet].sort(),[0,1,2]);
+// Leaving and resetting mid-comparison must return to a readable single round.
+by("recovery-compare").click();by("recovery-start").click();
+const oldOption=descendants(by("recovery-interaction")).find(x=>x.className==="recovery-option");
+by("recovery-exit-comparison").click();oldOption.click();assert.match(by("recovery-progress").textContent,/STAGE 1 \/ 3/);
+assert.equal(by("recovery-interaction").children.length,0);
+by("recovery-compare").click();by("recovery-start").click();by("play-reset").click();
+assert.equal(by("recovery-comparison-plan").hidden,true);assert.equal(by("recovery-comparison-results").hidden,true);
+assert.equal(by("recovery-compare").disabled,false);assert.equal(by("recovery-history").children.length,0);
+assert.equal(doc.activeElement,by("play-reset"));
 // All four fictional scenarios are reachable under all three help settings.
 by("tab-assist").click();
 for(const mode of ["reflect","hint","answer"]){
@@ -185,5 +245,6 @@ assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
 assert(html.includes('datetime="2026-11-05"'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
-console.log("Attention Playground regressions passed: reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
+console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
+
 

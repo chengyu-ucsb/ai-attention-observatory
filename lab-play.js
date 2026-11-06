@@ -8,7 +8,7 @@
   const button=(label,fn,cls="")=>{const n=E("button",cls,label);n.type="button";n.addEventListener("click",fn);return n};
   const round=n=>Math.round(n);
   const med=xs=>{if(!xs.length)return 0;const a=xs.slice().sort((x,y)=>x-y);return a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2};
-  const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false,timer:null,generation:0,kind:"snapshot",timed:true,length:20},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false},assist:{mode:"reflect",scenario:0,chosen:false}};
+  const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false,timer:null,generation:0,kind:"snapshot",timed:true,length:20},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false,comparison:null,comparisonCount:0},assist:{mode:"reflect",scenario:0,chosen:false}};
   function activate(name){
     $$("[data-play-tab]").forEach(b=>{let on=b.dataset.playTab===name;b.classList.toggle("is-active",on);b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
     ["switch","recovery","assist"].forEach(k=>$("#play-"+k).hidden=k!==name);
@@ -156,6 +156,47 @@
     {context:"You're checking an AI-generated explanation. You've found the original article, but haven't checked its results yet.",next:"Compare the explanation with the reported results",options:["Compare the explanation with the reported results","Polish the explanation's tone","Share the explanation immediately"]},
     {context:"You're organizing a literature review. Two papers use the word attention for different kinds of tasks.",next:"Record how each paper defines and measures attention",options:["Average all the scores together","Rename the project folder","Record how each paper defines and measures attention"]}
   ];
+  // Parallel templates make task identity explicit; they are not validated as
+  // equally difficult. Each pair uses both conditions, with independent random
+  // choices for starting condition and task variant. No causal estimate is made.
+  const recoveryPairs=[
+    [
+      {context:"You're drafting a research brief. You've collected two studies about reading, but haven't compared how they measured understanding.",next:"Compare how the two studies measured understanding",options:["Choose a cover image for the brief","Compare how the two studies measured understanding","Send the brief before comparing the studies"]},
+      {context:"You're drafting a research brief. You've collected two studies about memory, but haven't compared how they measured recall.",next:"Compare how the two studies measured recall",options:["Choose a cover image for the brief","Compare how the two studies measured recall","Send the brief before comparing the studies"]}
+    ],
+    [
+      {context:"You're preparing a presentation. You've selected two examples about AI writing, but haven't connected them to your central claim.",next:"Connect the writing examples to your central claim",options:["Change the presentation's background color","Connect the writing examples to your central claim","Delete the examples before reviewing them"]},
+      {context:"You're preparing a presentation. You've selected two examples about AI search, but haven't connected them to your central claim.",next:"Connect the search examples to your central claim",options:["Change the presentation's background color","Connect the search examples to your central claim","Delete the examples before reviewing them"]}
+    ]
+  ];
+  const modeName=mode=>mode==="cue"?"With checkpoint":"Without checkpoint";
+  const recoveryMode=()=>{const r=practice.recovery;return r.comparison?r.comparison.conditions[r.comparison.step]:r.mode};
+  const recoveryStory=()=>{const r=practice.recovery,c=r.comparison;return c?recoveryPairs[c.pairIndex][c.variants[c.step]]:recoveryCases[r.round%recoveryCases.length]};
+  function shuffled(items){
+    const result=items.slice();
+    for(let i=result.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[result[i],result[j]]=[result[j],result[i]]}
+    return result;
+  }
+  function recoveryComparisonControls(){
+    const c=practice.recovery.comparison;
+    $$("[data-recovery-mode]").forEach(b=>b.disabled=!!c);
+    $("#recovery-compare").disabled=!!c;
+    $("#recovery-exit-comparison").hidden=!c;$("#recovery-exit-help").hidden=!c;
+    $("#recovery-comparison-plan").hidden=!c;
+    $("#recovery-comparison-plan").textContent=c?"Pair "+(c.pairIndex+1)+" · "+modeName(c.conditions[0])+" → "+modeName(c.conditions[1])+". Task "+"AB"[c.variants[0]]+" → "+"AB"[c.variants[1]]+". Read each new task before starting.":"";
+  }
+  function startRecoveryComparison(){
+    const r=practice.recovery,condition=Math.random()<.5?"cue":"none",variant=Math.random()<.5?0:1;
+    r.comparison={id:++r.comparisonCount,pairIndex:(r.comparisonCount-1)%recoveryPairs.length,step:0,conditions:[condition,condition==="cue"?"none":"cue"],variants:[variant,1-variant],results:[]};
+    $("#recovery-comparison-results").replaceChildren();$("#recovery-comparison-results").hidden=true;
+    recoveryComparisonControls();recoveryPreview();$("#recovery-headline").focus();
+  }
+  $("#recovery-compare").addEventListener("click",startRecoveryComparison);
+  $("#recovery-exit-comparison").addEventListener("click",()=>{
+    practice.recovery.comparison=null;
+    $("#recovery-comparison-results").replaceChildren();$("#recovery-comparison-results").hidden=true;
+    recoveryComparisonControls();recoveryPreview();$("#recovery-headline").focus();
+  });
   const distractions=[
     {prompt:"Choose the option with two diamonds",options:["◇","●","◇ ◇"],labels:["One diamond","One circle","Two diamonds"],right:2},
     {prompt:"Which number is smallest?",options:["19","7","13"],right:1},
@@ -163,16 +204,18 @@
     {prompt:"Which word has four letters?",options:["focus","plan","think"],right:1}
   ];
   function recoveryPreview(){
-    const r=practice.recovery,story=recoveryCases[r.round%recoveryCases.length];
+    const r=practice.recovery,c=r.comparison,story=recoveryStory();
     r.stage="ready";r.interrupt=0;r.correct=0;r.start=0;r.interrupted=false;
+    $("#recovery-round-context").textContent=c?"COMPARISON "+c.id+" · ROUND "+(c.step+1)+" / 2 · PAIR "+(c.pairIndex+1)+" · TASK "+"AB"[c.variants[c.step]]+" · "+modeName(recoveryMode()):"SINGLE ROUND · "+modeName(r.mode);
     $("#recovery-stage-label").textContent="THE TASK";
-    $("#recovery-progress").textContent="TASK "+(r.round%recoveryCases.length+1)+" / "+recoveryCases.length+" · STAGE 1 / 3";
+    $("#recovery-progress").textContent=(c?"ROUND "+(c.step+1)+" / 2":"TASK "+(r.round%recoveryCases.length+1)+" / "+recoveryCases.length)+" · STAGE 1 / 3";
     $("#recovery-headline").textContent="A half-finished project";
     $("#recovery-description").textContent=story.context+" Your next action: "+story.next+".";
     $("#recovery-interaction").replaceChildren();
     $("#recovery-start").hidden=false;$("#recovery-start").textContent="Begin interruption ↗";
   }
   $$("[data-recovery-mode]").forEach(btn=>btn.addEventListener("click",()=>{
+    if(practice.recovery.comparison)return;
     practice.recovery.mode=btn.dataset.recoveryMode;
     $$("[data-recovery-mode]").forEach(x=>{const active=x===btn;x.classList.toggle("is-active",active);x.setAttribute("aria-pressed",String(active))});
     recoveryPreview();
@@ -199,16 +242,16 @@
   }
   function recoveryReturn(){
     const r=practice.recovery; r.stage="return";
-    const story=recoveryCases[r.round%recoveryCases.length];
+    const story=recoveryStory();
     $("#recovery-stage-label").textContent="BACK TO YOUR WORK";
     $("#recovery-progress").textContent="STAGE 3 / 3";
     $("#recovery-headline").textContent="What was your next step?";
     $("#recovery-description").textContent="Choose the step that continues your project.";
     const place=$("#recovery-interaction");place.replaceChildren();
-    if(r.mode==="cue"){add(place,E("div","recovery-cue","↩  CHECKPOINT   ·   "+story.next))}
+    if(recoveryMode()==="cue"){add(place,E("div","recovery-cue","↩  CHECKPOINT   ·   "+story.next))}
     const options=E("div","recovery-options recovery-return-options");
     r.start=performance.now();
-    story.options.forEach((choice)=>options.append(button(choice,()=>recoveryFinish(choice===story.next), "recovery-option")));
+    shuffled(story.options).forEach((choice)=>options.append(button(choice,()=>recoveryFinish(choice===story.next), "recovery-option")));
     place.append(options);
     r.interrupted=!visible("recovery");
     $("#recovery-headline").focus();
@@ -216,22 +259,44 @@
   function recoveryFinish(correct){
     const r=practice.recovery;if(r.stage!=="return")return;r.stage="done";
     const elapsed=r.interrupted?null:Math.max(0,round(performance.now()-r.start));
-    r.history.push({mode:r.mode,correct,ms:elapsed,task:r.round%recoveryCases.length+1,round:r.history.length+1});
+    const c=r.comparison;
+    if(c)c.results.push({mode:recoveryMode(),correct,ms:elapsed,variant:c.variants[c.step],round:c.step+1});
+    else r.history.push({mode:r.mode,correct,ms:elapsed,task:r.round%recoveryCases.length+1,round:r.history.length+1});
     $("#recovery-stage-label").textContent="SESSION COMPLETE";
     $("#recovery-progress").textContent="DONE";
     $("#recovery-headline").textContent=correct?"Found your return point.":"Returning isn't always simple.";
     $("#recovery-description").textContent=(correct?"You selected the intended next step.":"You selected a different step.")+" How did the checkpoint change the experience?";
     const place=$("#recovery-interaction");place.replaceChildren();
     add(place,E("div","recovery-outcome",correct?"✓ Correct next action":"↩ Notice what was lost"),E("div","recovery-time",elapsed===null?"Timing omitted: you left this activity before choosing.":elapsed+" ms to choose"));
-    $("#recovery-start").hidden=false;$("#recovery-start").textContent="Try another round ↗";
+    $("#recovery-start").hidden=false;$("#recovery-start").textContent=c?(c.step===0?"Preview second round ↗":"Try another comparison ↗"):"Try another round ↗";
+    if(c){
+      if(c.results.length===2)recoveryComparisonFinish();
+      else $("#recovery-headline").focus();
+      return;
+    }
     $("#recovery-headline").focus();
     const history=$("#recovery-history");history.replaceChildren();
     const table=E("div","recovery-trial-list");
     r.history.slice(-4).forEach((x,i)=>{let row=E("div","recovery-trial");add(row,E("span","","Round "+x.round+" · Task "+x.task+" · "+(x.mode==="cue"?"With checkpoint":"Without checkpoint")),E("strong","",(x.ms===null?"timing omitted":round(x.ms/100)/10+" s")+"  ·  "+(x.correct?"correct":"different choice")));table.append(row)});
-    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" ROUNDS"),table,E("p","play-chart-caption","Timings begin when the return choices appear and are omitted after leaving the activity. Task numbers identify different materials; repeats introduce practice. You choose condition and order, and the checkpoint repeats the intended answer. These rounds cannot establish whether checkpoints improve performance. Reflect: what information would help you resume your own work?"));
+    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" SINGLE ROUNDS"),table,E("p","play-chart-caption","Timings begin when the return choices appear and are omitted after leaving the activity. Task numbers identify different materials; repeats introduce practice. You choose condition and order, and the checkpoint repeats the intended answer. These rounds cannot establish whether checkpoints improve performance. Reflect: what information would help you resume your own work?"));
+  }
+  function recoveryComparisonFinish(){
+    const c=practice.recovery.comparison,root=$("#recovery-comparison-results");
+    root.replaceChildren();root.hidden=false;
+    add(root,E("p","play-kicker","TWO ROUNDS · ONE EXPLORATION"),E("h4","","What helped you return?"));
+    const list=E("ol","recovery-comparison-list");
+    c.results.forEach(x=>{const row=E("li","recovery-comparison-result");
+      add(row,E("strong","","Round "+x.round+" · Pair "+(c.pairIndex+1)+", Task "+"AB"[x.variant]+" · "+modeName(x.mode)),E("p","",(x.correct?"Intended next step":"Different choice")+" · "+(x.ms===null?"timing omitted after leaving this activity":x.ms+" ms to choose")));list.append(row)});
+    add(root,list,E("p","play-chart-caption","Each condition appeared once, using different versions of a parallel fictional task. Starting condition and task order were randomized independently. These materials are not validated as equally difficult. The same four distractions repeat, so practice, wording and order can still shape your experience."),E("p","play-chart-caption","Two responses do not estimate a checkpoint effect. The checkpoint repeats the intended answer, timing includes reading and input differences, and faster does not mean better real-world attention. Interrupted timings are omitted; no difference score is calculated."),E("p","play-chart-caption","Reflect: did the checkpoint help you recover the task context, or simply reveal the answer? What would a useful checkpoint need to preserve in your own work?"));
+    if(visible("recovery"))root.focus();
   }
   $("#recovery-start").addEventListener("click",()=>{
-    const r=practice.recovery;if(r.stage==="done"){r.round++;recoveryPreview();$("#recovery-headline").focus();return}
+    const r=practice.recovery;
+    if(r.stage==="done"){
+      if(r.comparison){if(r.comparison.step===1){startRecoveryComparison();return}r.comparison.step=1}
+      else r.round++;
+      recoveryPreview();$("#recovery-headline").focus();return;
+    }
     if(r.stage==="ready")recoveryDistract();
   });
   recoveryPreview();
@@ -303,7 +368,9 @@
     $("#switch-phase").textContent="READY TO PLAY";$("#switch-progress").textContent="0 / 20";$("#switch-cue").textContent="TWO RULES · ONE BRAIN";$("#switch-number").textContent="?";
     $("#switch-note").textContent="Start when you're ready.";$("#switch-announcement").textContent="";
     $$(".switch-dot").forEach(d=>{d.className="switch-dot";d.hidden=false});
-    const r=practice.recovery;r.history=[];r.round=0;recoveryPreview();$("#recovery-history").replaceChildren();
+    const r=practice.recovery;r.history=[];r.round=0;r.comparison=null;r.comparisonCount=0;
+    $("#recovery-comparison-results").replaceChildren();$("#recovery-comparison-results").hidden=true;
+    recoveryComparisonControls();recoveryPreview();$("#recovery-history").replaceChildren();
     practice.assist.scenario=0;assistDraw();
     $("#play-session-status").textContent="Lab stopped and reset. This visit’s results are cleared. Your selected modes are unchanged.";
     $("#play-reset").focus();
@@ -311,4 +378,5 @@
   assistDraw();
   activate("switch");
 })();
+
 
