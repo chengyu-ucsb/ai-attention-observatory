@@ -4,6 +4,8 @@ Playwright browser builds are not a substitute for device/screen-reader testing.
 """
 import argparse
 from contextlib import contextmanager
+from datetime import datetime
+import re
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -43,6 +45,9 @@ def check(page, url, width, out):
     def overflow():
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Overflow at {width}: {page.url}'
     overflow(); screenshot('home')
+    # Theme links preserve selection when copied or opened in another tab.
+    theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
+    assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url
     # Real keyboard link activation, exact theme selection and scope matching.
     cognition = page.locator('[data-explore-theme="AI & cognition"]')
     cognition.focus(); page.keyboard.press('Enter')
@@ -52,6 +57,9 @@ def check(page, url, width, out):
     expect(page.locator('#library h1')).to_be_focused()
     expect(page.locator('[data-library-theme="AI & cognition"]')).to_have_attribute('aria-pressed', 'true')
     overflow(); screenshot('library')
+    page.reload(wait_until='networkidle')
+    expect(page.locator('#scope-filter')).to_have_value('all')
+    expect(page.locator('#topic-filter')).to_have_value('AI & cognition')
     page.locator('[data-library-theme="Fragmentation"]').click()
     expect(page.locator('#topic-filter')).to_have_value('Fragmentation')
     page.locator('#search').fill('no-result-zzzzzz')
@@ -66,10 +74,16 @@ def check(page, url, width, out):
     count = page.locator('.library-story').count()
     page.locator('#library-sort').select_option('published')
     assert page.locator('.library-story').count() == count
+    published = [datetime.strptime(re.search(r'Published (\w+ \d+, \d{4})', t).group(1), '%b %d, %Y') for t in page.locator('.card-source-meta').all_text_contents() if re.search(r'Published (\w+ \d+, \d{4})', t)]
+    assert published == sorted(published, reverse=True), 'Publication ordering must use publication date'
     page.locator('#library-sort').select_option('added')
+    added = [datetime.strptime(t.removeprefix('Added '), '%b %d, %Y') for t in page.locator('.card-added').all_text_contents() if t != 'Added date not recorded']
+    assert added == sorted(added, reverse=True), 'Recently added must use first-indexed date'
     page.locator('.library-refine summary').click()
     page.locator('#scope-filter').select_option('historical')
-    assert page.locator('.library-story').count() > 0
+    expect(page.locator('#library-context')).to_contain_text('Earlier foundations')
+    if not page.locator('.library-story').count():
+        expect(page.locator('#library-results')).to_contain_text('No source-backed items')
     page.locator('#library-reset').click()
     page.locator('.library-refine summary').click()
     page.locator('.library-story h3 button').first.click()
@@ -81,6 +95,11 @@ def check(page, url, width, out):
         page.locator(f'.main-nav [data-route="{route}"]').click()
         expect(page.locator(f'#{route}')).to_be_visible()
         overflow(); screenshot(route)
+        if route == 'issue':
+            page.locator('.issue-reading-shelf summary').click()
+            assert page.locator('.issue-shelf-item').count() > 0
+            expect(page.locator('#issue-coverage')).to_contain_text('sources in this edition')
+            screenshot('issue-sources')
     # Visual routes have ordinary destinations and no tracking/persistence.
     page.locator('.reading-routes a[href="#atlas"]').click()
     expect(page.locator('#atlas')).to_be_visible()
