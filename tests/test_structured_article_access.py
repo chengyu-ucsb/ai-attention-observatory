@@ -229,4 +229,25 @@ class PublisherLinkTests(unittest.TestCase):
                 access.fetch_candidate({'url':url},RECORD)
         self.assertEqual(request.call_count,1)
 
+class LivePilotBoundaryTests(unittest.TestCase):
+    def test_pilot_is_bounded_and_reports_no_summary_or_source_text(self):
+        import article_access_trials as trials
+        doc=access.Document([{'location':'page:1','text':'PRIVATE_SOURCE_SENTINEL '*100}],
+                            'https://arxiv.org/pdf/2610.31335v1',coverage={'evidence_status':'full_document_retrieved'})
+        with patch.object(trials,'fetch_candidate',return_value=doc) as fetch:
+            report=trials.free_source_pilot()
+        self.assertEqual(fetch.call_count,6)
+        self.assertEqual(len(report),6)
+        self.assertTrue(all(x['fulltext_retrieved'] and x['all_retrieved_text_retained'] for x in report))
+        self.assertTrue(all(x['summary_completed'] is False for x in report))
+        self.assertNotIn('PRIVATE_SOURCE_SENTINEL',json.dumps(report))
+
+    def test_pilot_isolates_provider_failures_and_redacts_exception_text(self):
+        import article_access_trials as trials
+        with patch.object(trials,'fetch_candidate',side_effect=ValueError('https://source/?secret=PRIVATE_KEY')):
+            report=trials.free_source_pilot()
+        self.assertEqual(len(report),6)
+        self.assertTrue(all(not x['fulltext_retrieved'] for x in report))
+        self.assertNotIn('PRIVATE_KEY',json.dumps(report))
+
 if __name__=='__main__':unittest.main()

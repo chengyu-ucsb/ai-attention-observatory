@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 from urllib.error import HTTPError
 from full_document_access import (request, fetch_candidate, candidate,
-    unpaywall_candidates,core_candidates,semantic_candidates)
+    unpaywall_candidates,core_candidates,semantic_candidates,failure_diagnostic)
 from comprehensive_readings import chunk_document,coverage_is_complete
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -14,6 +14,36 @@ PORTALS=[
  ('SSRN','https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5383106'),
 ]
 PORTAL_HOSTS={'www.researchgate.net','researchgate.net','papers.ssrn.com','ssrn.com'}
+
+
+def free_source_pilot():
+    """Six bounded live access checks; never generate/publish article summaries."""
+    manifest=json.loads((ROOT/'data/free-access-candidates.json').read_text())
+    records=manifest['records'][:5]
+    targets=[(r,r['fulltext_candidates'][0]) for r in records]
+    # An exact, independently identified open-access PMC article exercises the
+    # official API path rather than trying to scrape the human article page.
+    targets.append(({'title':'Artificial intelligence in language instruction: impact on English learning achievement, L2 motivation, and self-regulated learning',
+                     'doi':'10.3389/fpsyg.2023.1261955','kind':'scholarly'},
+                    {'url':'https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10658009/fullTextXML',
+                     'provider':'Europe PMC full-text API','doi':'10.3389/fpsyg.2023.1261955',
+                     'version':'repository_article_xml','structured_format':'jats'}))
+    rows=[]
+    for record,route in targets:
+        row={'site':route['provider'],'url':route['url'],'doi':record.get('doi',''),
+             'fulltext_retrieved':False,'summary_completed':False,'pilot':'free_source_routes_2026_11_06'}
+        try:
+            doc=fetch_candidate(route,record)
+            chunks=chunk_document(doc)
+            complete=doc.coverage.get('evidence_status')=='full_document_retrieved'
+            row.update(status='document_text_retrieved_not_reviewed' if complete else 'partial_text_retrieved_not_reviewed',
+                       fulltext_retrieved=complete,coverage=doc.manifest(),chunks=len(chunks),
+                       all_retrieved_text_retained=coverage_is_complete(doc,chunks))
+            del doc,chunks
+        except Exception as exc:
+            row.update(failure_diagnostic(exc,article=True))
+        rows.append(row)
+    return rows
 
 
 def run():
@@ -60,6 +90,8 @@ def run():
     except HTTPError as exc: row['status']='http_'+str(exc.code)
     except Exception as exc: row['status']=str(exc) if isinstance(exc,ValueError) else type(exc).__name__
     result['tests'].append(row)
+    result['scope']='Two exact-DOI locator checks, historical EconStor access, and six bounded official free-source routes; not corpus-wide recovery or summary validation.'
+    result['tests'].extend(free_source_pilot())
     (ROOT/'data/fulltext-access-tests.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     print('ACCESS_TEST_RESULTS_BEGIN')
     print(json.dumps(result,indent=2))
@@ -68,3 +100,4 @@ def run():
 
 
 if __name__=='__main__': run()
+
