@@ -43,8 +43,14 @@ def check(page, url, width, out):
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=False)
     def overflow():
-        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Overflow at {width}: {page.url}'
+        if not page.evaluate('document.documentElement.scrollWidth <= innerWidth'):
+            screenshot('overflow-'+page.url.split('#')[-1].split('?')[0])
+            offenders = page.locator('body *:visible').evaluate_all("es => es.filter(e => e.getBoundingClientRect().right > innerWidth + 1).slice(0,15).map(e => ({tag:e.tagName, cls:e.className, right:e.getBoundingClientRect().right}))")
+            raise AssertionError(f'Overflow at {width}: {page.url} {offenders}')
     overflow(); screenshot('home')
+    if out:
+        for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.lenses-grid','themes')]:
+            page.locator('#home '+section).screenshot(path=str(out / f'observatory-{width}-{name}.png'), style='.site-header { visibility: hidden !important; }')
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
     assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url
@@ -70,6 +76,8 @@ def check(page, url, width, out):
     expect(page.locator('#topic-filter')).to_have_value('')
     assert page.locator('.library-story').count() > 50
     assert page.locator('.card-added').count() == page.locator('.library-story').count()
+    if out:
+        page.locator('.library-story').first.screenshot(path=str(out / f'observatory-{width}-card.png'), style='.site-header { visibility: hidden !important; }')
     # Added date is distinct from publication date; both order modes retain all records.
     count = page.locator('.library-story').count()
     page.locator('#library-sort').select_option('published')

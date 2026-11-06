@@ -963,3 +963,9 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[role="button"]:focus
 /* Keep the library's first results within reach, rather than letting chrome dominate. */
 #library .inner-hero{padding:32px 0 27px}#library .inner-hero h1{font-size:clamp(40px,4.5vw,58px);margin:12px 0}#library .inner-hero p:not(.eyebrow){margin-bottom:0}.library-discovery{padding:23px}.library-discovery-title{margin-bottom:17px}.library-discovery-title h2{font-size:30px}.theme-browser{margin-bottom:16px}.library-discovery .search-wrap{min-height:48px}.library-discovery .search-wrap input{padding-block:12px}.library-refine{margin-top:14px}.library-refine summary{min-height:42px;padding-top:12px}
 @media(max-width:600px){#library .inner-hero{padding:29px 0}#library .inner-hero h1{font-size:42px}.library-discovery{padding:18px}.library-discovery-title>p{font-size:12px}.library-refine summary{min-height:48px}}
+
+/* Narrow atlas headings and panels reflow instead of widening the page. */
+#atlas .atlas-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#atlas .visual-panel{min-width:0}#atlas .inner-hero h1{overflow-wrap:anywhere}
+@media(max-width:850px){#atlas .atlas-grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){#atlas .inner-hero h1{font-size:clamp(35px,10.5vw,46px)}.theme-browser{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.theme-browser button{min-width:0;text-align:left;justify-content:flex-start;line-height:1.45}.theme-browser button:first-child{grid-column:1/-1}.theme-browser button span{flex-shrink:0}.library-discovery-title>p{max-width:260px}}
+@media(max-width:360px){#home .hero h1{font-size:44px}#home .hero-sub{font-size:14px}#home .hero-grid{padding-block:29px}}

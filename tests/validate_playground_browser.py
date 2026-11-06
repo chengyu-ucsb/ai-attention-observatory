@@ -67,6 +67,57 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
         expect(page.get_by_role("tab", name=name, exact=True)).to_be_visible()
     assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
+    precedents = page.get_by_role("list", name="Four product design precedents")
+    expect(precedents.get_by_role("listitem")).to_have_count(4)
+    # The first scan stays compact, but full access/source/trade-off information
+    # is still reachable through native, keyboard-operable disclosures.
+    details = precedents.locator(".precedent-details")
+    expect(details).to_have_count(4)
+    expect(precedents.get_by_role("link")).to_have_count(4)
+    collapsed_controls = precedents.locator("a:visible, summary")
+    expect(collapsed_controls).to_have_count(8)
+    for i in range(8):
+        if i == 0:
+            collapsed_controls.nth(i).focus()
+        else:
+            page.keyboard.press("Tab")
+        expect(collapsed_controls.nth(i)).to_be_focused()
+    page.keyboard.press("Tab")
+    assert precedents.evaluate("el => !el.contains(document.activeElement)"), "Closed source links must stay out of Tab order"
+    for i in range(4):
+        summary = details.nth(i).locator("summary")
+        summary.focus()
+        page.keyboard.press("Enter")
+        assert details.nth(i).evaluate("el => el.open")
+        expect(details.nth(i).locator(".precedent-details-body")).to_be_visible()
+    expect(precedents.get_by_role("link")).to_have_count(7)
+    controls = precedents.locator("a, summary")
+    expect(controls).to_have_count(11)
+    for i in range(11):
+        control = controls.nth(i)
+        if i == 0:
+            control.focus()
+        else:
+            page.keyboard.press("Tab")
+        expect(control).to_be_focused()
+        box = control.bounding_box()
+        assert box and box["x"] >= 0 and box["x"] + box["width"] <= width // zoom, "Precedent control overflow"
+        assert box["height"] >= 44, f"Precedent target below 44px: {control.inner_text()} {box}"
+        if control.evaluate("el => el.tagName") == "A":
+            assert control.get_attribute("href").startswith("https://")
+    for i in range(4):
+        details.nth(i).locator("summary").focus()
+        page.keyboard.press("Enter")
+        assert not details.nth(i).evaluate("el => el.open")
+    expect(precedents.get_by_role("link")).to_have_count(4)
+    if screenshots:
+        screenshots.mkdir(parents=True, exist_ok=True)
+        page.locator(".play-precedents").screenshot(path=str(screenshots / f"lab-precedents-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
+        details.first.locator("summary").focus()
+        page.keyboard.press("Enter")
+        precedents.locator(".precedent-card").first.screenshot(path=str(screenshots / f"lab-precedent-expanded-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
+        details.first.locator("summary").focus()
+        page.keyboard.press("Enter")
     page.locator(".play-update summary").click()
     assert page.locator(".play-update p").first.is_visible()
     if screenshots:
@@ -247,7 +298,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
-    print(f"{browser_name} Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, all scenarios/modes.")
+    print(f"{browser_name} Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, source-linked precedents, all scenarios/modes.")
 
 
 def check_site_integration(page, url):
@@ -268,10 +319,12 @@ def check_site_integration(page, url):
     page.reload(wait_until="networkidle")
     page.locator("#lab").wait_for(state="visible")
     assert page.locator("#issue-label").inner_text() == "INDEX OFFLINE"
+    expect(page.get_by_role("list", name="Four product design precedents").get_by_role("listitem")).to_have_count(4)
+    expect(page.get_by_role("link", name="Android Digital Wellbeing guide")).to_be_visible()
     page.locator("#switch-start").click()
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert not errors, errors
-    print("Full app integration passed: real navigation resumes safely and unavailable research data does not block the Lab.")
+    print("Full app integration passed: real navigation resumes safely and unavailable research data does not block the Lab or source-linked precedents.")
 
 
 if __name__ == "__main__":

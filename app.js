@@ -864,17 +864,6 @@ function showPaper(x){
  main.append(layout);
  root.append(main);
 }
-function showProductExamples(){
- const examples=S.records.filter(x=>x.source==="Official product documentation");
- const tbody=$("#product-examples");tbody.replaceChildren();
- const categories={"one sec":"Deliberate pause","Freedom":"Access restriction","Apple Developer":"Focus integration","Android":"System controls"};
- if(!examples.length){const tr=make("tr"),td=make("td","","Product design references have not been indexed yet.");td.colSpan=4;tr.append(td);tbody.append(tr);return}
- examples.forEach(x=>{
-  const tr=make("tr"),go=make("td");
-  go.append(btn("Read notes ↗",()=>goto("paper",id(x))));
-  add(tr,make("td","",categories[x.venue]||x.venue),make("td","",cut(x.reading?.overview||x.preview,110)),make("td","",cut(x.editorial_notes?.design_relevance,125)),go);tbody.append(tr)
- });
-}
 async function init(){
  // The Experimental Lab initializes independently in lab-play.js.
  try{
@@ -886,7 +875,7 @@ async function init(){
   S.backlog=rs[3].ok?await rs[3].json():{};
   S.issue=rs[4].ok?await rs[4].json():{};
   S.pending=rs[5].ok?await rs[5].json():[];
-  home();renderIssue();renderBacklog();showLibrary();showProductExamples();renderPerspectives();route();
+  home();renderIssue();renderBacklog();showLibrary();renderPerspectives();route();
  }catch(e){$("#issue-label").textContent="INDEX OFFLINE";$("#issue-meta").textContent="Research data could not load";$("#feature-grid").replaceChildren(make("div","empty-state","Could not load the research archive: "+e.message));route()}
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
@@ -901,4 +890,5 @@ $("#library-reset").addEventListener("click",()=>{
 });
 window.addEventListener("hashchange",route);
 init();
+
 
