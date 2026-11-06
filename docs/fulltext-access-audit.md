@@ -76,26 +76,52 @@ python scripts/retrieve_articles.py data/free-access-candidates.json \
   --report /tmp/observatory-free-access-report.json --known-sources-only --limit 11
 ```
 
-That command has **not** been run against external sources in this restricted
-executor. No live JATS/TEI bytes were retrieved here, and no production recovery
-count is claimed. No hosted LLM, model change, paid service, new account,
+The full 11-record command has not been run. The existing PR access-check
+workflow was subsequently extended with a bounded six-route pilot (the two
+publishers, the three DOI-less arXiv records, and exact PMC10658009 JATS). Its
+[actual run 42311202861](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42311202861)
+on commit `64acf1f79678b19289ee89e339bd8260c5c9db5f` retrieved and parsed five of
+six source documents:
+
+| Source | Observed coverage | Extracted characters | Chunks |
+| --- | --- | ---: | ---: |
+| IJLTER `10.26803/ijlter.25.10.23` | 33 of 33 pages with text | 94,870 | 18 |
+| arXiv `2610.31335v1` | 44 of 44 pages with text | 88,707 | 17 |
+| arXiv `2610.27170v1` | 16 of 16 pages with text | 98,347 | 18 |
+| arXiv `2501.17247v1` | 38 of 38 pages with text | 147,670 | 27 |
+| Europe PMC `PMC10658009` | 185 XML text units | 94,298 | 18 |
+
+Every retrieved text interval was retained in the chunk plan. These are actual
+retrieval/extraction outcomes, not model summaries or a public library update.
+The new JATS route was therefore exercised on real article XML. OpenAlex TEI
+remains offline-tested only. Springer returned PDF bytes but failed the exact
+article identity check (`document_identity_unverified`) and was not accepted.
+The successful historical EconStor control again covered all 89 PDF pages.
+
+Metadata-only evidence and hashes are in `data/free-access-pilot-results.json`.
+No source bodies were retained. This bounded result is not a corpus-wide
+recovery rate, and no production-library recovery count is claimed. No hosted LLM, model change, paid service, new account,
 institutional login or source-trained verifier run is introduced. The existing
 Zenodo recovery remains indirectly invoked by repository full-text recovery.
 
-Validation: 30 new offline route/parser tests; 332 selected Python tests passed
+Validation: 32 new offline route/parser/pilot tests; 334 selected Python tests passed
 (the holdout-named module and its sealed fixture were not loaded); Python
 compilation and JavaScript syntax passed; article UI validation passed for 69
 reading pages and weekly validation for the 8-source issue. Independent review
 identified and prompted additional tests for restrictive shorthand licenses,
 UTF-16 entities, partial-PDF fallback and supplement-link confusion. These tests
 use controlled data and do not establish live access or model summary accuracy.
+The exact-branch hosted run separately passed all 335 offline tests, both UI
+validators and the live access pilot, with zero warning/error annotations.
+The separate PR deep-reading check passed and skipped all model/inference steps.
 
 ### Next verification gates
 
-1. Run the bounded access-only pilot on the exact proposed branch; inspect all
-   failures and per-document identity, pages, source version and text coverage.
-2. Verify real official JATS/TEI examples, including final sections, rather than
-   treating an offline parser fixture as evidence of live source recovery.
+1. Extend bounded access-only checks to the remaining version-pinned candidates;
+   investigate the Springer identity mismatch before accepting that PDF.
+2. Verify actual OpenAlex TEI only in an environment already authorized to use
+   the existing key. The real JATS extraction is verified, but PDF/XML visual
+   equivalence and semantic completeness remain unchecked.
 3. Continue exact-title/identifier repository searches for unresolved records.
    A locator miss, a processing-license restriction and a missing free copy are
    separate states; none alone proves that an article is inaccessible.
