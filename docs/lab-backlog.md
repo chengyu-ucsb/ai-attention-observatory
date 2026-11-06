@@ -272,8 +272,12 @@ determine publication status, not this date.
   styling, effect estimate or comparison score was added.
 - Distinguished genuine zero-millisecond derived medians from missing eligible
   timings. Missing data remains a dash with a visible explanation, never a zero.
-- Added deterministic tests for all-incorrect, all-interrupted and zero-timing
-  cases plus detail retention. Browser checks cover Tab order, Enter/Space,
+- Kept ordinary detail/reflection text at 14 px, with larger secondary labels
+  rather than relying on tiny copy to shorten the page. The result heading
+  retains focus; the full single-round history no longer live-announces a second
+  copy of the debrief. Actual screen-reader review remains open.
+- Added deterministic tests for all-incorrect, all-interrupted, zero-timing and
+  mixed eligible/missing cases plus detail retention. Browser checks cover Tab order, Enter/Space,
   visible focus, open/closed layout and existing timed/untimed/reset flows.
 - Local syntax, deterministic regressions and Python compilation pass. Hosted
   browser checks and actual deployment must be reviewed before publication.

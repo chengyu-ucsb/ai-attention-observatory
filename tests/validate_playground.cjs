@@ -87,6 +87,7 @@ const answerSwitch=()=>{
 vm.runInNewContext(js,environment,{timeout:4000,filename:"lab-play.js"});
 const by=id=>{assert(ids[id],"No node "+id);return ids[id]};
 assert.equal(doc.querySelectorAll("[data-play-tab]").length,3);
+assert.equal(by("recovery-history").getAttribute("aria-live"),"off","History must not reannounce the entire debrief after result focus moves");
 assert.equal(doc.querySelectorAll(".switch-dot").length,20);
 // Task-switching game: automatically choose correct arrow for the displayed rule.
 by("lab").hidden=false;by("switch-start").click();
@@ -262,15 +263,15 @@ assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
 // Rendering must distinguish a genuine zero from missing eligible timing.
 by("tab-switch").click();by("switch-timing").value="timed";
-for(const kind of ["incorrect","zero","interrupted"]){
+for(const kind of ["incorrect","zero","interrupted","mixed"]){
  by("switch-start").click();
  for(let i=0;i<20;i++){
   const num=Number(by("switch-number").textContent),left=by("switch-cue").textContent.startsWith("ODD")?num%2===1:num<5;
   if(kind==="interrupted"){visibility(true);visibility(false)}
-  by((kind==="incorrect"?!left:left)?"switch-left":"switch-right").click();flush();
+  by(((kind==="incorrect"||(kind==="mixed"&&i>=8))?!left:left)?"switch-left":"switch-right").click();flush();
  }
  const results=by("switch-results"),strong=descendants(results).filter(x=>x.tagName==="STRONG").map(x=>x.textContent);
- assert.deepEqual(strong,kind==="zero"?["0 ms","0 ms"]:["—","—"],"Zero and absent timings must not be conflated");
+ assert.deepEqual(strong,kind==="zero"?["0 ms","0 ms"]:kind==="mixed"?["0 ms","—"]:["—","—"],"Zero and absent timings must not be conflated");
  if(kind!=="zero")assert(results.children.some(x=>x.textContent.startsWith("— means no uninterrupted correct response time")),"Missing timings need a visible explanation");
  if(kind==="interrupted")assert(descendants(results).some(x=>x.textContent==="20 interrupted response(s) excluded from timing."));
  const details=descendants(results).filter(x=>x.tagName==="DETAILS");assert.equal(details.length,1);assert.equal(details[0].children[0].tagName,"SUMMARY");

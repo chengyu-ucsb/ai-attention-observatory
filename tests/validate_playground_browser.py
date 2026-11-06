@@ -100,6 +100,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     page.set_viewport_size({"width": width // zoom, "height": 900 // zoom})
     page.goto(url, wait_until="networkidle")
     assert page.locator("#lab").is_visible()
+    assert page.locator("#recovery-history").get_attribute("aria-live") == "off"
     for name in ("Switch Lab", "Return Point", "Assistance Dial"):
         expect(page.get_by_role("tab", name=name, exact=True)).to_be_visible()
     assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
@@ -246,6 +247,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
                 page.keyboard.press("Enter")
                 break
         assert page.locator("#recovery-progress").inner_text() == "DONE"
+        assert page.evaluate("document.activeElement.id") == "recovery-headline"
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         page.locator("#recovery-start").click()
         assert "STAGE 1 / 3" in page.locator("#recovery-progress").inner_text()

@@ -21,6 +21,8 @@
   const round=n=>Math.round(n);
   const med=xs=>{if(!xs.length)return 0;const a=xs.slice().sort((x,y)=>x-y);return a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2};
   const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false,timer:null,generation:0,kind:"snapshot",timed:true,length:20},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false,comparison:null,comparisonCount:0},assist:{mode:"reflect",scenario:0,chosen:false}};
+  // The result heading receives focus. Avoid a second, full-history announcement.
+  $("#recovery-history").setAttribute("aria-live","off");
   function activate(name){
     $$("[data-play-tab]").forEach(b=>{let on=b.dataset.playTab===name;b.classList.toggle("is-active",on);b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
     ["switch","recovery","assist"].forEach(k=>$("#play-"+k).hidden=k!==name);
