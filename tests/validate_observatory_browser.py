@@ -48,6 +48,20 @@ def check(page, url, width, out):
             screenshot('overflow-'+page.url.split('#')[-1].split('?')[0])
             offenders = page.locator('body *:visible').evaluate_all("es => es.filter(e => e.getBoundingClientRect().right > innerWidth + 1).slice(0,15).map(e => ({tag:e.tagName, cls:e.className, right:e.getBoundingClientRect().right}))")
             raise AssertionError(f'Overflow at {width}: {page.url} {offenders}')
+    def navigate(route):
+        target = page.locator(f'.main-nav [data-route="{route}"]')
+        if not target.is_visible():
+            page.locator('#nav-toggle').click()
+            expect(page.locator('#nav-toggle')).to_have_attribute('aria-expanded', 'true')
+        target.click()
+        expect(page.locator('#nav-toggle')).to_have_attribute('aria-expanded', 'false')
+    if width <= 600:
+        page.locator('#nav-toggle').click()
+        expect(page.locator('.main-nav [data-route="lab"]')).to_be_visible()
+        page.locator('.main-nav a').first.focus()
+        page.keyboard.press('Escape')
+        expect(page.locator('#nav-toggle')).to_be_focused()
+        expect(page.locator('#nav-toggle')).to_have_attribute('aria-expanded','false')
     overflow(); screenshot('home')
     if out:
         for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.lenses-grid','themes')]:
@@ -101,7 +115,7 @@ def check(page, url, width, out):
     overflow(); screenshot('reading')
     # Every main destination remains available, with no page-level horizontal scroll.
     for route in ['issue', 'perspectives', 'atlas', 'about', 'home']:
-        page.locator(f'.main-nav [data-route="{route}"]').click()
+        navigate(route)
         expect(page.locator(f'#{route}')).to_be_visible()
         overflow(); screenshot(route)
         if route == 'issue':
@@ -112,7 +126,7 @@ def check(page, url, width, out):
     # Visual routes have ordinary destinations and no tracking/persistence.
     page.locator('.reading-routes a[href="#atlas"]').click()
     expect(page.locator('#atlas')).to_be_visible()
-    page.locator('.main-nav [data-route="perspectives"]').click()
+    navigate('perspectives')
     page.locator('#perspectives-library-link').click()
     expect(page.locator('#type-filter')).to_have_value('nonacademic')
     expect(page.locator('#scope-filter')).to_have_value('all')

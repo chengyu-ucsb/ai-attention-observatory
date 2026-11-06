@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
-const depths=[["full_text","Full-article readings","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
+const depths=[["full_text","Full-text material","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
@@ -149,7 +149,8 @@ function route(event){
  if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}showPaper(record(key))}
  if(page==="library")showLibrary();if(page==="atlas")showAtlas();
  window.scrollTo({top:0,behavior:"instant"});
- if(event?.type==="hashchange"&&page!=="lab"){
+ if(event?.type==="hashchange"){
+  closeNavigation();
   const heading=$("#"+page+" h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
  }
 }
@@ -365,7 +366,7 @@ function showLibrary(){
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
- for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-article readings",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
+ for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-text material",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
  topicBars("#atlas-topic-bars");
  const years={};for(let y=2023;y<=new Date().getFullYear();y++)years[String(y)]=0;
  S.records.forEach(x=>{const y=(x.published||"").slice(0,4);if(x.source_group==="AI-specific"&&Object.prototype.hasOwnProperty.call(years,y))years[y]++});
@@ -888,6 +889,13 @@ $("#library-sort").addEventListener("change",showLibrary);
 $("#library-reset").addEventListener("click",()=>{
  $("#search").value="";$("#scope-filter").value="all";$("#topic-filter").value="";$("#type-filter").value="";$("#depth-filter").value="readable";showLibrary();
 });
+function closeNavigation(){
+ $(".main-nav").classList.remove("is-open");$("#nav-toggle").setAttribute("aria-expanded","false");
+}
+const navigation=$(".main-nav"),menuToggle=$("#nav-toggle");
+navigation.classList.add("is-collapsible");menuToggle.hidden=false;
+menuToggle.addEventListener("click",()=>{const open=menuToggle.getAttribute("aria-expanded")!=="true";menuToggle.setAttribute("aria-expanded",String(open));navigation.classList.toggle("is-open",open)});
+navigation.addEventListener("keydown",event=>{if(event.key==="Escape"&&menuToggle.getAttribute("aria-expanded")==="true"){closeNavigation();menuToggle.focus()}});
 window.addEventListener("hashchange",route);
 init();
 
