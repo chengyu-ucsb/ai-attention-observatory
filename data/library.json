@@ -22718,34 +22718,72 @@
       ]
     },
     "complete_reading_attempt": {
-      "status": "invalid_claim_list",
-      "last_at": "2026-11-04",
-      "next_at": "2026-11-06",
+      "status": "claim_length_invalid",
+      "stage": "synthesis",
+      "last_at": "2026-11-06",
+      "next_at": "2026-11-08",
       "provider_diagnostics": [
         {
-          "provider": "Unpaywall",
-          "status": "candidates",
-          "candidates": 6
-        },
-        {
-          "provider": "CORE",
-          "status": "http_429"
-        },
-        {
-          "provider": "Semantic Scholar",
-          "status": "http_429"
-        },
-        {
+          "stage": "article",
           "provider": "existing_source",
+          "url": "https://europepmc.org/articles/PMC12678390",
+          "retryable": false,
           "status": "article_http_403"
         },
         {
-          "provider": "Unpaywall",
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 4,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12678390/",
+          "retryable": false,
+          "status": "access_challenge_not_article"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.3389/fpsyg.2025.1699320",
+          "retryable": false,
           "status": "host_requires_review"
         },
         {
-          "provider": "Unpaywall",
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41356052/",
+          "retryable": false,
           "status": "host_requires_review"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/41356052",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
         }
       ]
     }
@@ -29193,34 +29231,65 @@
     },
     "oa_grobid_checked": "2026-11-03",
     "complete_reading_attempt": {
-      "status": "JSONDecodeError",
-      "last_at": "2026-11-04",
-      "next_at": "2026-11-06",
+      "status": "copied_source_passage",
+      "stage": "synthesis",
+      "last_at": "2026-11-06",
+      "next_at": "2026-11-08",
       "provider_diagnostics": [
         {
-          "provider": "Unpaywall",
+          "stage": "discovery",
+          "provider": "OpenAIRE",
           "status": "candidates",
-          "candidates": 5
+          "candidates": 4,
+          "retryable": false
         },
         {
-          "provider": "CORE",
-          "status": "http_429"
-        },
-        {
-          "provider": "Semantic Scholar",
-          "status": "http_429"
-        },
-        {
-          "provider": "existing_source",
-          "status": "host_requires_review"
-        },
-        {
-          "provider": "Unpaywall",
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://www.mdpi.com/2227-7102/14/2/120/pdf",
+          "retryable": false,
           "status": "robots_disallow_or_unavailable"
         },
         {
-          "provider": "Unpaywall",
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doaj.org/article/6f9c88d6e2db4f9f9c440174a414c5c5",
+          "retryable": false,
           "status": "host_requires_review"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.3390/educsci14020120",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://dx.doi.org/10.3390/educsci14020120",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
         }
       ]
     }
