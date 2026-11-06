@@ -54,6 +54,43 @@ def server():
         srv.server_close()
 
 
+def check_result_disclosure(page, selector, label, full_text, screenshot=None, from_container=False):
+    root = page.locator(selector)
+    detail = root.locator(".play-result-details")
+    expect(detail).to_have_count(1)
+    summary = detail.locator("summary")
+    body = detail.locator(".play-result-details-body")
+    expect(summary).to_have_accessible_name(label)
+    assert not detail.evaluate("el => el.open")
+    expect(body).to_be_hidden()
+    expect(root.locator(".play-result-limit")).to_be_visible()
+    if from_container:
+        assert page.evaluate("document.activeElement.id") == selector[1:]
+        page.keyboard.press("Tab")
+    else:
+        summary.focus()
+        page.keyboard.press("Tab")
+        page.keyboard.press("Shift+Tab")
+    expect(summary).to_be_focused()
+    assert summary.bounding_box()["height"] >= 44
+    assert summary.evaluate("el => getComputedStyle(el).outlineStyle !== 'none' && parseFloat(getComputedStyle(el).outlineWidth) >= 2"), "Disclosure focus must be visible"
+    progress = page.locator("#switch-progress, #recovery-progress").all_text_contents()
+    page.keyboard.press("Enter")
+    assert detail.evaluate("el => el.open")
+    expect(body).to_be_visible()
+    expect(body).to_contain_text(full_text)
+    expect(summary).to_be_focused()
+    assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    if screenshot:
+        root.screenshot(path=str(screenshot), style=".site-header { visibility: hidden !important; }")
+    page.keyboard.press("Space")
+    assert not detail.evaluate("el => el.open")
+    expect(body).to_be_hidden()
+    expect(summary).to_be_focused()
+    assert page.locator("#switch-progress, #recovery-progress").all_text_contents() == progress, "Disclosure keys must not submit a game response"
+    expect(root.locator(".play-result-limit")).to_be_visible()
+
+
 def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -144,6 +181,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     assert "1 interrupted response(s) excluded" in page.locator("#switch-results").inner_text()
     assert page.evaluate("document.activeElement.id") == "switch-results"
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+    check_result_disclosure(page, "#switch-results", "Timing, order and limitations", "same rule always comes first (8 turns)", screenshots / f"lab-switch-explanation-{width}-zoom{zoom}.png" if screenshots else None, from_container=True)
     if screenshots:
         page.locator("#play-switch").screenshot(path=str(screenshots / f"lab-switch-results-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
     # Separate practice and untimed snapshots are completable with keyboard only.
@@ -176,6 +214,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     assert "No response times were recorded." in page.locator("#switch-results").inner_text()
     assert "ms" not in page.locator("#switch-results .play-chart").inner_text()
     assert page.evaluate("document.activeElement.id") == "switch-results"
+    check_result_disclosure(page, "#switch-results", "Timing, order and limitations", "No response times were recorded.", from_container=True)
     page.locator("#play-reset").focus()
     page.keyboard.press("Enter")
     assert page.locator("#switch-timing").input_value() == "untimed"
@@ -212,6 +251,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
         assert "STAGE 1 / 3" in page.locator("#recovery-progress").inner_text()
         assert page.locator(".recovery-option").count() == 0
     assert len(stories) == 4
+    check_result_disclosure(page, "#recovery-history", "Task differences and practice", "Task numbers identify different materials", screenshots / f"lab-history-explanation-{width}-zoom{zoom}.png" if screenshots else None)
     # Two guided pairs retain manual history and label every condition/material.
     history_before = page.locator("#recovery-history").inner_text()
     for pair in (1, 2):
@@ -265,6 +305,9 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
         assert "timing omitted" in page.locator(".recovery-comparison-result").first.inner_text()
         assert page.evaluate("document.activeElement.id") == "recovery-comparison-results"
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        expect(page.locator("#recovery-comparison-results .play-result-limit")).to_contain_text("Two responses do not estimate a checkpoint effect.")
+        expect(page.locator("#recovery-comparison-results .play-result-facts")).to_contain_text("Tasks are not validated as equally difficult.")
+        check_result_disclosure(page, "#recovery-comparison-results", "Task design, random order and limitations", "Starting condition and task order were randomized independently.", screenshots / f"lab-comparison-explanation-{width}-zoom{zoom}.png" if screenshots and pair == 2 else None, from_container=True)
         if screenshots and pair == 2:
             page.locator("#play-recovery").screenshot(path=str(screenshots / f"lab-comparison-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
         page.locator("#recovery-exit-comparison").focus()

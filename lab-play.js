@@ -6,6 +6,18 @@
   const E=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=String(txt);return n};
   const add=(p,...kids)=>{kids.filter(Boolean).forEach(n=>p.append(n));return p};
   const button=(label,fn,cls="")=>{const n=E("button",cls,label);n.type="button";n.addEventListener("click",fn);return n};
+  const interpretation=(title,...paragraphs)=>{
+    const root=E("details","play-result-details"),body=E("div","play-result-details-body");
+    paragraphs.forEach(text=>body.append(E("p","play-chart-caption",text)));
+    return add(root,E("summary","",title),body);
+  };
+  const reflection=(title,questions,note)=>{
+    const root=add(E("div","play-reflection"),E("p","play-kicker","REFLECT"),E("h5","",title));
+    if(questions.length===1)root.append(E("p","",questions[0]));
+    else{const list=E("ul","");questions.forEach(text=>list.append(E("li","",text)));root.append(list)}
+    if(note)root.append(E("p","play-reflection-note",note));
+    return root;
+  };
   const round=n=>Math.round(n);
   const med=xs=>{if(!xs.length)return 0;const a=xs.slice().sort((x,y)=>x-y);return a.length%2?a[(a.length-1)/2]:(a[a.length/2-1]+a[a.length/2])/2};
   const practice={switch:{active:false,trial:0,results:[],current:null,locked:false,shownAt:null,interrupted:false,timer:null,generation:0,kind:"snapshot",timed:true,length:20},recovery:{mode:"cue",stage:"ready",interrupt:0,correct:0,start:0,history:[],round:0,interrupted:false,comparison:null,comparisonCount:0},assist:{mode:"reflect",scenario:0,chosen:false}};
@@ -117,21 +129,22 @@
       g.results=[];if(visible("switch"))root.focus();return;
     }
     const repeat=g.results.filter(x=>x.phase==="repeat"),mixed=g.results.filter(x=>x.phase==="alternate");
-    const rtA=round(med(repeat.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt)));
-    const rtB=round(med(mixed.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt)));
+    const timesA=repeat.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt),timesB=mixed.filter(x=>x.correct&&x.rt!==null).map(x=>x.rt);
+    const rtA=timesA.length?round(med(timesA)):null,rtB=timesB.length?round(med(timesB)):null;
     const accA=repeat.filter(x=>x.correct).length,accB=mixed.filter(x=>x.correct).length;
     add(root,E("p","play-kicker",g.timed?"SESSION SNAPSHOT":"UNTIMED SESSION SNAPSHOT"),E("h4","","Repeat vs. switching"));
-    const chart=E("div","play-chart"),maximum=Math.max(rtA,rtB,1);
+    const chart=E("div","play-chart"),maximum=Math.max(rtA??0,rtB??0,1);
     [["Same rule",rtA,accA,8],["Alternating",rtB,accB,12]].forEach(([name,ms,good,total])=>{
       const r=E("div","play-chart-line"),bar=E("div","play-chart-track"),fill=E("span","play-chart-fill");
-      fill.style.width=(ms/maximum*100)+"%";bar.append(fill);
-      add(r,E("span","",name),g.timed?bar:null,E("strong","",g.timed?(ms?ms+" ms":"—"):good+" / "+total+" correct"));if(!g.timed)r.classList.add("play-chart-untimed");chart.append(r);
+      fill.style.width=((ms??0)/maximum*100)+"%";bar.append(fill);
+      add(r,E("span","",name),g.timed?bar:null,E("strong","",g.timed?(ms===null?"—":ms+" ms"):good+" / "+total+" correct"));if(!g.timed)r.classList.add("play-chart-untimed");chart.append(r);
       const note=E("p","play-chart-sub",good+" / "+total+" correct");if(g.timed)chart.append(note);
     });
     const omitted=g.results.filter(x=>x.interrupted).length;
     if(g.timed&&omitted)chart.append(E("p","play-chart-caption",omitted+" interrupted response(s) excluded from timing."));
-    add(root,chart,E("p","play-chart-caption",(g.timed?"Medians from uninterrupted correct responses only. Device, browser and input method affect timing. ":"No response times were recorded. ")+"The same rule always comes first (8 turns), followed by alternating rules (12 turns). Fixed order, small samples and practice effects prevent a valid estimate of switch cost or attention. Faster is not necessarily better real-world attention."));
-    add(root,E("p","play-chart-caption","Reflect: did keeping the rule in mind, noticing the cue, or choosing a response feel most effortful? This comparison cannot tell those processes apart."));
+    add(root,E("p","play-result-metric",g.timed?"Median response time · uninterrupted correct responses only.":"No response times were recorded."),chart);
+    if(g.timed&&(rtA===null||rtB===null))root.append(E("p","play-result-metric","— means no uninterrupted correct response time is available for that block."));
+    add(root,E("p","play-result-limit","This fixed-order, small-sample activity cannot estimate switch cost or attention. Faster is not necessarily better real-world attention."),interpretation("Timing, order and limitations",(g.timed?"Medians from uninterrupted correct responses only. Device, browser and input method affect timing. ":"No response times were recorded. ")+"The same rule always comes first (8 turns), followed by alternating rules (12 turns). Fixed order, small samples and practice effects prevent a valid estimate of switch cost or attention. Faster is not necessarily better real-world attention."),reflection("What felt most effortful?",["Keeping the rule in mind","Noticing the cue","Choosing a response"],"This comparison cannot tell those processes apart."));
     if(visible("switch"))root.focus();
   }
   $("#switch-start").addEventListener("click",()=>startSwitch());
@@ -282,7 +295,7 @@
     const history=$("#recovery-history");history.replaceChildren();
     const table=E("div","recovery-trial-list");
     r.history.slice(-4).forEach((x,i)=>{let row=E("div","recovery-trial");add(row,E("span","","Round "+x.round+" · Task "+x.task+" · "+(x.mode==="cue"?"With checkpoint":"Without checkpoint")),E("strong","",(x.ms===null?"timing omitted":round(x.ms/100)/10+" s")+"  ·  "+(x.correct?"correct":"different choice")));table.append(row)});
-    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" SINGLE ROUNDS"),table,E("p","play-chart-caption","Timings begin when the return choices appear and are omitted after leaving the activity. Task numbers identify different materials; repeats introduce practice. You choose condition and order, and the checkpoint repeats the intended answer. These rounds cannot establish whether checkpoints improve performance. Reflect: what information would help you resume your own work?"));
+    add(history,E("p","play-kicker","YOUR LAST "+Math.min(r.history.length,4)+" SINGLE ROUNDS"),table,E("p","play-result-metric","Timing starts when return choices appear; leaving the activity excludes timing."),E("p","play-result-limit","These rounds cannot establish whether checkpoints improve performance. You choose condition and order, and the checkpoint repeats the intended answer."),interpretation("Task differences and practice","Timings begin when the return choices appear and are omitted after leaving the activity. Task numbers identify different materials; repeats introduce practice. You choose condition and order, and the checkpoint repeats the intended answer. These rounds cannot establish whether checkpoints improve performance."),reflection("Carry it into your work",["What information would help you resume your own work?"]));
   }
   function recoveryComparisonFinish(){
     const c=practice.recovery.comparison,root=$("#recovery-comparison-results");
@@ -291,7 +304,9 @@
     const list=E("ol","recovery-comparison-list");
     c.results.forEach(x=>{const row=E("li","recovery-comparison-result");
       add(row,E("strong","","Round "+x.round+" · Pair "+(c.pairIndex+1)+", Task "+"AB"[x.variant]+" · "+modeName(x.mode)),E("p","",(x.correct?"Intended next step":"Different choice")+" · "+(x.ms===null?"timing omitted after leaving this activity":x.ms+" ms to choose")));list.append(row)});
-    add(root,list,E("p","play-chart-caption","Each condition appeared once, using different versions of a parallel fictional task. Starting condition and task order were randomized independently. These materials are not validated as equally difficult. The same four distractions repeat, so practice, wording and order can still shape your experience."),E("p","play-chart-caption","Two responses do not estimate a checkpoint effect. The checkpoint repeats the intended answer, timing includes reading and input differences, and faster does not mean better real-world attention. Interrupted timings are omitted; no difference score is calculated."),E("p","play-chart-caption","Reflect: did the checkpoint help you recover the task context, or simply reveal the answer? What would a useful checkpoint need to preserve in your own work?"));
+    const facts=E("ul","play-result-facts");
+    ["Tasks are not validated as equally difficult.","Timing includes reading and input differences; faster does not mean better real-world attention."].forEach(text=>facts.append(E("li","",text)));
+    add(root,list,E("p","play-result-metric","Interrupted timings are omitted; no difference score is calculated."),E("p","play-result-limit","Two responses do not estimate a checkpoint effect. The checkpoint repeats the intended answer."),facts,interpretation("Task design, random order and limitations","Each condition appeared once, using different versions of a parallel fictional task. Starting condition and task order were randomized independently. These materials are not validated as equally difficult. The same four distractions repeat, so practice, wording and order can still shape your experience.","Two responses do not estimate a checkpoint effect. The checkpoint repeats the intended answer, timing includes reading and input differences, and faster does not mean better real-world attention. Interrupted timings are omitted; no difference score is calculated."),reflection("What helped you return?",["Did the checkpoint help you recover the task context, or simply reveal the answer?","What would a useful checkpoint need to preserve in your own work?"]));
     if(visible("recovery"))root.focus();
   }
   $("#recovery-start").addEventListener("click",()=>{

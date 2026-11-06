@@ -55,6 +55,19 @@ Priority: correctness and access before new features.
   reduced-motion mode works; all dynamic transitions retain useful focus; no
   console errors. Keep the zero-dependency suite for rapid CI feedback.
 
+### P1 · Make results easy to explore
+
+Status: revised result hierarchy prepared for browser review. Metrics, timing
+omissions and key interpretation limits stay visible; complete context remains
+in native expandable sections, with separate reflection panels.
+
+- Preserve the complete explanation, rather than shortening it by dropping
+  caveats. Do not collapse the actual history or combine single and paired runs.
+- Keep zero-valued response times distinct from missing eligible observations.
+- Acceptance: disclosures work with Tab, Enter and Space; existing focus after
+  results is retained; open and closed layouts fit narrow screens; no causal
+  effect score or attention assessment is introduced.
+
 ### P1 · Give visitors control over a session
 
 Status: implemented. Deterministic and hosted Chromium keyboard regressions pass.
@@ -246,6 +259,24 @@ determine publication status, not this date.
   passed at all four viewport/density configurations on the review branch;
   desktop and 320 px WebKit card screenshots were inspected. The final PR
   checks and actual Pages deployment remain authoritative for the release.
+
+### 6 November 2026 · Richer, layered debriefs
+
+- Kept charts, correctness counts, round identities and omitted-timing notices
+  visible. Added explicit metric labels and visible interpretation cautions.
+- Moved complete timing/task/order explanations into native disclosures. All
+  substantive limitations remain available, including fixed order, unequal
+  task validation, input differences, repeated distractions and small samples.
+- Separated reflection from methodological prose using modest tinted panels.
+  Paired rounds retain chronological order and separate records; no winner
+  styling, effect estimate or comparison score was added.
+- Distinguished genuine zero-millisecond derived medians from missing eligible
+  timings. Missing data remains a dash with a visible explanation, never a zero.
+- Added deterministic tests for all-incorrect, all-interrupted and zero-timing
+  cases plus detail retention. Browser checks cover Tab order, Enter/Space,
+  visible focus, open/closed layout and existing timed/untimed/reset flows.
+- Local syntax, deterministic regressions and Python compilation pass. Hosted
+  browser checks and actual deployment must be reviewed before publication.
 
 ## Checks for every release
 
