@@ -8,6 +8,7 @@ on:
       - 'styles.css'
       - 'lab-play.*'
       - 'tests/validate_playground*'
+      - 'tests/validate_observatory_browser.py'
       - '.github/workflows/lab-checks.yml'
   push:
     branches: [main]
@@ -17,6 +18,7 @@ on:
       - 'styles.css'
       - 'lab-play.*'
       - 'tests/validate_playground*'
+      - 'tests/validate_observatory_browser.py'
       - '.github/workflows/lab-checks.yml'
   workflow_dispatch:
 permissions:
@@ -51,6 +53,8 @@ jobs:
           python -m playwright install --with-deps ${{ matrix.browser }}
       - name: Check desktop and mobile ${{ matrix.browser }} flows
         run: python tests/validate_playground_browser.py --browser ${{ matrix.browser }} --screenshots /tmp/lab-screenshots
+      - name: Check Observatory browsing and responsive layouts
+        run: python tests/validate_observatory_browser.py --browser ${{ matrix.browser }} --screenshots /tmp/lab-screenshots
       - name: Retain desktop and mobile screenshots
         if: always()
         uses: actions/upload-artifact@v7.0.2
@@ -59,4 +63,5 @@ jobs:
           path: /tmp/lab-screenshots
           retention-days: 7
           if-no-files-found: ignore
+
 
