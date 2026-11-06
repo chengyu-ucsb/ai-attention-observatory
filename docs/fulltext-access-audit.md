@@ -1,6 +1,40 @@
 # Full-article access and reading-quality audit
 
-Updated: 2026-11-05. This is the canonical audit note; update this file rather than creating parallel copies.
+Updated: 2026-11-06. This is the canonical audit note; update this file rather than creating parallel copies.
+
+## November 6: source-reviewed claim checks
+
+[PR 34](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/34) adds controlled positive and negative claims before any further production model change. Its development fixture contains 15 cases across three primary papers: 6 supported paraphrases and 9 deliberately misleading claims or claims paired with irrelevant evidence. Each paper has a checked article-specific CC BY 4.0 notice, attribution and exact section/offset locators. Only 107–137 words of licensed excerpts per source are included. All cases pass the existing deterministic anchor, number-presence and copying checks, so the experiment measures semantic verification rather than those simpler gates.
+
+The labels and source passages were checked by assistants, not independently adjudicated by domain experts. The set is deliberately challenging, small, and not a representative sample of the corpus. One source studies non-generative algorithmic offloading. A supported case follows from the full selected excerpt and has a relevant short anchor; the anchor need not independently contain every detail.
+
+### Observed results on the frozen development set
+
+| Diagnostic | Valid quality outcomes | Supported accepted | Misleading accepted | Interpretation |
+| --- | ---: | ---: | ---: | --- |
+| [1.5B baseline, run 42143742527](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42143742527) | 0 of 15 | Undefined | Undefined | All 15 verdicts had invalid claim-index partitions, so no semantic accuracy estimate is available |
+| [1.5B exact partition, run 42144752119](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42144752119) | 15 of 15 | 6 of 6 | 8 of 9 | Formatting was repaired, but misleading claims were usually accepted |
+| [7B exact partition, run 42145600528](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42145600528) | 15 of 15 | 6 of 6 | 3 of 9 | Better on this set, but two numeric-role swaps and one unmeasured long-term benefit were still accepted |
+| [7B supplemental checks, run 42147533395](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42147533395) | 10 of 15 | 3 of 4 tested | 1 of 6 tested | Reached the 720-second cap; still accepted a numeric swap and rejected a supported claim |
+
+The exact-partition grammar permits every complete supported/rejected partition; it does not encode the expected answers. These comparisons preserve the original verifier instruction and all deterministic gates. All results use prescribed fixture claims rather than model-written summaries. They do not establish full-article comprehension, successful generation, independent editorial review, or a corpus-level error rate. No production model or prompt has been changed on these results.
+
+The baseline's malformed verdicts must not be credited as correct rejections. The proposed production diagnostic correction distinguishes invalid schema/indices and unfinished output from a complete semantic rejection while retaining final failure behavior for negative-looking and incomplete-index verdicts. Existing pure-format recovery remains bounded to its original single retry; duplicate support indices additionally fail closed. No partial JSON prefix or supported subset is recovered.
+
+### Strict supplemental check and a separate holdout
+
+The supplemental diagnostic adds one bounded number/scope/anchor check only after the original verifier accepts a claim. Its prompt asks for explicit number-to-outcome matching, measured-versus-unassessed outcomes, decisive caveats and anchor relevance. It cannot revive a previous rejection. Malformed or incomplete supplemental output is excluded from quality metrics, and a valid supplemental rejection is final.
+
+The actual run completed the first ten cases, then hit the 720-second cap while processing the third source. Among completed cases it accepted three supported claims, rejected one supported claim, rejected five misleading claims and accepted one numeric-role swap. It newly rejected the Lee long-term-benefit overclaim but wrongly rejected the supported allocation claim. All five Iqbal cases are unavailable, not successful or failed quality outcomes. The partial result must not be compared with the complete 15-case rates as if their denominators matched. There is already enough evidence not to promote this candidate; repeating the unfinished tail would not remove its demonstrated false acceptance and false rejection.
+
+A separate holdout was frozen before this supplemental run: 10 cases across two different primary papers, including 4 supported claims and 6 misleading claims. Its curator and independent assistant source reviewer did not inspect candidate prompts or model outputs. The two CC BY 4.0 excerpts are 123 and 92 words, with checked publisher attribution and exact location metadata. The holdout remains unrun because the candidate already failed on the development set. It is reserved for a defensible future candidate, not consumed by repeated prompt tuning.
+
+- Development canonical fixture SHA-256: `1680c0405ecf5369747bc2f8710d5928fb966aa0232f7e897aa96cfffe8afc70`.
+- Holdout canonical fixture SHA-256: `c38cc64e80e94b2bd7d2604973c0f5f1f8ea54873bebbc1037a2a39324c35b89`.
+
+The diagnostic uses official local Qwen2.5-7B Q4_K_M weights with both split files pinned and SHA-256 checked, llama-cpp-python 0.3.36, seed 7, ChatML and a 6,144-token context. Worker loading and inference are capped at 720 seconds, downloads at 480 seconds, and the job at 30 minutes. No hosted API service, new credentials or paid inference was introduced. Reports contain controlled IDs, hashes and outcomes, not source prose or raw model checks. After these measurements, pull requests run only offline tests; model diagnostics require an explicit manual run with an allowlisted variant and fixture set. Neither option is endorsed for production. No recurring model diagnostic was added.
+
+The proposed workflow change removes only production runs caused by code pushes. Offline pull-request checks and the existing Tuesday/Friday schedule and manual trigger remain. The production reading workflow was verified active before editing, with an actual scheduled run on November 3. No user-requested scheduled updates are suspended. The hosted offline checks at candidate `d46f77852d5e66db31adc4e9cce6dbdd070ca963` passed 302 tests without Actions warning/error annotations; the final manual-only workflow guard adds one more passing offline test. Workflow health is separate from synthesis success: no new full-document summary has been validated by this work.
 
 ## November 5: article-synthesis format failures
 

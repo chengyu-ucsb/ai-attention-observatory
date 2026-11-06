@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "review_status": "assistant_source_reviewed_not_independent_expert_review",
+  "review_scope": "Assistant inspection of canonical publisher passages, article-specific license notices, and claim/anchor relationships on 2026-11-06. Not independent expert review, a representative benchmark, or validation of the studies themselves.",
+  "label_definition": "A supported case requires the entire claim to follow from the selected source text AND the selected production source span to provide relevant evidence. An unrelated_anchor negative deliberately pairs an otherwise true claim with an irrelevant literal span.",
+  "sources": [
+    {
+      "id": "wahn_2023_offloading",
+      "title": "Offloading under cognitive load: Humans are willing to offload parts of an attentionally demanding task to an algorithm",
+      "doi": "10.1371/journal.pone.0286102",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0286102",
+      "authors": [
+        "Basil Wahn",
+        "Laura Schmitz",
+        "Frauke Nora Gerster",
+        "Matthias Weiss"
+      ],
+      "published": "2023-05-19",
+      "library_match": "data/library.json DOI match",
+      "kind": "scholarly",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_verified_at": "2026-11-06",
+      "license_verification_basis": "Canonical PLOS article, Copyright notice after the abstract: copyright 2023 Wahn et al.; explicitly allows unrestricted use, distribution and reproduction with author/source credit. Its Creative Commons Attribution License link resolves to https://creativecommons.org/licenses/by/4.0/. Both the notice and linked license were inspected.",
+      "source_verified_at": "2026-11-06",
+      "review_status": "assistant_source_reviewed_not_independent_expert_review",
+      "review_note": "The selected measured result is from Experiment 1. These excerpts concern immediate multiple-object tracking with a computer partner, not generative AI or durable unaided attention. Original statistical values and condition labels were checked against the publisher Results text.",
+      "section": "Abstract; Results; Materials and methods / Experimental setup and procedure",
+      "excerpt_locations": [
+        {
+          "section": "Abstract",
+          "locator": "Second paragraph, first sentence: multiple object tracking task.",
+          "start": 0,
+          "end": 191
+        },
+        {
+          "section": "Results",
+          "locator": "Experiment 1 tracking-accuracy paragraph beginning We next explored; second sentence.",
+          "start": 193,
+          "end": 293
+        },
+        {
+          "section": "Results",
+          "locator": "Experiment 1 tracking-accuracy paragraph beginning We found that accuracy was significantly higher.",
+          "start": 295,
+          "end": 637
+        },
+        {
+          "section": "Materials and methods / Experimental setup and procedure",
+          "locator": "Final paragraph immediately before Results, beginning The experiments were programmed.",
+          "start": 639,
+          "end": 873
+        }
+      ],
+      "text": "Participants performed an attentionally demanding task (a multiple object tracking (MOT) task), which required them to track a subset of moving targets among distractors on a computer screen.\n\nAccuracy was computed by dividing participants’ correct selections by all selections for each trial.\n\nWe found that accuracy was significantly higher in the Joint (M = 0.97, SD = 0.03) compared to the Solo (M = 0.94, SD = 0.04) condition (paired t-test: t(25) = 4.59, p < .001, Cohen’s d = 0.90 (large-sized effect [28]), suggesting that offloading targets to the computer partner increased the accuracy of participants’ individual performance.\n\nThe experiments were programmed in Python 3.0 using the pygame library. An experimental session (i.e., completing the experiment as well as the questionnaires) took about 60 minutes. All analyses were performed using custom R scripts.",
+      "cases": [
+        {
+          "id": "wahn_2023_offloading_accuracy_supported",
+          "field": "reported_results",
+          "text": "In this tracking task, accuracy averaged 0.97 with the computer partner, versus 0.94 for solo performance.",
+          "quote": "higher in the Joint (M = 0.97, SD = 0.03) compared to the Solo (M =",
+          "source_span": "C0001:S004",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "Experiment 1 Results assign mean accuracy 0.97 to Joint and 0.94 to Solo. The chosen span identifies the Joint mean and starts the Solo comparison; the following span completes it."
+        },
+        {
+          "id": "wahn_2023_offloading_measurement_supported",
+          "field": "study_design",
+          "text": "The accuracy measure was the fraction of selections that were correct within each trial.",
+          "quote": "dividing participants’ correct selections by all selections for each trial. We found that accuracy was significantly",
+          "source_span": "C0001:S003",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The source defines accuracy as correct selections divided by all selections for each trial. This is a measurement description, not a broader cognitive outcome."
+        },
+        {
+          "id": "wahn_2023_offloading_accuracy_role_swap",
+          "field": "reported_results",
+          "text": "In this tracking task, accuracy averaged 0.94 with the computer partner, versus 0.97 for solo performance.",
+          "quote": "higher in the Joint (M = 0.97, SD = 0.03) compared to the Solo (M =",
+          "source_span": "C0001:S004",
+          "expected_supported": false,
+          "category": "numeric",
+          "rationale": "Both numbers occur in the source, but the claim reverses their conditions: Joint is 0.97 and Solo is 0.94. A numeric-presence check alone cannot detect this role swap."
+        },
+        {
+          "id": "wahn_2023_offloading_unaided_attention_transfer",
+          "field": "reported_results",
+          "text": "These results demonstrate that offloading improved participants' sustained attention even when they later worked without the computer partner.",
+          "quote": "0.90 (large-sized effect [28]), suggesting that offloading targets to the computer partner increased the accuracy of",
+          "source_span": "C0001:S006",
+          "expected_supported": false,
+          "category": "unsupported_transfer_attention",
+          "rationale": "The excerpt reports accuracy while targets are offloaded in the Joint condition. It supplies no later unaided attention assessment or evidence of durable transfer; the claim converts assisted task performance into an unmeasured outcome."
+        },
+        {
+          "id": "wahn_2023_offloading_accuracy_unrelated_anchor",
+          "field": "reported_results",
+          "text": "In this tracking task, accuracy averaged 0.97 with the computer partner, versus 0.94 for solo performance.",
+          "quote": "session (i.e., completing the experiment as well as the questionnaires) took about 60 minutes. All analyses were performed using custom R scripts.",
+          "source_span": "C0001:S008",
+          "expected_supported": false,
+          "category": "unrelated_anchor",
+          "rationale": "The claim text matches the supported accuracy case, but its selected span concerns session duration and analysis software. That span contains no evidence about the between-condition accuracy result."
+        }
+      ],
+      "year": 2023,
+      "excerpt_note": "Brief, non-contiguous primary-source excerpts, not the full paper. Whitespace and inline reference formatting normalized; paragraphs are separated by blank lines. Source authors, canonical article, and CC BY 4.0 license are credited here. Claim texts and rationales are original fixture annotations, not author statements."
+    },
+    {
+      "id": "lee_2024_guided_chatgpt",
+      "title": "Empowering ChatGPT with guidance mechanism in blended learning: effect of self-regulated learning, higher-order thinking skills, and knowledge construction",
+      "doi": "10.1186/s41239-024-00447-4",
+      "url": "https://link.springer.com/article/10.1186/s41239-024-00447-4",
+      "authors": [
+        "Hsin-Yu Lee",
+        "Pei-Hua Chen",
+        "Wei-Sheng Wang",
+        "Yueh-Min Huang",
+        "Ting-Ting Wu"
+      ],
+      "published": "2024-03-04",
+      "library_match": "data/library.json DOI match",
+      "kind": "scholarly",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_verified_at": "2026-11-06",
+      "license_verification_basis": "Canonical Springer article, Rights and permissions section: explicitly states Creative Commons Attribution 4.0 International License and permits use, sharing, adaptation, distribution and reproduction with attribution and change indication. The article links http://creativecommons.org/licenses/by/4.0/; the canonical HTTPS license URL is recorded here.",
+      "source_verified_at": "2026-11-06",
+      "review_status": "assistant_source_reviewed_not_independent_expert_review",
+      "review_note": "The fixture uses verified allocation and explicit limitations, not inconsistent motivation labels in the Results/Conclusion or inconsistent delayed-test timing elsewhere in the paper. GCLA is the guidance-based ChatGPT-assisted learning aid identified in the article. Inclusion is a fidelity test, not methodological endorsement.",
+      "section": "Conclusion; Limitations",
+      "excerpt_locations": [
+        {
+          "section": "Conclusion",
+          "locator": "Paragraph beginning The study involved 61 undergraduate students; its two sentences describing allocation and conditions.",
+          "start": 0,
+          "end": 341
+        },
+        {
+          "section": "Limitations",
+          "locator": "First limitation, from First, the sample size through validate the results.",
+          "start": 343,
+          "end": 620
+        },
+        {
+          "section": "Limitations",
+          "locator": "Final sentence, beginning The long-term effects of the GCLA.",
+          "start": 622,
+          "end": 872
+        }
+      ],
+      "text": "The study involved 61 undergraduate students from a university in Taiwan, who were randomly assigned to either the treatment group (TG) or the control group (CG). The TG used the GCLA, while the CG used the traditional ChatGPT application on iOS, to assist their learning in a foundational chemistry course within a blended learning setting.\n\nFirst, the sample size of this study was relatively small, and the participants were from a single university in Taiwan. Therefore, the generalizability of the findings may be limited, and further studies with larger and more diverse samples are needed to validate the results.\n\nThe long-term effects of the GCLA on students’ learning, such as retention, transfer, and application of knowledge and skills, were not assessed, and future studies should include more longitudinal measures to evaluate the lasting impact of the GCLA.",
+      "cases": [
+        {
+          "id": "lee_2024_guided_chatgpt_allocation_supported",
+          "field": "study_design",
+          "text": "At one Taiwanese university, 61 undergraduates were randomly allocated between GCLA and ordinary ChatGPT conditions.",
+          "quote": "The study involved 61 undergraduate students from a university in Taiwan, who were randomly assigned to",
+          "source_span": "C0001:S001",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The Conclusion gives the university location, sample of 61 undergraduates and random allocation; the next sentence identifies GCLA and traditional ChatGPT as the two conditions. No participant nationality is inferred."
+        },
+        {
+          "id": "lee_2024_guided_chatgpt_long_term_limits_supported",
+          "field": "limitations",
+          "text": "The authors state that long-term retention and transfer of students’ skills were not assessed.",
+          "quote": "and application of knowledge and skills, were not assessed, and future studies should include more longitudinal",
+          "source_span": "C0001:S008",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The final Limitations sentence explicitly states that long-term retention, transfer and application were not assessed. The selected span contains the not-assessed qualification and the preceding span identifies long-term learning and transfer. This case tests a faithful report of the authors’ stated limitation, not resolution of inconsistent long-term wording elsewhere in the article."
+        },
+        {
+          "id": "lee_2024_guided_chatgpt_long_term_transfer",
+          "field": "reported_results",
+          "text": "GCLA produced long-term gains in students' retention and transfer of skills beyond the chemistry course.",
+          "quote": "validate the results. The long-term effects of the GCLA on students’ learning, such as retention, transfer,",
+          "source_span": "C0001:S007",
+          "expected_supported": false,
+          "category": "unsupported_transfer_attention",
+          "rationale": "The claim presents long-term retention and transfer as measured benefits, while the adjacent Limitations text expressly states those long-term outcomes were not assessed."
+        },
+        {
+          "id": "lee_2024_guided_chatgpt_generalization_caveat_omitted",
+          "field": "authors_interpretation",
+          "text": "Because participants were randomly allocated, the results establish that GCLA's benefits generalize across universities and learning contexts.",
+          "quote": "The study involved 61 undergraduate students from a university in Taiwan, who were randomly assigned to",
+          "source_span": "C0001:S001",
+          "expected_supported": false,
+          "category": "omitted_caveat",
+          "rationale": "Random allocation is reported, but the source explicitly warns that the small sample from a single university limits generalizability and needs larger, more diverse validation. Random allocation does not erase this stated boundary."
+        },
+        {
+          "id": "lee_2024_guided_chatgpt_limits_unrelated_anchor",
+          "field": "limitations",
+          "text": "The authors state that long-term retention and transfer of students’ skills were not assessed.",
+          "quote": "The study involved 61 undergraduate students from a university in Taiwan, who were randomly assigned to",
+          "source_span": "C0001:S001",
+          "expected_supported": false,
+          "category": "unrelated_anchor",
+          "rationale": "The claim text matches the supported report of the authors’ stated limitation, but the chosen span only states sample, setting and random allocation. Those design details do not establish what the authors say about unassessed long-term outcomes. This case tests anchor relevance, not resolution of inconsistent long-term wording elsewhere in the article."
+        }
+      ],
+      "year": 2024,
+      "excerpt_note": "Brief, non-contiguous primary-source excerpts, not the full paper. Whitespace and inline reference formatting normalized; paragraphs are separated by blank lines. Source authors, canonical article, and CC BY 4.0 license are credited here. Claim texts and rationales are original fixture annotations, not author statements."
+    },
+    {
+      "id": "iqbal_2025_metacognition",
+      "title": "Generative AI tool use enhances academic achievement in sustainable education through shared metacognition and cognitive offloading among preservice teachers",
+      "doi": "10.1038/s41598-025-01676-x",
+      "url": "https://www.nature.com/articles/s41598-025-01676-x",
+      "authors": [
+        "Javed Iqbal",
+        "Zarqa Farooq Hashmi",
+        "Muhammad Zaheer Asghar",
+        "Muhammad Naseem Abid"
+      ],
+      "published": "2025-05-13",
+      "library_match": "data/library.json DOI match",
+      "kind": "scholarly",
+      "license": "CC-BY-4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "license_verified_at": "2026-11-06",
+      "license_verification_basis": "Canonical Scientific Reports article, Rights and permissions section: explicitly states Creative Commons Attribution 4.0 International License and permits use, sharing, adaptation, distribution and reproduction with attribution and change indication. The article links http://creativecommons.org/licenses/by/4.0/; the canonical HTTPS license URL is recorded here.",
+      "source_verified_at": "2026-11-06",
+      "review_status": "assistant_source_reviewed_not_independent_expert_review",
+      "review_note": "The selected result is explained variance in a fitted survey model, not an intervention effect. The author-stated causal limitation was read directly. This fixture excludes inconsistent construct/path descriptions elsewhere in the Abstract and Structural modeling text and does not assess the credibility of the study as a whole.",
+      "section": "Abstract; Results; Discussion / Limitations and future research",
+      "excerpt_locations": [
+        {
+          "section": "Abstract",
+          "locator": "Second sentence, beginning Therefore, through the following sentence defining SMC and COL.",
+          "start": 0,
+          "end": 321
+        },
+        {
+          "section": "Results",
+          "locator": "Paragraph beginning The R-square values; first sentence only.",
+          "start": 323,
+          "end": 436
+        },
+        {
+          "section": "Discussion / Limitations and future research",
+          "locator": "Sentence beginning Furthermore, while the time-lagged design improves upon cross-sectional methods.",
+          "start": 438,
+          "end": 750
+        }
+      ],
+      "text": "Therefore, the present study investigates the connection between generative artificial intelligence tool usage (GenAITU) and academic achievement (AA) in the context of SDG4. We assessed the mediating role of shared metacognition (SMC) and cognitive offloading (COL) in this relationship among preservice teachers (PSTs).\n\nThe R-square values indicate that the model explains 40.8% of the variance in AA, 34.5% in COL, and 30.7% in SMC.\n\nFurthermore, while the time-lagged design improves upon cross-sectional methods by introducing temporal separation between variables, it does not fully establish causal relationships, a limitation that also applies to the mediation analysis conducted in this study, as causality is a key assumption in mediation.",
+      "cases": [
+        {
+          "id": "iqbal_2025_metacognition_variance_supported",
+          "field": "reported_results",
+          "text": "The fitted model accounted for 40.8% of variation in academic achievement and 34.5% in cognitive offloading.",
+          "quote": "the model explains 40.8% of the variance in AA, 34.5% in COL, and 30.7% in SMC.",
+          "source_span": "C0001:S004",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The Abstract defines AA as academic achievement and COL as cognitive offloading. The Results sentence assigns explained variance of 40.8% to AA and 34.5% to COL; the claim preserves those roles without claiming a causal improvement."
+        },
+        {
+          "id": "iqbal_2025_metacognition_causal_limit_supported",
+          "field": "limitations",
+          "text": "The authors caution that spacing measurements over time does not resolve causal uncertainty in the mediation analysis.",
+          "quote": "does not fully establish causal relationships, a limitation that also applies to the mediation analysis conducted",
+          "source_span": "C0001:S006",
+          "expected_supported": true,
+          "category": "supported",
+          "rationale": "The Limitations passage acknowledges temporal separation but explicitly says causal relationships are not fully established, including in the mediation analysis."
+        },
+        {
+          "id": "iqbal_2025_metacognition_variance_role_swap",
+          "field": "reported_results",
+          "text": "The fitted model accounted for 34.5% of variation in academic achievement and 40.8% in cognitive offloading.",
+          "quote": "the model explains 40.8% of the variance in AA, 34.5% in COL, and 30.7% in SMC.",
+          "source_span": "C0001:S004",
+          "expected_supported": false,
+          "category": "numeric",
+          "rationale": "The claim swaps two source-present numbers: the source assigns 40.8% to AA and 34.5% to COL, not the reverse."
+        },
+        {
+          "id": "iqbal_2025_metacognition_association_as_causation",
+          "field": "reported_results",
+          "text": "The mediation analysis proves that generative AI use causes higher academic achievement through cognitive offloading.",
+          "quote": "does not fully establish causal relationships, a limitation that also applies to the mediation analysis conducted",
+          "source_span": "C0001:S006",
+          "expected_supported": false,
+          "category": "causality",
+          "rationale": "The source concerns modeled relationships, and its decisive limitation says the time-lagged design does not fully establish causality, including for mediation. The claim falsely upgrades this to proof of a causal pathway."
+        },
+        {
+          "id": "iqbal_2025_metacognition_variance_unrelated_anchor",
+          "field": "reported_results",
+          "text": "The fitted model accounted for 40.8% of variation in academic achievement and 34.5% in cognitive offloading.",
+          "quote": "does not fully establish causal relationships, a limitation that also applies to the mediation analysis conducted",
+          "source_span": "C0001:S006",
+          "expected_supported": false,
+          "category": "unrelated_anchor",
+          "rationale": "The claim text matches the supported variance case, but the selected span warns about causal inference. That span supplies no R-square values or mapping of percentages to constructs."
+        }
+      ],
+      "year": 2025,
+      "excerpt_note": "Brief, non-contiguous primary-source excerpts, not the full paper. Whitespace and inline reference formatting normalized; paragraphs are separated by blank lines. Source authors, canonical article, and CC BY 4.0 license are credited here. Claim texts and rationales are original fixture annotations, not author statements."
+    }
+  ]
+}
