@@ -2,7 +2,7 @@
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#a52c3e"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#d77c83"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#bf7868"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#947783"]];
-const depths=[["full_text","Full-article readings","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
+const depths=[["full_text","Full-text material","#a52c3e"],["abstract","Abstract-based","#d78f98"],["curated","Curated synopsis","#c6a6a9"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
@@ -129,10 +129,33 @@ function ideaInfo(x){
  return {text:cleanLead(value,readableSourceTitle(x))||"No substantive source text is available.",label};
 }
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.digest?.finding?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
-function goto(page,k){let v="#"+(page==="paper"?"paper/"+encodeURIComponent(k):page);if(location.hash===v)route();else location.hash=v}
-function route(){let raw=location.hash.slice(1)||"home";try{raw=decodeURIComponent(raw)}catch{raw="home"}let page=raw.startsWith("paper/")?"paper":raw;if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";$$(".view").forEach(v=>v.hidden=v.id!==page);$$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});if(page==="paper")showPaper(record(raw.slice(6)));if(page==="library")showLibrary();if(page==="atlas")showAtlas();window.scrollTo({top:0,behavior:"instant"})}
+function libraryHash(theme){return "#library?theme="+encodeURIComponent(theme)+"&scope=all"}
+function goto(page,k){
+ const value=page==="paper"?"#paper/"+encodeURIComponent(k):page==="library"&&k?libraryHash(k):"#"+page;
+ if(location.hash===value)route({type:"hashchange"});else location.hash=value;
+}
+function route(event){
+ const raw=location.hash.slice(1)||"home";
+ let page=raw.startsWith("paper/")?"paper":raw.split("?")[0];
+ if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";
+ if(page==="library"&&raw.includes("?")){
+  const params=new URLSearchParams(raw.slice(raw.indexOf("?")+1)),theme=params.get("theme"),scope=params.get("scope");
+  $("#topic-filter").value=themes.some(t=>t[0]===theme)?theme:"";
+  $("#scope-filter").value=["core","adjacent","historical","all"].includes(scope)?scope:"all";
+  $("#search").value="";$("#type-filter").value="";$("#depth-filter").value="readable";
+ }
+ $$(".view").forEach(v=>v.hidden=v.id!==page);
+ $$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});
+ if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}showPaper(record(key))}
+ if(page==="library")showLibrary();if(page==="atlas")showAtlas();
+ window.scrollTo({top:0,behavior:"instant"});
+ if(event?.type==="hashchange"){
+  closeNavigation();
+  const heading=$("#"+page+" h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+ }
+}
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
-function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>{$("#topic-filter").value=t[0];goto("library")},"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
+function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>goto("library",t[0]),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
 function donut(){const cc=counts(),total=Math.max(1,S.records.length),legend=$("#depth-legend");$("#record-count").textContent=S.records.length;legend.replaceChildren();let at=0,parts=[];for(const d of depths){let pct=cc[d[0]]/total*100;parts.push(d[2]+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;const r=make("div","legend-item"),sw=make("span","legend-swatch"),copy=make("div");sw.style.background=d[2];add(copy,make("div","legend-title",d[1]+" · "+cc[d[0]]),make("span","legend-caption",Math.round(pct)+"% of records"));add(r,sw,copy);legend.append(r)}$("#evidence-donut").style.background="conic-gradient("+parts.join(",")+")"}
 function featureCoverage(x){
  const area=make("div","feature-evidence"),row=make("div","feature-evidence-row");
@@ -149,7 +172,7 @@ function issueRefs(ids,target){
  for(const key of ids||[]){
    const src=list.find(x=>x.id===key);
    if(!src)continue;
-   const matches=S.records.find(x=>id(x)===key);
+   const resolved=record(key),matches=resolved&&depth(resolved)!=="citation_only"?resolved:null;
    const b=matches?btn(readableSourceTitle(src),()=>goto("paper",id(matches)),"issue-ref"):link(readableSourceTitle(src),src.url||"#library","issue-ref");
    container.append(b);
  }
@@ -225,12 +248,15 @@ function renderIssue(){
  $("#issue-closer").textContent=published?issue.closer:"";
  $("#issue-qualification").textContent=published?issue.editorial_note||"":"";
  $("#issue-qualification").hidden=!published||!issue.editorial_note;
- $("#issue-coverage").textContent="Explore the original research and reporting behind these ideas.";
+ const sourceList=issue.sources||[],earlier=sourceList.filter(source=>source.editorial_role==="previously_indexed_context").length,collection=sourceList.filter(source=>source.editorial_role==="collection_week").length;
+ $("#issue-coverage").textContent=sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries()){
-  const r=make("div","issue-shelf-item");let candidate=S.records.find(x=>id(x)===src.id);
-  const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",src.id)):link(readableSourceTitle(src),src.url||"#library");
-  add(r,make("span","issue-shelf-number",String(i+1).padStart(2,"0")),add(make("div","issue-shelf-content"),title,make("p","",[src.venue,src.reading_level==="full_text"?"Full-text extract":src.reading_level==="abstract"?"Abstract-based":"Publisher/editorial"].filter(Boolean).join(" · "))));
+  const r=make("div","issue-shelf-item"),resolved=record(src.id),candidate=resolved&&depth(resolved)!=="citation_only"?resolved:null;
+  const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",id(candidate))):link(readableSourceTitle(src),src.url||"#library");
+  const role=src.editorial_role==="previously_indexed_context"?"Earlier context":src.editorial_role==="collection_week"?"Collection-week reading":"";
+  const metadata=[src.venue,candidate?depthName(candidate):"Not in current reading library · Original source",candidate?.first_seen?"First indexed "+date(candidate.first_seen):"",role].filter(Boolean).join(" · ");
+  add(r,make("span","issue-shelf-number",String(i+1).padStart(2,"0")),add(make("div","issue-shelf-content"),title,make("p","",metadata)));
   shelf.append(r);
  }
 }
@@ -238,7 +264,7 @@ function renderIssue(){
 function home(){
  const run=S.week.run||{},all=(S.week.items||[]).map(x=>record(id(x))||S.records.find(r=>r.title===x.title)||x);
  const top=all.filter(x=>x.kind==="scholarly"&&depth(x)!=="citation_only"&&x.reading?.digest?.finding).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.digest?.finding)).slice(0,3);
- const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??all.length)+" recently indexed · "+S.records.length+" total";
+ const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??all.length)+" in latest collection · "+S.records.length+" in library";
  const root=$("#feature-grid");root.replaceChildren();
  if(!top.length)root.append(make("div","empty-state","The latest index contains no source-rich highlights yet. Browse the research library."));
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
@@ -248,10 +274,10 @@ function home(){
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
  topicBars("#topic-bars");donut();
- const grid=$("#lens-grid");grid.replaceChildren();themes.forEach(t=>{const a=link("","#library","lens");a.setAttribute("aria-label","Explore "+t[0]);a.onclick=e=>{e.preventDefault();$("#topic-filter").value=t[0];goto("library")};add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
+ const grid=$("#lens-grid");grid.replaceChildren();themes.forEach((t,i)=>{const a=link("",libraryHash(t[0]),"lens");a.setAttribute("aria-label","Explore "+t[0]);a.setAttribute("data-theme",String(i));add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
  const arr=$("#arrivals-body");arr.replaceChildren();
- const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.published||"").localeCompare(a.published||"")).slice(0,7);
- for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.published)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
+ const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||"")).slice(0,7);
+ for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.first_seen)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
 }
 
 function renderEditorial(){
@@ -306,13 +332,20 @@ function renderBacklog(){
  add(root,top,rail,detail);
 }
 function showLibrary(){
- const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value,scope=$("#scope-filter").value;
+ const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value,scope=$("#scope-filter").value,order=$("#library-sort")?.value||"added";
  const xs=S.records.filter(x=>(!q||[x.title,x.venue,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,(x.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!t||x.lane===t)&&(!k||x.kind===k)&&(
    scope==="all"||(scope==="core"&&x.source_group==="AI-specific")||
    (scope==="adjacent"&&x.source_group==="Adjacent digital-attention evidence")||
    (scope==="historical"&&/^(Earlier|Historical)/.test(x.source_group||""))
-  )&&(d!=="full_text"||depth(x)==="full_text")).sort((a,b)=>(b.published||"").localeCompare(a.published||"")||rank(b)-rank(a));
+  )&&(d!=="full_text"||depth(x)==="full_text")).sort((a,b)=>{const field=order==="published"?"published":"first_seen";return (b[field]||"").localeCompare(a[field]||"")||(b.published||"").localeCompare(a.published||"")||rank(b)-rank(a)});
  $("#library-count").textContent=xs.length+" matching sources · "+S.records.length+" in the complete archive";
+ const context=$("#library-context");
+ if(context){
+  const scopeNames={core:"AI-specific research",adjacent:"Adjacent digital-attention research",historical:"Earlier foundations",all:"All sources"};
+  context.textContent=[scopeNames[scope]||"All sources",t,d==="full_text"?"Full-text material":"",k==="scholarly"?"Academic research":k==="nonacademic"?"Commentary & technology":""].filter(Boolean).join(" · ");
+  $$("[data-library-theme]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.libraryTheme===t)));
+ }
+
  const box=$("#library-results");box.replaceChildren();
  if(!xs.length){box.append(make("div","empty-state","No source-backed items match those filters. Try a broader search."));return}
  for(const x of xs){
@@ -320,18 +353,20 @@ function showLibrary(){
   const image=editorialMedia(x,"card");
   image.onclick=()=>goto("paper",id(x));
   image.setAttribute("role","button");
+  image.setAttribute("aria-label","Read: "+shortIdea(x,115));
   image.tabIndex=0;
   image.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();goto("paper",id(x));}});
   h.append(btn(shortIdea(x,115),()=>goto("paper",id(x))));
-  add(foot,make("span","",date(x.published)+" · "+(x.venue||"")),make("span","",depthName(x)));
+  add(foot,make("span","card-source-meta",(x.venue||"Original source")+" · Published "+date(x.published)),make("span","card-added",x.first_seen?"Added "+date(x.first_seen):"Added date not recorded"),make("span","card-depth",depthName(x)));
   if(/^(Earlier|Historical)/.test(x.source_group||""))foot.append(make("span","", "Earlier foundation"));
   add(body,make("span","card-type",ideaInfo(x).label),h,make("p","library-citation",readableSourceTitle(x)),foot);
+  c.setAttribute("data-theme",String(Math.max(0,themes.findIndex(theme=>theme[0]===x.lane))));
   add(c,image,body);box.append(c);
  }
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
- for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-article readings",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
+ for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-text material",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
  topicBars("#atlas-topic-bars");
  const years={};for(let y=2023;y<=new Date().getFullYear();y++)years[String(y)]=0;
  S.records.forEach(x=>{const y=(x.published||"").slice(0,4);if(x.source_group==="AI-specific"&&Object.prototype.hasOwnProperty.call(years,y))years[y]++});
@@ -847,8 +882,21 @@ async function init(){
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
 ["search","scope-filter","topic-filter","depth-filter","type-filter"].forEach(s=>$("#"+s).addEventListener(s==="search"?"input":"change",showLibrary));
 $("#browse-editorial").addEventListener("click",e=>{e.preventDefault();goto("perspectives")});
-$("#perspectives-library-link").addEventListener("click",e=>{e.preventDefault();$("#type-filter").value="nonacademic";$("#depth-filter").value="readable";goto("library")});
+$("#perspectives-library-link").addEventListener("click",e=>{e.preventDefault();$("#scope-filter").value="all";$("#topic-filter").value="";$("#search").value="";$("#type-filter").value="nonacademic";$("#depth-filter").value="readable";goto("library")});
 $("#perspectives-essays-link").addEventListener("click",e=>{e.preventDefault();$("#perspectives-essays").scrollIntoView({behavior:"smooth",block:"start"})});
+$$("[data-library-theme]").forEach(button=>button.addEventListener("click",()=>{$("#topic-filter").value=button.dataset.libraryTheme;showLibrary()}));
+$("#library-sort").addEventListener("change",showLibrary);
+$("#library-reset").addEventListener("click",()=>{
+ $("#search").value="";$("#scope-filter").value="all";$("#topic-filter").value="";$("#type-filter").value="";$("#depth-filter").value="readable";showLibrary();
+});
+function closeNavigation(){
+ $(".main-nav").classList.remove("is-open");$("#nav-toggle").setAttribute("aria-expanded","false");
+}
+const navigation=$(".main-nav"),menuToggle=$("#nav-toggle");
+navigation.classList.add("is-collapsible");menuToggle.hidden=false;
+menuToggle.addEventListener("click",()=>{const open=menuToggle.getAttribute("aria-expanded")!=="true";menuToggle.setAttribute("aria-expanded",String(open));navigation.classList.toggle("is-open",open)});
+navigation.addEventListener("keydown",event=>{if(event.key==="Escape"&&menuToggle.getAttribute("aria-expanded")==="true"){closeNavigation();menuToggle.focus()}});
 window.addEventListener("hashchange",route);
 init();
+
 
