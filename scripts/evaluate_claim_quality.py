@@ -26,6 +26,18 @@ import comprehensive_readings as reading
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / 'tests/fixtures/claim_quality_sources.json'
 MODEL = 'Qwen/Qwen2.5-1.5B-Instruct-GGUF/qwen2.5-1.5b-instruct-q4_k_m.gguf'
+DEFAULT_MODEL_PROFILE = 'qwen2.5-1.5b'
+MODEL_PROFILES = {
+    DEFAULT_MODEL_PROFILE: {
+        'expected_model': MODEL,
+        'filenames': ('qwen2.5-1.5b-instruct-q4_k_m.gguf',),
+    },
+    'qwen2.5-7b': {
+        'expected_model': 'Qwen/Qwen2.5-7B-Instruct-GGUF',
+        'filenames': ('qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf',
+                      'qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf'),
+    },
+}
 SEED = 7
 VARIANTS = ('baseline', 'exact_partition')
 MAX_SECONDS = 720
@@ -64,7 +76,9 @@ LIMITATION = (
     'Short licensed source excerpts are repository fixture inputs; no source or claim text '
     'is included in the report and no additional source text is saved. '
     'The model identifier is expected, not verified from weights; its SHA-256 identifies '
-    'the supplied file. A fixed seed does not guarantee identical results across backends.'
+    'the supplied entry file only. model_file_hashes identifies every required profile file '
+    'under fixed expected filenames, including both shards for the split model. '
+    'A fixed seed does not guarantee identical results across backends.'
 )
 
 
@@ -392,18 +406,22 @@ def _model_hash(path, deadline):
             result.update(block)
 
 
-def _worker(out, fixtures, model_path, deadline, *, variant='baseline'):
+def _worker(out, fixtures, model_path, deadline, *, variant='baseline', model_profile=DEFAULT_MODEL_PROFILE):
     # Redirect Python and native logging before importing/loading any backend.
     with open(os.devnull, 'w') as sink, redirect_stdout(sink), redirect_stderr(sink):
         os.dup2(sink.fileno(), 1)
         os.dup2(sink.fileno(), 2)
         try:
             check_deadline(deadline)
+            profile = MODEL_PROFILES[model_profile]
             path = Path(model_path)
-            if not path.is_file():
+            names = profile['filenames']
+            paths = (path,) if len(names) == 1 else tuple(path.parent / name for name in names)
+            if (len(names) > 1 and path.name != names[0]) or not all(part.is_file() for part in paths):
                 out.put({'worker_failed': True})
                 return
-            out.put({'model_sha256': _model_hash(path, deadline)})
+            hashes = {name: _model_hash(part, deadline) for name, part in zip(names, paths)}
+            out.put({'model_file_hashes': hashes})
             from llama_cpp import Llama
             model = Llama(model_path=str(path), n_ctx=6144, chat_format='chatml',
                           n_threads=min(os.cpu_count() or 2, 4), seed=SEED, verbose=False)
@@ -439,7 +457,8 @@ def _accept_row(value, rows):
         return
 
 
-def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, variant='baseline'):
+def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, variant='baseline',
+                model_profile=DEFAULT_MODEL_PROFILE):
     """Bound model hashing/loading and all inference, including native hangs.
 
     Reserve a small portion of the total for terminate/kill, rather than adding
@@ -449,6 +468,9 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, vari
         raise ValueError('deadline_must_be_between_zero_and_720_seconds')
     if variant not in VARIANTS:
         raise ValueError('invalid_variant')
+    if model_profile not in MODEL_PROFILES:
+        raise ValueError('invalid_model_profile')
+    profile = MODEL_PROFILES[model_profile]
     started = time.monotonic()
     counts = validate_fixtures(fixtures)
     total_deadline = started + seconds
@@ -458,8 +480,8 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, vari
     out = ctx.Queue()
     rows = initial_rows(fixtures)
     process = ctx.Process(target=_worker, args=(out, copy.deepcopy(fixtures), str(model_path), deadline),
-                          kwargs={'variant': variant})
-    status, model_hash, process_started = 'deadline_exceeded', None, False
+                          kwargs={'variant': variant, 'model_profile': model_profile})
+    status, model_hashes, process_started = 'deadline_exceeded', {}, False
     try:
         check_deadline(deadline)
         process.start()
@@ -482,9 +504,11 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, vari
                 break
             if value == {'deadline_exceeded': True}:
                 break
-            if (set(value) == {'model_sha256'} and isinstance(value['model_sha256'], str)
-                    and re.fullmatch(r'[0-9a-f]{64}', value['model_sha256'])):
-                model_hash = value['model_sha256']
+            if (set(value) == {'model_file_hashes'} and type(value['model_file_hashes']) is dict
+                    and set(value['model_file_hashes']) == set(profile['filenames'])
+                    and all(isinstance(item, str) and re.fullmatch(r'[0-9a-f]{64}', item)
+                            for item in value['model_file_hashes'].values())):
+                model_hashes = copy.deepcopy(value['model_file_hashes'])
                 continue
             _accept_row(value, rows)
     except DeadlineExceeded:
@@ -508,7 +532,9 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, vari
     return {
         'status': status, 'variant': variant, 'review_status': REVIEW_STATUS, 'fixture_sha256': fixture_digest(fixtures),
         'fixture_counts': counts, 'results': rows, 'metrics': metrics(rows),
-        'expected_model': MODEL, 'model_sha256': model_hash,
+        'model_profile': model_profile, 'expected_model': profile['expected_model'],
+        'expected_quantization': 'Q4_K_M', 'model_file_hashes': model_hashes,
+        'model_sha256': model_hashes.get(profile['filenames'][0]), 'model_sha256_scope': 'entry_file_only',
         'settings': {'seed': SEED, 'n_ctx': 6144, 'chat_format': 'chatml', 'temperature': 0.1,
                      'generation': 'prescribed_fixture_no_model_generation', 'verification_max_tokens': 500,
                      'n_threads': min(os.cpu_count() or 2, 4), 'deadline_seconds': seconds},
@@ -536,12 +562,21 @@ def load_fixtures(path):
     return value
 
 
+def parse_model_profile(value):
+    if value not in MODEL_PROFILES:
+        raise argparse.ArgumentTypeError('unsupported model profile')
+    return value
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--fixtures', default=str(FIXTURES))
     parser.add_argument('--validate-only', action='store_true', help='Offline metadata/anchor validation; no model load')
     parser.add_argument('--variant', choices=VARIANTS, default='baseline',
                         help='Diagnostic verifier grammar; exact_partition retains every possible support decision')
+    parser.add_argument('--model-profile', type=parse_model_profile, choices=tuple(MODEL_PROFILES),
+                        default=DEFAULT_MODEL_PROFILE,
+                        help='Allowlisted local model identity and required files; no downloads')
     parser.add_argument('--time-budget-seconds', '--deadline-seconds', dest='seconds', type=float, default=MAX_SECONDS)
     parser.add_argument('--report', '--output', dest='output', help='Also save safe JSON to a new file outside the repository')
     args = parser.parse_args(argv)
@@ -557,13 +592,15 @@ def main(argv=None):
         fixtures = load_fixtures(args.fixtures)
         if args.validate_only:
             report = {'status': 'validated', 'variant': args.variant, 'review_status': REVIEW_STATUS,
+                      'model_profile': args.model_profile, 'expected_model': MODEL_PROFILES[args.model_profile]['expected_model'],
                       'fixture_sha256': fixture_digest(fixtures), 'fixture_counts': validate_fixtures(fixtures),
                       'model_loaded': False, 'limitation': LIMITATION}
         else:
             report = run_bounded(fixtures, os.getenv('LOCAL_READING_MODEL', '/tmp/attention-model.gguf'), args.seconds,
-                                 variant=args.variant)
+                                 variant=args.variant, model_profile=args.model_profile)
     except FixtureError as exc:
-        report = {'status': 'fixture_invalid', 'variant': args.variant, 'code': str(exc), 'model_loaded': False}
+        report = {'status': 'fixture_invalid', 'variant': args.variant, 'model_profile': args.model_profile,
+                  'code': str(exc), 'model_loaded': False}
     encoded = json.dumps(report, indent=2) + '\n'
     if output:
         try:

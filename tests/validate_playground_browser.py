@@ -154,6 +154,67 @@ def check(page, url, width, screenshots, zoom=1):
         assert "STAGE 1 / 3" in page.locator("#recovery-progress").inner_text()
         assert page.locator(".recovery-option").count() == 0
     assert len(stories) == 4
+    # Two guided pairs retain manual history and label every condition/material.
+    history_before = page.locator("#recovery-history").inner_text()
+    for pair in (1, 2):
+        page.locator("#recovery-compare").focus()
+        page.keyboard.press("Enter")
+        assert page.evaluate("document.activeElement.id") == "recovery-headline"
+        assert f"Pair {pair}" in page.locator("#recovery-comparison-plan").inner_text()
+        assert page.locator('[data-recovery-mode="cue"]').is_disabled()
+        contexts, previews = [], []
+        for step in (1, 2):
+            contexts.append(page.locator("#recovery-round-context").inner_text())
+            preview = page.locator("#recovery-description").inner_text()
+            previews.append(preview)
+            page.locator("#recovery-start").focus()
+            page.keyboard.press("Enter")
+            for correct_index in (2, 1, 2, 1):
+                for _ in range(correct_index + 1):
+                    page.keyboard.press("Tab")
+                page.keyboard.press("Enter")
+            cue_present = page.locator("#recovery-checkpoint").count() == 1
+            assert cue_present == ("With checkpoint" in contexts[-1])
+            assert ("recovery-checkpoint" in page.locator("#recovery-headline").get_attribute("aria-describedby")) == cue_present
+            choices = page.locator(".recovery-option")
+            correct = next(i for i, choice in enumerate(choices.all()) if choice.inner_text() in preview)
+            if step == 1:
+                page.locator("#tab-assist").click()
+                page.locator("#tab-recovery").click()
+            page.locator("#recovery-headline").focus()
+            for _ in range(correct + 1):
+                page.keyboard.press("Tab")
+            page.keyboard.press("Enter")
+            assert page.locator("#recovery-history").inner_text() == history_before
+            if step == 1:
+                assert page.locator("#recovery-comparison-results").is_hidden()
+                page.locator("#recovery-start").focus()
+                page.keyboard.press("Enter")
+                assert "ROUND 2 / 2" in page.locator("#recovery-progress").inner_text()
+                assert "STAGE 1 / 3" in page.locator("#recovery-progress").inner_text()
+                assert page.locator(".recovery-option").count() == 0
+        assert previews[0] != previews[1]
+        assert sum("With checkpoint" in x for x in contexts) == 1
+        assert sum("Without checkpoint" in x for x in contexts) == 1
+        assert sum("TASK A" in x for x in contexts) == 1
+        assert sum("TASK B" in x for x in contexts) == 1
+        assert page.locator(".recovery-comparison-result").count() == 2
+        assert "timing omitted" in page.locator(".recovery-comparison-result").first.inner_text()
+        assert page.evaluate("document.activeElement.id") == "recovery-comparison-results"
+        assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+        if screenshots and pair == 2:
+            page.locator("#play-recovery").screenshot(path=str(screenshots / f"lab-comparison-{width}-zoom{zoom}.png"))
+        page.locator("#recovery-exit-comparison").focus()
+        page.keyboard.press("Enter")
+        assert page.locator("#recovery-comparison-results").is_hidden()
+        assert page.locator('[data-recovery-mode="cue"]').is_enabled()
+        assert page.locator("#recovery-history").inner_text() == history_before
+    page.locator("#recovery-compare").click()
+    page.locator("#recovery-start").click()
+    page.locator("#play-reset").click()
+    assert page.locator("#recovery-comparison-plan").is_hidden()
+    assert page.locator("#recovery-comparison-results").is_hidden()
+    assert page.locator("#recovery-compare").is_enabled()
     page.locator("#tab-assist").click()
     for mode in ("reflect", "hint", "answer"):
         page.locator(f'[data-assist-mode="{mode}"]').click()
@@ -174,7 +235,7 @@ def check(page, url, width, screenshots, zoom=1):
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
-    print(f"Chromium Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, all scenarios/modes.")
+    print(f"Chromium Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, all scenarios/modes.")
 
 
 def check_site_integration(page, url):
@@ -218,4 +279,5 @@ if __name__ == "__main__":
             page.close()
         finally:
             browser.close()
+
 

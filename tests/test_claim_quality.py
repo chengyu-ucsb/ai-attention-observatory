@@ -426,12 +426,68 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
             path.write_bytes(b'original synthetic placeholder, never inference')
             with patch.object(evaluation.os, 'dup2') as dup, patch.dict(sys.modules, {'llama_cpp': backend}):
                 evaluation._worker(out, fixtures(), str(path), time.monotonic() + 60)
-            self.assertEqual(out.put.call_args_list[0].args[0], {'model_sha256': sha256(path.read_bytes()).hexdigest()})
+            self.assertEqual(out.put.call_args_list[0].args[0], {
+                'model_file_hashes': {'qwen2.5-1.5b-instruct-q4_k_m.gguf': sha256(path.read_bytes()).hexdigest()}})
             self.assertEqual(backend.Llama.call_args.kwargs, {
                 'model_path': str(path), 'n_ctx': 6144, 'chat_format': 'chatml',
                 'n_threads': min(os.cpu_count() or 2, 4), 'seed': 7, 'verbose': False})
         self.assertEqual([call.args[1] for call in dup.call_args_list], [1, 2])
         self.assertEqual(out.put.call_args_list[-1].args[0], {'done': True})
+
+    def test_split_model_requires_both_correctly_named_files_before_backend_or_hashing(self):
+        names = evaluation.MODEL_PROFILES['qwen2.5-7b']['filenames']
+        backend, out = Mock(), Mock()
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / names[0]
+            path.write_bytes(b'first synthetic shard')
+            with patch.object(evaluation.os, 'dup2'), patch.dict(sys.modules, {'llama_cpp': backend}), \
+                 patch.object(evaluation, '_model_hash') as hashed:
+                evaluation._worker(out, fixtures(), str(path), time.monotonic() + 60, model_profile='qwen2.5-7b')
+            backend.Llama.assert_not_called()
+            hashed.assert_not_called()
+            out.put.assert_called_once_with({'worker_failed': True})
+            (Path(temp) / names[1]).write_bytes(b'second synthetic shard')
+            out.reset_mock()
+            with patch.object(evaluation.os, 'dup2'), patch.dict(sys.modules, {'llama_cpp': backend}):
+                evaluation._worker(out, fixtures(), str(Path(temp) / 'wrong-entry-name.gguf'),
+                                   time.monotonic() + 60, model_profile='qwen2.5-7b')
+            backend.Llama.assert_not_called()
+            out.put.assert_called_once_with({'worker_failed': True})
+
+    def test_split_model_hashes_both_files_and_preserves_inference_parameters(self):
+        names = evaluation.MODEL_PROFILES['qwen2.5-7b']['filenames']
+        backend, out = Mock(), Mock()
+        backend.Llama.return_value = Model([CHECK, REJECT])
+        with tempfile.TemporaryDirectory() as temp:
+            paths = [Path(temp) / name for name in names]
+            for index, path in enumerate(paths):
+                path.write_bytes(f'original synthetic shard {index}'.encode())
+            expected = {name: sha256(path.read_bytes()).hexdigest() for name, path in zip(names, paths)}
+            with patch.object(evaluation.os, 'dup2'), patch.dict(sys.modules, {'llama_cpp': backend}), \
+                 patch('urllib.request.urlopen', side_effect=AssertionError('no network')):
+                evaluation._worker(out, fixtures(), str(paths[0]), time.monotonic() + 60,
+                                   variant='exact_partition', model_profile='qwen2.5-7b')
+            self.assertEqual(out.put.call_args_list[0].args[0], {'model_file_hashes': expected})
+            self.assertEqual(backend.Llama.call_args.kwargs, {
+                'model_path': str(paths[0]), 'n_ctx': 6144, 'chat_format': 'chatml',
+                'n_threads': min(os.cpu_count() or 2, 4), 'seed': 7, 'verbose': False})
+            self.assertNotIn(temp, json.dumps([call.args[0] for call in out.put.call_args_list]))
+        self.assertEqual(out.put.call_args_list[-1].args[0], {'done': True})
+
+    def test_split_hashing_shares_worker_deadline_and_cannot_load_after_expiry(self):
+        names = evaluation.MODEL_PROFILES['qwen2.5-7b']['filenames']
+        backend, out = Mock(), Mock()
+        with tempfile.TemporaryDirectory() as temp:
+            for name in names:
+                (Path(temp) / name).write_bytes(b'synthetic')
+            with patch.object(evaluation.os, 'dup2'), patch.dict(sys.modules, {'llama_cpp': backend}), \
+                 patch.object(evaluation, '_model_hash', side_effect=['a' * 64, evaluation.DeadlineExceeded()]) as hashed:
+                evaluation._worker(out, fixtures(), str(Path(temp) / names[0]), time.monotonic() + 60,
+                                   model_profile='qwen2.5-7b')
+            self.assertEqual(hashed.call_count, 2)
+            self.assertEqual(hashed.call_args_list[0].args[1], hashed.call_args_list[1].args[1])
+            backend.Llama.assert_not_called()
+            out.put.assert_called_once_with({'deadline_exceeded': True})
 
     def test_missing_model_worker_fails_without_import_or_source_diagnostics(self):
         backend = Mock()
@@ -563,7 +619,8 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
                 result = evaluation.main(['--fixtures', str(source), '--validate-only'])
         self.assertEqual(result, 1)
         self.assertEqual(json.loads(stdout.getvalue()), {
-            'status': 'fixture_invalid', 'variant': 'baseline', 'code': 'fixture_anchor_mismatch', 'model_loaded': False})
+            'status': 'fixture_invalid', 'variant': 'baseline', 'model_profile': 'qwen2.5-1.5b',
+            'code': 'fixture_anchor_mismatch', 'model_loaded': False})
 
     def test_full_cli_uses_local_reading_model_env_and_reports_safe_result(self):
         report = {'status': 'worker_failed', 'results': []}
@@ -575,7 +632,7 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
                  patch.object(evaluation, 'run_bounded', return_value=report) as run, redirect_stdout(stdout):
                 result = evaluation.main(['--fixtures', str(source), '--time-budget-seconds', '720'])
             self.assertEqual(run.call_args.args[1:], ('/private/model-path.gguf', 720))
-            self.assertEqual(run.call_args.kwargs, {'variant': 'baseline'})
+            self.assertEqual(run.call_args.kwargs, {'variant': 'baseline', 'model_profile': 'qwen2.5-1.5b'})
         self.assertEqual(result, 1)
         self.assertEqual(json.loads(stdout.getvalue()), report)
         self.assertNotIn('/private/model-path.gguf', stdout.getvalue())
@@ -586,14 +643,15 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
         context.Queue.return_value.get.return_value = {'worker_failed': True}
         report = evaluation.run_bounded(fixtures(), '/never-loaded.gguf', 1, context=context,
                                         variant='exact_partition')
-        self.assertEqual(context.Process.call_args.kwargs['kwargs'], {'variant': 'exact_partition'})
+        self.assertEqual(context.Process.call_args.kwargs['kwargs'], {
+            'variant': 'exact_partition', 'model_profile': 'qwen2.5-1.5b'})
         self.assertEqual(report['variant'], 'exact_partition')
         with tempfile.TemporaryDirectory() as temp:
             source = Path(temp) / 'fixtures.json'
             source.write_text(json.dumps(fixtures()))
             with patch.object(evaluation, 'run_bounded', return_value=report) as run, redirect_stdout(io.StringIO()):
                 evaluation.main(['--fixtures', str(source), '--variant', 'exact_partition'])
-            self.assertEqual(run.call_args.kwargs, {'variant': 'exact_partition'})
+            self.assertEqual(run.call_args.kwargs, {'variant': 'exact_partition', 'model_profile': 'qwen2.5-1.5b'})
         backend = Mock()
         backend.Llama.return_value = Model([])
         with tempfile.TemporaryDirectory() as temp:
@@ -604,6 +662,49 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
                 evaluation._worker(Mock(), fixtures(), str(model_file), time.monotonic() + 60,
                                    variant='exact_partition')
             self.assertEqual(evaluate.call_args.kwargs['variant'], 'exact_partition')
+
+    def test_allowlisted_model_profile_threads_to_worker_cli_and_safe_complete_hash_report(self):
+        names = evaluation.MODEL_PROFILES['qwen2.5-7b']['filenames']
+        hashes = {names[0]: 'a' * 64, names[1]: 'b' * 64}
+        context = Mock()
+        context.Process.return_value.is_alive.return_value = False
+        context.Queue.return_value.get.side_effect = [{'model_file_hashes': hashes}, {'worker_failed': True}]
+        report = evaluation.run_bounded(fixtures(), '/private/model-path.gguf', 1, context=context,
+                                        variant='exact_partition', model_profile='qwen2.5-7b')
+        self.assertEqual(context.Process.call_args.kwargs['kwargs'], {
+            'variant': 'exact_partition', 'model_profile': 'qwen2.5-7b'})
+        self.assertEqual(report['model_profile'], 'qwen2.5-7b')
+        self.assertEqual(report['expected_model'], 'Qwen/Qwen2.5-7B-Instruct-GGUF')
+        self.assertEqual(report['model_file_hashes'], hashes)
+        self.assertEqual(report['model_sha256'], hashes[names[0]])
+        self.assertEqual(report['model_sha256_scope'], 'entry_file_only')
+        self.assertNotIn('/private/model-path.gguf', json.dumps(report))
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / 'fixtures.json'
+            source.write_text(json.dumps(fixtures()))
+            with patch.object(evaluation, 'run_bounded', return_value=report) as run, redirect_stdout(io.StringIO()):
+                evaluation.main(['--fixtures', str(source), '--variant', 'exact_partition',
+                                 '--model-profile', 'qwen2.5-7b'])
+            self.assertEqual(run.call_args.kwargs, {'variant': 'exact_partition', 'model_profile': 'qwen2.5-7b'})
+        with self.assertRaisesRegex(ValueError, '^invalid_model_profile$'):
+            evaluation.run_bounded(fixtures(), '/private/path.gguf', model_profile='PRIVATE UNTRUSTED NAME')
+        stderr = io.StringIO()
+        with redirect_stderr(stderr), self.assertRaises(SystemExit):
+            evaluation.main(['--model-profile', 'PRIVATE UNTRUSTED NAME'])
+        self.assertNotIn('PRIVATE UNTRUSTED NAME', stderr.getvalue())
+
+    def test_partial_or_unrecognized_model_hashes_are_not_reported_as_complete_identity(self):
+        names = evaluation.MODEL_PROFILES['qwen2.5-7b']['filenames']
+        for hashes in ({names[0]: 'a' * 64}, {'PRIVATE FILE NAME': 'a' * 64},
+                       {names[0]: 'a' * 64, names[1]: 'PRIVATE HASH TEXT'}):
+            context = Mock()
+            context.Process.return_value.is_alive.return_value = False
+            context.Queue.return_value.get.side_effect = [{'model_file_hashes': hashes}, {'worker_failed': True}]
+            report = evaluation.run_bounded(fixtures(), '/private/path.gguf', 1, context=context,
+                                            model_profile='qwen2.5-7b')
+            self.assertEqual(report['model_file_hashes'], {})
+            self.assertIsNone(report['model_sha256'])
+            self.assertNotIn('PRIVATE', json.dumps(report))
 
     def test_real_spawn_missing_model_produces_safe_worker_failure(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -618,6 +719,8 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
         self.assertEqual(run.stderr, '')
         report = json.loads(run.stdout)
         self.assertEqual(report['status'], 'worker_failed')
+        self.assertEqual(report['model_profile'], 'qwen2.5-1.5b')
+        self.assertEqual(report['expected_model'], evaluation.MODEL)
         self.assertIsNone(report['model_sha256'])
         self.assertEqual(report['metrics']['quality_evaluated'], 0)
         self.assertNotIn(SOURCE, run.stdout)
