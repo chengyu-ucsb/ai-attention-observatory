@@ -1,0 +1,71 @@
+name: Evaluate source-grounded claims
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/evaluate_claim_quality.py'
+      - 'tests/test_claim_quality.py'
+      - 'tests/fixtures/claim_quality_sources.json'
+      - '.github/workflows/claim-quality-evaluation.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: claim-quality-evaluation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  evaluate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.11'
+      - name: Check fixtures and evaluator offline
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          python scripts/evaluate_claim_quality.py --validate-only
+          node tests/validate_article_ui.cjs
+          node tests/validate_weekly_issue.cjs
+      - name: Install the observed production inference version
+        run: |
+          python -m pip install --disable-pip-version-check --prefer-binary \
+            --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+            'llama-cpp-python==0.3.36' 'pypdf>=6.0,<7.0'
+      - name: Download the existing open model without hosted inference
+        run: |
+          timeout 480s curl --fail --location --retry 2 --connect-timeout 15 --max-time 420 \
+            'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf' \
+            --output /tmp/attention-model.gguf
+          test "$(stat -c '%s' /tmp/attention-model.gguf)" -gt 900000000
+          sha256sum /tmp/attention-model.gguf
+      - name: Measure labeled-claim acceptance without publishing readings
+        env:
+          LOCAL_READING_MODEL: /tmp/attention-model.gguf
+        run: |
+          python scripts/evaluate_claim_quality.py \
+            --report /tmp/claim-quality-evaluation.json --time-budget-seconds 720
+          if ! git diff --quiet -- data/library.json; then
+            echo '::error::The diagnostic changed library data; content is suppressed.'
+            exit 1
+          fi
+      - name: Record safe diagnostic results
+        if: always()
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          report = Path('/tmp/claim-quality-evaluation.json')
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as out:
+              out.write('# Source-grounded claim diagnostic\n\n')
+              out.write('Controlled claims on brief source excerpts, not generated summaries, full-article validation, or independent expert review. No readings published.\n\n')
+              if report.exists():
+                  out.write('```json\n' + report.read_text(encoding='utf-8') + '\n```\n')
+              else:
+                  out.write('No completed report is available; inspect the failed or timed-out step.\n')
+          PY
