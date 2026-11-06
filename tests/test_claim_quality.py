@@ -6,6 +6,7 @@ import copy
 from contextlib import redirect_stderr, redirect_stdout
 from hashlib import sha256
 import io
+import itertools
 import json
 import os
 from pathlib import Path
@@ -164,6 +165,86 @@ class EvaluationTests(unittest.TestCase):
         self.assertEqual(result['quality_evaluated'], 4)
         self.assertEqual(result['false_acceptance_rate'], 0.5)
         self.assertEqual(result['false_rejection_rate'], 0.5)
+
+    def test_exact_partition_schema_contains_every_decision_for_one_to_six_claims(self):
+        production = reading.verification_schema()
+        before = copy.deepcopy(production)
+        with patch.object(reading, 'verification_schema', return_value=production):
+            for count in range(1, 7):
+                schema = evaluation.exact_partition_schema(count)
+                decisions = schema.pop('enum')
+                self.assertEqual(schema, production)
+                self.assertEqual(len(decisions), 2 ** count)
+                actual = set()
+                for decision in decisions:
+                    supported, rejected = decision['supported'], decision['rejected']
+                    self.assertEqual(len(set(supported)), len(supported))
+                    self.assertEqual(len(set(rejected)), len(rejected))
+                    self.assertFalse(set(supported) & set(rejected))
+                    self.assertEqual(set(supported) | set(rejected), set(range(count)))
+                    actual.add(tuple(index in supported for index in range(count)))
+                self.assertEqual(actual, set(itertools.product((False, True), repeat=count)))
+                self.assertIn({'supported': [], 'rejected': list(range(count))}, decisions)
+                self.assertIn({'supported': list(range(count)), 'rejected': []}, decisions)
+        self.assertEqual(production, before)
+
+    def test_exact_partition_rejects_invalid_claim_counts_and_variants(self):
+        for count in (None, True, False, 0, -1, 7, 1.0, '1'):
+            with self.assertRaises(ValueError):
+                evaluation.exact_partition_schema(count)
+        with self.assertRaisesRegex(ValueError, 'invalid_variant'):
+            self.evaluate(Model([]), variant='unsupported')
+        with self.assertRaisesRegex(ValueError, 'invalid_variant'):
+            evaluation.run_bounded(fixtures(), '/never-loaded.gguf', variant='unsupported')
+
+    def test_candidate_changes_only_verifier_schema_and_preserves_fixtures_and_all_decisions(self):
+        data = fixtures()
+        before = copy.deepcopy(data)
+        baseline, candidate = Model([CHECK, REJECT]), Model([CHECK, REJECT])
+        baseline_rows = self.evaluate(baseline, data)
+        candidate_rows = self.evaluate(candidate, data, variant='exact_partition')
+        self.assertEqual(candidate_rows, baseline_rows)
+        self.assertEqual(len(candidate.calls), 2)
+        for reference, actual in zip(baseline.calls, candidate.calls):
+            expected = copy.deepcopy(reference)
+            expected['response_format']['schema']['enum'] = [REJECT, CHECK]
+            self.assertEqual(actual, expected)
+            self.assertEqual(actual['seed'], 7)
+        self.assertEqual(data, before)
+
+    def test_candidate_generation_retry_is_not_modified(self):
+        case = fixtures()['sources'][0]['cases'][0]
+        model = Model([{'claims': [], 'no_claim_reason': 'Later generation request.'}])
+        wrapper = evaluation.FixtureModel(model, case, time.monotonic() + 60, variant='exact_partition')
+        kwargs = {'messages': [{'role': 'user', 'content': 'original generation'}],
+                  'response_format': {'schema': reading.claim_schema('scholarly', [{'id': case['source_span']}])},
+                  'max_tokens': 2200, 'temperature': 0.1}
+        before = copy.deepcopy(kwargs)
+        wrapper.create_chat_completion(**kwargs)
+        wrapper.create_chat_completion(**kwargs)
+        self.assertEqual(model.calls, [dict(before, seed=7)])
+        self.assertEqual(kwargs, before)
+
+    def test_candidate_backend_ignoring_grammar_still_excludes_malformed_and_truncated_negative(self):
+        for response, code in (
+            (completion({'supported': [], 'rejected': 'BROKEN'}), 'model_schema_invalid'),
+            (completion(REJECT, finish='length'), 'model_output_truncated'),
+            (completion({'supported': [0], 'rejected': [0]}), 'model_verdict_indices_invalid'),
+        ):
+            model = Model([response, response])
+            rows = self.evaluate(model, variant='exact_partition')
+            self.assertEqual(len(model.calls), 2)  # Negative production verdict remains final.
+            self.assertTrue(all(row['code'] == code and row['outcome'] is None for row in rows))
+            self.assertEqual(evaluation.metrics(rows)['quality_evaluated'], 0)
+
+    def test_candidate_format_retry_preserves_prompt_and_allows_final_rejection(self):
+        model = Model([{'supported': [0]}, REJECT] * 2)
+        rows = self.evaluate(model, variant='exact_partition')
+        self.assertEqual(len(model.calls), 4)
+        self.assertEqual([row['outcome'] for row in rows], ['false_rejection', 'true_rejection'])
+        self.assertTrue(all(call['response_format']['schema']['enum'] == [REJECT, CHECK] for call in model.calls))
+        self.assertTrue(all(call['seed'] == 7 for call in model.calls))
+        self.assertTrue(model.calls[1]['messages'][-1]['content'].startswith(model.calls[0]['messages'][-1]['content']))
 
     def test_production_verifier_prompt_and_every_parameter_unchanged_except_seed(self):
         data = fixtures()
@@ -482,7 +563,7 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
                 result = evaluation.main(['--fixtures', str(source), '--validate-only'])
         self.assertEqual(result, 1)
         self.assertEqual(json.loads(stdout.getvalue()), {
-            'status': 'fixture_invalid', 'code': 'fixture_anchor_mismatch', 'model_loaded': False})
+            'status': 'fixture_invalid', 'variant': 'baseline', 'code': 'fixture_anchor_mismatch', 'model_loaded': False})
 
     def test_full_cli_uses_local_reading_model_env_and_reports_safe_result(self):
         report = {'status': 'worker_failed', 'results': []}
@@ -494,9 +575,35 @@ class BoundedWorkerAndCliTests(unittest.TestCase):
                  patch.object(evaluation, 'run_bounded', return_value=report) as run, redirect_stdout(stdout):
                 result = evaluation.main(['--fixtures', str(source), '--time-budget-seconds', '720'])
             self.assertEqual(run.call_args.args[1:], ('/private/model-path.gguf', 720))
+            self.assertEqual(run.call_args.kwargs, {'variant': 'baseline'})
         self.assertEqual(result, 1)
         self.assertEqual(json.loads(stdout.getvalue()), report)
         self.assertNotIn('/private/model-path.gguf', stdout.getvalue())
+
+    def test_candidate_variant_reaches_cli_worker_and_report(self):
+        context = Mock()
+        context.Process.return_value.is_alive.return_value = False
+        context.Queue.return_value.get.return_value = {'worker_failed': True}
+        report = evaluation.run_bounded(fixtures(), '/never-loaded.gguf', 1, context=context,
+                                        variant='exact_partition')
+        self.assertEqual(context.Process.call_args.kwargs['kwargs'], {'variant': 'exact_partition'})
+        self.assertEqual(report['variant'], 'exact_partition')
+        with tempfile.TemporaryDirectory() as temp:
+            source = Path(temp) / 'fixtures.json'
+            source.write_text(json.dumps(fixtures()))
+            with patch.object(evaluation, 'run_bounded', return_value=report) as run, redirect_stdout(io.StringIO()):
+                evaluation.main(['--fixtures', str(source), '--variant', 'exact_partition'])
+            self.assertEqual(run.call_args.kwargs, {'variant': 'exact_partition'})
+        backend = Mock()
+        backend.Llama.return_value = Model([])
+        with tempfile.TemporaryDirectory() as temp:
+            model_file = Path(temp) / 'placeholder.gguf'
+            model_file.write_bytes(b'test only')
+            with patch.object(evaluation.os, 'dup2'), patch.dict(sys.modules, {'llama_cpp': backend}), \
+                 patch.object(evaluation, 'evaluate') as evaluate:
+                evaluation._worker(Mock(), fixtures(), str(model_file), time.monotonic() + 60,
+                                   variant='exact_partition')
+            self.assertEqual(evaluate.call_args.kwargs['variant'], 'exact_partition')
 
     def test_real_spawn_missing_model_produces_safe_worker_failure(self):
         with tempfile.TemporaryDirectory() as temp:

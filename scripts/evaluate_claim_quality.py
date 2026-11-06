@@ -27,6 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURES = ROOT / 'tests/fixtures/claim_quality_sources.json'
 MODEL = 'Qwen/Qwen2.5-1.5B-Instruct-GGUF/qwen2.5-1.5b-instruct-q4_k_m.gguf'
 SEED = 7
+VARIANTS = ('baseline', 'exact_partition')
 MAX_SECONDS = 720
 REVIEW_STATUS = 'assistant_source_reviewed_not_independent_expert_review'
 LICENSES = {
@@ -210,12 +211,18 @@ def validate_fixtures(fixtures):
 class FixtureModel:
     """Inject exactly one generation; delegate all subsequent calls unchanged.
 
-    In particular, verifier prompts, schemas, retries and generation parameters
-    are production-owned. The only extra backend argument is the fixed seed.
+    Verifier prompts, retries and generation parameters are production-owned.
+    Baseline adds only the fixed seed; exact_partition additionally constrains
+    the verifier schema to every valid singleton partition. The injected
+    proposal always contains exactly one claim, irrespective of its label.
     """
-    def __init__(self, model, case, deadline):
+    def __init__(self, model, case, deadline, variant='baseline'):
+        if variant not in VARIANTS:
+            raise ValueError('invalid_variant')
         self.model, self.deadline = model, deadline
+        self.variant = variant
         self.proposal = {key: copy.deepcopy(case[key]) for key in ('field', 'text', 'source_span')}
+        self.claim_count = 1  # This harness injects a single prescribed claim.
         self.injected = False
         self.stage = 'generation'
         self.verifier_format_error = None
@@ -233,6 +240,11 @@ class FixtureModel:
             value = {'claims': [copy.deepcopy(self.proposal)], 'no_claim_reason': ''}
             return {'choices': [{'finish_reason': 'stop', 'message': {'content': json.dumps(value)}}]}
         kwargs = copy.deepcopy(kwargs)
+        if not generation and self.variant == 'exact_partition':
+            # This controlled diagnostic changes only the verifier grammar.
+            # Every acceptance/rejection decision remains possible; fixture
+            # generation, prompts, production validation and retries are intact.
+            kwargs['response_format']['schema'] = exact_partition_schema(self.claim_count)
         kwargs['seed'] = SEED
         answer = self.model.create_chat_completion(**kwargs)
         if not generation:
@@ -242,6 +254,23 @@ class FixtureModel:
             self.verifier_format_error = verifier_format_error(answer)
         check_deadline(self.deadline)
         return answer
+
+
+def exact_partition_schema(claim_count):
+    """Enumerate every complete disjoint verdict for 1–6 proposed claims.
+
+    Root object enum is supported by llama.cpp's JSON-schema grammar converter.
+    This constrains output indices, never the semantic support decision.
+    """
+    if type(claim_count) is not int or not 1 <= claim_count <= 6:
+        raise ValueError('claim_count_must_be_between_one_and_six')
+    schema = copy.deepcopy(reading.verification_schema())
+    schema['enum'] = [
+        {'supported': [index for index in range(claim_count) if mask & (1 << index)],
+         'rejected': [index for index in range(claim_count) if not mask & (1 << index)]}
+        for mask in range(1 << claim_count)
+    ]
+    return schema
 
 
 def verifier_format_error(response):
@@ -304,7 +333,7 @@ def set_result(row, code, stage):
         row['status'] = 'evaluation_error'
 
 
-def evaluate(fixtures, model, *, deadline, emit=None):
+def evaluate(fixtures, model, *, deadline, emit=None, variant='baseline'):
     """Evaluate in memory; the CLI additionally contains native hangs in a worker."""
     validate_fixtures(fixtures)
     rows = initial_rows(fixtures)
@@ -313,7 +342,7 @@ def evaluate(fixtures, model, *, deadline, emit=None):
         for case in source['cases']:
             row = rows[index]
             index += 1
-            wrapper = FixtureModel(model, case, deadline)
+            wrapper = FixtureModel(model, case, deadline, variant=variant)
             try:
                 check_deadline(deadline)
                 row.update(status='in_progress', code='in_progress', stage='generation')
@@ -363,7 +392,7 @@ def _model_hash(path, deadline):
             result.update(block)
 
 
-def _worker(out, fixtures, model_path, deadline):
+def _worker(out, fixtures, model_path, deadline, *, variant='baseline'):
     # Redirect Python and native logging before importing/loading any backend.
     with open(os.devnull, 'w') as sink, redirect_stdout(sink), redirect_stderr(sink):
         os.dup2(sink.fileno(), 1)
@@ -378,7 +407,7 @@ def _worker(out, fixtures, model_path, deadline):
             from llama_cpp import Llama
             model = Llama(model_path=str(path), n_ctx=6144, chat_format='chatml',
                           n_threads=min(os.cpu_count() or 2, 4), seed=SEED, verbose=False)
-            evaluate(fixtures, model, deadline=deadline, emit=out.put)
+            evaluate(fixtures, model, deadline=deadline, emit=out.put, variant=variant)
             out.put({'done': True})
         except DeadlineExceeded:
             out.put({'deadline_exceeded': True})
@@ -410,7 +439,7 @@ def _accept_row(value, rows):
         return
 
 
-def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None):
+def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None, variant='baseline'):
     """Bound model hashing/loading and all inference, including native hangs.
 
     Reserve a small portion of the total for terminate/kill, rather than adding
@@ -418,6 +447,8 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None):
     """
     if not 0 < seconds <= MAX_SECONDS:
         raise ValueError('deadline_must_be_between_zero_and_720_seconds')
+    if variant not in VARIANTS:
+        raise ValueError('invalid_variant')
     started = time.monotonic()
     counts = validate_fixtures(fixtures)
     total_deadline = started + seconds
@@ -426,7 +457,8 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None):
     ctx = context or multiprocessing.get_context('spawn')
     out = ctx.Queue()
     rows = initial_rows(fixtures)
-    process = ctx.Process(target=_worker, args=(out, copy.deepcopy(fixtures), str(model_path), deadline))
+    process = ctx.Process(target=_worker, args=(out, copy.deepcopy(fixtures), str(model_path), deadline),
+                          kwargs={'variant': variant})
     status, model_hash, process_started = 'deadline_exceeded', None, False
     try:
         check_deadline(deadline)
@@ -474,7 +506,7 @@ def run_bounded(fixtures, model_path, seconds=MAX_SECONDS, *, context=None):
     if status == 'completed' and any(row['code'] == 'unfinished' for row in rows):
         status = 'worker_failed'
     return {
-        'status': status, 'review_status': REVIEW_STATUS, 'fixture_sha256': fixture_digest(fixtures),
+        'status': status, 'variant': variant, 'review_status': REVIEW_STATUS, 'fixture_sha256': fixture_digest(fixtures),
         'fixture_counts': counts, 'results': rows, 'metrics': metrics(rows),
         'expected_model': MODEL, 'model_sha256': model_hash,
         'settings': {'seed': SEED, 'n_ctx': 6144, 'chat_format': 'chatml', 'temperature': 0.1,
@@ -508,6 +540,8 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--fixtures', default=str(FIXTURES))
     parser.add_argument('--validate-only', action='store_true', help='Offline metadata/anchor validation; no model load')
+    parser.add_argument('--variant', choices=VARIANTS, default='baseline',
+                        help='Diagnostic verifier grammar; exact_partition retains every possible support decision')
     parser.add_argument('--time-budget-seconds', '--deadline-seconds', dest='seconds', type=float, default=MAX_SECONDS)
     parser.add_argument('--report', '--output', dest='output', help='Also save safe JSON to a new file outside the repository')
     args = parser.parse_args(argv)
@@ -522,13 +556,14 @@ def main(argv=None):
     try:
         fixtures = load_fixtures(args.fixtures)
         if args.validate_only:
-            report = {'status': 'validated', 'review_status': REVIEW_STATUS,
+            report = {'status': 'validated', 'variant': args.variant, 'review_status': REVIEW_STATUS,
                       'fixture_sha256': fixture_digest(fixtures), 'fixture_counts': validate_fixtures(fixtures),
                       'model_loaded': False, 'limitation': LIMITATION}
         else:
-            report = run_bounded(fixtures, os.getenv('LOCAL_READING_MODEL', '/tmp/attention-model.gguf'), args.seconds)
+            report = run_bounded(fixtures, os.getenv('LOCAL_READING_MODEL', '/tmp/attention-model.gguf'), args.seconds,
+                                 variant=args.variant)
     except FixtureError as exc:
-        report = {'status': 'fixture_invalid', 'code': str(exc), 'model_loaded': False}
+        report = {'status': 'fixture_invalid', 'variant': args.variant, 'code': str(exc), 'model_loaded': False}
     encoded = json.dumps(report, indent=2) + '\n'
     if output:
         try:

@@ -48,7 +48,7 @@ jobs:
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
         run: |
-          python scripts/evaluate_claim_quality.py \
+          python scripts/evaluate_claim_quality.py --variant exact_partition \
             --report /tmp/claim-quality-evaluation.json --time-budget-seconds 720
           if ! git diff --quiet -- data/library.json; then
             echo '::error::The diagnostic changed library data; content is suppressed.'
