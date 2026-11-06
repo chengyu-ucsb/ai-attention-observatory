@@ -31,8 +31,9 @@ than assuming a scheduled run published an issue.
 
 ### P1 · Complete browser and accessibility coverage
 
-Status: implemented and checked in hosted Chromium; real Safari, Firefox, native
-browser zoom and assistive-technology review remain open.
+Status: cross-engine CI extension in review for Playwright Chromium, Firefox and
+WebKit. Installed Safari/Firefox, native browser zoom and assistive-technology
+review remain open; patched automation builds do not replace those checks.
 Priority: correctness and access before new features.
 
 - Run the new Chromium test at desktop and phone widths, then test real Safari
@@ -187,13 +188,34 @@ determine publication status, not this date.
   [Repository checks](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42143224586)
   passed 240 Python tests and 69 reading-page checks with no Actions warnings.
 
+### 6 November 2026 · Cross-engine verification
+
+- Prepared independent Chromium, Firefox and WebKit jobs with failure isolation
+  and separate screenshots. Each runs every Lab flow at desktop/phone widths and
+  the effective-viewport/density reflow approximation, including paired rounds.
+- Added computed accessible-name/description assertions for activity tabs and the
+  Return Point checkpoint. These are browser-level checks, not a screen-reader
+  evaluation. Playwright's Firefox and WebKit builds are patched automation
+  builds, not installed Firefox or Safari on a real device.
+- Verified current official action releases on 6 November: checkout v7.0.1,
+  setup-python v7.1.0 and upload-artifact v7.0.2 all use Node 24. Ubuntu 24.04 and
+  Python 3.12 meet the current Playwright requirements; recent observed Actions
+  runners (2.338.2) exceed checkout's 2.327.1 minimum.
+- Updated the test-only Playwright pin to
+  [1.64.1](https://github.com/microsoft/playwright-python/releases/tag/v1.64.1),
+  the current official release, including its Node 24.22.1 security update.
+- Local deterministic regressions, Python compilation and workflow structure
+  checks pass. Hosted engine outcomes must be checked before publication. No
+  research acquisition, external inference or public release-date change.
+
 ## Checks for every release
 
 1. `node --check lab-play.js`
 2. `node tests/validate_playground.cjs`
-3. With Playwright/Chromium installed:
+3. With Playwright and the chosen browser installed:
    `python tests/validate_playground_browser.py --executable-path /usr/bin/chromium`
-   (omit the flag when using Playwright's bundled Chromium).
+   (omit the flag when using Playwright's bundled Chromium). Also run with
+   `--browser firefox` and `--browser webkit` after installing those engines.
 4. Run the repository's existing application and Python tests in a full checkout.
 5. Inspect desktop/phone screenshots and complete all three activities manually.
 6. Review the diff, then create a draft PR. Do not claim tests passed if the

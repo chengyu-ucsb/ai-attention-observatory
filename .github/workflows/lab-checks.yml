@@ -26,10 +26,15 @@ concurrency:
   cancel-in-progress: true
 jobs:
   lab:
+    name: Lab (${{ matrix.browser }})
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox, webkit]
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      # Official releases and node24 runtimes verified 2026-11-05.
+      # Official releases and node24 runtimes verified 2026-11-06.
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
@@ -42,15 +47,16 @@ jobs:
           node tests/validate_playground.cjs
       - name: Install browser test dependencies
         run: |
-          python -m pip install 'playwright==1.62.0'
-          python -m playwright install --with-deps chromium
-      - name: Check desktop and mobile Chromium flows
-        run: python tests/validate_playground_browser.py --screenshots /tmp/lab-screenshots
+          python -m pip install 'playwright==1.64.1'
+          python -m playwright install --with-deps ${{ matrix.browser }}
+      - name: Check desktop and mobile ${{ matrix.browser }} flows
+        run: python tests/validate_playground_browser.py --browser ${{ matrix.browser }} --screenshots /tmp/lab-screenshots
       - name: Retain desktop and mobile screenshots
         if: always()
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: experimental-lab-screenshots
+          name: experimental-lab-${{ matrix.browser }}-screenshots
           path: /tmp/lab-screenshots
           retention-days: 7
           if-no-files-found: ignore
+

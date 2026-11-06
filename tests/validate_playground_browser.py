@@ -1,20 +1,25 @@
-"""Optional real-browser Lab regression check.
+"""Optional cross-engine Lab regression check.
 
-Requires Playwright and Chromium. Run from the repository root:
+Requires Playwright and the selected browser. Run from the repository root:
+    python tests/validate_playground_browser.py --browser firefox
+    python tests/validate_playground_browser.py --browser webkit
     python tests/validate_playground_browser.py --executable-path /usr/bin/chromium
 
 The fixture uses the real page, styles and Lab script, but omits app.js and its
-unrelated research-data fetches. A separate check exercises app.js navigation
+unrelated research-data fetches. Playwright Firefox and WebKit are patched test
+builds, not the installed Firefox/Safari apps or a screen-reader test.
+A separate check exercises app.js navigation
 and the Lab fallback when research data cannot load.
 """
 import argparse
+import re
 from contextlib import contextmanager
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
 
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import expect, sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -49,7 +54,7 @@ def server():
         srv.server_close()
 
 
-def check(page, url, width, screenshots, zoom=1):
+def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     # Native page zoom changes the effective CSS viewport. CSS body.zoom does
@@ -58,6 +63,8 @@ def check(page, url, width, screenshots, zoom=1):
     page.set_viewport_size({"width": width // zoom, "height": 900 // zoom})
     page.goto(url, wait_until="networkidle")
     assert page.locator("#lab").is_visible()
+    for name in ("Switch Lab", "Return Point", "Assistance Dial"):
+        expect(page.get_by_role("tab", name=name, exact=True)).to_be_visible()
     assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
     page.locator(".play-update summary").click()
@@ -87,7 +94,7 @@ def check(page, url, width, screenshots, zoom=1):
     assert page.evaluate("document.activeElement.id") == "switch-results"
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     if screenshots:
-        page.locator("#play-switch").screenshot(path=str(screenshots / f"lab-switch-results-{width}-zoom{zoom}.png"))
+        page.locator("#play-switch").screenshot(path=str(screenshots / f"lab-switch-results-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
     # Separate practice and untimed snapshots are completable with keyboard only.
     page.locator("#switch-practice").focus()
     page.keyboard.press("Enter")
@@ -176,6 +183,11 @@ def check(page, url, width, screenshots, zoom=1):
             cue_present = page.locator("#recovery-checkpoint").count() == 1
             assert cue_present == ("With checkpoint" in contexts[-1])
             assert ("recovery-checkpoint" in page.locator("#recovery-headline").get_attribute("aria-describedby")) == cue_present
+            if cue_present:
+                checkpoint = page.locator("#recovery-checkpoint").inner_text().split("·", 1)[1].strip()
+                expect(page.locator("#recovery-headline")).to_have_accessible_description(re.compile(re.escape(checkpoint)))
+            else:
+                expect(page.locator("#recovery-headline")).not_to_have_accessible_description(re.compile("CHECKPOINT"))
             choices = page.locator(".recovery-option")
             correct = next(i for i, choice in enumerate(choices.all()) if choice.inner_text() in preview)
             if step == 1:
@@ -203,7 +215,7 @@ def check(page, url, width, screenshots, zoom=1):
         assert page.evaluate("document.activeElement.id") == "recovery-comparison-results"
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         if screenshots and pair == 2:
-            page.locator("#play-recovery").screenshot(path=str(screenshots / f"lab-comparison-{width}-zoom{zoom}.png"))
+            page.locator("#play-recovery").screenshot(path=str(screenshots / f"lab-comparison-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
         page.locator("#recovery-exit-comparison").focus()
         page.keyboard.press("Enter")
         assert page.locator("#recovery-comparison-results").is_hidden()
@@ -235,7 +247,7 @@ def check(page, url, width, screenshots, zoom=1):
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
-    print(f"Chromium Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, all scenarios/modes.")
+    print(f"{browser_name} Lab passed at {width // zoom}px CSS viewport / {zoom}x density: keyboard, reset, timed/untimed snapshots, practice, route pause, replay, paired comparisons, all scenarios/modes.")
 
 
 def check_site_integration(page, url):
@@ -264,15 +276,17 @@ def check_site_integration(page, url):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--browser", choices=("chromium", "firefox", "webkit"), default="chromium")
     parser.add_argument("--executable-path")
     parser.add_argument("--screenshots", type=Path)
     args = parser.parse_args()
     with server() as url, sync_playwright() as pw:
-        browser = pw.chromium.launch(executable_path=args.executable_path, headless=True)
+        browser = getattr(pw, args.browser).launch(executable_path=args.executable_path, headless=True)
+        print(f"Testing Playwright {args.browser} {browser.version}")
         try:
             for width, zoom in ((1280, 1), (390, 1), (320, 1), (1280, 2)):
                 page = browser.new_page(reduced_motion="reduce", device_scale_factor=zoom)
-                check(page, url, width, args.screenshots, zoom)
+                check(page, url, width, args.screenshots, zoom, args.browser)
                 page.close()
             page = browser.new_page()
             check_site_integration(page, url)
