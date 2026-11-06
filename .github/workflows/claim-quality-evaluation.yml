@@ -6,10 +6,24 @@ on:
       - 'scripts/evaluate_claim_quality.py'
       - 'tests/test_claim_quality.py'
       - 'tests/test_claim_quality_holdout.py'
+      - 'tests/test_reading_workflow.py'
       - 'tests/fixtures/claim_quality_sources.json'
       - 'tests/fixtures/claim_quality_holdout.json'
       - '.github/workflows/claim-quality-evaluation.yml'
   workflow_dispatch:
+    inputs:
+      variant:
+        description: Diagnostic only; neither variant is approved for production
+        type: choice
+        options: [exact_partition, focused_checks]
+        default: exact_partition
+        required: true
+      fixture_set:
+        description: Development cases or the separately frozen holdout
+        type: choice
+        options: [development, holdout]
+        default: development
+        required: true
 permissions:
   contents: read
 concurrency:
@@ -36,11 +50,13 @@ jobs:
           node tests/validate_article_ui.cjs
           node tests/validate_weekly_issue.cjs
       - name: Install the observed production inference version
+        if: github.event_name == 'workflow_dispatch'
         run: |
           python -m pip install --disable-pip-version-check --prefer-binary \
             --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
             'llama-cpp-python==0.3.36' 'pypdf>=6.0,<7.0'
       - name: Download the stronger open model without hosted inference
+        if: github.event_name == 'workflow_dispatch'
         run: |
           timeout 480s bash -c '
             set -euo pipefail
@@ -57,17 +73,26 @@ jobs:
             '539cf93f78e887edea1c04e2d7d8cdaca9d01dae9c9025bcb8accbe29df3d72a  qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf' \
             | sha256sum --check --strict
       - name: Measure labeled-claim acceptance without publishing readings
+        if: github.event_name == 'workflow_dispatch'
         env:
           LOCAL_READING_MODEL: /tmp/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf
+          EVALUATION_VARIANT: ${{ inputs.variant }}
+          FIXTURE_SET: ${{ inputs.fixture_set }}
         run: |
-          python scripts/evaluate_claim_quality.py --variant focused_checks --model-profile qwen2.5-7b \
+          case "$FIXTURE_SET" in
+            development) fixtures=tests/fixtures/claim_quality_sources.json ;;
+            holdout) fixtures=tests/fixtures/claim_quality_holdout.json ;;
+            *) echo '::error::Unknown fixture set.'; exit 1 ;;
+          esac
+          python scripts/evaluate_claim_quality.py --variant "$EVALUATION_VARIANT" --model-profile qwen2.5-7b \
+            --fixtures "$fixtures" \
             --report /tmp/claim-quality-evaluation.json --time-budget-seconds 720
           if ! git diff --quiet -- data/library.json; then
             echo '::error::The diagnostic changed library data; content is suppressed.'
             exit 1
           fi
       - name: Record safe diagnostic results
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch'
         run: |
           python - <<'PY'
           import os

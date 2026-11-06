@@ -32,6 +32,24 @@ class ReadingWorkflowTests(unittest.TestCase):
                 self.assertIn('- name: ' + name +
                               "\n        if: github.event_name != 'pull_request'", text)
 
+    def test_claim_benchmark_models_run_only_on_explicit_manual_request(self):
+        text = WORKFLOW.with_name('claim-quality-evaluation.yml').read_text()
+        self.assertIn('  pull_request:', text)
+        self.assertIn('  workflow_dispatch:', text)
+        self.assertNotIn('  schedule:', text)
+        self.assertNotIn('  push:', text)
+        self.assertIn('  contents: read', text)
+        self.assertIn('options: [exact_partition, focused_checks]', text)
+        self.assertIn('options: [development, holdout]', text)
+        for name in ('Install the observed production inference version',
+                     'Download the stronger open model without hosted inference',
+                     'Measure labeled-claim acceptance without publishing readings'):
+            self.assertIn('- name: ' + name +
+                          "\n        if: github.event_name == 'workflow_dispatch'", text)
+        self.assertIn('if: always() && github.event_name == \'workflow_dispatch\'', text)
+        self.assertIn('--variant "$EVALUATION_VARIANT"', text)
+        self.assertIn('--fixtures "$fixtures"', text)
+
 
 if __name__ == '__main__':
     unittest.main()
