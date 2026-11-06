@@ -1789,11 +1789,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-23T08:32:20+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:57+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-06T08:32:20+00:00"
+      "next_at": "2026-11-20T20:54:58+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -4095,17 +4095,21 @@
     "abstract_source": "OpenAlex abstract index",
     "abstract_updated": "2026-10-18",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "In this study, a hybrid analytical approach is used that combines Fuzzy-Set Qualitative Comparative Analysis (fsQCA) with ten machine learning (ML) classifiers. The combination of these two approaches is designed to predict the Focused vs.",
-      "methods": "In this study, a hybrid analytical approach is used that combines Fuzzy-Set Qualitative Comparative Analysis (fsQCA) with ten machine learning (ML) classifiers.",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Digital competence among bank employees is an increasingly critical determinant of task efficiency in technology-driven financial service environments. In this study, a hybrid analytical approach is used that combines Fuzzy-Set Qualitative Comparative Analysis (fsQCA) with ten machine learning (ML) classifiers.",
+      "methods": "Figure 1 shows the methodological framework used in this study. The proposed workflow includes configurational analysis and predictive machine learning to analyze employee focused and distracted state. First, the employee attention dataset was loaded and analyzed using descriptive statistics, class distribution analysis, feature visualization and correlation analysis. Then, the categorical variables were encoded, the numerical variables were normalized and the class-imbalance issue was addressed by SMOTE method to achieve the stability of model learning. Following preprocessing, a set of engineered indicators were created, such as: (1) distraction index, (2) attention efficiency ratio, and (3) digital load score, which better capture the behavioral and digital-interaction patterns. The study then advanced in two complementary directions: firstly, the causal con-figurations related to focused attention were identified using fsQCA, and secondly, multiple machine learning classifiers were trained and evaluated in terms of their predictive performance. Lastly, the best performing model was explained using SHAP and an ensemble model was built to increase the classification robustness of the model. The excellent performance of the non-linear models LightGBM (auc = 0.9998) and Random Forest (auc = 0.9996) compared to the AUC value obtained from the line-ar models of Logistic Regression (auc = 0.826) confirms the non-linear feature interactions that are not captured by linear models.",
       "findings": "",
-      "interpretation": "",
-      "limitations": "",
+      "interpretation": "This study proposed a novel hybrid framework of fsQCA and machine learning to predict the attention and task engagement status of bank employees in digital work environments, contributing to the growing field of AI-driven workforce performance analytics. Key findings include: LightGBM delivered an almost perfect classification (AUC = 0.9998, Accuracy = 98.9%) setting a new benchmark in attention prediction using behavioral features. Both SHAP explainability and a fsQCA necessity analysis reveal that head orientation, facial expression and gaze direction are the dominant predictors. The three conditions required for focused attention were determined through fsQCA: neutral facial expression, forward gaze and straight head posture, all with high consistency values (0.99, 0.97, and 0.94 respectively). Digital behavioral signals (apps, notifications, micro-movements) are reliable secondary distraction signals. The hybrid fsQCA+ML framework provides a methodologically sound and practically actionable tool to conceptualize and predict the attention and task engagement of bank employees in digital work environments. The framework is a step forward in the field of organizational performance analytics and digital competence assessment, providing a methodologically rigorous and practically actionable tool for next-generation intelligent workplace management systems in banking and financial service institutions. The proposal to integrate the IoT development model with the sensing and smart environmental systems to monitor attention in real time is an area that future research should focus on, particularly as a result of advances in wireless communication and network performance optimization [159] . In the field of organizational performance analytics and intelligent workplace syste",
+      "limitations": "There are a number of drawbacks to this study. Firstly, the data is extensive and might not be applicable in a variety of cultural or demographic situations. Secondly, causal inference, besides the one that can be made with the help of configurational analysis using the fsQCA, is not possible in a crosssectional design. Third, the binary nature of attention to continuousness of cognitive engagement is a disadvantage. Multi-level attention classification, longitudinal designs and real-world deployment validation are topics for future research.",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
     },
@@ -4113,12 +4117,12 @@
     "open_access_url": "https://doi.org/10.56979/1201/2026/1624",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "oa_grobid_checked": "2026-10-18",
+    "oa_grobid_checked": "2026-11-06",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T09:58:21+00:00",
-      "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T09:58:21+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:52+00:00",
+      "status": "full_text",
+      "next_at": null,
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -4146,6 +4150,25 @@
       "providers": [
         "unpaywall_checked",
         "s2_candidate"
+      ]
+    },
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "Figure 1 shows the methodological framework used in this study. The proposed workflow includes configurational analysis and predictive machine learning to analyze employee focused and distracted state. First, the employee attention dataset was loaded and analyzed using descriptive statistics, class distribution analysis, feature visualization and correlation analysis. Then, the categorical variables were encoded, the numerical variables were normalized and the class-imbalance issue was addressed by SMOTE method to achieve the stability of model learning. Following preprocessing, a set of engineered indicators were created, such as: (1) distraction index, (2) attention efficiency ratio, and (3) digital load score, which better capture the behavioral and digital-interaction patterns. The study then advanced in two complementary directions: firstly, the causal con-figurations related to focused attention were identified using fsQCA, and secondly, multiple machine learning classifiers were trained and evaluated in terms of their predictive performance. Lastly, the best performing model was explained using SHAP and an ensemble model was built to increase the classification robustness of the model. The excellent performance of the non-linear models LightGBM (auc = 0.9998) and Random Forest (auc = 0.9996) compared to the AUC value obtained from the line-ar models of Logistic Regression (auc = 0.826) confirms the non-linear feature interactions that are not captured by linear models. It is worth noting that the AUC difference of 17% between LightGBM and Logistic Regres-sion indicates the importance of model selection for the classification of behaviors.This is a result of the observation, which was recently confirmed in various domains such as healthcare and engineering, that non-linear models outperform linear classifiers when dealing with complex interaction effects that are needed in many applications [149], [150] . This performance of AP metric (1.000) with a very high distributional imbalance (91.2%) still proves the power of LightGBM against the distributional imbalance.",
+      "results": "",
+      "discussion": "This study proposed a novel hybrid framework of fsQCA and machine learning to predict the attention and task engagement status of bank employees in digital work environments, contributing to the growing field of AI-driven workforce performance analytics. Key findings include: LightGBM delivered an almost perfect classification (AUC = 0.9998, Accuracy = 98.9%) setting a new benchmark in attention prediction using behavioral features. Both SHAP explainability and a fsQCA necessity analysis reveal that head orientation, facial expression and gaze direction are the dominant predictors. The three conditions required for focused attention were determined through fsQCA: neutral facial expression, forward gaze and straight head posture, all with high consistency values (0.99, 0.97, and 0.94 respectively). Digital behavioral signals (apps, notifications, micro-movements) are reliable secondary distraction signals. The hybrid fsQCA+ML framework provides a methodologically sound and practically actionable tool to conceptualize and predict the attention and task engagement of bank employees in digital work environments. The framework is a step forward in the field of organizational performance analytics and digital competence assessment, providing a methodologically rigorous and practically actionable tool for next-generation intelligent workplace management systems in banking and financial service institutions. The proposal to integrate the IoT development model with the sensing and smart environmental systems to monitor attention in real time is an area that future research should focus on, particularly as a result of advances in wireless communication and network performance optimization [159] . In the field of organizational performance analytics and intelligent workplace systems, deep learning techniques have proven to be a valuable tool for automatically extracting attention-relevant features from raw sensor and behavioral data, especially with the use of transfer learning and encoder-decoder architectures",
+      "limitations": "There are a number of drawbacks to this study. Firstly, the data is extensive and might not be applicable in a variety of cultural or demographic situations. Secondly, causal inference, besides the one that can be made with the help of configurational analysis using the fsQCA, is not possible in a crosssectional design. Third, the binary nature of attention to continuousness of cognitive engagement is a disadvantage. Multi-level attention classification, longitudinal designs and real-world deployment validation are topics for future research.",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.56979/1201/2026/1624",
+      "key_idea": "This study proposed a novel hybrid framework of fsQCA and machine learning to predict the attention and task engagement status of bank employees in digital work environments, contributing to the growing field of AI-driven workforce performance analytics. Key findings include: Lig",
+      "extraction_date": "2026-11-06",
+      "extraction_version": 3,
+      "sections_available": [
+        "methods",
+        "limitations",
+        "discussion"
       ]
     }
   },
@@ -4935,11 +4958,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:45+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:58+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:45+00:00"
+      "next_at": "2026-11-20T20:54:58+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -5011,11 +5034,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:45+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:58+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:45+00:00"
+      "next_at": "2026-11-20T20:54:58+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -7651,10 +7674,10 @@
     "open_access_version": "publishedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:48:18+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:50+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:48:18+00:00",
+      "next_at": "2026-11-20T20:54:51+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -8604,10 +8627,10 @@
     "open_access_version": "acceptedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T09:58:21+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:53+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T09:58:21+00:00",
+      "next_at": "2026-11-13T20:54:54+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -8848,11 +8871,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:49+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:58+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:49+00:00"
+      "next_at": "2026-11-20T20:54:59+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -9638,11 +9661,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:49+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:59+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:50+00:00"
+      "next_at": "2026-11-20T20:54:59+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -10011,10 +10034,10 @@
     "open_access_version": "acceptedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T09:58:21+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:54+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T09:58:21+00:00",
+      "next_at": "2026-11-13T20:54:54+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -10871,10 +10894,10 @@
     "open_access_version": "publishedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:41+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:51+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:41+00:00",
+      "next_at": "2026-11-20T20:54:51+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -11353,11 +11376,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:50+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:59+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:50+00:00"
+      "next_at": "2026-11-20T20:54:59+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -12946,10 +12969,10 @@
     "oa_meta_checked": "2026-10-18",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:43+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:56+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:43+00:00",
+      "next_at": "2026-11-20T20:54:56+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -13264,10 +13287,10 @@
     "open_access_version": "",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T09:58:21+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:54+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T09:58:22+00:00",
+      "next_at": "2026-11-13T20:54:54+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -13731,11 +13754,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:50+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:59+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:50+00:00"
+      "next_at": "2026-11-20T20:54:59+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -13953,10 +13976,10 @@
     "open_access_version": "publishedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:41+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:51+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:41+00:00",
+      "next_at": "2026-11-20T20:54:51+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -14838,10 +14861,10 @@
     "oa_meta_checked": "2026-10-18",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:43+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:56+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:43+00:00",
+      "next_at": "2026-11-20T20:54:57+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -15785,10 +15808,10 @@
     "open_access_version": "publishedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:41+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:51+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:41+00:00",
+      "next_at": "2026-11-20T20:54:52+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -16912,10 +16935,10 @@
     },
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:43+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:57+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:43+00:00",
+      "next_at": "2026-11-20T20:54:57+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -17272,10 +17295,10 @@
     },
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:41+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:52+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:42+00:00",
+      "next_at": "2026-11-20T20:54:52+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -17493,10 +17516,10 @@
     },
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T09:58:22+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:54+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T09:58:22+00:00",
+      "next_at": "2026-11-13T20:54:54+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -19660,10 +19683,10 @@
     },
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:42+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:52+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:42+00:00",
+      "next_at": "2026-11-20T20:54:52+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -19887,10 +19910,10 @@
     },
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T20:18:01+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:54+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T20:18:01+00:00",
+      "next_at": "2026-11-13T20:54:55+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -20063,7 +20086,7 @@
     "curated": false,
     "first_seen": "2026-10-18",
     "oa_meta_checked": "2026-10-18",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "reading": {
       "level": "citation_only",
       "provenance": "Citation only",
@@ -20211,7 +20234,7 @@
     "open_access_url": "https://doi.org/10.52058/2786-6165-2026-4(46)-2581-2592",
     "open_access_license": "unknown",
     "open_access_version": "publishedVersion",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "reading": {
       "level": "abstract",
       "provenance": "OpenAlex abstract index",
@@ -20301,13 +20324,13 @@
       "research_type": "unclassified",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:42+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:52+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:42+00:00",
+      "next_at": "2026-11-20T20:54:52+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -20378,7 +20401,7 @@
       "research_type": "unclassified",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 2,
@@ -20442,27 +20465,30 @@
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
       "overview": "People find it harder to switch from one task to another than to repeat a task. One common explanation is that lingering activation of the just-executed task facilitates repetitions and impairs switching.",
-      "methods": "Furthermore, this effect transferred to new task pairs (only descriptively in Experiment 3, significantly in Experiment 4).",
+      "methods": "Experiment 1 was preregistered ( https://aspredicted.org/7vtd-qqch. pdf ). In all experiments, data collection and analysis were performed according to the preregistration protocol. A power analysis based on Langenberg et al. (2023) , using the effect size of a comparable manipulation on the switch costs (Mendl & Dreisbach, 2022 ; Exp 2: partial eta squared = 0.31), with a power of 0.80, resulted in a required sample of at least 20 participants. Due to the novelty of the current approach, we aimed for at least 50 participants. Hence, 52 participants completed the experiment. One participant had to be excluded (for exclusion criteria, see Data Preprocessing), resulting in a final sample of N = 51. In the final sample, the mean age was 23.24 years (SD = 3.35), ranging from 18 to 30 years. Thirty-nine participants were female (12 male) and 45 were right-handed (6 left-handed). All participants provided informed consent following the ethical standards of the national research committee and with the 1964 Helsinki Declaration and its later amendments. Psychology students received course credit for their participation. After providing demographic information, the experiment started with separate practice blocks for each task (8 trials each). Next, participants practiced switching between the two tasks in a forced-choice practice block (only one stimulus presented per trial; 16 trials) and a free-choice practice block (stimuli of both tasks presented in each trial; 16 trials). 4 Each",
       "findings": "",
-      "interpretation": "",
+      "interpretation": "The results of Experiment 1 are in line with the predictions of the switch-readiness account. After a switch chunk, participants were more inclined to switch voluntarily and showed reduced switch costs in RTs. Critically, the pattern of the exploratory chunk sequence analyses can only be explained by considering switch readiness whereas task-set activation cannot account for the findings. This suggests that, independent of task-set activation, switch readiness influences task choice and task processing in the current chunk. The results thus provide first evidence for the role of sequential switch readiness in task switching. The results of Experiment 2 closely replicated those of Experiment 1. Even when controlling for potential influences of location and response repetitions, behavior was modulated by the transition within the previous chunk. After a switch chunk, participants were again more inclined to switch voluntarily and showed reduced switch costs in RTs. Again, the pattern of the exploratory chunk sequence analyses can only be explained by switch readiness. The effects were similar in size to those of Experiment 1, suggesting that location and hand repetitions had negligible influence on the present results. Hence, the present results can be interpreted as evidence for sequential switch readiness during forced and voluntary task switching. The results of Experiment 3 replicate the RT findings of Experiments 1 and 2. Participants showed reduced switch costs when the previous chunk involved a task switch. In the exploratory chunk sequence analysis, the pattern was again more in line with the switch-readiness than with the task-set activation account. The effect of sequential switch readiness on the switch costs was only significant when the task pair repeated. Ho",
       "limitations": "",
-      "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "sample": "20",
+      "section_coverage": [
+        "methods",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
-    "oa_grobid_checked": "2026-10-18",
+    "oa_checked": "2026-11-06",
+    "oa_grobid_checked": "2026-11-06",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T20:18:01+00:00",
-      "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T20:18:02+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:55+00:00",
+      "status": "full_text",
+      "next_at": null,
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -20490,6 +20516,24 @@
       "providers": [
         "unpaywall_checked",
         "s2_candidate"
+      ]
+    },
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "Experiment 1 was preregistered ( https://aspredicted.org/7vtd-qqch. pdf ). In all experiments, data collection and analysis were performed according to the preregistration protocol. A power analysis based on Langenberg et al. (2023) , using the effect size of a comparable manipulation on the switch costs (Mendl & Dreisbach, 2022 ; Exp 2: partial eta squared = 0.31), with a power of 0.80, resulted in a required sample of at least 20 participants. Due to the novelty of the current approach, we aimed for at least 50 participants. Hence, 52 participants completed the experiment. One participant had to be excluded (for exclusion criteria, see Data Preprocessing), resulting in a final sample of N = 51. In the final sample, the mean age was 23.24 years (SD = 3.35), ranging from 18 to 30 years. Thirty-nine participants were female (12 male) and 45 were right-handed (6 left-handed). All participants provided informed consent following the ethical standards of the national research committee and with the 1964 Helsinki Declaration and its later amendments. Psychology students received course credit for their participation. After providing demographic information, the experiment started with separate practice blocks for each task (8 trials each). Next, participants practiced switching between the two tasks in a forced-choice practice block (only one stimulus presented per trial; 16 trials) and a free-choice practice block (stimuli of both tasks presented in each trial; 16 trials). 4 Each trial of these practice blocks contained a fixation cross in the center of the screen for 500 ms, followed by the stimulus/stimuli (until response), feedback in the form of the German words for correct (\"Richtig!\") and error (\"Fehler\") for 1000 ms, and an inter-trial interval for 500 ms. In the next practice block (4 trials), participants were familiarized with the trial structure of the test phase, where each trial (hereafter referred to as a chunk) consisted of two consecutive tasks. Each chunk comprised a fixation cross for 500 ms, the first task (until response), a blank screen for 500 ms, another fixation cross for 500 ms, the second task (until response), a pre-feedback interval for 200 ms, feedback (until the spacebar is pressed), and an inter-chunk interval for 500 ms (see Fig. 3 ). The feedback informed participants whether they responded correctly (\"Richtig!\") or made an error in the first task (\"Fehler bei erstem Reiz!\"), the second task (\"Fehler bei zweitem Reiz!\"), or both (\"Fehler bei erstem Reiz! Fehler bei zweitem Reiz!\"). The feedback served as a self-paced break between chunks because participants had to press the spacebar to continue. The test phase consisted of eight blocks with 32 chunks each. In every fourth chunk, the second task was presented in the free-choice format, while all other tasks were presented in the forced-choice format. In each block, all eight potential sequences of transitions in four consecutive chunks appeared in random order (RRRF, RRSF, RSRF, RSSF, SRRF, SRSF, SSRF, SSSF; R = Repetition chunk, S = Switch chunk, F = Free choice in the second task). Across the eight blocks, each task appeared equally often in each position of each sequence of four chunks. The stimuli were presented in randomized order, avoiding direct stimulus repetitions. One session lasted approximately 35 min. The VSR (in %) was analyzed as a function of the within-subjects factor Previous Transition (repetition chunk, switch chunk), referring to the transition within the previous chunk. For the mean RT (in ms) and error rate (in %) in forced-choice chunks, we used a 2 (Previous Transition) x 2 (Current Transition: repetition chunk, switch chunk) repeated measures design. Current Transition refers to the transition within the current chunk. 5 We additionally report exploratory analyses of the VSRs and RTs with the factor chunk sequence (AA-AX, BB-AX, BA-AX, AB-AX; Fig. 1 and Fig. 2 ) instead of Previous Transition to support the interpretation of the present findings as switch readiness. We thank an anonymous reviewer for suggesting this analysis. In the Supplemental Material we report comparisons of the switch costs within and between chunks for all experiments to show that the most salient transition happened within chunks rather than between chunks. We also report analyses of the error rate in voluntary chunks per Previous Transition and Current Transition to rule out careless and random responding following switches. Last, we analyzed the duration of the self-paced break following a chunk per Current Transition. All raw data files associated with this article are available online under the following link: http://doi.org/10.5283/epub.78517 . Additional study materials of all experiments (lab.js experiment files, SPSS analysis scripts) will be shared upon request. Experiment 2 was preregistered ( https://aspredicted.org/tbcf-y2zj. pdf ). A power analysis according to Langenberg et al. (2023) , using the effect size of the RT interaction in Experiment 1 (partial eta squared = 0.18), with a power of 0.80, resulted in a required sample of at least 38 participants. To be on the safe side, we aimed for a minimum of 50 participants. We collected 54 participants. One participant had to be excluded (for exclusion criteria, see Data Preprocessing), resulting in a final sample of N = 53. The mean age was 20.87 years (SD = 2.08), ranging from 18 to 28 years. Forty-five participants were female (8 male) and 48 were right-handed (5 left-handed). All participants provided informed consent in accordance with the ethical standards of the national research committee and with the 1964 Helsinki Declaration and its later amendments. Psychology students received course credit for their participation. The procedure of Experiment 2 was very similar to that of Experiment 1. The same tasks and stimuli were used. As a main difference, one task was mapped to the two middle fingers while the other task was mapped to the two index fingers of both hands. We again used an intuitive response mapping (Dehaene et al., 1993) . That means, participants had to respond to numbers smaller than 153 with the left middle finger (G key) and to numbers larger than 153 with the right middle finger (L key). Likewise, letters closer to A required a response with the left index finger (H key), and letters closer to Z required a response with the right index finger (K key). The task-to-finger mapping was counterbalanced across participants. The second difference was that forced-choice tasks were always presented in the center of the screen. On free-choice tasks, the two stimuli were randomly presented slightly above or below the center of the screen (vertical offset = 3.33% of the screen height). Thereby, tasks were no longer associated with distinct hands or locations. The entire procedure and design remained the same as in Experiment 1. Experiment 3 was preregistered ( https://aspredicted.org/v4ty-krdz. pdf ). A power analysis according to Langenberg et al. (2023) , using the effect size of the RT interaction in Experiment 1 (partial eta squared = 0.18), with a power of 0.80, resulted in a required sample of at least 38 participants. We again aimed for at least 50 participants. The initial sample consisted of 52 participants. Two participants had to be excluded (for exclusion criteria, see Data Preprocessing), resulting in a final sample of N = 50. The mean age was 26.12 years (SD = 5.35), ranging from 18 to 41 years.",
+      "results": "",
+      "discussion": "The results of Experiment 1 are in line with the predictions of the switch-readiness account. After a switch chunk, participants were more inclined to switch voluntarily and showed reduced switch costs in RTs. Critically, the pattern of the exploratory chunk sequence analyses can only be explained by considering switch readiness whereas task-set activation cannot account for the findings. This suggests that, independent of task-set activation, switch readiness influences task choice and task processing in the current chunk. The results thus provide first evidence for the role of sequential switch readiness in task switching. The results of Experiment 2 closely replicated those of Experiment 1. Even when controlling for potential influences of location and response repetitions, behavior was modulated by the transition within the previous chunk. After a switch chunk, participants were again more inclined to switch voluntarily and showed reduced switch costs in RTs. Again, the pattern of the exploratory chunk sequence analyses can only be explained by switch readiness. The effects were similar in size to those of Experiment 1, suggesting that location and hand repetitions had negligible influence on the present results. Hence, the present results can be interpreted as evidence for sequential switch readiness during forced and voluntary task switching. The results of Experiment 3 replicate the RT findings of Experiments 1 and 2. Participants showed reduced switch costs when the previous chunk involved a task switch. In the exploratory chunk sequence analysis, the pattern was again more in line with the switch-readiness than with the task-set activation account. The effect of sequential switch readiness on the switch costs was only significant when the task pair repeated. However, the descriptive pattern showed reduced switch costs after switch compared to repetition chunks, even when the task pair switched. Experiment 3 allows no clear conclusion as to whether switch readiness transfers between different pairs of tasks. To gain further insight, we conducted Experiment 4, this time focusing on the voluntary switch rate as the main dependent measure. The results of Experiment 4 showed that participants are more inclined to switch voluntarily following a switch chunk. The pattern of the chunk sequence analyses perfectly mirrored the predictions of the switch-readiness account. Critically, the effect was evident not only when the task pair repeated, replicating the VSR results of Experiments 1 and 2, but crucially also when the task pair switched. This finding suggests that, regarding the motivation to switch, sequential switch readiness can transfer from one task pair to a different task pair. The present study investigated whether switching tasks has an influence on switch readiness, in other words, whether people are better at switching and more inclined to switch after previously switching tasks. In four experiments, we found evidence supporting this idea. We presented two consecutive tasks per trial (chunk) with self-paced breaks between chunks to investigate the role of switching independent from Note. SEs are presented in parentheses. 6 We thank an anonymous reviewer for suggesting this analysis. specific tasks (e.g., AB and BA were treated equally). Critically, participants switched tasks more often voluntarily and showed reduced switch costs when there was a task switch within the previous chunk. Notably, for VSRs, the effect even transferred to different task pairs (Experiment 4). The transfer on the level of switch costs failed to reach significance but showed the predicted descriptive pattern (Experiment 3). An additional explorative analysis per chunk sequence (AA-AX, BB-AX, BA-AX, AB-AX) provided evidence that the present results can be better explained by a switch-readiness account than by task-set activation (or backward inhibition) alone. The present results uncovered a new property of cognitive control during task switching. The task transition in one chunk appears to influence processing of the following chunk. After a task switch, participants appear to be more flexible, in terms of reduced switch costs and increased VSR. Conversely, after a task repetition, participants appear to be more stable. There are two potential mechanisms by which this effect is produced. First, the present finding may represent passive inertia of the previously activated control set, similar to the lingering activation of task sets during task switching (Allport et al., 1994; Goschke, 2000) . When a control set of switching is triggered through a task switch (or when a control set of repeating is triggered through a task repetition), the respective control set may persist and bias processing of the subsequent chunk. The fact that switch readiness seems to be independent of specific task activations and even transfers to new pairs of tasks suggests that the underlying mechanism is abstract in nature (for example, reduced between-task shielding after a switch chunk). Such a mechanism provides insights into task-general factors of cognitive flexibility and stability, as they are explored in dynamic systems models of task switching (cf. Musslick & Cohen, 2021) . These models assume that task switching dynamics are determined by an energy landscape characterized by task attractors. The depth of these attractors acts as a taskgeneral parameter which modulates cognitive flexibility. Our findings suggest that, unlike previously assumed (Musslick & Bizyaeva, 2024) , adjustments in this attractor depth can happen on a smaller time scale and affect the entire task landscape (as evidenced by the transfer between task pairs). Alternatively, the present finding may represent a more active adaptation in response to the previous demand, similar to active task-set reconfiguration (De Jong, 2000; Rogers & Monsell, 1995) . According to this reasoning, following a switch chunk, participants might actively prepare for a task switch after the first task of the then following chunk and likewise prepare for a task repetition following a repetition chunk. The present study is not suited to distinguish between these two possible mechanisms. In a previous study by Brown et al. (2007) , immediate task-set activation (Rogers & Monsell, 1995) and sequential switch readiness were perfectly confounded. Brown et al. investigated how the task transition in the previous trial influenced the switch costs in the current trial and found reduced switch costs following task switches. However, this effect can simply be explained by lingering effects of task-set activation. Repetitions after repetitions are faster due to the accumulated activation advantage of repeating the same task set multiple times. Faster switches after switches may simply reflect the advantage of switching back to the just-executed task set. To circumvent this issue, we used chunks of two tasks with self-paced breaks between chunks. The self-paced break reduces lingering effects of task-set activation between chunks. This was also confirmed by the exploratory comparison of the switch costs within and between chunks. The switch costs within chunks were larger than the switch costs between chunks (significant difference in all experiments except for Experiment 2; see Supplemental Material). Hence, the self-paced break successfully reduced the salience of the transition between chunks. Additionally, we varied the specific tasks within a",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.1016/j.cognition.2026.106458",
+      "key_idea": "The results of Experiment 1 are in line with the predictions of the switch-readiness account. After a switch chunk, participants were more inclined to switch voluntarily and showed reduced switch costs in RTs. Critically, the pattern of the exploratory chunk sequence analyses can",
+      "extraction_date": "2026-11-06",
+      "extraction_version": 3,
+      "sections_available": [
+        "methods",
+        "discussion"
       ]
     }
   },
@@ -20528,7 +20572,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 3,
@@ -20579,7 +20623,7 @@
     "first_seen": "2026-10-12",
     "curated": true,
     "source": "Initial curated reading list",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "reading": {
       "level": "abstract",
       "provenance": "Initial curated reading list",
@@ -20599,10 +20643,10 @@
     "oa_grobid_checked": "2026-10-18",
     "open_access_url": "https://doi.org/10.1016/j.chb.2026.108926",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T20:18:02+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:56+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T20:18:02+00:00",
+      "next_at": "2026-11-13T20:54:56+00:00",
       "pipeline_version": 3
     },
     "source_group": "AI-specific",
@@ -20671,13 +20715,13 @@
       "research_type": "unclassified",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 3,
-      "last_at": "2026-10-29T20:18:02+00:00",
+      "attempts": 4,
+      "last_at": "2026-11-06T20:54:56+00:00",
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-05T20:18:02+00:00",
+      "next_at": "2026-11-13T20:54:56+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -20824,7 +20868,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 2,
@@ -20899,7 +20943,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 3,
@@ -20974,7 +21018,7 @@
       "research_type": "unclassified",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 4,
@@ -21056,7 +21100,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 4,
@@ -21133,13 +21177,13 @@
       "sample": "",
       "notice": "No accessible abstract or licensed text has been indexed for this record."
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:43+00:00",
-      "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:44+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:57+00:00",
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-11-13T20:54:57+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -21167,7 +21211,8 @@
       "providers": [
         "unpaywall_checked"
       ]
-    }
+    },
+    "open_access_url": "https://doi.org/10.1109/mipro70003.2026.11591879"
   },
   {
     "title": "Design and Development of an ESP32-Based Battery Monitoring System for Container Cranes with Automatic Transfer Switching (ATS) Mechanism and Telegram Notifications",
@@ -21209,7 +21254,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 3,
@@ -21284,7 +21329,7 @@
       "research_type": "unclassified",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
       "attempts": 3,
@@ -21370,7 +21415,7 @@
       "research_type": "observational",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -21568,7 +21613,7 @@
       "status": "waiting_for_license",
       "next_at": "2026-11-19T10:55:19+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -22467,7 +22512,7 @@
       "status": "waiting_for_license",
       "next_at": "2026-11-19T10:55:19+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -22624,7 +22669,7 @@
       "status": "waiting_for_license",
       "next_at": "2026-11-19T10:55:20+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmcid": "PMC13131016",
     "pmc_oai_attempt": {
@@ -22999,7 +23044,7 @@
       "status": "waiting_for_license",
       "next_at": "2026-11-19T10:55:20+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -23042,7 +23087,7 @@
     "first_seen": "2026-10-12",
     "curated": true,
     "source": "Initial curated reading list",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "abstract_text": "Recent advancements in AI, particularly Generative AI (GenAI) and Large Language Models (LLMs), have facilitated the integration of AI techniques into digital wellbeing applications, i.e., digital tools that aim at helping people’s wellbeing as a sum of mental and emotional wellness. These AI-powered systems hold the potential to foster healthier habits by collecting and analyzing user behavioral data to provide personalized and dynamic solutions tailored to each user’s needs and lifestyle, therefore improving the efficacy with respect to traditional non-AI interventions. Yet, their development presents significant challenges, including ethical concerns, privacy risks, and the potential for over-reliance on automated interventions. In this paper, we conduct a systematic literature review to examine the key characteristics, challenges, and opportunities in the existing research about AI-powered digital wellbeing tools. Based on our findings, we propose a design framework that outlines 6 critical dimensions and 23 sub-dimensions, spacing from user data and privacy to intervention strategies and personalization, offering practical guidance for researchers and practitioners developing AI-powered digital wellbeing applications. The framework emphasizes the importance of developing tailored and adaptive user-centered interventions adhering to scientific principles, psychological models and responsible data collection. We discuss the applicability and utility of our framework in evaluating and guiding the integration of AI in digital wellbeing applications.",
     "abstract_source": "OpenAlex abstract index",
     "abstract_updated": "2026-10-18",
@@ -23452,7 +23497,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -23839,7 +23884,7 @@
       "status": "waiting_for_machine_text",
       "next_at": "2026-11-12T21:28:51+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -23911,7 +23956,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -23921,11 +23966,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:52:50+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:54:59+00:00",
       "pipeline_version": 3,
       "status": "missing_sections",
-      "next_at": "2026-11-05T05:52:51+00:00"
+      "next_at": "2026-11-20T20:55:00+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -24325,7 +24370,7 @@
     "figure_checked": "2026-10-18",
     "figure_verification_method": "pmc_aws_2026",
     "source_group": "AI-specific",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3
   },
   {
@@ -24743,7 +24788,7 @@
     "source_group": "AI-specific",
     "abstract_updated": "2026-10-22",
     "oa_meta_checked": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -24976,7 +25021,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -25139,7 +25184,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -25149,11 +25194,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:29+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:00+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T08:36:29+00:00"
+      "next_at": "2026-11-20T20:55:00+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -25717,7 +25762,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -25899,7 +25944,7 @@
     "source_group": "AI-specific",
     "abstract_text": " Abstract \n                   The integration of generative artificial intelligence tools in education has emerged as a transformative approach to enhancing learning outcomes, particularly in the context of sustainable development goals (SDG4). Therefore, the present study investigates the connection between generative artificial intelligence tool usage (GenAITU) and academic achievement (AA) in the context of SDG4. We assessed the mediating role of shared metacognition (SMC) and cognitive offloading (COL) in this relationship among preservice teachers (PSTs). The indicators, including performance expectancy (PE), effort expectancy (EE), facilitating conditions (FC), and use behavior (UB), are derived from adapting the Unified Theory of Acceptance and Use of Technology 2 (UTAUT2) for GenAITU. The authors surveyed 465 students from five universities in Wuhan, China, using a 7-point Likert scale through a time-lag design. Statistical analysis was performed through partial least squares structural equation modeling (PLS-SEM), to determine the relationship between variables. Findings indicated that two components of GenAITU, namely PE and UB, showed significant positive associations with AA, while the other two, EE and FC, did not show significant and positive relationships with AA. Results also showed that three dimensions of GenAITU, namely EE, FC, and UB have a positive and significant association with SMC while PE has a positive and significant connection with SMC. All four components of GenAITU like PE, EE, FC, and UB have positive and significant links with COL. SMC and COL have a positive and significant relationship with AA. Results also indicated that SMC mediated the connections between GenAITU (EE, FC, and UB) and AA. Outcomes also indicated that COL mediated the connections between GenAITU (PE, EE, FC, and UB) and AA. The current study shows that SMC and COL were strong mediators of the association between GenAITU and AA. The results of our study provide guidance to teachers, curriculum planners, and university management to successfully integrate GenAITU into the education for PSTs. ",
     "abstract_source": "Crossref abstract",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3
   },
   {
@@ -25944,7 +25989,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -26065,7 +26110,7 @@
     "first_seen": "2026-10-12",
     "curated": true,
     "source": "Initial curated reading list",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "abstract_text": "The rise of Generative AI (GenAI) in knowledge workflows raises questions about its impact on critical thinking skills and practices.We survey 319 knowledge workers to investigate 1) when and how they perceive the enaction of critical thinking when using GenAI, and 2) when and why GenAI affects their effort to do so.Participants shared 936 first-hand examples of using GenAI in work tasks.Quantitatively, when considering both task-and user-specific factors, a user's task-specific self-confidence and confidence in GenAI are predictive of whether critical thinking is enacted and the effort of doing so in GenAI-assisted tasks.Specifically, higher confidence in GenAI is associated with less critical thinking, while higher self-confidence is associated with more critical thinking.Qualitatively, GenAI shifts the nature of critical thinking toward information verification, response integration, and task stewardship.Our insights reveal new design challenges and opportunities for developing GenAI tools for knowledge work.",
     "abstract_source": "OpenAlex abstract index",
     "abstract_updated": "2026-10-18",
@@ -26250,7 +26295,7 @@
       "reported_findings": false
     },
     "abstract_updated": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -26334,7 +26379,7 @@
       "next_at": "2026-11-19T10:55:20+00:00"
     },
     "abstract_updated": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -27097,7 +27142,7 @@
       "next_at": "2026-11-19T21:28:42+00:00"
     },
     "abstract_updated": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -27167,7 +27212,7 @@
       "reported_findings": false
     },
     "abstract_updated": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -27177,11 +27222,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:29+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:00+00:00",
       "pipeline_version": 3,
       "status": "missing_sections",
-      "next_at": "2026-11-05T08:36:30+00:00"
+      "next_at": "2026-11-20T20:55:01+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -27252,7 +27297,7 @@
       "status": "waiting_for_license",
       "next_at": "2026-11-19T21:28:43+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -27958,7 +28003,7 @@
       "research_type": "unclassified",
       "reported_findings": true
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -28618,7 +28663,7 @@
       "reported_findings": false
     },
     "abstract_updated": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -28628,11 +28673,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:30+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:01+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T08:36:31+00:00"
+      "next_at": "2026-11-20T20:55:02+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -28954,7 +28999,7 @@
       "status": "waiting_for_license",
       "next_at": "2026-11-19T21:28:43+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -29336,7 +29381,7 @@
     "source_group": "AI-specific",
     "abstract_updated": "2026-10-22",
     "oa_meta_checked": "2026-10-22",
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -29809,7 +29854,7 @@
       "status": "waiting_for_machine_text",
       "next_at": "2026-11-12T21:28:53+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -30045,7 +30090,7 @@
       "status": "waiting_for_machine_text",
       "next_at": "2026-11-12T21:28:54+00:00"
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -30705,7 +30750,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -30715,11 +30760,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:32+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:02+00:00",
       "pipeline_version": 3,
       "status": "missing_sections",
-      "next_at": "2026-11-05T08:36:33+00:00"
+      "next_at": "2026-11-20T20:55:02+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -31103,7 +31148,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -31113,11 +31158,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:33+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:02+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T08:36:33+00:00"
+      "next_at": "2026-11-20T20:55:03+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -31478,7 +31523,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-10-30",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -31959,11 +32004,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:33+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:03+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T08:36:34+00:00"
+      "next_at": "2026-11-20T20:55:03+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -33018,11 +33063,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T08:36:34+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T20:55:03+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T08:36:34+00:00"
+      "next_at": "2026-11-20T20:55:03+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -33313,10 +33358,10 @@
     "oa_meta_checked": "2026-10-18",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:52:44+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T20:54:57+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:52:44+00:00",
+      "next_at": "2026-11-20T20:54:57+00:00",
       "pipeline_version": 3
     },
     "source_group": "Earlier digital-attention foundation",
