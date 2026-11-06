@@ -34,6 +34,7 @@ def check(page, url, width, out):
     page.set_viewport_size({'width': width, 'height': 900})
     page.goto(url, wait_until='networkidle')
     expect(page.locator('#library-count')).to_contain_text('matching sources')
+    assert 'recently indexed' not in page.locator('#issue-meta').inner_text(), 'Collection-week readings must not imply first indexing'
     assert page.locator('#home .field-question').count() == 4
     for node in page.locator('.field-question').all():
         box = node.bounding_box()

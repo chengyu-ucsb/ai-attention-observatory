@@ -969,3 +969,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,[role="button"]:focus
 @media(max-width:850px){#atlas .atlas-grid{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:600px){#atlas .inner-hero h1{font-size:clamp(35px,10.5vw,46px)}.theme-browser{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.theme-browser button{min-width:0;text-align:left;justify-content:flex-start;line-height:1.45}.theme-browser button:first-child{grid-column:1/-1}.theme-browser button span{flex-shrink:0}.library-discovery-title>p{max-width:260px}}
 @media(max-width:360px){#home .hero h1{font-size:44px}#home .hero-sub{font-size:14px}#home .hero-grid{padding-block:29px}}
+/* Secondary labels stay legible; narrow panel headers can take another line. */
+.identity-text small{color:#74636b}#home .editorial-foot span,#perspectives .perspective-bottom span,#home .panel-foot,#atlas .panel-foot{color:#69575d}#home .tiny-label,#atlas .tiny-label{color:#705a63;font-size:10px}
+@media(max-width:600px){#home .panel-header,#atlas .panel-header{flex-wrap:wrap;gap:10px}#home .tiny-label,#atlas .tiny-label{white-space:normal;line-height:1.5}#atlas .topic-bar-line{grid-template-columns:minmax(100px,1.3fr) minmax(20px,1fr) 24px;gap:8px}}
+.library-refine summary:focus-visible,#home .home-source-drawer summary:focus-visible{outline:2px solid #a03449;outline-offset:4px}
