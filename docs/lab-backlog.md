@@ -17,6 +17,9 @@ validated cognitive assessments or evidence that an intervention works.
 - Inspect main and open PRs first. Keep full-text acquisition and weekly issue
   publication independent of Lab development. Do not launch discovery/backfill
   jobs just to publish a Lab change.
+- Keep information rich without burying visitors in prose. Use visual hierarchy,
+  mechanism sketches, meaningful grouping and progressive disclosure; do not
+  achieve a shorter page by silently dropping evidence or access caveats.
 - Take the highest-value ready item below, implement it, add regression checks,
   and record the actual changes and checks. Ship small, reviewable changes.
 - Leave the current public release date unchanged until substantive changes have
@@ -31,9 +34,11 @@ than assuming a scheduled run published an issue.
 
 ### P1 · Complete browser and accessibility coverage
 
-Status: cross-engine CI extension in review for Playwright Chromium, Firefox and
-WebKit. Installed Safari/Firefox, native browser zoom and assistive-technology
-review remain open; patched automation builds do not replace those checks.
+Status: automated coverage now includes Playwright Chromium, Firefox and WebKit.
+Installed Safari/Firefox, native browser zoom and assistive-technology review
+remain open; patched automation builds do not replace those checks. See the
+[verification PR](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/35)
+for run outcomes and the final merged revision.
 Priority: correctness and access before new features.
 
 - Run the new Chromium test at desktop and phone widths, then test real Safari
@@ -91,7 +96,10 @@ real assistive-technology review and more rigorous material design remain open.
 
 ### P2 · Make design precedents easier to explore
 
-Status: source verification needed.
+Status: four source-checked mobile cards implemented. Official feature guides
+and relevant access limits replace the truncated table. See the
+[design-precedent PR](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/36)
+for browser checks and publication verification.
 
 - Check current product feature links and distinguish a product's own claims from
   independent evidence. Add a useful mobile comparison layout if needed.
@@ -190,7 +198,7 @@ determine publication status, not this date.
 
 ### 6 November 2026 · Cross-engine verification
 
-- Prepared independent Chromium, Firefox and WebKit jobs with failure isolation
+- Added independent Chromium, Firefox and WebKit jobs with failure isolation
   and separate screenshots. Each runs every Lab flow at desktop/phone widths and
   the effective-viewport/density reflow approximation, including paired rounds.
 - Added computed accessible-name/description assertions for activity tabs and the
@@ -205,8 +213,39 @@ determine publication status, not this date.
   [1.64.1](https://github.com/microsoft/playwright-python/releases/tag/v1.64.1),
   the current official release, including its Node 24.22.1 security update.
 - Local deterministic regressions, Python compilation and workflow structure
-  checks pass. Hosted engine outcomes must be checked before publication. No
+  checks pass. Final hosted engine outcomes are recorded in the verification PR;
+  actual run logs, not the presence of a workflow, establish a passed check. No
   research acquisition, external inference or public release-date change.
+
+### 6 November 2026 · Source-linked design precedents
+
+- Replaced truncated, horizontally scrolling product rows with four readable
+  cards in the existing cream/red visual style. Mechanism sketches and key
+  access limits support a quick scan. Complete access notes, design questions
+  and supplementary sources remain in keyboard-operable native disclosures.
+  The main official guide stays visible on each card. Official feature guides and
+  plan references are ordinary links with distinct labels, visible focus and
+  48 px minimum-height targets (checked against a 44 px rendered threshold).
+- Kept the cards in the page so unavailable archive data does not remove them.
+  Existing research records and their reading pages remain unchanged.
+- Checked official documentation on 6 November: one sec Intention Tracking is
+  iPhone/iPad-specific, and its plan tier is not stated in the comparison table;
+  Freedom has a free account tier for immediate sessions up to two hours, while
+  scheduling/longer sessions/Locked Mode require Premium; Apple Focus filters
+  narrow supported app content and do not sync across devices; Android Focus
+  mode pauses selected apps and notifications, with availability varying by
+  device. No effect statistic or product endorsement was added.
+- Source and access links are on each card. Apple's canonical guide was
+  retrieved through its official redirect after an initial rate limit; later
+  requests were again rate-limited. The guide was not treated as unavailable
+  or as proof that every Apple device supports the feature.
+- Added deterministic card/link/detail-preservation checks plus keyboard
+  disclosure opening/closing, control order, target size,
+  viewport bounds and offline-archive checks to the browser suite. Local syntax,
+  deterministic tests and Python compilation pass. Chromium and WebKit checks
+  passed at all four viewport/density configurations on the review branch;
+  desktop and 320 px WebKit card screenshots were inspected. The final PR
+  checks and actual Pages deployment remain authoritative for the release.
 
 ## Checks for every release
 
