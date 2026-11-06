@@ -292,10 +292,10 @@
     "oa_meta_checked": "2026-10-18",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:48:15+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T10:52:14+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:48:15+00:00",
+      "next_at": "2026-11-20T10:52:15+00:00",
       "pipeline_version": 3
     },
     "source_group": "AI-specific",
@@ -623,10 +623,10 @@
     "open_access_version": "publishedVersion",
     "oa_grobid_checked": "2026-10-18",
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-22T05:48:18+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T10:52:19+00:00",
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:48:18+00:00",
+      "next_at": "2026-11-20T10:52:19+00:00",
       "pipeline_version": 3
     },
     "source_group": "Adjacent digital-attention evidence",
@@ -766,6 +766,48 @@
       ]
     },
     "oa_grobid_checked": "2026-10-22",
+    "complete_reading_attempt": {
+      "status": "claim_anchor_invalid",
+      "stage": "synthesis",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.tandfonline.com/doi/pdf/10.1080/09297049.2026.2744732",
+          "retryable": false,
+          "status": "article_http_403"
+        }
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -1026,6 +1068,49 @@
       ]
     },
     "oa_grobid_checked": "2026-10-22",
+    "complete_reading_attempt": {
+      "status": "claim_anchor_invalid",
+      "stage": "synthesis",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1974520/pdf",
+          "status": "full_document_retrieved",
+          "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1974520/pdf",
+          "retryable": false
+        }
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -1207,11 +1292,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-22T05:48:17+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T10:52:18+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-05T05:48:17+00:00"
+      "next_at": "2026-11-20T10:52:19+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -1574,6 +1659,55 @@
       ]
     },
     "oa_grobid_checked": "2026-10-22",
+    "complete_reading_attempt": {
+      "status": "claim_anchor_absent",
+      "stage": "synthesis",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.1016/j.chbr.2026.101340",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.sciencedirect.com/science/article/pii/S2451958826004148/pdf",
+          "retryable": false,
+          "status": "robots_disallow_or_unavailable"
+        }
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -2920,6 +3054,56 @@
       ]
     },
     "oa_grobid_checked": "2026-10-23",
+    "complete_reading_attempt": {
+      "status": "claim_anchor_absent",
+      "stage": "synthesis",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.3389/feduc.2026.1878665",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1878665/pdf",
+          "status": "full_document_retrieved",
+          "final_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1878665/pdf",
+          "retryable": false
+        }
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -3023,6 +3207,63 @@
     },
     "figure_checked": "2026-10-22",
     "figure_verification_method": "pmc_aws_2026",
+    "complete_reading_attempt": {
+      "status": "copied_source_passage",
+      "stage": "synthesis",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://europepmc.org/articles/PMC13582594",
+          "retryable": false,
+          "status": "article_http_403"
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.3389/fpsyg.2026.1955418",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1955418/pdf",
+          "status": "full_document_retrieved",
+          "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1955418/pdf",
+          "retryable": false
+        }
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -3214,11 +3455,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-23T08:32:15+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T10:52:11+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-06T08:32:15+00:00"
+      "next_at": "2026-11-20T10:52:11+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -3461,6 +3702,63 @@
       ]
     },
     "oa_grobid_checked": "2026-10-23",
+    "complete_reading_attempt": {
+      "status": "claim_verification_failed",
+      "stage": "synthesis",
+      "last_at": "2026-11-05",
+      "next_at": "2026-11-07",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 2,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.3389/fpsyg.2026.1906199",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/42729409",
+          "retryable": false,
+          "status": "host_requires_review"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1906199/pdf",
+          "status": "full_document_retrieved",
+          "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1906199/pdf",
+          "retryable": false
+        }
+      ]
+    },
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -3554,7 +3852,7 @@
     "abstract_updated": "2026-10-22",
     "oa_meta_checked": "2026-10-22",
     "open_access_version": "publishedVersion",
-    "oa_checked": "2026-10-29",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -3896,7 +4194,7 @@
         "reading_mode": "finding"
       }
     },
-    "oa_checked": "2026-10-29",
+    "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -4634,11 +4932,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-23T08:32:16+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-06T10:52:11+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-06T08:32:17+00:00"
+      "next_at": "2026-11-20T10:52:11+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -4711,25 +5009,30 @@
     "open_access_license": "cc-by-nc-nd",
     "open_access_version": "publishedVersion",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Generative AI tools are increasingly embedded in everyday work and learning, yet their fluency, opacity, and propensity to hallucinate mean that users must critically evaluate AI outputs rather than accept them at face value.",
-      "methods": "The current work clarifies why and how people exercise oversight over generative AI outputs and provides a validated scale and ecologically grounded paradigm to support theory testing, cross-group, and longitudinal research on critical thinking in AI use.",
-      "findings": "",
-      "interpretation": "",
-      "limitations": "",
-      "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Generative AI tools are increasingly embedded in everyday work and learning, yet their fluency, opacity, and propensity to hallucinate mean that users must critically evaluate AI outputs rather than accept them at face value. The present research conceptualises critical thinking in AI use as a dispositional tendency to verify the source and content of AI-generated information, to understand how models work…",
+      "methods": "Data collection for all studies in the current work was approved by the corresponding authors' university institutional review board (IRB-25-141-A112-M3(925)) prior to data collection. To meet the recommended guideline of at least 10 respondents per item (Boateng et al., 2018) , we recruited 270 adults from Prolific to complete the 27-item critical thinking in AI use scale. Participants were at least 18 years old, U.S. residents, and ranged in age from 21 to 83 years (Mage = 44.30, SDage = 13.30); 52.96% were female. Informed consent was obtained electronically prior to participation. The study was administered via Qualtrics, which included the scale and demographic questions, and it took approximately 3 minutes to complete. Attention to instructions was verified with an attention check item (\"Please select 'Disagree' for this statement\"), which all participants passed. Most participants identified as American by nationality (95.9%), Caucasian/White (68.9%), and held at least a bachelor's degree (Bachelor's = 35.2%, or higher = 14.0%). Household income was in the mid-range, with 58.2% earning $25,000-$100,000. The full demographic data are available in Supplementary Materials Table S3 . We estimated the required sample size for the confirmatory factor analysis (CFA) a priori using the RMSEA-based power analysis framework for covariance structure modeling (MacCallum et al., 1996) . This approach evaluates statistical power in terms of the RMSEA, contrasting hypotheses of close",
+      "findings": "Across four rounds of content validation, items were iteratively revised for readability, clarity, and interpretability. Of the initial thirty items, sixteen items, seven items, and five items failed to meet Colquitt et al.'s (2019) threshold criteria of .72 for psa and .51 for csv in rounds 1 to 3, respectively. After item refinement and the addition of dimensional descriptions in the survey, only three items failed in the fourth and final round, which were completed by five RAs, and these items were removed, yielding the 27-item critical thinking in AI use scale. The final scale demonstrated excellent content validity (psa = 0.96; csv = 0.93), indicating that nearly all items were correctly mapped to their intended dimensions by the majority of judges. In terms of scale readability, the 27-item critical thinking in AI use scale achieved a Flesch-Kincaid Grade Level of 6.22 and a Reading Ease score of 74, suggesting that the items were easier to read than the average adult reading level. These results indicate that the scale is not only comprehensive in its coverage of the key dimensions of critical thinking in AI use, but also accessible and easy to understand for the broader audience. The 27-item version of the scale is available in Supplementary Materials Table S2 . Bartlett's test was statistically significant, χ²(351) = 3714.58, p < .001, indicating that the data were appropriate for factor analysis. The overall KMO value was excellent (KMO = .92), with all individual item KMOs exceeding .82. Parallel analysis showed that the first four observed eigenvalues exceeded simulated values, with subsequent eigenvalues falling below the random data threshold. The scree plot likewise displayed a clear inflection after the fourth factor (refer to Supplementary Materials Figure S1 for the parallel analysis scree plot). Although a four-factor model was initially estimated, closer inspection revealed that the fourth factor accounted for relatively little variance (4%) and only contained two items. A factor with fewer than three items is generally weak and unstable (Costello & Osborne, 2005) , and the two items in question (items 15 and 16) showed weak primary loadings of .37 and .36, respectively. Furthermore, the Bayesian Information Criterion favoured the threefactor model (BIC = -973) over the four-factor model (BIC = -958). Taken together, these results supported a more parsimonious three-factor solution, which demonstrated stronger interpretability and adequate fit (RMSEA = .06, TLI = .89, CFI = .92, RMSR = .04). A threefactor structure was therefore retained for subsequent analyses. Results from the iterative refinement procedure indicated that a three-factor model with 17 items, all of which met the communality, primary loading, and cross-loading thresholds, provided the best overall fit, demonstrating excellent model performance (RMSEA = .05, TLI = .96, CFI = .98, RMSR = .03). Closer inspection, however, revealed that four items lacked adequate ",
+      "interpretation": "As generative AI becomes integral to workplace and educational settings, the central question is no longer just whether we can use these tools, but whether AI users can critically evaluate AI outputs, in light of its persuasive fluency, hallucinations, opaque training data, such that human judgement remains in control. Yet critical thinking in AI use remains empirically underexplored and conceptually underdefined, with few tools that capture the distinctive demands of generative AI use and little work explaining why individuals differ in critical thinking in AI use or how these differences shape their behaviour and outcomes. To address this gap, we developed and validated the critical thinking in AI use scale, a theorydriven instrument that assesses individual differences in AI output content and source verification, motivation to understand AI systems, and reflection on the broader implications of AI use. Across six studies, the scale demonstrated strong psychometric properties, a stable three-factor structure with a higher-order factor, robust convergent and discriminant validity, measurement invariance across sex, and good test-retest reliability over one-and two-week intervals. Higher critical thinking in AI use was linked to a user profile of openness, extraversion, trait positive affect, and more frequent AI use. Notably, higher critical thinking in AI use predicted more frequent verification behaviour, greater diversity of verification strategies, higher fact-checking accuracy, and deeper reflection. Taken together, these findings position the critical thinking in AI use scale as a reliable and valid tool for advancing research on critical thinking in the context of using generative AI tools, clarifying its correlates, and informing interventions to support more ",
+      "limitations": "While the present research provides a foundational understanding of critical thinking in AI use, it has a few limitations that should be acknowledged and that open avenues for future research. First, our data fully relies on English-speaking online and university samples. Competencies that relate to critical thinking in AI use, such as AI literacy (Chung & Wihbey, 2024; Mansoor et al., 2024) and misinformation susceptibility (M. Chan et al., 2025; Kyrychenko et al., 2025; Maertens et al., 2024; Roozenbeek et al., 2020) have demonstrated cross-cultural variations. Future work should test critical thinking in AI use across cultures, languages, and organisational settings, examining measurement invariance and group differences to strengthen the generalisability of the scale. Second, the present studies did not include direct measures of (generative) AI literacy. As a result, we were unable to examine how critical thinking in AI use relates to people's declarative and procedural knowledge ",
+      "sample": "10",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "scale_validation",
-      "reported_findings": false,
+      "reported_findings": true,
       "digest": {
-        "idea": "What happens to critical thinking when people use AI?",
+        "idea": "Notably, we found that critical thinking in AI use significantly predicted higher Evidence-Gap Resolution (b = 10.32, SE = 2.52, t = 4.102, p < .001, R² = .082), and the",
         "explain": "",
         "approach": "",
-        "finding": "",
-        "finding_source": "none",
+        "finding": "Notably, we found that critical thinking in AI use significantly predicted higher Evidence-Gap Resolution (b = 10.32, SE = 2.52, t = 4.102, p < .001, R² = .082), and the",
+        "finding_source": "full_text",
         "interpretation": "",
         "limitation": "",
         "tags": [
@@ -4737,8 +5040,8 @@
           "Learning"
         ],
         "status": "automatically_condensed_source_text",
-        "editorial_basis": "abstract",
-        "reading_mode": "research_question"
+        "editorial_basis": "full_text",
+        "reading_mode": "finding"
       }
     },
     "oa_checked": "2026-10-30",
@@ -4758,11 +5061,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-10-30T09:59:51+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-06T10:52:12+00:00",
       "pipeline_version": 3,
-      "status": "waiting_for_machine_text",
-      "next_at": "2026-11-06T09:59:51+00:00"
+      "status": "full_text",
+      "next_at": null
     },
     "repository_recovery": {
       "version": 1,
@@ -4774,6 +5077,27 @@
         "s2_candidate"
       ]
     },
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "Data collection for all studies in the current work was approved by the corresponding authors' university institutional review board (IRB-25-141-A112-M3(925)) prior to data collection. To meet the recommended guideline of at least 10 respondents per item (Boateng et al., 2018) , we recruited 270 adults from Prolific to complete the 27-item critical thinking in AI use scale. Participants were at least 18 years old, U.S. residents, and ranged in age from 21 to 83 years (Mage = 44.30, SDage = 13.30); 52.96% were female. Informed consent was obtained electronically prior to participation. The study was administered via Qualtrics, which included the scale and demographic questions, and it took approximately 3 minutes to complete. Attention to instructions was verified with an attention check item (\"Please select 'Disagree' for this statement\"), which all participants passed. Most participants identified as American by nationality (95.9%), Caucasian/White (68.9%), and held at least a bachelor's degree (Bachelor's = 35.2%, or higher = 14.0%). Household income was in the mid-range, with 58.2% earning $25,000-$100,000. The full demographic data are available in Supplementary Materials Table S3 . We estimated the required sample size for the confirmatory factor analysis (CFA) a priori using the RMSEA-based power analysis framework for covariance structure modeling (MacCallum et al., 1996) . This approach evaluates statistical power in terms of the RMSEA, contrasting hypotheses of close fit (e.g., RMSEA ≤ .05) against those of notclose fit (e.g., RMSEA ≥ .08). By specifying the model's degrees of freedom, the significance level (α = .05), and desired power (1 -the probability of making a Type II error), the method yields the minimum sample size needed to detect whether a model exhibits adequate versus inadequate fit. For our model (df = 62), the analysis showed that 183 participants would be sufficient to achieve 80% power. To ensure greater precision and robustness in model estimation, we targeted 99% power, which required a minimum of 376 participants. Based on this estimation, we recruited 376 participants from Prolific to complete the scale. Participants were at least 18 years old, U.S. residents, and ranged in age from 19 to 79 years (Mage = 44.97, SDage = 14.06); 53.46% were female. The demographic distribution of this sample (available in Supplementary Materials Table S4 ) is similar to the sample in Study 2. Informed consent was obtained electronically prior to participation. The study was administered via Qualtrics and took approximately 11 minutes to complete. The study included the critical thinking in AI use scale, psychometric scales, and demographic questions. Attention to instructions was verified via three attention check questions spread evenly across the study, which all participants passed. Similar to Study 3, RMSEA-based power analysis framework for covariance structure modelling (MacCallum et al., 1996) indicated a minimum of 183 participants to achieve 80% power. Based on this estimation, we recruited a total of 295 participants from Prolific. To ensure adequate familiarity with AI tools, only individuals with prior experience using AI were eligible to participate. During data screening, five participants were excluded for not meeting this inclusion criterion, which was clearly stated in the study description and participant information sheet. Specifically, these participants indicated \"Never (I do not use AI at all in my daily life)\" in response to the screening question, \"How often do you use AI in your daily life?\" Consequently, they were removed from all subsequent analyses, resulting in a final sample of 290 participants. A total of 92.41% of participants indicated that they \"use AI (at least) a few times a week\". All participants were U.S. residents, ranged in age from 20 to 78 years (Mage = 42.30, SDage = 12.73); 50.69% female, 93.79% American by nationality, and 63.10% Caucasian White (see Supplementary Materials Table S5 for the full list of demographic characteristics). Informed consent was obtained electronically prior to participation. The survey included four attention check items (e.g., \"Please select 'True' for this statement.\") that were evenly distributed across the questionnaire. All participants successfully passed at least three of the four checks. Using a precision-based approach for test-retest reliability, we sized the study to achieve narrow 95% CI around ICC(2,1) (Koo & Li, 2016) . We estimated an ICC of .80, Bonett's CI-width method (Bonett, 2002) indicated that a 95% CI width of .15 required n = 89 completers. For subscales, translating the expected coefficient alpha of .80 to ICC ≈ .72 and fixing the width at .20 yielded n = 90. These results informed us that we would require a minimum of 90 participants for examining test-retest reliability. For the 1-week test-retest interval, 92 participants (Mage = 21.13, SDage = 1.69; refer to Supplementary Materials Table S6 for participant demographics) were recruited from a university subject pool system in Singapore. For the 2-week test-retest interval, we extended participant recruitment through a Telegram channel that advertises psychology experiments, and recruited 122 participants (Mage = 24.15, SDage = 3.57; see Supplementary Materials Table S7 for participant demographics) who completed the scale on both sessions. The target sample size for Study 6 was determined a priori based on the expected association between critical thinking in AI use and task-based indices of AI evaluation (e.g., veracity-judgement accuracy) which prior work suggests being in the small-to-moderate range (r ≈ .22-.40; Orhan, 2022; Pennycook & Rand, 2019) . To be conservative, we based our power analysis on detecting a correlation of r = .22 with α = .05 (two-tailed). This analysis indicated that approximately 159 participants would be required to achieve 80% power. We recruited 200 adults from Prolific. Nine participants were excluded for noncompliance, incomplete responses, or extreme completion times (>3 SD from the median). The resulting 191 participants ranged in age from 19 to 78 years (Mage = 44.65, SDage = 14.34), 50.26% were female, and 66.49% were White. The full demographic data are available in Supplementary Materials Table S8 . Informed consent was obtained electronically prior to participation. The survey, which took approximately 17 minutes to complete, was administered via Qualtrics. Participants received £1.70 as compensation. Attention to instructions was verified using two attention check items (e.g., \"Please select 'Disagree' for this statement\"), which all participants passed. Participants first completed the fact-checking task, followed by the reflection writing task, and then the 13-item critical thinking in AI use scale. Fact-checking Task. We created a fact-checking task that closely resembles participants' verification behaviour when using generative AI. Participants evaluated 12 statements (6 true, 6 false) presented in random order through a ChatGPT-4o-powered chatbot interface embedded in Qualtrics. Independently, each item was assigned one of four source-link conditions: None (disabled and not clickable), Broken (clickable but fails to load), Working-irrelevant (valid page with irrelevant information), or Working-relevant (valid page with relevant information). These source-link conditions were meant to mimic the full range of source link scenarios typical of LLM Table",
+      "results": "Across four rounds of content validation, items were iteratively revised for readability, clarity, and interpretability. Of the initial thirty items, sixteen items, seven items, and five items failed to meet Colquitt et al.'s (2019) threshold criteria of .72 for psa and .51 for csv in rounds 1 to 3, respectively. After item refinement and the addition of dimensional descriptions in the survey, only three items failed in the fourth and final round, which were completed by five RAs, and these items were removed, yielding the 27-item critical thinking in AI use scale. The final scale demonstrated excellent content validity (psa = 0.96; csv = 0.93), indicating that nearly all items were correctly mapped to their intended dimensions by the majority of judges. In terms of scale readability, the 27-item critical thinking in AI use scale achieved a Flesch-Kincaid Grade Level of 6.22 and a Reading Ease score of 74, suggesting that the items were easier to read than the average adult reading level. These results indicate that the scale is not only comprehensive in its coverage of the key dimensions of critical thinking in AI use, but also accessible and easy to understand for the broader audience. The 27-item version of the scale is available in Supplementary Materials Table S2 . Bartlett's test was statistically significant, χ²(351) = 3714.58, p < .001, indicating that the data were appropriate for factor analysis. The overall KMO value was excellent (KMO = .92), with all individual item KMOs exceeding .82. Parallel analysis showed that the first four observed eigenvalues exceeded simulated values, with subsequent eigenvalues falling below the random data threshold. The scree plot likewise displayed a clear inflection after the fourth factor (refer to Supplementary Materials Figure S1 for the parallel analysis scree plot). Although a four-factor model was initially estimated, closer inspection revealed that the fourth factor accounted for relatively little variance (4%) and only contained two items. A factor with fewer than three items is generally weak and unstable (Costello & Osborne, 2005) , and the two items in question (items 15 and 16) showed weak primary loadings of .37 and .36, respectively. Furthermore, the Bayesian Information Criterion favoured the threefactor model (BIC = -973) over the four-factor model (BIC = -958). Taken together, these results supported a more parsimonious three-factor solution, which demonstrated stronger interpretability and adequate fit (RMSEA = .06, TLI = .89, CFI = .92, RMSR = .04). A threefactor structure was therefore retained for subsequent analyses. Results from the iterative refinement procedure indicated that a three-factor model with 17 items, all of which met the communality, primary loading, and cross-loading thresholds, provided the best overall fit, demonstrating excellent model performance (RMSEA = .05, TLI = .96, CFI = .98, RMSR = .03). Closer inspection, however, revealed that four items lacked adequate conceptual or psychometric support. Two items (\"I try to check if AI information is still up to date before using it\" and \"I try to stay sceptical of AI information until I am sure it is accurate\") were removed because they showed substantial cross-loadings and high complexity, making their factor membership ambiguous. Two items (\"I often wonder if AI responses are biased in any way\" and \"I try to look at things in more than one way before deciding if I agree with what AI says\") were removed because they did not correspond to their original theoretical dimensions. Removing these four items produced a more parsimonious 13-item solution characterised by a clearer simple structure, stronger construct validity, and excellent overall model fit (RMSEA = .037, TLI = .98, CFI = .99, RMSR = .02). The final 13-item version of the scale is presented in Table 1 , while factor loadings are presented in Supplementary Materials Table S11 . Higher levels of critical thinking in AI use were consistently associated with more engaged verification behaviour on the fact-checking task. As expected, participants who scored higher on critical thinking in AI use reported verifying statements more frequently during the task, (b = 0.282, SE = 0.139, t = 2.03, p = .044, R² = .02). They also reported using a broader range of verification methods, (b = 0.145, SE = 0.059, t = 2.45, p = .015, R² = .03), indicating that higher critical thinking in AI use scorers not only verified more often but also did so through multiple strategies such as checking source links, searching online, or consulting other AI tools. These findings align with the notion that individuals with stronger critical thinking dispositions toward AI are more likely to engage in active corroboration and cross-validation of AI outputs rather than relying on them passively. Fact-checking task performance data further reinforced this interpretation. Critical thinking in AI use significantly predicted veracity-judgement accuracy, (b = 6.91, SE = 1.92, t = 3.59, p < .001, R² = .06). This suggests that participants who were more motivated, and actually engaged in more verification behaviour, were better at discriminating true from false claims. Higher levels of critical thinking in AI use were also consistently associated with deeper reflection about AI use on the reflective writing task. Critical thinking in AI use predicted both selfreported reflection depth, (b = 7.29, SE = 1.73, t = 4.20, p < .001, R² = .09), and LLM-coded reflection depth on the writing task, (b = 0.21, SE = 0.08, t = 2.57, p = .011, R² = .03). These results suggest that critical thinking in AI use extends beyond verification to encompass metacognitive awareness and reflection on the moral and societal implications of AI usage. Taken together, participants higher in critical thinking in AI use not only verified more but also reflected more deeply on issues such as fairness, accountability, and ethical consequences of AI use. For exploratory purposes, critical thinking in AI use showed a small, non-significant positive association with Evidence Extraction (b = 3.51, SE = 2.25, t = 1.557, p = .121, R² = .013), while the Verification subscale significantly predicted higher Evidence Extraction (b = 4.69, SE = 1.89, t = 2.479, p = .014, R² = .032) on the fact-checking task. This suggests that the verification facet of critical thinking in AI use was the most proximal driver of effective use of relevant working link sources provided. Participants with higher verification scores were more likely to access the link, evaluate the credibility of its contents, and apply that evidence to their judgements rather than rely on general knowledge. We also observed that higher critical thinking in AI use showed a marginal reduction in Misread Rate (b = -3.48, SE = 1.96, t = -1.777, p = .077, R² = .016), consistent with less uncertainty when usable evidence was present; the Verification subscale showed a similar but non-significant tendency (b = -2.35, SE = 1.67, t = -1.407, p = .161, R² = .010). This pattern suggests that individuals higher in critical thinking in AI use were slightly more adept at recognising and using on-page evidence, applying it to interpret the statement, and committing to a judgement rather than being \"Unsure\" on the fact-checking task. Notably, we found that critical thinking in AI use significantly predicted higher Evidence-Gap Resolution (b = 10.32, SE = 2.52, t = 4.102, p < .001, R² = .082), and the",
+      "discussion": "As generative AI becomes integral to workplace and educational settings, the central question is no longer just whether we can use these tools, but whether AI users can critically evaluate AI outputs, in light of its persuasive fluency, hallucinations, opaque training data, such that human judgement remains in control. Yet critical thinking in AI use remains empirically underexplored and conceptually underdefined, with few tools that capture the distinctive demands of generative AI use and little work explaining why individuals differ in critical thinking in AI use or how these differences shape their behaviour and outcomes. To address this gap, we developed and validated the critical thinking in AI use scale, a theorydriven instrument that assesses individual differences in AI output content and source verification, motivation to understand AI systems, and reflection on the broader implications of AI use. Across six studies, the scale demonstrated strong psychometric properties, a stable three-factor structure with a higher-order factor, robust convergent and discriminant validity, measurement invariance across sex, and good test-retest reliability over one-and two-week intervals. Higher critical thinking in AI use was linked to a user profile of openness, extraversion, trait positive affect, and more frequent AI use. Notably, higher critical thinking in AI use predicted more frequent verification behaviour, greater diversity of verification strategies, higher fact-checking accuracy, and deeper reflection. Taken together, these findings position the critical thinking in AI use scale as a reliable and valid tool for advancing research on critical thinking in the context of using generative AI tools, clarifying its correlates, and informing interventions to support more responsible AI use. In conclusion, this work provides a comprehensive first account of critical thinking in AI use as a measurable construct that captures stable individual differences and has realworld benefits for how people engage with generative AI. Across six studies, we introduced a theoretically grounded and empirically validated instrument that captures how users verify the source and content of AI outputs, seek to understand model behaviour and limits, and reflect responsibly on personal, social, and ethical implications of AI use. The critical thinking in AI use scale exhibited a clear three-factor structure with a higher-order factor, strong internal consistency, temporal stability, convergent and discriminant validity, and measurement invariance across sex. Critical thinking in AI use was systematically patterned by frequency of AI use, positive affect, and personality traits such as openness and extraversion. Importantly, critical thinking in AI use generalises beyond self-report, providing evidence about what AI users actually do, not just what they intend. Higher critical thinking in AI use predicts more frequent and diverse verification methods, better veracity-judgement accuracy in a generative-AI fact-checking task, and deeper reflection in a reflective writing task. Critical thinking in AI use supports calibrated, responsible AI use by encouraging engagement with AI while maintaining human oversight of its outputs. Practically, the critical thinking in AI use scale provides a rigorous diagnostic for evaluating human oversight of AI outputs, across time and between demographic groups, in AI-mediated organisations and educational institutions. manipulation and biases 4. I try to figure out reasons when I see AI giving conflicting answers. 5. I sometimes wonder if AI-generated content is meant to shape my behaviour. 6. I often wonder if AI content might reflect someone else's goals or interests. 7. I sometimes feel cautious if AI outputs strongly agree with what I already believe. 8. I tend to question whether AI responses might leave out important viewpoints. 9. I sometimes doubt whether AI outputs are influenced by the data it was trained on. 10. I often think about who might benefit if I accept an AI recommendation. 11. I try to stay alert to whether AI-generated content could be slanted in a particular direction. 12. I sometimes check if AI outputs sound persuasive rather than objective. 13. I often reflect on whether AI systems are designed to nudge users toward certain choices. 14. I usually pause to consider whether AI suggestions could be misleading, even unintentionally. 15. I sometimes worry that AI outputs might reinforce stereotypes or unfair assumptions. 16. I often wonder whether AI-generated content is shaped by hidden commercial interests. 17. I sometimes test AI with different prompts to see if it gives contradictory answers. 18. I try to stay aware that AI systems might present information in ways that affect my opinions. Openness and Flexibility of Thought Measures willingness to adjust beliefs, seek diverse viewpoints, and consider alternative explanations 1. I often think about alternative viewpoints instead of only relying on AI answers. 2. I consider multiple possible explanations before accepting AI-generated conclusions. 3. I often reconsider my views when I come across evidence that doesn't match AI information. 4. I sometimes talk to others about AI-generated information to hear different views. 5. I often consider how my own assumptions might affect how I see AI-generated content 6. I try to stay open to revising my views when AI content challenges what I think. 7. I sometimes explore perspectives that AI does not mention. 8. I am willing to change my mind if new information suggests the AI might be wrong. 9. I like to compare AI-generated ideas with different sources before deciding what to believe. 10. I often think about whether there are other ways to interpret the same information AI provides. 11. I sometimes reflect on how people with different experiences might see AI outputs differently. 12. I enjoy considering multiple options even if AI suggests only one answer. 13. I sometimes play with alternative scenarios to test how reliable AI information is. 14. I try to imagine how people from other cultures might respond to AI content. 15. I often ask myself what assumptions AI might be making that shape its answers. 16. I sometimes question whether my first reaction to AIgenerated content is the only valid one. 17. I am open to the possibility that AI responses can be both helpful and limited at the same time. 18. I often reflect on how AI information fits alongside my own experiences and values. Intrinsic Motivation to Understand AI Reflects curiosity, enjoyment, and internal drive to understand AI systems and their processes 1. I try to understand how AI outputs are generated, when possible. 2. I sometimes feel motivated to learn how AI works to judge its outputs better. 3. I try to understand the reasoning or logic behind AI's recommendations. 4. I think it can be helpful to understand how AI models are trained to assess their reliability. 5. I try to stay updated on what AI can and cannot do 6. I enjoy questioning AI-generated outputs rather than passively consuming them. 7. I often explore how AI arrives at its answers out of curiosity. 8. I enjoy learning about the limitations of AI systems. 9. I sometimes look into the methods AI uses to generate information. 10. I find it interesting to learn why AI might give different answers to the same question. 11. I like to read or watch materials that explain how AI works. 12. I enjoy discovering",
+      "limitations": "While the present research provides a foundational understanding of critical thinking in AI use, it has a few limitations that should be acknowledged and that open avenues for future research. First, our data fully relies on English-speaking online and university samples. Competencies that relate to critical thinking in AI use, such as AI literacy (Chung & Wihbey, 2024; Mansoor et al., 2024) and misinformation susceptibility (M. Chan et al., 2025; Kyrychenko et al., 2025; Maertens et al., 2024; Roozenbeek et al., 2020) have demonstrated cross-cultural variations. Future work should test critical thinking in AI use across cultures, languages, and organisational settings, examining measurement invariance and group differences to strengthen the generalisability of the scale. Second, the present studies did not include direct measures of (generative) AI literacy. As a result, we were unable to examine how critical thinking in AI use relates to people's declarative and procedural knowledge about AI systems, or whether the scale predicts outcomes over and above AI literacy. Given frameworks that conceptualise AI literacy as a prerequisite for competent and responsible AI use (Long & Magerko, 2020; Mills et al., 2024) , future research should include validated AI literacy measures to test their overlap, discriminant validity, and incremental predictive value for verification behaviour and real-world AI outcomes. Lastly, we did not assess participants' prior knowledge or expertise in the substantive domains of the veracity-judgement tasks. Domain knowledge may shape how individuals evaluate AI outputs, and it may interact with AI outputs (Dikmen & Burns, 2022) , for example, by enabling high-critical thinking in AI use individuals to detect subtle inaccuracies in AI-generated content. Future studies should therefore measure and experimentally manipulate topic knowledge to clarify how critical thinking in AI use combines with domain-specific expertise in guiding verification behaviour.",
+      "figures": [],
+      "fulltext_url": "https://arxiv.org/abs/2512.12413",
+      "key_idea": "Across four rounds of content validation, items were iteratively revised for readability, clarity, and interpretability. Of the initial thirty items, sixteen items, seven items, and five items failed to meet Colquitt et al.'s (2019) threshold criteria of .72 for psa and .51 for c",
+      "extraction_date": "2026-11-06",
+      "extraction_version": 3,
+      "sections_available": [
+        "results",
+        "methods",
+        "discussion",
+        "limitations"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-06",
     "source_quality": {
       "decision": "include",
       "venue_level": "specialist",
@@ -4781,8 +5105,16 @@
       "reason": "field_venue_and_explicit_relevance"
     },
     "visual": {
-      "kind": "illustration_only",
-      "reason": "insufficient_indexed_evidence"
+      "kind": "evidence_snapshot",
+      "basis": "full_text",
+      "status": "indexed",
+      "finding_source": "full_text",
+      "blocks": [
+        {
+          "label": "Reported finding",
+          "text": "Notably, we found that critical thinking in AI use significantly predicted higher Evidence-Gap Resolution (b = 10.32, SE = 2.52, t = 4.102, p < .001, R² = .082), and the"
+        }
+      ]
     }
   },
   {
