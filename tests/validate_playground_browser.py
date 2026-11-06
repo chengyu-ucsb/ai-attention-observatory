@@ -67,6 +67,24 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
         expect(page.get_by_role("tab", name=name, exact=True)).to_be_visible()
     assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
+    precedents = page.get_by_role("list", name="Four product design precedents")
+    expect(precedents.get_by_role("listitem")).to_have_count(4)
+    links = precedents.get_by_role("link")
+    expect(links).to_have_count(7)
+    for i in range(7):
+        link = links.nth(i)
+        if i == 0:
+            link.focus()
+        else:
+            page.keyboard.press("Tab")
+        expect(link).to_be_focused()
+        box = link.bounding_box()
+        assert box and box["x"] >= 0 and box["x"] + box["width"] <= width // zoom, "Precedent link overflow"
+        assert box["height"] >= 44, "Precedent links need generous targets"
+        assert link.get_attribute("href").startswith("https://")
+    if screenshots:
+        screenshots.mkdir(parents=True, exist_ok=True)
+        page.locator(".play-precedents").screenshot(path=str(screenshots / f"lab-precedents-{width}-zoom{zoom}.png"), style=".site-header { visibility: hidden !important; }")
     page.locator(".play-update summary").click()
     assert page.locator(".play-update p").first.is_visible()
     if screenshots:
@@ -268,6 +286,8 @@ def check_site_integration(page, url):
     page.reload(wait_until="networkidle")
     page.locator("#lab").wait_for(state="visible")
     assert page.locator("#issue-label").inner_text() == "INDEX OFFLINE"
+    expect(page.get_by_role("list", name="Four product design precedents").get_by_role("listitem")).to_have_count(4)
+    expect(page.get_by_role("link", name="Android Digital Wellbeing guide")).to_be_visible()
     page.locator("#switch-start").click()
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert not errors, errors

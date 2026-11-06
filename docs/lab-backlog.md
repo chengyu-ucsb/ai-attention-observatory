@@ -91,7 +91,9 @@ real assistive-technology review and more rigorous material design remain open.
 
 ### P2 · Make design precedents easier to explore
 
-Status: source verification needed.
+Status: source-checked mobile cards prepared for review. Four official feature
+guides and relevant access limits replace the truncated table. Browser checks
+and publication still need verification.
 
 - Check current product feature links and distinguish a product's own claims from
   independent evidence. Add a useful mobile comparison layout if needed.
@@ -207,6 +209,29 @@ determine publication status, not this date.
 - Local deterministic regressions, Python compilation and workflow structure
   checks pass. Hosted engine outcomes must be checked before publication. No
   research acquisition, external inference or public release-date change.
+
+### 6 November 2026 · Source-linked design precedents
+
+- Replaced truncated, horizontally scrolling product rows with four readable
+  cards in the existing cream/red visual style. Official feature guides and
+  plan references are ordinary links with distinct labels and visible focus.
+- Kept the cards in the page so unavailable archive data does not remove them.
+  Existing research records and their reading pages remain unchanged.
+- Checked official documentation on 6 November: one sec Intention Tracking is
+  iPhone/iPad-specific, and its plan tier is not stated in the comparison table;
+  Freedom has a free account tier for immediate sessions up to two hours, while
+  scheduling/longer sessions/Locked Mode require Premium; Apple Focus filters
+  narrow supported app content and do not sync across devices; Android Focus
+  mode pauses selected apps and notifications, with availability varying by
+  device. No effect statistic or product endorsement was added.
+- Source and access links are on each card. Apple's canonical guide was
+  retrieved through its official redirect after an initial rate limit; later
+  requests were again rate-limited. The guide was not treated as unavailable
+  or as proof that every Apple device supports the feature.
+- Added deterministic card/link checks plus keyboard order, target size,
+  viewport bounds and offline-archive checks to the browser suite. Local syntax,
+  deterministic tests and Python compilation pass; hosted browser results and
+  actual Pages deployment must still be verified.
 
 ## Checks for every release
 
