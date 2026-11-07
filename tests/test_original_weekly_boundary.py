@@ -11,7 +11,7 @@ from unittest.mock import Mock, patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-from test_original_readings import record, accepted, approve
+from test_original_readings import record, accepted, approve, article_screen
 import original_readings as original
 import build_public
 import build_issue
@@ -37,7 +37,7 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
             'source_url':'https://export.arxiv.org/api/query?id_list='+pinned}
         n=accepted();n.update(doi='',record_url=row['url']);n['source'].update(
             url='https://arxiv.org/pdf/'+pinned,source_doi='',version='arxiv_preprint_v1')
-        row['original_reading']=approve(n)
+        article_screen(n,row);row['original_reading']=approve(n)
         return annotate(row)
 
     def test_checked_same_doi_source_still_enters_week(self):
@@ -46,7 +46,7 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
     def test_old_working_version_is_library_only_and_cannot_pad_week(self):
         row=record();note=accepted();note['source'].update(
             source_doi='10.9999/working-paper',related_journal_doi=row['doi'],version='working_paper')
-        approve(note)
+        article_screen(note,row);approve(note)
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);data=root/'data';data.mkdir();manifest=data/'original-readings.json'
             manifest.write_text(json.dumps({'articles':[note]}))
@@ -80,7 +80,7 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
             if changed=='doi':
                 row['doi']='10.48550/arXiv.2610.12345v2';note['doi']=row['doi'];note['source']['source_doi']=row['doi']
             if changed=='version':note['source']['version']='arxiv_preprint_v2'
-            approve(note)
+            article_screen(note,row);approve(note)
             self.assertTrue(original.eligible(note,row))
             self.assertFalse(weekly_eligible(row,*previous_week('2026-11-02')),changed)
 
@@ -110,7 +110,7 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
             if mutation=='missing':row.pop('publication_date_provenance')
             if mutation=='conflicting':row['publication_date_provenance']['status']='unresolved'
             if mutation=='wrong_window':window['from']='2026-10-25'
-            if mutation=='working_version':n['source'].update(source_doi='10.9999/older',related_journal_doi=row['doi'],version='working_paper');approve(n)
+            if mutation=='working_version':n['source'].update(source_doi='10.9999/older',related_journal_doi=row['doi'],version='working_paper');article_screen(n,row);approve(n)
             with self.subTest(mutation=mutation),tempfile.TemporaryDirectory() as tmp:
                 root=Path(tmp);data=root/'data';data.mkdir();manifest=data/'original-readings.json'
                 manifest.write_text(json.dumps({'articles':[n]}))
@@ -136,10 +136,11 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
         for existing in (False,True):
             row=self.row() if existing else record()
             note=accepted();note['source'].update(source_doi='10.9999/older',
-                related_journal_doi=row['doi'],version='working_paper');approve(note)
+                related_journal_doi=row['doi'],version='working_paper');article_screen(note,row);approve(note)
             with self.subTest(existing=existing),tempfile.TemporaryDirectory() as tmp:
                 root=Path(tmp);data=root/'data';data.mkdir();manifest=data/'original-readings.json'
                 manifest.write_text(json.dumps({'articles':[note]}))
+                (data/'library.json').write_text(json.dumps([row]))
                 (data/'public-weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
                 (data/'issue-editorial.json').write_text('{}');model=Mock()
                 with patch.object(original,'MANIFEST',manifest):

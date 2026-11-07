@@ -124,6 +124,95 @@ step summary explains the hold. This is a withheld edition, not a successful new
 publication. Direct composition still rejects insufficient evidence. The earlier
 published edition remains visible. No minimum, quality, or date gate is relaxed.
 
-This adapter admits scholarly summaries. Nonacademic analysis still needs its
-separate full-argument review and publication pathway; a feed preview or partial
-HTML extraction does not become a reviewed policy, opinion, or news reading.
+A feed preview or partial HTML extraction alone never becomes a reviewed policy,
+opinion, or news reading. The following explicit receipt path is required.
+
+## Article-screened preprints and attributed commentary
+
+The same empty accepted register now supports two additional **explicitly
+screened** types. No screening draft, source body, or actual publication approval
+is included. Code validation is not source review and cannot determine whether
+an attestor's prose is true. Publication still requires a separate, content-bound
+acceptance after the independent AI source check.
+
+Both types require an `article_screen` object with exactly:
+- `record_sha256`: `checked_reading_types.record_digest(record)`, binding current
+  kind, DOI, URL, title, venue, publication date and its evidence, research type,
+  source version. A changed indexed record requires renewed review.
+- `decision`: `acceptable`; `reviewer`; `checked_on` (no earlier than publication,
+  no later than the separate source check, no future dates).
+- `topic_fit`, `methodological_assessment`, `limitations_assessment`: substantive,
+  source-specific assessments, not a venue reputation shortcut.
+- `peer_review_claimed` and `strong_causal_evidence_claimed`: both false.
+
+This object is inside both existing receipt hashes. Unreviewed, held, duplicate,
+changed or revoked entries remain excluded. Known preprint signals include
+repository venues, arXiv URLs/DOIs, first-submission provenance, and manuscript
+version labels. Preprint articles retain independent topic screening. Projected
+notices and limitations explicitly distinguish article screening from peer
+review and strong causal evidence. Weekly synthesis requires those qualifications
+in each cited comparison, including its tension section. These lexical checks
+are a conservative guard, not semantic proof of every generated claim.
+
+Nonacademic receipts replace scholarly summary/evidence fields with `thesis`,
+`reasoning`, `examples`, `tension`, `qualification`. Each is a substantive original
+paraphrase with main-argument section and numbered paragraph locators. No study
+methods/results slots are populated. A `commentary` object requires:
+- `genre`: opinion, policy_analysis, reported_analysis, product_analysis, practical_advice, or product_control_guidance.
+- `attributed_to`: the source's author or organization.
+- `source_depth`: main_argument_html.
+- `html_completeness` and `semantic_completeness`: not_verified.
+- `figures_checked`, `supplements_checked`, and
+  `linked_claims_independently_verified`: false.
+
+The adapter currently accepts only exact canonical publisher HTML URLs and the
+`publisher_article` version, with empty DOIs. This intentionally does not claim
+support for alternate republications or a complete machine extraction. The
+checked source SHA-256 and paragraph locations identify the read rendition;
+without new retrieval this offline adapter cannot detect later live-site changes.
+An updated source hash requires renewed source check and publication acceptance.
+Commentary is projected as curated, attributed main-argument reading, never as
+machine-extracted full text or empirical results. RSS snippets remain ineligible.
+Examples, tension and qualifications travel into the synthesis evidence packet.
+
+Previous-week original-publication and exact checked-source gates are unchanged.
+Synthetic tests cover library, weekly evidence, revocation and stale metadata.
+Existing journal-linked working-manuscript fixtures now also need article screens.
+
+### Queue and display boundaries
+
+Queued extended receipts carry an exact metadata-only `original_record_context`,
+separate from display labels. Resolution requires the current internal library,
+a unique same-identity row and identical bound metadata. The current row supplies
+any abstract needed for topic screening; no abstract/source body is copied into
+the queue. Missing, duplicated or changed indexed records require rebuilding and
+revalidating the issue. Revoked/changed acceptance still fails afterward.
+
+**Commentary publication remains blocked on typed display support.** The backend
+exports all five argument lenses in `reading.digest.longform`, with genre,
+attribution, truthful main-argument scope and no methods/results. Current main's
+original-summary UI branch does not render those lenses correctly. Existing
+Node regression passes are not acceptance of this new commentary presentation.
+Do not populate real commentary receipts until a separately reviewed renderer
+change exposes these fields without empirical-study labels. No UI code is part
+of this backend change.
+
+Commentary additionally requires `commentary.temporal` with exact
+`original_published` (matching indexed publication date), `reported_modified`
+(a verified date or null for unknown), `checked_on` (matching source-check date),
+and `historical_snapshot_verified: false`. Known modification must not precede
+publication or follow the source check. Dates and unknowns are projected in a
+prominent `temporal_notice`, alongside `quality_note` and “limited reading”
+framing. A known modification after the weekly window withholds that current
+version from that week's shelf; library inclusion remains possible with the
+caveat. Same-week modifications remain eligible. Modified/check dates never
+replace original publication dates. Queue reconstruction restores temporal
+metadata from the current accepted receipt, so dropping displayed dates cannot
+bypass the weekly gate. An unknown modification date remains explicitly unknown,
+not an inferred unchanged original-week snapshot.
+
+Normal synthesis, RSS and current public-cache revalidation also require the unique
+current library row for extended receipts. The cached context must match current
+metadata, and the accepted receipt is checked against current topical evidence.
+Missing, duplicate or changed indexed records are quarantined as citation-only;
+stale cached abstract/digest prose cannot fall back into synthesis or RSS.

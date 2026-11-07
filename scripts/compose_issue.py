@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+from checked_reading_types import is_preprint
 from build_issue import source_id
 from original_readings import public_record
 from collection_window import previous_week, weekly_eligible, window_metadata
@@ -41,20 +42,26 @@ def evidence(items):
         # Authored digests can add a concise account; titles and generic research
         # questions cannot qualify as evidence for a finding.
         fields.update({k: digest.get(k, '') for k in ('finding', 'approach', 'explain', 'limitation')})
-        if digest.get('longform', {}).get('source_depth') == 'read_article':
-            fields.update({k: digest['longform'].get(k, '') for k in ('thesis', 'reasoning', 'qualification')})
+        if (digest.get('longform', {}).get('source_depth') == 'read_article'
+                or (reading.get('original_summary') and digest.get('longform', {}).get('source_depth') == 'main_argument_html')):
+            fields.update({k: digest['longform'].get(k, '') for k in ('thesis', 'reasoning', 'examples', 'tension', 'qualification')})
         # Budget each field separately: a long Results section must never push
         # Methods or Limitations out of the model's evidence packet.
         budgets = {'findings':700, 'methods':450, 'interpretation':450, 'limitations':650,
                    'finding':350, 'approach':300, 'explain':400, 'limitation':400,
-                   'thesis':400, 'reasoning':550, 'qualification':500}
+                   'thesis':1500, 'reasoning':1500, 'examples':1500, 'tension':1500, 'qualification':2200}
         text = '\n'.join(f'{k}: {str(v)[:budgets[k]]}' for k, v in fields.items() if v)
         if len(text.split()) < 35:
             continue
         packet.append({'key': f'S{len(packet)+1}', 'id': source_id(item), 'title': item['title'],
                        'kind': item.get('kind'), 'level': reading.get('level'), 'published': item.get('published'),
                        'research_type': reading.get('research_type', ''),
+                       'preprint': is_preprint(item, (item.get('original_reading') or {}).get('source') or {}),
                        'editorial_role': item.get('editorial_role', 'collection_week'),
+                       **({'genre': item['original_reading']['commentary']['genre'],
+                           'attributed_to': item['original_reading']['commentary']['attributed_to'],
+                           'evidence_kind': 'attributed_argument_not_empirical_results'}
+                          if reading.get('original_summary') and item.get('kind') == 'nonacademic' else {}),
                        **({'source_url': reading['source_url'], 'source_version': reading['source_version'],
                            'source_doi': reading['source_doi'], 'related_journal_doi': reading['related_journal_doi'],
                            'review_kind': reading['review_kind'], 'review_scope': reading['review_scope'],
@@ -125,8 +132,7 @@ def validate(draft, packet):
         keys = {a.get('key') for a in anchors}
         if len(keys) < 2 or not keys <= lookup.keys():
             raise ValueError('Each theme must cite at least two eligible sources')
-        if section in signals:
-            qualify_section(section, [lookup[k] for k in keys])
+        qualify_section(section, [lookup[k] for k in keys])
         for anchor in anchors:
             phrase = normalize(anchor.get('quote', ''))
             if len(phrase.split()) < 5 or phrase not in normalize(lookup[anchor['key']]['evidence']):
@@ -163,7 +169,7 @@ findings, author interpretation, conceptual proposals and commentary. Label abst
 evidence when used. This collection contains only sources originally published in the previous completed UTC week.
 Do not introduce older sources or confuse first-indexed dates with original publication dates. Separate assisted performance, independent learning and sustained
 attention; do not infer one from another. Never invent consensus, mechanisms, effect sizes,
-causality, or long-term outcomes. Mention substantive design and evidence limitations.
+causality, or long-term outcomes. Mention substantive design and evidence limitations. For every preprint comparison explicitly say "preprint", "not peer reviewed", and "does not establish causality"; do not claim peer review or strong causal evidence.
 Write accessible, specific prose: an opening argument, three themes of 90–140 words
 each, a tension of 80–120 words, and a closing research question. No raw HTML or Markdown.
 Avoid numeric claims in the headline, deck, letter and closer. Return only JSON:
@@ -179,7 +185,16 @@ Use 500–850 words overall. Source packet:\n''' + json.dumps(packet, ensure_asc
 
 
 def qualify_section(section, sources):
-    text = section.get('text', '').lower()
+    text = (section.get('title', '') + ' ' + section.get('text', '')).lower()
+    if any(p.get('preprint') for p in sources):
+        if 'preprint' not in text or not re.search(r'not (?:yet )?peer[- ]reviewed', text):
+            raise ValueError('Explicitly identify the preprint as not peer reviewed')
+        if not re.search(r'(?:does? not|cannot) establish (?:strong )?causal(?:ity| evidence| effects?)', text):
+            raise ValueError('Explicitly state that the preprint does not establish causality')
+        # Conservative lexical guard, not a claim of semantic fact checking.
+        positive = re.sub(r'not (?:yet )?peer[- ]reviewed|(?:does? not|cannot) establish (?:strong )?causal(?:ity| evidence| effects?)', '', text)
+        if re.search(r'peer[- ]reviewed|\bproves?\b|\bcauses?\b|establish(?:es)? caus|strong causal evidence', positive):
+            raise ValueError('Preprint comparison contains an unsupported peer-review or causal claim')
     if any(p.get('level') == 'abstract' for p in sources) and 'abstract' not in text:
         raise ValueError('Explicitly label the abstract-only source and limit claims to its abstract')
     if any(p.get('kind') == 'nonacademic' for p in sources) and not re.search(r'\b(commentary|essay|opinion)\b', text):
@@ -261,7 +276,7 @@ attached to that source. Do not claim an attention study tested AI unless it did
 Discussion is author interpretation, not measured results. Use the word "abstract" to explicitly label abstract-only evidence.
 Identify nonacademic material as an "essay" or "commentary", never a study or experiment. Attribute its proposals to the author.
 Distinguish assisted performance, independent learning and sustained attention. No broad
-causal or long-term claims. Paraphrase; do not copy long passages. No numeric claims needed.
+causal or long-term claims. For preprints explicitly say "preprint", "not peer reviewed", and "does not establish causality". Paraphrase; do not copy long passages. No numeric claims needed.
 Return an object with "text" containing your COMPLETE original paragraph and "evidence" containing two objects. Each evidence object needs "key" (the actual source key) and "quote" (an exact 5–12 word excerpt from THAT source, never from your paragraph or the other source). Do not output placeholders.
 Theme: '''+theme['title']+'\nSources:\n'+json.dumps(pair,ensure_ascii=False),check_section,1100)
         signals.append({**theme,**section})

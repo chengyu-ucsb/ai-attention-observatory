@@ -69,6 +69,8 @@ def build():
   label="Conceptual framework" if x.get("research_type")=="conceptual_framework" else "Research finding" if digest.get("finding") else ("Research question" if kind=="scholarly" else "Perspective")
   if read.get("original_summary"):
    label="AI source-checked summary (not human review; "+read["source_version"]+")"
+   if (x.get("original_reading") or {}).get("article_screen"):
+    label+=". "+read.get("notice","")
   stable=x.get("doi") or x.get("url") or x.get("title")
   if not stable:continue
   permalink=BASE+"#paper/"+urllib.parse.quote(str(stable),safe="")

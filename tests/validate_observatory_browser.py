@@ -1,4 +1,4 @@
-"""Full-application visual browsing checks. Use real public payloads, never mock findings.
+"""Full-application browsing checks plus explicitly synthetic typed-receipt regressions.
 
 Playwright browser builds are not a substitute for device/screen-reader testing.
 """
@@ -133,6 +133,137 @@ def check(page, url, width, out):
     assert page.locator('.library-story').count() > 0
     assert not errors, errors
 
+def typed_reading_payloads():
+    """Build only synthetic receipts through the production publication boundary."""
+    import sys
+    from copy import deepcopy
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    sys.path.insert(0, str(ROOT / 'tests'))
+    from test_checked_reading_types import commentary
+    from test_original_readings import record, accepted, approve, article_screen
+    from original_readings import public_record
+    from condense_readings import annotate
+    from build_public import readable
+    from build_issue import checked_source_metadata
+
+    row, receipt = commentary()
+    receipt['commentary']['temporal'].update(reported_modified='2026-11-05', checked_on='2026-11-07')
+    receipt['review']['checked_on'] = '2026-11-07'
+    approve(receipt)
+    row['original_reading'] = receipt
+    checked = public_record(annotate(row))
+    assert readable(checked)
+    # These are intentionally stale indexed visuals, not newly approved evidence.
+    checked['visual'] = {'kind': 'evidence_snapshot', 'basis': 'full_text',
+                         'blocks': [{'label': 'Old graphic', 'text': 'Stale visual sentinel'}]}
+    rejected = []
+    for mode in ('revoked', 'stale'):
+        candidate = deepcopy(row)
+        note = candidate['original_reading']
+        if mode == 'revoked':
+            note['publication']['decision'] = 'revoked'
+        else:
+            note['summary']['thesis'] = 'Changed synthetic thesis without a new receipt.'
+        projected = public_record(annotate(candidate))
+        assert not projected['reading'].get('original_summary')
+        assert not readable(projected), mode
+        rejected.append(projected)
+
+    preprint = record()
+    preprint.update(venue='arXiv', title='Synthetic screened preprint about generative AI and attention',
+                    url='https://example.org/synthetic-preprint', doi='10.9999/synthetic-preprint')
+    note = accepted()
+    note.update(title=preprint['title'], record_url=preprint['url'], doi=preprint['doi'])
+    note['source'].update(version='preprint_v1', source_doi=preprint['doi'],
+                          url='https://example.org/synthetic-preprint-v1.pdf')
+    article_screen(note, preprint)
+    approve(note)
+    preprint['original_reading'] = note
+    preprint = public_record(annotate(preprint))
+    assert readable(preprint) and preprint['reading'].get('original_summary')
+    assert 'not verified peer-reviewed evidence' in preprint['reading']['notice']
+    library = [x for x in [checked, preprint, *rejected] if readable(x)]
+    assert len(library) == 2
+    for item in library:
+        item['source_group'] = 'AI-specific'
+    shelf = [{'id': x.get('doi') or x['url'], 'title': x['title'], 'url': x['url'],
+              'venue': x['venue'], **checked_source_metadata(x)} for x in library]
+    return library, {'status': 'awaiting_publication', 'sources': shelf}, rejected
+
+
+def check_typed_readings(page, url, width, out):
+    """Real DOM/navigation coverage, isolated from the live original register."""
+    import json
+    library, issue, rejected = typed_reading_payloads()
+    commentary, preprint = library
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.set_viewport_size({'width': width, 'height': 900})
+    payloads = {'public-library.json': library, 'public-weekly.json': {'run': {}, 'items': []},
+                'runs.json': [], 'fulltext-backfill-state.json': {},
+                'public-featured-issue.json': issue, 'public-pending-sources.json': []}
+    # Fulfill only app JSON requests; HTML, CSS, JS and local artwork are real.
+    def fulfill(route):
+        name = route.request.url.split('/')[-1].split('?')[0]
+        if name in payloads:
+            route.fulfill(status=200, content_type='application/json', body=json.dumps(payloads[name]))
+        else:
+            route.continue_()
+    page.route('**/data/*.json*', fulfill)
+    page.goto(url + '#library', wait_until='networkidle')
+    expect(page.locator('.library-story')).to_have_count(2)
+    card = page.locator('.library-story').filter(has_text=commentary['reading']['digest']['idea'])
+    temporal = commentary['reading']['temporal_notice']
+    for value in (temporal, 'policy analysis', 'Synthetic policy author', 'not human review'):
+        expect(card).to_contain_text(value)
+    expect(card.get_by_text(temporal, exact=False).last).to_be_visible()
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed card overflow at {width}px'
+    card.locator('h3 button').click()
+    expect(page.locator('#paper')).to_be_visible()
+    expect(page.locator('.rv-head')).to_contain_text(temporal)
+    expect(page.locator('.rv-head .rv-reading-notice')).to_be_visible()
+    for key in ('thesis', 'reasoning', 'examples', 'tension', 'qualification'):
+        expect(page.locator('#paper-content')).to_contain_text(commentary['reading']['digest']['longform'][key])
+    for forbidden in ('How it was studied', 'Study approach', 'Reported finding', 'REPORTED FINDING', 'Stale visual sentinel'):
+        expect(page.locator('#paper-content')).not_to_contain_text(forbidden)
+    expect(page.locator('.automatic-evidence, .rv-original-figure, .rv-context-grid')).to_have_count(0)
+    expect(page.locator('.rv-primary-link')).to_have_attribute('href', commentary['reading']['source_url'])
+    evidence = page.locator('.rv-evidence')
+    expect(evidence).not_to_have_attribute('open', '')
+    evidence.locator('summary').click()
+    expect(evidence.locator('.rv-source-locator')).to_have_count(5)
+    expect(evidence.locator('.rv-source-locator').first).to_be_visible()
+    expect(evidence).to_contain_text('extracted block 1')
+    evidence.locator('summary').click()
+    expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
+    evidence.locator('summary').click()
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed reading overflow at {width}px'
+    if out:
+        out.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(out / f'observatory-{width}-synthetic-commentary.png'), full_page=True)
+    page.locator('.rv-back').click()
+    expect(page.locator('#library')).to_be_visible()
+    page.locator('.library-story').filter(has_text=preprint['title']).locator('h3 button').click()
+    expect(page.locator('#paper-content')).to_contain_text('Limited reading.')
+    expect(page.locator('#paper-content')).to_contain_text('not verified peer-reviewed evidence')
+    expect(page.locator('#paper-content')).to_contain_text('How it was studied')
+    expect(page.locator('.rv-primary-link')).to_have_attribute('href', preprint['reading']['source_url'])
+    page.locator('.rv-evidence summary').click()
+    expect(page.locator('.rv-evidence')).to_contain_text('page 2')
+    expect(page.locator('.rv-evidence')).not_to_contain_text('extracted block')
+    page.goto(url + '#issue', wait_until='networkidle')
+    page.locator('.issue-reading-shelf > details > summary').click()
+    shelf = page.locator('.issue-shelf-item').first
+    expect(shelf).to_contain_text(temporal)
+    expect(shelf).to_contain_text('Synthetic policy author')
+    shelf.locator('.rv-evidence summary').click()
+    expect(shelf.locator('.rv-source-locator').first).to_be_visible()
+    expect(shelf).to_contain_text('extracted block 1')
+    expect(page.locator('.issue-shelf-item').nth(1)).to_contain_text('not verified peer-reviewed evidence')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed shelf overflow at {width}px'
+    assert not errors, errors
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
@@ -144,6 +275,7 @@ if __name__ == '__main__':
             context = browser.new_context(reduced_motion='reduce')
             try:
                 check(context.new_page(), url, width, args.screenshots)
+                check_typed_readings(context.new_page(), url, width, args.screenshots)
             finally:
                 context.close()
         print(f'Observatory browsing passed in {args.browser}: 1280, 768, 390, 320px; theme navigation, filters, dates, reading pages and all routes.')

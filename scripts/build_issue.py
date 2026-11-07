@@ -6,7 +6,8 @@ The issue includes citations to the exact source records and a complete source s
 """
 from __future__ import annotations
 import json,datetime,pathlib,re
-from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for
+from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for, identifier
+from checked_reading_types import record_context, RECORD_FIELDS
 from collection_window import window_metadata,previous_week,weekly_eligible
 ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
 def source_id(x):return x.get("id") or (x.get("doi") or "").lower() or x.get("url") or x.get("title")
@@ -18,9 +19,12 @@ def checked_source_metadata(item):
  reading=item.get("reading") or {}
  source=reading if reading.get("original_summary") else item
  if not source.get("original_summary"):return {}
- return {"original_summary":True,**{key:source.get(key,"") for key in (
+ return {"original_summary":True,
+ **({"original_record_context":record_context(item)} if (item.get("original_reading") or {}).get("article_screen")
+    else {"original_record_context":item["original_record_context"]} if item.get("original_record_context") else {}),**{key:source.get(key,"") for key in (
   "source_url","source_version","source_format","source_doi","related_journal_doi",
-  "review_kind","review_scope")},"review_label":source.get("notice") or source.get("review_label",""),
+  "review_kind","review_scope","quality_note","temporal","temporal_notice",
+  "genre","attributed_to","evidence","research_type")},"review_label":source.get("notice") or source.get("review_label",""),
  "original_reading_sha256":publication_digest(item["original_reading"]) if item.get("original_reading") else item.get("original_reading_sha256","")}
 
 def resolve_queued_original(item):
@@ -31,8 +35,31 @@ def resolve_queued_original(item):
  ident=str(item.get("id") or "")
  record={**item,"doi":ident if ident.lower().startswith("10.") else "",
          "url":item.get("url") or ident}
+ context=item.get("original_record_context")
+ if context is not None:
+  if not isinstance(context,dict) or set(context)!=set(RECORD_FIELDS):
+   raise ValueError("Queued original record context is invalid; revalidate the issue")
+  for key in ("title","kind","url","venue","published","publication_date_provenance"):
+   if item.get(key)!=context.get(key):
+    raise ValueError("Queued original record context changed; revalidate the issue")
+  if identifier(context)!=(ident.lower() if ident.lower().startswith("10.") else ident):
+   raise ValueError("Queued original identity changed; revalidate the issue")
+  record.update(context)
+  # Topic screening may depend on the current abstract, which must not be
+  # copied into the public queue merely to reconstruct a display record.
+  library_path=DATA/"library.json"
+  if not library_path.exists():
+   raise ValueError("Current index unavailable; rebuild and revalidate the issue")
+  if library_path.exists():
+   library=json.loads(library_path.read_text())
+   candidates=[r for r in library if identifier(r)==identifier(record)]
+   if len(candidates)!=1 or record_context(candidates[0])!=context:
+    raise ValueError("Current indexed record changed; rebuild and revalidate the issue")
+   record.update(candidates[0])
  apply_original_readings([record])
  note=record.get("original_reading")
+ if note and note.get("article_screen") and context is None:
+  raise ValueError("Queued original record context is missing; rebuild and revalidate the issue")
  if not note or publication_digest(note) != item.get("original_reading_sha256"):
   raise ValueError("Queued original reading is no longer current; revalidate the issue before publication")
  record["reading"]=note_for(record)

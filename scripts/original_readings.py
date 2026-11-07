@@ -14,6 +14,8 @@ import json
 from pathlib import Path
 import re
 from urllib.parse import urlsplit
+from checked_reading_types import (COMMENTARY_FIELDS, COMMENTARY_NOTICE, PREPRINT_NOTICE,
+                                   is_preprint, valid_extension, temporal_notice, record_context)
 
 MANIFEST = Path(__file__).resolve().parents[1] / 'data/original-readings.json'
 FIELDS = ('idea', 'explain', 'approach', 'finding', 'interpretation', 'limitation')
@@ -73,8 +75,11 @@ def publication_digest(note):
 def eligible(note, record):
     """Fail closed: a source check is neither a quality decision nor approval."""
     try:
-        if not isinstance(note, dict) or record.get('kind') != 'scholarly': return False
-        if set(note) != {'id', 'doi', 'record_url', 'title', 'author', 'source', 'summary', 'evidence', 'rights', 'quality', 'review', 'publication'}: return False
+        if not isinstance(note, dict) or record.get('kind') not in ('scholarly', 'nonacademic'): return False
+        commentary = record['kind'] == 'nonacademic'
+        extended = commentary or is_preprint(record, note.get('source') or {})
+        extra = ({'article_screen', 'commentary'} if commentary else {'article_screen'}) if extended else set()
+        if set(note) - extra != {'id', 'doi', 'record_url', 'title', 'author', 'source', 'summary', 'evidence', 'rights', 'quality', 'review', 'publication'}: return False
         if not text(note['id'], 100) or not text(note['author'], 100): return False
         if not isinstance(note['doi'], str) or not safe_url(note['record_url']): return False
         if note['doi'] and not re.fullmatch(r'10\.\d{4,9}/\S+', note['doi'], re.I): return False
@@ -97,18 +102,22 @@ def eligible(note, record):
                 return False
         if urlsplit(source['url']).hostname in ('arxiv.org', 'www.arxiv.org', 'export.arxiv.org'):
             if not re.fullmatch(r'/(?:abs|pdf|html)/\d{4}\.\d{4,5}v[1-9]\d*(?:\.pdf)?/?', urlsplit(source['url']).path): return False
+        if extended and not valid_extension(note, record): return False
+        fields = COMMENTARY_FIELDS if commentary else FIELDS
         summary = note['summary']
-        if not isinstance(summary, dict) or set(summary) != set(FIELDS): return False
-        if any(not text(summary[k]) for k in FIELDS if k != 'finding'): return False
-        if record.get('research_type') == 'conceptual_framework' and summary['finding'] != '': return False
-        if not text(summary['finding']) and not (summary['finding'] == '' and record.get('research_type') == 'conceptual_framework'): return False
-        if sum(len(summary[k].split()) for k in FIELDS) > 220: return False
+        if not isinstance(summary, dict) or set(summary) != set(fields): return False
+        if any(not text(summary[k]) for k in fields if k != 'finding'): return False
+        if not commentary and record.get('research_type') == 'conceptual_framework' and summary['finding'] != '': return False
+        if not commentary and not text(summary['finding']) and not (summary['finding'] == '' and record.get('research_type') == 'conceptual_framework'): return False
+        if commentary and any(len(summary[k].split()) < 8 for k in fields): return False
+        if sum(len(summary[k].split()) for k in fields) > (320 if commentary else 220): return False
         evidence = note['evidence']
-        if not isinstance(evidence, dict) or set(evidence) != set(FIELDS): return False
+        if not isinstance(evidence, dict) or set(evidence) != set(fields): return False
         for locations in evidence.values():
             if not isinstance(locations, list) or not 1 <= len(locations) <= 8: return False
             for loc in locations:
                 if not isinstance(loc, dict) or not set(loc) <= {'section', 'page', 'paragraph'} or not text(loc.get('section'), 180): return False
+                if commentary and 'paragraph' not in loc: return False
                 for key in ('page', 'paragraph'):
                     if key in loc and (type(loc[key]) is not int or not 1 <= loc[key] <= 100000): return False
         rights = note['rights']
@@ -178,12 +187,17 @@ def apply(rows, manifest=None):
     grouped = {}
     for note in notes:
         if isinstance(note, dict): grouped.setdefault(identifier(note), []).append(note)
+    id_counts = {}
+    for note in notes:
+        if isinstance(note, dict):
+            key = str(note.get('id'))
+            id_counts[key] = id_counts.get(key, 0) + 1
     count = 0
     for row in rows:
         had = 'original_reading' in row or (row.get('reading') or {}).get('original_summary')
         row.pop('original_reading', None)
         matches = grouped.get(identifier(row), [])
-        if len(matches) == 1 and eligible(matches[0], row):
+        if len(matches) == 1 and id_counts.get(str(matches[0].get('id'))) == 1 and eligible(matches[0], row):
             row['original_reading'] = deepcopy(matches[0]); count += 1; had = True
         if had:
             # Clear previously projected prose so rejection cannot leave a stale digest.
@@ -195,12 +209,17 @@ def note_for(record):
     original = record.get('original_reading')
     if not eligible(original, record): return None
     s = original['summary']; source = original['source']
+    if record['kind'] == 'nonacademic': return commentary_note(original)
+    qualifier = 'Limited reading. ' + PREPRINT_NOTICE if is_preprint(record, source) else ''
+    s = deepcopy(s)
+    if qualifier: s['limitation'] = qualifier + ' ' + s['limitation']
     return {
         'level': 'full_text', 'original_summary': True, 'original_summary_id': original['id'],
-        'provenance': BASIS, 'notice': BASIS + ' Source version: ' + source['version'] + '.',
+        'provenance': BASIS, 'notice': BASIS + ' ' + qualifier + ' Source version: ' + source['version'] + '.',
         'overview': s['explain'], 'methods': s['approach'], 'findings': s['finding'],
         'interpretation': s['interpretation'], 'limitations': s['limitation'],
         'sample': '', 'reported_findings': bool(s['finding']),
+        'quality_note': original['quality']['note'],
         'research_type': record.get('research_type') or 'unclassified',
         'section_coverage': [], 'extraction_depth': 'original_summary_not_machine_extraction',
         'source_url': source['url'], 'source_version': source['version'], 'source_format': source['format'],
@@ -214,12 +233,44 @@ def note_for(record):
     }
 
 
+def current_index_record(snapshot):
+    """Resolve a unique current row without copying source bodies to a queue."""
+    try:
+        rows = json.loads(MANIFEST.with_name('library.json').read_text(encoding='utf-8'))
+        if not isinstance(rows, list): return None
+        matches = [row for row in rows if isinstance(row, dict) and identifier(row) == identifier(snapshot)]
+        if len(matches) != 1 or record_context(matches[0]) != record_context(snapshot): return None
+        return deepcopy(matches[0])
+    except (OSError, ValueError, TypeError):
+        return None
+
+
 def public_record(record, *, require_current=False):
     """Revalidate cached snapshots and strip nonaccepted private candidate data."""
     result = deepcopy(record)
     had_original = 'original_reading' in result or (result.get('reading') or {}).get('original_summary') or ((result.get('reading') or {}).get('digest') or {}).get('status') == STATUS
     if require_current:
+        cached_reading = result.get('reading') or {}
+        extended = bool((result.get('original_reading') or {}).get('article_screen'))
+        if had_original and (result.get('kind') == 'nonacademic' or is_preprint(result, {
+                'version': cached_reading.get('source_version', ''),
+                'url': cached_reading.get('source_url', ''),
+                'source_doi': cached_reading.get('source_doi', '')})):
+            extended = True
         apply([result])
+        extended = extended or bool((result.get('original_reading') or {}).get('article_screen'))
+        if extended:
+            # A cached public row is never the current index. Recheck both its
+            # bound metadata and current topical evidence before using prose.
+            current = current_index_record(result)
+            note = result.get('original_reading')
+            if current is None or not eligible(note, current):
+                result.pop('original_reading', None)
+                result['reading'] = {'level': 'citation_only', 'overview': '',
+                                     'notice': 'Current source record or acceptance requires revalidation.'}
+                return result
+            result = current
+            apply([result])
     if (had_original or 'original_reading' in result or (result.get('reading') or {}).get('original_summary')
             or ((result.get('reading') or {}).get('digest') or {}).get('status') == STATUS):
         if not eligible(result.get('original_reading'), result): result.pop('original_reading', None)
@@ -227,3 +278,29 @@ def public_record(record, *, require_current=False):
         from build_readings import make_note
         result['reading'] = make_note(result)
     return result
+
+
+def commentary_note(original):
+    """No invented study methods/results and no machine/full-text claim."""
+    s = deepcopy(original['summary']); source = original['source']; c = original['commentary']
+    time_notice = temporal_notice(c['temporal'])
+    label = time_notice + ' ' + BASIS + ' ' + COMMENTARY_NOTICE + ' Attributed to: ' + c['attributed_to'] + ' (' + c['genre'] + ').'
+    qualification = time_notice + ' ' + COMMENTARY_NOTICE + ' ' + s['qualification']
+    return {'level': 'curated', 'original_summary': True, 'original_summary_id': original['id'],
+            'provenance': label, 'notice': label, 'overview': s['thesis'],
+            'genre': c['genre'], 'attributed_to': c['attributed_to'],
+            'quality_note': original['quality']['note'], 'temporal': deepcopy(c['temporal']),
+            'temporal_notice': time_notice,
+            'methods': '', 'findings': '', 'interpretation': s['reasoning'],
+            'limitations': qualification, 'sample': '', 'reported_findings': False,
+            'research_type': 'attributed_commentary', 'section_coverage': [],
+            'extraction_depth': 'original_summary_not_machine_extraction',
+            'source_url': source['url'], 'source_version': source['version'],
+            'source_format': source['format'], 'source_doi': '', 'related_journal_doi': '',
+            'review_kind': 'ai_source_check', 'review_scope': source['review_scope'],
+            'source_sha256': source['source_sha256'], 'evidence': deepcopy(original['evidence']),
+            'digest': {'idea': s['thesis'], 'explain': s['thesis'], 'approach': '', 'finding': '',
+                       'interpretation': s['reasoning'], 'limitation': qualification,
+                       'status': STATUS, 'basis': label, 'finding_source': 'none', 'tags': [],
+                       'longform': {**s, 'qualification': qualification, 'basis': label,
+                                    'source_depth': 'main_argument_html', **deepcopy(c)}}}

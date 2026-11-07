@@ -689,17 +689,18 @@ class WeeklyQueueTests(unittest.TestCase):
         from itertools import permutations
         hosts = ['www.eff.org', 'www.niemanlab.org', 'www.econstor.eu',
                  'www.ainowinstitute.org', 'www.themarkup.org', 'www.nngroup.com', 'techpolicy.press']
-        nested, first, second = next((q, p, r) for q, p, r in permutations(hosts, 3)
-            if list({'host:' + p, 'host:' + q})[-1] == 'host:' + q
-            and list({'host:' + r, 'host:' + q})[-1] == 'host:' + q)
-        fetch = Mock(return_value={'diagnostics': [{'stage': 'article', 'status': 'article_http_429',
-            'failure_url': f'https://{nested}/shared.pdf', 'retryable': True, 'retry_after_seconds': 600}]})
-        state = run(weekly(item(1, url=f'https://{first}/one'),
-                           item(2, url=f'https://{second}/two')), attempt=fetch)
-        self.assertEqual(fetch.call_count, 2)
-        self.assertEqual(state['run']['attempted_records'], 2)
-        self.assertEqual(state['run']['attempted_stages'], 2)
-        queue.validate_state(state)
+        # Exercise every ordering instead of requiring a hash-seed-dependent
+        # set traversal to end on the shared host. Keep fixture selection deterministic.
+        for nested, first, second in permutations(hosts, 3):
+            with self.subTest(nested=nested, first=first, second=second):
+                fetch = Mock(return_value={'diagnostics': [{'stage': 'article', 'status': 'article_http_429',
+                    'failure_url': f'https://{nested}/shared.pdf', 'retryable': True, 'retry_after_seconds': 600}]})
+                state = run(weekly(item(1, url=f'https://{first}/one'),
+                                   item(2, url=f'https://{second}/two')), attempt=fetch)
+                self.assertEqual(fetch.call_count, 2)
+                self.assertEqual(state['run']['attempted_records'], 2)
+                self.assertEqual(state['run']['attempted_stages'], 2)
+                queue.validate_state(state)
 
     def test_nested_pdf_host_cooldown_is_deferred_without_new_http_response(self):
         record = item(url='https://www.eff.org/article')

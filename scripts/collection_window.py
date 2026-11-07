@@ -74,6 +74,9 @@ def weekly_eligible(record, start, end):
             or record.get('original_summary') or record.get('original_reading_sha256')):
         from original_readings import weekly_source_eligible
         if not weekly_source_eligible(record):return False
+        temporal = ((record.get('original_reading') or {}).get('commentary') or {}).get('temporal') or {}
+        modified = publication_date(temporal.get('reported_modified'))
+        if modified is not None and modified > end:return False
     return (date_in_window(day,start,end) and not record.get("historical_backfill")
             and not str(record.get("discovery_scope", "")).startswith("historical:"))
 

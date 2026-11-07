@@ -12,6 +12,16 @@ function id(x){return String(x.doi||x.url||x.title)}
 function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.pending.find(x=>id(x)===k);return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
 function depth(x){return x.reading?.level||"citation_only"}
 function originalSummary(x){return x.reading?.original_summary===true}
+function originalCommentary(reading){return reading?.original_summary===true&&reading.research_type==="attributed_commentary"}
+function checkedReadingContext(reading,cls="source-meta"){
+ const box=make("div",cls),deep=reading.digest?.longform||{};
+ if(originalCommentary(reading))box.append(make("p","","Attributed commentary · "+(reading.genre||deep.genre||"commentary").replace(/_/g," ")+((reading.attributed_to||deep.attributed_to)?" · "+(reading.attributed_to||deep.attributed_to):"")));
+ box.append(make("p","",reading.notice||reading.review_label||"AI source-check · not human review or independent replication"));
+ if(reading.review_scope)box.append(make("p","","AI source-check scope: "+reading.review_scope));
+ if(reading.quality_note)box.append(make("p","","Article quality screening: "+reading.quality_note));
+ if(reading.temporal_notice&&!String(reading.notice||"").includes(reading.temporal_notice))box.append(make("p","",reading.temporal_notice));
+ return box;
+}
 function depthName(x){if(originalSummary(x))return "Original summary · AI source-check";if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":x.analysis?.original_paraphrases_only?"Reviewed full article":"Full-text sections","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 
@@ -112,7 +122,7 @@ function shortIdea(x,limit=105){
 function ideaInfo(x){
  const r=x.reading||{},d=r.digest||{},notes=x.editorial_notes||{};
  let value="",label="";
- if(originalSummary(x))return {text:d.idea||d.finding||"",label:x.research_type==="conceptual_framework"?"ORIGINAL SUMMARY / AI SOURCE-CHECK / CONCEPTUAL PROPOSAL":"ORIGINAL SUMMARY / AI SOURCE-CHECK"};
+ if(originalSummary(x))return {text:d.idea||d.finding||"",label:originalCommentary(r)?"ORIGINAL COMMENTARY / AI SOURCE-CHECK / ATTRIBUTED ARGUMENT":x.research_type==="conceptual_framework"?"ORIGINAL SUMMARY / AI SOURCE-CHECK / CONCEPTUAL PROPOSAL":"ORIGINAL SUMMARY / AI SOURCE-CHECK"};
  if(x.research_type==="conceptual_framework"){
   value=d.idea||r.overview||"";
   label="CONCEPTUAL FRAMEWORK / NOT AN EMPIRICAL FINDING";
@@ -166,7 +176,7 @@ function featureCoverage(x){
  for(let i=0;i<3;i++){const mark=make("span","feature-evidence-mark"+(i<active?" covered":""));mark.title=tiers[i];track.append(mark)}
  add(row,make("span","", "AVAILABLE MATERIAL"),make("span","",depthName(x)));
  add(area,row,track);
- if(originalSummary(x))area.append(make("p","source-meta","Checked source: "+checkedSourceLabel(x.reading)));
+ if(originalSummary(x))add(area,make("p","source-meta","Checked source: "+checkedSourceLabel(x.reading)),checkedReadingContext(x.reading));
  return area;
 }
 
@@ -267,7 +277,7 @@ function issueSourceShelfItem(src,index){
   // Use the edition's source snapshot, not the current library reading: a
   // later accepted version must not relabel an earlier working-paper source.
   add(content,make("p","issue-source-version","Checked source: "+checkedSourceLabel(src)),
-   make("p","issue-source-review-label",src.review_label||"AI source-check · not human review or independent replication"));
+   checkedReadingContext(src,"issue-source-review-label"));
   const sourceUrl=httpsSourceUrl(src.source_url),links=make("div","issue-source-links");
   if(sourceUrl)links.append(add(make("p"),link("Read checked source: "+checkedSourceLabel(src)+" ↗",sourceUrl,"issue-source-checked-link")));
   const related=src.related_journal_doi&&src.related_journal_doi!==src.source_doi;
@@ -280,6 +290,7 @@ function issueSourceShelfItem(src,index){
   if(src.source_doi)scope.append(make("p","","Checked source DOI: "+src.source_doi));
   if(related)scope.append(make("p","","Related journal DOI (not checked here): "+src.related_journal_doi));
   if(scope.children.length)content.append(add(review,make("summary","","AI source-check scope and identifiers"),scope));
+  const evidence=originalEvidence(src);if(evidence)content.append(evidence);
  }
  return add(item,make("span","issue-shelf-number",String(index+1).padStart(2,"0")),content);
 }
@@ -382,7 +393,7 @@ function showLibrary(){
   h.append(btn(shortIdea(x,115),()=>goto("paper",id(x))));
   add(foot,make("span","card-source-meta",(x.venue||"Original source")+" · Published "+date(x.published)),make("span","card-added",x.first_seen?"Added "+date(x.first_seen):"Added date not recorded"),make("span","card-depth",depthName(x)));
   if(/^(Earlier|Historical)/.test(x.source_group||""))foot.append(make("span","", "Earlier foundation"));
-  if(originalSummary(x))foot.append(make("span","card-source-version","Checked source: "+checkedSourceLabel(x.reading)));
+  if(originalSummary(x))add(foot,make("span","card-source-version","Checked source: "+checkedSourceLabel(x.reading)),checkedReadingContext(x.reading));
   add(body,make("span","card-type",ideaInfo(x).label),h,originalSummary(x)?make("p","card-summary",cut(x.reading.digest?.explain,260)):null,make("p","library-citation",readableSourceTitle(x)),foot);
   c.setAttribute("data-theme",String(Math.max(0,themes.findIndex(theme=>theme[0]===x.lane))));
   add(c,image,body);box.append(c);
@@ -667,10 +678,11 @@ function httpsSourceUrl(value){
 }
 function doiUrl(doi){return "https://doi.org/"+encodeURIComponent(doi).replace(/%2F/gi,"/")}
 function checkedSourceLabel(reading){
- return reading.source_version+(reading.source_format?" · "+reading.source_format.toUpperCase():"");
+ return (reading.source_version||"Source version not recorded")+(reading.source_format?" · "+reading.source_format.toUpperCase():"");
 }
 function originalEvidence(reading){
- const fields=[["idea","Main idea"],["explain","Explanation"],["approach","Study approach"],
+ const fields=originalCommentary(reading)?[["thesis","Attributed central argument"],["reasoning","How the argument develops"],
+  ["examples","Examples and distinctions"],["tension","The central tension"],["qualification","Qualifications"]]:[["idea","Main idea"],["explain","Explanation"],["approach","Study approach"],
   ["finding","Reported finding"],["interpretation","Interpretation"],["limitation","Limitations"]];
  const details=make("details","rv-drawer rv-evidence"),body=make("div","rv-drawer-body");
  for(const [key,label] of fields){
@@ -681,7 +693,7 @@ function originalEvidence(reading){
    if(!locator||typeof locator.section!=="string"||!locator.section.trim())continue;
    const parts=["Section: "+locator.section];
    if(Number.isInteger(locator.page)&&locator.page>0)parts.push("page "+locator.page);
-   if(Number.isInteger(locator.paragraph)&&locator.paragraph>0)parts.push("paragraph "+locator.paragraph);
+   if(Number.isInteger(locator.paragraph)&&locator.paragraph>0)parts.push((originalCommentary(reading)&&reading.source_format==="html"?"extracted block ":"paragraph ")+locator.paragraph);
    list.append(make("li","rv-source-locator",parts.join(" · ")));
   }
   if(list.children.length)body.append(add(make("section","rv-excerpt"),make("h3","",label),list));
@@ -710,6 +722,7 @@ function showPaper(x){
   page.append(note);root.append(page);return;
  }
  const r=x.reading||{},d=r.digest||{},original=originalSummary(x),editorial=d.status==="editorially_written_from_indexed_sections";
+ const commentary=originalCommentary(r);
  const scholarly=x.kind==="scholarly",hasFinding=Boolean(d.finding),conceptual=x.research_type==="conceptual_framework";
  const isQuestion=scholarly&&!hasFinding&&!editorial&&!original;
  // Unreviewed extracts are identifiable as source notes, not hand-written insight.
@@ -725,7 +738,10 @@ function showPaper(x){
  const title=make("h1","rv-headline",cut(original?headline:cleanLead(headline,readableSourceTitle(x)),230));
  const intro=(scholarly||original)&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title,intro,status);
- if(original)head.append(make("p","rv-source-version","Checked source: "+checkedSourceLabel(r)));
+ if(original){
+  head.append(make("p","rv-source-version","Checked source: "+checkedSourceLabel(r)));
+  if(r.temporal_notice)head.append(make("p","rv-reading-notice",r.temporal_notice));
+ }
  // Illustration is a small identifying thumbnail in the reading header, not a full-width pseudo-figure.
  head.append(editorialMedia(x,"reading"));
  main.append(back,head);
@@ -739,7 +755,7 @@ function showPaper(x){
  add(lead,make("span","rv-section-overline","01 / UNDER THE HOOD"),
   make("h2","rv-section-title",conceptual?"What the paper proposes":scholarly?"What the evidence actually says":"The argument in context"));
  body.append(lead);
- if(original){
+ if(original&&!commentary){
   // A conceptual summary can intentionally have no measured finding. Its
   // checked idea and interpretation must never fall through to legacy stages.
   if(hasFinding||conceptual){
@@ -752,7 +768,7 @@ function showPaper(x){
   const claim=make("div","rv-claim");
   add(claim,make("span","rv-mini-label","REPORTED FINDING"),make("p","",d.finding));
   body.append(claim);
- }else if(!scholarly){
+ }else if(commentary||!scholarly){
   const deep=d.longform||{},hasDepth=Boolean(deep.reasoning||deep.examples||deep.tension||deep.implications);
   const reading=make("div","rv-longform");
   function lens(label,value){
@@ -763,7 +779,7 @@ function showPaper(x){
   }
   // Publisher metadata alone cannot justify invented counterarguments or a
   // faux methods section. Only display fields supported by source analysis.
-  lens(deep.source_depth==="publisher_synopsis"?"From the publisher’s description":"The central argument",deep.thesis||r.overview);
+  lens(commentary?"The attributed central argument":deep.source_depth==="publisher_synopsis"?"From the publisher’s description":"The central argument",deep.thesis||(commentary?"":r.overview));
   lens("How the argument develops",deep.reasoning);
   lens("Concrete examples and distinctions",deep.examples);
   lens("The central tension",deep.tension);
@@ -809,8 +825,8 @@ function showPaper(x){
  add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),
    make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
  add(context,method,caveat);
- if((scholarly||original)&&!autoGraphic)body.append(context);
- if((original||(scholarly&&editorial))&&d.interpretation){
+ if(!commentary&&(scholarly||original)&&!autoGraphic)body.append(context);
+ if(!commentary&&(original||(scholarly&&editorial))&&d.interpretation){
   const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
     make("h2","rv-section-title",original?"Interpretation and implications":"Why this matters"),
@@ -854,7 +870,7 @@ function showPaper(x){
   "Inspect source text and abstract");
  const drawerBody=make("div","rv-drawer-body");
  let notes=0;
- const fields=original?[
+ const fields=commentary?[]:original?[
   ["Methods as indexed",indexed.methods],["Results as indexed",indexed.results],
   ["Discussion as indexed",indexed.discussion],["Limitations as indexed",indexed.limitations],
   ["Abstract",x.abstract_text]
@@ -896,7 +912,7 @@ function showPaper(x){
   add(cite,make("p","rv-source-version","Checked source: "+checkedSourceLabel(r)),
     make("p","rv-review-scope","AI source-check scope: "+(r.review_scope||d.review_scope||"Scope not recorded")),
     make("p","rv-review-basis",d.basis||"Original summary checked against the stated source by a separate AI pass; not human review or independent replication."));
-  if(r.notice)cite.append(make("p","rv-reading-notice",r.notice));
+  cite.append(checkedReadingContext(r,"rv-reading-notice"));
   const sourceUrl=httpsSourceUrl(r.source_url);
   if(sourceUrl)cite.append(link("Read checked source: "+checkedSourceLabel(r)+" ↗",sourceUrl,"rv-primary-link"));
   if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)

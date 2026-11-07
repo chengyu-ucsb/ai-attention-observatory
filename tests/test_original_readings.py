@@ -34,6 +34,18 @@ def record():
                         'discussion':'ORIGINAL MACHINE DISCUSSION','limitations':'ORIGINAL MACHINE LIMITATIONS'}}
 
 
+def article_screen(note, row):
+    from checked_reading_types import record_digest
+    note['article_screen'] = {
+        'record_sha256': record_digest(row), 'decision': 'acceptable',
+        'reviewer': 'synthetic article screener', 'checked_on': '2026-11-06',
+        'topic_fit': 'Synthetic article examines human attention with generative AI tools.',
+        'methodological_assessment': 'Synthetic short comparison has limited scope and uncertain generalization.',
+        'limitations_assessment': 'Synthetic design does not establish strong causal or lasting effects.',
+        'peer_review_claimed': False, 'strong_causal_evidence_claimed': False}
+    return note
+
+
 def approve(note):
     note['review']['payload_sha256']=original.payload_digest(note)
     note['publication']['payload_sha256']=original.publication_digest(note)
@@ -133,7 +145,7 @@ class OriginalSummaryTests(unittest.TestCase):
         row=record();self.assertEqual(original.apply([row],{'articles':[accepted(),accepted()]}),0)
 
     def test_working_paper_doi_not_silently_promoted_to_journal_version(self):
-        n=accepted();n['source'].update(source_doi='10.9999/working-paper',related_journal_doi=n['doi'],version='working_paper_not_journal_version');approve(n)
+        n=accepted();n['source'].update(source_doi='10.9999/working-paper',related_journal_doi=n['doi'],version='working_paper_not_journal_version');article_screen(n,record());approve(n)
         row=record();row['original_reading']=n
         self.assertTrue(original.eligible(n,row))
         note=make_note(row)
@@ -242,10 +254,11 @@ class OriginalSummaryTests(unittest.TestCase):
 
     def test_library_and_archived_newsletter_keep_working_version_not_new_week(self):
         row=record();n=accepted()
-        n['source'].update(source_doi='10.9999/working-paper',related_journal_doi=n['doi'],version='working_paper_not_journal_version');approve(n)
+        n['source'].update(source_doi='10.9999/working-paper',related_journal_doi=n['doi'],version='working_paper_not_journal_version');article_screen(n,record());approve(n)
         row['original_reading']=n;row=annotate(row)
         with tempfile.TemporaryDirectory() as tmp:
             data=Path(tmp);manifest=data/'manifest.json';manifest.write_text(json.dumps({'articles':[n]}))
+            (data/'library.json').write_text(json.dumps([row]))
             (data/'public-weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
             (data/'issue-editorial.json').write_text('{}')
             with patch.object(original,'MANIFEST',manifest),patch.object(build_issue,'DATA',data):

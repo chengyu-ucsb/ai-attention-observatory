@@ -389,5 +389,85 @@ if(conceptual){
 const title=vm.runInContext('TEST.shortIdea({kind:"scholarly",title:"A Study of Attention",reading:{digest:{idea:"AI use can support attention.",status:"editorially_written_from_indexed_sections"}}},100)',ctx);
 assert.equal(title,"AI use can support attention.");
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
+// Typed commentary uses checked argument layers, never scholarly fallback text.
+const commentary=JSON.parse(JSON.stringify(original));
+commentary.kind="nonacademic";commentary.doi="";commentary.url="https://example.org/synthetic-policy";
+Object.assign(commentary.reading,{level:"curated",research_type:"attributed_commentary",
+ source_version:"publisher_article",source_format:"html",source_url:commentary.url,
+ source_doi:"",related_journal_doi:"",review_scope:"Main-argument HTML only; completeness not verified.",
+ quality_note:"Suitable for attributed analysis, not empirical evidence.",
+ notice:"Limited reading · AI source-check · not human review. Figures, supplements and linked claims not independently checked.",
+ temporal:{original_published:"2026-10-29",reported_modified:"2026-11-05",checked_on:"2026-11-07",historical_snapshot_verified:false},
+ temporal_notice:"Included by original publication on 2026-10-29. Current HTML modified 2026-11-05 and checked 2026-11-07; not an original-week snapshot."});
+const lenses={thesis:"Synthetic author proposes reviewable decisions.",reasoning:"Context can change a decision's meaning.",
+ examples:"A fictional appeal supplies missing context.",tension:"Speed competes with reviewability.",qualification:"The proposed safeguards have not been tested."};
+commentary.reading.digest={idea:lenses.thesis,explain:lenses.thesis,approach:"",finding:"",interpretation:lenses.reasoning,
+ longform:{...lenses,genre:"policy_analysis",attributed_to:"Synthetic policy author",source_depth:"main_argument_html"}};
+commentary.reading.evidence=Object.fromEntries(Object.keys(lenses).map((k,i)=>[k,[{section:"Synthetic argument",paragraph:i+1}]]));
+ctx.selected=commentary;vm.runInContext("TEST.showPaper(selected)",ctx);
+const commentaryText=textContent(paperContainer);
+assert(textContent(match(paperContainer,"rv-head")).includes(commentary.reading.temporal_notice),"Date-version caveat must be prominent, not collapsed");
+for(const value of Object.values(lenses))assert(commentaryText.includes(value),"Missing commentary lens: "+value);
+for(const forbidden of ["How it was studied","Study approach","REPORTED FINDING","Reported finding","Methods as indexed","Stale unreviewed"])
+ assert(!commentaryText.includes(forbidden),"Commentary borrowed scholarly content: "+forbidden);
+assert(!match(paperContainer,"rv-context-grid"));assert(!match(paperContainer,"automatic-evidence"));
+assert.equal(matching(paperContainer,"rv-source-locator").length,5);
+assert(textContent(match(paperContainer,"rv-evidence")).includes("extracted block 1"),"Typed HTML locators index extracted blocks, including headings and list items");
+assert(!textContent(match(paperContainer,"rv-evidence")).includes("paragraph 1"),"Typed HTML blocks must not be mislabeled as prose paragraphs");
+assert.equal(match(paperContainer,"rv-primary-link").href,commentary.url);
+const required=["Limited reading","not human review","policy analysis","Synthetic policy author",commentary.reading.review_scope,commentary.reading.quality_note,"2026-11-05","2026-11-07","not an original-week snapshot"];
+for(const value of required)assert(commentaryText.includes(value),"Missing reading caveat: "+value);
+ctx.commentary=commentary;vm.runInContext("TEST.S.records=[commentary];TEST.showLibrary()",ctx);
+for(const value of required)assert(textContent(libraryContainer).includes(value),"Missing card caveat: "+value);
+const commentarySource={id:commentary.url,title:commentary.title,url:commentary.url,...commentary.reading};
+ctx.commentarySource=commentarySource;
+const commentaryShelf=vm.runInContext("TEST.issueSourceShelfItem(commentarySource,0)",ctx);
+for(const value of required)assert(textContent(commentaryShelf).includes(value),"Missing shelf caveat: "+value);
+assert.equal(matching(commentaryShelf,"rv-source-locator").length,5);
+// Missing optional metadata or invalid locators must not create fabricated prose.
+const minimalCommentary=JSON.parse(JSON.stringify(commentary));
+for(const key of ["quality_note","temporal","temporal_notice","notice","review_scope","source_version"])delete minimalCommentary.reading[key];
+minimalCommentary.reading.digest.longform={thesis:lenses.thesis};
+minimalCommentary.reading.evidence={thesis:[null,{section:""},{section:"Synthetic argument",page:-1,paragraph:0}]};
+ctx.selected=minimalCommentary;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(!/undefined|\[object Object\]|How it was studied/.test(textContent(paperContainer)));
+assert.equal(matching(paperContainer,"rv-source-locator").length,1);
+assert(!textContent(match(paperContainer,"rv-evidence")).includes("paragraph 0"));
+// A screened preprint remains scholarly but never silently becomes peer reviewed.
+const preprint=JSON.parse(JSON.stringify(original));
+preprint.reading.notice="Preprint, not verified peer-reviewed evidence. Article screening is not peer review.";
+preprint.reading.quality_note="Acceptable for a qualified reading; no strong causal claim.";
+ctx.selected=preprint;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(textContent(paperContainer).includes(preprint.reading.notice));
+assert(textContent(paperContainer).includes("How it was studied"));
+assert(textContent(paperContainer).includes(originalDigest.finding));
+assert(textContent(match(paperContainer,"rv-evidence")).includes("page 7 · paragraph 2"),"PDF page and paragraph locators must remain unchanged");
+ctx.preprint=preprint;vm.runInContext("TEST.S.records=[preprint];TEST.showLibrary()",ctx);
+assert(textContent(libraryContainer).includes(preprint.reading.notice));
+ctx.preprintSource={id:preprint.doi,title:preprint.title,url:preprint.url,...preprint.reading};
+assert(textContent(vm.runInContext("TEST.issueSourceShelfItem(preprintSource,0)",ctx)).includes(preprint.reading.notice));
+// Optional integration input is generated by the backend's synthetic receipt tests.
+if(process.env.CHECKED_RENDER_FIXTURE){
+ const fixture=JSON.parse(fs.readFileSync(process.env.CHECKED_RENDER_FIXTURE,"utf8"));
+ ctx.backendShelf=fixture.shelf;
+ const backendShelf=vm.runInContext("TEST.issueSourceShelfItem(backendShelf,0)",ctx);
+ for(const key of ["review_scope","review_label","temporal_notice","quality_note","attributed_to"])assert(textContent(backendShelf).includes(fixture.shelf[key]));
+ assert.equal(matching(backendShelf,"rv-source-locator").length,5);
+ for(const candidate of [fixture.accepted,fixture.modified_after_original_week]){
+  ctx.selected=candidate;vm.runInContext("TEST.showPaper(selected)",ctx);
+  assert(textContent(paperContainer).includes(candidate.reading.notice));
+  if(candidate.reading.research_type==="attributed_commentary"){
+   for(const key of Object.keys(lenses))assert(textContent(paperContainer).includes(candidate.reading.digest.longform[key]));
+   assert(!textContent(paperContainer).includes("How it was studied"));
+  }
+ }
+ for(const candidate of [fixture.revoked,fixture.stale]){
+  assert(!candidate.reading?.original_summary,"Backend must revoke stale receipts before publication");
+  ctx.selected=candidate;vm.runInContext("TEST.showPaper(selected)",ctx);
+  assert(!match(paperContainer,"rv-evidence"));
+  assert(!textContent(paperContainer).includes("Original summary"));
+ }
+}
+
 console.log("Validated",checked,"reading pages including",edited,"edited notes and",sourceOnly,"automated/publisher readings, plus synthetic original-summary/source-version/excerpt regressions.");
 

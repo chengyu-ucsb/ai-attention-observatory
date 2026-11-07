@@ -41,6 +41,8 @@ def first_two(parts,limit=420):
     return t
 
 def make_note(r):
+    original=note_for(r)
+    if original is not None:return original
     if r.get("kind")=="nonacademic":
         existing=r.get("reading")
         if existing and existing.get("overview") and (r.get("content_access")=="editorially_read_source" or r.get("source")!="Publisher RSS / Google News RSS" or useful_description(r.get("title"),existing.get("overview"),r.get("venue"))):
@@ -49,8 +51,6 @@ def make_note(r):
         if useful_description(r.get("title"),prose,r.get("venue")) and not any(s in prose.lower() for s in STOP):
             return {"level":"curated","provenance":r.get("venue","Publisher")+" supplied synopsis","overview":prose[:330],"methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Short publisher/editorial description, not an independently verified full-article analysis."}
         return {"level":"citation_only","provenance":"Publisher citation","overview":"","methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Source link and bibliographic metadata only."}
-    original=note_for(r)
-    if original is not None:return original
     src=clean(r.get("abstract_text"))
     if len(src)<90 and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         src=clean(r["preview"])
