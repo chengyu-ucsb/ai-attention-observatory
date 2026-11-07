@@ -87,6 +87,7 @@ const answerSwitch=()=>{
 vm.runInNewContext(js,environment,{timeout:4000,filename:"lab-play.js"});
 const by=id=>{assert(ids[id],"No node "+id);return ids[id]};
 assert.equal(doc.querySelectorAll("[data-play-tab]").length,3);
+assert.equal(by("recovery-history").getAttribute("aria-live"),"off","History must not reannounce the entire debrief after result focus moves");
 assert.equal(doc.querySelectorAll(".switch-dot").length,20);
 // Task-switching game: automatically choose correct arrow for the displayed rule.
 by("lab").hidden=false;by("switch-start").click();
@@ -220,6 +221,10 @@ for(const [caseIndex,seeds] of [[.1,.1],[.1,.9],[.9,.1],[.9,.9]].entries()){
  assert.match(rows[0].children[1].textContent,/Intended next step/);assert.match(rows[1].children[1].textContent,/Different choice/);
  if(caseIndex===0)assert.match(rows[0].children[1].textContent,/timing omitted/);
  assert(descendants(result).some(x=>x.textContent.startsWith("Two responses do not estimate a checkpoint effect.")));
+ assert(result.children.some(x=>x.className==="play-result-limit"&&x.textContent.startsWith("Two responses do not estimate a checkpoint effect.")),"Causal caution must remain outside the collapsed detail");
+ assert(descendants(result).some(x=>x.tagName==="DETAILS"&&x.children[0].tagName==="SUMMARY"),"Paired explanations need a native disclosure");
+ assert(descendants(result).some(x=>x.textContent.includes("Starting condition and task order were randomized independently.")),"Preserve full task-design context");
+ assert(descendants(result).some(x=>x.textContent==="Tasks are not validated as equally difficult."),"Material differences must remain visible");
  by("recovery-exit-comparison").click();
  assert.equal(result.hidden,true);assert.equal(result.children.length,0);
  assert.equal(by("recovery-compare").disabled,false);
@@ -256,6 +261,26 @@ by("play-reset").click();assert.equal(by("recovery-history").children.length,0);
 assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 4");
 assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").value,"timed");
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
+// Rendering must distinguish a genuine zero from missing eligible timing.
+by("tab-switch").click();by("switch-timing").value="timed";
+for(const kind of ["incorrect","zero","interrupted","mixed"]){
+ by("switch-start").click();
+ for(let i=0;i<20;i++){
+  const num=Number(by("switch-number").textContent),left=by("switch-cue").textContent.startsWith("ODD")?num%2===1:num<5;
+  if(kind==="interrupted"){visibility(true);visibility(false)}
+  by(((kind==="incorrect"||(kind==="mixed"&&i>=8))?!left:left)?"switch-left":"switch-right").click();flush();
+ }
+ const results=by("switch-results"),strong=descendants(results).filter(x=>x.tagName==="STRONG").map(x=>x.textContent);
+ assert.deepEqual(strong,kind==="zero"?["0 ms","0 ms"]:kind==="mixed"?["0 ms","—"]:["—","—"],"Zero and absent timings must not be conflated");
+ if(kind!=="zero")assert(results.children.some(x=>x.textContent.startsWith("— means no uninterrupted correct response time")),"Missing timings need a visible explanation");
+ if(kind==="interrupted")assert(descendants(results).some(x=>x.textContent==="20 interrupted response(s) excluded from timing."));
+ const details=descendants(results).filter(x=>x.tagName==="DETAILS");assert.equal(details.length,1);assert.equal(details[0].children[0].tagName,"SUMMARY");
+ assert.equal(details[0].getAttribute("open"),null,"Interpretation must not automatically expand");
+ assert(results.children.some(x=>x.className==="play-result-limit"&&x.textContent.includes("cannot estimate switch cost or attention")));
+ assert(descendants(details[0]).some(x=>x.textContent.includes("same rule always comes first (8 turns), followed by alternating rules (12 turns)")));
+ assert(descendants(results).some(x=>x.textContent==="This comparison cannot tell those processes apart."));
+}
+by("play-reset").click();
 assert(html.includes('datetime="2026-11-06"'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
 console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
