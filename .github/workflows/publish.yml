@@ -31,7 +31,7 @@ on:
       - 'tests/validate_article_ui.cjs'
       - '.github/workflows/publish.yml'
   workflow_run:
-    workflows: ["Update research library", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
+    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -40,11 +40,12 @@ permissions:
   pages: write
   id-token: write
 concurrency:
-  group: pages
+  group: ${{ (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('pages-skip-{0}', github.run_id) || 'pages' }}
+  queue: max
   cancel-in-progress: false
 jobs:
   deploy:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -115,3 +116,4 @@ jobs:
           path: _site
       - id: deployment
         uses: actions/deploy-pages@v5
+

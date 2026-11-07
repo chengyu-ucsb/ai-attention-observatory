@@ -10,7 +10,7 @@ on:
       - '.github/workflows/weekly-source-acquisition.yml'
       - '.github/workflows/refresh.yml'
   workflow_run:
-    workflows: ['Update research library']
+    workflows: ['Update research library', 'Resume weekly source discovery']
     types: [completed]
     branches: [main]
   # Discovery remains weekly. These bounded retries drain that same week's queue.
@@ -20,7 +20,8 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || 'observatory-weekly-acquisition' }}
+  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('acquisition-skip-{0}', github.run_id) || 'observatory-weekly-acquisition' }}
+  queue: max
   cancel-in-progress: false
 jobs:
   verify:
@@ -47,7 +48,7 @@ jobs:
           node tests/validate_weekly_issue.cjs
           node tests/validate_weekly_window.cjs
   collect:
-    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main'))
     permissions:
       contents: write
     runs-on: ubuntu-24.04

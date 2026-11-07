@@ -1,0 +1,103 @@
+name: Preserve publisher feed metadata
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/editorial_feed_cache.py'
+      - 'scripts/discover_editorial.py'
+      - 'tests/test_editorial_feed_cache.py'
+      - 'data/editorial-sources.json'
+      - '.github/workflows/editorial-feed-snapshots.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/editorial_feed_cache.py'
+      - 'data/editorial-sources.json'
+      - '.github/workflows/editorial-feed-snapshots.yml'
+  schedule:
+    - cron: '7 2,8,14,20 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('feed-cache-check-{0}', github.ref) || 'observatory-feed-cache' }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Official release action.yml files verified 2026-11-07: Node 24.
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -p 'test_editorial*.py' -v
+  capture:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Capture bounded publisher metadata only
+        run: python scripts/editorial_feed_cache.py --max-requests 24 --time-budget 240
+      - name: Validate metadata-only cache
+        id: validated
+        if: always()
+        run: |
+          python - <<'PY'
+          import json, os, shutil, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          import discover_editorial as ed
+          from editorial_feed_cache import load_cache
+          path = Path('data/editorial-feed-cache.json')
+          if path.exists():
+              state = load_cache(path, ed.FEEDS)
+              destination = Path(os.environ['RUNNER_TEMP']) / 'validated-editorial-feed-cache.json'
+              shutil.copyfile(path, destination)
+              with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+                  out.write('ready=true\n')
+              print('Validated metadata only: no descriptions, article bodies, PDFs or generated summaries.')
+          PY
+      - name: Save metadata without repeating network collection
+        if: always() && steps.validated.outputs.ready == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/editorial-feed-cache.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Preserve rolling publisher feed metadata'
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if ! git rebase origin/main; then
+                git rebase --abort
+                echo 'Cache conflict; keep the validated recovery artifact rather than overwrite newer state.'
+                exit 1
+              fi
+              if git push origin HEAD:main; then exit 0; fi
+              sleep "$((attempt * 2))"
+            done
+            exit 1
+          fi
+      - name: Retain validated metadata checkpoint
+        if: always() && steps.validated.outputs.ready == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: editorial-feed-cache-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validated-editorial-feed-cache.json
+          if-no-files-found: error
+          retention-days: 7

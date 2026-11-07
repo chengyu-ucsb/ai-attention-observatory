@@ -1,8 +1,9 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
 import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
+from academic_state import DiscoveryState, ProviderDeferred, cursor_search
 from search_plan import plan,source_class
-from arxiv_publication import ArxivPublicationVerifier, identifier_for as arxiv_identifier
-from priority_research import discover as discover_priority, crossref_article, crossref_search, doi_id
+from arxiv_publication import ArxivPublicationVerifier, identifier_for as arxiv_identifier, fetch_atom
+from priority_research import discover as discover_priority, crossref_article, crossref_search, doi_id, load_manifest as priority_manifest
 from collection_window import (crossref_publication, date_in_window, previous_week,
                                publication_date, weekly_eligible, window_metadata, reconcile_publication_evidence)
 ROOT=pathlib.Path(__file__).resolve().parents[1]
@@ -51,54 +52,35 @@ def request(url):
 def abstract(inv):
  if not isinstance(inv,dict):return ""
  return " ".join(word for _,word in sorted((p,word) for word,ps in inv.items() for p in ps if isinstance(p,int)))[:800]
-def openalex_search(params, *, max_pages=5, page_size=100):
- rows=[]; errors=[]; cursor="*"; seen_cursors=set()
- audit={"provider":"OpenAlex","query":params.get("search", ""),"filter":params.get("filter", ""),
-        "pages":0,"records_seen":0,"provider_total":None,"max_pages":max_pages,"page_size":page_size,
-        "status":"complete","truncated":False}
- if max_pages<1:return [],dict(audit,status="truncated",truncated=True,reason="page budget is zero"),[]
- for page in range(max_pages):
-  try:
-   result=request("https://api.openalex.org/works?"+urllib.parse.urlencode(dict(params,per_page=page_size,cursor=cursor)))
-   if not isinstance(result.get("results"),list):raise ValueError("Malformed OpenAlex search response")
-   works=result["results"];meta=result.get("meta") or {}
-   audit["pages"]+=1;audit["provider_total"]=meta.get("count",audit["provider_total"])
-   rows.extend(works);audit["records_seen"]=len(rows)
-   total=audit["provider_total"]
-   if not works:
-    if isinstance(total,int) and len(rows)<total:audit.update(status="truncated",truncated=True,reason="empty page before reported total")
-    break
-   if (isinstance(total,int) and len(rows)>=total) or (len(works)<page_size and not isinstance(total,int)):break
-   next_cursor=meta.get("next_cursor")
-   if not next_cursor or next_cursor==cursor or next_cursor in seen_cursors:
-    audit.update(status="truncated",truncated=True,reason="provider did not supply a new cursor");break
-   seen_cursors.add(cursor);cursor=next_cursor
-   if page+1==max_pages:audit.update(status="truncated",truncated=True,reason="page budget reached")
-  except Exception as exc:
-   reason="HTTP "+str(exc.code) if hasattr(exc,"code") else type(exc).__name__
-   audit.update(status="error",truncated=True,reason=reason)
-   if getattr(exc,"code",None)==429:audit["quota_exhausted"]=True
-   if getattr(exc,"code",None) in (403,429):audit["provider_paused"]=True
-   errors.append("OpenAlex search unavailable: "+reason);break
- return rows,audit,errors
+def openalex_search(params, *, max_pages=5, page_size=100, state=None):
+ return cursor_search(request,"OpenAlex",params,state=state,max_pages=max_pages,page_size=page_size)
 
 
-def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=100,arxiv_verifier=None):
+def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=100,arxiv_verifier=None,state=None):
  """Collect metadata within explicit publication windows, with coverage limits."""
  found=[];errors=[];stats={"openalex":0,"crossref":0,"provider_windows":[],
                          "publication_date_rejected":0,"publication_date_unverified":0,"publication_date_quarantine":[],
                          "date_lookups":0,"date_lookups_deferred":0}
  today=datetime.date.fromisoformat(TODAY)
  scopes=plan(today,mode)
+ start_window,end_window=previous_week(today) if mode=="weekly" else (datetime.date(2023,1,1),today)
+ window={"from":start_window.isoformat(),"to":end_window.isoformat()}
+ state=state or DiscoveryState(mode=mode,window=window)
+ state.validate_window(mode,window)
+ planned=[]
+ for lane,q,start,end,scope in scopes:
+  planned.extend([("OpenAlex",{"search":q,"filter":"from_publication_date:"+start+",to_publication_date:"+end},page_size),
+                  ("Crossref",{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},page_size)])
+ state.register_plan("general",planned)
  stats["search_scopes"]=[{"theme":lane,"period":scope,"from":start,"to":end,"query":q} for lane,q,start,end,scope in scopes]
  stats["queries_planned"]=2*len(scopes);stats["queries_attempted"]=0
- crossref_dates={};crossref_paused=False
+ crossref_dates=dict(state.current["date_evidence"]);crossref_paused=False;uncertain=[]
  for lane,q,start,end,scope in scopes:
   params={"search":q,"filter":"from_publication_date:"+start+",to_publication_date:"+end,
           **({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})}
-  works,audit,provider_errors=openalex_search(params,max_pages=max_pages,page_size=page_size)
+  works,audit,provider_errors=openalex_search(params,max_pages=max_pages,page_size=page_size,state=state)
   audit.update(theme=lane,scope=scope);stats["provider_windows"].append(audit)
-  errors.extend(provider_errors);stats["openalex"]+=len(works);stats["queries_attempted"]+=1
+  errors.extend(provider_errors);stats["openalex"]+=len(works);stats["queries_attempted"]+=int(audit.get("requests_this_run",0)>0)
   for w in works:
    title=w.get("title") or "";ab=abstract(w.get("abstract_inverted_index"));doi=doi_id(w.get("doi"))
    if not title or not KEYWORDS.search(title+" "+ab) or w.get("is_retracted"):continue
@@ -114,38 +96,46 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
      "relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence",
      "evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY,
      "discovery_scope":scope,"discovery_query":q,"historical_backfill":mode=="backfill"})
-  if audit.get("provider_paused"):break
-  time.sleep(.3)
+  if audit.get("requests_this_run"):time.sleep(.3)
  for lane,q,start,end,scope in scopes:
-  works,audit,provider_errors=crossref_search(request,{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},max_pages=max_pages,page_size=page_size)
+  works,audit,provider_errors=crossref_search(request,{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},max_pages=max_pages,page_size=page_size,state=state)
   audit.update(theme=lane,scope=scope);stats["provider_windows"].append(audit)
-  errors.extend(provider_errors);stats["crossref"]+=len(works);stats["queries_attempted"]+=1
+  errors.extend(provider_errors);stats["crossref"]+=len(works);stats["queries_attempted"]+=int(audit.get("requests_this_run",0)>0)
   for w in works:
    doi=doi_id(w.get("DOI"));datev,provenance=crossref_publication(w)
    if doi:crossref_dates[doi]=reconcile_publication_evidence(crossref_dates.get(doi),(datev,provenance))
-   x=crossref_article(w,lane=lane,scope=scope,query=q,today=today,screen=False)
+   x=crossref_article(w,lane=lane,scope=scope,query=q,today=today,screen=False,allow_unresolved=True)
+   if x and not datev and mode=="weekly" and relevant(x):
+    uncertain.append(x)
    if not x or not date_in_window(datev,start,end):stats["publication_date_rejected"]+=1;continue
    x["source"]="Crossref";x["historical_backfill"]=mode=="backfill"
    if KEYWORDS.search(x["title"]+" "+x["abstract_text"]):found.append(x)
   if audit.get("provider_paused"):
-   crossref_paused=True;break
-  time.sleep(.3)
+   crossref_paused=True
+  if audit.get("requests_this_run"):time.sleep(.3)
  # A print/issue date must not turn an old online-first paper into new work.
  # Verify DOI-backed OpenAlex candidates against the publication events in
  # Crossref. Missing registry evidence is fail-closed for the weekly set.
  if mode=="weekly":
   start,end=previous_week(today)
   kept=[];deferred=set();quarantined={};conflicts={};quota=crossref_paused
-  arxiv=arxiv_verifier or ArxivPublicationVerifier()
+  arxiv=arxiv_verifier or ArxivPublicationVerifier(fetch=lambda url:state.fetch("arXiv",url,fetch_atom))
   def quarantine(x,reason):
    pending=dict(x)
    evidence=dict(x.get("publication_date_provenance") or {})
    evidence.update(status="unresolved",reason=reason,provider_publication_date=x.get("published", ""))
    pending.update(published="",publication_date_provenance=evidence,acquisition_status="original_publication_date_required")
    quarantined[key(x)]=pending
+  for x in uncertain:quarantine(x,"Crossref original-publication day unavailable or unresolved")
   for x in found:
    if x["source"]=="OpenAlex" and arxiv_identifier(x):
-    day,provenance=arxiv.verify(x)
+    arxiv_key=arxiv_identifier(x)+":"+x["title"]
+    arxiv_cache=state.current.setdefault("arxiv_date_evidence",{})
+    if arxiv_key in arxiv_cache:
+     day,provenance=arxiv_cache[arxiv_key]
+    else:
+     day,provenance=arxiv.verify(x)
+     if day:arxiv_cache[arxiv_key]=(day,provenance);state.save()
     if x.get("doi"):crossref_dates[x["doi"]]=(day,provenance)
     x["publication_date_provenance"]=provenance
     if day:
@@ -164,15 +154,16 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
       deferred.add(doi);quarantine(x,"Original-day verification deferred by provider or lookup budget");continue
      stats["date_lookups"]+=1
      try:
-      result=request("https://api.crossref.org/works/"+urllib.parse.quote(doi,safe="/"))
+      result=state.fetch("Crossref","https://api.crossref.org/works/"+urllib.parse.quote(doi,safe="/"),request)
       work=result.get("message") or {}
       if doi_id(work.get("DOI"))!=doi:raise ValueError("DOI identity mismatch")
       crossref_dates[doi]=crossref_publication(work)
+      state.current["date_evidence"][doi]=crossref_dates[doi];state.save()
      except Exception as exc:
-      reason="HTTP "+str(exc.code) if hasattr(exc,"code") else type(exc).__name__
+      reason="HTTP "+str(exc.code) if getattr(exc,"code",None) else type(exc).__name__
       errors.append("Original publication date unavailable for "+doi+": "+reason)
       crossref_dates[doi]=("",{"source":"Crossref","status":"unresolved","reason":reason,"verification_error":True})
-      if getattr(exc,"code",None) in (403,429):quota=True;crossref_paused=True
+      if isinstance(exc,ProviderDeferred) or getattr(exc,"code",None) in (401,403,429,500,502,503,504):quota=True;crossref_paused=True
     registry_day,provenance=crossref_dates[doi]
     # An earlier generic OpenAlex day is conflicting evidence, not a
     # publisher-verified original date. Never relabel it as Crossref evidence.
@@ -194,7 +185,8 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
    canonical=crossref_dates.get(doi_id(x.get("doi")))
    if x["source"]!="OpenAlex" and canonical:
     x["published"],x["publication_date_provenance"]=canonical
-   if date_in_window(x["published"],start,end):kept.append(x)
+   if not x["published"] and x["source"]!="OpenAlex":quarantine(x,"Crossref original-publication day unavailable or unresolved")
+   if weekly_eligible(x,start,end):kept.append(x)
    else:stats["publication_date_rejected"]+=1
   # A disputed DOI cannot re-enter through another query or provider. Keep
   # the conflict correction so existing indexed records fail closed too.
@@ -206,10 +198,22 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
   stats["arxiv_publication_verification"]=arxiv.audit
  # Used to correct existing records even when an earlier original date
  # rightly removes a rediscovered paper from this week. Not a public count.
+ for doi,evidence in crossref_dates.items():
+  if not evidence[1].get("verification_error"):state.current["date_evidence"][doi]=evidence
+ state.save()
+ # Replayed queries and overlapping providers are one article, not several.
+ unique={}
+ for entry in found:
+  k=key(entry)
+  if k not in unique or len(entry.get("abstract_text", ""))>len(unique[k].get("abstract_text", "")):unique[k]=entry
+ found=list(unique.values())
  stats["publication_date_corrections"]=crossref_dates
  stats["crossref_provider_paused"]=crossref_paused
- stats["queries_deferred"]=stats["queries_planned"]-stats["queries_attempted"]
- stats["discovery_status"]="partial" if errors or stats["queries_deferred"] or stats["date_lookups_deferred"] or stats["publication_date_unverified"] or any(a["truncated"] for a in stats["provider_windows"]) else "complete"
+ stats["queries_completed"]=sum(a["status"]=="complete" for a in stats["provider_windows"])
+ stats["queries_deferred"]=sum(a["status"]!="complete" and not a.get("requests_this_run") for a in stats["provider_windows"])
+ stats["discovery_status"]="partial" if state.summary()["query_plan_drift"] or errors or stats["queries_deferred"] or stats["date_lookups_deferred"] or stats["publication_date_unverified"] or any(a["truncated"] for a in stats["provider_windows"]) else "complete"
+ stats["configured_query_status"]="complete_for_configured_queries" if stats["discovery_status"]=="complete" else "partial"
+ stats["checkpoint"]=state.summary()
  stats["coverage_note"]="Bounded provider/query coverage, not exhaustive web or literature coverage; candidates still require article screening."
  return found,errors,stats
 def apply_publication_evidence(current, day, provenance):
@@ -238,15 +242,29 @@ def main():
  records={key(x):x for x in previous if x.get("kind")=="scholarly" or relevant(x)}
  for record in records.values():record["source_group"]=source_class(record)
  mode=os.environ.get("MODE","weekly")
- candidates,errors,stats=discover(mode=mode)
- if stats.get("crossref_provider_paused"):
-  priority=[];priority_errors=["Crossref unavailable or rate-limited; journal searches deferred."]
-  priority_stats={"discovery_status":"partial","deferred_reason":"Crossref provider paused"}
- else:
-  priority,priority_errors,priority_stats=discover_priority(
-   request,datetime.date.fromisoformat(TODAY),mode=mode,
+ start_window,end_window=previous_week(TODAY) if mode=="weekly" else (datetime.date(2023,1,1),datetime.date.fromisoformat(TODAY))
+ resume_only=os.environ.get("DISCOVERY_RESUME_ONLY","").lower() in {"1","true","yes"}
+ if resume_only and mode!="weekly":raise ValueError("Resume-only recovery supports the current weekly window only")
+ state=DiscoveryState(os.environ.get("ACADEMIC_DISCOVERY_STATE") or DIR/"academic-discovery-state.json",mode=mode,
+                      window={"from":start_window.isoformat(),"to":end_window.isoformat()},resume_only=resume_only,
+                      max_inline_wait=float(os.environ.get("ACADEMIC_MAX_INLINE_WAIT_SECONDS","5")))
+ if resume_only and (not state.had_window or not state.current["plans"].get("general")):
+  print(json.dumps({"status":"no_current_window_plan","publication_window":window_metadata(TODAY),
+                    "note":"No full discovery started; stale windows remain excluded."}))
+  return
+ max_pages=int(os.environ.get("ACADEMIC_MAX_PAGES","5"));page_size=int(os.environ.get("ACADEMIC_PAGE_SIZE","100"))
+ manifest=priority_manifest()
+ state.register_plan("journals",[("Crossref",{"query.title":p["q"],"query.container-title":p["venue"],
+                       "filter":"from-pub-date:"+start_window.isoformat()+",until-pub-date:"+end_window.isoformat()},page_size)
+                      for p in manifest.get("venue_queries",[])])
+ candidates,errors,stats=discover(mode=mode,state=state,max_pages=max_pages,page_size=page_size,
+                                 max_date_lookups=int(os.environ.get("ACADEMIC_MAX_DATE_LOOKUPS","100")))
+ priority,priority_errors,priority_stats=discover_priority(
+   request,datetime.date.fromisoformat(TODAY),mode=mode,state=state,manifest=manifest,max_pages=max_pages,page_size=page_size,
    existing_dois={x.get("doi") for x in records.values() if x.get("doi")}
-  )
+ )
+ stats["checkpoint"]=state.summary()
+ stats["resume_only"]=resume_only
  corrections=stats.pop("publication_date_corrections",{})
  for doi,evidence in priority_stats.pop("publication_date_corrections",{}).items():
   corrections[doi]=reconcile_publication_evidence(corrections.get(doi),evidence)
@@ -255,7 +273,7 @@ def main():
   if known:
    day,provenance=known
    apply_publication_evidence(current,day,provenance)
- quarantined=stats.pop("publication_date_quarantine",[])
+ quarantined=stats.pop("publication_date_quarantine",[])+priority_stats.pop("publication_date_quarantine",[])
  for pending in quarantined:
   if relevant(pending) and key(pending) not in records:
    pending["source_group"]=source_class(pending)
@@ -263,7 +281,8 @@ def main():
  candidates=priority+candidates
  errors.extend(priority_errors)
  stats["priority_and_journal_discovery"]=priority_stats
- stats["discovery_status"]="partial" if errors or stats.get("discovery_status")=="partial" or priority_stats.get("discovery_status")=="partial" else "complete"
+ stats["discovery_status"]="partial" if errors or stats.get("discovery_status")=="partial" or priority_stats.get("discovery_status")=="partial" or stats["checkpoint"]["status"]=="partial" or stats["checkpoint"]["query_plan_drift"] else "complete"
+ stats["configured_query_status"]="complete_for_configured_queries" if stats["discovery_status"]=="complete" else "partial"
  if stats["discovery_status"]=="partial":
   print("::warning::Discovery completed with some unavailable provider searches; see run diagnostics.")
  new=[]
