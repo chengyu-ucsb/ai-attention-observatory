@@ -2,6 +2,134 @@
 
 Updated: 2026-11-06. This is the canonical audit note; update this file rather than creating parallel copies.
 
+## November 6: free-source routing and structured full text
+
+The current acquisition inventory at commit `79f123cd6ea561763c815f3f022b4d13a094904f`
+contains 423 scholarly records: 156 with machine-extracted sections, one separate
+editorial full-article synthesis, and 266 without either. These categories do not
+mean 157 completed whole-document reviews.
+
+The latest [production deep-reading run](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42284828976)
+attempted two records and completed zero summaries. It retrieved zero new source
+documents, fell back to two partial indexed inputs, and rejected output for
+`claim_length_invalid` and `copied_source_passage`. The green workflow exit is not
+successful article synthesis. No quality gate is weakened by the changes below.
+
+### Sources actually opened through the web reader
+
+Eleven records previously missing extracted full text have verified, free,
+source-hosted PDF routes in `data/free-access-candidates.json`. Both publisher PDFs
+and all nine exact versioned arXiv PDF URLs were opened successfully through the
+web reader, with page counts and article identity checked. This is **not** a
+production-runner download, parser-coverage test or completed summary:
+
+- BMC Nursing `10.1186/s12912-026-05512-z`: the publisher's actual Download PDF
+  points to an 18-page `_reference.pdf`, explicitly an article-in-press version
+  under CC BY 4.0. Guessing the ordinary `.pdf` URL misses this route.
+- IJLTER `10.26803/ijlter.25.10.23`: the official OJS viewer links to a 33-page
+  article download without a `.pdf` filename suffix. Its CC BY-NC-ND 4.0 terms
+  are not permission to store the source body in the public repository.
+- Nine arXiv records include three with empty DOI fields. Their 16–53-page PDFs
+  can be addressed directly by arXiv identifier. Version-pinned routes preserve
+  the matching source title: `2609.24616v1` is the 21-page version matching the
+  indexed title; v2 has a different title and 24 pages and is not silently
+  substituted. Preprint access does not establish peer-review status.
+
+The metadata-only source register now includes these routes. Restricted or
+nonexclusive redistribution licenses remain distinct from transient reading and
+original factual paraphrase. No source PDF, extracted body, private credential or
+model response is committed.
+
+### Implementation changes and limits
+
+The whole-source reader now has an official Europe PMC full-text JATS route,
+separate from human article pages. It resolves an exact DOI and open-access PMCID,
+then checks article-header DOI/title and an article-level permissive license.
+It also supports OpenAlex TEI when an already authorized environment supplies an
+existing key. No key is created, moved or wired into another workflow here;
+production's deep-reading workflow currently does not pass that key, so this
+optional route will report `openalex_key_not_configured` there.
+
+Both XML formats preserve all text supplied in the article XML, including the
+introduction, nested sections, captions/table text, final qualifications and
+references. Compressed and expanded input sizes are bounded; internal entities,
+unsupported encodings and ambiguous identity are rejected. Legacy OpenAlex
+`html/body/tei/text/div` and standard TEI body layouts are handled. The manifest
+explicitly says XML-to-original-document equivalence, layout and semantics are
+unverified. This is not a claim that PDF-only figures, supplements or equations
+were visually read.
+
+Publisher HTML can now follow declared PDF links and same-host Download PDF
+links rather than guessing suffixes. Supplement/appendix links are excluded.
+A partially readable PDF cannot displace richer HTML, and a later complete PDF
+is still attempted. Robots, challenge-page, host, redirect, identity and size
+checks remain in effect. The source allowlist adds only the verified IJLTER
+publisher host. Existing arXiv routing works without a DOI.
+
+Access-only acquisition is already separate from editorial source screening and
+model inference through `scripts/retrieve_articles.py`. The new pilot can be
+validated in an authorized network-enabled executor without opening articles to
+public publication:
+
+```bash
+python scripts/retrieve_articles.py data/free-access-candidates.json \
+  --report /tmp/observatory-free-access-report.json --known-sources-only --limit 11
+```
+
+The full 11-record command has not been run. The existing PR access-check
+workflow was subsequently extended with a bounded six-route pilot (the two
+publishers, the three DOI-less arXiv records, and exact PMC10658009 JATS). Its
+[actual run 42311202861](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42311202861)
+on commit `64acf1f79678b19289ee89e339bd8260c5c9db5f` retrieved and parsed five of
+six source documents:
+
+| Source | Observed coverage | Extracted characters | Chunks |
+| --- | --- | ---: | ---: |
+| IJLTER `10.26803/ijlter.25.10.23` | 33 of 33 pages with text | 94,870 | 18 |
+| arXiv `2610.31335v1` | 44 of 44 pages with text | 88,707 | 17 |
+| arXiv `2610.27170v1` | 16 of 16 pages with text | 98,347 | 18 |
+| arXiv `2501.17247v1` | 38 of 38 pages with text | 147,670 | 27 |
+| Europe PMC `PMC10658009` | 185 XML text units | 94,298 | 18 |
+
+Every retrieved text interval was retained in the chunk plan. These are actual
+retrieval/extraction outcomes, not model summaries or a public library update.
+The new JATS route was therefore exercised on real article XML. OpenAlex TEI
+remains offline-tested only. Springer returned PDF bytes but failed the exact
+article identity check (`document_identity_unverified`) and was not accepted.
+The successful historical EconStor control again covered all 89 PDF pages.
+
+Metadata-only evidence and hashes are in `data/free-access-pilot-results.json`.
+No source bodies were retained. This bounded result is not a corpus-wide
+recovery rate, and no production-library recovery count is claimed. No hosted LLM, model change, paid service, new account,
+institutional login or source-trained verifier run is introduced. The existing
+Zenodo recovery remains indirectly invoked by repository full-text recovery.
+
+Validation: 32 new offline route/parser/pilot tests; 334 selected Python tests passed
+(the holdout-named module and its sealed fixture were not loaded); Python
+compilation and JavaScript syntax passed; article UI validation passed for 69
+reading pages and weekly validation for the 8-source issue. Independent review
+identified and prompted additional tests for restrictive shorthand licenses,
+UTF-16 entities, partial-PDF fallback and supplement-link confusion. These tests
+use controlled data and do not establish live access or model summary accuracy.
+The exact-branch hosted run separately passed all 335 offline tests, both UI
+validators and the live access pilot, with zero warning/error annotations.
+The separate PR deep-reading check passed and skipped all model/inference steps.
+
+### Next verification gates
+
+1. Extend bounded access-only checks to the remaining version-pinned candidates;
+   investigate the Springer identity mismatch before accepting that PDF.
+2. Verify actual OpenAlex TEI only in an environment already authorized to use
+   the existing key. The real JATS extraction is verified, but PDF/XML visual
+   equivalence and semantic completeness remain unchecked.
+3. Continue exact-title/identifier repository searches for unresolved records.
+   A locator miss, a processing-license restriction and a missing free copy are
+   separate states; none alone proves that an article is inaccessible.
+4. Complete and independently check actual source-grounded summaries before
+   promoting the acquired documents. Existing local-model semantic limitations
+   documented below remain unresolved; checkpointing or more downloaded papers
+   does not fix them.
+
 ## November 6: source-reviewed claim checks
 
 [PR 34](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/34) adds controlled positive and negative claims before any further production model change. Its development fixture contains 15 cases across three primary papers: 6 supported paraphrases and 9 deliberately misleading claims or claims paired with irrelevant evidence. Each paper has a checked article-specific CC BY 4.0 notice, attribution and exact section/offset locators. Only 107–137 words of licensed excerpts per source are included. All cases pass the existing deterministic anchor, number-presence and copying checks, so the experiment measures semantic verification rather than those simpler gates.
@@ -215,4 +343,5 @@ The most concrete result is now a tested chain: exact-DOI discovery can identify
 - [Crossref full-text/TDM locators](https://www.crossref.org/documentation/retrieve-metadata/text-and-data-mining/)
 - [Zotero indexed full-text and coverage API](https://www.zotero.org/support/dev/web_api/v3/fulltext_content)
 - [UCSB Library text and data mining support](https://guides.library.ucsb.edu/text-data-mining/home)
+
 

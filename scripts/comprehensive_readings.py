@@ -400,7 +400,8 @@ def process(records,model,limit=2,retriever=retrieve):
                 model='Qwen2.5-1.5B-Instruct (on-runner; chunked with claim checking)',
                 basis=('Every retrieved text chunk processed; claim-level machine checks. '
                        'Not independently reviewed. Figures, tables and supplements not visually verified. '
-                       + ('Whole PDF text retrieved.' if complete else 'Partial source coverage; not a whole-article review.')),
+                       + (('All supplied article XML text retrieved; equivalence to the original PDF is not verified.'
+                          if document.coverage.get('document_format') in ('jats','tei') else 'Whole PDF text retrieved.') if complete else 'Partial source coverage; not a whole-article review.')),
                 review_status='machine_checked_not_independently_reviewed',created_at=today)
             previous=record.get('deep_analysis') or {}
             if not complete and previous.get('source_depth') in ('full_text','source_html'):
@@ -436,4 +437,5 @@ def main():
 
 
 if __name__=='__main__': main()
+
 
