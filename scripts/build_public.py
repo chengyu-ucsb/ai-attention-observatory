@@ -123,7 +123,7 @@ def build():
                 and (source.get("deep_analysis") or {}).get("source_depth")=="source_html"):
             source["reading"]["level"]="curated"
         published=annotate(source)
-        if published.get("kind")=="nonacademic" and not substantive_article(published):
+        if published.get("kind")=="nonacademic" and not (original_eligible(published.get("original_reading"), published) or substantive_article(published)):
             # Keep a minimal locator so bookmarks remain useful. It must never
             # appear as a source-backed analysis in the featured/library lists.
             held["journalism_awaiting_full_article_reading"]+=1

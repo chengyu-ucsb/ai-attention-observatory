@@ -46,7 +46,7 @@ def topic_class(record):
     focused=bool(FOCUS.search(text))
     attention=bool(ADJACENT.search(text))
     # A code paper using 'cross-attention' is not human-attention research.
-    if ENGINEERING.search(title) and not FOCUS.search(title.replace("cross-attention","").replace("Cross-Attention","")) and not re.search(r"participants|students|users|human attention|human cognition",abstract,re.I):
+    if ENGINEERING.search(title) and not FOCUS.search(re.sub(r"cross[- ]attention", "", title, flags=re.I)) and not re.search(r"participants|students|users|human attention|human cognition",abstract,re.I):
         return "off_topic"
     if direct and focused and (FOCUS.search(title) or (len(abstract)>160 and FOCUS.search(abstract))):
         return "direct"
@@ -60,13 +60,19 @@ def screen(record,rules=None):
         return {"decision":"editorial","venue_level":"not_applicable","topic":"not_applicable","reason":"nonacademic"}
     venue=venue_class(record.get("venue"),rules)
     topic=topic_class(record)
-    if record.get("research_type")=="conceptual_framework" and "editorially verified" in str(record.get("source") or "").lower():
-        return {"decision":"include","venue_level":venue,"topic":"direct","reason":"verified_primary_conceptual_work"}
     if topic=="off_topic":
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"computational_attention_not_human_attention"}
+    from checked_reading_types import is_preprint
+    preprint = is_preprint(record, (record.get('original_reading') or {}).get('source') or {})
+    if not preprint and record.get("research_type")=="conceptual_framework" and "editorially verified" in str(record.get("source") or "").lower():
+        return {"decision":"include","venue_level":venue,"topic":"direct","reason":"verified_primary_conceptual_work"}
     if topic=="uncertain":
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"topical_fit_needs_review"}
-    if venue=="preprint":
+    if preprint:
+        from original_readings import eligible
+        if eligible(record.get('original_reading'), record):
+            return {"decision":"include","venue_level":"preprint","topic":topic,
+                    "reason":"article_screened_preprint_not_peer_reviewed"}
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"preprint_requires_article_screen"}
     if venue=="unverified":
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"publication_venue_unverified"}
