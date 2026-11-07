@@ -43,8 +43,8 @@ page check is metadata verification, not a full-article retrieval.
   Article JSON-LD node. An HTML title may include the exact named publisher.
   A general body mention of the title is insufficient.
 - Validate canonical/OG URLs against the final page's exact host, path, and
-  meaningful query identity. Same-host HTTP redirects can change the path;
-  cross-host redirects and mismatching canonical destinations require review.
+  meaningful query identity. Identity-changing same-host redirects, cross-host
+  redirects and mismatching canonical destinations require review.
   Tracking parameters are ignored for identity; other query parameters are not.
 - Read `datePublished` only from the matching Article node, not unrelated
   recommended articles or WebSite metadata. Explicit publication meta fields
@@ -85,8 +85,8 @@ restricted access stops verification without fetching another route.
 HTTP 401/403 and bot challenges stop that host for future runs in the saved
 state. They require a reviewed state reset, not automatic alternate routes.
 HTTP 429, 408/425, temporary server errors, and transport failures back off
-across the host. Retry-After seconds and HTTP dates are honored, bounded between
-one second and seven days. No login, CAPTCHA solving, proxy, cached copy, or
+across the host. Retry-After seconds and HTTP dates are honored without shortening
+a longer server cooldown; an unrepresentable delay holds the host for review. No login, CAPTCHA solving, proxy, cached copy, or
 paywall fallback is implemented.
 
 Successful or terminal unchanged records are not refetched. An input fingerprint
