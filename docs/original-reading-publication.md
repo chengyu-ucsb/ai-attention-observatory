@@ -188,14 +188,15 @@ any abstract needed for topic screening; no abstract/source body is copied into
 the queue. Missing, duplicated or changed indexed records require rebuilding and
 revalidating the issue. Revoked/changed acceptance still fails afterward.
 
-**Commentary publication remains blocked on typed display support.** The backend
-exports all five argument lenses in `reading.digest.longform`, with genre,
-attribution, truthful main-argument scope and no methods/results. Current main's
-original-summary UI branch does not render those lenses correctly. Existing
-Node regression passes are not acceptance of this new commentary presentation.
-Do not populate real commentary receipts until a separately reviewed renderer
-change exposes these fields without empirical-study labels. No UI code is part
-of this backend change.
+The accompanying narrowly scoped renderer exposes all five commentary lenses
+from `reading.digest.longform`, with genre, attribution, main-argument scope,
+source blocks, temporal caveats and no scholarly methods/results labels. It is
+independent of the broader reading-design work. Synthetic backend-to-renderer
+and hosted browser regressions cover accepted commentary/preprints and excluded
+revoked/stale receipts, repeated disclosures and responsive layouts. Passing
+these checks validates presentation behavior, not actual source claims or
+publication acceptance. Real summaries still require a separate reviewed data
+change and a deliberate, content-bound publication decision.
 
 Commentary additionally requires `commentary.temporal` with exact
 `original_published` (matching indexed publication date), `reported_modified`
