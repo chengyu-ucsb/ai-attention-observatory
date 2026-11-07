@@ -302,7 +302,10 @@ def document_from_html(raw,record,url,version='unspecified',candidate_doi=''):
     # Large HTML is NOT silently sampled or truncated. Completeness is not
     # inferred from body length, section names, or the presence of an abstract.
     return Document(units,url,version,{'evidence_status':'partial_full_text',
-        'html_completeness':'not_verified','semantic_completeness':'not_verified'})
+        'html_completeness':'not_verified','semantic_completeness':'not_verified',
+        'html_body_selection':parser.selection,
+        'html_blocks_extracted':len(parser.blocks),
+        'html_list_items_found':parser.list_items_found})
 
 
 def candidate_identity(option,record):
