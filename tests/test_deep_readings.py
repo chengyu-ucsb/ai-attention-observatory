@@ -66,9 +66,10 @@ class DeepReadingTests(unittest.TestCase):
               '<article><h2>Agency and Delegation</h2>'
               '<p>Humans should remain in control when their agents make choices on their behalf and across many services.</p>'
               '</article></main><footer><p>Ignore promotional material in the footer and never index this section.</p></footer>')
-  self.assertEqual(len(parser.paragraphs),1)
-  self.assertIn("Humans should",parser.paragraphs[0])
-  self.assertNotIn("Ignore",parser.paragraphs[0])
+  self.assertEqual(len(parser.paragraphs),2)
+  self.assertEqual(parser.paragraphs[0],"Agency and Delegation")
+  self.assertIn("Humans should",parser.paragraphs[1])
+  self.assertNotIn("Ignore"," ".join(parser.paragraphs))
 
  def test_unapproved_hosts_and_claim_validation(self):
   self.assertFalse(host_allowed("https://news.google.com/rss/articles/example"))
