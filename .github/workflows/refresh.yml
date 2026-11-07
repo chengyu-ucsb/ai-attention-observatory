@@ -33,6 +33,7 @@ on:
 permissions:
   contents: write
 concurrency:
+  # Article acquisition uses its own group: other pending writers must not replace it.
   group: observatory-index
   cancel-in-progress: false
 jobs:
