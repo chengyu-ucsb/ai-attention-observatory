@@ -22,13 +22,17 @@ def report():
     group=Counter(r.get("source_group") or "unclassified" for r in public)
     levels=Counter((r.get("reading") or {}).get("level") or "unknown" for r in public)
     fulltext=[r for r in scholarly if (r.get("reading") or {}).get("level")=="full_text"]
+    extracted=[r for r in scholarly if (r.get("analysis") or {}).get("fulltext_url") and not (r.get("analysis") or {}).get("original_paraphrases_only")]
+    originals=[r for r in scholarly if (r.get("reading") or {}).get("original_summary")]
     return {
       "public_total":len(public),
       "linked_explainers":len(companions),
       "unpaired_commentary":sum(r.get("kind")=="nonacademic" for r in public),
       "explicit_conceptual_frameworks":sum(r.get("research_type")=="conceptual_framework" for r in scholarly),
       "scholarly":len(scholarly),
-      "full_text_extracted":len(fulltext),
+      "full_text_extracted":len(extracted),
+      "original_summaries":len(originals),
+      "full_text_reading_depth":len(fulltext),
       "scholarly_abstract_only":sum((r.get("reading") or {}).get("level")=="abstract" for r in scholarly),
       "full_text_share_of_scholarly":round(100*len(fulltext)/max(1,len(scholarly)),1),
       "source_groups":dict(sorted(group.items())),
@@ -41,3 +45,4 @@ def report():
 
 if __name__=="__main__":
     print(json.dumps(report(),ensure_ascii=False,indent=2))
+

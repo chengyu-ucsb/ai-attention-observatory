@@ -70,6 +70,10 @@ def weekly_eligible(record, start, end):
     try:
         if urlsplit(record.get("url") or "").hostname=="news.google.com":return False
     except ValueError:return False
+    if (record.get('original_reading') is not None or (record.get('reading') or {}).get('original_summary')
+            or record.get('original_summary') or record.get('original_reading_sha256')):
+        from original_readings import weekly_source_eligible
+        if not weekly_source_eligible(record):return False
     return (date_in_window(day,start,end) and not record.get("historical_backfill")
             and not str(record.get("discovery_scope", "")).startswith("historical:"))
 

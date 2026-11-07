@@ -10,6 +10,8 @@ import pathlib
 import urllib.parse
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
+from original_readings import public_record
+from collection_window import previous_week, weekly_eligible, window_metadata
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
@@ -30,6 +32,13 @@ def build():
   from build_public import build as project
   project()
  weekly=json.loads((DATA/"public-weekly.json").read_text(encoding="utf-8"))
+ date=(weekly.get("run") or {}).get("date")
+ bounds=previous_week(date) if date else None
+ if bounds:
+  expected=window_metadata(date)
+  supplied=(weekly.get("run") or {}).get("publication_window") or expected
+  if any(supplied.get(key)!=expected[key] for key in ("from","to","timezone")):
+   raise ValueError("RSS publication window does not match previous completed UTC week")
  root=ET.Element("rss",{"version":"2.0"})
  channel=ET.SubElement(root,"channel")
  fields={
@@ -44,6 +53,8 @@ def build():
  ET.SubElement(channel,"{"+ATOM+"}link",{"href":URL,"rel":"self","type":"application/rss+xml"})
  entries=0
  for x in (weekly.get("items") or [])[:50]:
+  x=public_record(x, require_current=True)
+  if bounds and not weekly_eligible(x,*bounds):continue
   read=x.get("reading") or {}
   if read.get("level")=="citation_only":continue
   digest=read.get("digest") or {}
@@ -56,6 +67,8 @@ def build():
    text+=" "+explain
   kind=x.get("kind") or "scholarly"
   label="Conceptual framework" if x.get("research_type")=="conceptual_framework" else "Research finding" if digest.get("finding") else ("Research question" if kind=="scholarly" else "Perspective")
+  if read.get("original_summary"):
+   label="AI source-checked summary (not human review; "+read["source_version"]+")"
   stable=x.get("doi") or x.get("url") or x.get("title")
   if not stable:continue
   permalink=BASE+"#paper/"+urllib.parse.quote(str(stable),safe="")
@@ -70,6 +83,8 @@ def build():
    el=ET.SubElement(item,field)
    if field=="guid":el.attrib["isPermaLink"]="true"
    el.text=value
+  if read.get("original_summary"):
+   ET.SubElement(item,"source",{"url":read["source_url"]}).text=read["source_version"]
   ET.SubElement(item,"category").text=x.get("lane") or "AI and attention"
   entries+=1
  ET.SubElement(channel,"lastBuildDate").text=rss_date((weekly.get("run") or {}).get("date"))
@@ -82,3 +97,4 @@ def build():
  return entries
 
 if __name__=="__main__":build()
+
