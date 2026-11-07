@@ -208,7 +208,9 @@ def evidence_item(field, value, basis, url):
 def prior_evidence(record):
     provenance = record.get("publication_date_provenance") or {}
     result = []
-    for row in [provenance] + (provenance.get("evidence") or []):
+    # Preserve established evidence order on repeat checks. Reordering identical
+    # evidence would also change the article-screen receipt's record hash.
+    for row in (provenance.get("evidence") or []) + [provenance]:
         if not isinstance(row, dict):
             continue
         value = row.get("value") or row.get("date")
@@ -301,6 +303,15 @@ def verify_record(record, page, *, url=None, checked_at=None):
             "field": selected_date["field"], "value": selected_date["date"], "date": selected_date["date"],
             "timezone": "UTC", "source_url": access.diagnostic_url(url), "evidence": all_dates,
             "independently_verified": True, "checked_at": now}
+        # Keep the timestamp of unchanged date evidence stable. The per-run
+        # editorial_metadata report above still records this verification time.
+        # Rewriting only checked_at would invalidate source-bound reading receipts
+        # despite no change in identity, original date, or supporting evidence.
+        candidate = output["publication_date_provenance"]
+        if (provenance.get("checked_at")
+                and {k: v for k, v in provenance.items() if k != "checked_at"}
+                == {k: v for k, v in candidate.items() if k != "checked_at"}):
+            candidate["checked_at"] = provenance["checked_at"]
         report["date_status"] = "verified"
     elif provenance.get("basis") in ORIGINAL_BASES and provenance.get("status") not in UNRESOLVED and day(provenance.get("value") or provenance.get("date")) == stored:
         report["date_status"] = "publisher_feed_only" if provenance["basis"] in {"publisher_rss_pubDate", "publisher_atom_published"} else "previously_verified"
