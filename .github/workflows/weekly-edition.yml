@@ -8,11 +8,13 @@ on:
     branches: [main]
     paths:
       - 'scripts/compose_issue.py'
+      - 'data/original-readings.json'
       - '.github/workflows/weekly-edition.yml'
   pull_request:
     branches: [main]
     paths:
       - 'scripts/compose_issue.py'
+      - 'data/original-readings.json'
       - 'tests/test_compose_issue.py'
       - '.github/workflows/weekly-edition.yml'
   # Recovery if an upstream run fails before dispatching its successor.
@@ -43,7 +45,11 @@ jobs:
       - name: Check whether this week already has an edition
         id: edition
         if: github.event_name != 'pull_request'
-        run: python scripts/compose_issue.py --check
+        run: |
+          # Reconcile newly accepted/revoked readings before using a cached shelf.
+          # This is local projection only, never discovery or source retrieval.
+          python scripts/build_public.py
+          python scripts/compose_issue.py --check
       - name: Install runner-local inference
         if: steps.edition.outputs.needed == 'true'
         run: |

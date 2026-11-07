@@ -323,7 +323,35 @@ class OriginalSummaryTests(unittest.TestCase):
         row['original_reading']=n;reading=make_note(row)
         self.assertEqual(reading['findings'],'');self.assertFalse(reading['reported_findings'])
 
-    def test_public_manifest_empty_no_real_pilot_readings(self):
-        self.assertEqual(json.loads((ROOT/'data/original-readings.json').read_text())['articles'],[])
+    def test_accepted_register_change_rechecks_weekly_edition(self):
+        workflow=(ROOT/'.github/workflows/weekly-edition.yml').read_text()
+        push=workflow.split('  push:',1)[1].split('  pull_request:',1)[0]
+        pull_request=workflow.split('  pull_request:',1)[1].split('  # Recovery',1)[0]
+        for trigger in (push,pull_request):
+            self.assertIn("'data/original-readings.json'",trigger)
+        self.assertIn("if: github.event_name != 'pull_request'",workflow)
+        self.assertIn('python scripts/compose_issue.py --check',workflow)
+        self.assertIn('python scripts/build_public.py',workflow)
+        self.assertLess(workflow.index('python scripts/build_public.py'),workflow.index('python scripts/compose_issue.py --check'))
+        self.assertNotIn('update.py',workflow)
+        self.assertNotIn('discover_editorial.py',workflow)
+
+    def test_public_manifest_contains_only_accepted_content_bound_readings(self):
+        # Real accepted readings arrive separately from the adapter. A metadata
+        # change may quarantine an old receipt, but no draft/hold belongs here.
+        notes=json.loads((ROOT/'data/original-readings.json').read_text())['articles']
+        self.assertEqual(len({n['id'] for n in notes}),len(notes))
+        self.assertEqual(len({original.identifier(n) for n in notes}),len(notes))
+        for note in notes:
+            with self.subTest(id=note['id']):
+                self.assertEqual(note['review']['kind'],'ai_source_check')
+                self.assertEqual(note['review']['status'],'passed')
+                self.assertEqual(note['review']['payload_sha256'],original.payload_digest(note))
+                self.assertEqual(note['publication']['decision'],'approved')
+                self.assertTrue(note['publication']['approved_by'])
+                self.assertGreaterEqual(note['publication']['approved_on'],note['review']['checked_on'])
+                self.assertEqual(note['publication']['payload_sha256'],original.publication_digest(note))
+                self.assertTrue(note['rights']['original_paraphrases_only'])
+                self.assertFalse(note['rights']['source_text_redistribution'])
 
 if __name__=='__main__':unittest.main()

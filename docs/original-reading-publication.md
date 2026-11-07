@@ -8,10 +8,20 @@ independent. The legacy verified-HTML route remains unchanged.
 
 ## Status of this change
 
-`data/original-readings.json` is deliberately empty. No private pilot draft, paper
-text, or PDF is included. Merging this code alone does not approve or publish any
-new summary, solve unattended model quality, or certify scientific validity.
-Tests use fictional source claims and publication receipts.
+The adapter was first introduced with an empty accepted register. The separate
+initial data change adds six original, explicitly limited readings after source
+checking, article-specific assessment, amendment checks and a distinct editorial
+publication decision. Three are pinned arXiv v1 preprints and three are attributed
+EFF arguments. Five qualify for the October 26–November 1, 2026 shelf; the parenting
+article is library-only because its checked page reports a November 5 modification.
+No source article body, PDF, screenshot or figure is redistributed.
+
+These checks are AI-assisted, not human review, peer review, replication or a
+certification of source validity. The quantitative preprints retain unresolved
+reporting/inference limitations; the expert-role-play paper retains its source
+example-error caveat. EFF product and policy claims are attributed, not independently
+verified functionality or effectiveness. Generic adapter tests remain synthetic;
+registered-reading browser checks inspect actual accepted text and source labels.
 
 ## Admission and review
 
@@ -129,10 +139,10 @@ opinion, or news reading. The following explicit receipt path is required.
 
 ## Article-screened preprints and attributed commentary
 
-The same empty accepted register now supports two additional **explicitly
-screened** types. No screening draft, source body, or actual publication approval
-is included. Code validation is not source review and cannot determine whether
-an attestor's prose is true. Publication still requires a separate, content-bound
+The accepted register supports two additional **explicitly screened** types.
+Only accepted original readings belong in it, never unresolved screening drafts
+or source bodies. Code validation is not source review and cannot determine
+whether an attestor's prose is true. Publication requires a separate, content-bound
 acceptance after the independent AI source check.
 
 Both types require an `article_screen` object with exactly:
@@ -217,3 +227,10 @@ current library row for extended receipts. The cached context must match current
 metadata, and the accepted receipt is checked against current topical evidence.
 Missing, duplicate or changed indexed records are quarantined as citation-only;
 stale cached abstract/digest prose cannot fall back into synthesis or RSS.
+
+An accepted-register change triggers a local public-shelf rebuild followed by
+the existing weekly-edition preflight, not a new discovery sweep. This reconciles
+new or revoked receipts instead of composing from an older committed shelf. PR events run offline validation only. On main, the
+existing current-edition, previous-week, source-count and quality gates decide
+whether composition is needed; a data change does not itself approve a weekly
+synthesis or bypass its validation.
