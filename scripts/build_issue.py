@@ -7,6 +7,7 @@ The issue includes citations to the exact source records and a complete source s
 from __future__ import annotations
 import json,datetime,pathlib,re
 from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for
+from collection_window import window_metadata,previous_week,weekly_eligible
 ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
 def source_id(x):return x.get("id") or (x.get("doi") or "").lower() or x.get("url") or x.get("title")
 def find(needle,items):
@@ -23,7 +24,10 @@ def checked_source_metadata(item):
  "original_reading_sha256":publication_digest(item["original_reading"]) if item.get("original_reading") else item.get("original_reading_sha256","")}
 
 def resolve_queued_original(item):
- if not item.get("original_summary"):return item
+ if not item.get("original_summary"):
+  if any(item.get(key) for key in ("original_reading_sha256","review_kind","source_version")):
+   raise ValueError("Queued original reading marker is incomplete; revalidate the issue before publication")
+  return item
  ident=str(item.get("id") or "")
  record={**item,"doi":ident if ident.lower().startswith("10.") else "",
          "url":item.get("url") or ident}
@@ -46,7 +50,7 @@ def build(edition_date=None):
  if edition_date:
   datetime.date.fromisoformat(edition_date)
   packet=json.loads((DATA/"editorial-queue"/(edition_date+".json")).read_text(encoding="utf-8"))
-  weekly={"run":{"date":edition_date},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
+  weekly={"run":{"date":edition_date,"publication_window":packet.get("publication_window") or window_metadata(edition_date)},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
  issue_date=(weekly.get("run") or {}).get("date") or ""
  drafts=json.loads((DATA/"issue-editorial.json").read_text())
  items=weekly.get("items") or []
@@ -60,14 +64,23 @@ def build(edition_date=None):
   items=checked
  else:
   items=[resolve_queued_original(item) for item in items]
+ if weekly.get("run",{}).get("date"):
+  weekly["run"].setdefault("publication_window",window_metadata(weekly["run"]["date"]))
+  expected=window_metadata(weekly["run"]["date"])
+  if any(weekly["run"]["publication_window"].get(key)!=expected[key] for key in ("from","to","timezone")):
+   raise ValueError("Publication window does not match previous completed UTC week")
+  bounds=previous_week(weekly["run"]["date"])
+  if any(not weekly_eligible(x,*bounds) for x in items):
+   raise ValueError("Weekly source lacks verified previous-week original publication evidence; rebuild/review the source shelf")
  schema={
   "edition_date":issue_date,"source_count":len(items),
+  **({"publication_window":weekly["run"]["publication_window"]} if weekly.get("run",{}).get("publication_window") else {}),
   "types":{"scholarly":sum(x.get("kind")=="scholarly" for x in items),"commentary":sum(x.get("kind")!="scholarly" for x in items)},
   "material":{"full_text":sum(x.get("reading",{}).get("level")=="full_text" for x in items),
    "abstract":sum(x.get("reading",{}).get("level")=="abstract" for x in items),
    "publisher_or_editorial":sum(x.get("reading",{}).get("level")=="curated" for x in items)},
   "sources":[{"id":source_id(x),"title":x.get("title",""),"kind":x.get("kind",""),"venue":x.get("venue",""),
-     "published":x.get("published",""),"reading_level":x.get("reading",{}).get("level",""),
+     "published":x.get("published",""),"publication_date_provenance":x.get("publication_date_provenance",{}),"reading_level":x.get("reading",{}).get("level",""),
      "research_type":x.get("research_type") or x.get("reading",{}).get("research_type",""),
      "url":x.get("url",""),
      "editorial_role":x.get("editorial_role","collection_week"),
@@ -76,6 +89,12 @@ def build(edition_date=None):
   "note":"New source records have been indexed. The website's weekly synthesis has not yet passed publication checks."
  }
  draft=drafts.get(issue_date)
+ existing_archive=DATA/"approved-issues"/(issue_date+".json")
+ if not edition_date and schema.get("publication_window") and existing_archive.exists():
+  archived=json.loads(existing_archive.read_text(encoding="utf-8"))
+  if archived.get("status")=="published":
+   # A new collection rule/shelf must not rewrite an already published edition.
+   draft=None
  if draft:
   if len(items)<3:raise ValueError("Issue must have at least three source-backed items")
   cards=[]

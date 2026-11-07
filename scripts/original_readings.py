@@ -33,7 +33,7 @@ def safe_url(value):
         p = urlsplit(value)
         host = p.hostname or ''
         if (p.scheme != 'https' or not host or '.' not in host or host.endswith(('.local', '.localhost'))
-                or p.username or p.password or p.port not in (None, 443) or p.query or p.fragment):
+                or host.endswith('.') or p.username or p.password or p.port not in (None, 443) or p.query or p.fragment):
             return False
         try:
             ipaddress.ip_address(host)
@@ -89,12 +89,14 @@ def eligible(note, record):
         if not re.fullmatch(r'[0-9a-f]{64}', source['source_sha256']): return False
         if source['journal_version_equivalence_claimed'] is not False: return False
         if not isinstance(source['source_doi'], str) or not isinstance(source['related_journal_doi'], str): return False
+        if any(value and not re.fullmatch(r'10\.\d{4,9}/\S+', value, re.I)
+               for value in (source['source_doi'], source['related_journal_doi'])): return False
         if source['source_doi'].lower() != str(note['doi'] or '').lower():
             if not (source['source_doi'] and source['related_journal_doi'].lower() == note['doi'].lower()
                     and re.search(r'preprint|working.paper|accepted.manuscript', source['version'], re.I)):
                 return False
-        if urlsplit(source['url']).hostname in ('arxiv.org', 'export.arxiv.org'):
-            if not re.search(r'v\d+(?:\.pdf)?$', urlsplit(source['url']).path): return False
+        if urlsplit(source['url']).hostname in ('arxiv.org', 'www.arxiv.org', 'export.arxiv.org'):
+            if not re.fullmatch(r'/(?:abs|pdf|html)/\d{4}\.\d{4,5}v[1-9]\d*(?:\.pdf)?/?', urlsplit(source['url']).path): return False
         summary = note['summary']
         if not isinstance(summary, dict) or set(summary) != set(FIELDS): return False
         if any(not text(summary[k]) for k in FIELDS if k != 'finding'): return False
@@ -127,6 +129,41 @@ def eligible(note, record):
     except (KeyError, TypeError, ValueError, AttributeError):
         return False
 
+
+
+def weekly_source_eligible(record):
+    """A dated publication cannot stand in for a different checked source version.
+
+    This is deliberately stricter than general-library admission. In particular,
+    an older related manuscript remains a labeled library reading, not evidence
+    for the journal publication's week. It performs no external lookups.
+    """
+    note = record.get('original_reading')
+    if not eligible(note, record): return False
+    source = note['source']
+    doi = str(record.get('doi') or '').lower()
+    if doi and source['source_doi'].lower() != doi: return False
+    provenance = record.get('publication_date_provenance') or {}
+    is_arxiv = (provenance.get('basis') == 'arxiv_first_submitted'
+                or doi.startswith('10.48550/arxiv.')
+                or urlsplit(source['url']).hostname in ('arxiv.org', 'www.arxiv.org', 'export.arxiv.org')
+                or urlsplit(record.get('url') or '').hostname in ('arxiv.org', 'www.arxiv.org', 'export.arxiv.org'))
+    if is_arxiv:
+        # Reuse the acquisition queue's pure binding checks, never its network
+        # route functions, so summary and retrieval versions cannot diverge.
+        from collect_weekly_sources import verified_arxiv_v1, is_pinned_arxiv_url
+        pinned = verified_arxiv_v1(record)
+        if not pinned or source['version'] not in ('arxiv_preprint_v1', 'preprint_v1'): return False
+        if not is_pinned_arxiv_url(source['url'], pinned): return False
+        # The acquisition verifier accepts unversioned record locators, but an
+        # explicitly different indexed version must not label a v1 summary.
+        for value in (doi, record.get('url') or '', note['record_url']):
+            version = re.search(r'v(\d+)(?:\.pdf)?/?$', value, re.I)
+            if version and version.group(1) != '1': return False
+        return True
+    if not doi:
+        return source['url'] == note['record_url'] == record.get('url')
+    return True
 
 def apply(rows, manifest=None):
     """Reconcile the accepted register; removal/revocation removes old summaries.

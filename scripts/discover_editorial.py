@@ -1,190 +1,490 @@
-"""Discover thoughtful nonacademic articles independently of scholarly DOI search.
+"""Discover prior-week journalism, opinion, policy and analysis from free feeds.
 
-Sources: publisher RSS/Atom feeds and narrowly scoped Google News RSS.
-No arbitrary publisher HTML crawling, paywall bypassing, or full-text copying.
-Only source metadata and short feed descriptions are stored/published.
+Publisher-declared original publication dates determine admission, never modified,
+indexed or first-seen dates. Google News is a separate, unverified lead queue.
+Only metadata and short publisher previews persist; discovery is not full text.
 """
-import datetime, email.utils, html, json, pathlib, re, time
-import urllib.parse, urllib.request, urllib.error
+from collections import Counter
+import datetime
+import email.utils
+import html
+import json
+import pathlib
+import re
+import time
+import unicodedata
+import urllib.parse
+import urllib.request
+import urllib.error
 import xml.etree.ElementTree as ET
+
+from collection_window import previous_week, date_in_window, weekly_eligible, window_metadata
 from news_quality import useful_description, publisher_url
 from editorial_corrections import apply as apply_editorial_corrections
 from editorial_source_reviews import apply as apply_source_reviews
 
-ROOT=pathlib.Path(__file__).resolve().parents[1]
-DIR=ROOT/"data"
-TODAY=datetime.datetime.now(datetime.timezone.utc).date()
-ATOM="{http://www.w3.org/2005/Atom}"
-FEEDS=[
-    {"name":"The Conversation","url":"https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom","category":"Expert commentary"},
-    {"name":"The Verge","url":"https://www.theverge.com/rss/index.xml","category":"Technology journalism"},
-    {"name":"Ars Technica","url":"https://feeds.arstechnica.com/arstechnica/technology-lab","category":"Technology journalism"},
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+DIR = ROOT / "data"
+TODAY = datetime.datetime.now(datetime.timezone.utc).date()
+ATOM = "{http://www.w3.org/2005/Atom}"
+DC = "{http://purl.org/dc/elements/1.1/}"
+MAX_FEED_BYTES = 3_000_000
+MAX_FEED_PAGES = 6
+AGENT = "AIAttentionObservatory/8.0 (+https://github.com/chengyu-ucsb/ai-attention-observatory)"
+FEEDS = json.loads((DIR / "editorial-sources.json").read_text())["sources"]
+GOOGLE_SEARCHES = [
+    ('"AI" ("attention" OR "distraction" OR "focus")', "AI & cognition"),
+    ('"ChatGPT" ("thinking" OR "cognitive" OR "memory")', "AI & cognition"),
+    ('"AI" ("digital wellbeing" OR "attention management")', "Interventions"),
+    ('"AI" "learning" "critical thinking"', "AI & cognition"),
+    ('"notification batching" OR "interruption recovery"', "Interventions"),
+    ('"AI" "productivity" "focus"', "Interventions"),
+    ('"cognitive offloading" "generative AI"', "AI & cognition"),
+    ('"attention economy" "AI" ("design" OR "policy")', "Technology & society"),
 ]
-GOOGLE_SEARCHES=[
-    ('"AI" "attention" OR "distraction" OR "focus" when:45d',"AI & cognition"),
-    ('"ChatGPT" "thinking" OR "cognitive" OR "memory" when:45d',"AI & cognition"),
-    ('"AI" "digital wellbeing" OR "attention management" when:45d',"Interventions"),
-    ('"AI" "learning" "critical thinking" when:45d',"AI & cognition"),
-    ('"notification batching" OR "interruption recovery" when:45d',"Interventions"),
-    ('"AI" "productivity" "focus" when:45d',"Interventions"),
-    ('"cognitive offloading" "generative AI" when:45d',"AI & cognition"),
-    ('"attention economy" "AI" "design" when:45d',"Technology & society"),
-]
-# Narrowly curated sources. Include practitioners and independent analysis, not just journal literature.
-PUBLISHERS={
-    "The Conversation","The Verge","Ars Technica","WIRED","MIT Technology Review",
-    "Tech Policy Press","The Atlantic","The Guardian","BBC","The New York Times",
-    "Financial Times","The Economist","Harvard Business Review","IEEE Spectrum",
-    "Nielsen Norman Group","NPR","Vox","Rest of World","EdSurge",
-    "Inside Higher Ed","404 Media","The Markup","TechCrunch","Poynter",
-    "New Scientist","Nature","Scientific American","Fast Company",
+PUBLISHERS = {
+    "The Conversation", "The Verge", "Ars Technica", "WIRED", "MIT Technology Review",
+    "Tech Policy Press", "The Atlantic", "The Guardian", "BBC", "The New York Times",
+    "Financial Times", "The Economist", "Harvard Business Review", "IEEE Spectrum",
+    "Nielsen Norman Group", "NPR", "Vox", "Rest of World", "EdSurge", "Inside Higher Ed",
+    "404 Media", "The Markup", "TechCrunch", "Poynter", "New Scientist", "Nature",
+    "Scientific American", "Fast Company", "Nieman Lab", "AI Now Institute", "Brookings",
+    "Electronic Frontier Foundation",
 }
-AI=re.compile(r"\b(?:ai|genai|chatgpt|copilot|generative|artificial intelligence|language models?|llms?|claude|algorithmic)\b",re.I)
-FOCUS=re.compile(r"\b(?:attention|focus|distraction|cognitive|offloading|thinking|think|mental effort|memory|learning|workflows?|interruption|notifications?|task.switching|mindful|productivity|deep work|wellbeing|well-being|autonomy)\b",re.I)
-NOISE=re.compile(r"stock (?:price|market)|share price|market cap|latest earnings|price target|football|crypto investment|gambling|celebrity|smartphone deal|focus on privacy|focuses on privacy|paying attention to (?:the|a|creative)|(?:ai|artificial intelligence).*museum|museum.*(?:ai|artificial intelligence)",re.I)
-def clean(s):
-    s=html.unescape(re.sub(r"<[^>]+>"," ",s or ""))
-    return re.sub(r"\s+"," ",s).strip()
-def url_key(s):
+AI = re.compile(r"\b(?:ai|genai|chatgpt|copilot|generative|artificial intelligence|language models?|llms?|claude|algorithmic)\b", re.I)
+FOCUS = re.compile(r"\b(?:attention|focus|distraction|cognitive|offloading|thinking|mental effort|memory|learning|interruption|notifications?|task.switching|mindful|productivity|deep work|wellbeing|well-being|autonomy)\b", re.I)
+NOISE = re.compile(r"stock (?:price|market)|share price|market cap|latest earnings|price target|football|crypto investment|gambling|celebrity|smartphone deal|focus on privacy|focuses on privacy|paying attention to (?:the|a|creative)|(?:ai|artificial intelligence).*museum|museum.*(?:ai|artificial intelligence)", re.I)
+TRACKING = {"fbclid", "gclid", "dclid", "msclkid", "mc_cid", "mc_eid", "ref_src", "ref_url"}
+FORMATS = {"journalism": "Technology journalism", "opinion": "Opinion & analysis",
+           "policy": "Policy & analysis", "analysis": "Expert analysis"}
+
+
+def clean(value):
+    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", value or ""))).strip()
+
+
+def url_key(value):
+    """Remove known tracking only; article IDs in query strings are identity."""
     try:
-        p=urllib.parse.urlsplit(s)
-        return (p.netloc.lower()+p.path.rstrip("/")).replace("www.","")
-    except Exception:return s
-def normalize_date(s):
-    if not s:return ""
-    try:return email.utils.parsedate_to_datetime(s).date().isoformat()
-    except (ValueError,TypeError):
-        try:return datetime.date.fromisoformat(s[:10]).isoformat()
-        except ValueError:return ""
+        parts = urllib.parse.urlsplit(value)
+        host = (parts.hostname or "").lower().removeprefix("www.")
+        params = [(k, v) for k, v in urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+                  if not k.lower().startswith("utm_") and k.lower() not in TRACKING]
+        query = urllib.parse.urlencode(sorted(params))
+        return host + parts.path.rstrip("/") + ("?" + query if query else "")
+    except ValueError:
+        return value
+
+
+def title_key(title, publisher, published):
+    # Do not collapse similar titles, truncated prefixes, or different publishers.
+    words = " ".join(re.findall(r"\w+", unicodedata.normalize("NFKC", title).casefold()))
+    return (publisher.casefold(), published, words)
+
+
+def normalize_date(value):
+    """Normalize an actual publication field to a UTC date, never infer a day."""
+    if not value:
+        return ""
+    value = str(value).strip()
+    try:
+        stamp = email.utils.parsedate_to_datetime(value)
+    except (ValueError, TypeError, OverflowError):
+        if re.fullmatch(r"\d{4}-\d{2}-\d{2}", value):
+            try:
+                return datetime.date.fromisoformat(value).isoformat()
+            except ValueError:
+                return ""
+        if not re.match(r"^\d{4}-\d{2}-\d{2}T", value):
+            return ""
+        try:
+            stamp = datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
+        except ValueError:
+            return ""
+    if stamp.tzinfo:
+        stamp = stamp.astimezone(datetime.timezone.utc)
+    return stamp.date().isoformat()
+
+
+class FeedRedirects(urllib.request.HTTPRedirectHandler):
+    def __init__(self, host):
+        self.host = host.lower().removeprefix("www.")
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        parts = urllib.parse.urlsplit(newurl)
+        if (parts.scheme != "https" or parts.username or parts.password
+                or parts.port not in (None, 443)
+                or (parts.hostname or "").lower().removeprefix("www.") != self.host):
+            raise ValueError("feed_redirect_requires_review")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
 def get_xml(url):
-    r=urllib.request.Request(url,headers={"User-Agent":"Mozilla/5.0 (compatible; ResearchObservatory/2.0; contact fangcu@ucmail.uc.edu)","Accept":"application/atom+xml,application/rss+xml,application/xml,text/xml"})
-    with urllib.request.urlopen(r,timeout=22) as response:
-        blob=response.read(2_200_000)
-    return ET.fromstring(blob)
-def atom_text(el,local):
-    child=el.find(ATOM+local)
+    parts = urllib.parse.urlsplit(url)
+    if parts.scheme != "https" or parts.username or parts.password or parts.port not in (None, 443):
+        raise ValueError("unsafe_feed_url")
+    request = urllib.request.Request(url, headers={"User-Agent": AGENT,
+        "Accept": "application/atom+xml,application/rss+xml,application/xml,text/xml"})
+    with urllib.request.build_opener(FeedRedirects(parts.hostname)).open(request, timeout=22) as response:
+        blob = response.read(MAX_FEED_BYTES + 1)
+    if len(blob) > MAX_FEED_BYTES:
+        raise ValueError("feed_size_limit_exceeded")
+    root = ET.fromstring(blob)
+    if root.tag not in (ATOM + "feed", "rss", "{http://www.w3.org/1999/02/22-rdf-syntax-ns#}RDF"):
+        raise ValueError("not_an_rss_or_atom_feed")
+    return root
+
+
+def atom_text(element, local):
+    child = element.find(ATOM + local)
     return "".join(child.itertext()) if child is not None else ""
+
+
 def parse_feed(root):
-    out=[]
-    if root.tag.endswith("feed"):
-        for item in root.findall(ATOM+"entry")[:65]:
-            links=item.findall(ATOM+"link")
-            url=next((a.get("href") for a in links if a.get("rel","alternate")=="alternate" and a.get("href","").startswith("https://")),None)
-            url=url or next((a.get("href") for a in links if a.get("href","").startswith("https://")),"")
-            summary=atom_text(item,"summary") or atom_text(item,"content")
-            author=item.find(ATOM+"author")
-            people=[atom_text(author,"name")] if author is not None else []
-            out.append(dict(title=clean(atom_text(item,"title")),url=url,description=clean(summary),date=normalize_date(atom_text(item,"published") or atom_text(item,"updated")),authors=[x for x in people if x]))
+    output = []
+    if root.tag == ATOM + "feed":
+        for item in root.findall(ATOM + "entry"):
+            links = item.findall(ATOM + "link")
+            url = next((a.get("href") for a in links if a.get("rel", "alternate") == "alternate"), "")
+            original = atom_text(item, "published")
+            output.append({"title": clean(atom_text(item, "title")), "url": url,
+                "description": clean(atom_text(item, "summary") or atom_text(item, "content")),
+                "date": normalize_date(original), "date_raw": original,
+                "date_basis": "publisher_atom_published" if original else "missing_original_publication_date",
+                "updated": normalize_date(atom_text(item, "updated")),
+                "authors": [clean(atom_text(a, "name")) for a in item.findall(ATOM + "author") if atom_text(a, "name")],
+                "categories": [a.get("term", "") for a in item.findall(ATOM + "category")]})
     else:
-        for item in root.findall(".//item")[:65]:
-            source=item.find("source")
-            creator=item.find("{http://purl.org/dc/elements/1.1/}creator")
-            out.append(dict(title=clean(item.findtext("title")),url=clean(item.findtext("link")),description=clean(item.findtext("description")),date=normalize_date(item.findtext("pubDate")),authors=[creator.text.strip()] if creator is not None and creator.text else [],source=source.text.strip() if source is not None and source.text else ""))
-    return out
-def label(title,desc,category):
-    match=(title+" "+desc).lower()
-    if re.search("design|tool|product|focus mode|notification|workflow|interface|usability|prototype",match):return "Product & design"
-    if "Perspective" in category or "commentary" in category.lower():return "Opinion & analysis"
-    return category
-def classify(title,desc):
-    s=(title+" "+desc).lower()
-    if re.search(r"\b(?:focus|notification|self.regulation|digital wellbeing|attention support|intervention|design)\b",s):return "Interventions"
-    if re.search(r"distraction|fragmentation|interruption|task.switching",s):return "Fragmentation"
-    if re.search(r"attention economy|ethics|agency|platform|policy",s):return "Technology & society"
+        # RSS 2 and namespaced RSS 1. Never substitute channel lastBuildDate or dc:date.
+        nodes = root.findall(".//item") + root.findall(".//{http://purl.org/rss/1.0/}item")
+        for item in nodes:
+            namespace = "{http://purl.org/rss/1.0/}" if item.tag.startswith("{") else ""
+            source = item.find("source")
+            original = item.findtext("pubDate") or ""
+            output.append({"title": clean(item.findtext(namespace + "title")),
+                "url": clean(item.findtext(namespace + "link")),
+                "description": clean(item.findtext(namespace + "description")),
+                "date": normalize_date(original), "date_raw": original,
+                "date_basis": "publisher_rss_pubDate" if original else "missing_original_publication_date",
+                "authors": [clean(a.text) for a in item.findall(DC + "creator") if a.text],
+                "source": clean(source.text) if source is not None else "",
+                "categories": [clean(a.text) for a in item.findall("category") if a.text]})
+    return output
+
+
+def next_page(root, current_url):
+    container = root.find("channel") if root.tag == "rss" else root
+    if container is None:
+        return ""
+    for link in container.findall(ATOM + "link"):
+        if link.get("rel") != "next":
+            continue
+        target = urllib.parse.urljoin(current_url, link.get("href", ""))
+        parts, old = urllib.parse.urlsplit(target), urllib.parse.urlsplit(current_url)
+        if (parts.scheme != "https" or parts.hostname != old.hostname or parts.username
+                or parts.password or parts.port not in (None, 443)):
+            raise ValueError("feed_pagination_requires_review")
+        return target
+    return ""
+
+
+def source_type(item, feed):
+    tags = {str(x).strip().casefold() for x in item.get("categories", [])}
+    for kind, values in (("opinion", {"opinion", "perspective", "commentary", "editorial"}),
+                         ("analysis", {"analysis", "explainer"}),
+                         ("policy", {"policy", "policy analysis", "policy brief"}),
+                         ("journalism", {"news", "reporting", "investigation"})):
+        if tags & values:
+            return kind, "publisher_item_category"
+    return feed.get("source_type", "analysis"), "provisional_feed_default"
+
+
+def label(title, desc, category):
+    # A design topic does not turn a reported article into product documentation.
+    return "Opinion & analysis" if "commentary" in category.casefold() else category
+
+
+def classify(title, desc):
+    value = (title + " " + desc).lower()
+    if re.search(r"\b(?:focus|notification|self.regulation|digital wellbeing|attention support|intervention|design)\b", value):
+        return "Interventions"
+    if re.search(r"distraction|fragmentation|interruption|task.switching", value):
+        return "Fragmentation"
+    if re.search(r"attention economy|ethics|agency|platform|policy", value):
+        return "Technology & society"
     return "AI & cognition"
+
+
 def eligible(item):
-    title=item["title"]
-    description=item["description"]
-    if len(title)<16 or NOISE.search(title) or NOISE.search(description[:260]):return False
-    if re.search(r"focus on (?:privacy|market|revenue|policy|security|investment)|paying attention to",title+" "+description[:100],re.I):return False
-    if item["date"] and item["date"]>TODAY.isoformat():return False
-    body=title+" "+description
-    # Require explicit discussion of AI and a human attention/cognition/product-design concept.
-    if not ((AI.search(body) and FOCUS.search(body)) or
-            (re.search(r"attention|focus|digital wellbeing|notification|cognitive offload",title,re.I) and FOCUS.search(body))):
+    """Topical screening only; exact publication-window admission is separate."""
+    title, description = item["title"], item["description"]
+    if len(title) < 16 or NOISE.search(title) or NOISE.search(description[:260]):
         return False
-    return True
-def to_record(item,publisher,format_label):
-    title=item["title"]
-    desc=item["description"]
-    if not useful_description(title,desc,publisher) or not publisher_url(item["url"]):
-        # A headline alone is not a substantive summary.
-        overview=""
-        reading_level="citation_only"
-    else:
-        overview=desc[:320].rsplit(" ",1)[0]+"…" if len(desc)>320 else desc
-        reading_level="source_preview"
-    lane=classify(title,desc)
+    if re.search(r"focus on (?:privacy|market|revenue|policy|security|investment)|paying attention to", title + " " + description[:100], re.I):
+        return False
+    body = title + " " + description
+    # Technical model learning and ordinary rhetoric ("I think", regulatory
+    # "agency", deployment "workflow") are not evidence of human cognition.
+    human_body = re.sub(r"\b(?:machine|deep|reinforcement|representation|transfer) learning\b", "", body, flags=re.I)
+    return bool((AI.search(body) and FOCUS.search(human_body)) or
+                (re.search(r"attention|focus|digital wellbeing|notification|cognitive offload", title, re.I) and FOCUS.search(human_body)))
+
+
+def allowed_article(url, feed):
+    if not publisher_url(url):
+        return False
+    parts = urllib.parse.urlsplit(url)
+    host = (parts.hostname or "").lower().removeprefix("www.")
+    return (not parts.username and not parts.password and parts.port in (None, 443)
+            and any(host == domain or host.endswith("." + domain) for domain in feed["article_hosts"]))
+
+
+def to_record(item, publisher, format_label, *, feed=None, today=None):
+    today = today or TODAY
+    title, desc = item["title"], item["description"]
+    overview = ""
+    if useful_description(title, desc, publisher) and publisher_url(item["url"]):
+        overview = desc[:320].rsplit(" ", 1)[0] + "…" if len(desc) > 320 else desc
+    kind, basis = source_type(item, feed or {"source_type": "analysis"})
     return {
-        "title":title,"authors":item["authors"],"published":item["date"],"venue":publisher,
-        "doi":"","url":item["url"],"preview":overview or "Source listed; editorial text not yet available.",
-        "kind":"nonacademic","lane":lane,"relation":"Nonacademic reporting / commentary",
-        "evidence":"Publisher feed metadata (not independently reviewed)",
-        "source":"Publisher RSS / Google News RSS","format":format_label,
-        "curated":False,"first_seen":TODAY.isoformat(),
-        "reading":{"level":reading_level,"provenance":publisher+" RSS/Atom description",
-                   "overview":overview,"methods":"","findings":"","limitations":"",
-                   "notice":"This is a short description supplied by the publisher feed, not a full-article review or independent assessment."},
-        "content_access":"feed_description" if overview else "headline_only",
-        "source_checked":TODAY.isoformat(),
+        "title": title, "authors": item.get("authors", []), "published": item["date"], "venue": publisher,
+        "doi": "", "url": item["url"], "preview": overview or "Source listed; editorial text not yet available.",
+        "kind": "nonacademic", "lane": classify(title, desc), "relation": "Nonacademic reporting / commentary",
+        "evidence": "Publisher feed metadata (not independently reviewed)",
+        "source": "Publisher RSS / Google News RSS", "format": format_label,
+        "source_type": kind, "source_type_basis": basis,
+        "publication_date_provenance": {"basis": item.get("date_basis", "unspecified"),
+            "raw": item.get("date_raw", ""), "date": item["date"], "timezone": "UTC",
+            "source_url": (feed or {}).get("url", ""), "independently_verified": False},
+        "discovery_provenance": {"method": "publisher_feed", "feed_id": (feed or {}).get("id", ""),
+            "feed_url": (feed or {}).get("url", ""), "checked_at": today.isoformat()},
+        "curated": False, "first_seen": today.isoformat(),
+        "reading": {"level": "source_preview" if overview else "citation_only",
+            "provenance": publisher + " RSS/Atom description", "overview": overview,
+            "methods": "", "findings": "", "limitations": "",
+            "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."},
+        "content_access": "feed_description" if overview else "headline_only", "source_checked": today.isoformat(),
     }
-def run():
-    path=DIR/"library.json"
-    data=apply_source_reviews(apply_editorial_corrections(json.loads(path.read_text())))
-    # Remove earlier automatic editorial false positives; never remove manually curated work.
-    data=[r for r in data if r.get("source")!="Publisher RSS / Google News RSS" or r.get("source_review") or eligible({"title":r.get("title",""),"description":r.get("preview",""),"date":r.get("published","")})]
-    seen={url_key(x.get("url","")) for x in data if x.get("url")}
-    seen_titles={re.sub("[^a-z0-9]","",(x.get("title") or "").lower())[:110] for x in data}
-    added=[];errors=[];source_counts={}
-    for feed in FEEDS:
+
+
+def quarantine_item(item, feed, reason):
+    return {"title": item["title"], "url": item["url"], "publisher": feed["name"],
+            "feed_id": feed["id"], "reported_date": item.get("date", ""),
+            "reported_date_basis": item.get("date_basis", ""), "status": reason,
+            "eligible_for_weekly": False}
+
+
+def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, sleep=time.sleep):
+    today = now or TODAY
+    if isinstance(today, datetime.datetime):
+        today = today.astimezone(datetime.timezone.utc).date() if today.tzinfo else today.date()
+    start, end = previous_week(today)
+    feeds = FEEDS if feeds is None else feeds
+    searches = GOOGLE_SEARCHES if searches is None else searches
+    seen = {url_key(x["url"]) for x in existing if x.get("url")}
+    titles = {title_key(x.get("title", ""), x.get("venue", ""), x.get("published", "")) for x in existing}
+    added, quarantine, reports, verified_existing = [], [], [], []
+    date_conflicts = {}
+    existing_by_url = {url_key(row["url"]): row for row in existing if row.get("url")}
+    observed_by_url = {}
+    paused_hosts = {}
+    for feed in feeds:
+        report = {"source_id": feed["id"], "name": feed["name"], "feed_url": feed["url"],
+                  "status": "ok", "pages": 0, "returned": 0, "accepted": 0, "warnings": []}
+        rejected, dates, visited = Counter(), [], set()
+        host = urllib.parse.urlsplit(feed["url"]).hostname
+        if host in paused_hosts:
+            report.update(status="deferred", reason=paused_hosts[host])
+            reports.append(report)
+            continue
+        current = feed["url"]
         try:
-            items=parse_feed(get_xml(feed["url"]))
-            source_counts[feed["name"]]=len(items)
+            while current:
+                if current in visited:
+                    report["warnings"].append("pagination_loop")
+                    break
+                if report["pages"] >= MAX_FEED_PAGES:
+                    report["warnings"].append("pagination_page_limit_reached")
+                    break
+                visited.add(current)
+                root = fetcher(current)
+                items = parse_feed(root)
+                report["pages"] += 1
+                report["returned"] += len(items)
+                dates.extend(x["date"] for x in items if x["date"])
+                for item in items:
+                    topical = eligible(item)
+                    key = url_key(item["url"])
+                    if not topical and key not in existing_by_url and key not in observed_by_url:
+                        rejected["not_topical"] += 1
+                        continue
+                    if not item["date"]:
+                        rejected["original_publication_date_missing"] += 1
+                        quarantine.append(quarantine_item(item, feed, "original_publication_date_missing"))
+                        continue
+                    if not allowed_article(item["url"], feed):
+                        rejected["publisher_url_unverified"] += 1
+                        quarantine.append(quarantine_item(item, feed, "publisher_url_unverified"))
+                        continue
+                    key = url_key(item["url"])
+                    old = existing_by_url.get(key) or observed_by_url.get(key)
+                    fresh = to_record(item, feed["name"], "", feed=feed, today=today)
+                    observed_by_url.setdefault(key, fresh)
+                    # A publisher correction outside this week's bounds still
+                    # invalidates an old in-window date. Preserve both accounts.
+                    if old and old.get("published") and old["published"] != item["date"]:
+                        rejected["conflicting_original_publication_dates"] += 1
+                        quarantine.append(quarantine_item(item, feed, "conflicting_original_publication_dates"))
+                        fresh = to_record(item, feed["name"], "", feed=feed, today=today)
+                        conflict = date_conflicts.setdefault(key, {"url": old["url"],
+                            "stored_publication_date": old["published"], "conflicting_evidence": [old.get("publication_date_provenance", {"date":old["published"]})]})
+                        conflict["conflicting_evidence"].append(fresh["publication_date_provenance"])
+                        if key not in seen and key not in existing_by_url and date_in_window(item["date"],start,end):
+                            kind,_=source_type(item,feed)
+                            added.append(to_record(item,feed["name"],FORMATS[kind],feed=feed,today=today))
+                            seen.add(key)
+                        continue
+                    if not topical:
+                        rejected["not_topical"] += 1
+                        continue
+                    if not date_in_window(item["date"], start, end):
+                        rejected["outside_previous_week"] += 1
+                        continue
+                    name = title_key(item["title"], feed["name"], item["date"])
+                    if key in seen or name in titles:
+                        if old and old.get("published") == item["date"]:
+                            fresh = to_record(item, feed["name"], "", feed=feed, today=today)
+                            verified_existing.append({"url": old["url"], "published": item["date"],
+                                "publication_date_provenance": fresh["publication_date_provenance"],
+                                "discovery_provenance": fresh["discovery_provenance"]})
+                        rejected["duplicate"] += 1
+                        continue
+                    seen.add(key)
+                    titles.add(name)
+                    kind, _ = source_type(item, feed)
+                    added.append(to_record(item, feed["name"], FORMATS[kind], feed=feed, today=today))
+                    report["accepted"] += 1
+                current = next_page(root, current)
+                if current:
+                    sleep(.25)
+        except Exception as error:
+            report["status"] = "failed" if not report["pages"] else "partial"
+            report["error_type"] = type(error).__name__
+            report["error"] = "HTTP " + str(error.code) if isinstance(error, urllib.error.HTTPError) else str(error)[:140]
+            if isinstance(error, urllib.error.HTTPError) and error.code in (401, 403, 429):
+                paused_hosts[host] = "provider_http_" + str(error.code)
+                report["retry_after"] = (error.headers.get("Retry-After", "") if error.headers else "")
+        report["rejected"] = dict(rejected)
+        report["oldest_original_date"] = min(dates) if dates else ""
+        report["newest_original_date"] = max(dates) if dates else ""
+        if not dates:
+            report["warnings"].append("no_original_publication_dates_returned")
+        elif min(dates) > start.isoformat():
+            report["warnings"].append("rolling_feed_does_not_reach_window_start")
+        if report["warnings"] and report["status"] == "ok":
+            report["status"] = "partial"
+        reports.append(report)
+        sleep(.25)
+    # Aggregator timestamps are not proof of original publication. Keep bounded-
+    # date search leads separate until a canonical publisher and date are verified.
+    for index, (query, lane) in enumerate(searches):
+        exact = f"{query} after:{(start - datetime.timedelta(days=1)).isoformat()} before:{(end + datetime.timedelta(days=1)).isoformat()}"
+        url = "https://news.google.com/rss/search?" + urllib.parse.urlencode({"q": exact, "hl": "en-US", "gl": "US", "ceid": "US:en"})
+        report = {"source_id": f"google-news-{index + 1}", "name": "Google News RSS", "status": "leads_only",
+                  "query": exact, "returned": 0, "accepted": 0, "warnings": ["original_publisher_and_publication_date_unverified"]}
+        if "news.google.com" in paused_hosts:
+            report.update(status="deferred", reason=paused_hosts["news.google.com"])
+            reports.append(report)
+            continue
+        try:
+            items = parse_feed(fetcher(url))
+            report["returned"] = len(items)
             for item in items:
-                if not item["url"].startswith("https://") or not eligible(item):continue
-                key=url_key(item["url"]);name=re.sub("[^a-z0-9]","",item["title"].lower())[:110]
-                if key in seen or name in seen_titles:continue
-                seen.add(key);seen_titles.add(name)
-                added.append(to_record(item,feed["name"],label(item["title"],item["description"],feed["category"])))
-        except Exception as e:errors.append(feed["name"]+": "+str(e)[:130])
-        time.sleep(.25)
-    for query,lane in GOOGLE_SEARCHES:
-        url="https://news.google.com/rss/search?"+urllib.parse.urlencode({"q":query,"hl":"en-US","gl":"US","ceid":"US:en"})
-        try:
-            for item in parse_feed(get_xml(url))[:45]:
-                publisher=item.get("source","")
-                if publisher not in PUBLISHERS or not eligible(item):continue
-                if not item["url"].startswith("https://"):continue
-                key=url_key(item["url"]);name=re.sub("[^a-z0-9]","",item["title"].lower())[:110]
-                if key in seen or name in seen_titles:continue
-                seen.add(key);seen_titles.add(name)
-                rec=to_record(item,publisher,label(item["title"],item["description"],"Technology journalism"))
-                rec["lane"]=lane
-                added.append(rec)
-        except Exception as e:errors.append("Google News RSS: "+str(e)[:130])
-        time.sleep(.25)
-    # Avoid growing the published site through unbounded automated imports.
-    limit=80
-    added=sorted(added,key=lambda r:r.get("published") or "",reverse=True)[:limit]
+                publisher = item.get("source", "")
+                if publisher not in PUBLISHERS or not eligible(item):
+                    continue
+                if item["date"] and not date_in_window(item["date"], start, end):
+                    continue
+                item["date_basis"] = "aggregator_pubDate_not_verified_original"
+                quarantine.append(quarantine_item(item, {"name": publisher, "id": report["source_id"]},
+                                                   "canonical_publisher_and_original_date_required"))
+        except Exception as error:
+            report.update(status="failed", error_type=type(error).__name__)
+            if isinstance(error, urllib.error.HTTPError):
+                report["http_status"] = error.code
+                report["retry_after"] = (error.headers.get("Retry-After", "") if error.headers else "")
+            # One failed supplemental provider must not generate repeated requests
+            # into a rate limit, access refusal or outage during the same run.
+            paused_hosts["news.google.com"] = "supplemental_provider_unavailable"
+        reports.append(report)
+        sleep(.25)
+    quarantine = list({(x["url"], x["status"]): x for x in quarantine}.values())
+    status = {"schema_version": 1, "checked_on": today.isoformat(),
+        "publication_window": window_metadata(today),
+        "date_policy": "Publisher original publication field only; never modified, indexed, Google News or first-seen dates.",
+        "scope": "Configured feeds and explicit search queries, not exhaustive coverage of online publishing.",
+        "status": "partial" if any(x["status"] in ("failed", "partial", "deferred") for x in reports) else "completed_configured_sources",
+        "accepted": len(added), "quarantined": len(quarantine),
+        "source_type_counts": dict(Counter(x["source_type"] for x in added)),
+        "full_articles_retrieved": 0, "verified_existing_records": verified_existing,
+        "conflicting_existing_records": list(date_conflicts.values()), "sources": reports}
+    added=apply_discovery_evidence(added,status)
+    status["accepted"]=sum(weekly_eligible(row,start,end) for row in added)
+    status["source_type_counts"]=dict(Counter(row["source_type"] for row in added if weekly_eligible(row,start,end)))
+    status["conflicting_new_records"]=sum(url_key(row["url"]) in date_conflicts for row in added)
+    return added, status, quarantine
+
+
+def apply_discovery_evidence(data, status):
+    """Update date evidence without replacing articles or clearing conflicts."""
+    verified = {url_key(row["url"]): row for row in status.get("verified_existing_records", [])}
+    conflicts = {url_key(row["url"]): row for row in status.get("conflicting_existing_records", [])}
+    unresolved = {"unresolved", "conflict", "conflicting", "unknown"}
+    for row in data:
+        key = url_key(row.get("url", ""))
+        prior = row.get("publication_date_provenance") or {}
+        conflict = conflicts.get(key)
+        if conflict:
+            evidence = list(prior.get("evidence") or []) if prior.get("status") in unresolved else []
+            if not evidence:
+                evidence.append(dict(prior, date=row.get("published", "")))
+            evidence.extend(conflict["conflicting_evidence"])
+            evidence = list({json.dumps(x, sort_keys=True): x for x in evidence}.values())
+            row["publication_date_provenance"] = {
+                "status": "unresolved", "reason": "conflicting_original_publication_dates",
+                "stored_publication_date": row.get("published", ""), "evidence": evidence}
+            continue
+        match = verified.get(key)
+        if (match and match["published"] == row.get("published")
+                and prior.get("status") not in unresolved):
+            row["publication_date_provenance"] = match["publication_date_provenance"]
+            row["discovery_provenance"] = match["discovery_provenance"]
+    return data
+
+
+def run():
+    path = DIR / "library.json"
+    data = apply_source_reviews(apply_editorial_corrections(json.loads(path.read_text())))
+    added, status, quarantine = collect(data)
+    # Historical and curated records remain in the archive; never relabel them as new.
     data.extend(added)
-    data=apply_source_reviews(apply_editorial_corrections(data))
-    data.sort(key=lambda r:(r.get("published") or "",r.get("first_seen") or ""),reverse=True)
-    path.write_text(json.dumps(data,ensure_ascii=False,indent=2)+"\n")
-    weekly_path=DIR/"weekly.json"
-    week=json.loads(weekly_path.read_text())
-    start=(TODAY-datetime.timedelta(days=6)).isoformat()
-    latest=[r for r in data if r.get("first_seen","")>=start and not r.get("curated")]
-    # Give journalism and practitioner perspectives a real place in the weekly selection.
-    media=[r for r in latest if r.get("kind")=="nonacademic"]
-    scholarly=[r for r in latest if r.get("kind")=="scholarly"]
-    by_date=lambda records:sorted(records,key=lambda x:x.get("published") or "",reverse=True)
-    week["items"]=by_date(media)[:15]+by_date(scholarly)[:25]
-    week["run"]["total"]=len(data)
-    week["run"]["last_seven_days"]=len(latest)
-    week["run"]["new"]=week["run"].get("new",0)+len(added)
-    week["run"]["nonacademic_added"]=len(added)
-    week["run"]["nonacademic_total"]=len([x for x in data if x.get("kind")=="nonacademic"])
-    week["run"].setdefault("stats",{})["editorial_feeds"]={"source_counts":source_counts,"errors":errors}
-    weekly_path.write_text(json.dumps(week,ensure_ascii=False,indent=2)+"\n")
-    print(json.dumps({"nonacademic_discovered":len(added),"nonacademic_total":week["run"]["nonacademic_total"],"feed_counts":source_counts,"errors":errors},indent=2))
-if __name__=="__main__":run()
+    apply_discovery_evidence(data, status)
+    data = apply_source_reviews(apply_editorial_corrections(data))
+    data.sort(key=lambda row: (row.get("published") or "", row.get("first_seen") or ""), reverse=True)
+    path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+    (DIR / "editorial-discovery-status.json").write_text(json.dumps(status, ensure_ascii=False, indent=2) + "\n")
+    (DIR / "editorial-discovery-quarantine.json").write_text(json.dumps({"publication_window": status["publication_window"], "items": quarantine}, ensure_ascii=False, indent=2) + "\n")
+    week_path = DIR / "weekly.json"
+    week = json.loads(week_path.read_text())
+    start, end = previous_week(TODAY)
+    week["items"] = [row for row in data if weekly_eligible(row, start, end)]
+    week["run"].update(total=len(data), nonacademic_added=len(added),
+        nonacademic_total=sum(x.get("kind") == "nonacademic" for x in data))
+    week["run"]["new"] = week["run"].get("new", 0) + len(added)
+    week["run"].setdefault("stats", {})["editorial_feeds"] = status
+    week_path.write_text(json.dumps(week, ensure_ascii=False, indent=2) + "\n")
+    print(json.dumps(status, indent=2))
+
+
+if __name__ == "__main__":
+    run()

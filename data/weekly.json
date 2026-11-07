@@ -1,323 +1,668 @@
 {
   "run": {
-    "date": "2026-11-02",
+    "date": "2026-11-07",
     "mode": "weekly",
-    "new": 63,
-    "total": 438,
-    "candidates": 270,
-    "last_seven_days": 26,
+    "new": 10,
+    "total": 572,
+    "candidates": 50,
+    "last_seven_days": 10,
+    "publication_window": {
+      "from": "2026-10-26",
+      "to": "2026-11-01",
+      "timezone": "UTC",
+      "basis": "original publication date",
+      "inclusive": true,
+      "scope": "original_publication_date_previous_completed_week"
+    },
+    "selection_basis": "original_publication_date_previous_completed_week",
     "stats": {
-      "openalex": 240,
-      "crossref": 144,
+      "openalex": 2685,
+      "crossref": 100,
+      "provider_windows": [
+        {
+          "provider": "OpenAlex",
+          "query": "generative AI cognitive offloading critical thinking",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 2,
+          "records_seen": 127,
+          "provider_total": 127,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "AI & cognition",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "ChatGPT metacognition memory cognitive effort",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 1,
+          "records_seen": 36,
+          "provider_total": 36,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "AI & cognition",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "large language model cognitive engagement agency",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 5,
+          "records_seen": 500,
+          "provider_total": 983,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "truncated",
+          "truncated": true,
+          "reason": "page budget reached",
+          "theme": "AI & cognition",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "generative AI sustained attention task switching",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 3,
+          "records_seen": 275,
+          "provider_total": 275,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Fragmentation",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "AI assistant interruptions distraction multitasking",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 1,
+          "records_seen": 1,
+          "provider_total": 1,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Fragmentation",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "digital distraction notification fatigue attention",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 1,
+          "records_seen": 27,
+          "provider_total": 27,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Fragmentation",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "AI attention management intervention focus assistant",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 5,
+          "records_seen": 437,
+          "provider_total": 437,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Interventions",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "generative AI self regulation learning intervention",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 5,
+          "records_seen": 500,
+          "provider_total": 853,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "truncated",
+          "truncated": true,
+          "reason": "page budget reached",
+          "theme": "Interventions",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "adaptive notifications attention digital wellbeing",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 1,
+          "records_seen": 61,
+          "provider_total": 61,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Interventions",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "artificial intelligence attention economy cognitive autonomy",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 2,
+          "records_seen": 159,
+          "provider_total": 159,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Technology & society",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "generative AI interface attention design human agency",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 5,
+          "records_seen": 404,
+          "provider_total": 404,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Technology & society",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "OpenAlex",
+          "query": "AI information overload algorithmic mediation",
+          "filter": "from_publication_date:2026-10-26,to_publication_date:2026-11-01",
+          "pages": 2,
+          "records_seen": 158,
+          "provider_total": 158,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "complete",
+          "truncated": false,
+          "theme": "Technology & society",
+          "scope": "previous_publication_week"
+        },
+        {
+          "provider": "Crossref",
+          "query": "generative AI cognitive offloading critical thinking",
+          "filter": "from-pub-date:2026-10-26,until-pub-date:2026-11-01",
+          "pages": 1,
+          "records_seen": 100,
+          "provider_total": 7799,
+          "max_pages": 5,
+          "page_size": 100,
+          "status": "error",
+          "truncated": true,
+          "reason": "HTTP 429",
+          "quota_exhausted": true,
+          "provider_paused": true,
+          "theme": "AI & cognition",
+          "scope": "previous_publication_week"
+        }
+      ],
+      "publication_date_rejected": 90,
+      "publication_date_unverified": 793,
+      "date_lookups": 0,
+      "date_lookups_deferred": 751,
       "search_scopes": [
         {
           "theme": "AI & cognition",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "generative AI cognitive offloading critical thinking"
         },
         {
           "theme": "AI & cognition",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "ChatGPT metacognition memory cognitive effort"
         },
         {
+          "theme": "AI & cognition",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
+          "query": "large language model cognitive engagement agency"
+        },
+        {
           "theme": "Fragmentation",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "generative AI sustained attention task switching"
         },
         {
           "theme": "Fragmentation",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "AI assistant interruptions distraction multitasking"
         },
         {
+          "theme": "Fragmentation",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
+          "query": "digital distraction notification fatigue attention"
+        },
+        {
           "theme": "Interventions",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "AI attention management intervention focus assistant"
         },
         {
           "theme": "Interventions",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "generative AI self regulation learning intervention"
         },
         {
+          "theme": "Interventions",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
+          "query": "adaptive notifications attention digital wellbeing"
+        },
+        {
           "theme": "Technology & society",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "artificial intelligence attention economy cognitive autonomy"
         },
         {
           "theme": "Technology & society",
-          "period": "recent",
-          "from": "2026-09-03",
-          "to": "2026-11-02",
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
           "query": "generative AI interface attention design human agency"
         },
         {
-          "theme": "AI & cognition",
-          "period": "historical:2024",
-          "from": "2024-01-01",
-          "to": "2024-12-31",
-          "query": "ChatGPT learning cognition"
-        },
-        {
-          "theme": "Fragmentation",
-          "period": "historical:2025",
-          "from": "2025-01-01",
-          "to": "2025-12-31",
-          "query": "AI cognitive offloading"
-        },
-        {
-          "theme": "Interventions",
-          "period": "historical:2023",
-          "from": "2023-01-01",
-          "to": "2023-12-31",
-          "query": "ChatGPT self regulated learning"
-        },
-        {
           "theme": "Technology & society",
-          "period": "historical:2024",
-          "from": "2024-01-01",
-          "to": "2024-12-31",
-          "query": "AI information overload"
+          "period": "previous_publication_week",
+          "from": "2026-10-26",
+          "to": "2026-11-01",
+          "query": "AI information overload algorithmic mediation"
         }
       ],
-      "news_rss": 11,
-      "priority_and_journal_discovery": {
-        "priority_dois_requested": 1,
-        "priority_dois_found": 0,
-        "journal_queries_attempted": 8,
-        "journal_queries_succeeded": 8,
-        "journal_records_seen": 160,
-        "journal_relevant": 1
+      "queries_planned": 24,
+      "queries_attempted": 13,
+      "arxiv_publication_verification": {
+        "provider": "arXiv",
+        "purpose": "v1 original publication date",
+        "request_limit": 20,
+        "minimum_interval_seconds": 3,
+        "requests": 20,
+        "verified": 44,
+        "failures": 0,
+        "deferred": 21,
+        "status": "partial"
       },
+      "crossref_provider_paused": true,
+      "queries_deferred": 11,
       "discovery_status": "partial",
+      "coverage_note": "Bounded provider/query coverage, not exhaustive web or literature coverage; candidates still require article screening.",
+      "priority_and_journal_discovery": {
+        "discovery_status": "partial",
+        "deferred_reason": "Crossref provider paused"
+      },
       "errors": [
-        "Priority DOI metadata mismatch: 10.1016/j.compedu.2026.105576"
+        "Crossref search unavailable: HTTP 429",
+        "Crossref unavailable or rate-limited; journal searches deferred."
       ],
-      "accepted_new": 61,
+      "accepted_new": 7,
+      "publication_date_quarantine_records": 126,
       "source_screen_note": "Discovery yields metadata candidates, not verified full texts or journal-level quality certification.",
       "editorial_feeds": {
-        "source_counts": {
-          "The Conversation": 25,
-          "The Verge": 10,
-          "Ars Technica": 20
+        "schema_version": 1,
+        "checked_on": "2026-11-07",
+        "publication_window": {
+          "from": "2026-10-26",
+          "to": "2026-11-01",
+          "timezone": "UTC",
+          "basis": "original publication date",
+          "inclusive": true,
+          "scope": "original_publication_date_previous_completed_week"
         },
-        "errors": []
+        "date_policy": "Publisher original publication field only; never modified, indexed, Google News or first-seen dates.",
+        "scope": "Configured feeds and explicit search queries, not exhaustive coverage of online publishing.",
+        "status": "partial",
+        "accepted": 3,
+        "quarantined": 3,
+        "source_type_counts": {
+          "policy": 3
+        },
+        "full_articles_retrieved": 0,
+        "verified_existing_records": [],
+        "conflicting_existing_records": [],
+        "sources": [
+          {
+            "source_id": "conversation-ai",
+            "name": "The Conversation",
+            "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
+            "status": "partial",
+            "pages": 1,
+            "returned": 25,
+            "accepted": 0,
+            "warnings": [
+              "rolling_feed_does_not_reach_window_start"
+            ],
+            "rejected": {
+              "not_topical": 23,
+              "outside_previous_week": 2
+            },
+            "oldest_original_date": "2026-10-27",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "verge",
+            "name": "The Verge",
+            "feed_url": "https://www.theverge.com/rss/index.xml",
+            "status": "partial",
+            "pages": 1,
+            "returned": 10,
+            "accepted": 0,
+            "warnings": [
+              "rolling_feed_does_not_reach_window_start"
+            ],
+            "rejected": {
+              "not_topical": 10
+            },
+            "oldest_original_date": "2026-11-06",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "ars-technology",
+            "name": "Ars Technica",
+            "feed_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
+            "status": "ok",
+            "pages": 1,
+            "returned": 20,
+            "accepted": 0,
+            "warnings": [],
+            "rejected": {
+              "not_topical": 20
+            },
+            "oldest_original_date": "2026-10-14",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "tech-policy-press",
+            "name": "Tech Policy Press",
+            "feed_url": "https://www.techpolicy.press/rss/feed.xml",
+            "status": "ok",
+            "pages": 1,
+            "returned": 4122,
+            "accepted": 0,
+            "warnings": [],
+            "rejected": {
+              "not_topical": 4103,
+              "outside_previous_week": 19
+            },
+            "oldest_original_date": "2018-11-21",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "guardian-ai",
+            "name": "The Guardian",
+            "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
+            "status": "partial",
+            "pages": 1,
+            "returned": 20,
+            "accepted": 0,
+            "warnings": [
+              "rolling_feed_does_not_reach_window_start"
+            ],
+            "rejected": {
+              "not_topical": 20
+            },
+            "oldest_original_date": "2026-11-05",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "guardian-opinion",
+            "name": "The Guardian",
+            "feed_url": "https://www.theguardian.com/commentisfree/rss",
+            "status": "partial",
+            "pages": 1,
+            "returned": 36,
+            "accepted": 0,
+            "warnings": [
+              "rolling_feed_does_not_reach_window_start"
+            ],
+            "rejected": {
+              "not_topical": 36
+            },
+            "oldest_original_date": "2026-10-27",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "nieman-lab",
+            "name": "Nieman Lab",
+            "feed_url": "https://www.niemanlab.org/feed/",
+            "status": "ok",
+            "pages": 1,
+            "returned": 30,
+            "accepted": 0,
+            "warnings": [],
+            "rejected": {
+              "not_topical": 30
+            },
+            "oldest_original_date": "2026-10-15",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "nielsen-norman",
+            "name": "Nielsen Norman Group",
+            "feed_url": "https://www.nngroup.com/feed/rss/",
+            "status": "ok",
+            "pages": 1,
+            "returned": 20,
+            "accepted": 0,
+            "warnings": [],
+            "rejected": {
+              "not_topical": 20
+            },
+            "oldest_original_date": "2026-09-11",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "eff",
+            "name": "Electronic Frontier Foundation",
+            "feed_url": "https://www.eff.org/rss/updates.xml",
+            "status": "ok",
+            "pages": 1,
+            "returned": 50,
+            "accepted": 3,
+            "warnings": [],
+            "rejected": {
+              "outside_previous_week": 5,
+              "not_topical": 42
+            },
+            "oldest_original_date": "2026-10-02",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "ai-now",
+            "name": "AI Now Institute",
+            "feed_url": "https://ainowinstitute.org/feed",
+            "status": "ok",
+            "pages": 1,
+            "returned": 10,
+            "accepted": 0,
+            "warnings": [],
+            "rejected": {
+              "not_topical": 10
+            },
+            "oldest_original_date": "2026-10-21",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "mit-tech-review",
+            "name": "MIT Technology Review",
+            "feed_url": "https://www.technologyreview.com/feed/",
+            "status": "partial",
+            "pages": 1,
+            "returned": 10,
+            "accepted": 0,
+            "warnings": [
+              "rolling_feed_does_not_reach_window_start"
+            ],
+            "rejected": {
+              "not_topical": 10
+            },
+            "oldest_original_date": "2026-11-03",
+            "newest_original_date": "2026-11-06"
+          },
+          {
+            "source_id": "the-markup",
+            "name": "The Markup",
+            "feed_url": "https://themarkup.org/feeds/rss.xml",
+            "status": "ok",
+            "pages": 1,
+            "returned": 20,
+            "accepted": 0,
+            "warnings": [],
+            "rejected": {
+              "not_topical": 20
+            },
+            "oldest_original_date": "2026-03-06",
+            "newest_original_date": "2026-10-15"
+          },
+          {
+            "source_id": "google-news-1",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"AI\" (\"attention\" OR \"distraction\" OR \"focus\") after:2026-10-25 before:2026-11-02",
+            "returned": 61,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-2",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"ChatGPT\" (\"thinking\" OR \"cognitive\" OR \"memory\") after:2026-10-25 before:2026-11-02",
+            "returned": 27,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-3",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"AI\" (\"digital wellbeing\" OR \"attention management\") after:2026-10-25 before:2026-11-02",
+            "returned": 1,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-4",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"AI\" \"learning\" \"critical thinking\" after:2026-10-25 before:2026-11-02",
+            "returned": 13,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-5",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"notification batching\" OR \"interruption recovery\" after:2026-10-25 before:2026-11-02",
+            "returned": 0,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-6",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"AI\" \"productivity\" \"focus\" after:2026-10-25 before:2026-11-02",
+            "returned": 29,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-7",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"cognitive offloading\" \"generative AI\" after:2026-10-25 before:2026-11-02",
+            "returned": 9,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          },
+          {
+            "source_id": "google-news-8",
+            "name": "Google News RSS",
+            "status": "leads_only",
+            "query": "\"attention economy\" \"AI\" (\"design\" OR \"policy\") after:2026-10-25 before:2026-11-02",
+            "returned": 9,
+            "accepted": 0,
+            "warnings": [
+              "original_publisher_and_publication_date_unverified"
+            ]
+          }
+        ],
+        "conflicting_new_records": 0
       }
     },
-    "nonacademic_added": 2,
-    "nonacademic_total": 15,
+    "nonacademic_added": 3,
+    "nonacademic_total": 16,
     "editorial_selections_added": 0,
-    "product_examples": 4,
-    "selection_basis": "Complete discovery-week set plus verified brief nominations; historical backfills excluded"
+    "product_examples": 4
   },
   "items": [
     {
-      "title": "Cognitive Offloading to Generative AI: A Theoretical Framework for Memory, Metacognition, and Consumer Decision-Making",
+      "title": "Self-Expansion Through AI: Latent Profile Analysis of AI Companionship and Wellbeing Outcomes",
       "authors": [
-        "Chen (Crystal) Chen",
-        "Kristy A. Hamilton",
-        "Jacob T. Fisher"
-      ],
-      "published": "2026-11-02",
-      "venue": "Journal of Advertising",
-      "doi": "10.1080/00913367.2026.2725645",
-      "url": "https://doi.org/10.1080/00913367.2026.2725645",
-      "preview": "Abstract unavailable; bibliographic metadata only.",
-      "abstract_text": "",
-      "abstract_source": "",
-      "kind": "scholarly",
-      "lane": "AI & cognition",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "ChatGPT metacognition memory cognitive effort",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "oa_meta_checked": "2026-11-02",
-      "reading": {
-        "level": "citation_only",
-        "provenance": "Citation only",
-        "overview": "",
-        "methods": "",
-        "findings": "",
-        "limitations": "",
-        "sample": "",
-        "notice": "No accessible abstract or licensed text has been indexed for this record."
-      }
-    },
-    {
-      "title": "The role of inhibition in task switching: Evidence from an n-back task",
-      "authors": [
-        "Bihua Cao",
-        "Gege Liu",
-        "Meiling Fu",
-        "Chenyu Pan",
-        "Fuhong Li"
-      ],
-      "published": "2026-10-28",
-      "venue": "Attention, Perception, &amp; Psychophysics",
-      "doi": "10.3758/s13414-026-03359-9",
-      "url": "https://doi.org/10.3758/s13414-026-03359-9",
-      "preview": "Task switching is a well-established paradigm for assessing cognitive flexibility. However, the precise role of inhibition in task switching remains unclear. This study investigates the effects of inhibition on switch costs in tasks requiring participants to judge whether the magnitude (small vs. large) or parity (odd vs. even) of a number was the same as that presented in previous trials. To this end, an n-back task…",
-      "abstract_text": "Task switching is a well-established paradigm for assessing cognitive flexibility. However, the precise role of inhibition in task switching remains unclear. This study investigates the effects of inhibition on switch costs in tasks requiring participants to judge whether the magnitude (small vs. large) or parity (odd vs. even) of a number was the same as that presented in previous trials. To this end, an n-back task was embedded in the task-switching paradigm. The results of Experiment 1 demonstrated that, in comparison to the 1-back condition, switch costs were significantly reduced in the 2-back condition, which involved an increased inhibition process. The selective increase in inhibition in some trials in the 1-back condition (Experiment 2) and the carryover of inhibition (Experiment 3) significantly reduced the switch costs. These findings indicate that the enhanced inhibition of task-irrelevant information can facilitate cognitive flexibility in task switching and reduce switch costs, providing novel empirical evidence for the inhibition mechanism underlying task switching.",
-      "abstract_source": "Europe PMC bibliographic abstract",
-      "kind": "scholarly",
-      "lane": "Fragmentation",
-      "relation": "Adjacent digital-attention evidence",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "generative AI sustained attention task switching",
-      "source_group": "Adjacent digital-attention evidence",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.17605/osf.io/gyh53",
-      "open_access_license": "unknown",
-      "open_access_version": "",
-      "reading": {
-        "level": "abstract",
-        "provenance": "Europe PMC bibliographic abstract",
-        "overview": "This study investigates the effects of inhibition on switch costs in tasks requiring participants to judge whether the magnitude (small vs. large) or parity (odd vs. even) of a number was the same as that presented in previous trials.",
-        "methods": "The results of Experiment 1 demonstrated that, in comparison to the 1-back condition, switch costs were significantly reduced in the 2-back condition, which involved an increased inhibition process. The selective increase in inhibition in some trials in the 1-back condition (Experiment 2) and the carryover of inhibition (Experiment 3) significantly reduced the switch costs.",
-        "findings": "The results of Experiment 1 demonstrated that, in comparison to the 1-back condition, switch costs were significantly reduced in the 2-back condition, which involved an increased inhibition process.",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": true
-      }
-    },
-    {
-      "title": "An AI/generative AI-assisted blended learning intervention for nursing undergraduates: a quasi-experimental study of attitudes toward AI, AI literacy, and autonomous learning competency",
-      "authors": [
-        "Xuefen Lan",
-        "Yaxuan Luo",
-        "Shunfei Lu",
-        "Yufeng Wu",
-        "Xianqi Gao",
-        "Lijuan Xu",
-        "Qing Tao",
-        "Min Li"
-      ],
-      "published": "2026-10-27",
-      "venue": "BMC Nursing",
-      "doi": "10.1186/s12912-026-05512-z",
-      "url": "https://doi.org/10.1186/s12912-026-05512-z",
-      "preview": " Abstract \n                   \n                     Background \n                     Artificial intelligence (AI) is increasingly shaping healthcare, highlighting the need for nursing graduates to develop relevant competencies. However, structured AI education remains limited in nursing programs, and evidence on the effects of AI-focused teaching interventions remains scarce. \n                   \n                   \n…",
-      "abstract_text": " Abstract \n                   \n                     Background \n                     Artificial intelligence (AI) is increasingly shaping healthcare, highlighting the need for nursing graduates to develop relevant competencies. However, structured AI education remains limited in nursing programs, and evidence on the effects of AI-focused teaching interventions remains scarce. \n                   \n                   \n                     Methods \n                     A quasi-experimental pretest–posttest study was conducted among 142 undergraduate nursing students at a university in southwestern Zhejiang, China. Seventy-two students participated in a 10-week AI/generative AI (GenAI)-assisted blended learning course comprising 12 h of self-paced online learning and 6 h of hands-on workshops, while 70 students received standard instruction. Attitudes toward AI, AI literacy, and autonomous learning competency were assessed before and immediately after the intervention using validated instruments. Post-test outcomes were compared using analysis of covariance (ANCOVA), adjusting for the corresponding baseline score, previous AI training experience, frequency of AI use, and digital literacy. \n                   \n                   \n                     Results \n                     \n                      In the intervention group, AI literacy increased significantly from 55.67 ± 9.84 to 65.01 ± 8.81 (\n                       P \n                       &lt; 0.001), as did attitudes toward AI, which increased from 48.07 ± 6.77 to 51.72 ± 9.90 (\n                       P \n                       = 0.049). Neither outcome changed significantly in the control group. After adjustment for covariates, the intervention group had significantly higher post-test scores for AI literacy (adjusted mean difference = 11.01, 95% CI 8.55–13.47;\n                       P \n                       &lt; 0.001) and attitudes toward AI (adjusted mean difference = 4.60, 95% CI 1.98–7.21;\n                       P \n                       &lt; 0.001). Autonomous learning competency changed little in the intervention group (\n                       P \n                       = 0.578) but declined significantly in the control group (\n                       P \n                       &lt; 0.001). The adjusted post-test difference also favored the intervention group (adjusted mean difference = 10.94, 95% CI 7.44–14.43;\n                       P \n                       &lt; 0.001).\n                     \n                   \n                   \n                     Conclusions \n                     AI/GenAI-assisted blended teaching was associated with higher AI literacy and more favorable attitudes toward AI, while autonomous learning competency remained relatively stable in the intervention group but declined in the control group. Structured AI education integrating conceptual learning, practical application, and responsible AI use may be a valuable addition to undergraduate nursing education. \n                   ",
-      "abstract_source": "Crossref abstract",
-      "kind": "scholarly",
-      "lane": "Interventions",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "generative AI self regulation learning intervention",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.1186/s12912-026-05512-z",
-      "open_access_license": "cc-by",
-      "open_access_version": "publishedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "Crossref abstract",
-        "overview": "Abstract Background Artificial intelligence (AI) is increasingly shaping healthcare, highlighting the need for nursing graduates to develop relevant competencies. However, structured AI education remains limited in nursing programs, and evidence on the effects of AI-focused teaching interventions remains scarce.",
-        "methods": "Methods A quasi-experimental pretest–posttest study was conducted among 142 undergraduate nursing students at a university in southwestern Zhejiang, China.",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "VANFROG.ART: Looking Again — Artificial Intelligence, Play and Participatory Attention in Artistic Practice",
-      "authors": [
-        "Renato Basteri"
-      ],
-      "published": "2026-10-31",
-      "venue": "Crossref",
-      "doi": "10.22501/rc.5007792",
-      "url": "https://doi.org/10.22501/rc.5007792",
-      "preview": " VANFROG.ART is an artistic research project exploring how artificial intelligence, digital image-making, play and audience participation can encourage renewed attention to art. The project centres on two recurring characters: René VANFROG, a frog who enters and interacts with well-known artworks, and Julie, a shy duckling who hides within them. Through a daily participatory game, viewers are invited to find Julie, t…",
-      "abstract_text": " VANFROG.ART is an artistic research project exploring how artificial intelligence, digital image-making, play and audience participation can encourage renewed attention to art. The project centres on two recurring characters: René VANFROG, a frog who enters and interacts with well-known artworks, and Julie, a shy duckling who hides within them. Through a daily participatory game, viewers are invited to find Julie, transforming observation from passive viewing into an active and playful experience.The research investigates whether this simple mechanism can extend the time and quality of attention devoted to an artwork, while creating a dialogue between historical art, contemporary digital practices and artificial intelligence. The project combines artistic reinterpretation, visual storytelling, social-media participation and an educational component, “L’Angolo del Prof”, which introduces artists, techniques, historical contexts and curiosities.Rather than treating artificial intelligence as a substitute for artistic thought, VANFROG.ART approaches it as a creative tool within a human-directed process. The project examines how play, participation and AI-assisted image-making can generate new forms of engagement with existing artistic heritage and stimulate curiosity, visual attention and artistic literacy. \n                 keywords: artistic research, artificial intelligence, participatory art, visual attention, art education, digital art, gamification ",
-      "abstract_source": "Crossref abstract",
-      "kind": "scholarly",
-      "lane": "Technology & society",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "artificial intelligence attention economy cognitive autonomy",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.22501/rc.5007792",
-      "open_access_license": "cc-by-nc-nd",
-      "open_access_version": "acceptedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "Crossref abstract",
-        "overview": "The project examines how play, participation and AI-assisted image-making can generate new forms of engagement with existing artistic heritage and stimulate curiosity, visual attention and artistic literacy. keywords: artistic research, artificial intelligence, participatory art, visual attention, art education, digital art, gamification",
-        "methods": "",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "Mathematics Outcomes and Creative Metacognition in Primary Students: A Quasi-Experimental Study Using AI-Generated Explanations",
-      "authors": [
-        "Tatyana Karatayeva",
-        "Aida Ussenova",
-        "Natalya Nikolaevna Khan",
-        "Batima Daumova"
+        "Ali Sahandi",
+        "Jaime Banks"
       ],
       "published": "2026-10-30",
-      "venue": "International Journal of Learning Teaching and Educational Research",
-      "doi": "10.26803/ijlter.25.10.23",
-      "url": "https://doi.org/10.26803/ijlter.25.10.23",
-      "preview": "This exploration examines the impact of supplementary AI-generated explanatory materials on foundational mathematics learning and creative metacognition in primary education. The study followed a quantitative, quasi-experimental pretest–posttest design with a nonequivalent control group. Fourth-grade classes in five schools were assigned to conditions at the classroom level: an intervention group receiving AI-facilit…",
-      "abstract_text": "This exploration examines the impact of supplementary AI-generated explanatory materials on foundational mathematics learning and creative metacognition in primary education. The study followed a quantitative, quasi-experimental pretest–posttest design with a nonequivalent control group. Fourth-grade classes in five schools were assigned to conditions at the classroom level: an intervention group receiving AI-facilitated handouts (n = 135) and a control group using programmatic textbooks (n = 128). Students in the experimental condition received eight supplementary lessons featuring paper-based handouts. These handouts presented explanations, examples, and illustrations of new mathematical topics generated by a large language model (Gemini 2.5 Pro), prompted the inclusion of age-appropriate content and a dedicated section encouraging creative metacognition (reflection and novel idea generation). Baseline equivalence was confirmed. The outcomes assessed included single-digit mental arithmetic, multidigit calculation, arithmetic word problem-solving, and creative metacognition, which were analyzed via multilevel or robust linear modeling accounting for classroom clustering. The results indicated no statistically significant differences between groups on single-digit mental arithmetic tasks. However, students who received AI-generated materials showed significantly greater improvement in multidigit calculation tasks and one-step word problem-solving than did the control group. No significant difference was found for multistep word problems. The intervention group also presented a substantially greater increase in creative metacognition scores than did the control group. The findings provide preliminary quasi-experimental evidence that curated, static AI-generated explanations, when designed to include metacognitive prompts, may be associated with greater gains in specific procedural and applied mathematical skills and creative metacognition among fourth-grade students under the conditions studied. This approach illustrates how generative AI can be leveraged as an authoring tool to supplement standard instruction and cultivate higher-order cognitive skills in young learners.",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2611.00436",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2611.00436v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2611.00436v1",
+        "version_url": "https://arxiv.org/abs/2611.00436v1",
+        "status": "day_known",
+        "value": "2026-10-30",
+        "raw": "2026-10-30T22:40:14Z",
+        "source_id": "http://arxiv.org/abs/2611.00436v1"
+      },
+      "url": "https://doi.org/10.48550/arxiv.2611.00436",
+      "preview": "People increasingly form meaningful relationships with conversational AI. Current variable-centered literature offers a mixed picture of relational patterns and how they associate with wellbeing. Taking a person-centered approach, we applied latent profile analysis to secondary data from 467 active conversational AI users, evaluating five indicators of machine companionship: utilitarian motivation, eudaimonic exchang…",
+      "abstract_text": "People increasingly form meaningful relationships with conversational AI. Current variable-centered literature offers a mixed picture of relational patterns and how they associate with wellbeing. Taking a person-centered approach, we applied latent profile analysis to secondary data from 467 active conversational AI users, evaluating five indicators of machine companionship: utilitarian motivation, eudaimonic exchange, connective coordination, mind perception, and inclusion of other in the self. Five profiles emerged, ordering parsimoniously from objectified-utilitarian to intimate-bonded. Conceptually divergent utilitarian motivation and companionate engagement co-occurred, rather than diverging. Furthermore, deep companionship was achieved without users attributing a mind to the AI. Prof",
       "abstract_source": "OpenAlex abstract index",
       "kind": "scholarly",
       "lane": "AI & cognition",
@@ -325,200 +670,15 @@
       "evidence": "Metadata screened (unverified)",
       "source": "OpenAlex",
       "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "ChatGPT metacognition memory cognitive effort",
-      "source_group": "AI-specific",
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
+      "discovery_query": "large language model cognitive engagement agency",
       "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.26803/ijlter.25.10.23",
-      "open_access_license": "cc-by-nc-nd",
-      "open_access_version": "publishedVersion",
+      "source_group": "AI-specific",
       "reading": {
         "level": "abstract",
         "provenance": "OpenAlex abstract index",
-        "overview": "This exploration examines the impact of supplementary AI-generated explanatory materials on foundational mathematics learning and creative metacognition in primary education. The findings provide preliminary quasi-experimental evidence that curated, static AI-generated explanations, when designed to include metacognitive prompts, may be associated with greater gains in…",
-        "methods": "The study followed a quantitative, quasi-experimental pretest–posttest design with a nonequivalent control group. Students in the experimental condition received eight supplementary lessons featuring paper-based handouts.",
-        "findings": "The results indicated no statistically significant differences between groups on single-digit mental arithmetic tasks. No significant difference was found for multistep word problems.",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": true
-      }
-    },
-    {
-      "title": "A COMPARATIVE STUDY TO ASSESS EFFECTIVENESS OF AI-ASSISTED DISTRACTION AND TRADITIONAL DISTRACTION TECHNIQUES ON PAIN DURING INVASIVE PROCEDURES AMONG PRESCHOOLERS",
-      "authors": [],
-      "published": "2026-10-26",
-      "venue": "Acta Innovations",
-      "doi": "10.62441/actainnovations.vi.2359",
-      "url": "https://doi.org/10.62441/actainnovations.vi.2359",
-      "preview": "Background: Invasive natured medical procedures, such as venipuncture and intravenous cannulation, are sources of acute pain as well as here to distress in pediatric populations, particularly among preschoolers in this way. Unmanaged aspects here are to send procedural pain leads to heightened anxiety as well as needle phobias. Non-pharmacological interventions, specifically distraction techniques, are mostly recomme…",
-      "abstract_text": "Background: Invasive natured medical procedures, such as venipuncture and intravenous cannulation, are sources of acute pain as well as here to distress in pediatric populations, particularly among preschoolers in this way. Unmanaged aspects here are to send procedural pain leads to heightened anxiety as well as needle phobias. Non-pharmacological interventions, specifically distraction techniques, are mostly recommended. While traditional distraction methods have here to be proven effective, the advent of artificial intelligence (AI) has introduced novel interventions, such as herein AI-adaptive virtual reality (VR). Objective: This study aims here to assess as well as compare the effectiveness of AI-assisted distraction versus traditional based distraction on procedural pain as well as anxiety during invasive procedures among preschoolers (aged 3–6). Methods: A randomized, three-arm clinical trial was here by conducted in a pediatric outpatient setting. A total of 150 preschoolers requiring natured venipuncture were assigned to one of three groups: AI-Assisted Distraction (n=50), Traditional Distraction (cartoon watching and bubble blowing, n=50), or a Control Group (standard care, n=50). Pain was evaluated using the Face, Legs, Activity, Cry, Consolability (FLACC) scale as well as the Wong-Baker FACES Pain Rating Scale. Anxiety was hereby measured using the Children's Fear Scale (CFS). Results: The AI-Assisted Distraction group hereby exhibited significantly lower FLACC scores (Mean = 2.14, SD = 1.05) compared to both of the Traditional group (Mean = 3.82, SD = 1.34) as well as the Control group (Mean = 6.45, SD = 1.52) (p < 0.001). FACES scores followed a similar trend. Conclusion: AI-assisted structure here to be distraction is significantly more effective than traditional distraction in reducing natured procedural pain and anxiety among preschoolers.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "Fragmentation",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "AI assistant interruptions distraction multitasking",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.62441/actainnovations.vi.2359",
-      "open_access_license": "cc-by",
-      "open_access_version": "publishedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "Objective: This study aims here to assess as well as compare the effectiveness of AI-assisted distraction versus traditional based distraction on procedural pain as well as anxiety during invasive procedures among preschoolers (aged 3–6).",
-        "methods": "Methods: A randomized, three-arm clinical trial was here by conducted in a pediatric outpatient setting.",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "The ‘good mobile’: a mobile launcher for children to facilitate human interactions",
-      "authors": [
-        "Zsolt Jurányi",
-        "Krisztina Liszkai-Peres",
-        "Réka Pető",
-        "Dorottya Júlia Ujfalussy",
-        "Ákos Pogány",
-        "George Kampis",
-        "Veronika Konok"
-      ],
-      "published": "2026-10-23",
-      "venue": "Biologia Futura",
-      "doi": "10.1007/s42977-026-00343-0",
-      "url": "https://doi.org/10.1007/s42977-026-00343-0",
-      "preview": "Abstract Children today grow up in a hybrid physical and digital environment, engaging with mobile devices from an early age, which poses a risk of negatively impacting their development. This usage often replaces social interactions and physical activities, potentially deteriorating relationships, socio-cognitive skills, and mental health. Banning device use is unrealistic, but the way children use mobiles can be al",
-      "abstract_text": "Abstract Children today grow up in a hybrid physical and digital environment, engaging with mobile devices from an early age, which poses a risk of negatively impacting their development. This usage often replaces social interactions and physical activities, potentially deteriorating relationships, socio-cognitive skills, and mental health. Banning device use is unrealistic, but the way children use mobiles can be altered through responsible technology. In the present study we (1) explored parental expectations regarding children’s mobile applications, (2) directlyincorporated these expectations into the design of a specific application (Alphie), and (3) examined its reception through UX testing. Alphie is a child-focused application (launcher) that promotes social interaction, real-world activities, and reduces solitary screen time. Its design is informed by parental expectations and scientific data, emphasizing educational, age-appropriate, and moderately stimulating content, with parental control features. A user study with parent-child dyads showed positive experiences. Notably, the games requiring active parental involvement were also well-received, suggesting that they are effective tools for facilitating joint activities within the family. This research highlights how responsible technology can support the mental and physical health of the new generation. By linking parental expectations, application design, and user experience within a single framework, the present studyprovides a more integrative perspective on the development and evaluation of child-focused digital applications.",
-      "abstract_source": "Crossref publisher-supplied abstract",
-      "kind": "scholarly",
-      "lane": "Interventions",
-      "relation": "Adjacent digital-attention evidence",
-      "evidence": "Registry metadata screened; original paper not yet independently assessed",
-      "source": "Weekly brief lead verified against Crossref",
-      "curated": false,
-      "first_seen": "2026-10-27",
-      "discovery_scope": "weekly_brief",
-      "discovery_query": "exact DOI from weekly brief",
-      "brief_provenance": {
-        "origin": "AI & Attention Weekly Brief, October 26, 2026",
-        "week": "2026-10-26"
-      },
-      "reading": {
-        "level": "full_text",
-        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
-        "overview": "Abstract Children today grow up in a hybrid physical and digital environment, engaging with mobile devices from an early age, which poses a risk of negatively impacting their development. This usage often replaces social interactions and physical activities, potentially deteriorating relationships, socio-cognitive skills, and mental health.",
-        "methods": "Parents were recruited from a database compiled during our previous studies (N = 613). The selection criterion was that the child had to be between 4 and 9 years old. Although both parents were eligible to participate, the respondents were exclusively mothers. Altogether 66 mothers (parents identified as female) filled out the questionnaire (27-49 years old, M ± SD = 37.8 ± 5.1; 12 with high school degree or less; 23 with BSc, 31 with MSc; 18 from the capital, 16 from county seats, 22 from towns and 10 from villages). We allowed one mother-child dyad to participate in our study, even if there were more 4-9-year-old siblings in the family (in such cases, the mother was asked to select one child to participate). The age of their children varied between 4 and 9 (M ± SD = 6.2 ± 1.3), there were 35 boys and 31 girls. Data were collected in October 2022. Parents filled out an online questionnaire, which took approximately 20 min. The link to the questionnaire was distributed via email. We used anonymized personal data and have complied with all ethics rules. The survey was conducted in accordance with The Code of Ethics of the World Medical Association (Declaration of Helsinki) and approved by the United Ethical Review Committee for Research in Psychology (EPKEB) (reference number of approval: 2019/17). Written informed consent was obtained from all participants. Parents and children participated in a longitudinal study investigating whether different personality versions of Alphie",
-        "findings": "Mean ratings by children and parents are shown in Fig. 10 . All games received mean ratings of at least 2 (\"It's OK\"), usually around 2.5. The only exception was \"Needle in the Haystack,\" which had a mean parental rating below 2. In most cases, parent and child ratings were similar (Mann-Whitney U tests, all ps > 0.124). The only significant difference was for \"Color Sudoku,\" which parents rated higher than children (U = 120.5, p = 0.02). However, as participants did not play with all games, the number of responses were quite variable, ranging from 19 (Multiplayer drawing game) to 52 (Tic-tac-toe and Balloon-popping game; see Fig. 10 for the number of responses for all games).",
-        "interpretation": "Although the results are in line with previous research in many respects, it sheds light on new aspects as well. While many studies (e.g., Broekman et al. 2016; Dias and Brito 2021) showed that safety is a less salient consideration for parents than educational potential, the results of Study 1 show that safety is one of the most important values for parents, which includes control over content and available apps, limitations on time spent using devices, and the avoidance of addiction (similar results were obtained by Brito and Dias 2020). Getting feedback on the child's digital activity and GPS location probably also serves safety concerns for parents. Therefore, an app for children will be attractive to parents if it ensures safe and controlled device use. From a scientific point of view, controlling device use is indeed important to reduce the displacement effect and the chance of developing addiction. Parents prefer applications for their children that provide educational and age-appropriate content, that do not contain advertisements and that are not overstimulating. In line with parents' preference for educational apps (which has been shown as the most important aspect for parents in many studies, e.g., Broekman et al. 2016; Dias and Brito 2021) , research has also shown that educational content has better effects on children's cognitive development than contents that are merely entertaining (Zimmerman and Christakis 2007; Huber et al. 2018 ). However, although there are tens or hundreds of thousands of applications on the market that claim to be educational (Healthy Children 2018) , their real educational potential and effectiveness are often low (Taylor et al. 2022) . Additionally, they rarely offer age-appropriate language or guidance (Callaghan and Reich 2018;",
-        "limitations": "A limitation of the present studies is the relatively small sample sizes, which may have limited generalizability and in Study 2 (in which significance testing was conducted) the statistical power to detect smaller effects. Future studies with larger samples would allow not only for more robust statistical analyses but also for the systematic investigation of additional questions, e.g. whether parental expectations differ between preschool-and early school-aged children. The samples were not representative regarding sociodemographic variables: for example, highly educated parents were overrepresented. Additionally, although both parents were eligible to participate, the respondents were exclusively mothers, which likely reflects higher response willingness among mothers in surveys on child-related topics. This may have distorted or biased the results. In addition, we did not collect information about the presence and number of siblings, which may influence both children's media use and",
-        "sample": "613",
-        "section_coverage": [
-          "methods",
-          "results",
-          "discussion",
-          "limitations"
-        ],
-        "extraction_depth": "multi_section",
-        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
-        "research_type": "unclassified",
-        "reported_findings": true
-      },
-      "oa_checked": "2026-10-27",
-      "oa_pass_version": 3,
-      "pmc_oai_attempt": {
-        "version": 1,
-        "status": "no_pmc_record",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-24",
-        "attempts": 1
-      },
-      "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-27T03:24:39+00:00",
-        "pipeline_version": 3,
-        "status": "full_text",
-        "next_at": null
-      },
-      "open_access_url": "https://doi.org/10.1007/s42977-026-00343-0",
-      "analysis": {
-        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
-        "license": "cc-by",
-        "license_url": "https://openalex.org/licenses/cc-by",
-        "methods": "Parents were recruited from a database compiled during our previous studies (N = 613). The selection criterion was that the child had to be between 4 and 9 years old. Although both parents were eligible to participate, the respondents were exclusively mothers. Altogether 66 mothers (parents identified as female) filled out the questionnaire (27-49 years old, M ± SD = 37.8 ± 5.1; 12 with high school degree or less; 23 with BSc, 31 with MSc; 18 from the capital, 16 from county seats, 22 from towns and 10 from villages). We allowed one mother-child dyad to participate in our study, even if there were more 4-9-year-old siblings in the family (in such cases, the mother was asked to select one child to participate). The age of their children varied between 4 and 9 (M ± SD = 6.2 ± 1.3), there were 35 boys and 31 girls. Data were collected in October 2022. Parents filled out an online questionnaire, which took approximately 20 min. The link to the questionnaire was distributed via email. We used anonymized personal data and have complied with all ethics rules. The survey was conducted in accordance with The Code of Ethics of the World Medical Association (Declaration of Helsinki) and approved by the United Ethical Review Committee for Research in Psychology (EPKEB) (reference number of approval: 2019/17). Written informed consent was obtained from all participants. Parents and children participated in a longitudinal study investigating whether different personality versions of Alphie influence children's social interactions and sociocognitive skills differently. For the present UX study, we analyzed only the responses to the questionnaire in which parents and children rated how much they liked Alphie's games. We received 31 responses from children aged between 6.3 and 8.8 years (M ± SD = 7.5 ± 0.7); 16 were girls (sex assigned at birth). The age range was narrower than our previously defined 4-9-year-old target group due to additional socio-cognitive measurements that required a more homogeneous sample. Thirty parents completed the questionnaire; all identified as women (although both parents were eligible to participate). Regarding educational background, 4 had vocational/high school degrees, 14 held bachelor's degrees, and 12 had master's degrees. Four families lived in the capital, 6 in other large cities, 11 in smaller towns, and 9 in villages. Data were collected between August and October 2023. After children had used Alphie for one month, parents were asked to complete the UX questionnaire online. Following this, we arranged online video calls via Microsoft Teams with both the parent and child present. During these meetings (which also included tests of socio-cognitive skills, e.g., false belief test; not discussed here), the experimenter read aloud the UX questions to the child and recorded the child's responses directly into the online questionnaire. These interviews and the filling out of the questionnaires for the parents lasted approximately 10 min. All personal data were anonymized, and the study complied with ethical standards. It was conducted in accordance with the Declaration of Helsinki and approved by the United Ethical Review Committee for Research in Psychology (EPKEB; approval number: 2022/101). Written informed consent was obtained from all participants.",
-        "results": "Mean ratings by children and parents are shown in Fig. 10 . All games received mean ratings of at least 2 (\"It's OK\"), usually around 2.5. The only exception was \"Needle in the Haystack,\" which had a mean parental rating below 2. In most cases, parent and child ratings were similar (Mann-Whitney U tests, all ps > 0.124). The only significant difference was for \"Color Sudoku,\" which parents rated higher than children (U = 120.5, p = 0.02). However, as participants did not play with all games, the number of responses were quite variable, ranging from 19 (Multiplayer drawing game) to 52 (Tic-tac-toe and Balloon-popping game; see Fig. 10 for the number of responses for all games).",
-        "discussion": "Although the results are in line with previous research in many respects, it sheds light on new aspects as well. While many studies (e.g., Broekman et al. 2016; Dias and Brito 2021) showed that safety is a less salient consideration for parents than educational potential, the results of Study 1 show that safety is one of the most important values for parents, which includes control over content and available apps, limitations on time spent using devices, and the avoidance of addiction (similar results were obtained by Brito and Dias 2020). Getting feedback on the child's digital activity and GPS location probably also serves safety concerns for parents. Therefore, an app for children will be attractive to parents if it ensures safe and controlled device use. From a scientific point of view, controlling device use is indeed important to reduce the displacement effect and the chance of developing addiction. Parents prefer applications for their children that provide educational and age-appropriate content, that do not contain advertisements and that are not overstimulating. In line with parents' preference for educational apps (which has been shown as the most important aspect for parents in many studies, e.g., Broekman et al. 2016; Dias and Brito 2021) , research has also shown that educational content has better effects on children's cognitive development than contents that are merely entertaining (Zimmerman and Christakis 2007; Huber et al. 2018 ). However, although there are tens or hundreds of thousands of applications on the market that claim to be educational (Healthy Children 2018) , their real educational potential and effectiveness are often low (Taylor et al. 2022) . Additionally, they rarely offer age-appropriate language or guidance (Callaghan and Reich 2018; Taylor et al. 2022) . Therefore, parents' expectations about being educational and age-appropriate are often not met. Apps usually also contain advertisements (unless a subscription is paid). In addition to the financial risks (e.g., children unintentionally charge the parents' bank account), these ads often appear in the form of pop-up windows, which may distract attention and decrease children's engagement with the app (Meyer et al. 2021) . Related to this, overstimulation is considered harmful to children's attention and executive function by researchers ( Christakis et al. 2012, 2018 Parents did not spontaneously express a need to be actively involved in their child's device use. In contrast, they think that an ideal app for children should contain both entertaining and educational content, which the child can use easily, implying that they prefer the child to be able to engage independently and use the content autonomously. This is in line with a finding that, when choosing an app, the most important need for parents is \"independent entertainment\", i.e., need for their child to have fun, to understand the app, and to be able to use it independently (Broekman et al. 2016 ). However, the second most important need was labelled as \"co-education\", and reflected parents' desire for their children to learn from an app, while also having the ability to control or co-use it with them (Broekman et al. 2016) . In accordance with this, in our study, parents quite liked the idea of such apps/games that would need their engagement: the digital board game that would suggest and facilitate real-world activities for the children and their parents, and the story creator in which children and parents would be able to create their own stories with the help of images, texts and advice. Therefore, parents might not be reluctant to engage in the child's device use if we offer them entertaining ways of doing this. It remains an open question whether increasing parental awareness of the benefits of joint media engagement would increase their willingness to engage in co-use with their children. Parents also found important that an app for children should encourage physical activity. Given the increasing prevalence of obesity in industrialized societies, this is undoubtedly in line with professional and scientific principles. Research shows the positive effects of exergames on both physical activity (Staiano and Calvert 2011) and cognitive functions (Best 2012; Benzing and Schmidt 2019; Gashaj et al. 2021) . However, there is a need to develop exergames for mobile devices instead of console games, as mobile devices are more common and more easily used by younger children. In conclusion, parents expressed positive attitudes towards those goals we aim to achieve with Alphie, both in open-ended and focused, close-ended questions. They also liked the specific game ideas we described: in most cases, they gave an average of 4 out of 5 points on a scale expressing their level of liking. These findings directly informed the design features of Alphie. For example, the parental preference for ad-free and educational content motivated the inclusion of carefully selected cognitive games without external advertisements. In addition to scientific considerations, parental concerns about overstimulation reinforced our decision to use minimal animations and sounds. Most notably, the strong parental interest in apps that encourage joint activities reinforced our decision to develop Alphie's story-creating game and the cooperative boardgame, both of which were positively received in the parental survey. While most games were rated positively, there was some variation in ratings. Children particularly liked Tic-Tac-Toe, the Balloon-Popping Game, the Colors and Shapes Game, the Board Game, and the Multiplayer Drawing Game. They rated the Story-Creating Game, the Picture-Matching Game, and the Etch-a-Sketch Game lower. The latter two may have posed challenges: the Picture-Matching Game may demand high executive function and attention, while the Etch-a-Sketch requires fine motor skills. These factors might have contributed to their lower ratings, although this interpretation should be examined in future research. The lower rating of the Story-Creating Game is more surprising, especially since parents liked it more and had previously expressed interest in such a game during Study 1 (parental survey). As our fundamental aim with this game is to encourage parents to tell stories to the child, it is important that parents like it enough to use it regularly. Children might have liked this game a bit less because they might have tried to play it independently, although it is not designed for solo use. More detailed user experience studies are needed to understand why children like these games less, and inform further development. The Board game was well-liked by both parents and children, aligning with the results of Study 1 (parental survey). Therefore, this game appears to be a valuable tool for facilitating joint activities in the family, encouraging parental involvement in the children's mobile devices use, and promoting real-world engagement, including physical activity. Although it's unclear whether parents rated the games based on direct experience or observation, the high ratings for Mastermind, Color Sudoku, and Tangram suggest that these games appeal to adults as well (probably because advanced levels can also be chosen). Since our goal is to promote co-use of mobile devices, this is promising: even when parents' primary motivation is to keep children engaged (Selak et al. 2023) , games that they also enjoy may encourage shared In",
-        "limitations": "A limitation of the present studies is the relatively small sample sizes, which may have limited generalizability and in Study 2 (in which significance testing was conducted) the statistical power to detect smaller effects. Future studies with larger samples would allow not only for more robust statistical analyses but also for the systematic investigation of additional questions, e.g. whether parental expectations differ between preschool-and early school-aged children. The samples were not representative regarding sociodemographic variables: for example, highly educated parents were overrepresented. Additionally, although both parents were eligible to participate, the respondents were exclusively mothers, which likely reflects higher response willingness among mothers in surveys on child-related topics. This may have distorted or biased the results. In addition, we did not collect information about the presence and number of siblings, which may influence both children's media use and parental expectations. It should also be noted that the questionnaire format may have been susceptible to social desirability bias, as parents (and children) might have been inclined to provide generally positive evaluations of applications/ functions/ values in Study 1 (closed-ended questions) and of Alphie's games in Study 2. The relatively low standard deviations (high agreement among parents) in Study 1 (closed-ended questions) may also reflect socially desirable responding. More robust measures could be used in the future to measure likability, attitudes and preferences, e.g. digital logging of game use, fake door testing, and ranking of all games/functions on a single scale instead of independent ratings of each of them.",
-        "figures": [],
-        "fulltext_url": "https://doi.org/10.1007/s42977-026-00343-0",
-        "key_idea": "Mean ratings by children and parents are shown in Fig. 10 . All games received mean ratings of at least 2 (\"It's OK\"), usually around 2.5. The only exception was \"Needle in the Haystack,\" which had a mean parental rating below 2. In most cases, parent and child ratings were simil",
-        "extraction_date": "2026-10-27",
-        "extraction_version": 3,
-        "sections_available": [
-          "methods",
-          "discussion",
-          "results",
-          "limitations"
-        ]
-      },
-      "oa_grobid_checked": "2026-10-27",
-      "source_group": "Adjacent digital-attention evidence",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_license": "cc-by",
-      "open_access_version": "publishedVersion"
-    },
-    {
-      "title": "Algorithms at the Storefront: How Artificial Intelligence Is Reshaping Business Promotion",
-      "authors": [
-        "Krishika Gautam"
-      ],
-      "published": "2026-10-30",
-      "venue": "OpenAlex",
-      "doi": "10.33774/coe-2026-qtqql",
-      "url": "https://doi.org/10.33774/coe-2026-qtqql",
-      "preview": "Promotion has always been a problem of attention: a firm must decide what to say, to whom, and at which moment. Artificial intelligence now participates in each of those decisions. This paper reviews how machine learning, generative models, and predictive systems have been built into promotional practice, and what scholarly and trade evidence reveals about their results. It organizes the technology into five working …",
-      "abstract_text": "Promotion has always been a problem of attention: a firm must decide what to say, to whom, and at which moment. Artificial intelligence now participates in each of those decisions. This paper reviews how machine learning, generative models, and predictive systems have been built into promotional practice, and what scholarly and trade evidence reveals about their results. It organizes the technology into five working capabilities, follows them through six commercial settings, and examines four cases drawn from music streaming, food manufacturing, financial services, and ride hailing. It then considers how returns are measured, why outcomes differ so sharply between firms, and which risks deserve closest attention: privacy erosion, skewed ad delivery, undisclosed synthetic media, sameness of creative output, and upheaval in marketing careers. The central argument is that AI produces its strongest promotional results when it is treated as an organizational capability, supported by sound data, clear accountability, and human review, rather than as software that can simply be purchased and switched on.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "Technology & society",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "artificial intelligence attention economy cognitive autonomy",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.33774/coe-2026-qtqql",
-      "open_access_license": "cc-by",
-      "open_access_version": "acceptedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This paper reviews how machine learning, generative models, and predictive systems have been built into promotional practice, and what scholarly and trade evidence reveals about their results. It organizes the technology into five working capabilities, follows them through six commercial settings, and examines four cases drawn from music streaming, food manufacturing…",
+        "overview": "People increasingly form meaningful relationships with conversational AI. Current variable-centered literature offers a mixed picture of relational patterns and how they associate with wellbeing.",
         "methods": "",
         "findings": "",
         "interpretation": "",
@@ -532,474 +692,118 @@
       }
     },
     {
-      "title": "Patrick Stewart was thinking about AI ethics years before ChatGPT launched - Fast Company",
-      "authors": [],
-      "published": "2026-10-30",
-      "venue": "Fast Company",
-      "doi": "",
-      "url": "https://news.google.com/rss/articles/CBMisAFBVV95cUxPZDhkV3RKaFF0bl9MQ0kwaG1Zak9LUEd1Tl8zc0o4SGQyNTZrbGUzbmtDZUVmYXNZR3JYRGJDUnRUSWU2V0c1SGk5d081a2J2OFI1S3JOZUcxSUxSOUZSb2RhMmdYV3hDNm1DOVFfTHYyVVdLWDgtNTJyRFVVUGpvUlFBcXJrME1pS2poY1NFQVVDWVdyV3dTZnJrOERyWjNCZTRlNWtMTk1WT0hBTGtHdw?oc=5",
-      "preview": "Source listed; editorial text not yet available.",
-      "kind": "nonacademic",
-      "lane": "AI & cognition",
-      "relation": "Nonacademic reporting / commentary",
-      "evidence": "Publisher feed metadata (not independently reviewed)",
-      "source": "Publisher RSS / Google News RSS",
-      "format": "Technology journalism",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "reading": {
-        "level": "citation_only",
-        "provenance": "Publisher citation",
-        "overview": "",
-        "methods": "",
-        "findings": "",
-        "limitations": "",
-        "sample": "",
-        "reported_findings": false,
-        "notice": "Source link and bibliographic metadata only."
-      },
-      "content_access": "headline_only",
-      "source_checked": "2026-11-02"
-    },
-    {
-      "title": "Fear of missing out as the key pathway linking psychological distress to Facebook addiction and smartphone orientation",
+      "title": "Tech Tips for Parents this Digital Parenting Week",
       "authors": [
-        "Patrycja Uram",
-        "Sebastian Skalski-Bednarz",
-        "Paolo Soraci",
-        "Attila Szabo",
-        "Janusz Surzykiewicz"
-      ],
-      "published": "2026-10-23",
-      "venue": "Journal of Public Health",
-      "doi": "10.1007/s10389-026-02915-9",
-      "url": "https://doi.org/10.1007/s10389-026-02915-9",
-      "preview": "Guided by Griffiths’ components model of addiction and the I-PACE (Interaction of Person-Affect-Cognition-Execution) framework, this study tested whether psychological distress is associated with Facebook addiction and smartphone orientation through two emotion-regulation pathways: fear of missing out (FoMO) and escapism. A cross-sectional sample of N = 480 adults (86.3% female, 11.7% male) completed measures of psyc…",
-      "abstract_text": "Guided by Griffiths’ components model of addiction and the I-PACE (Interaction of Person-Affect-Cognition-Execution) framework, this study tested whether psychological distress is associated with Facebook addiction and smartphone orientation through two emotion-regulation pathways: fear of missing out (FoMO) and escapism. A cross-sectional sample of N = 480 adults (86.3% female, 11.7% male) completed measures of psychological distress, FoMO, escapism, Facebook addiction, and smartphone orientation. Structural equation modeling was used to compare mediation models linking these variables. Psychological distress was not directly associated with Facebook addiction (β = 0.01, nonsignificant), but it was positively related to FoMO (β = 0.49) and escapism (β = 0.38). FoMO (β = 0.46) and escapism (β = 0.09) were both associated with Facebook addiction. Facebook addiction (β = 0.21), FoMO (β = 0.32), and escapism (β = 0.26) were associated with smartphone orientation. Model comparisons showed that the full mediation model was the most parsimonious and best-fitting representation of the data. Psychological distress appears to be linked to problematic Facebook use and smartphone orientation indirectly, primarily through FoMO and secondarily through escapism. Interventions may therefore benefit from targeting FoMO and maladaptive escapist coping rather than distress alone.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "Fragmentation",
-      "relation": "Adjacent digital-attention evidence",
-      "evidence": "Registry metadata screened; original paper not yet independently assessed",
-      "source": "Weekly brief lead verified against Crossref",
-      "curated": false,
-      "first_seen": "2026-10-27",
-      "discovery_scope": "weekly_brief",
-      "discovery_query": "exact DOI from weekly brief",
-      "brief_provenance": {
-        "origin": "AI & Attention Weekly Brief, October 26, 2026",
-        "week": "2026-10-26"
-      },
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "Guided by Griffiths’ components model of addiction and the I-PACE (Interaction of Person-Affect-Cognition-Execution) framework, this study tested whether psychological distress is associated with Facebook addiction and smartphone orientation through two emotion-regulation pathways: fear of missing out (FoMO) and escapism.",
-        "methods": "A cross-sectional sample of N = 480 adults (86.3% female, 11.7% male) completed measures of psychological distress, FoMO, escapism, Facebook addiction, and smartphone orientation. Structural equation modeling was used to compare mediation models linking these variables.",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "480",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      },
-      "oa_checked": "2026-10-27",
-      "oa_pass_version": 3,
-      "pmc_oai_attempt": {
-        "version": 1,
-        "status": "no_pmc_record",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-24",
-        "attempts": 1
-      },
-      "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-27T03:24:38+00:00",
-        "pipeline_version": 3,
-        "status": "waiting_for_license",
-        "next_at": "2026-11-10T03:24:39+00:00"
-      },
-      "open_access_url": "https://doi.org/10.1007/s10389-026-02915-9",
-      "pdf_fulltext_attempt": {
-        "version": 1,
-        "status": "no_licensed_machine_pdf",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-17",
-        "attempts": 1
-      },
-      "repository_recovery": {
-        "version": 1,
-        "status": "license_unverified",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-26",
-        "attempts": 1,
-        "providers": [
-          "unpaywall_checked"
-        ]
-      },
-      "source_group": "Adjacent digital-attention evidence",
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_license": "cc-by-nc-nd",
-      "open_access_version": "publishedVersion"
-    },
-    {
-      "title": "Too Long to Watch, Too Short to Leave: Designing for Agent Micro-Waits",
-      "authors": [
-        "Kevin Pu",
-        "Anh Truong",
-        "Michael Terry",
-        "Carrie J. Cai",
-        "Michael Xieyang Liu",
-        "Savvas Petridis"
-      ],
-      "published": "2026-10-19",
-      "venue": "arXiv",
-      "doi": "",
-      "url": "https://arxiv.org/abs/2610.27170",
-      "abstract_text": "Agentic systems increasingly carry out complex work, where a single turn routinely runs for minutes. This produces a micro-wait that is too long to watch and too short to leave. In a formative study with 12 daily agent users, we found that staying felt like wasted time, while switching away fragmented attention and forfeited the context needed to re-engage. We introduce Sidecar, a parallel assistant situated in the same interface as the agent, which reads the run and surfaces implicit decisions the agent made, along with task directions worth exploring. In a within-subjects study (N=16), Sidecar helped participants stay focused on their main task, freely workshop unfinished ideas without fear of unwanted action, and recognize under-specification in their own prompts. Together, these findings contribute to designs that help users stay context-aware and engaged during agent micro-waits.",
-      "abstract_source": "arXiv author-supplied abstract",
-      "preview": "Agentic systems increasingly carry out complex work, where a single turn routinely runs for minutes. This produces a micro-wait that is too long to watch and too short to leave. In a formative study with 12 daily agent users, we found that staying felt like wasted time, while switching away fragmented attention and forfeited the context needed to re-engage. We introduce Sidecar, a parallel assistant situated in the s",
-      "kind": "scholarly",
-      "lane": "Interventions",
-      "relation": "AI-related literature",
-      "evidence": "Preprint; article screening required",
-      "source": "Weekly brief lead verified against arXiv",
-      "curated": false,
-      "first_seen": "2026-10-27",
-      "discovery_scope": "weekly_brief",
-      "brief_provenance": {
-        "origin": "AI & Attention Weekly Brief, October 26, 2026",
-        "week": "2026-10-26"
-      },
-      "reading": {
-        "level": "abstract",
-        "provenance": "arXiv author-supplied abstract",
-        "overview": "Agentic systems increasingly carry out complex work, where a single turn routinely runs for minutes. This produces a micro-wait that is too long to watch and too short to leave.",
-        "methods": "",
-        "findings": "In a formative study with 12 daily agent users, we found that staying felt like wasted time, while switching away fragmented attention and forfeited the context needed to re-engage.",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": true
-      },
-      "source_group": "Adjacent digital-attention evidence"
-    },
-    {
-      "title": "Learning alone: language models, overreliance, and the goals of education",
-      "authors": [
-        "Leonard Dung",
-        "Dominik Balg"
-      ],
-      "published": "2026-10-23",
-      "venue": "AI and Ethics",
-      "doi": "10.1007/s43681-026-01464-x",
-      "url": "https://doi.org/10.1007/s43681-026-01464-x",
-      "preview": "Abstract The development and ubiquitous availability of large language model based systems (LLMs) poses a plurality of potentials and risks for education in schools and universities. In this paper, we provide an analysis and discussion of the overreliance concern as one specific risk: that students might fail to acquire important skills, or be inhibited in the acquisition of these skills, because they overly rely on ",
-      "abstract_text": "Abstract The development and ubiquitous availability of large language model based systems (LLMs) poses a plurality of potentials and risks for education in schools and universities. In this paper, we provide an analysis and discussion of the overreliance concern as one specific risk: that students might fail to acquire important skills, or be inhibited in the acquisition of these skills, because they overly rely on LLMs. We use the distinction between local and global goals of education to guide our investigation. In our view, the harm of LLM overreliance is specifically that it severs the connection between local educational goals (e.g., successfully solving a specific kind of math problem) and global educational goals (e.g., acquiring general skills for mathematics). Based on this analysis, we sketch three possible responses to the overreliance concern: preserving both local and global goals while making minimal changes to educational practice (a conservative approach), changing global and local educational goals (a revisionary perspective), and preserving global educational goals while changing local goals (an in-between view). Since different types of responses have different benefits and weaknesses, we think that it is likely that an optimal response ultimately combines elements from all three types.",
-      "abstract_source": "Crossref publisher-supplied abstract",
-      "kind": "scholarly",
-      "lane": "Technology & society",
-      "relation": "AI-related literature",
-      "evidence": "Registry metadata screened; original paper not yet independently assessed",
-      "source": "Weekly brief lead verified against Crossref",
-      "curated": false,
-      "first_seen": "2026-10-27",
-      "discovery_scope": "weekly_brief",
-      "discovery_query": "exact DOI from weekly brief",
-      "brief_provenance": {
-        "origin": "AI & Attention Weekly Brief, October 26, 2026",
-        "week": "2026-10-26"
-      },
-      "reading": {
-        "level": "full_text",
-        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
-        "overview": "Abstract The development and ubiquitous availability of large language model based systems (LLMs) poses a plurality of potentials and risks for education in schools and universities. In this paper, we provide an analysis and discussion of the overreliance concern as one specific risk: that students might fail to acquire important skills, or be inhibited in the acquisition of these skills, because they…",
-        "methods": "",
-        "findings": "",
-        "interpretation": "In this paper, we have provided an analysis and discussion of the overreliance concern: that students might fail to acquire important skills, or be inhibited in the acquisition of these skills, because they overly rely on LLMs. In our view, the harm of LLM-overreliance is specifically that it severs the connection between local educational goals (e.g., successfully solving a specific kind of math problem) and global educational goals (e.g., acquiring general skills for mathematics). Based on this analysis, we have sketched three possible responses to the overreliance concern: preserving the educational goals while distinguishing admissible from inadmissible uses of LLMs, changing global and local educational goals, and preserving global educational goals while changing local goals. Since different types of responses have different benefits and weaknesses, we think that an optimal response may combine elements from all three types.39 Open Access This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [
-          "discussion"
-        ],
-        "extraction_depth": "limited",
-        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      },
-      "oa_checked": "2026-10-27",
-      "oa_pass_version": 3,
-      "pmc_oai_attempt": {
-        "version": 1,
-        "status": "no_pmc_record",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-24",
-        "attempts": 1
-      },
-      "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-27T03:24:37+00:00",
-        "pipeline_version": 3,
-        "status": "full_text",
-        "next_at": null
-      },
-      "open_access_url": "https://doi.org/10.1007/s43681-026-01464-x",
-      "analysis": {
-        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
-        "license": "cc-by",
-        "license_url": "https://openalex.org/licenses/cc-by",
-        "methods": "",
-        "results": "",
-        "discussion": "In this paper, we have provided an analysis and discussion of the overreliance concern: that students might fail to acquire important skills, or be inhibited in the acquisition of these skills, because they overly rely on LLMs. In our view, the harm of LLM-overreliance is specifically that it severs the connection between local educational goals (e.g., successfully solving a specific kind of math problem) and global educational goals (e.g., acquiring general skills for mathematics). Based on this analysis, we have sketched three possible responses to the overreliance concern: preserving the educational goals while distinguishing admissible from inadmissible uses of LLMs, changing global and local educational goals, and preserving global educational goals while changing local goals. Since different types of responses have different benefits and weaknesses, we think that an optimal response may combine elements from all three types.39 Open Access This article is licensed under a Creative Commons Attribution 4.0 International License, which permits use, sharing, adaptation, distribution and reproduction in any medium or format, as long as you give appropriate credit to the original author(s) and the source, provide a link to the Creative Commons licence, and indicate if changes were made. The images or other third party material in this article are included in the article's Creative Commons licence, unless indicated otherwise in a credit line to the material. If material is not included in the article's Creative Commons licence and your intended use is not permitted by statutory regulation or exceeds the permitted",
-        "limitations": "",
-        "figures": [],
-        "fulltext_url": "https://doi.org/10.1007/s43681-026-01464-x",
-        "key_idea": "In this paper, we have provided an analysis and discussion of the overreliance concern: that students might fail to acquire important skills, or be inhibited in the acquisition of these skills, because they overly rely on LLMs. In our view, the harm of LLM-overreliance is specifi",
-        "extraction_date": "2026-10-27",
-        "extraction_version": 3,
-        "sections_available": [
-          "discussion"
-        ]
-      },
-      "oa_grobid_checked": "2026-10-27",
-      "source_group": "AI-specific",
-      "oa_meta_checked": "2026-11-02"
-    },
-    {
-      "title": "GENERATIVE AI AND HUMAN THINKING: COGNITIVE OFFLOADING, LEARNING, MEMORY, AND CRITICAL THINKING",
-      "authors": [
-        "Jurahanova Nigora",
-        "Worldly Knowledge Publishing Centre"
+        "Paige Collings"
       ],
       "published": "2026-10-29",
-      "venue": "Zenodo (CERN European Organization for Nuclear Research)",
-      "doi": "10.5281/zenodo.23754342",
-      "url": "https://doi.org/10.5281/zenodo.23754342",
-      "preview": "Conversational artificial intelligence (AI) systems such as ChatGPT and Claude have rapidly become everyday tools for hundreds of millions of people. Unlike earlier tools, they do not merely retrieve information but analyse, write and draw conclusions on the user's behalf. This narrative review analyses the available empirical evidence on how offloading cognitive tasks to generative AI affects brain engagement, learn…",
-      "abstract_text": "Conversational artificial intelligence (AI) systems such as ChatGPT and Claude have rapidly become everyday tools for hundreds of millions of people. Unlike earlier tools, they do not merely retrieve information but analyse, write and draw conclusions on the user's behalf. This narrative review analyses the available empirical evidence on how offloading cognitive tasks to generative AI affects brain engagement, learning, memory and critical thinking. It focuses on an EEG study from the MIT Media Lab (n=54), a survey of 319 knowledge workers by Microsoft Research and Carnegie Mellon University, a randomised field experiment with high-school students and related research. The evidence indicates that uncritical reliance on AI is associated with lower engagement of the user's own cognitive resources during the task, poorer recall of self-written text and a reduced tendency to verify AI output; the higher the trust in AI, the less critical scrutiny is applied. However, the evidence base is still limited: studies are small, some are non-peer-reviewed preprints, and no long-term harm has been demonstrated. A conceptual model of \"cognitive debt\" accumulation and recommendations for the reasoned use of AI in higher education, including medical education, are proposed.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "AI & cognition",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "generative AI cognitive offloading critical thinking",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.5281/zenodo.23754342",
-      "open_access_license": "cc-by",
-      "open_access_version": "",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "Conversational artificial intelligence (AI) systems such as ChatGPT and Claude have rapidly become everyday tools for hundreds of millions of people. Unlike earlier tools, they do not merely retrieve information but analyse, write and draw conclusions on the user's behalf.",
-        "methods": "It focuses on an EEG study from the MIT Media Lab (n=54), a survey of 319 knowledge workers by Microsoft Research and Carnegie Mellon University, a randomised field experiment with high-school students and related research.",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "54",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "Impact of Information Overload on Cognitive Fatigue, Psychological Well- Being and Academic Outcomes",
-      "authors": [
-        "KAROLINE KENNETH KATHY",
-        "SAKTHI PRASATH"
-      ],
-      "published": "2026-09-29",
-      "venue": "Research Square",
-      "doi": "10.21203/rs.3.rs-10801009/v1",
-      "url": "https://doi.org/10.21203/rs.3.rs-10801009/v1",
-      "preview": "Abstract The higher education sector has gone through tremendous transformation which has enhanced the use of digital technologies and online learning platforms operated by artificial intelligence. These technology has not only given a better learning evenvironment, it also creates a certain amount of pressure which results in stress among the students. This study aims to analyse the interrelationships between techno…",
-      "abstract_text": "Abstract The higher education sector has gone through tremendous transformation which has enhanced the use of digital technologies and online learning platforms operated by artificial intelligence. These technology has not only given a better learning evenvironment, it also creates a certain amount of pressure which results in stress among the students. This study aims to analyse the interrelationships between techno-stress, attention difficulties, psychological effects with cognitive fatigue among the undergraduate students in digital mediated learning environments. Quantitative correlational research was used and grounded on the theories of Cognitive Load Theory and Information Processing Theory. It looked at the cognitive effects and psychological effects of prolonged use of digital devices. The data was collected using a structured questionnaire 121 undergraduate engineering students aged 17–23 years through purposive sampling. The techno-stress, attention and learning difficulties, cognitive fatigue and psychological effects were measured. The Statistical Package for the Social Sciences (SPSS) was used to analyze the data with descriptive statistics, reliability analysis, Pearson correlation and multiple regression analysis. As per the results, techno-stress (M = 14.40), cognitive fatigue (M = 13.83), attention-related problems (M = 14.16), and psycho-affective repercussions (M = 14.84 resulted moderate level. Prior research has established a strong correlation between cognitive fatigue and techno-stress, which refers to anxiety and impairment of daily functioning caused by technology disruptions. The study indicates prolonged digital learning overloads students’ brain, exhausts them mentally, makes them inattentive, and induces psychological strain.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "Fragmentation",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "AI assistant interruptions distraction multitasking",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.21203/rs.3.rs-10801009/v1",
-      "open_access_license": "cc-by",
-      "open_access_version": "acceptedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This study aims to analyse the interrelationships between techno-stress, attention difficulties, psychological effects with cognitive fatigue among the undergraduate students in digital mediated learning environments.",
-        "methods": "Quantitative correlational research was used and grounded on the theories of Cognitive Load Theory and Information Processing Theory. The data was collected using a structured questionnaire 121 undergraduate engineering students aged 17–23 years through purposive sampling.",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "Corrigendum: when AI improves and impairs performance: role stress and regulatory focus in service work",
-      "authors": [],
-      "published": "2026-09-28",
-      "venue": "International Journal of Contemporary Hospitality Management",
-      "doi": "10.1108/ijchm-09-2026-1604",
-      "url": "https://doi.org/10.1108/ijchm-09-2026-1604",
-      "preview": "Abstract unavailable; bibliographic metadata only.",
-      "abstract_text": "",
-      "abstract_source": "",
-      "kind": "scholarly",
+      "venue": "Electronic Frontier Foundation",
+      "doi": "",
+      "url": "https://www.eff.org/deeplinks/2026/10/tech-tips-parents-digital-parenting-week",
+      "preview": "In today’s digital world, the internet is an essential resource for young people to access information, explore community, and find themselves. But we know that this often comes alongside fears of experiencing online harms like doxxing, grooming, or bullying. Trying to protect your family from everything all the time…",
+      "kind": "nonacademic",
       "lane": "Interventions",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
+      "relation": "Nonacademic reporting / commentary",
+      "evidence": "Publisher feed metadata (not independently reviewed)",
+      "source": "Publisher RSS / Google News RSS",
+      "format": "Policy & analysis",
+      "source_type": "policy",
+      "source_type_basis": "provisional_feed_default",
+      "publication_date_provenance": {
+        "basis": "publisher_rss_pubDate",
+        "raw": "Thu, 29 Oct 2026 17:00:05 +0000",
+        "date": "2026-10-29",
+        "timezone": "UTC",
+        "source_url": "https://www.eff.org/rss/updates.xml",
+        "independently_verified": false
+      },
+      "discovery_provenance": {
+        "method": "publisher_feed",
+        "feed_id": "eff",
+        "feed_url": "https://www.eff.org/rss/updates.xml",
+        "checked_at": "2026-11-07"
+      },
       "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "AI attention management intervention focus assistant",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.1108/ijchm-09-2026-1604",
-      "open_access_license": "unknown",
-      "open_access_version": "publishedVersion",
+      "first_seen": "2026-11-07",
       "reading": {
-        "level": "citation_only",
-        "provenance": "Citation only",
-        "overview": "",
+        "level": "source_preview",
+        "provenance": "Electronic Frontier Foundation RSS/Atom description",
+        "overview": "In today’s digital world, the internet is an essential resource for young people to access information, explore community, and find themselves. But we know that this often comes alongside fears of experiencing online harms like doxxing, grooming, or bullying. Trying to protect your family from everything all the time…",
         "methods": "",
         "findings": "",
         "limitations": "",
-        "sample": "",
-        "notice": "No accessible abstract or licensed text has been indexed for this record."
-      }
+        "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."
+      },
+      "content_access": "feed_description",
+      "source_checked": "2026-11-07"
     },
     {
-      "title": "From sample diversity to interpretive convergence",
+      "title": "AI-Based Technopreneurship for Speech Disorder Therapyin ADHD Children",
       "authors": [
-        "Yusuke Moriguchi",
-        "Yasuhiro Kanakogi",
-        "Taro Murakami"
+        "Uki Hares Yulianti",
+        "Ida Zulaeha",
+        "Subyantoro",
+        "Yusro Edy Nugroho",
+        "Kgomotso Moyo"
       ],
-      "published": "2026-10-22",
-      "venue": "Nature Reviews Psychology",
-      "doi": "10.1038/s44159-026-00636-0",
-      "url": "https://doi.org/10.1038/s44159-026-00636-0",
-      "preview": "Abstract unavailable; bibliographic metadata only.",
-      "abstract_text": "",
-      "abstract_source": "",
+      "published": "2026-10-30",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-10-30"
+      },
+      "venue": "Journal of Computer Science and Technology Application",
+      "doi": "10.33050/corisinta.v2i2.135",
+      "url": "https://doi.org/10.33050/corisinta.v2i2.135",
+      "preview": "While existing literature explores AI in healthcare, this study uniquely high-lights technopreneurial approaches to address accessibility and affordability ofAI-based therapies. Focusing on Indonesia as a case study, the paper exam-ines how AI can support children with ADHD who often face delays in speechdevelopment and communication. ADHD affects attention, language process-ing, and social interaction, creating chal",
+      "abstract_text": "While existing literature explores AI in healthcare, this study uniquely high-lights technopreneurial approaches to address accessibility and affordability ofAI-based therapies. Focusing on Indonesia as a case study, the paper exam-ines how AI can support children with ADHD who often face delays in speechdevelopment and communication. ADHD affects attention, language process-ing, and social interaction, creating challenges for effective therapy. AI inte-grates machine learning to analyze speech patterns, detect phonological errors,and provide adaptive therapy exercises tailored to children’s developmental lev-els. Findings indicate that AI improves diagnostic accuracy and delivers engag-ing interventions through interactive and gamified tools, enhancing motivationand participation for children who struggle with conventional therapy. AI sys-tems can track progress and adjust feedback in real time, offering personalizedsupport. However, barriers remain regarding affordability, infrastructure, andthe need for human oversight to manage complex emotional and behavioral re-sponses. In this context, technopreneurship is essential to scale affordable AI-based therapies for schools, clinics, and homes. By bridging gaps in healthcaredelivery, this study contributes to SDG 3 (Good Health), SDG 4 (Quality Ed-ucation), and SDG 10 (Reduced Inequalities). It emphasizes the importance ofinterdisciplinary collaboration among AI developers, speech-language patholo-gists, medical professionals, and educators. Overall, AI-driven technopreneur-ship demonstrates strong potential to improve early detection, therapy person-alization, and language development for children with ADHD, while ensuringbroader accessibility and sustainability.",
+      "abstract_source": "Crossref publisher-supplied abstract",
       "kind": "scholarly",
-      "lane": "Technology & society",
-      "relation": "Adjacent digital-attention evidence",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
       "evidence": "Registry metadata screened; original paper not yet independently assessed",
-      "source": "Weekly brief lead verified against Crossref",
-      "curated": false,
-      "first_seen": "2026-10-27",
-      "discovery_scope": "weekly_brief",
-      "discovery_query": "exact DOI from weekly brief",
-      "brief_provenance": {
-        "origin": "AI & Attention Weekly Brief, October 26, 2026",
-        "week": "2026-10-26"
-      },
-      "reading": {
-        "level": "citation_only",
-        "provenance": "Citation only",
-        "overview": "",
-        "methods": "",
-        "findings": "",
-        "limitations": "",
-        "sample": "",
-        "notice": "No accessible abstract or licensed text has been indexed for this record."
-      },
-      "oa_checked": "2026-10-27",
-      "oa_pass_version": 3,
-      "pmc_oai_attempt": {
-        "version": 1,
-        "status": "no_pmc_record",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-24",
-        "attempts": 1
-      },
-      "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-10-27T03:24:40+00:00",
-        "pipeline_version": 3,
-        "status": "waiting_for_license",
-        "next_at": "2026-11-10T03:24:40+00:00"
-      },
-      "pdf_fulltext_attempt": {
-        "version": 1,
-        "status": "no_licensed_machine_pdf",
-        "last_at": "2026-10-27",
-        "next_at": "2026-11-17",
-        "attempts": 1
-      },
-      "repository_recovery": {
-        "version": 1,
-        "status": "no_oa_pdf_reported",
-        "last_at": "2026-10-29",
-        "next_at": "2026-11-28",
-        "attempts": 2,
-        "providers": [
-          "unpaywall_checked"
-        ]
-      },
-      "source_group": "Adjacent digital-attention evidence",
-      "oa_meta_checked": "2026-11-02"
-    },
-    {
-      "title": "Beyond Cognitive Offloading: A Catholic Theological-Ethical Framework for Human Intelligence, Critical Thinking, and AI Integration within Health-Professional Education",
-      "authors": [
-        "Ivan Efreaim A. Gozum"
-      ],
-      "published": "2026-10-28",
-      "venue": "Journal of Religion and Health",
-      "doi": "10.1007/s10943-026-02818-9",
-      "url": "https://doi.org/10.1007/s10943-026-02818-9",
-      "preview": "The growing integration of artificial intelligence (AI) into medical and health-professions education offers opportunities for personalized learning, access to information, and cognitive support, while raising concerns about cognitive offloading and the potential displacement of critical thinking and independent judgment. This article presents a conceptual and normative theological-ethical analysis of the responsible…",
-      "abstract_text": "The growing integration of artificial intelligence (AI) into medical and health-professions education offers opportunities for personalized learning, access to information, and cognitive support, while raising concerns about cognitive offloading and the potential displacement of critical thinking and independent judgment. This article presents a conceptual and normative theological-ethical analysis of the responsible integration of AI into health-professions education. It draws on a focused, critical, and integrative review of empirical and theoretical scholarship on AI, cognitive offloading, critical thinking, clinical reasoning, self-regulated learning, and human-AI interaction. The literature is analyzed using the See-Judge-Act method: the See phase identifies contemporary educational tensions associated with AI; the Judge phase evaluates these tensions through Catholic theological anthropology; and the Act phase develops a normative educational framework. The theological analysis draws particularly on Antiqua et Nova, Quo vadis, humanitas?, and Magnifica humanitas, which, respectively, illuminate the distinction between artificial and human intelligence, the embodied, relational, and situated character of human intelligence, and human primacy amid technological development. The analysis results in a human-centered, human-in-the-loop framework in which AI functions as cognitive support while learners retain responsibility for reasoning, judgment, reflection, and decision-making. The framework translates these principles into implications for curriculum, pedagogy, assessment, clinical simulation, AI literacy, and professional formation. As a conceptually derived framework, it has not yet been empirically validated and should therefore be understood as a normative and theoretically grounded proposition for subsequent empirical testing. The article contributes a theological-ethical model for integrating AI in health-professions education while preserving human intelligence, critical formation, and professional responsibility as central aims of education.",
-      "abstract_source": "Europe PMC bibliographic abstract",
-      "kind": "scholarly",
-      "lane": "AI & cognition",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
       "source": "Crossref",
       "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
       "discovery_query": "generative AI cognitive offloading critical thinking",
-      "source_group": "AI-specific",
       "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
+      "source_group": "AI-specific",
       "reading": {
         "level": "abstract",
-        "provenance": "Europe PMC bibliographic abstract",
-        "overview": "This article presents a conceptual and normative theological-ethical analysis of the responsible integration of AI into health-professions education.",
+        "provenance": "Crossref publisher-supplied abstract",
+        "overview": "While existing literature explores AI in healthcare, this study uniquely high-lights technopreneurial approaches to address accessibility and affordability ofAI-based therapies. By bridging gaps in healthcaredelivery, this study contributes to SDG 3 (Good Health), SDG 4 (Quality Ed-ucation), and SDG 10 (Reduced Inequalities).",
         "methods": "",
         "findings": "",
         "interpretation": "",
@@ -1013,44 +817,198 @@
       }
     },
     {
-      "title": "Smarter AI, Healthier Students? How Perceived AI Assistant Intelligence Shapes Medical Students’ Mental Health Through Learning Goal Progress and Academic Anxiety",
+      "title": "Social Media When Elections Are Close: Doing the Impossible Better",
       "authors": [
-        "Yue Chen",
-        "Shuyue Zhang",
-        "Xinru Liu",
-        "Liuyiran Li",
-        "Miao Si",
-        "Chenchen Xu"
+        "Corynne McSherry"
       ],
-      "published": "2026-09-22",
-      "venue": "Behavioral Sciences",
-      "doi": "10.3390/bs16101715",
-      "url": "https://doi.org/10.3390/bs16101715",
-      "preview": "As artificial intelligence (AI) adoption grows in medical education, AI assistants have become important learning support tools for medical students. However, existing research has primarily focused on learning performance and technology adoption, while little is known about how perceived AI assistant intelligence influences medical students' mental health. Drawing on Self-Determination Theory (SDT), this study devel…",
-      "abstract_text": "As artificial intelligence (AI) adoption grows in medical education, AI assistants have become important learning support tools for medical students. However, existing research has primarily focused on learning performance and technology adoption, while little is known about how perceived AI assistant intelligence influences medical students' mental health. Drawing on Self-Determination Theory (SDT), this study develops a model linking perceived AI assistant intelligence to mental health through the serial mediating roles of learning goal progress and academic anxiety, while examining the moderating role of AI literacy. A two-study design was employed. Study 1 surveyed 721 Chinese medical students, and Study 2 conducted a real human-AI interaction experiment with 398 medical students. Results showed that perceived AI assistant intelligence positively predicts learning goal progress. Learning goal progress and academic anxiety jointly mediate the relationship between perceived AI assistant intelligence and mental health. In addition, AI literacy strengthens the positive effect of perceived AI assistant intelligence on learning goal progress and enhances its indirect effect on mental health through the serial mediation pathway. The experimental findings further support the robustness of these relationships. This study extends research on AI in education by uncovering the psychological mechanisms through which perceived AI assistant intelligence affects medical students' mental health. It also enriches the application of SDT in human-AI collaborative learning contexts and provides practical implications for optimizing AI-assisted learning environments, improving AI literacy, and promoting student well-being.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
+      "published": "2026-10-27",
+      "venue": "Electronic Frontier Foundation",
+      "doi": "",
+      "url": "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better",
+      "preview": "Everyone knows, or should, that perfect (balanced, targeted, transparent, swift and swiftly appealable) content moderation at scale is impossible. That doesn’t mean powerful social platforms don’t have to try to get at least reasonably close, especially when access to good information can have a profound effect on…",
+      "kind": "nonacademic",
       "lane": "Interventions",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
+      "relation": "Nonacademic reporting / commentary",
+      "evidence": "Publisher feed metadata (not independently reviewed)",
+      "source": "Publisher RSS / Google News RSS",
+      "format": "Policy & analysis",
+      "source_type": "policy",
+      "source_type_basis": "provisional_feed_default",
+      "publication_date_provenance": {
+        "basis": "publisher_rss_pubDate",
+        "raw": "Tue, 27 Oct 2026 21:20:30 +0000",
+        "date": "2026-10-27",
+        "timezone": "UTC",
+        "source_url": "https://www.eff.org/rss/updates.xml",
+        "independently_verified": false
+      },
+      "discovery_provenance": {
+        "method": "publisher_feed",
+        "feed_id": "eff",
+        "feed_url": "https://www.eff.org/rss/updates.xml",
+        "checked_at": "2026-11-07"
+      },
       "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "AI attention management intervention focus assistant",
-      "source_group": "AI-specific",
+      "first_seen": "2026-11-07",
+      "reading": {
+        "level": "source_preview",
+        "provenance": "Electronic Frontier Foundation RSS/Atom description",
+        "overview": "Everyone knows, or should, that perfect (balanced, targeted, transparent, swift and swiftly appealable) content moderation at scale is impossible. That doesn’t mean powerful social platforms don’t have to try to get at least reasonably close, especially when access to good information can have a profound effect on…",
+        "methods": "",
+        "findings": "",
+        "limitations": "",
+        "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."
+      },
+      "content_access": "feed_description",
+      "source_checked": "2026-11-07"
+    },
+    {
+      "title": "Integrating AI and Big Data to Enhance Performance andSustainability in Hospitality",
+      "authors": [
+        "Hasrul Azwar Hasibuan",
+        "Syaifuddin",
+        "Rusiadi",
+        "John Edwards"
+      ],
+      "published": "2026-10-30",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-10-30"
+      },
+      "venue": "Journal of Computer Science and Technology Application",
+      "doi": "10.33050/corisinta.v2i2.118",
+      "url": "https://doi.org/10.33050/corisinta.v2i2.118",
+      "preview": "This paper explores the impact of Big Data and Artificial Intelligence (AI) on Employee Performance and Sustainability in the hospitality industry. The paper further explains how integrating Big Data and AI can optimize operations, enhance employee efficiency, and promote sustainable practices. The research uses SmartPLS to analyze the relationships between these variables, with a focus on how Big Data and AI influen",
+      "abstract_text": "This paper explores the impact of Big Data and Artificial Intelligence (AI) on Employee Performance and Sustainability in the hospitality industry. The paper further explains how integrating Big Data and AI can optimize operations, enhance employee efficiency, and promote sustainable practices. The research uses SmartPLS to analyze the relationships between these variables, with a focus on how Big Data and AI influence Employee Performance, which in turn contributes to Sustainability efforts. The findings, show that both Big Data and AI have significant positive effects on Employee Performance, with Big Data demonstrating a stronger impact. Moreover, Employee Performance mediates the relationship between Big Data, AI, and Sustainability, indicating that improvements in employee performance lead to better sustainability outcomes, such as resource optimization and waste reduction. The study findings align with SDG 8 (Decent Work and Economic Growth) and SDG 12 (Responsible Consumption and Production), highlighting the potential of technology to drive both economic and environmental sustainability in the hospitality sector This research contributes to understanding how the application of Big Data and AI can help hospitality businesses achieve long-term success through improved operational efficiency and sustainable practices.",
+      "abstract_source": "Crossref publisher-supplied abstract",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Registry metadata screened; original paper not yet independently assessed",
+      "source": "Crossref",
+      "curated": false,
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
+      "discovery_query": "generative AI cognitive offloading critical thinking",
       "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.3390/bs16101715",
-      "open_access_license": "cc-by",
-      "open_access_version": "publishedVersion",
+      "source_group": "AI-specific",
       "reading": {
         "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "Drawing on Self-Determination Theory (SDT), this study develops a model linking perceived AI assistant intelligence to mental health through the serial mediating roles of learning goal progress and academic anxiety, while examining the moderating role of AI literacy. This study extends research on AI in education by uncovering the psychological mechanisms through which…",
-        "methods": "Study 1 surveyed 721 Chinese medical students, and Study 2 conducted a real human-AI interaction experiment with 398 medical students. The experimental findings further support the robustness of these relationships.",
-        "findings": "Results showed that perceived AI assistant intelligence positively predicts learning goal progress.",
+        "provenance": "Crossref publisher-supplied abstract",
+        "overview": "This paper explores the impact of Big Data and Artificial Intelligence (AI) on Employee Performance and Sustainability in the hospitality industry. The study findings align with SDG 8 (Decent Work and Economic Growth) and SDG 12 (Responsible Consumption and Production), highlighting the potential of technology to drive both economic and environmental sustainability in the…",
+        "methods": "",
+        "findings": "",
+        "interpretation": "",
+        "limitations": "",
+        "sample": "",
+        "section_coverage": [],
+        "extraction_depth": "abstract_only",
+        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "research_type": "unclassified",
+        "reported_findings": false
+      }
+    },
+    {
+      "title": "Empowering Edupreneurship through AI-Based Creative Journalism Education",
+      "authors": [
+        "Hayatun Nufus",
+        "Subyantoro",
+        "Hari Bakti Mardikantoro",
+        "Rahayu Pristiwati",
+        "Henry Zainarthur"
+      ],
+      "published": "2026-10-30",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              10,
+              30
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-10-30"
+      },
+      "venue": "Journal of Computer Science and Technology Application",
+      "doi": "10.33050/corisinta.v2i2.112",
+      "url": "https://doi.org/10.33050/corisinta.v2i2.112",
+      "preview": "The advancement of Artificial Intelligence (AI) has reshaped journalism and education, creating opportunities to strengthen creative writing and entrepreneurial skills. AI-driven journalism platforms, such as automated content generation and real-time feedback, empower students to become both skilled writers and edupreneurs, while developing 21st-century competencies including creativity, critical thinking, collabora",
+      "abstract_text": "The advancement of Artificial Intelligence (AI) has reshaped journalism and education, creating opportunities to strengthen creative writing and entrepreneurial skills. AI-driven journalism platforms, such as automated content generation and real-time feedback, empower students to become both skilled writers and edupreneurs, while developing 21st-century competencies including creativity, critical thinking, collaboration, and digital literacy. This study examines the influence of AI integration on creative writing skills, edupreneurship, and competency development using a quantitative research design. Data were collected through structured questionnaires distributed to university students and analyzed with Partial Least Squares Structural Equation Modeling (PLS-SEM) via SmartPLS 4. The analysis revealed high reliability and convergent validity of the measurement model, with structural results confirming significant positive relationships between AI integration and creative writing skills, and between creative writing skills and 21st-century competencies. Furthermore, creative writing was shown to mediate the connection between AI adoption and both entrepreneurship and competency development, indicating its key role in linking technological tools with educational and entrepreneurial outcomes. The findings underline the transformative role of AI in journalism education, not only in enhancing writing proficiency but also in building entrepreneurial capacity and essential future-ready skills. This \\textbf{research provides} practical implications for integrating AI literacy, creative expression, and entrepreneurship into curricula, while also aligning with Sustainable Development Goals (SDGs) such as Quality Education, Economic Growth, Innovation, and Global Partnerships, supporting inclusive and technology-driven learning.",
+      "abstract_source": "Crossref publisher-supplied abstract",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Registry metadata screened; original paper not yet independently assessed",
+      "source": "Crossref",
+      "curated": false,
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
+      "discovery_query": "generative AI cognitive offloading critical thinking",
+      "historical_backfill": false,
+      "source_group": "AI-specific",
+      "reading": {
+        "level": "abstract",
+        "provenance": "Crossref publisher-supplied abstract",
+        "overview": "This study examines the influence of AI integration on creative writing skills, edupreneurship, and competency development using a quantitative research design.",
+        "methods": "This study examines the influence of AI integration on creative writing skills, edupreneurship, and competency development using a quantitative research design. Data were collected through structured questionnaires distributed to university students and analyzed with Partial Least Squares Structural Equation Modeling (PLS-SEM) via SmartPLS 4.",
+        "findings": "The analysis revealed high reliability and convergent validity of the measurement model, with structural results confirming significant positive relationships between AI integration and creative writing skills, and between creative writing skills and 21st-century competencies.",
         "interpretation": "",
         "limitations": "",
         "sample": "",
@@ -1062,60 +1020,29 @@
       }
     },
     {
-      "title": "The future of humanity in the face of artificial intelligence progress: possible scenarios, risks, and the role of governance",
+      "title": "When Does GenAI Use Support Critical Thinking? A Cross-Cultural Structural Account of Transactive Memory with GenAI",
       "authors": [
-        "Faztudo Languisse"
+        "Mahir Akgün",
+        "Şacip Toker"
       ],
-      "published": "2026-10-12",
-      "venue": "Research Square",
-      "doi": "10.21203/rs.3.rs-11053438/v1",
-      "url": "https://doi.org/10.21203/rs.3.rs-11053438/v1",
-      "preview": "Abstract The rapid pace of Artificial Intelligence (AI) development is posing unprecedented challenges for the organisation of societies and the contemporary legal order. This study explores possible scenarios related to the evolution of Artificial Intelligence, focusing on the balance between socio-economic benefits and existential risks on a planetary scale. Special attention is given to the legal dimensions of new…",
-      "abstract_text": "Abstract The rapid pace of Artificial Intelligence (AI) development is posing unprecedented challenges for the organisation of societies and the contemporary legal order. This study explores possible scenarios related to the evolution of Artificial Intelligence, focusing on the balance between socio-economic benefits and existential risks on a planetary scale. Special attention is given to the legal dimensions of new technologies, with the identification of gaps in contemporary legal regulation of algorithmic autonomy. A global legal regulatory framework, grounded in international cooperation, transparency, and the supremacy of human rights, is proposed as a strategic solution. The methodology encompasses prospective scenario analysis and a systematic bibliographic review spanning computer science, ethics, political science, and international law. The analysis distinguishes three prospective scenarios — optimisation and prosperity, misalignment and disruption, and existential risk — and examines the structural challenges AI poses to labour markets, algorithmic justice, and global security. The study concludes that anticipatory, internationally coordinated regulation of new technologies is crucial for ensuring their development remains compatible with human safety, dignity, and long-term collective welfare.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "Technology & society",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "artificial intelligence attention economy cognitive autonomy",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.21203/rs.3.rs-11053438/v1",
-      "open_access_license": "cc-by",
-      "open_access_version": "acceptedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This study explores possible scenarios related to the evolution of Artificial Intelligence, focusing on the balance between socio-economic benefits and existential risks on a planetary scale. The analysis distinguishes three prospective scenarios — optimisation and prosperity, misalignment and disruption, and existential risk — and examines the structural challenges AI poses…",
-        "methods": "",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "Metacognition in the Era of Generative AI: Understanding Human Cognitive Engagement and AI Reliance",
-      "authors": [
-        "Vanshika Rana"
-      ],
-      "published": "2026-10-27",
-      "venue": "Dandao Xuebao/Journal of Ballistics",
-      "doi": "",
-      "url": "https://openalex.org/W7224151034",
-      "preview": "The growing integration of Generative Artificial Intelligence (GenAI) into human cognitive activities, including problem-solving, decision-making, learning and information processing, has raised important questions about cognitive work allocation, metacognitive control and independent performance. Although GenAI can enhance efficiency by reducing cognitive demands, excessive reliance may weaken users’ engagement in r…",
-      "abstract_text": "The growing integration of Generative Artificial Intelligence (GenAI) into human cognitive activities, including problem-solving, decision-making, learning and information processing, has raised important questions about cognitive work allocation, metacognitive control and independent performance. Although GenAI can enhance efficiency by reducing cognitive demands, excessive reliance may weaken users’ engagement in reasoning, verification and independent task execution. This review examines the relationship between GenAI use and human cognition, with particular emphasis on cognitive offloading, appropriate reliance, over-reliance, automation bias and independent performance. Drawing on existing research, it explores how the effects of cognitive offloading depend on task characteristics and",
+      "published": "2026-10-28",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2610.38910",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2610.38910v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2610.38910v1",
+        "version_url": "https://arxiv.org/abs/2610.38910v1",
+        "status": "day_known",
+        "value": "2026-10-28",
+        "raw": "2026-10-28T21:01:28Z",
+        "source_id": "http://arxiv.org/abs/2610.38910v1"
+      },
+      "url": "https://doi.org/10.48550/arxiv.2610.38910",
+      "preview": "Whether generative AI (GenAI) use helps or hinders critical thinking remains contested, and existing accounts emphasize exposure to the tool rather than how a person structures their engagement with it. Extending Transactive Memory Systems (TMS) theory to human-AI partnerships, we test a structural account of critical thinking in GenAI-assisted academic work among 891 college students in the United States and Türkiye…",
+      "abstract_text": "Whether generative AI (GenAI) use helps or hinders critical thinking remains contested, and existing accounts emphasize exposure to the tool rather than how a person structures their engagement with it. Extending Transactive Memory Systems (TMS) theory to human-AI partnerships, we test a structural account of critical thinking in GenAI-assisted academic work among 891 college students in the United States and Türkiye. Self-appraised thinking ability and confidence in the partnership shaped how much practical experience a person built up with GenAI, but neither predicted critical thinking directly. That experience mattered only through two downstream behaviors, dividing and coordinating cognitive labor with the tool, and actively reworking its output rather than accepting it as given. A mul",
       "abstract_source": "OpenAlex abstract index",
       "kind": "scholarly",
       "lane": "AI & cognition",
@@ -1123,15 +1050,15 @@
       "evidence": "Metadata screened (unverified)",
       "source": "OpenAlex",
       "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
       "discovery_query": "generative AI cognitive offloading critical thinking",
-      "source_group": "AI-specific",
       "historical_backfill": false,
+      "source_group": "AI-specific",
       "reading": {
         "level": "abstract",
         "provenance": "OpenAlex abstract index",
-        "overview": "This review examines the relationship between GenAI use and human cognition, with particular emphasis on cognitive offloading, appropriate reliance, over-reliance, automation bias and independent performance. Drawing on existing research, it explores how the effects of cognitive offloading depend on task characteristics and",
+        "overview": "Whether generative AI (GenAI) use helps or hinders critical thinking remains contested, and existing accounts emphasize exposure to the tool rather than how a person structures their engagement with it. Extending Transactive Memory Systems (TMS) theory to human-AI partnerships, we test a structural account of critical thinking in GenAI-assisted academic work among 891 college…",
         "methods": "",
         "findings": "",
         "interpretation": "",
@@ -1145,72 +1072,46 @@
       }
     },
     {
-      "title": "Multi-pressure modalities integrated artificial intelligence model for supersonic isolator flow field prediction with attention mechanisms",
+      "title": "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
       "authors": [
-        "Yunxiao Han",
-        "Chen Kong",
-        "Xuan Wang",
-        "Juntao Chang"
+        "Rania Abdelghani",
+        "Peter Kaiser",
+        "Kou Murayama"
       ],
-      "published": "2026-10-01",
-      "venue": "Engineering Applications of Artificial Intelligence",
-      "doi": "10.1016/j.engappai.2026.115991",
-      "url": "https://doi.org/10.1016/j.engappai.2026.115991",
-      "preview": "Abstract unavailable; bibliographic metadata only.",
-      "abstract_text": "",
-      "abstract_source": "",
-      "kind": "scholarly",
-      "lane": "Technology & society",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "Crossref",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "artificial intelligence attention economy cognitive autonomy",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "oa_meta_checked": "2026-11-02",
-      "reading": {
-        "level": "citation_only",
-        "provenance": "Citation only",
-        "overview": "",
-        "methods": "",
-        "findings": "",
-        "limitations": "",
-        "sample": "",
-        "notice": "No accessible abstract or licensed text has been indexed for this record."
-      }
-    },
-    {
-      "title": "What the submission does not show: Complexifying cognitive offloading in students' mathematical work with LLMs",
-      "authors": [
-        "Igor' Kontorovich",
-        "Miriam N. Wallach"
-      ],
-      "published": "2026-10-22",
-      "venue": "arXiv",
-      "doi": "",
-      "url": "https://arxiv.org/abs/2610.31335",
-      "abstract_text": "A common concern is that using large language models (LLMs) lets students offload mathematical work that tasks are designed to elicit. Yet such claims often rest on outcomes (e.g., submitted solutions), rather than on evidence of students' work with LLMs. We followed 23 first-year linear algebra students as they solved three differently designed homework tasks with LLMs. Drawing on self-regulated learning and choice-affluent environments, we interpreted each of 429 prompts as a trace of a regulatory event and compared 59 chatlogs with the problem solutions the students submitted. Prompts formed five structures, casting the LLM mainly as a solver, explainer, or validator. The mix of structures shifted across the tasks, and ten of the 15 students who completed all three tasks changed their dominant structure. Most final submissions stayed close to LLM output, including those that followed exchanges in which students had explained, conjectured, and checked their own ideas. We conclude that an LLM-aided submission is not a trustworthy marker of students' offloading of the mathematical work, and that offloading needs to be examined in each regulatory space and part by part rather than as a whole.",
-      "abstract_source": "arXiv author-supplied abstract",
-      "preview": "A common concern is that using large language models (LLMs) lets students offload mathematical work that tasks are designed to elicit. Yet such claims often rest on outcomes (e.g., submitted solutions), rather than on evidence of students' work with LLMs. We followed 23 first-year linear algebra students as they solved three differently designed homework tasks with LLMs. Drawing on self-regulated learning and choice-",
+      "published": "2026-10-28",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2610.38950",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2610.38950v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2610.38950v1",
+        "version_url": "https://arxiv.org/abs/2610.38950v1",
+        "status": "day_known",
+        "value": "2026-10-28",
+        "raw": "2026-10-28T21:35:52Z",
+        "source_id": "http://arxiv.org/abs/2610.38950v1"
+      },
+      "url": "https://doi.org/10.48550/arxiv.2610.38950",
+      "preview": "Large language models (LLMs) are increasingly used for learning, raising a key question: can learners remain epistemically proactive, retaining responsibility for the cognitive and regulatory activities through which learning is produced while working with AI? Because this responsibility may change as interactions unfold, we examine epistemic proactivity as a developing process. We conceptualize epistemic proactivity…",
+      "abstract_text": "Large language models (LLMs) are increasingly used for learning, raising a key question: can learners remain epistemically proactive, retaining responsibility for the cognitive and regulatory activities through which learning is produced while working with AI? Because this responsibility may change as interactions unfold, we examine epistemic proactivity as a developing process. We conceptualize epistemic proactivity through self-regulated learning (SRL) moves, complemented by help-seeking strategies and manifestations of epistemic vigilance. We analyzed these behaviors in 880 substantive turns from 112 secondary-school students completing open-ended mathematical-modeling practice with a general-purpose LLM (Mistral). Overall, students showed limited observable epistemic proactivity: their",
+      "abstract_source": "OpenAlex abstract index",
       "kind": "scholarly",
       "lane": "AI & cognition",
       "relation": "AI-related literature",
-      "evidence": "Preprint; article screening required",
-      "source": "Weekly brief lead verified against arXiv",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
       "curated": false,
-      "first_seen": "2026-10-27",
-      "discovery_scope": "weekly_brief",
-      "brief_provenance": {
-        "origin": "AI & Attention Weekly Brief, October 26, 2026",
-        "week": "2026-10-26"
-      },
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
+      "discovery_query": "generative AI cognitive offloading critical thinking",
+      "historical_backfill": false,
+      "source_group": "AI-specific",
       "reading": {
         "level": "abstract",
-        "provenance": "arXiv author-supplied abstract",
-        "overview": "A common concern is that using large language models (LLMs) lets students offload mathematical work that tasks are designed to elicit.",
+        "provenance": "OpenAlex abstract index",
+        "overview": "Because this responsibility may change as interactions unfold, we examine epistemic proactivity as a developing process.",
         "methods": "",
         "findings": "",
         "interpretation": "",
@@ -1221,167 +1122,108 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
-      },
-      "source_group": "AI-specific"
+      }
     },
     {
-      "title": "Are you using AI to study? Here’s how to do it well",
+      "title": "Exploring AI Peer in Collaborative Mathematics Learning",
       "authors": [
-        "Luke Rowe, Lecturer and Researcher (Science of Learning), Australian Catholic University"
+        "Yiran Lin",
+        "Ye deng",
+        "Ziqi Pan",
+        "Yongan Yu",
+        "Alexandra Ioana Cristea"
       ],
-      "published": "2026-10-21",
-      "venue": "The Conversation",
+      "published": "2026-10-28",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2610.38990",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2610.38990v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2610.38990v1",
+        "version_url": "https://arxiv.org/abs/2610.38990v1",
+        "status": "day_known",
+        "value": "2026-10-28",
+        "raw": "2026-10-28T22:13:59Z",
+        "source_id": "http://arxiv.org/abs/2610.38990v1"
+      },
+      "url": "https://doi.org/10.48550/arxiv.2610.38990",
+      "preview": "Artificial intelligence (AI) agents are increasingly explored as collaborative learning partners in mathematics education, yet it remains unclear what makes an AI recognizable as a peer. This study examines how domain experts perceive and interact with an adaptive LLM-based peer agent combining a Big Five-informed persona with motivational state modulation for collaborative mathematics problem solving. Through themat…",
+      "abstract_text": "Artificial intelligence (AI) agents are increasingly explored as collaborative learning partners in mathematics education, yet it remains unclear what makes an AI recognizable as a peer. This study examines how domain experts perceive and interact with an adaptive LLM-based peer agent combining a Big Five-informed persona with motivational state modulation for collaborative mathematics problem solving. Through thematic analysis of expert interviews, we identify conditions shaping peer perceptions, including emotional safety, shared control, and collaborative reasoning. Participants primarily judged the AI through its social behavior rather than mathematical capabilities. The AI was perceived more as a peer when it created a non-judgmental space, engaged in tentative reasoning, displayed ap",
+      "abstract_source": "OpenAlex abstract index",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "curated": false,
+      "first_seen": "2026-11-07",
+      "discovery_scope": "previous_publication_week",
+      "discovery_query": "large language model cognitive engagement agency",
+      "historical_backfill": false,
+      "source_group": "AI-specific",
+      "reading": {
+        "level": "abstract",
+        "provenance": "OpenAlex abstract index",
+        "overview": "This study examines how domain experts perceive and interact with an adaptive LLM-based peer agent combining a Big Five-informed persona with motivational state modulation for collaborative mathematics problem solving.",
+        "methods": "Through thematic analysis of expert interviews, we identify conditions shaping peer perceptions, including emotional safety, shared control, and collaborative reasoning.",
+        "findings": "",
+        "interpretation": "",
+        "limitations": "",
+        "sample": "",
+        "section_coverage": [],
+        "extraction_depth": "abstract_only",
+        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "research_type": "unclassified",
+        "reported_findings": false
+      }
+    },
+    {
+      "title": "Victory! You Can Now Exclude Apps from Siri AI",
+      "authors": [
+        "Thorin Klosowski"
+      ],
+      "published": "2026-10-28",
+      "venue": "Electronic Frontier Foundation",
       "doi": "",
-      "url": "https://theconversation.com/are-you-using-ai-to-study-heres-how-to-do-it-well-294453",
-      "preview": "A good principle when studying with artificial intelligence is: think first, use AI second (or, in some cases, not at all).",
+      "url": "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai",
+      "preview": "In the most recent update to Apple’s devices, iOS 27.2, the company has introduced a new setting to “Exclude Apps” from Siri AI, fulfilling one of our asks from our Encrypt It Already campaign earlier this year . One of our main concerns with new AI features on devices is how those features interact with end-to-end…",
       "kind": "nonacademic",
       "lane": "AI & cognition",
       "relation": "Nonacademic reporting / commentary",
       "evidence": "Publisher feed metadata (not independently reviewed)",
       "source": "Publisher RSS / Google News RSS",
-      "format": "Opinion & analysis",
+      "format": "Policy & analysis",
+      "source_type": "policy",
+      "source_type_basis": "provisional_feed_default",
+      "publication_date_provenance": {
+        "basis": "publisher_rss_pubDate",
+        "raw": "Wed, 28 Oct 2026 20:04:21 +0000",
+        "date": "2026-10-28",
+        "timezone": "UTC",
+        "source_url": "https://www.eff.org/rss/updates.xml",
+        "independently_verified": false
+      },
+      "discovery_provenance": {
+        "method": "publisher_feed",
+        "feed_id": "eff",
+        "feed_url": "https://www.eff.org/rss/updates.xml",
+        "checked_at": "2026-11-07"
+      },
       "curated": false,
-      "first_seen": "2026-11-02",
+      "first_seen": "2026-11-07",
       "reading": {
         "level": "source_preview",
-        "provenance": "The Conversation RSS/Atom description",
-        "overview": "A good principle when studying with artificial intelligence is: think first, use AI second (or, in some cases, not at all).",
+        "provenance": "Electronic Frontier Foundation RSS/Atom description",
+        "overview": "In the most recent update to Apple’s devices, iOS 27.2, the company has introduced a new setting to “Exclude Apps” from Siri AI, fulfilling one of our asks from our Encrypt It Already campaign earlier this year . One of our main concerns with new AI features on devices is how those features interact with end-to-end…",
         "methods": "",
         "findings": "",
         "limitations": "",
-        "notice": "This is a short description supplied by the publisher feed, not a full-article review or independent assessment."
+        "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."
       },
       "content_access": "feed_description",
-      "source_checked": "2026-11-02",
-      "companion_to": "10.3390/educsci16081291",
-      "companion_relation": "Author-written explanation and study advice based on the conceptual publication",
-      "companion_verified_via": "https://phys.org/news/2026-10-ai-2.html"
-    },
-    {
-      "title": "THE PARADOX OF GENERATIVE AI IN HIGHER EDUCATION: ACADEMIC INTEGRITY VS. COGNITIVE OFFLOADING",
-      "authors": [
-        "AZANI GUNAY"
-      ],
-      "published": "2026-10-15",
-      "venue": "Zenodo (CERN European Organization for Nuclear Research)",
-      "doi": "10.5281/zenodo.23837125",
-      "url": "https://doi.org/10.5281/zenodo.23837125",
-      "preview": "Generative artificial intelligence (GenAI) is changing how university students study, research and write. It can explain difficult topics, help with research and improve students' academic language. However, depending on AI too much may lead students to let the technology do the thinking for them. This can weaken critical thinking and raise questions about academic integrity. This article discusses both the benefits …",
-      "abstract_text": "Generative artificial intelligence (GenAI) is changing how university students study, research and write. It can explain difficult topics, help with research and improve students' academic language. However, depending on AI too much may lead students to let the technology do the thinking for them. This can weaken critical thinking and raise questions about academic integrity. This article discusses both the benefits and risks of GenAI and suggests that universities should teach students to use it responsibly while keeping their own ideas and reasoning at the centre of learning.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "AI & cognition",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "generative AI cognitive offloading critical thinking",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.5281/zenodo.23837125",
-      "open_access_license": "cc-by",
-      "open_access_version": "",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This article discusses both the benefits and risks of GenAI and suggests that universities should teach students to use it responsibly while keeping their own ideas and reasoning at the centre of learning.",
-        "methods": "",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "Cognitive Offloading in AI-Assisted Learning: A Study of Its Psychological Effects on Memory, Critical Thinking, and Problem-Solving Skills",
-      "authors": [
-        "Shalvi Dogra"
-      ],
-      "published": "2026-10-09",
-      "venue": "Anusandhanvallari",
-      "doi": "",
-      "url": "https://openalex.org/W7223590774",
-      "preview": "Artificial intelligence (AI) has revolutionized the current educational landscape, making personalized learning, intelligent tutoring systems, and adaptive education possible. It has also been used increasingly for cognitive offloading, for learners to use Artificial Intelligence (AI) tools to assist them with memory, reasoning and problem-solving. The goal of this study is to shed light on the psychological impact o…",
-      "abstract_text": "Artificial intelligence (AI) has revolutionized the current educational landscape, making personalized learning, intelligent tutoring systems, and adaptive education possible. It has also been used increasingly for cognitive offloading, for learners to use Artificial Intelligence (AI) tools to assist them with memory, reasoning and problem-solving. The goal of this study is to shed light on the psychological impact of cognitive offloading in the context of AI-supported learning, specifically on memory retention, critical thinking, and problem-solving abilities. A complete narrative study process was carried out based on journal articles, books and conference studies published from 2020 to 2026. Relevant studies were identified through the use of established search strategies and inclusion/",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "AI & cognition",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "ChatGPT metacognition memory cognitive effort",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "The goal of this study is to shed light on the psychological impact of cognitive offloading in the context of AI-supported learning, specifically on memory retention, critical thinking, and problem-solving abilities.",
-        "methods": "",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
-    },
-    {
-      "title": "The Generative AI Cognitive Effort Paradox: When Less Effort Does Not Mean Better Learning – An Integrative Review of Cognitive Load, Productive Struggle, and Independent Learning",
-      "authors": [
-        "Papia Sarkar"
-      ],
-      "published": "2026-10-01",
-      "venue": "International Journal of Social Science Research (IJSSR)",
-      "doi": "10.70558/ijssr.2026.v3.i5.301390",
-      "url": "https://doi.org/10.70558/ijssr.2026.v3.i5.301390",
-      "preview": "Generative artificial intelligence (GenAI) is reshaping higher education by reducing the time and effort required to access information, solve problems, and complete academic tasks. Although these capabilities can improve learning efficiency, their implications for deeper understanding and independent learning remain uncertain. This review examines the cognitive effort paradox in GenAI-supported education: the possib…",
-      "abstract_text": "Generative artificial intelligence (GenAI) is reshaping higher education by reducing the time and effort required to access information, solve problems, and complete academic tasks. Although these capabilities can improve learning efficiency, their implications for deeper understanding and independent learning remain uncertain. This review examines the cognitive effort paradox in GenAI-supported education: the possibility that reducing unnecessary mental effort can facilitate learning while excessive cognitive delegation may weaken the processes through which knowledge is constructed and retained. Drawing on Cognitive Load Theory, desirable difficulties, self-regulated learning, and cognitive offloading research, the review distinguishes productive cognitive assistance from cognitive substitution. It examines how GenAI influences cognitive load, learning engagement, metacognitive monitoring, knowledge retention, and independent problem-solving. The synthesis suggests that the educational value of reduced cognitive effort depends on the nature of the task, learner characteristics, instructional design, and whether students remain actively involved in learning-relevant processing. An integrative conceptual framework is proposed to explain the conditions under which GenAI-supported efficiency may strengthen or constrain learning. The review offers directions for experimental research, educational assessment, and responsible GenAI integration in higher education.",
-      "abstract_source": "OpenAlex abstract index",
-      "kind": "scholarly",
-      "lane": "AI & cognition",
-      "relation": "AI-related literature",
-      "evidence": "Metadata screened (unverified)",
-      "source": "OpenAlex",
-      "curated": false,
-      "first_seen": "2026-11-02",
-      "discovery_scope": "recent",
-      "discovery_query": "ChatGPT metacognition memory cognitive effort",
-      "source_group": "AI-specific",
-      "historical_backfill": false,
-      "abstract_updated": "2026-11-02",
-      "oa_meta_checked": "2026-11-02",
-      "open_access_url": "https://doi.org/10.70558/ijssr.2026.v3.i5.301390",
-      "open_access_license": "cc-by",
-      "open_access_version": "publishedVersion",
-      "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This review examines the cognitive effort paradox in GenAI-supported education: the possibility that reducing unnecessary mental effort can facilitate learning while excessive cognitive delegation may weaken the processes through which knowledge is constructed and retained. It examines how GenAI influences cognitive load, learning engagement, metacognitive monitoring…",
-        "methods": "The review offers directions for experimental research, educational assessment, and responsible GenAI integration in higher education.",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
-        "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
-        "research_type": "unclassified",
-        "reported_findings": false
-      }
+      "source_checked": "2026-11-07"
     }
   ]
 }

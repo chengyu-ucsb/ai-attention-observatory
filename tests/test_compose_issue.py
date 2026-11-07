@@ -89,6 +89,8 @@ class CompositionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp); data=root/'data'; data.mkdir()
             items=[{'title':p['title'],'url':'https://example.org/'+p['id'],
+                    'kind':'scholarly','published':'2026-10-20',
+                    'publication_date_provenance':{'status':'day_known','basis':'editor_verified_original_publication_date','value':'2026-10-20'},
                     'reading':{'level':'abstract','findings':p['evidence']}} for p in packet]
             (data/'public-weekly.json').write_text(json.dumps({'run':{'date':'2026-10-26'},'items':items}),encoding='utf-8')
             path=data/'issue-editorial.json'

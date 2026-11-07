@@ -1,0 +1,149 @@
+name: Retrieve weekly article sources
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - 'app.js'
+      - 'data/editorial-sources.json'
+      - '.github/workflows/weekly-source-acquisition.yml'
+      - '.github/workflows/refresh.yml'
+  workflow_run:
+    workflows: ['Update research library']
+    types: [completed]
+    branches: [main]
+  # Discovery remains weekly. These bounded retries drain that same week's queue.
+  schedule:
+    - cron: '43 2,8,14,20 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || 'observatory-weekly-acquisition' }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Official releases/runtime inspected 2026-11-07: all use Node 24.
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Install supported PDF parser
+        run: python -m pip install --disable-pip-version-check 'pypdf>=6.0,<7.0'
+      - name: Verify offline gates and public rendering
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_article_ui.cjs
+          node tests/validate_weekly_issue.cjs
+          node tests/validate_weekly_window.cjs
+  collect:
+    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Require the current previous-publication-week snapshot
+        id: window
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          from collection_window import window_metadata
+          weekly = json.loads(Path('data/weekly.json').read_text())
+          expected = window_metadata()
+          actual = weekly.get('run', {}).get('publication_window') or {}
+          ready = all(actual.get(key) == expected[key] for key in ('from', 'to', 'timezone'))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('ready=' + str(ready).lower() + '\n')
+          print(json.dumps({'ready': ready, 'expected': expected, 'actual': actual}))
+          if not ready:
+              print('No current strict weekly snapshot. Article retrieval skipped; weekly discovery must run first.')
+          PY
+      - name: Install supported PDF parser
+        if: steps.window.outputs.ready == 'true'
+        run: python -m pip install --disable-pip-version-check 'pypdf>=6.0,<7.0'
+      - name: Retrieve bounded source batch without retaining source text
+        id: acquisition
+        if: steps.window.outputs.ready == 'true'
+        run: python scripts/collect_weekly_sources.py --limit 12 --time-budget 540 --item-time-budget 60
+      - name: Validate the durable metadata checkpoint
+        id: checkpoint
+        if: always() && steps.window.outputs.ready == 'true' && steps.acquisition.outcome != 'skipped'
+        run: |
+          python - <<'PY'
+          import json, os, shutil, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          from collect_weekly_sources import validate_state
+          path = Path('data/weekly-source-acquisition.json')
+          if not path.exists():
+              print('No checkpoint was produced; no state will be published.')
+              raise SystemExit(0)
+          state = json.loads(path.read_text())
+          validate_state(state)
+          destination = Path(os.environ['RUNNER_TEMP']) / 'validated-weekly-acquisition.json'
+          shutil.copyfile(path, destination)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('valid=true\n')
+          print('Closed-schema metadata checkpoint validated. No article text or PDFs are retained.')
+          PY
+      - name: Save acquisition metadata, never source prose or PDFs
+        if: always() && steps.checkpoint.outputs.valid == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/weekly-source-acquisition.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Record bounded previous-week article acquisition'
+            # Retry the saved commit, never external retrieval, on a push race.
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if ! git rebase origin/main; then
+                git rebase --abort
+                echo 'Metadata rebase conflict; validated checkpoint remains in the run artifact.'
+                exit 1
+              fi
+              if git push origin HEAD:main; then exit 0; fi
+              sleep "$((attempt * 2))"
+            done
+            echo 'Push attempts exhausted; validated checkpoint remains in the run artifact.'
+            exit 1
+          fi
+      - name: Retain validated checkpoint for recovery
+        if: always() && steps.checkpoint.outputs.valid == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: weekly-acquisition-checkpoint-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validated-weekly-acquisition.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Record coverage and unresolved sources
+        if: always() && steps.checkpoint.outputs.valid == 'true'
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ['RUNNER_TEMP']) / 'validated-weekly-acquisition.json'
+          state = json.loads(path.read_text())
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('## Weekly acquisition\n\nRetrieval metadata only; not summaries, source-quality approval, or exhaustive web coverage.\n\n```json\n' + json.dumps(state.get('run', {}), indent=2) + '\n```\n')
+          PY

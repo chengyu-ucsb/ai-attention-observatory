@@ -26,6 +26,7 @@ def record():
     return {'kind':'scholarly','doi':'10.9999/synthetic-attention','url':'https://example.org/article',
             'title':'Generative AI and attention: a synthetic fixture',
             'venue':'Computers in Human Behavior','published':'2026-10-30','lane':'AI & cognition',
+            'publication_date_provenance':{'status':'day_known','basis':'editor_verified_original_publication_date','value':'2026-10-30'},
             'abstract_text':'This synthetic abstract describes an experiment about generative AI and attention. The results showed differences in reported effort but not retention.',
             'analysis':{'fulltext_url':'https://example.org/licensed.xml','license':'CC BY',
                         'provenance':'Machine-extracted licensed XML sections',
@@ -239,7 +240,7 @@ class OriginalSummaryTests(unittest.TestCase):
         self.assertEqual(report['original_summaries'],1)
         self.assertEqual(report['full_text_reading_depth'],1)
 
-    def test_issue_shelf_and_newsletter_keep_working_version(self):
+    def test_library_and_archived_newsletter_keep_working_version_not_new_week(self):
         row=record();n=accepted()
         n['source'].update(source_doi='10.9999/working-paper',related_journal_doi=n['doi'],version='working_paper_not_journal_version');approve(n)
         row['original_reading']=n;row=annotate(row)
@@ -247,7 +248,10 @@ class OriginalSummaryTests(unittest.TestCase):
             data=Path(tmp);manifest=data/'manifest.json';manifest.write_text(json.dumps({'articles':[n]}))
             (data/'public-weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
             (data/'issue-editorial.json').write_text('{}')
-            with patch.object(original,'MANIFEST',manifest),patch.object(build_issue,'DATA',data):issue=build_issue.build()
+            with patch.object(original,'MANIFEST',manifest),patch.object(build_issue,'DATA',data):
+                with self.assertRaisesRegex(ValueError,'previous-week'):build_issue.build()
+        self.assertTrue(original.eligible(n,row))
+        issue={'sources':[{'id':row['doi'],'url':row['url'],**build_issue.checked_source_metadata(row)}]}
         shelf=issue['sources'][0]
         self.assertEqual(shelf['source_url'],n['source']['url'])
         self.assertEqual(shelf['source_doi'],'10.9999/working-paper')
@@ -273,7 +277,9 @@ class OriginalSummaryTests(unittest.TestCase):
     def test_unpublished_queue_needs_current_bound_original_receipt(self):
         row=record();row['original_reading']=accepted();row=annotate(row)
         source={'id':row['doi'],'title':row['title'],'kind':'scholarly','url':row['url'],
-                'reading_level':'full_text',**build_issue.checked_source_metadata(row)}
+                'reading_level':'full_text','published':row['published'],
+                'publication_date_provenance':row['publication_date_provenance'],
+                **build_issue.checked_source_metadata(row)}
         for articles,allowed in (([],False),([accepted()],True)):
             with tempfile.TemporaryDirectory() as tmp:
                 data=Path(tmp);(data/'editorial-queue').mkdir()

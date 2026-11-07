@@ -11,6 +11,7 @@ import urllib.parse
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
 from original_readings import public_record
+from collection_window import previous_week, weekly_eligible, window_metadata
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
@@ -31,6 +32,13 @@ def build():
   from build_public import build as project
   project()
  weekly=json.loads((DATA/"public-weekly.json").read_text(encoding="utf-8"))
+ date=(weekly.get("run") or {}).get("date")
+ bounds=previous_week(date) if date else None
+ if bounds:
+  expected=window_metadata(date)
+  supplied=(weekly.get("run") or {}).get("publication_window") or expected
+  if any(supplied.get(key)!=expected[key] for key in ("from","to","timezone")):
+   raise ValueError("RSS publication window does not match previous completed UTC week")
  root=ET.Element("rss",{"version":"2.0"})
  channel=ET.SubElement(root,"channel")
  fields={
@@ -46,6 +54,7 @@ def build():
  entries=0
  for x in (weekly.get("items") or [])[:50]:
   x=public_record(x, require_current=True)
+  if bounds and not weekly_eligible(x,*bounds):continue
   read=x.get("reading") or {}
   if read.get("level")=="citation_only":continue
   digest=read.get("digest") or {}

@@ -110,6 +110,11 @@ a:hover{text-decoration-thickness:2px!important}
 def section_label(label):
     return '<p class="stamp edition-label" style="color:#ae4457;font-size:10px;line-height:1.5;letter-spacing:2px;margin:0 0 15px">'+esc(label)+'</p>'
 
+def publication_scope(issue):
+    window=issue.get("publication_window") or {}
+    return ("Sources originally published "+str(window.get("from"))+" through "+str(window.get("to"))+
+            " (UTC). Older background sources are not included.") if window else ""
+
 def opening(issue):
     issue_num=issue.get("number","—")
     deck=issue.get("deck","")
@@ -117,6 +122,7 @@ def opening(issue):
     return (
         '<tr><td class="pad" style="padding:47px 48px 24px">'
         +section_label("ISSUE "+str(issue_num)+" · "+issue["edition_date"]+" · THE BIG QUESTION")
+        +("<p>"+esc(publication_scope(issue))+"</p>" if publication_scope(issue) else "")
         +'<h1 class="display hero-title" style="font:500 48px/1.04 Newsreader,Georgia,serif;letter-spacing:-1.3px;color:#392b32;margin:0 0 19px;max-width:590px">'
         +esc(issue["headline"])+'</h1>'
         +'<p class="display" style="font:400 20px/1.45 Newsreader,Georgia,serif;color:#8e3448;margin:0 0 18px">'+esc(deck)+'</p>'
@@ -241,6 +247,7 @@ def render_index(issues):
 def rss_content(issue):
     """The same published copy, with sources, for downstream RSS/chat delivery."""
     parts=['<h1>'+esc(issue['headline'])+'</h1>']
+    if publication_scope(issue):parts.append('<p>'+esc(publication_scope(issue))+'</p>')
     parts += ['<p>'+esc(issue.get(k,''))+'</p>' for k in ('deck','letter')]
     for section in issue.get('signals',[]) + [issue.get('tension',{})]:
         parts += ['<h2>'+esc(section.get('title',''))+'</h2>',

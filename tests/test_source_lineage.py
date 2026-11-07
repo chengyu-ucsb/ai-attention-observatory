@@ -12,6 +12,7 @@ import source_lineage
 import build_readings
 import build_public
 import condense_readings
+from collection_window import window_metadata
 
 ARTICLE="https://theconversation.com/are-you-using-ai-to-study-heres-how-to-do-it-well-294453"
 DOI="10.3390/educsci16081291"
@@ -57,7 +58,7 @@ class SourceLineageTests(unittest.TestCase):
         self.assertEqual(digest["finding"],"")
         self.assertIn("AI",digest["idea"])
 
-    def test_weekly_has_one_primary_and_preserves_legacy_route_data(self):
+    def test_older_primary_stays_out_of_weekly_but_preserves_legacy_route_data(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)
             (folder/"library.json").write_text(json.dumps([explainer()]))
@@ -71,9 +72,28 @@ class SourceLineageTests(unittest.TestCase):
         self.assertEqual(companion["companion_to"],DOI)
         self.assertEqual(week["run"]["total"],1)
         self.assertEqual(week["run"]["companion_count"],1)
-        self.assertEqual(len(week["items"]),1)
-        self.assertEqual(week["items"][0]["doi"],DOI)
+        self.assertEqual(week["items"], [])
+        self.assertEqual(week['run']['publication_window'], window_metadata('2026-10-22'))
+
+    def test_eligible_primary_and_explainer_count_once(self):
+        config = source_lineage.load()
+        primary = next(x for x in config['primary_publications'] if x['doi'] == DOI)
+        primary.update(published='2026-10-20', historical_backfill=False, publication_date_provenance={
+            'status': 'day_known', 'source': 'Crossref publisher metadata',
+            'field': 'published-online', 'value': '2026-10-20'})
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            (folder / 'library.json').write_text(json.dumps([explainer()]))
+            (folder / 'weekly.json').write_text(json.dumps({
+                'run': {'date': '2026-10-26'}, 'items': [explainer()]}))
+            with patch.object(build_public, 'DATA', folder), patch.object(source_lineage, 'load', return_value=config):
+                library, week = build_public.build()
+        self.assertEqual(week['run']['total'], 1)
+        self.assertEqual(week['run']['companion_count'], 1)
+        self.assertEqual([x['doi'] for x in week['items']], [DOI])
+        self.assertEqual(sum(x.get('companion_to') == DOI for x in library), 1)
 
 
 if __name__=="__main__":
     unittest.main()
+

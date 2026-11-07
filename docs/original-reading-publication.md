@@ -97,3 +97,33 @@ with its authorization and source-level checks. Existing private pilot drafts
 remain private until their individual quality/version questions and publication
 decisions are resolved. No new account, model API, credential, workflow schedule,
 or automatic publication approval is introduced here.
+
+## Previous-week integration
+
+New weekly shelves use the preceding completed UTC Monday–Sunday week. Accepted
+summary prose never supplies or overrides original-publication date evidence.
+Date conflicts, missing dates, historical backfill and out-of-window items remain
+excluded even when the summary itself is accepted. The general library can keep
+an older accepted reading without using it to pad a thin weekly edition.
+
+A weekly summary must check the dated source itself: the source DOI must match
+the indexed DOI, so a related older working-paper reading is library-only. arXiv
+summaries must use the officially verified v1 identity and pinned source URL,
+with `arxiv_preprint_v1` or `preprint_v1` version labels and no conflicting indexed
+version. A DOI-less non-arXiv summary needs the exact same source and record URL;
+alternate editions need explicit version evidence before weekly admission.
+The shared gate is checked again after current-register reconciliation in the
+issue builder, before synthesis, and in research RSS. Saved queue receipts keep
+publication-date provenance and cannot lose the original-summary marker to skip
+validation. Existing published archives remain untouched.
+
+The synthesis preflight reports `awaiting_substantive_sources` when fewer than
+four valid source-backed readings are available, before installing inference or
+downloading weights. The workflow's existing `needed` output stays false and its
+step summary explains the hold. This is a withheld edition, not a successful new
+publication. Direct composition still rejects insufficient evidence. The earlier
+published edition remains visible. No minimum, quality, or date gate is relaxed.
+
+This adapter admits scholarly summaries. Nonacademic analysis still needs its
+separate full-argument review and publication pathway; a feed preview or partial
+HTML extraction does not become a reviewed policy, opinion, or news reading.
