@@ -8,7 +8,6 @@ No model -> safe no-op, never fabricate a summary from an RSS snippet.
 from __future__ import annotations
 from datetime import date, timedelta
 from hashlib import sha256
-from html.parser import HTMLParser
 import html
 import json
 import os
@@ -34,8 +33,6 @@ HOSTS = ("techpolicy.press", "theconversation.com", "theverge.com",
          "edsurge.com", "spectrum.ieee.org", "scientificamerican.com",
          "newscientist.com", "fastcompany.com", "hbr.org", "vox.com",
          "techcrunch.com", "nature.com", "restofworld.org")
-BLOCK_TAGS = {"script", "style", "nav", "footer", "aside", "form", "noscript", "svg"}
-BODY_TAGS = {"article", "main"}
 FIELDS = {
  "nonacademic": ("thesis", "reasoning", "examples", "tension",
                  "implications", "open_question", "qualification"),
@@ -53,39 +50,8 @@ def host_allowed(url):
     return (u.scheme == "https" and not u.username and not u.password and
             u.port in (None, 443) and any(host == d or host.endswith("." + d) for d in HOSTS))
 
-class ArticleParser(HTMLParser):
-    """Prefer article/main prose, excluding UI, footer and hidden elements."""
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.stack, self.block, self.body = [], 0, 0
-        self.current, self.paragraphs = None, []
-    def handle_starttag(self, tag, attrs):
-        attrs = dict(attrs)
-        blocked = tag in BLOCK_TAGS or attrs.get("aria-hidden") == "true"
-        self.stack.append((tag, blocked))
-        if blocked:
-            self.block += 1
-        if tag in BODY_TAGS:
-            self.body += 1
-        if not self.block and self.body and tag in ("p", "h2", "h3") and self.current is None:
-            self.current = [tag, []]
-    def handle_data(self, data):
-        if self.current is not None and not self.block:
-            self.current[1].append(data)
-    def handle_endtag(self, tag):
-        if self.current is not None and self.current[0] == tag:
-            txt = " ".join(" ".join(self.current[1]).split())
-            if len(txt) >= (30 if tag != "p" else 65) and not re.search(
-                    r"^(?:sign up|subscribe|all rights reserved|read more|advertisement)", txt, re.I):
-                self.paragraphs.append(txt)
-            self.current = None
-        for i in range(len(self.stack)-1, -1, -1):
-            if self.stack[i][0] == tag:
-                for popped, blocked in self.stack[i:]:
-                    if blocked: self.block = max(0, self.block - 1)
-                    if popped in BODY_TAGS: self.body = max(0, self.body - 1)
-                del self.stack[i:]
-                break
+# Shared body parser preserves list arguments and excludes related-story cards.
+from article_body_parser import ArticleParser
 
 def source_html(url):
     if not host_allowed(url):
@@ -109,7 +75,7 @@ def source_html(url):
             raise ValueError("article_too_large")
     parser = ArticleParser()
     parser.feed(page.decode("utf-8", "replace"))
-    paragraphs = [p for p in parser.paragraphs if len(p.split()) >= 7]
+    paragraphs = parser.paragraphs
     text = "\n".join(paragraphs)
     if len(text) < 1600 or len(paragraphs) < 7:
         raise ValueError("insufficient_article_body")
