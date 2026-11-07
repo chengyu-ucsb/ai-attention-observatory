@@ -255,7 +255,7 @@ class AcademicCollectionTests(unittest.TestCase):
             data = Path(tmp)
             (data / 'library.json').write_text(json.dumps(old))
             if prior_week is not None: (data / 'weekly.json').write_text(json.dumps(prior_week))
-            with patch.object(update, 'DIR', data), patch.object(update, 'TODAY', TODAY), patch.dict('os.environ', {'MODE': mode}), patch.object(update, 'discover', return_value=(candidates, [], stats or {})), patch.object(update, 'discover_priority', return_value=(priority or [], [], priority_stats or {})), patch('builtins.print'):
+            with patch.object(update, 'DIR', data), patch.object(update, 'TODAY', TODAY), patch.dict('os.environ', {'MODE': mode}, clear=True), patch.object(update, 'discover', return_value=(candidates, [], stats or {})), patch.object(update, 'discover_priority', return_value=(priority or [], [], priority_stats or {})), patch('builtins.print'):
                 update.main()
             return json.loads((data / 'library.json').read_text()), json.loads((data / 'weekly.json').read_text())
 
