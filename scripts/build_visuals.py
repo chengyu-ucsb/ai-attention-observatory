@@ -43,13 +43,14 @@ def visual_spec(record: dict) -> dict:
     if not approach and not finding:
         return {"kind": "illustration_only", "reason": "insufficient_indexed_evidence"}
 
+    edited = digest.get("status") == "editorially_written_from_indexed_sections"
     blocks = []
     if approach:
-        blocks.append({"label": "Research approach", "text": approach})
+        blocks.append({"label": "Research approach", "text": approach, "source": digest.get("approach_source") or ("editorial" if edited else basis)})
     if finding:
-        blocks.append({"label": "Reported finding", "text": finding})
+        blocks.append({"label": "Reported finding", "text": finding, "source": finding_source})
     if limitation:
-        blocks.append({"label": "What remains uncertain", "text": limitation})
+        blocks.append({"label": "What remains uncertain", "text": limitation, "source": digest.get("limitation_source") or ("editorial" if edited else basis)})
     if not blocks:
         return {"kind": "illustration_only", "reason": "insufficient_indexed_evidence"}
     return {

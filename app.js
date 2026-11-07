@@ -594,12 +594,13 @@ function automaticEvidenceArtwork(x){
   const item=make("div","auto-evidence-item");
   add(item,make("span","auto-evidence-n",String(i+1).padStart(2,"0")),
     make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
+  const source=block.source||(block.label==="Reported finding"?spec.finding_source:spec.basis);
+  item.append(make("small","auto-evidence-source",source==="abstract"?"Source: abstract":source==="editorial"?"Source: editorial note":"Source: indexed full-text section"));
   if(block.text.length>240)item.className+=" auto-evidence-wide";
   board.append(item);
  });
  add(figure,board,make("figcaption","concept-note",
-   "Visual summary based on the "+(spec.basis==="full_text"?"indexed full text":"available abstract")+
-   ". Not an effect-size chart, causal model, or reproduction of published figures."));
+   "Source-derived statements, with the material used labelled on each card. Not an effect-size chart, causal model, or reproduction of published figures."));
  return figure;
 }
 function conceptArtwork(x){
@@ -763,7 +764,7 @@ function sourceReader(x){
   const count=String(content).trim().split(/\s+/).length;
   add(section,add(make("summary","rv-source-section-title"),make("span","",label),make("small","",count+" words")),
    make("p","rv-section-basis",basis),readingProse(content));
-  const jump=btn(label,()=>{section.open=true;section.scrollIntoView?.({behavior:"smooth",block:"start"});},"rv-reader-jump");
+  const jump=btn(label,()=>{section.open=true;section.querySelector?.("summary")?.focus();section.scrollIntoView?.({block:"start"});},"rv-reader-jump");
   contents.append(jump);sections.push(section);drawerBody.append(section);
  }
  const controls=make("div","rv-reader-controls");

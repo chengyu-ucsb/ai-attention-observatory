@@ -165,4 +165,29 @@ class ReadingCompletenessTests(unittest.TestCase):
  def test_missing_limitations_stay_missing(self):
   paper={"kind":"scholarly","title":"An AI study","abstract_text":"The authors surveyed 47 students about their learning activities.","reading":{"level":"abstract","limitations":""}}
   self.assertEqual(annotate(paper)["reading"]["digest"]["limitation"],"")
+ def test_compound_mediated_is_not_an_effect_predicate(self):
+  statement="The evidence base was characterized by strong representation from several countries, suggesting that concerns surrounding AI-mediated knowledge validation had emerged as a global educational phenomenon."
+  self.assertEqual(reported_result(statement,maxlen=600),"")
+ def test_method_prefers_design_and_sample_over_privacy_boilerplate(self):
+  from condense_readings import source_snippet
+  privacy="Data were collected anonymously and kept strictly confidential."
+  design="This study employed a cross-sectional survey of 807 teachers recruited through convenience and snowball sampling."
+  self.assertEqual(source_snippet(privacy+" "+design,"approach"),design)
+ def test_limitation_is_not_a_claim_about_ai_capability(self):
+  from condense_readings import source_snippet
+  conclusion="The analysis suggests that AI cannot replace the reflective judgment that teachers bring to their own practice."
+  limitation="The cross-sectional design cannot establish the direction of the relationships."
+  self.assertEqual(source_snippet(conclusion+" "+limitation,"limitations"),limitation)
+ def test_abstract_fallback_method_keeps_its_own_provenance(self):
+  paper={"kind":"scholarly","title":"AI and attention", "abstract_text":"We conducted interviews with 47 students about their learning habits.",
+   "analysis":{"fulltext_url":"https://example.org/paper","methods":"The section extraction is incomplete."},
+   "reading":{"level":"full_text","methods":"The section extraction is incomplete."}}
+  digest=annotate(paper)["reading"]["digest"]
+  self.assertEqual(digest["approach_source"],"abstract")
+  self.assertIn("47 students",digest["approach"])
+ def test_truncated_source_sentences_do_not_pass_as_intact_findings(self):
+  for fragment in [
+   "Experiment 1 showed that higher AI assistance significantly increased metacognitive disengageme",
+   "The results showed that AI use predicted a higher score, and the"]:
+   self.assertEqual(reported_result(fragment,maxlen=600),"")
 if __name__=="__main__":unittest.main()

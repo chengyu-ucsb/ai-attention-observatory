@@ -419,3 +419,7 @@ assert(textContent(paperContainer).includes("not a flaw in the study"),"Coverage
 const rawParagraphs=vm.runInContext("TEST.readingParagraphs('Sentence with p = 0.047 and a 95% CI [0.02, 0.15]. Another result remains qualified.')",ctx);
 assert.equal(rawParagraphs.join(" "),"Sentence with p = 0.047 and a 95% CI [0.02, 0.15]. Another result remains qualified.","Numeric tokens must remain unchanged");
 console.log("Source-reader preservation, section navigation, disclosure controls, and missing-field tests passed.");
+
+const mixedBasis={...future,visual:{...future.visual,basis:"full_text",finding_source:"abstract"}};
+ctx.selected=mixedBasis;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(textContent(match(paperContainer,"automatic-evidence")).includes("Source: abstract"),"A full-text record must not relabel an abstract-derived result as full-text evidence");

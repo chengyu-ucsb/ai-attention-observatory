@@ -6,6 +6,8 @@ import argparse
 from contextlib import contextmanager
 from datetime import datetime
 import re
+import subprocess
+import sys
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -122,6 +124,9 @@ def check(page, url, width, out):
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('.rv-content')).not_to_contain_text('Method details are not clear enough')
     expect(page.locator('.rv-coverage-table')).to_be_visible()
+    expect(page.locator('.rv-content')).to_contain_text('n = 47')
+    expect(page.locator('.automatic-evidence')).to_contain_text('Source: abstract')
+    overflow(); screenshot('source-reading')
     reader=page.locator('.rv-source-excerpts')
     reader.locator(':scope > summary').focus()
     page.keyboard.press('Enter')
@@ -166,6 +171,8 @@ if __name__ == '__main__':
     parser.add_argument('--screenshots', type=Path)
     parser.add_argument('--executable-path', type=str)
     args = parser.parse_args()
+    # Exercise the actual publication projection, not a stale committed payload.
+    subprocess.run([sys.executable, str(ROOT / "scripts/build_public.py")], cwd=ROOT, check=True)
     with server() as url, sync_playwright() as p:
         browser = getattr(p, args.browser).launch(**({"executable_path":args.executable_path} if args.executable_path else {}))
         for width in [1280, 768, 390, 320]:
