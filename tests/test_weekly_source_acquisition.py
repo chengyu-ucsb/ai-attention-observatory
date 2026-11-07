@@ -951,5 +951,246 @@ class WeeklyQueueTests(unittest.TestCase):
                 run(weekly(item()), **args)
 
 
+
+class HtmlRevisionQueueTests(unittest.TestCase):
+    def setUp(self):
+        self.record = item(kind='nonacademic', doi='', url='https://www.eff.org/example')
+        self.payload = weekly(self.record)
+
+    def html(self, size=4):
+        title = self.record['title']
+        text = 'Synthetic discussion of human attention, evidence and important qualifications. '
+        html = '<title>' + title + '</title><main><article>' + ''.join(
+            '<p>' + text * size + '</p>' for _ in range(10)) + '</article></main>'
+        return access.document_from_html(html.encode(), self.record, self.record['url'])
+
+    def legacy(self):
+        state = run(self.payload, attempt=lambda *args: result_for(self.html(8)))
+        rows(state)[0]['document'].pop('html_extraction_version')
+        return queue.seal_state(state)
+
+    def test_legacy_terminal_html_refreshes_exact_route_and_retains_old_evidence(self):
+        state = self.legacy(); old = copy.deepcopy(rows(state)[0]); saves = []
+        def fetch(record, plan, *args):
+            self.assertEqual(plan['kind'], 'known')
+            self.assertEqual(plan['source']['url'], old['document']['source_url'])
+            return result_for(self.html())
+        updated = run(self.payload, state, attempt=fetch, save=lambda s: saves.append(copy.deepcopy(s)))
+        row = rows(updated)[0]
+        self.assertEqual(row['document']['html_extraction_version'], queue.HTML_EXTRACTION_VERSION)
+        self.assertLess(row['document']['characters_retrieved'], old['document']['characters_retrieved'])
+        self.assertEqual(row['previous_documents'], [{'document': old['document'], 'document_evidence': old['document_evidence']}])
+        for key in ('cursor', 'tried_sources', 'fingerprint', 'plan', 'status', 'complete'):
+            self.assertEqual(row[key], old[key])
+        self.assertEqual(row['status'], 'partial_full_text_not_reviewed')
+        self.assertEqual(row['attempts'], old['attempts'] + 1)
+        self.assertEqual(rows(saves[0])[0]['html_refresh']['outcome'], 'interrupted_attempt')
+        self.assertEqual(rows(saves[0])[0]['document'], old['document'])
+        for saved in saves: queue.validate_state(saved)
+        self.assertNotIn('Synthetic discussion', json.dumps(updated))
+        no_fetch = Mock(side_effect=AssertionError('already current'))
+        run(self.payload, updated, attempt=no_fetch); no_fetch.assert_not_called()
+
+    def test_refresh_batch_rotates_without_resetting_cursors(self):
+        second = {**self.record, 'url': 'https://www.eff.org/second'}
+        payload = weekly(self.record, second)
+        def fetch(record, *args):
+            doc = self.html()
+            doc.url = record['url']
+            return result_for(doc)
+        state = run(payload, attempt=fetch)
+        for row in rows(state): row['document'].pop('html_extraction_version')
+        queue.seal_state(state)
+        once = run(payload, state, limit=1, attempt=fetch)
+        self.assertEqual(once['run']['attempted_records'], 1)
+        self.assertEqual(sum('html_refresh' in r for r in rows(once)), 1)
+        twice = run(payload, once, limit=1, attempt=fetch)
+        self.assertEqual(twice['run']['attempted_records'], 1)
+        self.assertTrue(all(r['document']['html_extraction_version'] == queue.HTML_EXTRACTION_VERSION
+                            for r in rows(twice)))
+        for key, row in twice['records'].items():
+            self.assertEqual(row['cursor'], state['records'][key]['cursor'])
+            self.assertEqual(row['tried_sources'], state['records'][key]['tried_sources'])
+
+    def test_revision_is_only_stamped_by_actual_html_parser(self):
+        actual = queue.document_metadata(self.html())
+        self.assertEqual(actual['html_extraction_version'], queue.HTML_EXTRACTION_VERSION)
+        unknown = access.Document([{'location': 'paragraph:1', 'text': 'some prose'}],
+            self.record['url'], coverage={'evidence_status': 'partial_full_text', 'html_completeness': 'not_verified'})
+        self.assertNotIn('html_extraction_version', queue.document_metadata(unknown))
+        self.assertNotIn('html_extraction_version', queue.document_metadata(document()))
+
+    def test_failure_retains_old_metadata_and_does_not_repeat_denied_refresh(self):
+        for status, retry in [('article_http_403', False), ('article_http_429', True),
+                              ('insufficient_article_body', False), ('deferred_time_budget', True)]:
+            with self.subTest(status=status):
+                state = self.legacy(); old = copy.deepcopy(rows(state)[0]['document'])
+                attempt = Mock(return_value={'diagnostics': [{'status': status, 'retryable': retry,
+                    'stage': 'article', 'url': self.record['url'], 'retry_after_seconds': 3600}]})
+                updated = run(self.payload, state, attempt=attempt)
+                row = rows(updated)[0]
+                self.assertEqual(row['document'], old)
+                self.assertNotIn('previous_documents', row)
+                self.assertEqual(row['html_refresh']['outcome'], status)
+                self.assertEqual(row['status'], 'partial_full_text_not_reviewed')
+                run(self.payload, updated, attempt=attempt)
+                self.assertEqual(attempt.call_count, 1)
+                if status.endswith('429'):
+                    self.assertIn('host:www.eff.org', updated['provider_pauses'])
+
+    def test_active_pause_limit_and_time_budget_do_not_consume_refresh(self):
+        state = self.legacy(); fetch = Mock(side_effect=AssertionError('no fetch'))
+        state['provider_pauses']['host:www.eff.org'] = '2026-11-07T13:00:00+00:00'
+        state.pop('run'); queue.seal_state(state)
+        updated = run(self.payload, state, attempt=fetch)
+        self.assertNotIn('html_refresh', rows(updated)[0])
+        self.assertEqual(rows(updated)[0]['status'], 'partial_full_text_not_reviewed')
+        run(self.payload, self.legacy(), limit=0, attempt=fetch)
+        times = iter([0, 400])
+        run(self.payload, self.legacy(), clock=lambda: next(times), attempt=fetch)
+        fetch.assert_not_called()
+        resumed = run(self.payload, updated, attempt=lambda *args: result_for(self.html()),
+                      clock=lambda: 0)
+        self.assertEqual(resumed['run']['attempted_records'], 0)
+        resumed = queue.run(self.payload, updated, now='2026-11-07T14:00:00+00:00',
+                            known_sources_only=True, attempt=lambda *args: result_for(self.html()), clock=lambda: 0)
+        self.assertEqual(resumed['run']['attempted_records'], 1)
+
+    def test_blocked_pdf_and_nonterminal_retry_are_not_reopened(self):
+        fetch = Mock(side_effect=AssertionError('no fetch'))
+        blocked = run(self.payload, attempt=lambda *args: {'diagnostics': [
+            {'status': 'article_http_403', 'retryable': False, 'url': self.record['url']}]})
+        run(self.payload, blocked, attempt=fetch)
+        pdf = run(weekly(item()))
+        run(weekly(item()), pdf, attempt=fetch)
+        retry = self.legacy(); row = rows(retry)[0]
+        row.update(complete=False, status='rate_limited', next_retry_at='2026-11-07T13:00:00+00:00')
+        retry.pop('run'); queue.seal_state(retry)
+        updated = run(self.payload, retry, attempt=fetch)
+        self.assertNotIn('html_refresh', rows(updated)[0])
+        self.assertEqual(rows(updated)[0]['next_retry_at'], row['next_retry_at'])
+        fetch.assert_not_called()
+
+    def test_old_window_and_changed_identity_do_not_refresh_prior_evidence(self):
+        state = self.legacy(); fetch = Mock(side_effect=AssertionError('old week'))
+        future = {'run': {'publication_window': {'from': '2026-11-02', 'to': '2026-11-08', 'timezone': 'UTC'}},
+                  'items': [self.record]}
+        updated = queue.run(future, state, now='2026-11-09T12:00:00+00:00', attempt=fetch)
+        self.assertFalse(updated['records']); fetch.assert_not_called()
+        changed = weekly({**self.record, 'title': 'A changed article identity'})
+        updated = run(changed, state, limit=0)
+        self.assertNotIn('document', rows(updated)[0])
+        self.assertEqual(updated['dispositions'][-1]['record']['document'], rows(state)[0]['document'])
+
+    def test_changed_return_identity_version_and_unstamped_document_are_not_refreshed(self):
+        for field, value in [('source_url', 'https://www.eff.org/other'),
+                             ('document_version', 'publishedVersion'), ('html_extraction_version', None)]:
+            state = self.legacy(); result = result_for(self.html())
+            if value is None: result['document'].pop(field)
+            else: result['document'][field] = value
+            updated = run(self.payload, state, attempt=lambda *args: result)
+            self.assertEqual(rows(updated)[0]['document'], rows(state)[0]['document'])
+            self.assertEqual(rows(updated)[0]['html_refresh']['outcome'], 'document_identity_unverified')
+
+    def test_checkpoint_rejects_invalid_refresh_and_history(self):
+        state = run(self.payload, self.legacy(), attempt=lambda *args: result_for(self.html()))
+        for mutate in (lambda row: row['html_refresh'].update(version='untrusted prose'),
+                       lambda row: row['previous_documents'][0]['document_evidence'].update(url='https://www.eff.org/wrong'),
+                       lambda row: row['document'].update(html_extraction_version='untrusted prose')):
+            bad = copy.deepcopy(state); mutate(rows(bad)[0])
+            with self.assertRaisesRegex(ValueError, queue.STATE_ERROR): queue.seal_state(bad)
+
+    def revision_run(self, state, revision, attempt=None):
+        # Round-trip the checkpoint: object aliasing must not be required on load.
+        state = json.loads(json.dumps(state))
+        with patch.object(queue, 'HTML_EXTRACTION_VERSION', revision), \
+             patch.object(access, 'HTML_EXTRACTION_VERSION', revision):
+            return run(self.payload, state, attempt=attempt or (lambda *args: result_for(self.html())))
+
+    def test_refresh_revision_rollback_never_repeats_success_failure_or_interruption(self):
+        for outcome in ('success', 'insufficient_article_body', 'interrupted_attempt'):
+            with self.subTest(outcome=outcome):
+                state = self.legacy()
+                if outcome == 'success':
+                    state = self.revision_run(state, 'article-body-v2')
+                else:
+                    state = self.revision_run(state, 'article-body-v2', attempt=lambda *args: {
+                        'diagnostics': [{'status': outcome, 'retryable': False}]})
+                state = self.revision_run(state, 'article-body-v3')
+                prior = copy.deepcopy(rows(state)[0])
+                fetch = Mock(side_effect=AssertionError('rollback cannot retry revision'))
+                state = self.revision_run(state, 'article-body-v2', attempt=fetch)
+                fetch.assert_not_called()
+                self.assertEqual(rows(state)[0], prior)
+                self.assertEqual([a['version'] for a in prior['html_refresh_attempts']],
+                                 ['article-body-v2', 'article-body-v3'])
+
+    def test_rollback_to_initial_stamped_extraction_does_not_fetch(self):
+        state = run(self.payload, attempt=lambda *args: result_for(self.html()))
+        state = self.revision_run(state, 'article-body-v3')
+        fetch = Mock(side_effect=AssertionError('initial extraction already retained'))
+        state = self.revision_run(state, 'article-body-v2', attempt=fetch)
+        fetch.assert_not_called()
+        self.assertEqual(rows(state)[0]['document']['html_extraction_version'], 'article-body-v3')
+        self.assertEqual(rows(state)[0]['previous_documents'][0]['document']['html_extraction_version'],
+                         'article-body-v2')
+
+    def test_refresh_history_cap_stops_without_dropping_any_evidence(self):
+        for fail in (False, True):
+            with self.subTest(fail=fail):
+                state = self.legacy()
+                for n in range(2, queue.MAX_HTML_REFRESH_ATTEMPTS + 2):
+                    attempt = (lambda *args: {'diagnostics': [
+                        {'status': 'insufficient_article_body', 'retryable': False}]}) if fail else None
+                    state = self.revision_run(state, f'article-body-v{n}', attempt=attempt)
+                old = copy.deepcopy(rows(state)[0])
+                self.assertEqual(len(old['html_refresh_attempts']), queue.MAX_HTML_REFRESH_ATTEMPTS)
+                self.assertEqual(len(old.get('previous_documents', [])), 0 if fail else queue.MAX_HTML_REFRESH_ATTEMPTS)
+                fetch = Mock(side_effect=AssertionError('audit capacity exhausted'))
+                state = self.revision_run(state, 'article-body-v999', attempt=fetch)
+                fetch.assert_not_called()
+                self.assertEqual(rows(state)[0], old)
+                queue.validate_state(state)
+
+    def test_refresh_checkpoint_rejects_forged_audit_relations(self):
+        state = self.revision_run(self.legacy(), 'article-body-v2')
+        state = self.revision_run(state, 'article-body-v3')
+        def rewrite_latest(row, **updates):
+            row['html_refresh'].update(updates)
+            row['html_refresh_attempts'][-1].update(updates)
+        def change_old_identity(row):
+            prior = row['previous_documents'][0]
+            prior['document']['source_url'] = 'https://www.eff.org/wrong'
+            prior['document_evidence']['url'] = 'https://www.eff.org/wrong'
+        changes = [
+            lambda row: row.update(previous_documents=row['previous_documents'] * 150),
+            lambda row: row['previous_documents'][0]['document'].update(document_version='publishedVersion'),
+            change_old_identity,
+            lambda row: rewrite_latest(row, outcome='full_document_retrieved'),
+            lambda row: rewrite_latest(row, version='article-body-v999'),
+            lambda row: rewrite_latest(row, outcome='insufficient_article_body'),
+            lambda row: row['document'].update(html_extraction_version='article-body-v2'),
+            lambda row: row['previous_documents'][0]['document'].update(html_extraction_version='article-body-v3'),
+            lambda row: row['html_refresh_attempts'].append(copy.deepcopy(row['html_refresh_attempts'][0])),
+            lambda row: row.pop('html_refresh_attempts'),
+            lambda row: row.pop('html_refresh'),
+            lambda row: row.update(last_attempt_at='2026-11-06T12:00:00+00:00'),
+            lambda row: rewrite_latest(row, attempted_at='2026-11-06T12:00:00+00:00'),
+        ]
+        for number, mutate in enumerate(changes):
+            with self.subTest(change=number):
+                bad = json.loads(json.dumps(state)); mutate(rows(bad)[0])
+                with self.assertRaisesRegex(ValueError, queue.STATE_ERROR): queue.seal_state(bad)
+
+    def test_interrupted_refresh_is_not_retried_automatically(self):
+        snapshots = []
+        class Interrupted(BaseException): pass
+        def interrupt(*args): raise Interrupted()
+        with self.assertRaises(Interrupted):
+            run(self.payload, self.legacy(), attempt=interrupt, save=lambda s: snapshots.append(copy.deepcopy(s)))
+        fetch = Mock(side_effect=AssertionError('interrupted attempt already recorded'))
+        run(self.payload, snapshots[-1], attempt=fetch); fetch.assert_not_called()
+
+
 if __name__ == '__main__':
     unittest.main()

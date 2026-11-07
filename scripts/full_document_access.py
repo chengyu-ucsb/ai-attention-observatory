@@ -24,6 +24,7 @@ from urllib.error import HTTPError, URLError
 from urllib.robotparser import RobotFileParser
 
 from enrich_deep_readings import ArticleParser, HOSTS as EDITORIAL_HOSTS
+from article_body_parser import EXTRACTION_VERSION as HTML_EXTRACTION_VERSION
 from enrich_repository_fulltext import ALLOWED_HOSTS as LEGACY_HOSTS
 
 AGENT='AIAttentionObservatory/7.0 (+https://github.com/chengyu-ucsb/ai-attention-observatory)'
@@ -304,6 +305,7 @@ def document_from_html(raw,record,url,version='unspecified',candidate_doi=''):
     return Document(units,url,version,{'evidence_status':'partial_full_text',
         'html_completeness':'not_verified','semantic_completeness':'not_verified',
         'html_body_selection':parser.selection,
+        'html_extraction_version':HTML_EXTRACTION_VERSION,
         'html_blocks_extracted':len(parser.blocks),
         'html_list_items_found':parser.list_items_found})
 

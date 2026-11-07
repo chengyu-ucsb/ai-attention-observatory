@@ -8,6 +8,9 @@ from dataclasses import dataclass, field
 from html.parser import HTMLParser
 import re
 
+# Bump when body selection changes; queue provenance must not reset discovery.
+EXTRACTION_VERSION = 'article-body-v2'
+
 VOID = {'area','base','br','col','embed','hr','img','input','link','meta','param','source','track','wbr'}
 BLOCKED = {'script','style','nav','footer','aside','form','noscript','svg','template','button','select','textarea'}
 TEXT_BLOCKS = {'p','li','dt','dd','blockquote','figcaption','h1','h2','h3','h4','h5','h6','pre'}
