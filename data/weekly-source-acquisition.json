@@ -739,7 +739,7 @@
       "kind": "scholarly",
       "published": "2026-10-30",
       "source_url": "https://doi.org/10.33050/corisinta.v2i2.135",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
       "attempts": 3,
       "cursor": {
@@ -794,7 +794,8 @@
       ],
       "source_text_saved": false,
       "last_attempt_at": "2026-11-07T18:51:43.277001+00:00",
-      "last_outcome": "source_unavailable"
+      "last_outcome": "rate_limited",
+      "next_retry_at": "2026-11-07T19:51:44.602942+00:00"
     },
     "aa304c545f704ae3a5c595352a67f2072a1cfa6eec122261dfe6708585a13cc1": {
       "fingerprint": "27b9989e300fc6676712bc7e91366e370102fbc3c703c0cb176a01e035b275d6",
@@ -1093,7 +1094,7 @@
       "kind": "scholarly",
       "published": "2026-10-30",
       "source_url": "https://doi.org/10.33050/corisinta.v2i2.118",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
       "attempts": 5,
       "cursor": {
@@ -1166,7 +1167,8 @@
       ],
       "source_text_saved": false,
       "last_attempt_at": "2026-11-07T18:51:43.277001+00:00",
-      "last_outcome": "source_unavailable"
+      "last_outcome": "rate_limited",
+      "next_retry_at": "2026-11-07T19:51:44.602942+00:00"
     },
     "82cf3951eafec1c18ac4e10d7b2638736f4b81a0051dad351adec755daed4b04": {
       "fingerprint": "0dad75b6a6348853af282a2a0aa8a27ab8e554960f03dd2b2dc066355da8cf58",
@@ -8391,20 +8393,18 @@
     }
   ],
   "input_fingerprint": "58c5b0d071a13cd764c5502f3fd942cf986fdaba1cd82c033cb304f450b3840b",
-  "state_sha256": "80befa2151a4defa6dbe611c8e3e09e8c8e6fe6f9f5e50aef4d62819bf360512",
   "run": {
-    "checked_at": "2026-11-07T18:51:43.277001+00:00",
+    "checked_at": "2026-11-07T19:04:17.905370+00:00",
     "selected_records": 10,
-    "attempted_records": 6,
-    "attempted_stages": 6,
+    "attempted_records": 0,
+    "attempted_stages": 0,
     "completed_records": 7,
     "pending_records": 3,
-    "deferred_retry_records": 1,
+    "deferred_retry_records": 3,
     "statuses": {
       "full_document_retrieved_not_reviewed": 4,
       "partial_full_text_not_reviewed": 3,
-      "pending_routes": 2,
-      "rate_limited": 1
+      "rate_limited": 3
     },
     "excluded": {},
     "duplicate_records": 0,
@@ -8420,5 +8420,6 @@
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
     "publication_or_review_performed": false
-  }
+  },
+  "state_sha256": "3cc4bd84d2c343a18a1e870fd3ac427bd52bb36007dd524ff5b4a1de71e2e4bb"
 }
