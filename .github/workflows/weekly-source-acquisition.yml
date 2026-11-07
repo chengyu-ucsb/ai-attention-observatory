@@ -20,7 +20,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || 'observatory-index' }}
+  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || 'observatory-weekly-acquisition' }}
   cancel-in-progress: false
 jobs:
   verify:

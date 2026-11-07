@@ -50,6 +50,9 @@ An older related preprint cannot silently stand in for a current-week article.
 
 The new workflow runs after weekly discovery and makes four bounded retry checks
 per UTC day on that same weekly queue. It skips stale/missing weekly snapshots.
+Its concurrency group is separate from historical backfill and edition writers,
+so GitHub cannot replace its pending run with a different workflow. Saved-commit
+rebase/retry handles concurrent main updates without repeating source requests.
 It records metadata only in `data/weekly-source-acquisition.json`, never paper
 text, PDFs or inferred summaries. Publication and summary-quality approval remain
 separate. Existing historical full-text recovery stays separate from this queue.
