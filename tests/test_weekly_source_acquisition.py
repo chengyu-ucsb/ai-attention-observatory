@@ -29,6 +29,18 @@ def item(number=1, **updates):
                 'source':'Crossref publisher metadata','value':day.isoformat() if day else ''}, **updates}
 
 
+def arxiv_item(**updates):
+    identifier = '2610.12345'
+    provenance = {'source': 'Official arXiv Atom metadata', 'basis': 'arxiv_first_submitted',
+        'field': 'published', 'requested_id': identifier + 'v1',
+        'source_url': 'https://export.arxiv.org/api/query?id_list=' + identifier + 'v1',
+        'version_url': 'https://arxiv.org/abs/' + identifier + 'v1',
+        'source_id': 'http://arxiv.org/abs/' + identifier + 'v1',
+        'status': 'day_known', 'value': '2026-10-28', 'raw': '2026-10-28T10:00:00Z'}
+    return item(**{'doi': '10.48550/arxiv.' + identifier, 'url': 'https://arxiv.org/abs/' + identifier,
+                   'publication_date_provenance': provenance, **updates})
+
+
 def weekly(*records):
     return {'run': {'date': '2026-11-02', 'publication_window': dict(WINDOW)},
             'items': list(records)}
@@ -774,6 +786,164 @@ class WeeklyQueueTests(unittest.TestCase):
         fetch.assert_called_once()
         self.assertEqual(fetch.call_args.kwargs['host_backoff'], {'www.econstor.eu': 0})
         self.assertFalse(any(d['status'] == 'rate_limit_pause' for d in result['diagnostics']))
+
+    def test_verified_original_arxiv_route_is_explicitly_pinned_to_v1(self):
+        record = arxiv_item()
+        routes, excluded = queue.eligible_routes(record, WINDOW)
+        self.assertEqual([r['url'] for r in routes], ['https://arxiv.org/pdf/2610.12345v1'])
+        self.assertEqual(routes[0]['version'], 'arxiv_preprint_v1')
+        self.assertGreater(excluded, 0)
+        # The ordinary retrieval module was not changed by this queue policy.
+        self.assertIn('https://arxiv.org/pdf/2610.12345', [r['url'] for r in access.known_candidates(record)])
+        record = arxiv_item(); record['doi'] = ''
+        routes, _ = queue.eligible_routes(record, WINDOW)
+        self.assertEqual(routes[0]['url'], 'https://arxiv.org/pdf/2610.12345v1')
+
+    def test_arxiv_pin_requires_consistent_exact_official_identity_evidence(self):
+        cases = [
+            ('requested_id', '2610.12345v2'), ('source_id', 'http://arxiv.org/abs/2610.99999v1'),
+            ('source_id', 'http://arxiv.org/abs/2610.12345v2'),
+            ('version_url', 'https://arxiv.org/abs/2610.12345'),
+            ('source_url', 'https://export.arxiv.org/api/query?id_list=2610.99999v1'),
+            ('source', 'Unverified arXiv metadata'),
+            ('raw', '2026-10-21T10:00:00Z'), ('raw', ''), ('raw', 'invalid timestamp'),
+        ]
+        for field, value in cases:
+            record = arxiv_item(); record['publication_date_provenance'][field] = value
+            fetch = Mock()
+            state = run(weekly(record), attempt=fetch)
+            fetch.assert_not_called()
+            self.assertEqual(state['run']['selected_records'], 0)
+            self.assertEqual(queue.verified_arxiv_v1(record), '')
+        for updates in ({'url': 'https://arxiv.org/abs/2610.99999'}, {'doi': '10.5555/not-arxiv'}):
+            record = arxiv_item(); record.update(updates)
+            self.assertEqual(queue.verified_arxiv_v1(record), '')
+            with patch.object(access, 'default_providers') as providers:
+                result = queue.perform_stage(record, {'kind': 'provider', 'name': 'CORE',
+                    'publication_window': WINDOW, 'tried_sources': []}, 8)
+            providers.assert_not_called()
+            self.assertEqual(result['diagnostics'][0]['status'], 'route_policy_excluded')
+
+    def test_arxiv_weekly_pin_rejects_aliases_other_versions_and_mirrors(self):
+        record = arxiv_item()
+        for url in ('https://arxiv.org/pdf/2610.12345', 'https://arxiv.org/pdf/2610.12345v2',
+                    'https://arxiv.org/abs/2610.12345v10', 'https://arxiv.org/pdf/2610.99999v1',
+                    'https://www.econstor.eu/mirror.pdf',
+                    'https://arxiv.org/pdf/2610.12345v1?version=2'):
+            self.assertFalse(queue.route_permitted({'url': url}, record, WINDOW), url)
+            with patch.object(access, 'retrieve') as retrieve:
+                outcome = queue.perform_stage(record, {'kind': 'known', 'source': {'url': url},
+                    'publication_window': WINDOW}, 1)
+            retrieve.assert_not_called()
+            self.assertEqual(outcome['diagnostics'][0]['status'], 'route_policy_excluded')
+        for url in ('https://arxiv.org/pdf/2610.12345v1', 'https://arxiv.org/abs/2610.12345v1',
+                    'https://export.arxiv.org/pdf/2610.12345v1'):
+            self.assertTrue(queue.route_permitted({'url': url}, record, WINDOW), url)
+
+    def test_arxiv_provider_candidates_use_the_same_v1_gate_and_version_label(self):
+        record = arxiv_item()
+        wanted = 'https://arxiv.org/pdf/2610.12345v1'
+        candidates = [{'url': url, 'doi': record['doi']} for url in (
+            'https://arxiv.org/pdf/2610.12345', 'https://arxiv.org/pdf/2610.12345v2',
+            'https://arxiv.org/pdf/2610.99999v1', 'https://www.econstor.eu/mirror.pdf', wanted)]
+        def fetch(route, record):
+            self.assertEqual(route['url'], wanted)
+            self.assertEqual(route['version'], 'arxiv_preprint_v1')
+            doc = document(); doc.url = wanted; doc.version = route['version']
+            return doc
+        with patch.object(access, 'default_providers', return_value=[('CORE', lambda _: candidates)]), \
+             patch.object(access, 'fetch_candidate', side_effect=fetch) as retrieve:
+            result = queue.perform_stage(record, {'kind': 'provider', 'name': 'CORE',
+                'publication_window': WINDOW, 'tried_sources': []}, 8)
+        self.assertEqual(retrieve.call_count, 1)
+        self.assertEqual(result['document']['source_url'], wanted)
+        self.assertEqual(result['document']['document_version'], 'arxiv_preprint_v1')
+
+    def test_arxiv_final_url_drift_is_not_recorded_as_verified_v1(self):
+        record = arxiv_item(); wanted = 'https://arxiv.org/pdf/2610.12345v1'
+        for final in ('https://arxiv.org/pdf/2610.12345', 'https://arxiv.org/pdf/2610.12345v2'):
+            doc = document(); doc.url = final
+            ledger = [{'stage': 'article', 'status': 'full_document_retrieved', 'retryable': False,
+                       'url': wanted, 'final_url': final}]
+            with patch.object(access, 'retrieve', return_value=(doc, ledger)):
+                result = queue.perform_stage(record, {'kind': 'known', 'source': {'url': wanted},
+                    'publication_window': WINDOW}, 1)
+            self.assertNotIn('document', result)
+            self.assertEqual(result['diagnostics'][0]['status'], 'source_version_unverified')
+            self.assertFalse(any(d['status'] in queue.SUCCESS for d in result['diagnostics']))
+
+    def test_arxiv_pin_does_not_override_an_explicit_outside_week_candidate_date(self):
+        record = arxiv_item(fulltext_candidates=[{'url': 'https://arxiv.org/pdf/2610.12345v1',
+                                                  'published': '2024-02-01'}])
+        routes, excluded = queue.eligible_routes(record, WINDOW)
+        self.assertEqual(routes, [])
+        self.assertGreater(excluded, 0)
+
+    def test_arxiv_plan_change_reopens_only_affected_record_and_keeps_old_evidence(self):
+        arxiv = arxiv_item(); ordinary = item(99)
+        original_routes = queue.eligible_routes
+        def legacy_routes(record, window):
+            return (access.known_candidates(record), 0) if record['doi'] == arxiv['doi'] else original_routes(record, window)
+        def old_result(record, *args):
+            if record['doi'] != arxiv['doi']:
+                return success(record)
+            doc = document(); doc.url = 'https://arxiv.org/pdf/2610.12345'
+            doc.version = 'arxiv_preprint_unversioned_url'
+            return result_for(doc)
+        with patch.object(queue, 'eligible_routes', side_effect=legacy_routes):
+            previous = run(weekly(arxiv, ordinary), attempt=old_result)
+        fetch = Mock()
+        current = run(weekly(arxiv, ordinary), previous, limit=0, attempt=fetch)
+        fetch.assert_not_called()
+        arxiv_key = queue.record_key(arxiv); ordinary_key = queue.record_key(ordinary)
+        self.assertFalse(current['records'][arxiv_key]['complete'])
+        self.assertTrue(current['records'][ordinary_key]['complete'])
+        self.assertEqual(current['records'][ordinary_key]['fingerprint'], previous['records'][ordinary_key]['fingerprint'])
+        self.assertEqual(len(current['dispositions']), 1)
+        old = current['dispositions'][0]
+        self.assertEqual(old['reason'], 'replaced_input_version')
+        self.assertEqual(old['record']['document']['source_url'], 'https://arxiv.org/pdf/2610.12345')
+        self.assertEqual(old['record']['document']['document_version'], 'arxiv_preprint_unversioned_url')
+        self.assertEqual(previous['records'][arxiv_key]['document']['document_version'], 'arxiv_preprint_unversioned_url')
+        queue.validate_state(current)
+        def pinned_result(record, plan, *args):
+            self.assertEqual(plan['source']['url'], 'https://arxiv.org/pdf/2610.12345v1')
+            doc = document(); doc.url = plan['source']['url']; doc.version = plan['source']['version']
+            return result_for(doc)
+        fetch = Mock(side_effect=pinned_result)
+        completed = run(weekly(arxiv, ordinary), current, attempt=fetch)
+        self.assertEqual(fetch.call_count, 1)
+        same = Mock()
+        run(weekly(arxiv, ordinary), completed, attempt=same)
+        same.assert_not_called()
+
+    def test_existing_correct_v1_plan_stays_unchanged(self):
+        record = arxiv_item()
+        record.update(doi='10.48550/arxiv.2610.12345v1', url='https://arxiv.org/abs/2610.12345v1')
+        old_routes = access.known_candidates(record)
+        routes, _ = queue.eligible_routes(record, WINDOW)
+        self.assertEqual(routes, old_routes)
+        self.assertTrue(all(r['version'] == 'arxiv_preprint_v1' for r in routes))
+
+    def test_arxiv_explicit_old_v1_date_cannot_reenter_through_undated_provider(self):
+        excluded = {'url': 'https://arxiv.org/pdf/2610.12345v1', 'published': '2024-02-01'}
+        for source in ('record', 'registry'):
+            record = arxiv_item(fulltext_candidates=[excluded] if source == 'record' else [])
+            registry = [excluded] if source == 'registry' else []
+            for url in ('https://arxiv.org/pdf/2610.12345v1', 'https://arxiv.org/abs/2610.12345v1'):
+                with self.subTest(source=source, provider_url=url), \
+                     patch.object(access, 'registry_candidates', return_value=registry), \
+                     patch.object(access, 'default_providers', return_value=[('CORE', lambda _: [
+                         {'url': url, 'doi': record['doi']}])]), \
+                     patch.object(access, 'fetch_candidate', return_value=document()) as fetch:
+                    routes, count = queue.eligible_routes(record, WINDOW)
+                    self.assertEqual(routes, [])
+                    self.assertGreater(count, 0)
+                    result = queue.perform_stage(record, {'kind': 'provider', 'name': 'CORE',
+                        'tried_sources': [], 'publication_window': WINDOW}, 1)
+                    fetch.assert_not_called()
+                    self.assertNotIn('document', result)
+                    self.assertEqual(result['diagnostics'][0]['candidates'], 0)
 
     def test_invalid_budgets_fail_before_fetch(self):
         for args in ({'limit': -1}, {'time_budget': 0}, {'max_candidates': 33}, {'item_time_budget': -1}):

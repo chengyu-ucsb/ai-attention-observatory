@@ -23,6 +23,30 @@ The queue never substitutes an explicitly older candidate or a related preprint
 for a newly published journal record. Date evidence remains metadata evidence,
 not an independent investigation of every publisher's entire publication history.
 
+## arXiv first-version retrieval
+
+When the publication evidence is the official arXiv first-submission check, the
+queue requires its requested ID, returned source ID, version URL and metadata
+query to identify the same article's explicit v1. The returned original timestamp,
+normalized publication day and record day must agree. Missing, contradictory or
+cross-article evidence is held before fetching.
+
+For these records, known sources and provider results must use that exact v1
+on an official arXiv host. Unversioned aliases, later versions and mirrors whose
+version cannot be established are excluded. An explicit outside-week date on a
+known v1 candidate or source-registry entry remains an exclusion when a locator
+returns the same version without a date; switching between its PDF and abstract
+URLs does not erase that evidence. If no pinned route was supplied,
+the verified v1 identifier supplies an explicit official PDF URL. Retrieval
+metadata names `arxiv_preprint_v1`; a returned latest/unversioned URL is a
+`source_version_unverified` failure, not completed first-version evidence.
+
+This is a weekly-queue policy, not a change to ordinary article-access callers.
+An affected source plan gets a new fingerprint and reopens. Its earlier
+unversioned retrieval stays unchanged in the `replaced_input_version` disposition;
+it is never relabeled v1. Unchanged non-arXiv plans and already-correct v1 plans
+retain their existing completion behavior.
+
 ## Run and resume
 
 ```sh
