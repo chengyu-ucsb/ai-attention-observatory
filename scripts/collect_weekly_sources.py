@@ -23,6 +23,7 @@ from urllib.parse import urlsplit, parse_qsl
 import full_document_access as access
 from collection_window import date_in_window, previous_week, publication_date, weekly_eligible
 from comprehensive_readings import chunk_document, coverage_is_complete
+from arxiv_publication import identifier_for as arxiv_record_identifier
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = 2
@@ -50,7 +51,7 @@ CODES = BLOCKED | SUCCESS | {
     'deferred_time_budget', 'interrupted_attempt', 'worker_failed',
     'retrieval_error', 'coverage_gap', 'invalid_document_locations',
     'route_policy_excluded', 'metadata_budget_exhausted', 'rate_limit_pause',
-    'credentialed_source_url_disallowed',
+    'credentialed_source_url_disallowed', 'source_version_unverified',
 }
 SAFE_PROVIDERS = set(PROVIDERS) | {
     'explicit_source', 'existing_source', 'known_open_access_source',
@@ -475,6 +476,63 @@ def validate_window(payload, now):
     return {'from': start.isoformat(), 'to': end.isoformat(), 'timezone': 'UTC'}
 
 
+def verified_arxiv_v1(record):
+    """Return the exact verified v1 ID, None if unrelated, or '' if invalid.
+
+    The official first-publication verifier binds its requested ID, returned
+    source ID, version URL and original day. Do not infer a first version from
+    an unversioned URL or relabel prior unversioned retrieval evidence.
+    """
+    provenance = record.get('publication_date_provenance') or {}
+    if not isinstance(provenance, dict) or provenance.get('basis') != 'arxiv_first_submitted':
+        return None
+    base = arxiv_record_identifier(record)
+    if not base:
+        return ''
+    expected = base + 'v1'
+    if (provenance.get('source') != 'Official arXiv Atom metadata'
+            or provenance.get('status') != 'day_known' or provenance.get('field') != 'published'
+            or provenance.get('requested_id') != expected
+            or provenance.get('version_url') != 'https://arxiv.org/abs/' + expected
+            or provenance.get('source_id') not in {'http://arxiv.org/abs/' + expected,
+                                                    'https://arxiv.org/abs/' + expected}
+            or publication_date(provenance.get('value')) != publication_date(record.get('published'))
+            or publication_date(provenance.get('raw')) != publication_date(record.get('published'))
+            or publication_date(record.get('published')) is None):
+        return ''
+    try:
+        source = urlsplit(provenance.get('source_url', ''))
+        if (source.scheme != 'https' or source.hostname != 'export.arxiv.org'
+                or source.path != '/api/query' or source.username or source.password
+                or source.port not in (None, 443) or source.fragment
+                or parse_qsl(source.query, keep_blank_values=True) != [('id_list', expected)]):
+            return ''
+        original = urlsplit(record.get('url') or '')
+        if original.hostname in {'arxiv.org', 'www.arxiv.org', 'export.arxiv.org'}:
+            match = re.fullmatch(r'/(?:abs|pdf|html)/(' + re.escape(base) + r')(?:v\d+)?(?:\.pdf)?/?', original.path)
+            if not match:
+                return ''
+    except (TypeError, ValueError):
+        return ''
+    return expected
+
+
+def is_pinned_arxiv_url(url, identifier):
+    try:
+        parsed = urlsplit(url)
+        return bool(parsed.scheme == 'https' and parsed.hostname in {'arxiv.org', 'export.arxiv.org'}
+            and not parsed.username and not parsed.password and parsed.port in (None, 443)
+            and not parsed.query and not parsed.fragment
+            and re.fullmatch(r'/(?:abs|pdf|html)/' + re.escape(identifier) + r'(?:\.pdf)?/?', parsed.path))
+    except (TypeError, ValueError):
+        return False
+
+
+def pin_arxiv_route(route, record):
+    identifier = verified_arxiv_v1(record)
+    return {**route, 'version': 'arxiv_preprint_v1'} if identifier else route
+
+
 def eligibility(record, window):
     day = publication_date(record.get('published'))
     if day is None:
@@ -492,6 +550,8 @@ def eligibility(record, window):
         return 'excluded_outside_publication_window'
     if record.get('historical_backfill') or str(record.get('discovery_scope', '')).startswith('historical:'):
         return 'excluded_historical_backfill'
+    if verified_arxiv_v1(record) == '':
+        return 'excluded_unverified_original_publication_date'
     if not weekly_eligible(record, window['from'], window['to']):
         return 'excluded_unverified_original_publication_date'
     if record.get('kind') not in ('scholarly', 'nonacademic'):
@@ -513,6 +573,19 @@ def route_permitted(route, record, window):
             return False
     except (TypeError, ValueError):
         return False
+    pinned = verified_arxiv_v1(record)
+    if pinned == '' or (pinned and not is_pinned_arxiv_url(route.get('url', ''), pinned)):
+        return False
+    if pinned:
+        # A locator omitting a date cannot erase an explicit exclusion for
+        # this same verified version, including its /abs and /pdf aliases.
+        originals = list(record.get('fulltext_candidates') or []) + access.registry_candidates(record)
+        for original in originals:
+            if not isinstance(original, dict) or access.arxiv_identifier(original.get('url')) != pinned:
+                continue
+            stated = original.get('published') or original.get('publication_date')
+            if stated and not date_in_window(stated, window['from'], window['to']):
+                return False
     original_date = route.get('published') or route.get('publication_date')
     related = (route.get('related_doi') or route.get('identity_verification_url')
         or (record.get('doi') and route.get('doi') and access.doi(record['doi']) != access.doi(route['doi'])))
@@ -520,17 +593,23 @@ def route_permitted(route, record, window):
 
 
 def eligible_routes(record, window):
-    routes = []; excluded = 0
+    routes = []; excluded = 0; pinned_route_seen = False
+    pinned = verified_arxiv_v1(record)
     inputs = list(record.get('fulltext_candidates') or []) + access.registry_candidates(record)
     for route in access.known_candidates(record):
         source_id = access.arxiv_identifier(route['url'])
+        pinned_route_seen = pinned_route_seen or bool(pinned and source_id == pinned)
         originals = [r for r in inputs if isinstance(r, dict) and
             (r.get('url') == route['url'] or (source_id and access.arxiv_identifier(r.get('url')) == source_id))]
         original = next((r for r in originals if r.get('published') or r.get('publication_date')), {})
         if not route_permitted({**original, **route}, record, window):
             excluded += 1
             continue
-        routes.append(route)
+        routes.append(pin_arxiv_route(route, record))
+    if pinned and not routes and not pinned_route_seen:
+        # Use the metadata-verified first version, not today's arXiv alias.
+        routes.append(access.candidate('https://arxiv.org/pdf/' + pinned, 'arXiv_identifier',
+            access.doi(record.get('doi')), 'arxiv_preprint_v1'))
     return routes, excluded
 
 
@@ -578,10 +657,12 @@ def stage_plan(routes, cursor, known_only, window, tried_sources=(), providers_e
 def perform_stage(record, plan, max_candidates):
     """Bounded stage; never continue to another source after a rate limit."""
     window = plan['publication_window']
+    if verified_arxiv_v1(record) == '':
+        return {'diagnostics': [{'status': 'route_policy_excluded', 'retryable': False}], 'tried_sources': []}
     diagnostics = []; tried = []; best = None; host_waits = []
     stage_started = time.monotonic()
     if plan['kind'] == 'known':
-        candidates = [plan['source']]
+        candidates = [pin_arxiv_route(plan['source'], record)]
         if not route_permitted(plan['source'], record, window):
             return {'diagnostics': [{'status': 'route_policy_excluded', 'retryable': False}],
                     'tried_sources': []}
@@ -603,7 +684,7 @@ def perform_stage(record, plan, max_candidates):
         unique = {}
         for route in sorted(found, key=priority):
             if route_permitted(route, record, window):
-                unique.setdefault(route['url'], route)
+                unique.setdefault(route['url'], pin_arxiv_route(route, record))
         candidates = [route for url, route in unique.items() if digest(url) not in attempted]
         discovery = {**discovery, 'candidates': len(candidates)}
         diagnostics.append(diagnostic(discovery))
@@ -617,6 +698,16 @@ def perform_stage(record, plan, max_candidates):
                              for host, seconds in plan.get('host_backoff', {}).items()}
         doc, ledger = access.retrieve(record, max_candidates=1, providers=[], known_sources=[route],
                                       anonymous_only=True, host_backoff=remaining_backoff)
+        pinned = verified_arxiv_v1(record)
+        if doc is not None and pinned:
+            if not is_pinned_arxiv_url(doc.url, pinned):
+                # Redirects or provider substitutions cannot make a latest
+                # version into first-version evidence. Retain only a failure.
+                ledger = [{**entry, 'status': 'source_version_unverified'}
+                          if entry.get('status') in SUCCESS else entry for entry in ledger]
+                doc = None
+            else:
+                doc.version = 'arxiv_preprint_v1'
         diagnostics.extend(diagnostic(row) for row in ledger)
         if not any(row.get('retryable') for row in ledger):
             tried.append(digest(route['url']))
