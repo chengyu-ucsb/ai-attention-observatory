@@ -584,7 +584,7 @@ function additionalArtwork(x){
 function automaticEvidenceArtwork(x){
  const spec=x.visual||{};
  if(x.kind!=="scholarly"||!["evidence_snapshot","research_design"].includes(spec.kind))return null;
- const blocks=Array.isArray(spec.blocks)?spec.blocks.filter(b=>b&&typeof b.label==="string"&&typeof b.text==="string"&&b.text.length<=230).slice(0,3):[];
+ const blocks=Array.isArray(spec.blocks)?spec.blocks.filter(b=>b&&typeof b.label==="string"&&typeof b.text==="string"&&b.text.length<=600).slice(0,3):[];
  if(!blocks.length)return null;
  const figure=make("figure","article-concept-art article-data-visual automatic-evidence");
  add(figure,make("p","eyebrow",spec.status==="edited"?"RESEARCH SNAPSHOT":"SOURCE-BASED READING"),
@@ -594,11 +594,13 @@ function automaticEvidenceArtwork(x){
   const item=make("div","auto-evidence-item");
   add(item,make("span","auto-evidence-n",String(i+1).padStart(2,"0")),
     make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
+  const source=block.source||(block.label==="Reported finding"?spec.finding_source:spec.basis);
+  item.append(make("small","auto-evidence-source",source==="abstract"?"Source: abstract":source==="editorial"?"Source: editorial note":"Source: indexed full-text section"));
+  if(block.text.length>240)item.className+=" auto-evidence-wide";
   board.append(item);
  });
  add(figure,board,make("figcaption","concept-note",
-   "Visual summary based on the "+(spec.basis==="full_text"?"indexed full text":"available abstract")+
-   ". Not an effect-size chart, causal model, or reproduction of published figures."));
+   "Source-derived statements, with the material used labelled on each card. Not an effect-size chart, causal model, or reproduction of published figures."));
  return figure;
 }
 function conceptArtwork(x){
@@ -691,6 +693,101 @@ function originalEvidence(reading){
   make("p","rv-source-version","Locators refer to: "+checkedSourceLabel(reading)),body);
  return details;
 }
+// Break long readings into comfortable paragraphs without deleting or paraphrasing
+// source content. These are presentation breaks, not original PDF paragraph locators.
+function readingParagraphs(content){
+ const text=String(content||"").replace(/\s+/g," ").trim();
+ if(!text)return [];
+ const sentences=typeof Intl!=="undefined"&&Intl.Segmenter?
+  Array.from(new Intl.Segmenter("en",{granularity:"sentence"}).segment(text),x=>x.segment.trim()):
+  text.split(/(?<=[.!?])\s+(?=[A-Z“])/);
+ const paragraphs=[];let pending="";
+ for(const sentence of sentences){
+  if(pending&&pending.length+sentence.length>540){paragraphs.push(pending);pending="";}
+  // PDF extraction sometimes loses punctuation. Retain every word rather
+  // than recreate a table or pretend the fragment is a complete finding.
+  if(sentence.length>900){
+   if(pending){paragraphs.push(pending);pending="";}
+   let line="";
+   for(const word of sentence.split(/\s+/)){
+    if(line&&line.length+word.length>600){paragraphs.push(line);line="";}
+    line+=(line?" ":"")+word;
+   }
+   pending=line;
+  }else pending+=(pending?" ":"")+sentence;
+ }
+ if(pending)paragraphs.push(pending);
+ return paragraphs;
+}
+function readingProse(content,className=""){
+ const prose=make("div","rv-prose "+className);
+ for(const paragraph of readingParagraphs(content))prose.append(make("p","",paragraph));
+ return prose;
+}
+function sourceFields(x){
+ const r=x.reading||{},a=x.analysis||{};
+ if(x.kind!=="scholarly")return [
+  ["Publisher or editorial synopsis",r.overview,"Synopsis"],
+  ["Original editorial notes",(x.editorial_notes||{}).argument,"Editorial notes"]];
+ // Do not mistake the shortened reading-card excerpts for all indexed text.
+ // Original summaries always retain the separate, potentially older index.
+ const original=originalSummary(x),hasSections=Boolean(a.fulltext_url);
+ return [
+  ["Methods as indexed",a.methods||(!original?r.methods:"") ,hasSections?"Methods section":"Abstract selection"],
+  ["Results as indexed",a.results||(!original?r.findings:"") ,hasSections?"Results section":"Abstract selection"],
+  ["Discussion as indexed",a.discussion||(!original?r.interpretation:"") ,hasSections?"Discussion section":"Abstract selection"],
+  ["Limitations as indexed",a.limitations||(!original?r.limitations:"") ,hasSections?"Limitations section":"Abstract selection"],
+  ["Abstract",x.abstract_text,x.abstract_source||"Source abstract"]
+ ];
+}
+function sourceReader(x){
+ const fields=sourceFields(x),available=fields.filter(([,content])=>content),r=x.reading||{},a=x.analysis||{},original=originalSummary(x);
+ if(!available.length)return null;
+ const drawer=make("details","rv-drawer rv-source-excerpts");
+ drawer.append(make("summary","",original?
+  a.original_paraphrases_only?"Inspect prior indexed notes and abstract":"Inspect machine-indexed excerpts and abstract":
+  "Inspect source text and abstract"));
+ const panel=make("div","rv-reader-panel"),intro=make("div","rv-indexed-provenance");
+ intro.append(make("p","rv-mini-label","SOURCE READER · "+available.length+" SECTIONS"));
+ if(original)intro.append(make("p","","Indexed reference material, separate from the original summary above. It may refer to a different source version."));
+ intro.append(make("p","",a.original_paraphrases_only?
+  "Original editorial paraphrases and the indexed abstract. These are not copied full-text passages.":
+  "Machine-indexed source passages, not an independent appraisal. Paragraph breaks are added for readability; extraction can retain citation, equation or table artifacts."));
+ if(a.provenance||r.provenance)intro.append(make("p","rv-reader-basis",a.provenance||r.provenance));
+ const url=httpsSourceUrl(a.fulltext_url)||(!original?httpsSourceUrl(x.url):null);
+ if(url)intro.append(link("Open indexed reference source ↗",url,"rv-secondary-link"));
+ panel.append(intro);
+ const contents=make("nav","rv-reader-contents");contents.setAttribute("aria-label","Source sections");
+ const drawerBody=make("div","rv-drawer-body"),sections=[];
+ for(const [label,content,basis] of available){
+  const section=make("details","rv-excerpt rv-source-section");
+  const count=String(content).trim().split(/\s+/).length;
+  add(section,add(make("summary","rv-source-section-title"),make("span","",label),make("small","",count+" words")),
+   make("p","rv-section-basis",basis),readingProse(content));
+  const jump=btn(label,()=>{section.open=true;section.querySelector?.("summary")?.focus();section.scrollIntoView?.({block:"start"});},"rv-reader-jump");
+  contents.append(jump);sections.push(section);drawerBody.append(section);
+ }
+ const controls=make("div","rv-reader-controls");
+ add(controls,btn("Expand all sections",()=>sections.forEach(s=>s.open=true),"rv-reader-control"),
+  btn("Collapse all sections",()=>sections.forEach(s=>s.open=false),"rv-reader-control"));
+ add(panel,contents,controls,drawerBody);drawer.append(panel);return drawer;
+}
+function evidenceCoverage(x){
+ const r=x.reading||{},d=r.digest||{},fields=sourceFields(x);
+ const section=make("section","rv-coverage");
+ add(section,make("h3","","What is available to read"),
+  make("p","rv-coverage-note",depth(x)==="abstract"?"This reading uses the abstract, not the full paper.":"Indexed sections can be incomplete. Availability does not rate study quality."));
+ const table=make("table","rv-coverage-table"),body=make("tbody","");
+ [["Methods",fields[0]?.[1],d.approach],["Results",fields[1]?.[1],d.finding],["Discussion",fields[2]?.[1],d.interpretation],["Limitations",fields[3]?.[1],d.limitation]].forEach(([label,content,summary])=>{
+  const row=make("tr",""),name=make("th","",label);name.setAttribute("scope","row");
+  const status=content?(depth(x)==="abstract"?"In abstract selection":"Indexed passage"):summary?"Summary note":"Not indexed";
+  add(row,name,make("td",content||summary?"rv-available":"rv-unavailable",status));body.append(row);
+ });
+ table.append(body);section.append(table);
+ section.append(make("p","rv-coverage-note","“Not indexed” describes the material available here, not a flaw in the study or proof that the paper omitted it."));
+ return section;
+}
+
 function showPaper(x){
  const root=$("#paper-content");
  root.replaceChildren();
@@ -713,7 +810,7 @@ function showPaper(x){
  const scholarly=x.kind==="scholarly",hasFinding=Boolean(d.finding),conceptual=x.research_type==="conceptual_framework";
  const isQuestion=scholarly&&!hasFinding&&!editorial&&!original;
  // Unreviewed extracts are identifiable as source notes, not hand-written insight.
- const headline=original?d.idea||d.finding:editorial?d.idea:hasFinding?d.finding:d.idea||x.title;
+ const headline=original?d.idea||d.finding:editorial?d.idea:hasFinding&&d.finding.length<=230?d.finding:d.idea||x.title;
  const main=make("article","rv-article");
  const back=btn("← All readings",()=>goto("library"),"rv-back");
  const head=make("header","rv-head");
@@ -737,7 +834,7 @@ function showPaper(x){
  const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
  const lead=make("div","rv-section-head");
  add(lead,make("span","rv-section-overline","01 / UNDER THE HOOD"),
-  make("h2","rv-section-title",conceptual?"What the paper proposes":scholarly?"What the evidence actually says":"The argument in context"));
+  make("h2","rv-section-title",conceptual?"What the paper proposes":scholarly?isQuestion?"Explore the source":"What the evidence actually says":"The argument in context"));
  body.append(lead);
  if(original){
   // A conceptual summary can intentionally have no measured finding. Its
@@ -752,13 +849,15 @@ function showPaper(x){
   const claim=make("div","rv-claim");
   add(claim,make("span","rv-mini-label","REPORTED FINDING"),make("p","",d.finding));
   body.append(claim);
+ }else if(scholarly&&hasFinding&&!autoGraphic){
+  body.append(add(make("div","rv-claim"),make("span","rv-mini-label","SOURCE-REPORTED RESULT"),readingProse(d.finding)));
  }else if(!scholarly){
   const deep=d.longform||{},hasDepth=Boolean(deep.reasoning||deep.examples||deep.tension||deep.implications);
   const reading=make("div","rv-longform");
   function lens(label,value){
    if(!value)return;
    const part=make("section","rv-longform-part");
-   add(part,make("h3","",label),make("p","",value));
+   add(part,make("h3","",label),readingProse(value));
    reading.append(part);
   }
   // Publisher metadata alone cannot justify invented counterarguments or a
@@ -792,8 +891,8 @@ function showPaper(x){
   }
  }else if(!hasFinding){
   const claim=make("div","rv-source-gap");
-  add(claim,make("span","rv-mini-label","EVIDENCE NOT YET ESTABLISHED"),
-    make("p","","A substantive result has not been identified in the accessible material. This is a research topic, not a verified finding."));
+  add(claim,make("span","rv-mini-label","RESEARCH QUESTION · RESULT SUMMARY PENDING"),
+    make("p","",depth(x)==="abstract"?"Explore the indexed abstract below. A full-paper appraisal is not available here.":"Explore the indexed sections below. A source-checked result summary is not available here."));
   body.append(claim);
  }
  if(art){
@@ -802,19 +901,20 @@ function showPaper(x){
   body.append(visuals);
  }
  const context=make("div","rv-context-grid");
- const method=make("section","rv-context");
- add(method,make("h3","",conceptual?"How the framework was developed":"How it was studied"),
-   make("p","",scholarly?d.approach||"Method details are not clear enough in the indexed material.":d.approach||"This is a commentary or editorial account, not a controlled study."));
- const caveat=make("section","rv-context");
- add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),
-   make("p","",d.limitation||"A source-specific limitation could not be verified from the available excerpt."));
- add(context,method,caveat);
+ if(d.approach){
+  const method=make("section","rv-context");
+  add(method,make("h3","",conceptual?"How the framework was developed":"How it was studied"),readingProse(d.approach));context.append(method);
+ }
+ if(d.limitation){
+  const caveat=make("section","rv-context");
+  add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),readingProse(d.limitation));context.append(caveat);
+ }
  if((scholarly||original)&&!autoGraphic)body.append(context);
  if((original||(scholarly&&editorial))&&d.interpretation){
   const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
     make("h2","rv-section-title",original?"Interpretation and implications":"Why this matters"),
-    make("p","",d.interpretation));
+    readingProse(d.interpretation));
   body.append(relevance);
  }
  if(scholarly&&!original&&d.longform){
@@ -835,7 +935,7 @@ function showPaper(x){
   for(const [label,value] of items){
    if(!value)continue;
    const part=make("section","rv-longform-part");
-   add(part,make("h3","",label),make("p","",value));
+   add(part,make("h3","",label),readingProse(value));
    parts.append(part);
   }
   if(deep.basis)parts.append(make("p","rv-longform-basis",
@@ -848,40 +948,8 @@ function showPaper(x){
   const evidence=originalEvidence(r);
   if(evidence)body.append(evidence);
  }
- const indexed=x.analysis||{};
- const drawer=make("details","rv-drawer rv-source-excerpts"),summary=make("summary","",original?
-  indexed.original_paraphrases_only?"Inspect prior indexed notes and abstract":"Inspect machine-indexed excerpts and abstract":
-  "Inspect source text and abstract");
- const drawerBody=make("div","rv-drawer-body");
- let notes=0;
- const fields=original?[
-  ["Methods as indexed",indexed.methods],["Results as indexed",indexed.results],
-  ["Discussion as indexed",indexed.discussion],["Limitations as indexed",indexed.limitations],
-  ["Abstract",x.abstract_text]
- ]:scholarly?[
-  ["Methods as indexed",r.methods],["Extracted Results (may include measurement diagnostics)",r.findings],
-  ["Discussion as indexed",r.interpretation],["Reported limitations",r.limitations],
-  ["Abstract",x.abstract_text]
- ]:[
-  ["Publisher or editorial synopsis",r.overview],["Original editorial notes",(x.editorial_notes||{}).argument]
- ];
- for(const [label,content] of fields){
-  if(!content)continue;
-  const sectionEl=make("section","rv-excerpt");
-  add(sectionEl,make("h3","",label),make("p","",content));
-  drawerBody.append(sectionEl);notes++;
- }
- if(notes){
-  if(original){
-   const reference=make("div","rv-indexed-provenance");
-   reference.append(make("p","","Indexed reference material, separate from the original summary above. It may refer to a different source version."));
-   if(indexed.provenance)reference.append(make("p","",indexed.provenance));
-   const indexedUrl=httpsSourceUrl(indexed.fulltext_url);
-   if(indexedUrl)reference.append(link("Open indexed reference source ↗",indexedUrl,"rv-secondary-link"));
-   drawer.append(summary,reference,drawerBody);
-  }else drawer.append(summary,drawerBody);
-  body.append(drawer);
- }
+ const reader=sourceReader(x);
+ if(reader)body.append(reader);
  story.append(body);
  const cite=make("section","rv-source");
  add(cite,make("span","rv-section-overline","SOURCE"),
@@ -917,6 +985,7 @@ function showPaper(x){
  }else provenanceBody.append(make("p","",x.doi?"DOI: "+x.doi:"No DOI recorded"));
  add(provenance,make("summary","","Source details"),provenanceBody);
  cite.append(provenance);side.append(cite);
+ if(scholarly&&!original)side.append(evidenceCoverage(x));
  if(!original&&x.analysis?.figures?.length){
   const figureSection=make("details","rv-figures");
   figureSection.append(make("summary","","Original paper figures ("+x.analysis.figures.length+")"));
