@@ -21,12 +21,13 @@ class SearchScopeTests(unittest.TestCase):
   self.assertTrue(all(start<=end for _,_,start,end,_ in tasks))
   self.assertTrue(all(start[:4]>="2023" for _,_,start,_,_ in tasks))
 
- def test_weekly_run_rotates_history_without_repeating_all_backfill(self):
-  a=plan(dt.date(2026,10,21),"weekly")
-  b=plan(dt.date(2026,10,28),"weekly")
-  self.assertEqual(len([t for t in a if t[4].startswith("historical:")]),4)
-  self.assertNotEqual([(t[0],t[4]) for t in a if t[4].startswith("historical:")],
-                      [(t[0],t[4]) for t in b if t[4].startswith("historical:")])
+ def test_weekly_run_only_searches_previous_completed_publication_week(self):
+  for day in range(2,9):
+   tasks=plan(dt.date(2026,11,day),"weekly")
+   self.assertEqual(len(tasks),sum(len(q) for q in LANES.values()))
+   self.assertEqual({t[0] for t in tasks},set(LANES))
+   self.assertTrue(all(t[2:]==("2026-10-26","2026-11-01","previous_publication_week") for t in tasks))
+  self.assertTrue(all(t[2:4]==("2026-11-02","2026-11-08") for t in plan("2026-11-09")))
 
  def test_older_attention_foundation_cannot_be_called_genai_study(self):
   old={"title":"The cost of interrupted work: More speed and stress","published":"2008-04-06"}
@@ -63,3 +64,4 @@ class SearchScopeTests(unittest.TestCase):
   self.assertFalse(grobid_eligible(item,dt.datetime(2026,10,21,tzinfo=dt.timezone.utc)))
 
 if __name__=="__main__":unittest.main()
+

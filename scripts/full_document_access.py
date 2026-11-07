@@ -6,7 +6,10 @@ coverage, respects robots, rejects login/challenge pages, and stops at 401/403.
 """
 from __future__ import annotations
 from dataclasses import dataclass, field
+from contextvars import ContextVar
 from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
+import math
 from hashlib import sha256
 from html.parser import HTMLParser
 import io
@@ -15,7 +18,7 @@ import os
 from pathlib import Path
 import re
 import time
-from urllib.parse import urlsplit, urlencode, quote, urljoin, unquote
+from urllib.parse import urlsplit, urlencode, quote, urljoin, unquote, parse_qsl
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
 from urllib.robotparser import RobotFileParser
@@ -36,6 +39,10 @@ ARTICLE_HOSTS=set(LEGACY_HOSTS) | set(EDITORIAL_HOSTS) | {
     'www.microsoft.com','research.aalto.fi','epub.ub.uni-muenchen.de','iagen.unam.mx',
     'opus.lib.uts.edu.au','www.martinreimann.com','ndownloader.figshare.com',
     'ijlter.org','www.ijlter.org',
+    # Exact official publishers from the reviewed weekly feed registry.
+    'eff.org','www.eff.org','niemanlab.org','www.niemanlab.org',
+    'ainowinstitute.org','www.ainowinstitute.org','themarkup.org','www.themarkup.org',
+    'nngroup.com','www.nngroup.com',
 }
 API_HOSTS={'api.unpaywall.org','api.core.ac.uk','api.semanticscholar.org',
            'api.crossref.org','api.openaire.eu','api.openalex.org','www.ebi.ac.uk'}
@@ -43,6 +50,36 @@ BLOCKED=re.compile(r'making sure you.re not a bot|verify you are human|enable ja
 DOI=re.compile(r'^10\.\d{4,9}/\S+$',re.I)
 MAX_BYTES=20_000_000
 SOURCE_HINTS=Path(__file__).resolve().parents[1]/'data/fulltext-source-hints.json'
+ANONYMOUS_ONLY=ContextVar('anonymous_article_sources',default=False)
+HOST_COOLDOWNS=ContextVar('article_host_cooldowns',default=None)
+
+
+class HostRateLimitPause(ValueError):
+    """An existing cooldown, not a new HTTP response or access denial."""
+    def __init__(self,url,seconds):
+        super().__init__('rate_limit_pause')
+        self.url=diagnostic_url(url)
+        self.retry_after_seconds=max(1,min(math.ceil(seconds),604800))
+
+
+def check_host_cooldown(url):
+    try: host=urlsplit(url).hostname
+    except (TypeError,ValueError): return
+    until=(HOST_COOLDOWNS.get() or {}).get(host,0)
+    remaining=until-time.monotonic()
+    if remaining>0: raise HostRateLimitPause(url,remaining)
+
+
+def anonymous_source_url(value):
+    from openaire_locations import SENSITIVE_QUERY
+    try:
+        parts=urlsplit(value)
+        return bool(parts.scheme=='https' and not parts.username and not parts.password
+                    and not any(SENSITIVE_QUERY.search(key) for key,_ in parse_qsl(parts.query,keep_blank_values=True)))
+    except (TypeError,ValueError):
+        return False
+
+
 ARXIV_ID=re.compile(r'^(?:\d{4}\.\d{4,5}|[a-z.-]+/\d{7})(?:v\d+)?$',re.I)
 
 
@@ -100,6 +137,9 @@ class Guard(HTTPRedirectHandler):
     def __init__(self, hosts):
         super().__init__(); self.hosts=hosts
     def redirect_request(self,req,fp,code,msg,headers,newurl):
+        check_host_cooldown(newurl)
+        if ANONYMOUS_ONLY.get() and not anonymous_source_url(newurl):
+            raise ValueError('credentialed_source_url_disallowed')
         if not safe_url(newurl,self.hosts):
             raise ValueError('unapproved_redirect')
         # Never forward an API credential to another host.
@@ -109,6 +149,9 @@ class Guard(HTTPRedirectHandler):
 
 
 def request(url, hosts=ARTICLE_HOSTS, limit=MAX_BYTES, headers=None):
+    check_host_cooldown(url)
+    if ANONYMOUS_ONLY.get() and not anonymous_source_url(url):
+        raise ValueError('credentialed_source_url_disallowed')
     if not safe_url(url,hosts): raise ValueError('unapproved_host')
     req=Request(url,headers={'User-Agent':AGENT,**(headers or {})})
     with build_opener(Guard(hosts)).open(req,timeout=22) as response:
@@ -125,11 +168,15 @@ def json_request(url,headers=None):
 
 
 def robots_allowed(url):
+    check_host_cooldown(url)
     p=urlsplit(url)
     try:
         body,_,_=request(p.scheme+'://'+p.netloc+'/robots.txt',limit=500000)
     except HTTPError as exc:
+        if exc.code in (408,425,429) or 500<=exc.code<600: raise
         return exc.code==404
+    except (HostRateLimitPause,TimeoutError,URLError,ConnectionError):
+        raise
     except Exception:
         return False
     robot=RobotFileParser()
@@ -208,7 +255,8 @@ def publisher_pdf_links(page,url,record,candidate_doi=''):
         # Generic Download links may not move onto another host. Cross-host
         # sources require an explicit citation URL or a verified source hint.
         if urlsplit(link).hostname==urlsplit(url).hostname: values.append(link)
-    return list(dict.fromkeys(x for x in values if safe_url(x)))[:2]
+    return list(dict.fromkeys(x for x in values if safe_url(x) and
+        (not ANONYMOUS_ONLY.get() or anonymous_source_url(x))))[:2]
 
 
 def identity_matches(record,front,candidate_doi='',metadata=None):
@@ -303,6 +351,7 @@ def candidate_identity(option,record):
 
 
 def fetch_candidate(candidate,record):
+    check_host_cooldown(candidate.get('url',''))
     if candidate.get('structured_format'):
         from structured_article_access import fetch_structured
         return fetch_structured(candidate,record)
@@ -328,6 +377,7 @@ def fetch_candidate(candidate,record):
     if BLOCKED.search(page[:18000]): raise ValueError('access_challenge_not_article')
     partial_pdf=None
     for pdf in publisher_pdf_links(page,final,identity,target):
+        check_host_cooldown(pdf)
         if robots_allowed(pdf):
             try:
                 body,pdfurl,_=request(pdf)
@@ -336,6 +386,10 @@ def fetch_candidate(candidate,record):
                     return finish(document)
                 if partial_pdf is None or sum(len(u['text']) for u in document.units)>sum(len(u['text']) for u in partial_pdf.units):
                     partial_pdf=document
+            except HTTPError as exc:
+                if exc.code in (408,425,429) or 500<=exc.code<600: raise
+            except (HostRateLimitPause,TimeoutError,URLError,ConnectionError):
+                raise
             except Exception:
                 pass
     try:
@@ -462,12 +516,25 @@ def known_candidates(record):
 def failure_diagnostic(exc,article=False):
     """Classify failures without putting exception URLs or credentials in logs."""
     result={'retryable':False}
+    if isinstance(exc,HostRateLimitPause):
+        return {'status':'rate_limit_pause','retryable':True,
+                'retry_after_seconds':exc.retry_after_seconds,'failure_url':exc.url}
     if isinstance(exc,HTTPError):
+        result['failure_url']=diagnostic_url(exc.url)
         result['status']=('article_http_' if article else 'http_')+str(exc.code)
         result['retryable']=exc.code in (408,425,429) or 500<=exc.code<600
         if result['retryable']:
             retry=(exc.headers or {}).get('Retry-After','')
-            seconds=int(retry) if str(retry).isdigit() else 3600
+            seconds=3600
+            if str(retry).isdigit():
+                seconds=int(retry)
+            elif retry:
+                try:
+                    until=parsedate_to_datetime(str(retry))
+                    if until.tzinfo is None: until=until.replace(tzinfo=timezone.utc)
+                    seconds=math.ceil((until-datetime.now(timezone.utc)).total_seconds())
+                except (ValueError,TypeError,OverflowError):
+                    pass
             result['retry_after_seconds']=max(1,min(seconds,604800))
     else:
         reason=str(exc)
@@ -514,11 +581,13 @@ def discover(record,providers=None):
     return unique,diagnostics
 
 
-def retrieve(record,max_candidates=8,providers=None):
+def _retrieve(record,max_candidates=8,providers=None,*,known_sources=None):
     """Try known sources first; retain partial text while seeking a whole PDF.
 
     Returns a Document (in memory only) and a per-provider/per-source ledger.
-    An empty providers list explicitly disables API discovery. A locator miss,
+    An empty providers list explicitly disables API discovery. known_sources can
+    restrict known routes to a caller-validated resumable subset. None preserves
+    the normal source registry and record URL lookup. A locator miss,
     an authentication failure and a temporary outage remain separate outcomes.
     """
     diagnostics=[]; seen=set(); attempted=0; partial=None
@@ -545,7 +614,7 @@ def retrieve(record,max_candidates=8,providers=None):
             except Exception as exc:
                 diagnostics.append({**result,**failure_diagnostic(exc,article=True)})
         return None
-    full=attempt(known_candidates(record))
+    full=attempt(known_candidates(record) if known_sources is None else known_sources)
     if full is not None: return full,diagnostics
     identifier=doi(record.get('doi'))
     if DOI.fullmatch(identifier) and attempted<budget:
@@ -561,3 +630,24 @@ def retrieve(record,max_candidates=8,providers=None):
                             'candidates_attempted':attempted,'retryable':False})
     return partial,diagnostics
 
+
+def retrieve(record,max_candidates=8,providers=None,*,known_sources=None,anonymous_only=False,host_backoff=None):
+    """Retrieve with an optional anonymous-only policy covering nested URLs.
+
+    Normal callers retain existing behavior. A restrictive enclosing policy
+    cannot be relaxed by a nested caller. No credential is removed and reused
+    as a different URL; a credential-bearing route is simply rejected. Existing
+    host_backoff seconds apply to nested PDFs, robots, requests and redirects.
+    """
+    deadlines=dict(HOST_COOLDOWNS.get() or {})
+    for host,seconds in (host_backoff or {}).items():
+        if not isinstance(host,str) or type(seconds) not in (int,float) or not 0<=seconds<=604800:
+            raise ValueError('invalid_host_cooldown')
+        deadlines[host]=max(deadlines.get(host,0),time.monotonic()+seconds)
+    cooldown_scope=HOST_COOLDOWNS.set(deadlines)
+    scope=ANONYMOUS_ONLY.set(ANONYMOUS_ONLY.get() or anonymous_only)
+    try:
+        return _retrieve(record,max_candidates,providers,known_sources=known_sources)
+    finally:
+        ANONYMOUS_ONLY.reset(scope)
+        HOST_COOLDOWNS.reset(cooldown_scope)

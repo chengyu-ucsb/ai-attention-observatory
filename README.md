@@ -269,10 +269,15 @@ documented and testable:
 - **Earlier foundations:** Older work, including the 2008 interruptions paper
   and the 2019 notifications paper, is retained for historical context but
   excluded from charts showing AI-specific research since 2023.
-- **Historical coverage:** `scripts/search_plan.py` runs four thematic lenses
-  over rotating 2023–2025 periods weekly and the full historical matrix when
-  backfill mode is requested. `scripts/seed_historical.py` resolves a small
-  set of DOI-verified foundational AI papers through bibliographic APIs.
+- **Weekly publication window:** Every weekly search covers the previous
+  completed UTC Monday–Sunday week, across all four thematic lenses. A run
+  on any day from November 2–8, 2026 searches October 26–November 1 inclusive.
+  Missing or partial publication dates, later print dates for older online-first
+  papers, rediscovery timestamps and nominations cannot make old work weekly.
+- **Historical coverage:** The full 2023+ matrix and nominated older DOI leads
+  run only in explicit backfill mode. `scripts/seed_historical.py` resolves a
+  small set of DOI-verified foundational AI papers separately. Historical
+  acquisition does not replace or enlarge the weekly publication set.
 - **Deduplication and screening:** Papers are deduplicated using DOI, relevance
   screened using title/abstract and source provenance, then assigned to direct
   AI, adjacent, or historical groups. These rules are heuristic, not formal
@@ -345,11 +350,20 @@ Identity mismatches and provider failures remain in
 screen before appearing in the public library. No additional API key is needed.
 
 The weekly workflow now finishes all intake stages before
-`scripts/build_weekly.py` freezes the complete discovery-week membership.
-Earlier per-channel display caps no longer truncate the final source shelf.
-Historical backfills remain excluded, and `build_public.py` still quarantines
-citation-only and otherwise ineligible records. This is a discovery week,
-not a claim that every source was published during that week.
+`scripts/build_weekly.py` freezes all eligible discovered sources whose original
+publication day falls in the previous completed UTC week. It does not use
+`first_seen`, updated/indexed dates, or brief nominations as substitutes.
+Earlier per-channel display caps no longer truncate the final source shelf,
+including sources in an additional or missing theme. Historical backfills stay
+separate, and `build_public.py` still quarantines citation-only and otherwise
+ineligible records. The run stores its inclusive `publication_window` and
+`selection_basis` alongside the existing collection date.
+
+Provider retrieval is bounded, not exhaustive: each query uses cursor pagination
+with explicit page budgets. Per-query audits report totals, pages, truncation,
+errors and deferred work. A cap or failed provider makes coverage partial, not
+complete. [Weekly collection details](docs/weekly-collection.md) describe the
+original-date evidence rules and offline validation.
 
 Each build saves the eligible source shelf to
 `data/editorial-queue/YYYY-MM-DD.json`. That queue survives the next collection.
@@ -407,3 +421,4 @@ node tests/validate_weekly_issue.cjs
 The published resource updates through GitHub Actions. API keys belong in repository **Actions secrets**, never in public files.
 
 Questions, possible sources, and collaboration ideas are welcome through [GitHub Issues](https://github.com/chengyu-ucsb/ai-attention-observatory/issues) or [Chengyu's website](https://chengyufang.org/).
+
