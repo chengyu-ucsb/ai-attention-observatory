@@ -21,12 +21,15 @@ import threading
 from urllib.parse import urlsplit, parse_qsl
 
 import full_document_access as access
+from article_body_parser import EXTRACTION_VERSION as HTML_EXTRACTION_VERSION
 from collection_window import date_in_window, previous_week, publication_date, weekly_eligible
 from comprehensive_readings import chunk_document, coverage_is_complete
 from arxiv_publication import identifier_for as arxiv_record_identifier
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = 2
+# Fail closed at capacity; never evict old evidence or retry an evicted revision.
+MAX_HTML_REFRESH_ATTEMPTS = 8
 # Reuse only existing anonymous locator functions. Never enable a new account,
 # contact-address transmission, key, model, or hosted inference service here.
 PROVIDERS = ('Europe PMC XML', 'OpenAIRE', 'CORE', 'Semantic Scholar')
@@ -188,14 +191,29 @@ def validate_diagnostic(row):
         require(not row['retryable'])
 
 
+def extraction_version(value):
+    require(type(value) is str and len(value) <= 40
+            and re.fullmatch(r'article-body-v[1-9][0-9]*', value) is not None)
+
+
+def is_html_document(meta):
+    return (meta.get('html_completeness') == 'not_verified'
+            and meta.get('evidence_status') == 'partial_full_text'
+            and 'pages_total' not in meta and 'document_format' not in meta)
+
+
 def validate_document(meta):
     required = {'source_url', 'document_version', 'semantic_completeness', 'review_status',
         'source_text_saved', 'redistribution_granted', 'all_retrieved_text_chunked',
         'chunks_total', 'units', 'chunk_intervals', 'evidence_status',
         'characters_retrieved', 'units_retrieved', 'source_sha256'}
     optional = set(MANIFEST_ENUMS) | {'source_byte_count', 'source_bytes_sha256',
-                                    'pages_total', 'pages_processed', 'pages_with_text'}
+                                    'pages_total', 'pages_processed', 'pages_with_text',
+                                    'html_extraction_version'}
     shape(meta, required, optional)
+    if 'html_extraction_version' in meta:
+        extraction_version(meta['html_extraction_version'])
+        require(is_html_document(meta))
     saved_url(meta['source_url'])
     require(token(meta['document_version']) == meta['document_version'])
     require(meta['semantic_completeness'] == 'not_verified' and meta['review_status'] == 'not_reviewed')
@@ -256,7 +274,8 @@ def validate_row(row, window):
     shape(row, {'fingerprint', 'kind', 'published', 'source_url', 'status', 'complete',
         'attempts', 'cursor', 'plan', 'tried_sources', 'excluded_related_or_outside_window_routes',
         'diagnostics', 'source_text_saved'},
-        {'document', 'document_evidence', 'last_outcome', 'next_retry_at', 'last_attempt_at'})
+        {'document', 'document_evidence', 'last_outcome', 'next_retry_at', 'last_attempt_at',
+         'html_refresh', 'html_refresh_attempts', 'previous_documents'})
     hash_value(row['fingerprint']); saved_url(row['source_url'], allow_empty=True)
     require(row['kind'] in {'scholarly', 'nonacademic'} and type(row['complete']) is bool)
     require(type(row['status']) is str and row['status'] in STATUSES and row['source_text_saved'] is False)
@@ -302,6 +321,8 @@ def validate_row(row, window):
         require(row['attempts'] > 0)
     else:
         require('document_evidence' not in row)
+    if {'previous_documents', 'html_refresh', 'html_refresh_attempts'} & set(row):
+        validate_html_refresh(row)
     if row['complete']:
         require(row['status'] in TERMINAL and 'next_retry_at' not in row)
         if row['status'] == 'full_document_retrieved_not_reviewed':
@@ -328,6 +349,54 @@ def validate_row(row, window):
         require('last_attempt_at' in row)
     if 'last_outcome' in row:
         require(row['last_outcome'] in SUCCESS | RETRY | {'access_blocked', 'source_unavailable', 'interrupted_attempt'})
+
+
+def validate_html_refresh(row):
+    """Bounded audit trail, tied to the same physical source and parser revisions.
+
+    Original v2 checkpoints omit these optional fields and remain valid. Once
+    a refresh is attempted, every revision stays in the ledger, even failures
+    and interrupted attempts. Reaching the cap requires separate reviewed work.
+    """
+    require({'document', 'html_refresh', 'html_refresh_attempts', 'last_attempt_at'} <= set(row)
+            and row['complete'] and row['status'] == 'partial_full_text_not_reviewed')
+    current = row['document']
+    require(is_html_document(current))
+    attempts = row['html_refresh_attempts']
+    require(type(attempts) is list and 1 <= len(attempts) <= MAX_HTML_REFRESH_ATTEMPTS
+            and row['attempts'] >= len(attempts) + 1)
+    revisions = []; successes = []; times = []
+    for attempt in attempts:
+        shape(attempt, {'version', 'attempted_at', 'outcome'})
+        extraction_version(attempt['version']); timestamp(attempt['attempted_at'])
+        require(code(attempt['outcome']) == attempt['outcome']
+                and attempt['outcome'] != 'full_document_retrieved')
+        revisions.append(attempt['version']); times.append(utc_now(attempt['attempted_at']))
+        if attempt['outcome'] == 'partial_full_text':
+            successes.append(attempt['version'])
+    require(len(revisions) == len(set(revisions)) and times == sorted(times)
+            and row['html_refresh'] == attempts[-1]
+            and row['last_attempt_at'] == attempts[-1]['attempted_at'])
+    history = row.get('previous_documents', [])
+    require(type(history) is list and len(history) == len(successes)
+            and len(history) <= MAX_HTML_REFRESH_ATTEMPTS)
+    documents = []
+    for prior in history:
+        shape(prior, {'document', 'document_evidence'})
+        doc = prior['document']; evidence = prior['document_evidence']
+        validate_document(doc); validate_diagnostic(evidence)
+        require(is_html_document(doc) and evidence['status'] == doc['evidence_status']
+                and (evidence.get('final_url') or evidence.get('url')) == doc['source_url']
+                and doc['source_url'] == current['source_url']
+                and doc['document_version'] == current['document_version'])
+        documents.append(doc)
+    documents.append(current)
+    retained_versions = [doc.get('html_extraction_version') for doc in documents]
+    # The first extraction may predate version tracking. Every later retained
+    # extraction must correspond, in order, to exactly one successful refresh.
+    require(len(retained_versions) == len(set(retained_versions))
+            and retained_versions[1:] == successes
+            and not set(revisions) & {retained_versions[0]})
 
 
 def validate_pauses(pauses):
@@ -463,6 +532,8 @@ def document_metadata(document):
     for key in ('source_sha256', 'source_bytes_sha256'):
         if isinstance(raw.get(key), str) and re.fullmatch(r'[0-9a-f]{64}', raw[key]):
             result[key] = raw[key]
+    if is_html_document(result) and raw.get('html_extraction_version') == HTML_EXTRACTION_VERSION:
+        result['html_extraction_version'] = HTML_EXTRACTION_VERSION
     # Byte and text coverage are physical extraction diagnostics only.
     return result
 
@@ -857,6 +928,63 @@ def advance(row, result, plan, routes, known_only, now):
         row['status'] = 'pending_routes'
 
 
+def html_refresh_plan(row, routes, record, window):
+    """One re-extraction per revision, never a discovery reset or failed-route retry.
+
+    Missing provenance is legacy HTML, not a reason to invalidate the identity
+    fingerprint. Only the exact successful URL/version still in the known plan
+    is eligible. Locator-only and redirect-only sources require separate review.
+    """
+    meta = row.get('document', {})
+    if (not row['complete'] or not is_html_document(meta)
+            or meta.get('html_extraction_version') == HTML_EXTRACTION_VERSION
+            or len(row.get('html_refresh_attempts', [])) >= MAX_HTML_REFRESH_ATTEMPTS
+            or any(attempt['version'] == HTML_EXTRACTION_VERSION
+                   for attempt in row.get('html_refresh_attempts', []))
+            or any(prior['document'].get('html_extraction_version') == HTML_EXTRACTION_VERSION
+                   for prior in row.get('previous_documents', []))):
+        return None
+    for route in routes:
+        if (route['url'] == meta['source_url'] and token(route.get('version')) == meta['document_version']
+                and route_permitted(route, record, window)):
+            if any((d['status'] in BLOCKED or d['status'].endswith('http_429'))
+                   and meta['source_url'] in (d.get('url'), d.get('final_url'), d.get('failure_url'))
+                   for d in row['diagnostics']):
+                return None
+            return {'kind': 'known', 'source': route, 'publication_window': window}
+    return None
+
+
+def finish_html_refresh(row, result):
+    ledger = [diagnostic(item) for item in result.get('diagnostics', [])]
+    row['diagnostics'] = (row['diagnostics'] + ledger)[-96:]
+    # Keep old extraction and provenance on every failure. Do not call advance:
+    # a parser deployment cannot move the discovery cursor or reopen other URLs.
+    row['html_refresh']['outcome'] = ledger[-1]['status'] if ledger else 'retrieval_error'
+    retrieved = result.get('document')
+    if not retrieved:
+        if row['html_refresh']['outcome'] in SUCCESS:
+            row['html_refresh']['outcome'] = 'retrieval_error'
+        return
+    validate_document(retrieved)
+    old = row['document']
+    evidence = next((d for d in ledger if d['status'] == retrieved['evidence_status']
+                     and (d.get('final_url') or d.get('url')) == retrieved['source_url']), None)
+    if (not is_html_document(retrieved) or evidence is None
+            or retrieved.get('html_extraction_version') != HTML_EXTRACTION_VERSION
+            or retrieved['source_url'] != old['source_url']
+            or retrieved['document_version'] != old['document_version']):
+        row['html_refresh']['outcome'] = 'document_identity_unverified'
+        return
+    row.setdefault('previous_documents', []).append({
+        'document': old, 'document_evidence': row['document_evidence']})
+    # A smaller extraction can be better: teaser removal must not lose to size.
+    row['document'] = retrieved
+    row['document_evidence'] = evidence
+    row['html_refresh']['outcome'] = retrieved['evidence_status']
+    row['last_outcome'] = retrieved['evidence_status']
+
+
 def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         item_time_budget=60, max_candidates=8, known_sources_only=False,
         attempt=bounded_stage, save=None, clock=time.monotonic):
@@ -953,7 +1081,9 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
     for offset in range(len(order)):
         index = (state['cursor'] + offset) % len(order)
         key = order[index]; row = state['records'][key]
-        if row.get('complete'):
+        record, routes = selected[key]
+        refresh_plan = html_refresh_plan(row, routes, record, window)
+        if row.get('complete') and refresh_plan is None:
             continue
         if row.get('next_retry_at') and utc_now(row['next_retry_at']) > now:
             continue
@@ -963,8 +1093,8 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
             state['next_cursor'] = index
             break
         record, routes = selected[key]
-        plan = stage_plan(routes, row['cursor'], known_sources_only, window, row['tried_sources'],
-                          row['plan']['doi_lookup_permitted'])
+        plan = refresh_plan or stage_plan(routes, row['cursor'], known_sources_only, window, row['tried_sources'],
+                                          row['plan']['doi_lookup_permitted'])
         if plan is None:
             row.update(complete=True, status='source_unavailable')
             continue
@@ -976,11 +1106,18 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
                      if plan['kind'] == 'known' else 'provider:' + plan['name'])
         pause = state['provider_pauses'].get(pause_key)
         if pause and utc_now(pause) > now:
-            row.update(status='rate_limited', next_retry_at=pause, last_outcome='rate_limited')
+            if refresh_plan is None:
+                row.update(status='rate_limited', next_retry_at=pause, last_outcome='rate_limited')
             continue
         row.pop('next_retry_at', None)
-        row.update(status='in_progress', attempts=row['attempts'] + 1,
-                   last_attempt_at=now.isoformat())
+        row.update(attempts=row['attempts'] + 1, last_attempt_at=now.isoformat())
+        if refresh_plan is not None:
+            # Save before I/O: interruption must not cause automatic repeated fetches.
+            row['html_refresh'] = {'version': HTML_EXTRACTION_VERSION,
+                'attempted_at': now.isoformat(), 'outcome': 'interrupted_attempt'}
+            row.setdefault('html_refresh_attempts', []).append(row['html_refresh'])
+        else:
+            row['status'] = 'in_progress'
         seal_state(state)
         if save:
             save(state)
@@ -989,7 +1126,10 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         except Exception as exc:
             result = {'diagnostics': [diagnostic(access.failure_diagnostic(exc, article=True))]}
         response_at = now + timedelta(seconds=max(0, clock() - started))
-        advance(row, result, plan, routes, known_sources_only, response_at)
+        if refresh_plan is not None:
+            finish_html_refresh(row, result)
+        else:
+            advance(row, result, plan, routes, known_sources_only, response_at)
         quota = [d for d in result.get('diagnostics', [])
                  if str(d.get('status', '')).endswith('http_429')]
         for entry in quota:
