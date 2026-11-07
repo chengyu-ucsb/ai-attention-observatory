@@ -909,10 +909,10 @@ function showPaper(x){
     make("span","",x.relation||"Unclassified"));
  cite.append(pills);
  if(original){
-  add(cite,make("p","rv-source-version","Checked source: "+checkedSourceLabel(r)),
-    make("p","rv-review-scope","AI source-check scope: "+(r.review_scope||d.review_scope||"Scope not recorded")),
-    make("p","rv-review-basis",d.basis||"Original summary checked against the stated source by a separate AI pass; not human review or independent replication."));
+  cite.append(make("p","rv-source-version","Checked source: "+checkedSourceLabel(r)));
   cite.append(checkedReadingContext(r,"rv-reading-notice"));
+  // Preserve distinct legacy basis text without repeating an entire typed notice.
+  if(d.basis&&!String(r.notice||"").includes(d.basis))cite.append(make("p","rv-review-basis",d.basis));
   const sourceUrl=httpsSourceUrl(r.source_url);
   if(sourceUrl)cite.append(link("Read checked source: "+checkedSourceLabel(r)+" ↗",sourceUrl,"rv-primary-link"));
   if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)

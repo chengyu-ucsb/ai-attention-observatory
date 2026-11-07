@@ -216,6 +216,7 @@ const citation=match(originalPage,"rv-source"),sourceLink=match(citation,"rv-pri
 assert.equal(sourceLink.href,original.reading.source_url,"Checked source link must open the exact version read");
 assert(sourceLink.textContent.includes(original.reading.source_version)&&sourceLink.textContent.includes("PDF"),"Checked source link needs a descriptive version/format label");
 assert(textContent(citation).includes("AI source-check scope: "+original.reading.review_scope));
+assert.equal(textContent(citation).split("AI source-check scope: "+original.reading.review_scope).length-1,1,"Do not repeat the source-check scope in the citation sidebar");
 assert(textContent(citation).includes(originalDigest.basis));
 assert(textContent(citation).includes(original.reading.notice));
 assert(textContent(citation).includes("Checked source DOI: "+original.reading.source_doi));
@@ -415,6 +416,7 @@ assert.equal(matching(paperContainer,"rv-source-locator").length,5);
 assert(textContent(match(paperContainer,"rv-evidence")).includes("extracted block 1"),"Typed HTML locators index extracted blocks, including headings and list items");
 assert(!textContent(match(paperContainer,"rv-evidence")).includes("paragraph 1"),"Typed HTML blocks must not be mislabeled as prose paragraphs");
 assert.equal(match(paperContainer,"rv-primary-link").href,commentary.url);
+assert.equal(textContent(match(paperContainer,"rv-source")).split("AI source-check scope: "+commentary.reading.review_scope).length-1,1);
 const required=["Limited reading","not human review","policy analysis","Synthetic policy author",commentary.reading.review_scope,commentary.reading.quality_note,"2026-11-05","2026-11-07","not an original-week snapshot"];
 for(const value of required)assert(commentaryText.includes(value),"Missing reading caveat: "+value);
 ctx.commentary=commentary;vm.runInContext("TEST.S.records=[commentary];TEST.showLibrary()",ctx);
