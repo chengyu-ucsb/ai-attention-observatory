@@ -68,6 +68,53 @@ class ParseAndVerifyTests(unittest.TestCase):
         self.assertNotIn(SECRET, json.dumps(metadata.parse_metadata(page(), URL)))
         self.assertTrue(weekly_eligible(output, *previous_week(NOW)))
 
+
+    def test_identical_refresh_preserves_bound_date_evidence_and_updates_run_time(self):
+        from checked_reading_types import record_digest
+        first = metadata.verify_record(record(), page(), checked_at="2026-11-06T12:00:00+00:00")
+        repeated = metadata.verify_record(first, page(), checked_at=NOW)
+        self.assertEqual(first["publication_date_provenance"], repeated["publication_date_provenance"])
+        self.assertEqual(record_digest(first), record_digest(repeated))
+        self.assertEqual(repeated["editorial_metadata"]["checked_at"], NOW.isoformat())
+        self.assertEqual(repeated["editorial_metadata"]["date_status"], "verified")
+
+    def test_new_date_evidence_still_changes_binding_and_conflicts_still_quarantine(self):
+        from checked_reading_types import record_digest
+        first = metadata.verify_record(record(), page(), checked_at="2026-11-06T12:00:00+00:00")
+        extra = '<meta property="article:published_time" content="2026-10-28">'
+        changed = metadata.verify_record(first, page(extra=extra), checked_at=NOW)
+        self.assertNotEqual(record_digest(first), record_digest(changed))
+        self.assertEqual(changed["publication_date_provenance"]["checked_at"], NOW.isoformat())
+        conflict = metadata.verify_record(first, page("2026-10-29"), checked_at=NOW)
+        self.assertEqual(conflict["editorial_metadata"]["date_status"], "conflict")
+        self.assertFalse(weekly_eligible(conflict, *previous_week(NOW)))
+
+    def test_refresh_preserves_receipts_only_when_evidence_is_unchanged(self):
+        from test_checked_reading_types import commentary
+        from test_original_readings import article_screen, approve
+        import original_readings
+        row, note = commentary()
+        html = page(date=row["published"], title=row["title"], canonical=row["url"])
+        first = metadata.verify_record(row, html, checked_at="2026-11-05T12:00:00+00:00")
+        article_screen(note, first); approve(note)
+        self.assertTrue(original_readings.eligible(note, first))
+        repeat = metadata.verify_record(first, html, checked_at=NOW)
+        self.assertTrue(original_readings.eligible(note, repeat))
+        for mutation in ("new_evidence", "conflicting_date", "changed_title"):
+            with self.subTest(mutation=mutation):
+                candidate = deepcopy(first)
+                altered = html
+                if mutation == "new_evidence":
+                    altered = page(date=row["published"], title=row["title"], canonical=row["url"],
+                        extra='<meta property="article:published_time" content="'+row["published"]+'">')
+                elif mutation == "conflicting_date":
+                    altered = page(date="2026-10-29", title=row["title"], canonical=row["url"])
+                else:
+                    candidate["title"] = "A different article about human attention"
+                    altered = page(date=row["published"], title=candidate["title"], canonical=row["url"])
+                changed = metadata.verify_record(candidate, altered, checked_at=NOW)
+                self.assertFalse(original_readings.eligible(note, changed))
+
     def test_meta_original_dates_and_itemprop(self):
         for field in metadata.DATE_META:
             html = '<meta property="og:title" content="' + TITLE + '"><meta itemprop="' + field + '" content="2026-10-28">'
