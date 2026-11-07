@@ -82,7 +82,8 @@ class PriorityLiteratureTests(unittest.TestCase):
    (dest/"library.json").write_text(json.dumps([old]))
    with patch.object(update,"DIR",dest),patch.object(update,"TODAY","2026-10-22"),\
         patch.object(update,"discover",return_value=([],[],{"openalex":0,"crossref":0})),\
-        patch.object(update,"discover_priority",return_value=([],[],{"priority_dois_requested":0})):
+        patch.object(update,"discover_priority",return_value=([],[],{"priority_dois_requested":0})),\
+        patch("builtins.print"):  # Fixture warnings must not become GitHub run annotations.
     update.main()
    stored=json.loads((dest/"library.json").read_text())
   self.assertEqual(len(stored),1)
