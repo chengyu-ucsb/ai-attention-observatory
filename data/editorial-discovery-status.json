@@ -12,13 +12,69 @@
   "date_policy": "Publisher original publication field only; never modified, indexed, Google News or first-seen dates.",
   "scope": "Configured feeds and explicit search queries, not exhaustive coverage of online publishing.",
   "status": "partial",
-  "accepted": 3,
-  "quarantined": 3,
-  "source_type_counts": {
-    "policy": 3
-  },
+  "accepted": 0,
+  "quarantined": 0,
+  "source_type_counts": {},
   "full_articles_retrieved": 0,
-  "verified_existing_records": [],
+  "verified_existing_records": [
+    {
+      "url": "https://www.eff.org/deeplinks/2026/10/tech-tips-parents-digital-parenting-week",
+      "published": "2026-10-29",
+      "publication_date_provenance": {
+        "basis": "publisher_rss_pubDate",
+        "raw": "Thu, 29 Oct 2026 17:00:05 +0000",
+        "date": "2026-10-29",
+        "timezone": "UTC",
+        "source_url": "https://www.eff.org/rss/updates.xml",
+        "independently_verified": false
+      },
+      "discovery_provenance": {
+        "method": "publisher_feed",
+        "feed_id": "eff",
+        "feed_url": "https://www.eff.org/rss/updates.xml",
+        "checked_at": "2026-11-07",
+        "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
+      }
+    },
+    {
+      "url": "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai",
+      "published": "2026-10-28",
+      "publication_date_provenance": {
+        "basis": "publisher_rss_pubDate",
+        "raw": "Wed, 28 Oct 2026 20:04:21 +0000",
+        "date": "2026-10-28",
+        "timezone": "UTC",
+        "source_url": "https://www.eff.org/rss/updates.xml",
+        "independently_verified": false
+      },
+      "discovery_provenance": {
+        "method": "publisher_feed",
+        "feed_id": "eff",
+        "feed_url": "https://www.eff.org/rss/updates.xml",
+        "checked_at": "2026-11-07",
+        "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
+      }
+    },
+    {
+      "url": "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better",
+      "published": "2026-10-27",
+      "publication_date_provenance": {
+        "basis": "publisher_rss_pubDate",
+        "raw": "Tue, 27 Oct 2026 21:20:30 +0000",
+        "date": "2026-10-27",
+        "timezone": "UTC",
+        "source_url": "https://www.eff.org/rss/updates.xml",
+        "independently_verified": false
+      },
+      "discovery_provenance": {
+        "method": "publisher_feed",
+        "feed_id": "eff",
+        "feed_url": "https://www.eff.org/rss/updates.xml",
+        "checked_at": "2026-11-07",
+        "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
+      }
+    }
+  ],
   "conflicting_existing_records": [],
   "sources": [
     {
@@ -26,281 +82,278 @@
       "name": "The Conversation",
       "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
       "status": "partial",
-      "pages": 1,
-      "returned": 25,
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
       "warnings": [
-        "rolling_feed_does_not_reach_window_start"
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
       ],
-      "rejected": {
-        "not_topical": 23,
-        "outside_previous_week": 2
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-10-27",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "verge",
       "name": "The Verge",
       "feed_url": "https://www.theverge.com/rss/index.xml",
       "status": "partial",
-      "pages": 1,
-      "returned": 10,
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
       "warnings": [
-        "rolling_feed_does_not_reach_window_start"
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
       ],
-      "rejected": {
-        "not_topical": 10
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-11-06",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "ars-technology",
       "name": "Ars Technica",
       "feed_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
-      "status": "ok",
-      "pages": 1,
-      "returned": 20,
+      "status": "partial",
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
-      "warnings": [],
-      "rejected": {
-        "not_topical": 20
+      "warnings": [
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-10-14",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "tech-policy-press",
       "name": "Tech Policy Press",
       "feed_url": "https://www.techpolicy.press/rss/feed.xml",
-      "status": "ok",
-      "pages": 1,
-      "returned": 4122,
+      "status": "partial",
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
-      "warnings": [],
-      "rejected": {
-        "not_topical": 4103,
-        "outside_previous_week": 19
+      "warnings": [
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2018-11-21",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "guardian-ai",
       "name": "The Guardian",
       "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
       "status": "partial",
-      "pages": 1,
-      "returned": 20,
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
       "warnings": [
-        "rolling_feed_does_not_reach_window_start"
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
       ],
-      "rejected": {
-        "not_topical": 20
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-11-05",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "guardian-opinion",
       "name": "The Guardian",
       "feed_url": "https://www.theguardian.com/commentisfree/rss",
       "status": "partial",
-      "pages": 1,
-      "returned": 36,
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
       "warnings": [
-        "rolling_feed_does_not_reach_window_start"
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
       ],
-      "rejected": {
-        "not_topical": 36
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-10-27",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "nieman-lab",
       "name": "Nieman Lab",
       "feed_url": "https://www.niemanlab.org/feed/",
-      "status": "ok",
-      "pages": 1,
-      "returned": 30,
+      "status": "partial",
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
-      "warnings": [],
-      "rejected": {
-        "not_topical": 30
+      "warnings": [
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-10-15",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "nielsen-norman",
       "name": "Nielsen Norman Group",
       "feed_url": "https://www.nngroup.com/feed/rss/",
-      "status": "ok",
-      "pages": 1,
-      "returned": 20,
+      "status": "partial",
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
-      "warnings": [],
-      "rejected": {
-        "not_topical": 20
+      "warnings": [
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-09-11",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "eff",
       "name": "Electronic Frontier Foundation",
       "feed_url": "https://www.eff.org/rss/updates.xml",
-      "status": "ok",
-      "pages": 1,
-      "returned": 50,
-      "accepted": 3,
-      "warnings": [],
-      "rejected": {
-        "outside_previous_week": 5,
-        "not_topical": 42
+      "status": "partial",
+      "pages": 0,
+      "returned": 0,
+      "accepted": 0,
+      "warnings": [
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 3,
+      "cached_evidence_rows": 3,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-10-02",
-      "newest_original_date": "2026-11-06"
+      "rejected": {
+        "duplicate": 3
+      },
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "ai-now",
       "name": "AI Now Institute",
       "feed_url": "https://ainowinstitute.org/feed",
-      "status": "ok",
-      "pages": 1,
-      "returned": 10,
+      "status": "partial",
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
-      "warnings": [],
-      "rejected": {
-        "not_topical": 10
+      "warnings": [
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-10-21",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "mit-tech-review",
       "name": "MIT Technology Review",
       "feed_url": "https://www.technologyreview.com/feed/",
       "status": "partial",
-      "pages": 1,
-      "returned": 10,
+      "pages": 0,
+      "returned": 0,
       "accepted": 0,
       "warnings": [
-        "rolling_feed_does_not_reach_window_start"
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
       ],
-      "rejected": {
-        "not_topical": 10
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
       },
-      "oldest_original_date": "2026-11-03",
-      "newest_original_date": "2026-11-06"
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     },
     {
       "source_id": "the-markup",
       "name": "The Markup",
       "feed_url": "https://themarkup.org/feeds/rss.xml",
-      "status": "ok",
-      "pages": 1,
-      "returned": 20,
-      "accepted": 0,
-      "warnings": [],
-      "rejected": {
-        "not_topical": 20
-      },
-      "oldest_original_date": "2026-03-06",
-      "newest_original_date": "2026-10-15"
-    },
-    {
-      "source_id": "google-news-1",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"AI\" (\"attention\" OR \"distraction\" OR \"focus\") after:2026-10-25 before:2026-11-02",
-      "returned": 61,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-2",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"ChatGPT\" (\"thinking\" OR \"cognitive\" OR \"memory\") after:2026-10-25 before:2026-11-02",
-      "returned": 27,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-3",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"AI\" (\"digital wellbeing\" OR \"attention management\") after:2026-10-25 before:2026-11-02",
-      "returned": 1,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-4",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"AI\" \"learning\" \"critical thinking\" after:2026-10-25 before:2026-11-02",
-      "returned": 13,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-5",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"notification batching\" OR \"interruption recovery\" after:2026-10-25 before:2026-11-02",
+      "status": "partial",
+      "pages": 0,
       "returned": 0,
       "accepted": 0,
       "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-6",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"AI\" \"productivity\" \"focus\" after:2026-10-25 before:2026-11-02",
-      "returned": 29,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-7",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"cognitive offloading\" \"generative AI\" after:2026-10-25 before:2026-11-02",
-      "returned": 9,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
-    },
-    {
-      "source_id": "google-news-8",
-      "name": "Google News RSS",
-      "status": "leads_only",
-      "query": "\"attention economy\" \"AI\" (\"design\" OR \"policy\") after:2026-10-25 before:2026-11-02",
-      "returned": 9,
-      "accepted": 0,
-      "warnings": [
-        "original_publisher_and_publication_date_unverified"
-      ]
+        "live_feed_not_requested_cached_recovery_only",
+        "no_original_publication_dates_returned"
+      ],
+      "cached_candidates": 0,
+      "cached_evidence_rows": 0,
+      "snapshot_coverage": {
+        "snapshots_during_publication_week": 0,
+        "largest_unobserved_interval_hours": 168.0,
+        "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
+      },
+      "rejected": {},
+      "oldest_original_date": "",
+      "newest_original_date": ""
     }
   ],
   "conflicting_new_records": 0

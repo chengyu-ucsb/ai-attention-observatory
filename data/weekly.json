@@ -339,13 +339,69 @@
         "date_policy": "Publisher original publication field only; never modified, indexed, Google News or first-seen dates.",
         "scope": "Configured feeds and explicit search queries, not exhaustive coverage of online publishing.",
         "status": "partial",
-        "accepted": 3,
-        "quarantined": 3,
-        "source_type_counts": {
-          "policy": 3
-        },
+        "accepted": 0,
+        "quarantined": 0,
+        "source_type_counts": {},
         "full_articles_retrieved": 0,
-        "verified_existing_records": [],
+        "verified_existing_records": [
+          {
+            "url": "https://www.eff.org/deeplinks/2026/10/tech-tips-parents-digital-parenting-week",
+            "published": "2026-10-29",
+            "publication_date_provenance": {
+              "basis": "publisher_rss_pubDate",
+              "raw": "Thu, 29 Oct 2026 17:00:05 +0000",
+              "date": "2026-10-29",
+              "timezone": "UTC",
+              "source_url": "https://www.eff.org/rss/updates.xml",
+              "independently_verified": false
+            },
+            "discovery_provenance": {
+              "method": "publisher_feed",
+              "feed_id": "eff",
+              "feed_url": "https://www.eff.org/rss/updates.xml",
+              "checked_at": "2026-11-07",
+              "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
+            }
+          },
+          {
+            "url": "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai",
+            "published": "2026-10-28",
+            "publication_date_provenance": {
+              "basis": "publisher_rss_pubDate",
+              "raw": "Wed, 28 Oct 2026 20:04:21 +0000",
+              "date": "2026-10-28",
+              "timezone": "UTC",
+              "source_url": "https://www.eff.org/rss/updates.xml",
+              "independently_verified": false
+            },
+            "discovery_provenance": {
+              "method": "publisher_feed",
+              "feed_id": "eff",
+              "feed_url": "https://www.eff.org/rss/updates.xml",
+              "checked_at": "2026-11-07",
+              "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
+            }
+          },
+          {
+            "url": "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better",
+            "published": "2026-10-27",
+            "publication_date_provenance": {
+              "basis": "publisher_rss_pubDate",
+              "raw": "Tue, 27 Oct 2026 21:20:30 +0000",
+              "date": "2026-10-27",
+              "timezone": "UTC",
+              "source_url": "https://www.eff.org/rss/updates.xml",
+              "independently_verified": false
+            },
+            "discovery_provenance": {
+              "method": "publisher_feed",
+              "feed_id": "eff",
+              "feed_url": "https://www.eff.org/rss/updates.xml",
+              "checked_at": "2026-11-07",
+              "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
+            }
+          }
+        ],
         "conflicting_existing_records": [],
         "sources": [
           {
@@ -353,287 +409,284 @@
             "name": "The Conversation",
             "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
             "status": "partial",
-            "pages": 1,
-            "returned": 25,
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
             "warnings": [
-              "rolling_feed_does_not_reach_window_start"
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
             ],
-            "rejected": {
-              "not_topical": 23,
-              "outside_previous_week": 2
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-10-27",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "verge",
             "name": "The Verge",
             "feed_url": "https://www.theverge.com/rss/index.xml",
             "status": "partial",
-            "pages": 1,
-            "returned": 10,
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
             "warnings": [
-              "rolling_feed_does_not_reach_window_start"
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
             ],
-            "rejected": {
-              "not_topical": 10
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-11-06",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "ars-technology",
             "name": "Ars Technica",
             "feed_url": "https://feeds.arstechnica.com/arstechnica/technology-lab",
-            "status": "ok",
-            "pages": 1,
-            "returned": 20,
+            "status": "partial",
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
-            "warnings": [],
-            "rejected": {
-              "not_topical": 20
+            "warnings": [
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-10-14",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "tech-policy-press",
             "name": "Tech Policy Press",
             "feed_url": "https://www.techpolicy.press/rss/feed.xml",
-            "status": "ok",
-            "pages": 1,
-            "returned": 4122,
+            "status": "partial",
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
-            "warnings": [],
-            "rejected": {
-              "not_topical": 4103,
-              "outside_previous_week": 19
+            "warnings": [
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2018-11-21",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "guardian-ai",
             "name": "The Guardian",
             "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
             "status": "partial",
-            "pages": 1,
-            "returned": 20,
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
             "warnings": [
-              "rolling_feed_does_not_reach_window_start"
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
             ],
-            "rejected": {
-              "not_topical": 20
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-11-05",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "guardian-opinion",
             "name": "The Guardian",
             "feed_url": "https://www.theguardian.com/commentisfree/rss",
             "status": "partial",
-            "pages": 1,
-            "returned": 36,
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
             "warnings": [
-              "rolling_feed_does_not_reach_window_start"
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
             ],
-            "rejected": {
-              "not_topical": 36
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-10-27",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "nieman-lab",
             "name": "Nieman Lab",
             "feed_url": "https://www.niemanlab.org/feed/",
-            "status": "ok",
-            "pages": 1,
-            "returned": 30,
+            "status": "partial",
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
-            "warnings": [],
-            "rejected": {
-              "not_topical": 30
+            "warnings": [
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-10-15",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "nielsen-norman",
             "name": "Nielsen Norman Group",
             "feed_url": "https://www.nngroup.com/feed/rss/",
-            "status": "ok",
-            "pages": 1,
-            "returned": 20,
+            "status": "partial",
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
-            "warnings": [],
-            "rejected": {
-              "not_topical": 20
+            "warnings": [
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-09-11",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "eff",
             "name": "Electronic Frontier Foundation",
             "feed_url": "https://www.eff.org/rss/updates.xml",
-            "status": "ok",
-            "pages": 1,
-            "returned": 50,
-            "accepted": 3,
-            "warnings": [],
-            "rejected": {
-              "outside_previous_week": 5,
-              "not_topical": 42
+            "status": "partial",
+            "pages": 0,
+            "returned": 0,
+            "accepted": 0,
+            "warnings": [
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 3,
+            "cached_evidence_rows": 3,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-10-02",
-            "newest_original_date": "2026-11-06"
+            "rejected": {
+              "duplicate": 3
+            },
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "ai-now",
             "name": "AI Now Institute",
             "feed_url": "https://ainowinstitute.org/feed",
-            "status": "ok",
-            "pages": 1,
-            "returned": 10,
+            "status": "partial",
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
-            "warnings": [],
-            "rejected": {
-              "not_topical": 10
+            "warnings": [
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-10-21",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "mit-tech-review",
             "name": "MIT Technology Review",
             "feed_url": "https://www.technologyreview.com/feed/",
             "status": "partial",
-            "pages": 1,
-            "returned": 10,
+            "pages": 0,
+            "returned": 0,
             "accepted": 0,
             "warnings": [
-              "rolling_feed_does_not_reach_window_start"
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
             ],
-            "rejected": {
-              "not_topical": 10
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
             },
-            "oldest_original_date": "2026-11-03",
-            "newest_original_date": "2026-11-06"
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           },
           {
             "source_id": "the-markup",
             "name": "The Markup",
             "feed_url": "https://themarkup.org/feeds/rss.xml",
-            "status": "ok",
-            "pages": 1,
-            "returned": 20,
-            "accepted": 0,
-            "warnings": [],
-            "rejected": {
-              "not_topical": 20
-            },
-            "oldest_original_date": "2026-03-06",
-            "newest_original_date": "2026-10-15"
-          },
-          {
-            "source_id": "google-news-1",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"AI\" (\"attention\" OR \"distraction\" OR \"focus\") after:2026-10-25 before:2026-11-02",
-            "returned": 61,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-2",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"ChatGPT\" (\"thinking\" OR \"cognitive\" OR \"memory\") after:2026-10-25 before:2026-11-02",
-            "returned": 27,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-3",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"AI\" (\"digital wellbeing\" OR \"attention management\") after:2026-10-25 before:2026-11-02",
-            "returned": 1,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-4",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"AI\" \"learning\" \"critical thinking\" after:2026-10-25 before:2026-11-02",
-            "returned": 13,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-5",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"notification batching\" OR \"interruption recovery\" after:2026-10-25 before:2026-11-02",
+            "status": "partial",
+            "pages": 0,
             "returned": 0,
             "accepted": 0,
             "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-6",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"AI\" \"productivity\" \"focus\" after:2026-10-25 before:2026-11-02",
-            "returned": 29,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-7",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"cognitive offloading\" \"generative AI\" after:2026-10-25 before:2026-11-02",
-            "returned": 9,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
-          },
-          {
-            "source_id": "google-news-8",
-            "name": "Google News RSS",
-            "status": "leads_only",
-            "query": "\"attention economy\" \"AI\" (\"design\" OR \"policy\") after:2026-10-25 before:2026-11-02",
-            "returned": 9,
-            "accepted": 0,
-            "warnings": [
-              "original_publisher_and_publication_date_unverified"
-            ]
+              "live_feed_not_requested_cached_recovery_only",
+              "no_original_publication_dates_returned"
+            ],
+            "cached_candidates": 0,
+            "cached_evidence_rows": 0,
+            "snapshot_coverage": {
+              "snapshots_during_publication_week": 0,
+              "largest_unobserved_interval_hours": 168.0,
+              "coverage_claim": "Observed feed snapshots only; publication completeness is not verified."
+            },
+            "rejected": {},
+            "oldest_original_date": "",
+            "newest_original_date": ""
           }
         ],
         "conflicting_new_records": 0
       }
     },
-    "nonacademic_added": 3,
+    "nonacademic_added": 0,
     "nonacademic_total": 16,
     "editorial_selections_added": 0,
     "product_examples": 4
@@ -689,7 +742,31 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
-      }
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-07",
+        "next_at": "2026-11-28",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-07",
+        "next_at": "2026-11-09",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-07T02:15:38+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-21T02:15:38+00:00"
+      },
+      "open_access_url": "https://arxiv.org/abs/2611.00436"
     },
     {
       "title": "Tech Tips for Parents this Digital Parenting Week",
@@ -710,18 +787,38 @@
       "source_type": "policy",
       "source_type_basis": "provisional_feed_default",
       "publication_date_provenance": {
-        "basis": "publisher_rss_pubDate",
-        "raw": "Thu, 29 Oct 2026 17:00:05 +0000",
+        "status": "day_known",
+        "basis": "publisher_meta_published_time",
+        "field": "article:published_time",
+        "value": "2026-10-29",
         "date": "2026-10-29",
         "timezone": "UTC",
-        "source_url": "https://www.eff.org/rss/updates.xml",
-        "independently_verified": false
+        "source_url": "https://www.eff.org/deeplinks/2026/10/tech-tips-parents-digital-parenting-week",
+        "evidence": [
+          {
+            "field": "publisher_rss_pubDate",
+            "date": "2026-10-29",
+            "basis": "publisher_rss_pubDate",
+            "source_url": "https://www.eff.org/rss/updates.xml",
+            "precision": "day"
+          },
+          {
+            "field": "article:published_time",
+            "date": "2026-10-29",
+            "basis": "publisher_meta_published_time",
+            "source_url": "https://www.eff.org/deeplinks/2026/10/tech-tips-parents-digital-parenting-week",
+            "precision": "day"
+          }
+        ],
+        "independently_verified": true,
+        "checked_at": "2026-11-07T02:19:18.907900+00:00"
       },
       "discovery_provenance": {
         "method": "publisher_feed",
         "feed_id": "eff",
         "feed_url": "https://www.eff.org/rss/updates.xml",
-        "checked_at": "2026-11-07"
+        "checked_at": "2026-11-07",
+        "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
       },
       "curated": false,
       "first_seen": "2026-11-07",
@@ -735,7 +832,17 @@
         "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."
       },
       "content_access": "feed_description",
-      "source_checked": "2026-11-07"
+      "source_checked": "2026-11-07",
+      "editorial_metadata": {
+        "version": 1,
+        "checked_at": "2026-11-07T02:19:18.907900+00:00",
+        "source_url": "https://www.eff.org/deeplinks/2026/10/tech-tips-parents-digital-parenting-week",
+        "status": "verified",
+        "identity": "verified",
+        "date_status": "verified",
+        "source_type_status": "unresolved",
+        "source_text_saved": false
+      }
     },
     {
       "title": "AI-Based Technopreneurship for Speech Disorder Therapyin ADHD Children",
@@ -801,19 +908,52 @@
       "historical_backfill": false,
       "source_group": "AI-specific",
       "reading": {
-        "level": "abstract",
-        "provenance": "Crossref publisher-supplied abstract",
-        "overview": "While existing literature explores AI in healthcare, this study uniquely high-lights technopreneurial approaches to address accessibility and affordability ofAI-based therapies. By bridging gaps in healthcaredelivery, this study contributes to SDG 3 (Good Health), SDG 4 (Quality Ed-ucation), and SDG 10 (Reduced Inequalities).",
-        "methods": "",
-        "findings": "",
-        "interpretation": "",
+        "level": "full_text",
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "overview": "While existing literature explores AI in healthcare, this study uniquely high-lights technopreneurial approaches to address accessibility and affordability ofAI-based therapies. Focusing on Indonesia as a case study, the paper exam-ines how AI can support children with ADHD who often face delays in speechdevelopment and communication.",
+        "methods": "3.1.AI Approaches to Speech Disorder Diagnosis and Therapy The paper should provide more technical details regarding the methodologies used. The diagnosis of speech disorders involves using AI technology, specifically machine learning and natural language processing (NLP), to analyze voice and recordings of children’s conversations. To enhance the paper’s technical contribu- tion, it would be helpful to specify the type of machine learning algorithms used and how they are trained on datasets that include a wide range of speech disorders associated with ADHD, as well as specific features such as voice pitch, speech rate, and intonation. To diagnose speech disorders, data in the form of voice and recordings of children’s conversations will be collected and analyzed using an AI model that can identify unusual speech patterns, such as irregularities in pronunciation, unnatural speech rate, or significant grammatical errors. The machine learning algorithm used will be trained using a dataset that includes a wide range of speech disorders associated with ADHD, as well as specific features such as voice pitch, speech rate, and intonation. AI-based speech therapy uses an app that interacts with children to assist them with speech practice. This app can track a child’s progress in real-time and provide feedback that can help improve their language skills. AI is used to tailor exercises to the child’s individual abilities and needs, and provide recommendations based on their progress. ",
+        "findings": "4.1.Implementation of AI Technology in the Diagnosis of Speech Disorders The results of using AI technology to diagnose speech disorders in children with ADHD show that AI-based algorithms, particularly those using speech processing and natural language processing (NLP), have enormous potential in detecting speech disorders early. Analysis of voice recording data from children with ADHD, which included measurements of speech rate, pronunciation errors, and sentence patterns, showed that AI can detect significant differences between children with ADHD and children in general. For example, the 94 ❒ E-ISSN: 3064-3597 P-ISSN: 3046-7616 results of data analysis conducted on 200 children’s voice recordings showed that 85% of children with ADHD had a tendency to speak faster with inaccuracies in word use and sentence structure, which are indications of a speech disorder that needs attention. The overall writing should be revised to improve sentence structure and consistency. Replacing the use of passive voice with active voice will improve readability. For example, the sentence could be rephrased as: ”AI enables faster and more accurate diagnoses than traditional methods”. Additionally, headings could be adjusted for consistency, such as standardizing the capitalization of section titles. AI-based diagnostic tools can perform real-time monitoring and provide reports that can be analyzed immediately to determine whether a child needs further intervention. Thus, AI technology not only improves diagnostic efficiency but also ensures earlier intervention, which is crucial for a child’s development. 4.2.Language Development of Children with ADHD through an AI Approach In terms of therapy, AI-based applications used to support the language development of children with ADHD have also shown positive results. Results from the speech therapy application developed in this study showed that children participating in the AI-based program experienced significant improvements in their speaking skills. Children who used the application consistently for six months showed a 30-40% improvement in speaking skills and understanding verbal instructions. The feedback provided by the AI-based application, which is tailored to the individual child’s abilities, allows them to practice language skills in a fun and interac- Furthermore, data shows that children with ADHD who participate in AI-based therapy are more mo- tivated to participate in exercises, as the app incorporates game elements that can make therapy more engaging and less boring. Using the app also provides parents with an easier way to monitor their child’s progress, as it records each child’s progress and provides detailed reports on areas for improvement. Figure 1. AI Therapy App Interface for Children with ADHD Figure 1 To improve clarity, the paper should add a brief explanation of the conceptual model’s key components in the text to help readers understand its relevance and application. A description of the AI",
+        "interpretation": "This research demonstrates that AI-based technology has significant potential to improve the diagnosis and treatment of speech disorders in children with ADHD. By using AI to analyze voice recordings and speech patterns, diagnoses can be made more quickly and accurately, enabling early intervention, which is crucial for child development. Furthermore, AI-based applications used for speech therapy have also been shown to be effective in helping children with ADHD develop their language skills by increasing their motivation and However, despite the positive results, the study also identified several challenges in implementing AI technology, including gaps in accessibility and limitations in AI’s ability to address the more complex needs of children with ADHD. Therefore, while AI can be a useful tool, human intervention is still needed to ensure a more personalized and holistic approach to therapy. The application of technology entrepreneurship, or technopreneurship, plays a crucial role in expand- ing access to these AI-based solutions, enabling more children with ADHD, especially those in areas with limited infrastructure, to benefit from technology-based therapies. By continuing to develop these solutions and addressing existing barriers, AI has the potential to become a highly beneficial tool in supporting the language development of children with ADHD in the future. Journal of Computer Science and Technology Application (CORISINTA) ❒ 97 Uki Hares Yulianti (UH) https://orcid.org/0009-0003-0498-6022 Ida Zulaeha (IZ) https://orcid.org/0000-0001-7694-2895 Subyantoro (SY) https://orcid.org/0000-0002-4365-5993 Yusro Edy Nugroho (YE) https://orcid.org/0000-0002-3437-0574 Kgomotso Moyo (KM) https://orcid.org/0009-0005-5779-562X Conceptualization: UH; Methodology: IZ; Software",
         "limitations": "",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
-        "reported_findings": false
+        "reported_findings": true
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "analysis": {
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "license": "cc-by",
+        "fulltext_url": "https://doi.org/10.33050/corisinta.v2i2.135",
+        "license_url": "https://doi.org/10.33050/corisinta.v2i2.135",
+        "methods": "3.1.AI Approaches to Speech Disorder Diagnosis and Therapy The paper should provide more technical details regarding the methodologies used. The diagnosis of speech disorders involves using AI technology, specifically machine learning and natural language processing (NLP), to analyze voice and recordings of children’s conversations. To enhance the paper’s technical contribu- tion, it would be helpful to specify the type of machine learning algorithms used and how they are trained on datasets that include a wide range of speech disorders associated with ADHD, as well as specific features such as voice pitch, speech rate, and intonation. To diagnose speech disorders, data in the form of voice and recordings of children’s conversations will be collected and analyzed using an AI model that can identify unusual speech patterns, such as irregularities in pronunciation, unnatural speech rate, or significant grammatical errors. The machine learning algorithm used will be trained using a dataset that includes a wide range of speech disorders associated with ADHD, as well as specific features such as voice pitch, speech rate, and intonation. AI-based speech therapy uses an app that interacts with children to assist them with speech practice. This app can track a child’s progress in real-time and provide feedback that can help improve their language skills. AI is used to tailor exercises to the child’s individual abilities and needs, and provide recommendations based on their progress. Data collection in this study was conducted through direct observation and audio recordings. The data used came from several sources relevant to children with ADHD and speech disorders in Indonesia. First, med- ical records from hospitals such as Dr. Cipto Mangunkusumo National Hospital in Jakarta and Dr. Marzoeki Mahir Mental Hospital in Bogor will be used to identify the number of children with ADHD and the types of speech disorders they experience. Furthermore, observational data from inclusive schools in Jakarta and Surabaya will describe the academic and communication development of children with ADHD. Data will also be collected through a survey of parents of children with ADHD, which will provide information on their experiences in detecting speech disorders. Voice recordings of children taken at therapy centers or schools will also be analyzed to detect speech patterns using AI technology. Furthermore, data on the use of AI-based speech therapy applications developed by local startups in Indonesia, such as the Speech Therapy, will help evaluate the success of therapy. Finally, demographic data on the prevalence of ADHD in Journal of Computer Science and Technology Application (CORISINTA) ❒ 93 Indonesia from the Central Statistics Agency (BPS) and the Ministry of Health will be used to illustrate the distribution of ADHD cases. This data will provide a clearer picture of the condition of children with ADHD in Indonesia and support the use of AI technology to detect speech disorders. Table 1. Medical Data of Children with ADHD in Indonesia No Hospital Location Children Types of Speech Types of Therapy with ADHD Disorders Therapy Provided 1 Mangunkusumo Jakarta 100 Articulation Disorder Speech Therapy, 2 Mahir Mental Bogor 50 Dysphasia Speech Therapy,Social Therapy Autistic Children’s Language Therapy, 3 Education Jakarta 40 Expressive LanguageDisorderCognitive Therapy 4 Speech Therapy Surabaya 60 Prescription LanguageDisorder Sensory Therapy Following table 1, which contains data on the collection of medical records for children with ADHD in Indonesia, the following can be explained: This table presents important information about various hospitals and therapy centers in Indonesia that treat children with ADHD, as well as the types of speech disorders they experience. Data obtained from these locations provides a more complete picture of the conditions of children with ADHD, including the language disorders they experience and the types of therapy provided to support their development. Using this data, this study can analyze the extent to which AI-based therapies and other technologies can be applied to detect and treat speech disorders in children with ADHD. The data also demon- strates the variability in ADHD treatment and provides context for the technology-based solutions proposed in this study. Table 1 provides a strong foundation for further analysis of the effectiveness of technology in the The technopreneurship approach in this research focuses on the development and implementation of AI-based applications that can help children with ADHD overcome their speech disorders. This approach involves collaboration between technologists, app developers, and healthcare professionals to create affordable and accessible solutions for families. Companies or startups in the education and healthcare technology sectors will be encouraged to develop AI-based applications that can be used by parents and children at home. These applications will be designed to provide personalized speech exercises and track the child’s progress through analysis of data generated during therapy sessions. The business model implemented in this research is a subscription model, where users can access the application via mobile devices or computers. Furthermore, collaboration with educational institutions and speech therapy clinics will be part of this product’s development strategy to ensure the solution is widely used and provides tangible benefits for children with ADHD.",
+        "results": "4.1.Implementation of AI Technology in the Diagnosis of Speech Disorders The results of using AI technology to diagnose speech disorders in children with ADHD show that AI-based algorithms, particularly those using speech processing and natural language processing (NLP), have enormous potential in detecting speech disorders early. Analysis of voice recording data from children with ADHD, which included measurements of speech rate, pronunciation errors, and sentence patterns, showed that AI can detect significant differences between children with ADHD and children in general. For example, the 94 ❒ E-ISSN: 3064-3597 P-ISSN: 3046-7616 results of data analysis conducted on 200 children’s voice recordings showed that 85% of children with ADHD had a tendency to speak faster with inaccuracies in word use and sentence structure, which are indications of a speech disorder that needs attention. The overall writing should be revised to improve sentence structure and consistency. Replacing the use of passive voice with active voice will improve readability. For example, the sentence could be rephrased as: ”AI enables faster and more accurate diagnoses than traditional methods”. Additionally, headings could be adjusted for consistency, such as standardizing the capitalization of section titles. AI-based diagnostic tools can perform real-time monitoring and provide reports that can be analyzed immediately to determine whether a child needs further intervention. Thus, AI technology not only improves diagnostic efficiency but also ensures earlier intervention, which is crucial for a child’s development. 4.2.Language Development of Children with ADHD through an AI Approach In terms of therapy, AI-based applications used to support the language development of children with ADHD have also shown positive results. Results from the speech therapy application developed in this study showed that children participating in the AI-based program experienced significant improvements in their speaking skills. Children who used the application consistently for six months showed a 30-40% improvement in speaking skills and understanding verbal instructions. The feedback provided by the AI-based application, which is tailored to the individual child’s abilities, allows them to practice language skills in a fun and interac- Furthermore, data shows that children with ADHD who participate in AI-based therapy are more mo- tivated to participate in exercises, as the app incorporates game elements that can make therapy more engaging and less boring. Using the app also provides parents with an easier way to monitor their child’s progress, as it records each child’s progress and provides detailed reports on areas for improvement. Figure 1. AI Therapy App Interface for Children with ADHD Figure 1 To improve clarity, the paper should add a brief explanation of the conceptual model’s key components in the text to help readers understand its relevance and application. A description of the AI ther- apy app’s interactive exercises and game elements would provide more clarity. Furthermore, the sections on challenges in AI implementation could be further elaborated to provide a deeper insight into obstacles such as the diversity in ADHD severity, the need for human oversight, and the high cost of technology. The app aims to make speech therapy more enjoyable and increase children’s engagement in the language learning process. 4.3.Challenges and Obstacles in Implementation However, despite the very positive results achieved, several challenges and barriers remain in the im- plementation of AI technology for the diagnosis and treatment of speech disorders in children with ADHD. One major challenge is the diversity in ADHD severity among children, which can impact the effectiveness of AI-based therapy. Some children with ADHD may have more complex needs that cannot be fully addressed by technology-based apps or systems. Therefore, while AI technology can be a very useful tool, human interven- tion is still needed to ensure a more personalized and holistic therapy. Furthermore, the implementation of AI technology still faces barriers in terms of accessibility and cost. While AI-based applications can reduce the cost of traditional therapy, not all families can afford this technology, especially in areas with limited digital Journal of Computer Science and Technology Application (CORISINTA) ❒ 95 infrastructure. This points to the importance of developing subscription-based business models or government subsidies to expand access to AI-based therapy solutions. Furthermore, to ensure the sustainability of broader implementation, continuous development of the quality and capabilities of AI is needed to reach more children with ADHD, both in urban and rural areas. Figure 2. Trends in the Use of AI Technology in the Treatment of Speech Disorders As an illustration, the graph showing the trend of AI technology use in the treatment of speech dis- orders figure 2 provides an overview of how this technology is increasingly being applied in the health and education sectors, although challenges remain. This figure illustrates the increasing trend of AI technology use in the treatment of speech disorders, indicating its growing adoption in the healthcare and education sectors. It reflects how AI technology is becoming an effective tool in detecting and treating speech disorders in children, 4.4.The Role of Technopreneurship in Improving Accessibility The application of technology-based entrepreneurship, or technopreneurship, in healthcare and ed- ucation has proven to play a crucial role in expanding access to AI-based solutions. Companies engaged in technopreneurship, such as startups developing AI-based therapy apps, play a crucial role in making therapy more affordable and accessible to families in need. These startups can also collaborate with educational insti- tutions and hospitals to provide more inclusive solutions tailored to the specific needs of children with ADHD. Successful examples of AI-based applications in Indonesia, such as the Speech Therapy App, demon- strate that with the right approach, technology-based solutions can be accessible to more children in need, including those living in areas with limited access to traditional therapies. With the growth of the techno- preneurship industry, it is hoped that more innovative solutions will emerge that can benefit children with Overall, the results of this study indicate that AI technology has significant potential to improve the diagnosis and treatment of speech disorders in children with ADHD. With appropriate implementation, this technology can accelerate early detection, provide more personalized therapy, and help parents monitor their child’s progress. However, to ensur",
+        "discussion": "This research demonstrates that AI-based technology has significant potential to improve the diagnosis and treatment of speech disorders in children with ADHD. By using AI to analyze voice recordings and speech patterns, diagnoses can be made more quickly and accurately, enabling early intervention, which is crucial for child development. Furthermore, AI-based applications used for speech therapy have also been shown to be effective in helping children with ADHD develop their language skills by increasing their motivation and However, despite the positive results, the study also identified several challenges in implementing AI technology, including gaps in accessibility and limitations in AI’s ability to address the more complex needs of children with ADHD. Therefore, while AI can be a useful tool, human intervention is still needed to ensure a more personalized and holistic approach to therapy. The application of technology entrepreneurship, or technopreneurship, plays a crucial role in expand- ing access to these AI-based solutions, enabling more children with ADHD, especially those in areas with limited infrastructure, to benefit from technology-based therapies. By continuing to develop these solutions and addressing existing barriers, AI has the potential to become a highly beneficial tool in supporting the language development of children with ADHD in the future. Journal of Computer Science and Technology Application (CORISINTA) ❒ 97 Uki Hares Yulianti (UH) https://orcid.org/0009-0003-0498-6022 Ida Zulaeha (IZ) https://orcid.org/0000-0001-7694-2895 Subyantoro (SY) https://orcid.org/0000-0002-4365-5993 Yusro Edy Nugroho (YE) https://orcid.org/0000-0002-3437-0574 Kgomotso Moyo (KM) https://orcid.org/0009-0005-5779-562X Conceptualization: UH; Methodology: IZ; Software: SY; Validation: YE and KM; Formal Analysis: UH and IZ; Investigation: YE; Resources: SY; Data Curation: KM; Writing Original Draft Preparation: UH and YE; Writing Review and Editing: IZ and SY; Visualization: SR; All authors, KM, UH, and IZ have read and agreed to the published version of the manuscript. The data presented in this study are available on request from the corresponding author. The authors received no financial support for the research, authorship, and/or publication of this arti- 7.5.Declaration of Conflicting Interest The authors declare that they have no conflicts of interest, known competing financial interests, or personal relationships that could have influenced the work reported in this paper.",
+        "limitations": "",
+        "figures": [],
+        "key_idea": "4.1.Implementation of AI Technology in the Diagnosis of Speech Disorders The results of using AI technology to diagnose speech disorders in children with ADHD show that AI-based algorithms, particularly those using speech processing and natural language processing (NLP), have eno",
+        "extraction_date": "2026-11-07",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "pdf_text_extraction": "pypdf; section boundary heuristics; check source"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "full_text",
+        "last_at": "2026-11-07",
+        "next_at": "2027-11-07",
+        "attempts": 1
       }
     },
     {
@@ -835,18 +975,38 @@
       "source_type": "policy",
       "source_type_basis": "provisional_feed_default",
       "publication_date_provenance": {
-        "basis": "publisher_rss_pubDate",
-        "raw": "Tue, 27 Oct 2026 21:20:30 +0000",
+        "status": "day_known",
+        "basis": "publisher_meta_published_time",
+        "field": "article:published_time",
+        "value": "2026-10-27",
         "date": "2026-10-27",
         "timezone": "UTC",
-        "source_url": "https://www.eff.org/rss/updates.xml",
-        "independently_verified": false
+        "source_url": "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better",
+        "evidence": [
+          {
+            "field": "publisher_rss_pubDate",
+            "date": "2026-10-27",
+            "basis": "publisher_rss_pubDate",
+            "source_url": "https://www.eff.org/rss/updates.xml",
+            "precision": "day"
+          },
+          {
+            "field": "article:published_time",
+            "date": "2026-10-27",
+            "basis": "publisher_meta_published_time",
+            "source_url": "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better",
+            "precision": "day"
+          }
+        ],
+        "independently_verified": true,
+        "checked_at": "2026-11-07T02:19:18.907900+00:00"
       },
       "discovery_provenance": {
         "method": "publisher_feed",
         "feed_id": "eff",
         "feed_url": "https://www.eff.org/rss/updates.xml",
-        "checked_at": "2026-11-07"
+        "checked_at": "2026-11-07",
+        "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
       },
       "curated": false,
       "first_seen": "2026-11-07",
@@ -860,7 +1020,17 @@
         "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."
       },
       "content_access": "feed_description",
-      "source_checked": "2026-11-07"
+      "source_checked": "2026-11-07",
+      "editorial_metadata": {
+        "version": 1,
+        "checked_at": "2026-11-07T02:19:18.907900+00:00",
+        "source_url": "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better",
+        "status": "verified",
+        "identity": "verified",
+        "date_status": "verified",
+        "source_type_status": "unresolved",
+        "source_text_saved": false
+      }
     },
     {
       "title": "Integrating AI and Big Data to Enhance Performance andSustainability in Hospitality",
@@ -925,19 +1095,52 @@
       "historical_backfill": false,
       "source_group": "AI-specific",
       "reading": {
-        "level": "abstract",
-        "provenance": "Crossref publisher-supplied abstract",
-        "overview": "This paper explores the impact of Big Data and Artificial Intelligence (AI) on Employee Performance and Sustainability in the hospitality industry. The study findings align with SDG 8 (Decent Work and Economic Growth) and SDG 12 (Responsible Consumption and Production), highlighting the potential of technology to drive both economic and environmental sustainability in the…",
-        "methods": "",
-        "findings": "",
-        "interpretation": "",
+        "level": "full_text",
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "overview": "This paper explores the impact of Big Data and Artificial Intelligence (AI) on Employee Performance and Sustainability in the hospitality industry. The paper further explains how integrating Big Data and AI can optimize operations, enhance employee efficiency, and promote sustainable practices.",
+        "methods": "In this study, SmartPLS (Partial Least Squares Structural Equation Modeling) will be used as the primary tool to analyze the relationships between Big Data, Artificial Intelligence (AI), employee performance, and sustainability in the hospitality industry [30]. SmartPLS is particularly suitable for complex models with multiple constructs, as it allows for both formative and reflective indicators [31] and is capable of handling small sample sizes, which is ideal for the exploratory nature of this research [32]. This research adopts a quantitative approach, utilizing structural equation modeling (SEM) to examine the direct and indirect effects of Big Data and AI on employee performance and sustainability in the hospitality industry [33]. The study will collect data through surveys distributed to hospitality businesses, including hotels and resorts, which have implemented Big Data and AI technologies in their operations [34]. The model will explore how Big Data and AI influence employee performance and sustainability, with the assumption that both technologies have a direct impact on improving operational efficiency, employee satisfaction, and overall sustainability practices The survey will target key stakeholders within hospitality businesses, such as managers, employees, and IT specialists, who are involved in the implementation of Big Data and AI technologies [35]. The re- spondents will be asked to provide insights into their experiences and perceptions regarding the use of",
+        "findings": "The results of this study, analyzed using SmartPLS, provide valuable insights into the relationships between Big Data, Artificial Intelligence (AI), Employee Performance (EP), and Sustainability (S) in the hos- pitality industry. The path analysis reveals the strength and significance of the connections between these constructs, with Big Data and AI both having significant positive impacts on Employee Performance. Addi- tionally, Employee Performance is found to play a key mediating role in enhancing Sustainability within the industry. The following sections present detailed results from the SmartPLS analysis, including path coeffi- cients, significance levels, and model fit indices, which are depicted in the figures below. These results shed light on the effectiveness of Big Data and AI in optimizing employee performance and supporting sustainability efforts in hospitality operations. Figure 2 illustrates the PLS-SEM results, highlighting both direct and indirect Figure 2. PLS-SEM: Effects of Big Data, AI, Performance Sustainability. The analysis results shown in figure 2 reveal the relationships between Big Data, Artificial Intelligence (AI), Employee Performance (EP), and Sustainability (S). The path coefficients indicate that Big Data has a strong impact on Employee Performance (0.543), and AI contributes moderately to Employee Performance (0.356). In terms of Employee Performance, all four indicators (EP1, EP2, EP3, EP4) are highly signifi- cant, with coefficients ranging from 0.577 to 0.856, indicating that employee productivity and task efficiency are strongly influenced by Big Data and AI. Moreover, Employee Performance has a strong positive effect on Sustainability (0.846), demonstrating that improvements in employee performance directly contribute to sustainability efforts. In practical terms, these indicators (EP1–EP4) directly mirror daily practices in hospi- tality operations. EP1 (Productivity) can be reflected in the number of guest rooms prepared by housekeeping staff per shift while maintaining cleanliness standards. EP2 (Task Efficiency) is evident in front-desk staff managing check-in/check-out processes more effectively with AI-assisted booking systems. EP3 (Employee Satisfaction) is observed when predictive scheduling reduces workload imbalance, leading to lower turnover and higher engagement. Finally, EP4 (Customer Service Quality) is seen in guest ratings that highlight staff responsiveness, friendliness, and problem-solving skills. These practical illustrations ground the indicators in real-world hospitality contexts, ensuring that the measurement reflects not only theoretical constructs but also tangible employee practices. The indicators for Sustainability (S1, S2, S3) are also strongly significant, with coefficients ranging from 0.862 to 0.873, further highlighting the role of performance in driving environmental and operational sustainability. These findings emphasize the interconnected nature of technology, performanc",
+        "interpretation": "In conclusion, this study emphasizes the significant role of Big Data and Artificial Intelligence (AI) in enhancing employee performance and promoting sustainability in the hospitality industry. By utilizing advanced analytics and AI-driven systems, hospitality businesses are able to optimize their operations, partic- ularly in areas such as staffing, resource allocation, and customer service delivery. The findings highlight that Big Data has a stronger influence on employee performance compared to AI, primarily due to its predictive capabilities in identifying demand patterns and operational inefficiencies. At the same time, AI contributes meaningfully through automation, decision support, and monitoring functions, which further improve produc- Moreover, the results underscore the mediating role of employee performance in connecting Big Data and AI with sustainability outcomes. When employees perform more effectively, this translates into better sustainability practices, including energy management, waste reduction, and resource optimization. These results illustrate that the adoption of digital technologies is not only about operational efficiency but also about creating a supportive environment for employees, which in turn strengthens an organization’s ability to achieve its sustainability goals. This highlights the need for hospitality managers to balance technological investment with strategies that prioritize workforce well-being. Finally, this research contributes to both theoretical and practical domains by demonstrating how technology integration supports the broader objectives of the United Nations Sustainable Development Goals, particularly SDG 8 (Decent Work and Economic Growth) and SDG 12 (Responsible Consumption and Produc- tion). The study provides eviden",
         "limitations": "",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
-        "reported_findings": false
+        "reported_findings": true
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "analysis": {
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "license": "cc-by",
+        "fulltext_url": "https://doi.org/10.33050/corisinta.v2i2.118",
+        "license_url": "https://doi.org/10.33050/corisinta.v2i2.118",
+        "methods": "In this study, SmartPLS (Partial Least Squares Structural Equation Modeling) will be used as the primary tool to analyze the relationships between Big Data, Artificial Intelligence (AI), employee performance, and sustainability in the hospitality industry [30]. SmartPLS is particularly suitable for complex models with multiple constructs, as it allows for both formative and reflective indicators [31] and is capable of handling small sample sizes, which is ideal for the exploratory nature of this research [32]. This research adopts a quantitative approach, utilizing structural equation modeling (SEM) to examine the direct and indirect effects of Big Data and AI on employee performance and sustainability in the hospitality industry [33]. The study will collect data through surveys distributed to hospitality businesses, including hotels and resorts, which have implemented Big Data and AI technologies in their operations [34]. The model will explore how Big Data and AI influence employee performance and sustainability, with the assumption that both technologies have a direct impact on improving operational efficiency, employee satisfaction, and overall sustainability practices The survey will target key stakeholders within hospitality businesses, such as managers, employees, and IT specialists, who are involved in the implementation of Big Data and AI technologies [35]. The re- spondents will be asked to provide insights into their experiences and perceptions regarding the use of these technologies to improve employee performance and support sustainability efforts [36]. The survey will employ a Likert scale, ranging from 1 (strongly disagree) to 5 (strongly agree), to measure responses related to the The collected data will be analyzed using SmartPLS [37, 38], focusing on the following key areas: 1.Measurement Model: Confirming the reliability and validity of the constructs through indicator reliabil- ity, internal consistency, convergent validity, and discriminant validity. 2.Structural Model: Testing the relationships between the latent variables using path coefficients, t-values, 3.Bootstrapping: To assess the significance of the path coefficients, SmartPLS will perform bootstrapping with 5,000 resamples to obtain the standard errors and t-values. The analysis will help test the hypotheses and examine the overall goodness-of-fit of the model. Based on the literature and the objectives of this study, four key latent variables (constructs) are iden- tified for analysis. Big Data (BD) reflects the use of big data technologies in decision-making, operational management, and predictive analytics within the hospitality sector, with indicators such as data collection practices, data processing capabilities, and data analysis technologies [39]. Artificial Intelligence (AI) refers to the application of AI technologies in automating tasks, improving decision-making, and enhancing em- ployee performance, focusing on AI applications in customer service, employee monitoring, task automation, and decision support systems [40]. Employee Performance (EP) represents the overall performance of em- ployees, measured by productivity, task efficiency, employee satisfaction, and customer service quality [41]. Finally, Sustainability (S) refers to environmental and operational sustainability efforts in the hospitality indus- try, including resource optimization and waste reduction, with indicators like energy consumption management, waste management, and resource optimization practices [42]. Based on the identified variables, the following hypotheses are proposed to examine the direct and indirect relationships between Big Data, Artificial Intelligence, Employee Performance, and Sustainability: 1.H1: Big Data (BD) has a positive impact on Employee Performance (EP). 2.H2: Artificial Intelligence (AI) has a positive impact on Employee Performance (EP) [43]. 3.H3: Big Data (BD) has a positive impact on Sustainability (S). 4.H4: Artificial Intelligence (AI) has a positive impact on Sustainability (S) [44]. 5.H5: Employee Performance (EP) has a positive impact on Sustainability (S). Journal of Computer Science and Technology Application (CORISINTA) ❒ 39 6.H6: The relationship between Big Data (BD) and Sustainability (S) is mediated by Employee Perfor- 7.H7: The relationship between Artificial Intelligence (AI) and Sustainability (S) is mediated by Employee In addition, this study acknowledges potential ethical and privacy risks in applying Big Data and AI. Pro- tecting guest information and avoiding excessive employee surveillance require strict governance measures, anonymization practices, and compliance with international data protection standards [45]. The structural model will test both direct and indirect relationships, with Employee Performance (EP) acting as a mediator between Big Data (BD), Artificial Intelligence (AI), and Sustainability (S) outcomes, significantly influencing resource management and sustainable practices in the hospitality industry [46]. The model hypothesizes that Big Data and AI enhance employee performance, which in turn positively influences sustainability efforts. This mediation suggests that improvements in employee performance driven by Big Data and AI lead to better resource management, waste reduction, and overall sustainable practices within the This methodology, using SmartPLS and the proposed model, will provide comprehensive insights into how Big Data and AI technologies influence the hospitality industry’s employee performance and sustainability practices, contributing to more efficient operations and environmentally sustainable practices. figure 1 presents the hypothesis framework of this study. The model in figure 1 illustrates the relationships between the key constructs of the study: Big Data, Artificial Intelligence (AI), Employee Performance (EP), and Sustainability (S). Big Data is represented by three indicators (BD1, BD2, BD3), which are linked to Employee Performance (EP) through four indicators (EP1, EP2, EP3, EP4), highlighting how data-driven insights influence employee productivity and efficiency. Similarly, Artificial Intelligence (AI), with its three indicators (AI1, AI2, AI3), is shown to impact Employee Performance by enhancing automation, decision support, and monitoring systems. Employee Performance, in turn, directly influences Sustainability (S), which is represented by three indicators (S1, S2, S3) that reflect sustainability practices such as resource optimization and waste management. This model highlights the in- terconnections between technology-driven performance improvements and their contribution to sustainability As illustrated in figure 1, each indicator was operationalized based on prior studies. For Big Data (BD), the indicato",
+        "results": "The results of this study, analyzed using SmartPLS, provide valuable insights into the relationships between Big Data, Artificial Intelligence (AI), Employee Performance (EP), and Sustainability (S) in the hos- pitality industry. The path analysis reveals the strength and significance of the connections between these constructs, with Big Data and AI both having significant positive impacts on Employee Performance. Addi- tionally, Employee Performance is found to play a key mediating role in enhancing Sustainability within the industry. The following sections present detailed results from the SmartPLS analysis, including path coeffi- cients, significance levels, and model fit indices, which are depicted in the figures below. These results shed light on the effectiveness of Big Data and AI in optimizing employee performance and supporting sustainability efforts in hospitality operations. Figure 2 illustrates the PLS-SEM results, highlighting both direct and indirect Figure 2. PLS-SEM: Effects of Big Data, AI, Performance Sustainability. The analysis results shown in figure 2 reveal the relationships between Big Data, Artificial Intelligence (AI), Employee Performance (EP), and Sustainability (S). The path coefficients indicate that Big Data has a strong impact on Employee Performance (0.543), and AI contributes moderately to Employee Performance (0.356). In terms of Employee Performance, all four indicators (EP1, EP2, EP3, EP4) are highly signifi- cant, with coefficients ranging from 0.577 to 0.856, indicating that employee productivity and task efficiency are strongly influenced by Big Data and AI. Moreover, Employee Performance has a strong positive effect on Sustainability (0.846), demonstrating that improvements in employee performance directly contribute to sustainability efforts. In practical terms, these indicators (EP1–EP4) directly mirror daily practices in hospi- tality operations. EP1 (Productivity) can be reflected in the number of guest rooms prepared by housekeeping staff per shift while maintaining cleanliness standards. EP2 (Task Efficiency) is evident in front-desk staff managing check-in/check-out processes more effectively with AI-assisted booking systems. EP3 (Employee Satisfaction) is observed when predictive scheduling reduces workload imbalance, leading to lower turnover and higher engagement. Finally, EP4 (Customer Service Quality) is seen in guest ratings that highlight staff responsiveness, friendliness, and problem-solving skills. These practical illustrations ground the indicators in real-world hospitality contexts, ensuring that the measurement reflects not only theoretical constructs but also tangible employee practices. The indicators for Sustainability (S1, S2, S3) are also strongly significant, with coefficients ranging from 0.862 to 0.873, further highlighting the role of performance in driving environmental and operational sustainability. These findings emphasize the interconnected nature of technology, performance, and sustainability in the hospitality industry. While Big Data and AI offer clear benefits, they also pose ethical challenges related to transparency, consent, and data privacy. Hospitality managers should ensure responsible use of data to balance innovation with fairness and trust. Overall, these findings highlight that Big Data and AI are not merely supportive tools but strategic enablers that redefine how hospitality businesses operate. Their influence extends from improving workforce Journal of Computer Science and Technology Application (CORISINTA) ❒ 41 productivity to fostering sustainable practices that align with global standards. However, to maximize these benefits, managers must adopt a balanced approach that combines technological innovation with ethical con- siderations, ensuring that efficiency gains do not compromise employee well-being or customer trust. Figure 3 displays the path coefficients highlighting the strength of relationships among AI, Big Data, Figure 3. Path Coefficients of Big Data, AI, and Employee Performance Figure 3 presents the path coefficients for the relationships between Artificial Intelligence (AI), Big Data, and Employee Performance (EP). The results show that Big Data has the strongest path coefficient (0.543), indicating its significant influence on Employee Performance. In comparison, Artificial Intelligence (AI) has a moderate path coefficient of 0.356, suggesting a more modest but still notable impact on Employee Performance. The analysis highlights the critical role of both Big Data and AI in improving employee perfor- mance in the hospitality sector, with Big Data demonstrating a more substantial effect. Table 1 presents the reliability and validity results for each construct in the model. Table 1. Construct Reliability and Validity Cronbach’s A Composite Average Variance Alpha Rho Reliability Extracted (AVE) Intelligence 0.850 0.851 0.909 0.769 Performance 0.783 0.824 0.800 0.610 Sustainability 0.818 0.844 0.890 0.730 As shown in Table 1, all constructs meet the recommended thresholds for reliability and validity. Cronbach’s Alpha and Composite Reliability values exceed 0.70, indicating good internal consistency, while Average Variance Extracted (AVE) values are above 0.50, confirming adequate convergent validity. Artificial Intelligence (AI) shows the strongest reliability with a Cronbach’s Alpha of 0.850, CR of 0.909, and an AVE of 0.769, suggesting excellent consistency. Big Data also demonstrates solid reliability (α = 0.805; AVE = 0.720), while Employee Performance has acceptable results though its AVE of 0.610 indicates room for improvement. Sustainability shows strong reliability (α = 0.818; CR = 0.890), confirming robustness in the These results confirm that the measurement model is both reliable and valid, thereby providing a solid foundation for testing the structural model in the subsequent analysis. In other words, the constructs used in this study are measured accurately and consistently, ensuring that the interpretation of the relationships among 42 ❒ E-ISSN:3064-3597 P-ISSN: 3046-7616 variables can be trusted. After establishing measurement reliability and validity, the next step is to evaluate the explanatory power of the model using R-squared and Adjusted R-squared values. This step allows us to understand how well the independent variables account for the variance in the dependent variables. Table 2 presents the R-squared and Adjusted R-squared values that indicate the explanatory power of the research model for Employee Performance and Sustainability. These values reflect the extent to which the independent variables collectively explain the variance in the dependent constructs, thereby demonstrating the predictive accuracy and robustness of the model. Table 2. R",
+        "discussion": "In conclusion, this study emphasizes the significant role of Big Data and Artificial Intelligence (AI) in enhancing employee performance and promoting sustainability in the hospitality industry. By utilizing advanced analytics and AI-driven systems, hospitality businesses are able to optimize their operations, partic- ularly in areas such as staffing, resource allocation, and customer service delivery. The findings highlight that Big Data has a stronger influence on employee performance compared to AI, primarily due to its predictive capabilities in identifying demand patterns and operational inefficiencies. At the same time, AI contributes meaningfully through automation, decision support, and monitoring functions, which further improve produc- Moreover, the results underscore the mediating role of employee performance in connecting Big Data and AI with sustainability outcomes. When employees perform more effectively, this translates into better sustainability practices, including energy management, waste reduction, and resource optimization. These results illustrate that the adoption of digital technologies is not only about operational efficiency but also about creating a supportive environment for employees, which in turn strengthens an organization’s ability to achieve its sustainability goals. This highlights the need for hospitality managers to balance technological investment with strategies that prioritize workforce well-being. Finally, this research contributes to both theoretical and practical domains by demonstrating how technology integration supports the broader objectives of the United Nations Sustainable Development Goals, particularly SDG 8 (Decent Work and Economic Growth) and SDG 12 (Responsible Consumption and Produc- tion). The study provides evidence that the use of Big Data and AI can simultaneously foster business growth, employee development, and environmental responsibility. These insights are valuable for both practitioners and policy-makers, offering a pathway for hospitality businesses to leverage digital transformation as a long-term strategy for competitiveness and sustainability. Syaifuddin (SS) https://orcid.org/0000-0002-6977-5256 Rusiadi (RR) https://orcid.org/0009-0006-6662-8505 John Edwards (JE) https://orcid.org/0000-0003-4026-3959 Conceptualization: HA; Methodology: SS; Software: RR; Validation: JE and HA; Formal Analysis: RR and SS ; Investigation: HA; Resources: SS; Data Curation: RR; Writing Original Draft Preparation: JE and SS; Writing Review and Editing: HA and RR; Visualization: HA; All authors, HA, SS, RR and JE have read and agreed to the published version of the manuscript. The data presented in this study are available on request from the corresponding author. The authors received no financial support for the research, authorship, and/or publication of this arti- 7.5.Declaration of Conflicting Interest The authors declare that they have no conflicts of interest, known competing financial interests, or personal relationships that could have influenced the work reported in this paper. 44 ❒ E-ISSN:3064-3597 P-ISSN: 3046-7616",
+        "limitations": "",
+        "figures": [],
+        "key_idea": "The results of this study, analyzed using SmartPLS, provide valuable insights into the relationships between Big Data, Artificial Intelligence (AI), Employee Performance (EP), and Sustainability (S) in the hos- pitality industry. The path analysis reveals the strength and signifi",
+        "extraction_date": "2026-11-07",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "pdf_text_extraction": "pypdf; section boundary heuristics; check source"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "full_text",
+        "last_at": "2026-11-07",
+        "next_at": "2027-11-07",
+        "attempts": 1
       }
     },
     {
@@ -1004,19 +1207,52 @@
       "historical_backfill": false,
       "source_group": "AI-specific",
       "reading": {
-        "level": "abstract",
-        "provenance": "Crossref publisher-supplied abstract",
-        "overview": "This study examines the influence of AI integration on creative writing skills, edupreneurship, and competency development using a quantitative research design.",
-        "methods": "This study examines the influence of AI integration on creative writing skills, edupreneurship, and competency development using a quantitative research design. Data were collected through structured questionnaires distributed to university students and analyzed with Partial Least Squares Structural Equation Modeling (PLS-SEM) via SmartPLS 4.",
-        "findings": "The analysis revealed high reliability and convergent validity of the measurement model, with structural results confirming significant positive relationships between AI integration and creative writing skills, and between creative writing skills and 21st-century competencies.",
-        "interpretation": "",
+        "level": "full_text",
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "overview": "The advancement of Artificial Intelligence (AI) has reshaped journalism and education, creating opportunities to strengthen creative writing and entrepreneurial skills. AI-driven journalism platforms, such as automated content generation and real-time feedback, empower students to become both skilled writers and edupreneurs, while developing 21st-century competencies including creativity, critical…",
+        "methods": "This research adopts a quantitative research design to explore the impact of AI-driven journalism plat- forms on creative writing and edupreneurship empowerment [35]. The study aims to analyze the relationships between various constructs such as AI integration, creative writing skills, edupreneurship, and 21st-century competencies among students [36]. The primary tool used for statistical analysis is SmartPLS 4, a Partial Least Squares Structural Equation Modeling (PLS-SEM) software, which is particularly suitable for exploring complex models with multiple variables and interactions [37]. The choice of SmartPLS 4 is driven by its ability to handle both reflective and formative measurement models, allowing for comprehensive analysis of the direct and indirect effects between constructs [38]. Given the relatively new and complex nature of the research topic, SmartPLS 4 offers a robust platform to assess the validity and reliability of the proposed model while managing data from multiple sources [39]. The software also facilitates the examination of path coefficients, R-squared values, and model fit indices, which are essential for understanding the strength and significance of the relationships between the variables [40]. This research adopts a quantitative research design with a descriptive correlational approach. The primary goal is to investigate the relationships between AI integration in journalism platforms, creative writing skills, edupreneurship, and 21st-century compet",
+        "findings": "The analysis of data collected from respondents provides important insights into the relationships between AI Integration in Journalism Platforms, Creative Writing Skills, Edupreneurship, and 21st-Century Competencies [46]. Consistent with the literature review, the findings suggest that the incorporation of AI tools ranging from content generators to realtime feedback systems has a notable influence on students’ ability to produce creative, structured, and engaging written work [47]. This improvement in creative writing skills appears to be a catalyst for fostering an entrepreneurial mindset, enabling students to identify market opportuni- ties for their content and apply digital marketing strategies effectively. Moreover, the results indicate that both enhanced writing skills and entrepreneurial capabilities contribute meaningfully to the development of critical 21st-century competencies, such as digital literacy, collaboration, and creative problem solving, reinforcing the theoretical framework established in the earlier sections of this study [48]. The results presented in figure 2 illustrate the structural model analysis using SmartPLS, showing the path coefficients, indicator loadings, and R-squared values for each construct [49]. The R-squared values in- dicate that AI Integration in Journalism Platforms explains 59.3% of the variance in Creative Writing Skills, 62.5% in Edupreneurship, and 95.4% in 21st-Century Competencies, highlighting the strong predictive capa- bility of the model. All indicator loadings exceed 0.70, suggesting high convergent validity, with the highest loadings observed for AI3 (0.846) and EP3 (0.852), reflecting strong representation of these indicators in their respective constructs. The path coefficient from AI Integration to Creative Writing Skills (0.770) and from Creative Writing Skills to 21st-Century Competencies (0.806) show substantial positive relationships, while the direct path from Edupreneurship to 21st-Century Competencies (-0.024) appears negligible. These findings emphasize that AI-driven journalism tools play a significant role in enhancing creative writing, which in turn strongly contributes to the development of essential competencies for the 21st century. The analysis also reveals that the relationship between AI Integration in Journalism Platforms and Edupreneurship is positive (path coefficient of 0.522), indicating that AI-driven tools significantly support stu- dents in transforming their creative writing skills into entrepreneurial opportunities. This result underscores the value of AI in bridging creative expression with practical business applications, enabling students to develop a digital entrepreneurial mindset. AI tools not only enhance writing proficiency but also empower students to market their content and scale their ideas into sustainable ventures. Furthermore, the structural model analysis shows that Creative Writing Skills serve as a critical mediator in the relationship betwee",
+        "interpretation": "The results confirm that AI integration into journalism platforms significantly enhances creative writ- ing skills and fosters entrepreneurial capacities among students. These improvements are foundational to the development of essential 21st-century competencies, including critical thinking, digital literacy, and collabora- tive skills. The study highlights the importance of aligning AI technologies with educational goals to ensure that students are not only proficient in writing but also equipped to thrive in the digital economy. Furthermore, the integration of AI facilitates the development of new educational products and innovative business mod- els, contributing to the growth of edupreneurship. Educational institutions must embrace AI tools to create a Journal of Computer Science and Technology Application (CORISINTA) ❒ 19 more interactive, personalized, and scalable learning environment that aligns with global goals such as quality education, economic growth, and innovation. The analysis further reveals that creative writing proficiency positively contributes to edupreneurship by enabling students to view their work as marketable content and apply entrepreneurial strategies, including digital marketing. While AI integration also directly influences edupreneurship, the pathway through enhanced creative writing proves to be a stronger driver for fostering entrepreneurial capabilities. Additionally, the devel- opment of 21st-century competencies comprising critical thinking, digital literacy, collaboration, and creative problem-solving is found to be more effectively achieved when both AI-driven learning and writing skills are strategically aligned within educational frameworks. From a practical perspective, the study offers valuable implications for educators, polic",
         "limitations": "",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
         "reported_findings": true
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "analysis": {
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "license": "cc-by",
+        "fulltext_url": "https://doi.org/10.33050/corisinta.v2i2.112",
+        "license_url": "https://doi.org/10.33050/corisinta.v2i2.112",
+        "methods": "This research adopts a quantitative research design to explore the impact of AI-driven journalism plat- forms on creative writing and edupreneurship empowerment [35]. The study aims to analyze the relationships between various constructs such as AI integration, creative writing skills, edupreneurship, and 21st-century competencies among students [36]. The primary tool used for statistical analysis is SmartPLS 4, a Partial Least Squares Structural Equation Modeling (PLS-SEM) software, which is particularly suitable for exploring complex models with multiple variables and interactions [37]. The choice of SmartPLS 4 is driven by its ability to handle both reflective and formative measurement models, allowing for comprehensive analysis of the direct and indirect effects between constructs [38]. Given the relatively new and complex nature of the research topic, SmartPLS 4 offers a robust platform to assess the validity and reliability of the proposed model while managing data from multiple sources [39]. The software also facilitates the examination of path coefficients, R-squared values, and model fit indices, which are essential for understanding the strength and significance of the relationships between the variables [40]. This research adopts a quantitative research design with a descriptive correlational approach. The primary goal is to investigate the relationships between AI integration in journalism platforms, creative writing skills, edupreneurship, and 21st-century competencies among students using AI-driven journalism tools. The quantitative approach allows for an objective and measurable examination of the impact of AI tools on writing and entrepreneurial skill development [41]. The target population for this study consists of university students enrolled in journalism and digital media programs who have access to AI-based writing platforms [42]. The study sample will be selected using convenience sampling, where participants are selected based on their availability and willingness to engage in the research [43]. A minimum of 200 students will be targeted to ensure the robustness and reliability of the The data will be analyzed using SmartPLS 4, a Partial Least Squares Structural Equation Modelling (PLS-SEM) tool, to assess the relationships between the study variables [44]. PLS-SEM is particularly suitable for this research because it allows for the modelling of complex relationships between multiple constructs and variables, even with small sample sizes [45]. SmartPLS 4 provides a comprehensive analysis of both the measurement model (to assess the validity and reliability of the indicators) and the structural model (to evaluate the hypotheses and relationships between the latent variables). Journal of Computer Science and Technology Application (CORISINTA) ❒ 15 AI Integration in Journalism Platforms (AI) refers to the use of artificial intelligence tools in journal- ism platforms to support students in creative writing and content creation. It is measured through indicators such as AI tools accessibility, which assesses the availability and ease of use of writing tools like grammar checkers and content generators, personalized learning support that reflects how AI platforms provide tailored feedback and suggestions to enhance writing skills, AI-driven feedback that gauges the real-time assistance in improving writing style and structure, and AI content generation, which helps in drafting articles, constructing sentences, and generating ideas. Creative Writing Skills (CWS) represent students’ ability to create original, engaging content, evaluated through writing fluency, creativity, writing structure and organization, and engage- ment with the audience. Edupreneurship (EP) refers to the capacity to use creative writing and AI skills to develop content-based ventures, with indicators such as business model development, marketability of content, an entrepreneurial mindset focused on scalability and innovation, and digital marketing awareness to promote and distribute content. Lastly, 21st-Century Competencies (21CC) encompass essential skills for modern suc- cess, including critical thinking, digital literacy, collaboration, and creative problem solving, which are key for evaluating content, using digital tools effectively, working collaboratively, and approaching challenges with The following hypotheses will be tested: 1.H1: AI Integration in Journalism Platforms (AI) positively impacts Creative Writing Skills (CWS). 2.H2: Creative Writing Skills (CWS) positively influence Edupreneurship (EP). 3.H3: AI Integration in Journalism Platforms (AI) positively impacts Edupreneurship (EP). 4.H4: AI Integration in Journalism Platforms (AI) positively impacts 21st-Century Competencies (21CC). 5.H5: Creative Writing Skills (CWS) positively impact 21st-Century Competencies (21CC). 6.H6: Edupreneurship (EP) positively influences 21st-Century Competencies (21CC). SmartPLS 4 will be used to calculate the path coefficients for each hypothesis, which will indicate the strength and direction of the relationships between variables. Additionally, R-squared values will be calculated to assess the explanatory power of the model, and bootstrapping will be conducted to evaluate the statistical significance of the path coefficients. The research framework presented in figure 1 outlines the hypothesized relationships between key constructs, including AI Integration in Journalism Platforms, Creative Writing Skills, Edupreneurship, and 21st-Century Competencies. AI Integration, represented by indicators such as AI tools accessibility (AI1), personalized learning support (AI2), AI-driven feedback (AI3), and content generation (AI4), is hypothesized to positively impact both Creative Writing Skills (CWS) and Edupreneurship (EP). Creative Writing Skills, in- dicated by writing fluency (CWS1), creativity (CWS2), structure (CWS3), and audience engagement (CWS4), 16 ❒ E-ISSN: 3064-3597 P-ISSN: 3046-7616 are expected to influence the development of Edupreneurship and enhance 21st-Century Competencies, includ- ing critical thinking (21CC1), digital literacy (21CC2), collaboration (21CC3), and creative problem-solving (21CC4). The framework highlights the dynamic and interconnected role of AI in fostering creative and en- trepreneurial skills while simultaneously developing essential competencies for success in the modern work-",
+        "results": "The analysis of data collected from respondents provides important insights into the relationships between AI Integration in Journalism Platforms, Creative Writing Skills, Edupreneurship, and 21st-Century Competencies [46]. Consistent with the literature review, the findings suggest that the incorporation of AI tools ranging from content generators to realtime feedback systems has a notable influence on students’ ability to produce creative, structured, and engaging written work [47]. This improvement in creative writing skills appears to be a catalyst for fostering an entrepreneurial mindset, enabling students to identify market opportuni- ties for their content and apply digital marketing strategies effectively. Moreover, the results indicate that both enhanced writing skills and entrepreneurial capabilities contribute meaningfully to the development of critical 21st-century competencies, such as digital literacy, collaboration, and creative problem solving, reinforcing the theoretical framework established in the earlier sections of this study [48]. The results presented in figure 2 illustrate the structural model analysis using SmartPLS, showing the path coefficients, indicator loadings, and R-squared values for each construct [49]. The R-squared values in- dicate that AI Integration in Journalism Platforms explains 59.3% of the variance in Creative Writing Skills, 62.5% in Edupreneurship, and 95.4% in 21st-Century Competencies, highlighting the strong predictive capa- bility of the model. All indicator loadings exceed 0.70, suggesting high convergent validity, with the highest loadings observed for AI3 (0.846) and EP3 (0.852), reflecting strong representation of these indicators in their respective constructs. The path coefficient from AI Integration to Creative Writing Skills (0.770) and from Creative Writing Skills to 21st-Century Competencies (0.806) show substantial positive relationships, while the direct path from Edupreneurship to 21st-Century Competencies (-0.024) appears negligible. These findings emphasize that AI-driven journalism tools play a significant role in enhancing creative writing, which in turn strongly contributes to the development of essential competencies for the 21st century. The analysis also reveals that the relationship between AI Integration in Journalism Platforms and Edupreneurship is positive (path coefficient of 0.522), indicating that AI-driven tools significantly support stu- dents in transforming their creative writing skills into entrepreneurial opportunities. This result underscores the value of AI in bridging creative expression with practical business applications, enabling students to develop a digital entrepreneurial mindset. AI tools not only enhance writing proficiency but also empower students to market their content and scale their ideas into sustainable ventures. Furthermore, the structural model analysis shows that Creative Writing Skills serve as a critical mediator in the relationship between AI Inte- gration and 21st-Century Competencies. The high path coefficient of 0.806 between Creative Writing Skills and 21st-Century Competencies suggests that improving writing skills through AI platforms directly fosters Journal of Computer Science and Technology Application (CORISINTA) ❒ 17 competencies such as critical thinking, digital literacy, and creative problem solving. This finding aligns with the objective of integrating technology into education, demonstrating how AI-enhanced learning can equip students with the skills needed to thrive in the modern, digital-driven world [50]. The path coefficient results presented in figure 3 indicate varying levels of influence among the pro- posed relationships in the research model. The strongest positive effects are observed from AI Integration in Journalism Platforms → Creative Writing Skills and Creative Writing Skills → 21st-Century Competen- cies, demonstrating that the integration of AI tools significantly enhances students’ writing abilities, which in turn strongly contributes to the development of essential competencies for the modern era. Moderate positive effects are found for Creative Writing Skills → Edupreneurship and AI Integration in Journalism Platforms → Edupreneurship, suggesting that both direct skill development and AI adoption can foster entrepreneurial capacity. In contrast, the paths AI Integration in Journalism Platforms → 21st-Century Competencies and Edupreneurship → 21st-Century Competencies show minimal direct influence, indicating that their impact on competencies is likely mediated through improved creative writing skills. These findings align with the theoretical expectation that writing proficiency serves as a key bridge between technological integration, en- trepreneurship, and the acquisition of 21st-century skills. Table 1. Reliability and Validity of Constructs Construct Cronbach’s Reliability Reliability Variance Competencies 0.858 0.860 0.904 0.702 Journalism Platforms 0.830 0.849 0.988 0.622 Edupreneurship 0.801 0.809 0.870 0.626 The measurement model evaluation presented in table 1 demonstrates that all constructs meet the rec- ommended thresholds for reliability and convergent validity. Cronbach’s alpha values range from 0.801 to 0.858, exceeding the minimum criterion of 0.70, indicating strong internal consistency among the indicators of each construct. Similarly, the composite reliability (rho c) values are all above 0.86, confirming the robustness of the measurement scales. The Average Variance Extracted (AVE) for all constructs is also above the 0.50 threshold, with values ranging from 0.626 to 0.702, signifying adequate convergent validity and that the major- ity of variance is explained by the indicators rather than measurement error. These results collectively confirm 18 ❒ E-ISSN: 3064-3597 P-ISSN: 3046-7616 that the measurement model is reliable and valid, providing a solid foundation for subsequent structural model analysis. The findings of this study are closely aligned with several Sustainable Development Goals (SDGs) that emphasize the integration of technology, education, and innovation. Specifically, SDG 4 (Quality Educa- tion) is directly addressed through the use of AI-driven journalism platforms to enhance creative writing and entrepreneurship, equipping students with the essential skills required for modern education. This integration allows students to produce market-ready content, aligning with SDG 8 (Decent Work and Economic Growth) by nurturing entrepreneurial capabilities. Furthermore, the inclusion of AI tools in curricula addresses SDG 9 (Industry, Innovation, and Infrastructure) by enhancing educational infrastructures and promoting innovation through the use of advanced technologies in journalism education. 5.1.I",
+        "discussion": "The results confirm that AI integration into journalism platforms significantly enhances creative writ- ing skills and fosters entrepreneurial capacities among students. These improvements are foundational to the development of essential 21st-century competencies, including critical thinking, digital literacy, and collabora- tive skills. The study highlights the importance of aligning AI technologies with educational goals to ensure that students are not only proficient in writing but also equipped to thrive in the digital economy. Furthermore, the integration of AI facilitates the development of new educational products and innovative business mod- els, contributing to the growth of edupreneurship. Educational institutions must embrace AI tools to create a Journal of Computer Science and Technology Application (CORISINTA) ❒ 19 more interactive, personalized, and scalable learning environment that aligns with global goals such as quality education, economic growth, and innovation. The analysis further reveals that creative writing proficiency positively contributes to edupreneurship by enabling students to view their work as marketable content and apply entrepreneurial strategies, including digital marketing. While AI integration also directly influences edupreneurship, the pathway through enhanced creative writing proves to be a stronger driver for fostering entrepreneurial capabilities. Additionally, the devel- opment of 21st-century competencies comprising critical thinking, digital literacy, collaboration, and creative problem-solving is found to be more effectively achieved when both AI-driven learning and writing skills are strategically aligned within educational frameworks. From a practical perspective, the study offers valuable implications for educators, policymakers, and industry stakeholders seeking to modernize journalism education. Integrating AI into curricula can create a more interactive, personalized, and market-relevant learning environment, while also aligning with global agendas such as the Sustainable Development Goals (SDGs). By embedding AI literacy, creative expression, and entrepreneurship within journalism training, institutions can prepare graduates who are not only adept at navigating the evolving media landscape but also capable of innovating and contributing meaningfully to the digital economy. Future research could explore longitudinal impacts, cross-cultural applications, and expanded AI toolsets to further validate and extend these findings. Hayatun Nufus (HN) https://orcid.org/0000-0003-4360-8537 Subyantoro (SS) http://orcid.org/0000-0002-4365-5993 Hari Bakti Mardikantoro (HB) https://orcid.org/0000-0003-3089-516X Rahayu Pristiwati (RP) https://orcid.org/0000-0001-8399-0238 Henry Zainarthur (HZ) https://orcid.org/0009-0001-7510-9321 Conceptualization: HN; Methodology: SS; Software: HB; Validation: RP and HZ; Formal Analysis: HN and SS ; Investigation: SS; Resources: HB; Data Curation: RP; Writing Original Draft Preparation: HZ and HN; Writing Review and Editing: RP and HZ; Visualization: SS; All authors, HN, SS, HB, RP and HZ have read and agreed to the published version of the manuscript. The data presented in this study are available on request from the corresponding author. The authors received no financial support for the research, authorship, and/or publication of this arti- 7.5.Declaration of Conflicting Interest The authors declare that they have no conflicts of interest, known competing financial interests, or personal relationships that could have influenced the work reported in this paper.",
+        "limitations": "",
+        "figures": [],
+        "key_idea": "The analysis of data collected from respondents provides important insights into the relationships between AI Integration in Journalism Platforms, Creative Writing Skills, Edupreneurship, and 21st-Century Competencies [46]. Consistent with the literature review, the findings sugg",
+        "extraction_date": "2026-11-07",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "pdf_text_extraction": "pypdf; section boundary heuristics; check source"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "full_text",
+        "last_at": "2026-11-07",
+        "next_at": "2027-11-07",
+        "attempts": 1
       }
     },
     {
@@ -1069,6 +1305,40 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-07",
+        "next_at": "2026-12-05",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-07T01:15:43+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-21T01:15:43+00:00"
+      },
+      "open_access_url": "https://arxiv.org/abs/2610.38910",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-07",
+        "next_at": "2026-11-28",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-07",
+        "next_at": "2026-11-09",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_no_entry"
+        ]
       }
     },
     {
@@ -1122,7 +1392,31 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
-      }
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-07",
+        "next_at": "2026-11-28",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-07",
+        "next_at": "2026-11-09",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-07T02:15:38+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-21T02:15:38+00:00"
+      },
+      "open_access_url": "https://arxiv.org/abs/2610.38950"
     },
     {
       "title": "Exploring AI Peer in Collaborative Mathematics Learning",
@@ -1164,19 +1458,52 @@
       "historical_backfill": false,
       "source_group": "AI-specific",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This study examines how domain experts perceive and interact with an adaptive LLM-based peer agent combining a Big Five-informed persona with motivational state modulation for collaborative mathematics problem solving.",
-        "methods": "Through thematic analysis of expert interviews, we identify conditions shaping peer perceptions, including emotional safety, shared control, and collaborative reasoning.",
-        "findings": "",
-        "interpretation": "",
+        "level": "full_text",
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "overview": "Artificial intelligence (AI) agents are increasingly explored as collaborative learning partners in mathematics education, yet it remains unclear what makes an AI recognizable as a peer. This study examines how domain experts perceive and interact with an adaptive LLM-based peer agent combining a Big Five-informed persona with motivational state modulation for collaborative mathematics problem solving.",
+        "methods": "Before the formal study, we conducted a pilot study with two experts in educational technology. The pilot aimed to validate the clarity of the study scenario, the realism of the agent’s behavior, and the usability of the design. Participants in the pilot interacted with the agent and provided open-ended feedback on the interaction flow, personality expression, and perceived peer-likeness. Data from the pilot study were not included in the analysis. We adopted an exploratory qualitative approach to examine how the theory-informed AI peer design was experienced and interpreted in interaction [8]. The initial design was grounded in theories of peer learning and social interaction, and the study aimed to understand how these theoretical principles translated into the agent’s interactional behaviors and how they were perceived during use. Rather than testing learning outcomes, we focused on identifying interactional patterns, tensions, and characteristics that could inform the development of a framework for designing AI agents as We conducted the qualitative study between December 2025 and January 2026 with seven researchers in User Experience, Learning Sciences, Educational Technology, and Computer Science, with experience ranging from 3 to over 20 years. Participants were asked to critically engage with the AI agent as a peer and examine how the proposed design dimensions manifested during interaction. In particular, we explored how participants interpreted the agent’s social ro",
+        "findings": "5.1 RQ1: Perception of an AI peer agent 5.1.1 Reduced Pressure and Increased Safety. A dominant theme across the interviews was that participants associated a stronger sense of safety with interacting with the AI compared to a real peer, when considering the experience from a learner’s perspective. This allowed them to focus on the math problem without worrying about being judged. P1 explained that when compared to regular class setting, seeing other students finish faster made them feel “anxious and ashamed,\" while with the AI there was no comparison. P3 shared that because the agent was “not a real human being,\" they felt “less embarrassed\" and “more comfortable making mistakes\"; P5 also emphasized that safety came from the lack of human judgment: “I know he won’t think I’m fool...He doesn’t have any human emotions, he’s just AI.\" P6 further explained that safety increased when the AI felt like an equal. They suggested that if the agent was presented as ”your classmate...same level as you,\" then “it feels safer\", as “with your friend or someone equal to you, you can make mistakes without a problem.\" This shows that safety was created both by the AI’s non-human nature and by the feeling 8 Yiran Lin, Ye Deng, Ziqi Pan, Yongan Yu, and Alexandra I. Cristea of equality. For these participants, experiencing the AI as a peer meant being able to make mistakes without fear of 5.1.2 Peer Through Imperfection.Participants described the AI’s peer-likeness through its willingness to acknowledge its own imperfections, which are caused by the inherent imperfections of LLM. P3 felt the agent was peer-like because it was “not very clever\" and made “stupid and simple mistakes.\" When P3 gave a wrong answer and the agent accepted it, they said it felt “like a real human peer.\" P7 expressed a similar view; the agent felt like a peer, as it “did not show the solution directly,\" but instead “made some assumptions and asked for my idea.\" They also noted that the agent “made mistakes sometimes\" and tried wrong approaches before asking for participants’ opinion, which made the interaction However, not all participants welcomed this behavior. P5 disliked an AI that was “as stupid as I am,\" and believed a peer should be “smarter than me\" to provide helpful ideas. This shows that while mistakes helped some participants see the AI as human-like, others felt that too many mistakes reduced its usefulness. This indicates a distinction between peer-likeness and peer-usefulness, which were not always aligned in participants’ experiences. 5.1.3 The Impact of Personality and Motivation Embeddings.Personality and motivation had different effects on participants. P1 felt the agent’s personality was “steady\" and that it “really wants me to learn,\" which made the interaction feel meaningful. However, P7 did not experience the personality as stable. They said it was “more a surface level\" and changed according to the user’s input. They added that they mainly saw the AI “as a tool, not ",
+        "interpretation": "This study responds to the growing attention in AIED that looks beyond designing AI systems merely as instructional tools. We examined how learners experience an AI agent in the social–cognitive role of a peer, laying the groundwork for future research on AI systems that emulate human-like social and cognitive behaviors in learning environments. Our findings show that in peer-oriented designs, correctness alone is insufficient; the enactment of authority, uncertainty, and shared responsibility is central. We contribute a human-centered set of design and evaluation dimensions for AI peer agents that emphasize interaction quality, emotional safety, and shared control. This perspective clarifies AI peers not as simplified tutors or information providers, but as partners that support collaborative reasoning and sustained engagement.",
         "limitations": "",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
-        "reported_findings": false
+        "reported_findings": true
+      },
+      "oa_checked": "2026-11-07",
+      "oa_pass_version": 3,
+      "analysis": {
+        "provenance": "OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
+        "license": "cc-by",
+        "fulltext_url": "https://arxiv.org/abs/2610.38990",
+        "license_url": "https://arxiv.org/abs/2610.38990",
+        "methods": "Before the formal study, we conducted a pilot study with two experts in educational technology. The pilot aimed to validate the clarity of the study scenario, the realism of the agent’s behavior, and the usability of the design. Participants in the pilot interacted with the agent and provided open-ended feedback on the interaction flow, personality expression, and perceived peer-likeness. Data from the pilot study were not included in the analysis. We adopted an exploratory qualitative approach to examine how the theory-informed AI peer design was experienced and interpreted in interaction [8]. The initial design was grounded in theories of peer learning and social interaction, and the study aimed to understand how these theoretical principles translated into the agent’s interactional behaviors and how they were perceived during use. Rather than testing learning outcomes, we focused on identifying interactional patterns, tensions, and characteristics that could inform the development of a framework for designing AI agents as We conducted the qualitative study between December 2025 and January 2026 with seven researchers in User Experience, Learning Sciences, Educational Technology, and Computer Science, with experience ranging from 3 to over 20 years. Participants were asked to critically engage with the AI agent as a peer and examine how the proposed design dimensions manifested during interaction. In particular, we explored how participants interpreted the agent’s social role, perceived its position of authority, and identified moments of collaboration, role shifts, or interactional breakdown. The study was approved by the university ethics board, and informed consent was obtained from all participants. Each session lasted approximately 30 minutes and was conducted through an online meeting platform. After consent, participants were asked to take the perspective of a student learning quadratic functions. Participants then interacted with the AI agent for approximately 20 minutes to collaboratively solve quadratic equations (Figure 2). They received the same information about quadratic functions that had been provided during the agent’s development and were encouraged to treat the agent as a classmate and reason collaboratively, rather than expecting direct instruction or final answers. No specific conversational structure was imposed so as to preserve the natural development of the interaction. Exploring AI Peer in Collaborative Mathematics Learning 7 Following the interaction, participants completed a structured interview based on predefined questions derived from the research questions. The interview focused on how they interpreted the agent’s social role and authority, how the interaction reflected the proposed design dimensions, and where they observed moments of collaboration, role shifts, All sessions were audio-recorded with participants’ permission and transcribed. The interview transcripts were de- identified before analysis. We conducted an iterative thematic analysis [31]. Two authors independently reviewed the transcripts, generated initial codes, and then collaboratively grouped them into themes, through discussion and Fig. 2. Collaborative Mathematical Problem Solving Example Dialogue during Interview",
+        "results": "5.1 RQ1: Perception of an AI peer agent 5.1.1 Reduced Pressure and Increased Safety. A dominant theme across the interviews was that participants associated a stronger sense of safety with interacting with the AI compared to a real peer, when considering the experience from a learner’s perspective. This allowed them to focus on the math problem without worrying about being judged. P1 explained that when compared to regular class setting, seeing other students finish faster made them feel “anxious and ashamed,\" while with the AI there was no comparison. P3 shared that because the agent was “not a real human being,\" they felt “less embarrassed\" and “more comfortable making mistakes\"; P5 also emphasized that safety came from the lack of human judgment: “I know he won’t think I’m fool...He doesn’t have any human emotions, he’s just AI.\" P6 further explained that safety increased when the AI felt like an equal. They suggested that if the agent was presented as ”your classmate...same level as you,\" then “it feels safer\", as “with your friend or someone equal to you, you can make mistakes without a problem.\" This shows that safety was created both by the AI’s non-human nature and by the feeling 8 Yiran Lin, Ye Deng, Ziqi Pan, Yongan Yu, and Alexandra I. Cristea of equality. For these participants, experiencing the AI as a peer meant being able to make mistakes without fear of 5.1.2 Peer Through Imperfection.Participants described the AI’s peer-likeness through its willingness to acknowledge its own imperfections, which are caused by the inherent imperfections of LLM. P3 felt the agent was peer-like because it was “not very clever\" and made “stupid and simple mistakes.\" When P3 gave a wrong answer and the agent accepted it, they said it felt “like a real human peer.\" P7 expressed a similar view; the agent felt like a peer, as it “did not show the solution directly,\" but instead “made some assumptions and asked for my idea.\" They also noted that the agent “made mistakes sometimes\" and tried wrong approaches before asking for participants’ opinion, which made the interaction However, not all participants welcomed this behavior. P5 disliked an AI that was “as stupid as I am,\" and believed a peer should be “smarter than me\" to provide helpful ideas. This shows that while mistakes helped some participants see the AI as human-like, others felt that too many mistakes reduced its usefulness. This indicates a distinction between peer-likeness and peer-usefulness, which were not always aligned in participants’ experiences. 5.1.3 The Impact of Personality and Motivation Embeddings.Personality and motivation had different effects on participants. P1 felt the agent’s personality was “steady\" and that it “really wants me to learn,\" which made the interaction feel meaningful. However, P7 did not experience the personality as stable. They said it was “more a surface level\" and changed according to the user’s input. They added that they mainly saw the AI “as a tool, not ... with personality... like friends.\" This shows that for some participants, the personality design was not strong enough. Personality also caused problems when the tone felt inappropriate. P1 became anxious when the agent said it was “feeling a bit unconcerned,\" which sounded dismissive. Others described the agent as “strict\" (P4) or a “know-it-all\" (P2). When the agent sounded confident or directive, participants were more likely to see it as a teacher rather than a peer. This shows that personality can help create consistency, but it can also create distance, if the tone is too authoritative. 5.1.4 Collaboration versus Instruction.Participants described collaboration as situations where the AI guided their thinking without taking control. P6 felt like “working together as a team\" because the agent “has the information but . . . gives you hints and lets you think and be part of the solution.\" This feeling changed when the AI moved too quickly. P7 felt “a little annoyed\" when they were still thinking and the agent “just gave me the right number.\" For them, showing the answer too early broke the sense of collaboration. Similarly, P4 felt the agent was “examining me, not helping me,\" and P2 said it was “very fixed on a direction of travel.\" In these moments, the AI was no longer seen as a peer, but as a tutor giving instructions. In summary, participants experienced the AI as a peer when it supported their thinking process, and as a teacher when it controlled the pace or 5.2 RQ2: Boundaries of AI as a learning peer 5.2.1 Failure of Shared Memory and Mutual Understanding.The most significant boundary emerged through moments of confusion, where the AI failed to maintain a consistent shared understanding. For a peer relationship to be effective, both partners must remember what was previously discussed. P2 expressed frustration when the agent “claims I’ve said some things which I didn’t,\" which led to a direct “breakdown in trust\". P3 experienced a similar issue at the very start of the conversation, when the agent assumed they were already solving an equation that hadn’t been introduced yet. P3 remarked, “I don’t remember anything about giving an equation... its previous memory might prevent our mutual Exploring AI Peer in Collaborative Mathematics Learning 9 understanding.\" These point to a boundary that the AI cannot yet act as a reliable, long-term peer, because it often hallucinates or mixes up different conversations. 5.2.2 Blind Validation and Misinformation.Another boundary appeared through discomfort when the AI agreed with incorrect ideas. P4 asked, \"Is he agreeing because it’s correct or because he doesn’t know the correct answer?\" P2 warned that this could “keep reinforcing those mistakes forever.” P7 believed this issue came from the design rather than from the idea of an AI peer, “I would rather say it’s due to the design... if it can hold on and not show the correct answer.” This shows that participants accepted the idea of an AI peer, but expected better control over how and when 5.2.3 Lack of Flexibility. Resistance emerged when the AI enforced a fixed problem-solving order. P5 said the agent “doesn’t want me to jump the steps.\" P2 felt it did not “really try and collaborate\" with their ideas. P7 also suggested that the agent should wait longer before giving answers. Overall, AI was seen as less peer-like when it followed a rigid process, instead of adapting to the participants’ approach. 5.2.4 Emotional and Social Gaps.Finally, participants noted that the AI could not respond well to their emotions. P1 said the agent could not “sense your tone, your emotions or motivations,\" and sometimes sounded “harsh or abrupt.” When the agent said it was unconcerned,” P1 felt more stressed. P6 believed that younger students woul",
+        "discussion": "This study responds to the growing attention in AIED that looks beyond designing AI systems merely as instructional tools. We examined how learners experience an AI agent in the social–cognitive role of a peer, laying the groundwork for future research on AI systems that emulate human-like social and cognitive behaviors in learning environments. Our findings show that in peer-oriented designs, correctness alone is insufficient; the enactment of authority, uncertainty, and shared responsibility is central. We contribute a human-centered set of design and evaluation dimensions for AI peer agents that emphasize interaction quality, emotional safety, and shared control. This perspective clarifies AI peers not as simplified tutors or information providers, but as partners that support collaborative reasoning and sustained engagement.",
+        "limitations": "",
+        "figures": [],
+        "key_idea": "5.1 RQ1: Perception of an AI peer agent 5.1.1 Reduced Pressure and Increased Safety. A dominant theme across the interviews was that participants associated a stronger sense of safety with interacting with the AI compared to a real peer, when considering the experience from a lea",
+        "extraction_date": "2026-11-07",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "pdf_text_extraction": "pypdf; section boundary heuristics; check source"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "full_text",
+        "last_at": "2026-11-07",
+        "next_at": "2027-11-07",
+        "attempts": 1
       }
     },
     {
@@ -1198,18 +1525,38 @@
       "source_type": "policy",
       "source_type_basis": "provisional_feed_default",
       "publication_date_provenance": {
-        "basis": "publisher_rss_pubDate",
-        "raw": "Wed, 28 Oct 2026 20:04:21 +0000",
+        "status": "day_known",
+        "basis": "publisher_meta_published_time",
+        "field": "article:published_time",
+        "value": "2026-10-28",
         "date": "2026-10-28",
         "timezone": "UTC",
-        "source_url": "https://www.eff.org/rss/updates.xml",
-        "independently_verified": false
+        "source_url": "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai",
+        "evidence": [
+          {
+            "field": "publisher_rss_pubDate",
+            "date": "2026-10-28",
+            "basis": "publisher_rss_pubDate",
+            "source_url": "https://www.eff.org/rss/updates.xml",
+            "precision": "day"
+          },
+          {
+            "field": "article:published_time",
+            "date": "2026-10-28",
+            "basis": "publisher_meta_published_time",
+            "source_url": "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai",
+            "precision": "day"
+          }
+        ],
+        "independently_verified": true,
+        "checked_at": "2026-11-07T02:19:18.907900+00:00"
       },
       "discovery_provenance": {
         "method": "publisher_feed",
         "feed_id": "eff",
         "feed_url": "https://www.eff.org/rss/updates.xml",
-        "checked_at": "2026-11-07"
+        "checked_at": "2026-11-07",
+        "metadata_snapshot_observed_at": "2026-11-07T02:13:44.163501+00:00"
       },
       "curated": false,
       "first_seen": "2026-11-07",
@@ -1223,7 +1570,17 @@
         "notice": "Publisher-supplied discovery preview, not a full-article review or independent assessment."
       },
       "content_access": "feed_description",
-      "source_checked": "2026-11-07"
+      "source_checked": "2026-11-07",
+      "editorial_metadata": {
+        "version": 1,
+        "checked_at": "2026-11-07T02:19:18.907900+00:00",
+        "source_url": "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai",
+        "status": "verified",
+        "identity": "verified",
+        "date_status": "verified",
+        "source_type_status": "unresolved",
+        "source_text_saved": false
+      }
     }
   ]
 }
