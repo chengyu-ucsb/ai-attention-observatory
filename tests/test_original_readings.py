@@ -271,8 +271,10 @@ class OriginalSummaryTests(unittest.TestCase):
         self.assertEqual(shelf['related_journal_doi'],row['doi'])
         self.assertEqual(shelf['review_kind'],'ai_source_check')
         html=build_newsletter.source_links(issue,[row['doi']])
-        self.assertIn(n['source']['url'],html);self.assertIn('working_paper_not_journal_version',html)
-        self.assertIn('not human review',html);self.assertIn('Related journal DOI (different version)',html)
+        self.assertIn(n['source']['url'],html);self.assertIn('working paper not journal version',html)
+        details=build_newsletter.source_shelf(issue)
+        self.assertIn('not human review',details);self.assertIn('Related journal DOI (different version)',details)
+        self.assertNotIn('AI source-check',html)
         issue.update(headline='Synthetic issue',signals=[{'source_ids':[row['doi']]}])
         self.assertIn(n['source']['url'],build_newsletter.rss_content(issue))
 

@@ -48,7 +48,7 @@ class VisualPipelineTests(unittest.TestCase):
   for phrase in ("","The results were mostly unclear and incomplete…"):
    record={"kind":"scholarly","reading":{"level":"abstract","digest":{
     "finding":phrase,"finding_source":"abstract",
-    "approach":"This paper has a very long description of its study but does not explain any method."*5}}}
+    "approach":"This paper has a very long description of its study but does not explain any method."*10}}}
    self.assertEqual(visual_spec(record)["kind"],"illustration_only")
 
  def test_commentary_does_not_get_empirical_graphics(self):

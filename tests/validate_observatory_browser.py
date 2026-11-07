@@ -6,6 +6,8 @@ import argparse
 from contextlib import contextmanager
 from datetime import datetime
 import re
+import subprocess
+import sys
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -112,7 +114,45 @@ def check(page, url, width, out):
     page.locator('.library-story h3 button').first.click()
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('#paper h1')).to_be_visible()
+    expect(page.locator('.rv-head .story-visual-reading')).to_have_count(0)
+    provenance = page.locator('.rv-provenance')
+    expect(provenance).not_to_have_attribute('open', '')
+    provenance.locator(':scope > summary').focus()
+    page.keyboard.press('Enter')
+    expect(provenance.locator('.rv-status')).to_be_visible()
+    provenance.locator(':scope > summary').click()
+    expect(provenance.locator('.rv-status')).not_to_be_visible()
     overflow(); screenshot('reading')
+    # A former generic-question reading now retains a supported method and result.
+    navigate('library')
+    page.locator('#library-reset').click()
+    page.locator('#search').fill('ChatGPT as cognitive scaffold')
+    expect(page.locator('.library-story')).to_have_count(1)
+    page.locator('.library-story h3 button').click()
+    expect(page.locator('#paper')).to_be_visible()
+    expect(page.locator('.rv-content')).not_to_contain_text('Method details are not clear enough')
+    expect(page.locator('.rv-coverage-table')).to_be_visible()
+    expect(page.locator('.rv-content')).to_contain_text('n = 47')
+    expect(page.locator('.automatic-evidence')).to_contain_text('Source: abstract')
+    overflow(); screenshot('source-reading')
+    reader=page.locator('.rv-source-excerpts')
+    reader.locator(':scope > summary').focus()
+    page.keyboard.press('Enter')
+    expect(reader.locator('.rv-reader-contents')).to_be_visible()
+    reader.get_by_role('button', name='Abstract', exact=True).click()
+    # The source name can differ by index provider, so locate by its actual title.
+    abstract=reader.locator('.rv-source-section').filter(has=page.locator('summary span').filter(has_text='Abstract'))
+    expect(abstract.locator('.rv-prose')).to_be_visible()
+    assert abstract.locator('.rv-prose p').count()>1
+    overflow(); screenshot('source-reader')
+    reader.get_by_role('button',name='Expand all sections',exact=True).click()
+    assert reader.locator('.rv-source-section').evaluate_all('es => es.every(e => e.open)')
+    reader.get_by_role('button',name='Collapse all sections',exact=True).click()
+    assert reader.locator('.rv-source-section').evaluate_all('es => es.every(e => !e.open)')
+    reader.locator(':scope > summary').click()
+    reader.locator(':scope > summary').click()
+    expect(reader.locator('.rv-reader-contents')).to_be_visible()
+    overflow()
     # Every main destination remains available, with no page-level horizontal scroll.
     for route in ['issue', 'perspectives', 'atlas', 'about', 'home']:
         navigate(route)
@@ -216,13 +256,21 @@ def check_typed_readings(page, url, width, out):
     temporal = commentary['reading']['temporal_notice']
     for value in (temporal, 'policy analysis', 'Synthetic policy author', 'not human review'):
         expect(card).to_contain_text(value)
+    card_details = card.locator('.card-reading-details')
+    expect(card_details).not_to_have_attribute('open', '')
+    card_details.locator(':scope > summary').click()
     expect(card.get_by_text(temporal, exact=False).last).to_be_visible()
+    card_details.locator(':scope > summary').click()
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed card overflow at {width}px'
     card.locator('h3 button').click()
     expect(page.locator('#paper')).to_be_visible()
     paper = page.locator('#paper-content')
     expect(paper.locator('.rv-head')).to_contain_text(temporal)
-    expect(paper.locator('.rv-head .rv-reading-notice')).to_be_visible()
+    dates = paper.locator('.rv-source-dates')
+    expect(dates).not_to_have_attribute('open', '')
+    dates.locator(':scope > summary').click()
+    expect(dates.locator('.rv-reading-notice')).to_be_visible()
+    dates.locator(':scope > summary').click()
     for key in ('thesis', 'reasoning', 'examples', 'tension', 'qualification'):
         expect(paper).to_contain_text(commentary['reading']['digest']['longform'][key])
     for forbidden in ('How it was studied', 'Study approach', 'Reported finding', 'REPORTED FINDING', 'Stale visual sentinel'):
@@ -332,11 +380,14 @@ def check_registered_readings(page, url, width, out, payloads):
             expect(paper).to_contain_text(reading['quality_note'])
         if reading.get('temporal_notice'):
             expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
-            expect(paper.locator('.rv-head .rv-reading-notice')).to_be_visible()
+            expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
         # Compare against the approved source fields, not legacy extracted prose.
         for field, value in row['original_reading']['summary'].items():
             if value:
-                expect(paper).to_contain_text(value)
+                # textContent includes the optional overview/interpretation drawers.
+                # Normalize only whitespace: every approved word must survive.
+                actual = paper.evaluate("el => { const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); const parts = []; while (walk.nextNode()) parts.push(walk.currentNode.textContent); return parts.join(' ').replace(/\\s+/g, ' ').trim(); }")
+                assert re.sub(r'\s+', ' ', value).strip() in actual, field
         if commentary:
             for label in ('How it was studied', 'Study approach', 'REPORTED FINDING', 'Methods as indexed', 'Results as indexed'):
                 expect(paper).not_to_contain_text(label)
@@ -373,10 +424,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
     parser.add_argument('--screenshots', type=Path)
+    parser.add_argument('--executable-path', type=str)
     args = parser.parse_args()
+    # Exercise the actual publication projection, not a stale committed payload.
+    subprocess.run([sys.executable, str(ROOT / "scripts/build_public.py")], cwd=ROOT, check=True)
     registered = registered_reading_payloads()
     with server() as url, sync_playwright() as p:
-        browser = getattr(p, args.browser).launch()
+        browser = getattr(p, args.browser).launch(**({"executable_path":args.executable_path} if args.executable_path else {}))
         for width in [1280, 768, 390, 320]:
             context = browser.new_context(reduced_motion='reduce')
             try:

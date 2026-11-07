@@ -24,7 +24,7 @@ assert(app.includes("function renderIssue()"),"Missing issue renderer");
 const deployment=text(".github/workflows/publish.yml");
 assert(deployment.includes("Catch up full-text research backlog"),"Catch-up results must trigger a Pages redeployment");
 assert(!site.includes('id="issue-source-landscape"'),"Internal source-coverage dashboard should not appear in the public edition");
-assert(!site.includes('THE ATTENTION EDIT · IN PREPARATION'),"Editorial workflow statuses leaked into public markup");
+assert(!site.includes('THE ATTENTION BRIEF · IN PREPARATION'),"Editorial workflow statuses leaked into public markup");
 const featured=JSON.parse(text("data/public-featured-issue.json"));
 assert(featured.status==="published"||featured.status==="none","Only completed editorials may appear as featured issues");
 if(featured.status==="published"){
@@ -58,5 +58,5 @@ if(issue.status==="published"){
  }
 }
 const rss=text("issue-feed.xml");
-assert(rss.includes("The Attention Edit"),"Missing synthesized editorial feed");
+assert(rss.includes("The Attention Brief"),"Missing synthesized editorial feed");
 console.log("Weekly issue test passed:",issue.status,issue.source_count,"source-backed readings, complete shelf, source-linked themes.");

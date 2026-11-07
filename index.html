@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#a22c3b">
+  <meta name="theme-color" content="#172f31">
   <meta name="description" content="An open research observatory on artificial intelligence, attention, cognitive effort, and the tools that could help us stay focused.">
   <title>Attention / AI · The Research Observatory</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="lab-play.css">
-  <link rel="alternate" type="application/rss+xml" title="The Attention Edit weekly synthesis" href="issue-feed.xml">
+  <link rel="alternate" type="application/rss+xml" title="The Attention Brief weekly synthesis" href="issue-feed.xml">
   <script src="app.js" defer></script>
   <script src="lab-play.js" defer></script>
 </head>
@@ -24,11 +24,11 @@
       <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="site-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
       <nav id="site-navigation" class="main-nav" aria-label="Main navigation">
         <a href="#home" data-route="home">Overview</a>
-        <a href="#issue" data-route="issue">Weekly Edit</a>
+        <a href="#issue" data-route="issue">Weekly Brief</a>
         <a href="#library" data-route="library">Research</a>
         <a href="#perspectives" data-route="perspectives">Ideas & tools</a>
         <a href="#atlas" data-route="atlas">Evidence atlas</a>
-        <a href="#lab" data-route="lab">Experimental Lab <span style="font-size:9px;color:#a52c3e">↗</span></a>
+        <a href="#lab" data-route="lab">Try the Lab</a>
         <a href="#about" data-route="about">About</a>
       </nav>
       <a class="header-link" href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">By Chengyu Fang <span aria-hidden="true">↗</span></a>
@@ -40,24 +40,24 @@
       <div class="hero">
         <div class="shell hero-grid">
           <div class="hero-copy">
-            <p class="eyebrow light">AN OPEN RESEARCH OBSERVATORY <span class="small-diamond">◆</span> UPDATED WEEKLY</p>
-            <h1>Where attention meets <em>intelligence.</em></h1>
-            <p class="hero-sub">Does AI help us think more deeply—or make it easier to stop thinking? Follow the research on focus, fragmented attention, cognitive offloading, and what might help.</p>
+            <p class="eyebrow light">AI × ATTENTION × HUMAN AGENCY</p>
+            <h1>Think clearly.<br>Stay <em>curious.</em></h1>
+            <p class="hero-sub">Explore how AI changes the way we think, focus, and learn. Research, fresh perspectives, and small experiments for a more intentional digital life.</p>
             <div class="hero-actions">
               <a class="button button-light" href="#library">Explore the research <span>↗</span></a>
               <a class="hero-secondary" href="#atlas">See the evidence map <span>↗</span></a>
             </div>
-            <div class="hero-credit"><span class="hero-credit-line"></span> Research on the relationship between humans, technology, and attention</div>
+            <div class="hero-credit"><span class="hero-credit-line"></span> An independent observatory by Chengyu Fang</div>
           </div>
           <div class="field-guide" aria-labelledby="field-guide-title">
-            <div class="field-guide-heading"><span class="eyebrow light">FOUR WAYS INTO THE RESEARCH</span><h2 id="field-guide-title">Follow your curiosity.</h2><p>Choose a question. See where the evidence leads.</p></div>
+            <div class="field-guide-heading"><span class="eyebrow light">START WITH A QUESTION</span><h2 id="field-guide-title">Four ways in.</h2><p></p></div>
             <div class="field-guide-grid">
               <a href="#library?theme=AI%20%26%20cognition&amp;scope=all" class="field-question" data-explore-theme="AI &amp; cognition"><span class="question-art art-cognition" aria-hidden="true"><i></i><i></i><i></i></span><span class="question-number">01 / THINKING</span><strong>What do we hand over to AI?</strong><span class="question-cta">Cognition &amp; offloading <span aria-hidden="true">↗</span></span></a>
               <a href="#library?theme=Fragmentation&amp;scope=all" class="field-question" data-explore-theme="Fragmentation"><span class="question-art art-fragmentation" aria-hidden="true"><i></i><i></i></span><span class="question-number">02 / SWITCHING</span><strong>What happens between tasks?</strong><span class="question-cta">Attention &amp; interruptions <span aria-hidden="true">↗</span></span></a>
               <a href="#library?theme=Interventions&amp;scope=all" class="field-question" data-explore-theme="Interventions"><span class="question-art art-interventions" aria-hidden="true"><i></i><i></i><i></i></span><span class="question-number">03 / DESIGNING</span><strong>Can technology protect focus?</strong><span class="question-cta">Tools &amp; interventions <span aria-hidden="true">↗</span></span></a>
               <a href="#library?theme=Technology%20%26%20society&amp;scope=all" class="field-question" data-explore-theme="Technology &amp; society"><span class="question-art art-society" aria-hidden="true"><i></i><i></i><i></i></span><span class="question-number">04 / CHOOSING</span><strong>Who gets to shape our attention?</strong><span class="question-cta">Platforms &amp; agency <span aria-hidden="true">↗</span></span></a>
             </div>
-            <p class="field-guide-note">Conceptual sketches, not measured effects.</p>
+
           </div>
         </div>
       </div>
@@ -77,9 +77,9 @@
       </nav>
 
       <section class="shell home-edition pad-top">
-        <div class="section-heading"><div><p class="eyebrow">THE ATTENTION EDIT</p><h2>One idea worth thinking about<span class="red-period">.</span></h2></div></div>
+        <div class="section-heading"><div><p class="eyebrow">THE ATTENTION BRIEF</p><h2>This week, in focus<span class="red-period">.</span></h2></div></div>
         <div class="weekly-cover">
-          <div class="weekly-cover-copy"><p class="eyebrow" id="weekly-kicker">THE ATTENTION EDIT</p><h3 id="weekly-title">This week's big idea</h3><p id="weekly-deck"></p>
+          <div class="weekly-cover-copy"><p class="eyebrow" id="weekly-kicker">THE ATTENTION BRIEF</p><h3 id="weekly-title">This week's big idea</h3><p id="weekly-deck"></p>
             <div class="weekly-cover-actions"><a class="button button-red" href="#issue">Read this issue ↗</a></div>
             <p id="weekly-scope" class="weekly-scope"></p>
           </div>
@@ -96,15 +96,15 @@
 
       <section class="shell editorial-section" id="beyond-journals">
   <div class="section-heading"><div><p class="eyebrow">02 / BEYOND THE JOURNALS</p>
-    <h2>Reporting, perspectives & product ideas<span class="red-period">.</span></h2>
-    <p class="section-deck">Careful journalism, practitioner experience, and design experiments. Different evidence, equally worth exploring.</p>
+    <h2>Ideas beyond the journals<span class="red-period">.</span></h2>
+    <p class="section-deck">Reporting, arguments, and tools worth a closer look.</p>
   </div><a class="quiet-link" href="#perspectives" id="browse-editorial">See all ideas & tools ↗</a></div>
   <div class="editorial-grid" id="editorial-grid"></div>
-  <p class="editorial-disclaimer">Publisher descriptions and attributed interpretations are not independent full-text reviews. The original article remains one click away.</p>
+
 </section>
 
       <section class="shell glance-section">
-        <div class="section-heading"><div><p class="eyebrow">03 / RESEARCH AT A GLANCE</p><h2>See the landscape<span class="red-period">.</span></h2><p class="section-deck">These are counts from the observatory's collection, not estimates of all published research.</p></div><a class="quiet-link" href="#atlas">Explore the atlas ↗</a></div>
+        <div class="section-heading"><div><p class="eyebrow">03 / RESEARCH AT A GLANCE</p><h2>See the landscape<span class="red-period">.</span></h2><p class="section-deck">Explore the observatory’s collection by topic and source material.</p></div><a class="quiet-link" href="#atlas">Explore the atlas ↗</a></div>
         <div class="glance-grid">
           <div class="visual-panel topic-panel">
             <div class="panel-header"><h3>Where the literature clusters</h3><span class="tiny-label">INDEXED SOURCES BY THEME</span></div>
@@ -112,10 +112,10 @@
             <div class="panel-foot">Select a theme to explore its sources <span aria-hidden="true">↗</span></div>
           </div>
           <div class="visual-panel depth-panel">
-            <div class="panel-header"><h3>How much can we actually read?</h3><span class="tiny-label">SOURCE COVERAGE</span></div>
+            <div class="panel-header"><h3>Inside the collection</h3><span class="tiny-label">SOURCE COVERAGE</span></div>
             <div class="donut-row"><div id="evidence-donut" class="donut" aria-label="Distribution of reading material" role="img"><div class="donut-center"><strong id="record-count">–</strong><span>records</span></div></div><div id="depth-legend" class="depth-legend"></div></div>
-            <div id="backlog-coverage" class="coverage-status" aria-live="polite">Checking full-text retrieval progress…</div>
-            <div class="panel-foot">Coverage is not a measure of research quality.</div>
+            <details class="collection-details"><summary>Collection &amp; access details</summary><div id="backlog-coverage" class="coverage-status" aria-live="polite">Loading access details…</div><p>Counts describe this collection, not the entire field or study quality.</p></details>
+
           </div>
         </div>
       </section>
@@ -135,20 +135,20 @@
 
       <section class="shell follow-section">
         <div class="follow-art" aria-hidden="true"><span>◎</span><i></i><i></i><i></i></div>
-        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>One considered update<br>at a time.</h2><p>A considered synthesis of the week: new ideas, open questions and something to try. Newsletter preview and RSS work today; email delivery is not connected yet.</p></div>
-        <div class="follow-actions"><a class="button button-light" href="subscribe.html">Follow the weekly edit ↗</a><a class="button button-outline-light" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20newsletter">Ask about email updates ↗</a></div>
+        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>One considered update<br>at a time.</h2><p>Research connections, open questions, and something to try. Read online or follow the RSS feed.</p></div>
+        <div class="follow-actions"><a class="button button-light" href="subscribe.html">Follow the weekly brief ↗</a><a class="button button-outline-light" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20newsletter">Ask about email updates ↗</a></div>
       </section>
     </section>
 
 
     <section id="issue" class="view" hidden>
-      <div class="issue-hero"><div class="shell issue-hero-wrap"><p class="eyebrow light" id="issue-edition">THE ATTENTION EDIT</p><h1 id="issue-headline">A weekly idea worth thinking about.</h1><p id="issue-deck"></p><div class="issue-hero-actions"><a class="button button-light" href="newsletter.html">Read email-style edition ↗</a><a class="hero-secondary" href="subscribe.html">Weekly editorial RSS ↗</a><a class="hero-secondary" href="issues/">Past editions ↗</a></div></div></div>
+      <div class="issue-hero"><div class="shell issue-hero-wrap"><p class="eyebrow light" id="issue-edition">THE ATTENTION BRIEF</p><h1 id="issue-headline">A weekly idea worth thinking about.</h1><p id="issue-deck"></p><div class="issue-hero-actions"><a class="button button-light" href="newsletter.html">Reader view ↗</a><a class="hero-secondary" href="subscribe.html">Follow via RSS ↗</a><a class="hero-secondary" href="issues/">Past editions ↗</a></div></div></div>
       <div class="shell issue-layout">
-        <section class="issue-letter"><p class="eyebrow">THE BIG IDEA THIS WEEK</p><p id="issue-letter-text"></p></section>
-        <section class="issue-signals-section"><div class="section-heading"><div><p class="eyebrow">THREE SIGNALS / THE CROSS-SOURCE VIEW</p><h2>What connects the readings<span class="red-period">.</span></h2></div></div><div id="issue-signals" class="issue-signals"></div></section>
-        <section class="issue-extras" id="issue-extras"><div class="issue-tension"><p class="eyebrow">THE PRODUCTIVE TENSION</p><h2 id="issue-tension-title"></h2><p id="issue-tension-text"></p><div id="issue-tension-refs" class="issue-references"></div></div>
+        <details class="issue-letter"><summary>The big picture <span>Read the editorial introduction</span></summary><div id="issue-letter-text"></div></details>
+        <section class="issue-signals-section"><div class="section-heading"><div><p class="eyebrow">THE WEEK IN THREE IDEAS</p><h2>The connections worth making<span class="red-period">.</span></h2></div></div><div id="issue-signals" class="issue-signals"></div></section>
+        <section class="issue-extras" id="issue-extras"><div class="issue-tension"><p class="eyebrow">THE PRODUCTIVE TENSION</p><h2 id="issue-tension-title"></h2><div id="issue-tension-text"></div><div id="issue-tension-refs" class="issue-references"></div></div>
         <div class="issue-experiment"><p class="eyebrow">ONE TINY EXPERIMENT</p><h2 id="issue-experiment-title"></h2><p id="issue-experiment-text"></p><p id="issue-experiment-caution"></p><a href="#lab" class="quiet-link">Try the Experimental Lab ↗</a></div></section>
-        <section class="issue-closing"><p id="issue-closer"></p><p id="issue-qualification" hidden></p></section>
+        <section class="issue-closing"><p id="issue-closer"></p><details class="issue-editorial-details"><summary>About this synthesis</summary><p id="issue-qualification" hidden></p></details></section>
         <section class="issue-reading-shelf"><div class="section-heading"><div><p class="eyebrow">FURTHER READING</p><h2>Follow the sources<span class="red-period">.</span></h2><p id="issue-coverage" class="section-deck"></p></div></div><details><summary>Browse the complete source list and reading pages <span>↗</span></summary><div id="issue-sources" class="issue-sources"></div></details></section>
         <section class="issue-follow"><div><p class="eyebrow">KEEP EXPLORING</p><h2>More ideas, less noise.</h2><p>Follow new editions through RSS, or explore the research library.</p></div><div><a class="button button-red" href="subscribe.html">Follow the weekly feed ↗</a><p><a class="quiet-link" href="issues/">Read past issues ↗</a></p></div></section>
       </div>
@@ -159,7 +159,7 @@
         <div class="shell">
           <p class="eyebrow">BEYOND THE JOURNALS / PUBLIC IDEAS & PRACTICE</p>
           <h1>Ideas in the <em>wild.</em></h1>
-          <p>Journalism, criticism, interface experiments, policy arguments, and real-world attention tools. Each entry distinguishes the source's argument from our own design interpretations.</p>
+          <p>Perspectives on technology, human agency, and the design of everyday life.</p>
         </div>
       </div>
       <div class="shell perspectives-page">
@@ -180,12 +180,12 @@
           <p>Existing products and operating-system features, viewed as mechanisms to compare or test—not claims of demonstrated effectiveness.</p>
         </div>
         <div id="perspectives-products" class="perspectives-grid"></div>
-        <p class="editorial-disclaimer">The page links to original sources. Summaries and design implications are brief discovery notes, not a complete review of every article or effectiveness study.</p>
+
       </div>
     </section>
 
     <section id="library" class="view" hidden>
-      <div class="inner-hero"><div class="shell"><p class="eyebrow">THE SELECTED RESEARCH LIBRARY / 02</p><h1>A library for thinking <em>clearly.</em></h1><p>Explore source-screened studies, commentary, and emerging interventions. Records still awaiting venue verification stay out of this reading library. Open an article's reading page before leaving for the source.</p></div></div>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">THE SELECTED RESEARCH LIBRARY / 02</p><h1>A library for thinking <em>clearly.</em></h1><p>Find a question. Compare the evidence. Follow an idea back to its source.</p></div></div>
       <div class="shell library-section">
         <div class="library-discovery" aria-label="Browse the research collection">
           <div class="library-discovery-title"><div><p class="eyebrow">START WITH A QUESTION</p><h2>Find your thread.</h2></div><p>Choose a theme, search an idea, or refine the evidence.</p></div>
@@ -400,16 +400,16 @@
     </section>
 
     <section id="about" class="view" hidden>
-      <div class="inner-hero"><div class="shell"><p class="eyebrow">ABOUT & METHODOLOGY / 04</p><h1>Making attention <em>legible.</em></h1><p>A public reading room for a fast-moving research problem, not a replacement for critical evaluation of the original literature.</p></div></div>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">ABOUT & METHODOLOGY / 04</p><h1>Making attention <em>legible.</em></h1><p>A public reading room for the questions AI raises about thinking, focus, and human agency.</p></div></div>
       <div class="shell about-grid">
         <div class="about-lead"><p class="eyebrow">WHY THIS EXISTS</p><h2>Less noise. Better questions. More substantive evidence.</h2><p>AI is changing the conditions under which people work, learn, and direct attention. This observatory brings together empirical studies, conceptual scholarship, interventions, and strong public commentary while preserving the differences between them.</p><a class="button button-red" href="#library">Explore the collection ↗</a></div>
-        <div class="about-steps"><div><span>01</span><section><h3>Discover</h3><p>Search scholarly metadata and trusted public sources; verify publication venues and keep preprints, weak matches, and unidentified journals in a review queue rather than automatically featuring them.</p></section></div><div><span>02</span><section><h3>Read what is available</h3><p>Retrieve abstracts and permitted open-access text when accessible. Article cards distinguish abstract-based readings, extracted full-text sections, and editorially checked essays. Headline-only sources are not published as readings.</p></section></div><div><span>03</span><section><h3>Show limits</h3><p>Study excerpts are automatically selected rather than expert-reviewed. The field-journal watchlist is a discovery baseline, not proof that an individual paper is valid. Unverified venue records can be reviewed and added later; illustrations are not measured effects.</p></section></div><div><span>04</span><section><h3>Keep updating</h3><p>Scheduled workflows maintain the public bibliography and an RSS feed. Automation may be affected by source outages or rate limits, so the latest successful index date is displayed.</p></section></div></div>
+        <div class="about-steps"><div><span>01</span><section><h3>Follow the questions</h3><p>Empirical research, conceptual work, commentary, and design experiments, organized by what they help us understand.</p></section></div><div><span>02</span><section><h3>Choose your depth</h3><p>Start with the takeaway. Open the methods, limitations, source passages, or original publication when you want to go deeper.</p></section></div><div><span>03</span><section><h3>Keep the distinctions</h3><p>Findings, proposals, and attributed arguments have different roles. Source versions, study limits, and reading basis stay with each article.</p></section></div><div><span>04</span><section><h3>Return each week</h3><p>The Attention Brief connects the readings. Follow new editions through RSS or browse the archive.</p><details><summary>About the reading process</summary><p>AI-assisted summaries and extracted passages are not independent peer review. Source details retain publication metadata, the material used, and its limits. The collection is selective, not a systematic review.</p></details></section></div></div>
       </div>
       <section class="shell about-contact"><div><p class="eyebrow">EDITOR & COLLABORATION</p><h2>Chengyu Fang</h2><p>Communication scholar interested in human cognition, technology-mediated collaboration, and emerging forms of organizing.</p></div><div class="about-contact-links"><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">Personal website ↗</a><a href="mailto:fangcu@ucmail.uc.edu">Get in touch ↗</a><a href="https://github.com/chengyu-ucsb/ai-attention-observatory" target="_blank" rel="noopener noreferrer">Open-source project ↗</a></div></section>
     </section>
   </main>
 
-  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">a<span>·</span></span><div><strong>ATTENTION / AI</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#issue">Weekly Edit</a><a href="#library">Research library</a><a href="#perspectives">Ideas & tools</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Data is an automatically maintained discovery aid, not a systematic review.</div></div></footer>
+  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">a<span>·</span></span><div><strong>ATTENTION / AI</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#issue">Weekly Brief</a><a href="#library">Research library</a><a href="#perspectives">Ideas & tools</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Research on attention. Room for questions.</div></div></footer>
   <div class="toast" id="site-toast" hidden role="status"></div>
 </body>
 </html>
