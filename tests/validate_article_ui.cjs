@@ -22,13 +22,13 @@ class Element{
  addEventListener(_name,_callback){}
 }
 const paperContainer=new Element("div");
-const libraryContainer=new Element("div"),libraryCount=new Element("div");
+const libraryContainer=new Element("div"),libraryCount=new Element("div"),backlogContainer=new Element("div");
 const inputs={"#search":{value:""},"#scope-filter":{value:"all"},"#topic-filter":{value:""},"#depth-filter":{value:"readable"},"#type-filter":{value:""}};
-const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-content"?paperContainer:q==="#library-results"?libraryContainer:q==="#library-count"?libraryCount:inputs[q]||null};
+const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-content"?paperContainer:q==="#library-results"?libraryContainer:q==="#library-count"?libraryCount:q==="#backlog-coverage"?backlogContainer:inputs[q]||null};
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unable to load application functions");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
-vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,readableSourceTitle,editorialImage,make,S};",ctx);
+vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,featureCoverage,renderBacklog,issueSourceShelfItem,readableSourceTitle,editorialImage,make,S};",ctx);
 const nodes=root=>[root,...root.children.flatMap(nodes)];
 const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
@@ -139,6 +139,218 @@ ctx.selected=unknown;vm.runInContext("TEST.showPaper(selected)",ctx);
 assert(match(paperContainer,"story-visual-reading"),"Unknown papers must retain a themed illustration");
 assert(!match(paperContainer,"automatic-evidence"),"No fabricated result charts for an unknown paper");
 
+// Synthetic original summaries are independent from machine extraction. Never
+// copy private research drafts into these fixtures.
+const original={
+ ...future,doi:"10.9999/synthetic-journal",title:"Synthetic attention working paper",
+ url:"https://example.org/synthetic-journal",venue:"Synthetic Journal",source_group:"AI-specific",
+ analysis:{provenance:"Synthetic machine extraction from an older source version",
+  fulltext_url:"https://example.org/synthetic-machine-v1.pdf",
+  methods:"Unchanged machine methods sentinel.",results:"Unchanged machine results sentinel.",
+  discussion:"Unchanged machine discussion sentinel.",limitations:"Unchanged machine limitations sentinel."},
+ reading:{original_summary:true,level:"full_text",review_kind:"ai_source_check",
+  source_version:"Working paper v2 (2027-01-15)",source_format:"pdf",
+  source_url:"https://example.org/synthetic-working-paper-v2.pdf",
+  source_doi:"10.9999/synthetic-working-paper.v2",related_journal_doi:"10.9999/synthetic-journal",
+  review_scope:"Working-paper PDF, including Methods, Results and Discussion; journal version not checked.",
+  provenance:"Original paraphrase checked against the stated working-paper version by a separate AI pass.",
+  notice:"This summary concerns the working-paper version, not the related journal publication.",
+  methods:"Original study approach.",findings:"Original reported finding.",
+  interpretation:"Original interpretation.",limitations:"Original limitation.",
+  evidence:{
+   idea:[{section:"Results",page:7,paragraph:2}],
+   explain:[{section:"Introduction",page:2,paragraph:3}],
+   approach:[{section:"Methods",page:4}],
+   finding:[{section:"Results",page:7,paragraph:2},{section:"Table 2",page:8}],
+   interpretation:[{section:"Discussion",page:10}],
+   limitation:[{section:"Limitations",page:11,paragraph:1}]
+  },
+  digest:{status:"ai_source_checked_original_summary",
+   idea:"Different prompting habits were associated with different attention ratings.",
+   explain:"An original explanation summarizes the checked working-paper version.",
+   approach:"Original study approach.",finding:"Original reported finding.",
+   interpretation:"Original interpretation.",limitation:"Original limitation.",
+   basis:"Original summary checked against the stated source by a separate AI pass; not human review or independent replication.",
+   source_version:"Working paper v2 (2027-01-15)",
+   source_url:"https://example.org/synthetic-working-paper-v2.pdf",
+   review_scope:"Working-paper PDF, including Methods, Results and Discussion; journal version not checked.",
+   longform:{reported_results:"Stale unreviewed long-form sentinel."}
+  }
+ },
+ visual:{kind:"evidence_snapshot",basis:"full_text",blocks:[
+  {label:"Older machine graphic",text:"Stale unreviewed visual sentinel."}
+ ]}
+};
+const originalBefore=JSON.stringify(original);
+ctx.selected=original;vm.runInContext("TEST.showPaper(selected)",ctx);
+const originalPage=match(paperContainer,"rv-article"),originalDigest=original.reading.digest;
+assert.equal(match(originalPage,"rv-headline").textContent,originalDigest.idea,"Original idea must be the primary detail heading");
+assert.equal(match(originalPage,"rv-deck").textContent,originalDigest.explain);
+assert(textContent(match(originalPage,"rv-claim")).includes(originalDigest.finding),"Original reported finding missing from primary prose");
+assert(textContent(match(originalPage,"rv-context-grid")).includes(originalDigest.approach));
+assert(textContent(match(originalPage,"rv-context-grid")).includes(originalDigest.limitation));
+assert(textContent(match(originalPage,"rv-take")).includes(originalDigest.interpretation),"Original interpretation must be shown separately");
+assert(textContent(match(originalPage,"rv-take")).includes("Interpretation and implications"));
+assert(match(originalPage,"rv-status").textContent.includes("AI source-check"));
+assert(match(originalPage,"rv-status").textContent.includes("not human review or independent replication"));
+assert(!textContent(match(originalPage,"rv-meta")).includes("Edited reading"),"AI source-check must not imply human editorial review");
+assert(textContent(match(originalPage,"rv-head")).includes(original.reading.source_version),"Exact checked version must be visible up front");
+assert(!match(originalPage,"automatic-evidence"),"An older machine visual must not substitute for the checked summary");
+assert(!match(originalPage,"rv-research-longform"),"Do not mix older long-form notes into the original summary");
+const excerpts=match(originalPage,"rv-source-excerpts");
+assert(excerpts&&excerpts.tag==="details"&&excerpts.open===false,"Machine excerpts must remain optional and collapsed");
+assert(textContent(excerpts).includes("Inspect machine-indexed excerpts and abstract"));
+for(const field of ["methods","results","discussion","limitations"])
+ assert(textContent(excerpts).includes(original.analysis[field]),"Unchanged machine "+field+" must be retained separately");
+for(const field of ["methods","findings","interpretation","limitations"])
+ assert(!textContent(excerpts).includes(original.reading[field]),"Original prose mislabeled as machine excerpts: "+field);
+const visibleText=root=>root.tag==="details"?"":[root.textContent,...root.children.map(visibleText)].filter(Boolean).join(" | ");
+assert(!visibleText(originalPage).includes("machine results sentinel"),"Raw machine output leaked into primary reading");
+assert(!textContent(originalPage).includes("Stale unreviewed"),"Older claims must not override the checked source version");
+const evidence=match(originalPage,"rv-evidence");
+assert(evidence&&evidence.tag==="details"&&evidence.open===false,"Source locators need an accessible, collapsed disclosure");
+assert.equal(matching(evidence,"rv-source-locator").length,7,"Every summary-field locator must remain traceable");
+assert(textContent(evidence).includes("Section: Results · page 7 · paragraph 2"));
+assert(textContent(evidence).includes(original.reading.source_version));
+const citation=match(originalPage,"rv-source"),sourceLink=match(citation,"rv-primary-link");
+assert.equal(sourceLink.href,original.reading.source_url,"Checked source link must open the exact version read");
+assert(sourceLink.textContent.includes(original.reading.source_version)&&sourceLink.textContent.includes("PDF"),"Checked source link needs a descriptive version/format label");
+assert(textContent(citation).includes("AI source-check scope: "+original.reading.review_scope));
+assert(textContent(citation).includes(originalDigest.basis));
+assert(textContent(citation).includes(original.reading.notice));
+assert(textContent(citation).includes("Checked source DOI: "+original.reading.source_doi));
+assert(textContent(citation).includes("Related journal DOI (not checked here): "+original.reading.related_journal_doi));
+const journalLink=matching(citation,"rv-secondary-link").find(n=>n.textContent.includes("Related journal publication"));
+assert(journalLink&&journalLink.textContent.includes("not the checked source"));
+assert.equal(journalLink.href,"https://doi.org/"+original.reading.related_journal_doi);
+assert(!textContent(citation).includes("Reviewed full article")&&!textContent(citation).includes("Full-text sections"),"Original summary must not be labeled as machine extraction or publisher full-article review");
+assert.equal(JSON.stringify(original),originalBefore,"Rendering must never rewrite the machine analysis or original summary");
+assert.equal(vm.runInContext("TEST.shortIdea(selected,200)",ctx),originalDigest.idea);
+assert.equal(vm.runInContext("TEST.processedIdea(selected)",ctx),originalDigest.idea);
+assert.equal(vm.runInContext("TEST.ideaInfo(selected).text",ctx),originalDigest.idea);
+assert(vm.runInContext("TEST.ideaInfo(selected).label",ctx).includes("AI SOURCE-CHECK"));
+const coverage=vm.runInContext("TEST.featureCoverage(selected)",ctx);
+assert(textContent(coverage).includes(original.reading.source_version));
+assert(matching(coverage,"feature-evidence-mark").some(n=>n.title==="Checked source text"));
+ctx.original=original;
+vm.runInContext("TEST.S.records=[original];TEST.showLibrary()",ctx);
+const originalCard=match(libraryContainer,"library-story");
+assert(textContent(originalCard).includes(originalDigest.idea),"Original idea must be the primary library-card prose");
+assert.equal(match(originalCard,"card-summary").textContent,originalDigest.explain);
+assert(textContent(originalCard).includes("AI SOURCE-CHECK")&&textContent(originalCard).includes(original.reading.source_version));
+assert(!textContent(originalCard).includes("machine results sentinel"));
+inputs["#search"].value="Original interpretation";
+vm.runInContext("TEST.showLibrary()",ctx);
+assert.equal(matching(libraryContainer,"library-story").length,1,"Original summary prose must be searchable");
+inputs["#search"].value="";
+vm.runInContext("TEST.S.backlog={};TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("1 of 1 scholarly papers"),"Original summaries must retain the count of separately stored machine extraction");
+vm.runInContext("TEST.S.records=[{...original,analysis:undefined}];TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("0 of 1 scholarly papers"),"An original summary alone must not count as machine extraction");
+vm.runInContext("TEST.S.records=[{...original,analysis:{...original.analysis,original_paraphrases_only:true}}];TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("0 of 1 scholarly papers"),"Original paraphrases in analysis must not count as machine extraction");
+vm.runInContext("TEST.S.records=[{...original,analysis:{...original.analysis,fulltext_url:undefined}}];TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("0 of 1 scholarly papers"),"Machine extraction count requires an actual full-text source");
+vm.runInContext("TEST.S.records=[original];TEST.S.backlog={full_text_extracted:0};TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("0 of 1 scholarly papers"),"An explicit zero extraction count must not be overwritten");
+vm.runInContext("TEST.S.records=[{kind:'scholarly',analysis:original.analysis,reading:{level:'abstract'}}];TEST.S.backlog={};TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("1 of 1 scholarly papers"),"Stored machine extraction must count independently of projected reading level");
+vm.runInContext("TEST.S.records=[{kind:'scholarly',reading:{level:'full_text'}}];TEST.renderBacklog()",ctx);
+assert(textContent(backlogContainer).includes("0 of 1 scholarly papers"),"Reading depth alone must not be counted as machine extraction");
+vm.runInContext("TEST.S.records=database;TEST.S.backlog={}",ctx);
+
+const publisherSummary=JSON.parse(JSON.stringify(original));
+publisherSummary.reading.source_version="Publisher version of record";
+publisherSummary.reading.source_format="html";
+publisherSummary.reading.source_url="https://example.org/synthetic-publisher-version";
+publisherSummary.reading.source_doi=publisherSummary.doi;
+publisherSummary.reading.review_scope="Publisher HTML Methods, Results and Discussion.";
+publisherSummary.reading.provenance="Original paraphrase checked against publisher HTML by a separate AI pass.";
+publisherSummary.reading.notice="This summary concerns the publisher version of record.";
+Object.assign(publisherSummary.reading.digest,{
+ source_version:publisherSummary.reading.source_version,source_url:publisherSummary.reading.source_url,
+ review_scope:publisherSummary.reading.review_scope
+});
+delete publisherSummary.reading.related_journal_doi;
+ctx.selected=publisherSummary;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert.equal(match(paperContainer,"rv-primary-link").href,publisherSummary.reading.source_url);
+assert(match(paperContainer,"rv-primary-link").textContent.includes("Publisher version of record · HTML"));
+assert(!textContent(match(paperContainer,"rv-source")).includes("Related journal DOI"),"One source DOI must not be relabeled as a separate journal version");
+
+const conceptualOriginal={...original,research_type:"conceptual_framework"};
+ctx.selected=conceptualOriginal;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert.equal(match(paperContainer,"rv-headline").textContent,originalDigest.idea);
+assert(textContent(match(paperContainer,"rv-claim")).includes("PROPOSED MODEL, NOT A TESTED EFFECT"));
+assert(vm.runInContext("TEST.ideaInfo(selected).label",ctx).includes("CONCEPTUAL PROPOSAL"));
+const conceptualWithoutFinding={...conceptualOriginal,
+ framework_notes:{idea:"Legacy framework idea sentinel.",stages:["First: Legacy framework stage sentinel."]},
+ reading:{...conceptualOriginal.reading,findings:"",digest:{...conceptualOriginal.reading.digest,finding:""}}
+};
+ctx.selected=conceptualWithoutFinding;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(textContent(match(paperContainer,"rv-claim")).includes(originalDigest.idea),"Conceptual original must use its own approved idea when no finding exists");
+assert(textContent(match(paperContainer,"rv-take")).includes(originalDigest.interpretation),"Conceptual original must retain its own interpretation without a measured finding");
+assert(!textContent(paperContainer).includes("Legacy framework"),"Empty findings must never introduce older framework ideas or stages");
+assert(!match(paperContainer,"rv-longform"),"Legacy framework stages must not become original summary prose");
+assert(!match(paperContainer,"rv-source-gap"),"An approved conceptual summary is not a failed finding extraction");
+
+// Weekly source provenance belongs to the archived edition, even when the
+// current library reading has since moved to the publisher's version.
+const issueOriginal={id:original.doi,title:original.title,url:original.url,venue:original.venue,
+ editorial_role:"collection_week",original_summary:true,
+ source_url:original.reading.source_url,source_version:original.reading.source_version,
+ source_format:original.reading.source_format,source_doi:original.reading.source_doi,
+ related_journal_doi:original.reading.related_journal_doi,review_kind:"ai_source_check",
+ review_scope:original.reading.review_scope,
+ review_label:"AI source-check against this source version; not human review or independent replication."
+};
+ctx.issueOriginal=issueOriginal;ctx.publisherSummary=publisherSummary;
+vm.runInContext("TEST.S.records=[publisherSummary]",ctx);
+for(const hasCurrentReading of [true,false]){
+ if(!hasCurrentReading)vm.runInContext("TEST.S.records=[]",ctx);
+ const shelfItem=vm.runInContext("TEST.issueSourceShelfItem(issueOriginal,0)",ctx);
+ assert(textContent(shelfItem).includes(original.reading.source_version),"Weekly shelf must preserve the actual checked version");
+ assert(!textContent(shelfItem).includes("Publisher version of record"),"Current reading must not overwrite archived source-version metadata");
+ assert(textContent(shelfItem).includes(issueOriginal.review_label),"Weekly shelf must retain its explicit AI review label");
+ const checkedLink=match(shelfItem,"issue-source-checked-link");
+ assert.equal(checkedLink.href,original.reading.source_url,"Weekly shelf must link the actual working-paper source");
+ assert(checkedLink.textContent.includes(original.reading.source_version)&&checkedLink.textContent.includes("PDF"));
+ const publicationLink=match(shelfItem,"issue-source-publication-link");
+ assert.equal(publicationLink.href,"https://doi.org/"+original.reading.related_journal_doi);
+ assert(publicationLink.textContent.includes("not the checked source"));
+ assert(textContent(shelfItem).includes("Checked source DOI: "+original.reading.source_doi));
+ assert(textContent(shelfItem).includes("Related journal DOI (not checked here): "+original.reading.related_journal_doi));
+ assert(textContent(shelfItem).includes("AI source-check scope: "+original.reading.review_scope));
+ assert.equal(match(shelfItem,"issue-source-review").open,false,"Weekly review details should be optional and collapsed");
+}
+ctx.unsafeShelf={...issueOriginal,source_url:"javascript:invalid()",source_version:'Working paper <svg onload="invalid()">'};
+const safeShelf=vm.runInContext("TEST.issueSourceShelfItem(unsafeShelf,1)",ctx);
+assert(!match(safeShelf,"issue-source-checked-link"),"Weekly shelf must reject unsafe checked-source links");
+assert.equal(match(safeShelf,"issue-source-version").textContent,"Checked source: "+ctx.unsafeShelf.source_version+" · PDF");
+assert(!nodes(safeShelf).some(n=>["svg","script","img"].includes(n.tag)),"Weekly provenance must render as plain text");
+ctx.legacyShelf={id:"synthetic-legacy",title:"Synthetic older source",url:"https://example.org/legacy",venue:"Synthetic Journal"};
+const legacyShelf=vm.runInContext("TEST.issueSourceShelfItem(legacyShelf,2)",ctx);
+assert(!match(legacyShelf,"issue-source-review")&&!match(legacyShelf,"issue-source-version"),"Legacy shelf entries must not acquire an unverified AI review label");
+assert(textContent(legacyShelf).includes("Not in current reading library · Original source"));
+vm.runInContext("TEST.S.records=database",ctx);
+
+const safeSummary=JSON.parse(JSON.stringify(original));
+safeSummary.reading.source_version='Working paper <svg onload="invalid()">';
+safeSummary.reading.evidence.finding=[{section:'Results <img src=x onerror="invalid()">',page:9,paragraph:1}];
+safeSummary.analysis.fulltext_url="javascript:invalid()";
+for(const unsafe of ["javascript:invalid()","http://example.org/unsecured","https://user:password@example.org/source"]){
+ safeSummary.reading.source_url=unsafe;
+ ctx.selected=safeSummary;vm.runInContext("TEST.showPaper(selected)",ctx);
+ assert(!match(match(paperContainer,"rv-source"),"rv-primary-link"),"Unsafe checked-source link must not be rendered: "+unsafe);
+ assert(!matching(match(paperContainer,"rv-source-excerpts"),"rv-secondary-link").length,"Unsafe machine-source link must not be rendered");
+ assert(textContent(match(paperContainer,"rv-evidence")).includes(safeSummary.reading.evidence.finding[0].section));
+ assert(!nodes(match(paperContainer,"rv-evidence")).some(n=>["img","svg","script"].includes(n.tag)),"Source locator text must never become markup");
+ assert(!nodes(match(paperContainer,"rv-head")).some(n=>["svg","script"].includes(n.tag)),"Source-version text must never become markup");
+}
+const noMachine={...original,analysis:undefined,abstract_text:undefined};
+ctx.selected=noMachine;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(!match(paperContainer,"rv-source-excerpts"),"Do not fabricate a machine-excerpt drawer when no extraction exists");
+assert(match(paperContainer,"rv-evidence"),"Source locators must remain available without machine extraction");
+
 const visualDoi=[
  "10.1007/s44217-026-02332-w","10.1515/humaff-2026-0011",
  "10.3389/fpsyg.2026.1960382","10.1177/21582440261497404",
@@ -177,4 +389,5 @@ if(conceptual){
 const title=vm.runInContext('TEST.shortIdea({kind:"scholarly",title:"A Study of Attention",reading:{digest:{idea:"AI use can support attention.",status:"editorially_written_from_indexed_sections"}}},100)',ctx);
 assert.equal(title,"AI use can support attention.");
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
-console.log("Validated",checked,"reading pages including",edited,"edited notes and",sourceOnly,"automated/publisher readings.");
+console.log("Validated",checked,"reading pages including",edited,"edited notes and",sourceOnly,"automated/publisher readings, plus synthetic original-summary/source-version/excerpt regressions.");
+

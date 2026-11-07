@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 from build_issue import source_id
+from original_readings import public_record
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'Qwen2.5-7B-Instruct-Q4_K_M'
@@ -25,6 +26,7 @@ def normalize(text):
 def evidence(items):
     packet = []
     for item in items:
+        item = public_record(item, require_current=True)
         reading = item.get('reading') or {}
         if reading.get('level') == 'citation_only':
             continue
@@ -52,6 +54,10 @@ def evidence(items):
                        'kind': item.get('kind'), 'level': reading.get('level'), 'published': item.get('published'),
                        'research_type': reading.get('research_type', ''),
                        'editorial_role': item.get('editorial_role', 'collection_week'),
+                       **({'source_url': reading['source_url'], 'source_version': reading['source_version'],
+                           'source_doi': reading['source_doi'], 'related_journal_doi': reading['related_journal_doi'],
+                           'review_kind': reading['review_kind'], 'review_scope': reading['review_scope'],
+                           'review_label': reading['notice']} if reading.get('original_summary') else {}),
                        'evidence': text})
     return packet
 
@@ -333,3 +339,4 @@ if __name__ == '__main__':
         print('Edition needed: ' + str(needed))
     else:
         compose()
+

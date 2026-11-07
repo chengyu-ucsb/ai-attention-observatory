@@ -10,6 +10,7 @@ import pathlib
 import urllib.parse
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
+from original_readings import public_record
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
@@ -44,6 +45,7 @@ def build():
  ET.SubElement(channel,"{"+ATOM+"}link",{"href":URL,"rel":"self","type":"application/rss+xml"})
  entries=0
  for x in (weekly.get("items") or [])[:50]:
+  x=public_record(x, require_current=True)
   read=x.get("reading") or {}
   if read.get("level")=="citation_only":continue
   digest=read.get("digest") or {}
@@ -56,6 +58,8 @@ def build():
    text+=" "+explain
   kind=x.get("kind") or "scholarly"
   label="Conceptual framework" if x.get("research_type")=="conceptual_framework" else "Research finding" if digest.get("finding") else ("Research question" if kind=="scholarly" else "Perspective")
+  if read.get("original_summary"):
+   label="AI source-checked summary (not human review; "+read["source_version"]+")"
   stable=x.get("doi") or x.get("url") or x.get("title")
   if not stable:continue
   permalink=BASE+"#paper/"+urllib.parse.quote(str(stable),safe="")
@@ -70,6 +74,8 @@ def build():
    el=ET.SubElement(item,field)
    if field=="guid":el.attrib["isPermaLink"]="true"
    el.text=value
+  if read.get("original_summary"):
+   ET.SubElement(item,"source",{"url":read["source_url"]}).text=read["source_version"]
   ET.SubElement(item,"category").text=x.get("lane") or "AI and attention"
   entries+=1
  ET.SubElement(channel,"lastBuildDate").text=rss_date((weekly.get("run") or {}).get("date"))
@@ -82,3 +88,4 @@ def build():
  return entries
 
 if __name__=="__main__":build()
+

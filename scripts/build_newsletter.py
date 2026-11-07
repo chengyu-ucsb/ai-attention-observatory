@@ -6,6 +6,7 @@ An unreviewed new week must not erase the latest published edition.
 from __future__ import annotations
 from datetime import date, datetime, time, timezone
 from email.utils import format_datetime
+from original_readings import safe_url as safe_original_url
 import html
 import json
 from pathlib import Path
@@ -41,6 +42,16 @@ def source_links(issue,ids):
         source=lookup.get(ident)
         if not source:continue
         title=source.get("title") or "Original source"
+        if source.get("original_summary") and safe_original_url(source.get("source_url")):
+            version=source.get("source_version") or "stated version"
+            out.append('<a class="source-link" href="'+esc(source['source_url'])+'" title="'+esc(title)+'">'
+                       +esc("Reading "+str(number)+" · "+version)+" ↗</a>"
+                       +' <span>'+esc("AI source-check, not human review")+'</span>')
+            if source.get("source_doi"):
+                out.append('<span>'+esc("Source DOI: "+source['source_doi'])+'</span>')
+            if source.get("related_journal_doi"):
+                out.append('<span>'+esc("Related journal DOI (different version): "+source['related_journal_doi'])+'</span>')
+            continue
         # Keep full descriptive alt/title; short labels prevent a forest of 80-word citations.
         out.append(
             '<a class="source-link" style="color:#9b3b4d;text-decoration:underline;text-underline-offset:3px;"'
@@ -320,3 +331,4 @@ def build():
     return count
 
 if __name__=="__main__":build()
+

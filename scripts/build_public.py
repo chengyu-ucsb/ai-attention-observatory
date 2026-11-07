@@ -17,10 +17,13 @@ from editorial_corrections import apply as apply_editorial_corrections
 from source_quality import screen as screen_source
 from news_quality import substantive_article
 from editorial_source_reviews import apply as apply_source_reviews
+from original_readings import apply as apply_original_readings, eligible as original_eligible, public_record
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
 def readable(record):
+    if (record.get("reading") or {}).get("original_summary"):
+        return original_eligible(record.get("original_reading"),record)
     reading=record.get("reading") or {}
     level=reading.get("level")
     if level=="citation_only":return False
@@ -85,10 +88,12 @@ def editorial_shelf(weekly, canonical, minimum=8, max_items=12):
 
 def build():
     all_records=prepare(apply_source_reviews(apply_editorial_corrections(json.loads((DATA/"library.json").read_text()))))
+    apply_original_readings(all_records)
     selected=[]
     pending=[]
     held=Counter()
     for source in all_records:
+        source=public_record(source)
         if not source.get("reading") or (source.get("research_type")=="conceptual_framework" and source.get("reading",{}).get("research_type")!="conceptual_framework"):
             source["reading"]=make_note(source)
         if source.get("kind")=="scholarly":
@@ -141,6 +146,8 @@ def build():
     run["reading_eligible_count"]=len(canonical)
     run["companion_count"]=len(selected)-len(canonical)
     run["full_text_count"]=sum(x.get("reading",{}).get("level")=="full_text" for x in canonical)
+    run["original_summary_count"]=sum(bool(x.get("reading",{}).get("original_summary")) for x in canonical)
+    run["machine_sections_count"]=sum(bool(x.get("analysis",{}).get("fulltext_url")) and not x.get("analysis",{}).get("original_paraphrases_only") for x in canonical)
     run["abstract_count"]=sum(x.get("reading",{}).get("level")=="abstract" for x in canonical)
     run["ai_specific_count"]=sum(x["source_group"]=="AI-specific" for x in canonical)
     run["historical_foundations_count"]=sum(x["source_group"].startswith(("Earlier","Historical")) for x in canonical)
@@ -169,3 +176,4 @@ def build():
     return selected,projected
 
 if __name__=="__main__":build()
+

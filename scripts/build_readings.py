@@ -7,6 +7,7 @@ import json,pathlib,re,html
 from editorial_corrections import apply as apply_editorial_corrections
 from news_quality import useful_description
 from source_lineage import prepare
+from original_readings import note_for
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 STOP=("abstract unavailable","bibliographic metadata only","no abstract", "abstract not available")
@@ -48,6 +49,8 @@ def make_note(r):
         if useful_description(r.get("title"),prose,r.get("venue")) and not any(s in prose.lower() for s in STOP):
             return {"level":"curated","provenance":r.get("venue","Publisher")+" supplied synopsis","overview":prose[:330],"methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Short publisher/editorial description, not an independently verified full-article analysis."}
         return {"level":"citation_only","provenance":"Publisher citation","overview":"","methods":"","findings":"","limitations":"","sample":"","reported_findings":False,"notice":"Source link and bibliographic metadata only."}
+    original=note_for(r)
+    if original is not None:return original
     src=clean(r.get("abstract_text"))
     if len(src)<90 and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         src=clean(r["preview"])
@@ -125,3 +128,4 @@ def main():
     LIB.write_text(json.dumps(records,ensure_ascii=False,indent=2)+"\n")
     print("Reading cards:",counts)
 if __name__=="__main__":main()
+

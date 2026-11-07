@@ -446,6 +446,11 @@ def deep_perspective(record,notes):
  }
 
 def annotate(record):
+ from original_readings import public_record, note_for
+ record=public_record(record)
+ original=note_for(record)
+ if original is not None:
+  return {**record,"reading":original}
  r=record.get("reading") or {}
  base=dict(record);base["reading"]=dict(r)
  level=r.get("level")
@@ -534,3 +539,4 @@ def annotate(record):
   digest["longform"]["review_status"]=machine.get("review_status","automatic_unreviewed")
  base["reading"]["digest"]=digest
  return base
+

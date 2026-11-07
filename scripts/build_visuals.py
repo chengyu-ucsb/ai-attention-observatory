@@ -25,6 +25,9 @@ def visual_spec(record: dict) -> dict:
     have survived the source-aware digest checks.
     """
     reading = record.get("reading") or {}
+    if reading.get("original_summary"):
+        # Avoid mixing old DOI-specific/extracted graphics with a versioned summary.
+        return {"kind": "illustration_only", "reason": "original_summary_has_separate_evidence_locators"}
     digest = reading.get("digest") or {}
     if record.get("kind") != "scholarly":
         return {"kind": "illustration_only", "reason": "nonempirical_or_commentary"}
@@ -56,3 +59,4 @@ def visual_spec(record: dict) -> dict:
         "finding_source": finding_source if finding else "none",
         "blocks": blocks,
     }
+
