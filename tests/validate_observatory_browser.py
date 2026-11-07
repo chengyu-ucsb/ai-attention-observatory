@@ -267,11 +267,114 @@ def check_typed_readings(page, url, width, out):
     assert not errors, errors
 
 
+def registered_reading_payloads():
+    """Run the real publication builder without changing checked-in data/receipts."""
+    import json
+    import shutil
+    import sys
+    import tempfile
+    from unittest.mock import patch
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    import build_public
+    import original_readings
+    from collection_window import previous_week, weekly_eligible
+    with tempfile.TemporaryDirectory(prefix='registered-reading-browser-') as tmp:
+        data = Path(tmp) / 'data'
+        shutil.copytree(ROOT / 'data', data)
+        with patch.object(build_public, 'DATA', data), patch.object(original_readings, 'MANIFEST', data / 'original-readings.json'):
+            library, weekly = build_public.build()
+        pending = json.loads((data / 'public-pending-sources.json').read_text())
+    originals = [row for row in library if row.get('reading', {}).get('original_summary')]
+    if weekly.get('run', {}).get('publication_window'):
+        start, end = previous_week(weekly['run']['date'])
+        weekly_ids = {build_public.record_id(row) for row in weekly['items']}
+        for row in originals:
+            if not weekly_eligible(row, start, end):
+                assert build_public.record_id(row) not in weekly_ids, 'An out-of-window original leaked into weekly publication'
+    print(f'Registered-reading browser input: {len(originals)} admitted originals' +
+          ('; actual original-reading DOM coverage skipped because none were admitted.' if not originals else '.'))
+    return library, weekly, pending, originals
+
+
+def check_registered_readings(page, url, width, out, payloads):
+    """Validate every actually admitted original, never create an approval."""
+    import hashlib
+    import json
+    from urllib.parse import quote
+    library, weekly, pending, originals = payloads
+    if not originals:
+        return
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.set_viewport_size({'width': width, 'height': 900})
+    data = {'public-library.json': library, 'public-weekly.json': weekly,
+            'public-pending-sources.json': pending}
+    def fulfill(route):
+        name = route.request.url.split('/')[-1].split('?')[0]
+        if name in data:
+            route.fulfill(status=200, content_type='application/json', body=json.dumps(data[name]))
+        else:
+            route.continue_()
+    page.route('**/data/*.json*', fulfill)
+    for row in originals:
+        reading = row['reading']
+        commentary = reading.get('research_type') == 'attributed_commentary'
+        identifier = row.get('doi') or row['url']
+        page.goto(url + '#paper/' + quote(identifier, safe=''), wait_until='networkidle')
+        paper = page.locator('#paper-content')
+        expect(page.locator('#paper')).to_be_visible()
+        expect(paper.locator('.rv-primary-link')).to_have_attribute('href', reading['source_url'])
+        expect(paper).to_contain_text(reading['source_version'])
+        expect(paper).to_contain_text(reading['review_scope'])
+        expect(paper).to_contain_text(reading['notice'])
+        expect(paper).to_contain_text('not human review')
+        if reading.get('quality_note'):
+            expect(paper).to_contain_text(reading['quality_note'])
+        if reading.get('temporal_notice'):
+            expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
+            expect(paper.locator('.rv-head .rv-reading-notice')).to_be_visible()
+        # Compare against the approved source fields, not legacy extracted prose.
+        for field, value in row['original_reading']['summary'].items():
+            if value:
+                expect(paper).to_contain_text(value)
+        if commentary:
+            for label in ('How it was studied', 'Study approach', 'REPORTED FINDING', 'Methods as indexed', 'Results as indexed'):
+                expect(paper).not_to_contain_text(label)
+            expect(paper.locator('.rv-context-grid')).to_have_count(0)
+        if 'Preprint, not verified peer-reviewed evidence' in reading['notice']:
+            expect(paper).to_contain_text('Limited reading.')
+            expect(paper).to_contain_text('Article screening is not peer review')
+        expect(paper.locator('.automatic-evidence, .rv-artwork, .rv-original-figure')).to_have_count(0)
+        evidence = paper.locator('.rv-evidence')
+        expect(evidence).to_have_count(1)
+        evidence.locator('summary').click()
+        locators = [locator for values in reading['evidence'].values() for locator in values]
+        expect(evidence.locator('.rv-source-locator')).to_have_count(len(locators))
+        for locator in locators:
+            expect(evidence).to_contain_text('Section: ' + locator['section'])
+            if locator.get('page'):
+                expect(evidence).to_contain_text('page ' + str(locator['page']))
+            if locator.get('paragraph'):
+                label = 'extracted block ' if commentary and reading['source_format'] == 'html' else 'paragraph '
+                expect(evidence).to_contain_text(label + str(locator['paragraph']))
+        expect(evidence.locator('.rv-source-locator').first).to_be_visible()
+        evidence.locator('summary').click()
+        expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
+        evidence.locator('summary').click()
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Registered reading overflow: {identifier} at {width}px'
+        if out:
+            out.mkdir(parents=True, exist_ok=True)
+            key = hashlib.sha256(identifier.encode()).hexdigest()[:12]
+            page.screenshot(path=str(out / f'observatory-{width}-registered-{key}.png'), full_page=True)
+    assert not errors, errors
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
     parser.add_argument('--screenshots', type=Path)
     args = parser.parse_args()
+    registered = registered_reading_payloads()
     with server() as url, sync_playwright() as p:
         browser = getattr(p, args.browser).launch()
         for width in [1280, 768, 390, 320]:
@@ -279,6 +382,7 @@ if __name__ == '__main__':
             try:
                 check(context.new_page(), url, width, args.screenshots)
                 check_typed_readings(context.new_page(), url, width, args.screenshots)
+                check_registered_readings(context.new_page(), url, width, args.screenshots, registered)
             finally:
                 context.close()
         print(f'Observatory browsing passed in {args.browser}: 1280, 768, 390, 320px; theme navigation, filters, dates, reading pages and all routes.')
