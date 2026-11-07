@@ -22,11 +22,12 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('observatory-check-{0}-{1}', github.workflow, github.ref) || 'observatory-index' }}
+  group: ${{ github.event_name == 'pull_request' && format('observatory-check-{0}-{1}', github.workflow, github.ref) || (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('observatory-skip-{0}', github.run_id) || 'observatory-index' }}
+  queue: max
   cancel-in-progress: false
 jobs:
   edition:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
@@ -101,3 +102,4 @@ jobs:
             issues/
           retention-days: 7
           if-no-files-found: warn
+

@@ -6,6 +6,7 @@ Only metadata and short publisher previews persist; discovery is not full text.
 """
 from collections import Counter
 import datetime
+import argparse
 import email.utils
 import html
 import json
@@ -54,6 +55,7 @@ PUBLISHERS = {
 AI = re.compile(r"\b(?:ai|genai|chatgpt|copilot|generative|artificial intelligence|language models?|llms?|claude|algorithmic)\b", re.I)
 FOCUS = re.compile(r"\b(?:attention|focus|distraction|cognitive|offloading|thinking|mental effort|memory|learning|interruption|notifications?|task.switching|mindful|productivity|deep work|wellbeing|well-being|autonomy)\b", re.I)
 NOISE = re.compile(r"stock (?:price|market)|share price|market cap|latest earnings|price target|football|crypto investment|gambling|celebrity|smartphone deal|focus on privacy|focuses on privacy|paying attention to (?:the|a|creative)|(?:ai|artificial intelligence).*museum|museum.*(?:ai|artificial intelligence)", re.I)
+SENSITIVE_QUERY_KEYS = {"api_key", "apikey", "key", "access_token", "refresh_token", "id_token", "token", "auth", "authorization", "client_secret", "password", "passwd", "pwd", "session", "sessionid", "session_id", "sid", "secret", "signature", "sig"}
 TRACKING = {"fbclid", "gclid", "dclid", "msclkid", "mc_cid", "mc_eid", "ref_src", "ref_url"}
 FORMATS = {"journalism": "Technology journalism", "opinion": "Opinion & analysis",
            "policy": "Policy & analysis", "analysis": "Expert analysis"}
@@ -61,6 +63,29 @@ FORMATS = {"journalism": "Technology journalism", "opinion": "Opinion & analysis
 
 def clean(value):
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", value or ""))).strip()
+
+
+def credentialed_url(value):
+    try:
+        parts = urllib.parse.urlsplit(value)
+        return bool(parts.username or parts.password or any(
+            key.casefold() in SENSITIVE_QUERY_KEYS
+            for key, _ in urllib.parse.parse_qsl(parts.query, keep_blank_values=True)))
+    except (ValueError, TypeError):
+        return True
+
+
+def diagnostic_locator(value):
+    """Keep ordinary article IDs, never userinfo, credential queries or fragments."""
+    try:
+        parts = urllib.parse.urlsplit(value)
+        if parts.scheme not in {"http", "https"} or not parts.hostname:
+            return ""
+        query = urllib.parse.urlencode([(k, v) for k, v in urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+                                       if k.casefold() not in SENSITIVE_QUERY_KEYS])
+        return urllib.parse.urlunsplit((parts.scheme, parts.hostname, parts.path, query, ""))
+    except (ValueError, TypeError):
+        return ""
 
 
 def url_key(value):
@@ -182,7 +207,7 @@ def next_page(root, current_url):
         target = urllib.parse.urljoin(current_url, link.get("href", ""))
         parts, old = urllib.parse.urlsplit(target), urllib.parse.urlsplit(current_url)
         if (parts.scheme != "https" or parts.hostname != old.hostname or parts.username
-                or parts.password or parts.port not in (None, 443)):
+                or parts.password or parts.port not in (None, 443) or credentialed_url(target)):
             raise ValueError("feed_pagination_requires_review")
         return target
     return ""
@@ -231,7 +256,7 @@ def eligible(item):
 
 
 def allowed_article(url, feed):
-    if not publisher_url(url):
+    if not publisher_url(url) or credentialed_url(url):
         return False
     parts = urllib.parse.urlsplit(url)
     host = (parts.hostname or "").lower().removeprefix("www.")
@@ -257,7 +282,8 @@ def to_record(item, publisher, format_label, *, feed=None, today=None):
             "raw": item.get("date_raw", ""), "date": item["date"], "timezone": "UTC",
             "source_url": (feed or {}).get("url", ""), "independently_verified": False},
         "discovery_provenance": {"method": "publisher_feed", "feed_id": (feed or {}).get("id", ""),
-            "feed_url": (feed or {}).get("url", ""), "checked_at": today.isoformat()},
+            "feed_url": (feed or {}).get("url", ""), "checked_at": today.isoformat(),
+            **({"metadata_snapshot_observed_at": item["_snapshot_observed_at"]} if item.get("_snapshot_observed_at") else {})},
         "curated": False, "first_seen": today.isoformat(),
         "reading": {"level": "source_preview" if overview else "citation_only",
             "provenance": publisher + " RSS/Atom description", "overview": overview,
@@ -268,13 +294,13 @@ def to_record(item, publisher, format_label, *, feed=None, today=None):
 
 
 def quarantine_item(item, feed, reason):
-    return {"title": item["title"], "url": item["url"], "publisher": feed["name"],
+    return {"title": item["title"], "url": diagnostic_locator(item["url"]), "publisher": feed["name"],
             "feed_id": feed["id"], "reported_date": item.get("date", ""),
             "reported_date_basis": item.get("date_basis", ""), "status": reason,
             "eligible_for_weekly": False}
 
 
-def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, sleep=time.sleep):
+def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, sleep=time.sleep, cached_items=None, cache_coverage=None, live=True):
     today = now or TODAY
     if isinstance(today, datetime.datetime):
         today = today.astimezone(datetime.timezone.utc).date() if today.tzinfo else today.date()
@@ -288,32 +314,46 @@ def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, s
     existing_by_url = {url_key(row["url"]): row for row in existing if row.get("url")}
     observed_by_url = {}
     paused_hosts = {}
+    cached_items = cached_items or {}
+    cache_coverage = cache_coverage or {}
     for feed in feeds:
         report = {"source_id": feed["id"], "name": feed["name"], "feed_url": feed["url"],
                   "status": "ok", "pages": 0, "returned": 0, "accepted": 0, "warnings": []}
         rejected, dates, visited = Counter(), [], set()
         host = urllib.parse.urlsplit(feed["url"]).hostname
+        cached = list(cached_items.get(feed["id"], []))
+        cache_pending = bool(cached)
+        report["cached_candidates"] = sum(date_in_window(x.get("date"), start, end) for x in cached)
+        report["cached_evidence_rows"] = len(cached)
+        report["snapshot_coverage"] = cache_coverage.get(feed["id"], {})
+        current = feed["url"] if live else ""
+        if not live:
+            report.update(status="partial")
+            report["warnings"].append("live_feed_not_requested_cached_recovery_only")
         if host in paused_hosts:
             report.update(status="deferred", reason=paused_hosts[host])
-            reports.append(report)
-            continue
-        current = feed["url"]
+            current = ""
         try:
-            while current:
-                if current in visited:
-                    report["warnings"].append("pagination_loop")
-                    break
-                if report["pages"] >= MAX_FEED_PAGES:
-                    report["warnings"].append("pagination_page_limit_reached")
-                    break
-                visited.add(current)
-                root = fetcher(current)
-                items = parse_feed(root)
-                report["pages"] += 1
-                report["returned"] += len(items)
-                dates.extend(x["date"] for x in items if x["date"])
+            while current or cache_pending:
+                from_cache = cache_pending
+                if from_cache:
+                    items = cached
+                    cache_pending = False
+                else:
+                    if current in visited:
+                        report["warnings"].append("pagination_loop")
+                        break
+                    if report["pages"] >= MAX_FEED_PAGES:
+                        report["warnings"].append("pagination_page_limit_reached")
+                        break
+                    visited.add(current)
+                    root = fetcher(current)
+                    items = parse_feed(root)
+                    report["pages"] += 1
+                    report["returned"] += len(items)
+                    dates.extend(x["date"] for x in items if x["date"])
                 for item in items:
-                    topical = eligible(item)
+                    topical = eligible(item) or (from_cache and item.get("_snapshot_screening_version") == 1)
                     key = url_key(item["url"])
                     if not topical and key not in existing_by_url and key not in observed_by_url:
                         rejected["not_topical"] += 1
@@ -332,13 +372,18 @@ def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, s
                     observed_by_url.setdefault(key, fresh)
                     # A publisher correction outside this week's bounds still
                     # invalidates an old in-window date. Preserve both accounts.
-                    if old and old.get("published") and old["published"] != item["date"]:
+                    cached_conflict = item.get("_snapshot_conflicting_dates") if from_cache else []
+                    if (old and old.get("published") and old["published"] != item["date"]) or cached_conflict:
                         rejected["conflicting_original_publication_dates"] += 1
                         quarantine.append(quarantine_item(item, feed, "conflicting_original_publication_dates"))
                         fresh = to_record(item, feed["name"], "", feed=feed, today=today)
-                        conflict = date_conflicts.setdefault(key, {"url": old["url"],
-                            "stored_publication_date": old["published"], "conflicting_evidence": [old.get("publication_date_provenance", {"date":old["published"]})]})
+                        prior = old or fresh
+                        conflict = date_conflicts.setdefault(key, {"url": prior["url"],
+                            "stored_publication_date": prior["published"], "conflicting_evidence": [prior.get("publication_date_provenance", {"date":prior["published"]})]})
                         conflict["conflicting_evidence"].append(fresh["publication_date_provenance"])
+                        if cached_conflict:
+                            conflict["conflicting_evidence"].append({"basis": "publisher_feed_cache_conflict",
+                                "status": "unresolved", "observed_original_dates": list(cached_conflict)})
                         if key not in seen and key not in existing_by_url and date_in_window(item["date"],start,end):
                             kind,_=source_type(item,feed)
                             added.append(to_record(item,feed["name"],FORMATS[kind],feed=feed,today=today))
@@ -364,9 +409,10 @@ def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, s
                     kind, _ = source_type(item, feed)
                     added.append(to_record(item, feed["name"], FORMATS[kind], feed=feed, today=today))
                     report["accepted"] += 1
-                current = next_page(root, current)
-                if current:
-                    sleep(.25)
+                if not from_cache:
+                    current = next_page(root, current)
+                    if current:
+                        sleep(.25)
         except Exception as error:
             report["status"] = "failed" if not report["pages"] else "partial"
             report["error_type"] = type(error).__name__
@@ -379,15 +425,18 @@ def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, s
         report["newest_original_date"] = max(dates) if dates else ""
         if not dates:
             report["warnings"].append("no_original_publication_dates_returned")
-        elif min(dates) > start.isoformat():
-            report["warnings"].append("rolling_feed_does_not_reach_window_start")
+        else:
+            if min(dates) > start.isoformat():
+                report["warnings"].append("rolling_feed_does_not_reach_window_start")
+            if max(dates) < start.isoformat():
+                report["warnings"].append("newest_feed_entry_predates_publication_window")
         if report["warnings"] and report["status"] == "ok":
             report["status"] = "partial"
         reports.append(report)
         sleep(.25)
     # Aggregator timestamps are not proof of original publication. Keep bounded-
     # date search leads separate until a canonical publisher and date are verified.
-    for index, (query, lane) in enumerate(searches):
+    for index, (query, lane) in enumerate(searches if live else []):
         exact = f"{query} after:{(start - datetime.timedelta(days=1)).isoformat()} before:{(end + datetime.timedelta(days=1)).isoformat()}"
         url = "https://news.google.com/rss/search?" + urllib.parse.urlencode({"q": exact, "hl": "en-US", "gl": "US", "ceid": "US:en"})
         report = {"source_id": f"google-news-{index + 1}", "name": "Google News RSS", "status": "leads_only",
@@ -462,10 +511,13 @@ def apply_discovery_evidence(data, status):
     return data
 
 
-def run():
+def run(*, cached_only=False):
     path = DIR / "library.json"
     data = apply_source_reviews(apply_editorial_corrections(json.loads(path.read_text())))
-    added, status, quarantine = collect(data)
+    from editorial_feed_cache import load_cache, candidate_items, coverage_report
+    cache = load_cache(DIR / "editorial-feed-cache.json", FEEDS)
+    added, status, quarantine = collect(data, cached_items=candidate_items(cache, FEEDS, now=TODAY),
+                                         cache_coverage=coverage_report(cache, FEEDS, now=TODAY), live=not cached_only)
     # Historical and curated records remain in the archive; never relabel them as new.
     data.extend(added)
     apply_discovery_evidence(data, status)
@@ -487,4 +539,7 @@ def run():
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--cached-only", action="store_true", help="Use staged previous-week metadata without repeating live feed/search requests")
+    args = parser.parse_args()
+    run(cached_only=args.cached_only)

@@ -72,7 +72,7 @@ class PaginationTests(unittest.TestCase):
             return {'results': [openalex()], 'meta': {'count': 3, 'next_cursor': '1' if cursor == '*' else '2'}}
         with patch.object(update, 'request', fetch):
             rows, audit, errors = update.openalex_search({}, max_pages=2, page_size=1)
-        self.assertEqual(len(rows), 2); self.assertTrue(audit['truncated']); self.assertFalse(errors)
+        self.assertEqual(len(rows), 1); self.assertEqual(audit['pages'], 2); self.assertTrue(audit['truncated']); self.assertFalse(errors)
 
 
 class AcademicCollectionTests(unittest.TestCase):
@@ -175,7 +175,7 @@ class AcademicCollectionTests(unittest.TestCase):
     def test_openalex_doi_date_is_verified_once_then_shared_between_queries(self):
         work = crossref(); work['published-online'] = {'date-parts': [[2026, 10, 27]]}
         rows, errors, stats, calls = self.discover([openalex(), openalex()], [], direct=work)
-        self.assertEqual(len(rows), 2)
+        self.assertEqual(len(rows), 1)  # Duplicate provider/query rows are one article.
         self.assertTrue(all(r['published'] == '2026-10-27' for r in rows))
         self.assertEqual(sum('/works/10.' in u for u in calls), 1)
         self.assertFalse(errors)
