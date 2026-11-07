@@ -49,13 +49,6 @@ jobs:
       contents: write
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    env:
-      MODE: weekly
-      DISCOVERY_RESUME_ONLY: '1'
-      ACADEMIC_MAX_PAGES: '1'
-      ACADEMIC_MAX_DATE_LOOKUPS: '12'
-      ACADEMIC_MAX_INLINE_WAIT_SECONDS: '2'
-      OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -83,6 +76,13 @@ jobs:
           PY
       - name: Resume existing academic cursors and date checks only
         if: steps.window.outputs.ready == 'true'
+        env:
+          MODE: weekly
+          DISCOVERY_RESUME_ONLY: '1'
+          ACADEMIC_MAX_PAGES: '1'
+          ACADEMIC_MAX_DATE_LOOKUPS: '12'
+          ACADEMIC_MAX_INLINE_WAIT_SECONDS: '2'
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python scripts/update.py
       - name: Admit only staged previous-week publisher metadata
         if: steps.window.outputs.ready == 'true'

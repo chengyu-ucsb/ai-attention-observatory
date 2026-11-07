@@ -28,6 +28,16 @@ class CoverageWorkflowTests(unittest.TestCase):
         self.assertNotIn('compose_issue.py',text)
         self.assertLess(text.index('scripts/editorial_metadata.py --'),text.index('scripts/build_weekly.py'))
 
+    def test_resume_controls_are_scoped_to_academic_step_not_validation(self):
+        text=(ROOT/'.github/workflows/resume-weekly-discovery.yml').read_text()
+        step=text.index('      - name: Resume existing academic cursors and date checks only')
+        following=text.index('      - name: Admit only staged',step)
+        block=text[step:following]
+        for variable in ('DISCOVERY_RESUME_ONLY','ACADEMIC_MAX_PAGES','ACADEMIC_MAX_DATE_LOOKUPS','ACADEMIC_MAX_INLINE_WAIT_SECONDS','OPENALEX_API_KEY'):
+            self.assertIn(variable,block)
+            self.assertNotIn(variable,text[:step])
+            self.assertNotIn(variable,text[following:])
+
     def test_completed_resume_routes_to_acquisition_and_publication(self):
         for name in ('publish.yml','weekly-source-acquisition.yml'):
             text=(ROOT/'.github/workflows'/name).read_text()
