@@ -30,11 +30,12 @@ on:
 permissions:
   contents: write
 concurrency:
-  group: observatory-index
+  group: ${{ (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('observatory-skip-{0}', github.run_id) || 'observatory-index' }}
+  queue: max
   cancel-in-progress: false
 jobs:
   catchup:
-    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-24.04
     timeout-minutes: 28
     env:
@@ -139,3 +140,4 @@ jobs:
             issues/
           retention-days: 7
           if-no-files-found: warn
+

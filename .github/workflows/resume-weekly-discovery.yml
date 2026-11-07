@@ -1,0 +1,145 @@
+name: Resume weekly source discovery
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/resume-weekly-discovery.yml'
+      - '.github/workflows/editorial-feed-snapshots.yml'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/resume-weekly-discovery.yml'
+  schedule:
+    - cron: '17 2,8,14,20 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('discovery-resume-check-{0}', github.ref) || 'observatory-index' }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Official releases and Node 24 runtimes verified 2026-11-07.
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check 'pypdf>=6.0,<7.0'
+      - name: Validate offline without provider requests
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_article_ui.cjs
+          node tests/validate_weekly_issue.cjs
+          node tests/validate_weekly_window.cjs
+  resume:
+    if: github.event_name != 'pull_request'
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      MODE: weekly
+      DISCOVERY_RESUME_ONLY: '1'
+      ACADEMIC_MAX_PAGES: '1'
+      ACADEMIC_MAX_DATE_LOOKUPS: '12'
+      ACADEMIC_MAX_INLINE_WAIT_SECONDS: '2'
+      OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Require a current strict weekly discovery window
+        id: window
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          from pathlib import Path
+          sys.path.insert(0, 'scripts')
+          from collection_window import window_metadata
+          expected = window_metadata()
+          actual = json.loads(Path('data/weekly.json').read_text()).get('run', {}).get('publication_window', {})
+          ready = all(actual.get(key) == expected[key] for key in ('from', 'to', 'timezone'))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('ready=' + str(ready).lower() + '\n')
+          print(json.dumps({'ready': ready, 'expected': expected, 'actual': actual}))
+          if not ready:
+              print('Recovery skipped. Scheduled weekly discovery must establish the current window first.')
+          PY
+      - name: Resume existing academic cursors and date checks only
+        if: steps.window.outputs.ready == 'true'
+        run: python scripts/update.py
+      - name: Admit only staged previous-week publisher metadata
+        if: steps.window.outputs.ready == 'true'
+        run: python scripts/discover_editorial.py --cached-only
+      - name: Verify bounded publisher original dates and explicit genres
+        if: steps.window.outputs.ready == 'true'
+        run: python scripts/editorial_metadata.py --max-records 8 --max-requests 24 --time-budget 120
+      - name: Rebuild strict source shelf without generating an editorial
+        if: steps.window.outputs.ready == 'true'
+        run: |
+          python scripts/build_readings.py
+          python scripts/build_weekly.py
+          python scripts/build_public.py
+          python scripts/build_issue.py
+          python scripts/build_newsletter.py
+          python scripts/pipeline_status.py
+          python scripts/feed.py
+      - name: Validate before saving any recovery result
+        if: steps.window.outputs.ready == 'true'
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_weekly_window.cjs
+          python -m json.tool data/library.json >/dev/null
+          python -m json.tool data/weekly.json >/dev/null
+      - name: Save current-window results and resumable metadata
+        if: steps.window.outputs.ready == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/ feed.xml issue-feed.xml newsletter.html issues/
+          if ! git diff --cached --quiet; then
+            git commit -m 'Resume bounded previous-week discovery and verify publisher metadata'
+            for attempt in 1 2 3; do
+              git fetch origin main
+              if ! git rebase origin/main; then
+                git rebase --abort
+                echo 'Recovery conflict. Preserve results for review; never overwrite newer source records.'
+                exit 1
+              fi
+              if git push origin HEAD:main; then exit 0; fi
+              sleep "$((attempt * 2))"
+            done
+            exit 1
+          fi
+      - name: Preserve recovery files if validation or saving fails
+        if: failure() && steps.window.outputs.ready == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: weekly-discovery-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            data/academic-discovery-state.json
+            data/editorial-metadata-state.json
+            data/editorial-metadata-status.json
+            data/editorial-discovery-status.json
+            data/library.json
+            data/weekly.json
+          retention-days: 7
+          if-no-files-found: warn
