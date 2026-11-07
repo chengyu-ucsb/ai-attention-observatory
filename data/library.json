@@ -41210,17 +41210,20 @@
     "acquisition_status": "original_publication_date_required",
     "source_group": "Adjacent digital-attention evidence",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "ABSTRACT Electrocatalytic CO 2 reduction reaction (CO 2 RR) represents a pivotal pathway for the promotion of carbon neutrality and the preparation of highly valuable chemicals. To improve the product selectivity and catalytic efficiency of CO 2 RR, single‐atom catalysts (SACs) offering highly efficient atomic utilization rates and adjustable electronic properties attract…",
-      "methods": "However, SAC exploration in the vast parameter space through traditional trial‐and‐error methods is greatly impeded by long periods and high costs.",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "ABSTRACT Electrocatalytic CO 2 reduction reaction (CO 2 RR) represents a pivotal pathway for the promotion of carbon neutrality and the preparation of highly valuable chemicals. To improve the product selectivity and catalytic efficiency of CO 2 RR, single‐atom catalysts (SACs) offering highly efficient atomic utilization rates and adjustable electronic properties attract substantial attention.",
+      "methods": "Based on the established framework, ML, with its unique performance advantages, can identify catalysts with high activity and stability, and its main advantages are reflected in three aspects. First, ML enables HT virtual screening, thereby significantly accelerating the discovery of candidate materials [135] . By learning from limited high-quality datasets (e.g., DFT calculation results or HT experimental data), ML constructs a predictive model that maps catalyst characteristics to target performance. This model can instantly evaluate the performance of massive virtual candidate materials, thus rapidly narrowing the research focus to the most promising material regions. For example, a study exploring the 15-element space for CO 2 conversion to C3 hydrocarbon catalysts, by integrating an automated experimental platform with an explainable ML model, achieved an accelerated discovery of approximately 165 times compared to traditional methods, of which about 33 times comes from the innovation of the experimental platform, and about 5 times is due to the ML guidance that integrates domain knowledge [136] . In addition, through interpretable analysis, ML can quantitatively reveal the implicit relationship between the microscopic characteristics of materials (e.g., d-electron number, bond length) and their macrocatalytic properties. This ability makes it possible to design rational catalysts at the atomic structure level and also provides guidance for the realization of specific ca",
       "findings": "",
-      "interpretation": "",
+      "interpretation": "Through the circumvention of the intrinsic restrictions that characterize traditional trial-and-error approaches, ML makes it remarkably feasible to perform fast, expandable, and forecasting modeling over broad compositional and structural spaces. From intelligent guidance of coordination environment engineering to feature extraction and mechanism elucidation, recent work has made it increasingly clear that the feasibility of ML-driven frameworks can assist SACs rational design. Even with the considerable progress that has been made, significant obstacles still stand in the way of broadening the use of ML-driven investigation frameworks (Figure 13 ). In particular, the following aspects deserve much attention: i. Building a high-throughput synthesis platform for SACs: Further progress in the exploration of SACs hinges considerably on the establishment of flexible, scalable preparation methods. Significantly different physical/ chemical properties make it difficult to devise a versatile synthetic strategy for producing SACs that possess a broad spectrum of metal sites and supports, considering the solubility, reactivity, and thermal stability of metal precursors, as well as surface coordination and support wettability [275]. Additionally, across different synthesis protocols, variables like concentration, temperature, stirring rate, and the pH of the solution have been found to significantly impact how the metal species aggregate. Based on these multiple factors, these chemical methods lack broad versatility and do not translate well to the synthesis of SACs featuring various metal sites and supports. Therefore, it has become a scientific imperative to establish a synthesis route that is both versatile and continuous; achieving this essentially requires a direct and prac",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
     },
@@ -41249,7 +41252,34 @@
       "providers": [
         "unpaywall_checked"
       ]
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-07T10:06:11+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.1002/rar2.70688",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "Based on the established framework, ML, with its unique performance advantages, can identify catalysts with high activity and stability, and its main advantages are reflected in three aspects. First, ML enables HT virtual screening, thereby significantly accelerating the discovery of candidate materials [135] . By learning from limited high-quality datasets (e.g., DFT calculation results or HT experimental data), ML constructs a predictive model that maps catalyst characteristics to target performance. This model can instantly evaluate the performance of massive virtual candidate materials, thus rapidly narrowing the research focus to the most promising material regions. For example, a study exploring the 15-element space for CO 2 conversion to C3 hydrocarbon catalysts, by integrating an automated experimental platform with an explainable ML model, achieved an accelerated discovery of approximately 165 times compared to traditional methods, of which about 33 times comes from the innovation of the experimental platform, and about 5 times is due to the ML guidance that integrates domain knowledge [136] . In addition, through interpretable analysis, ML can quantitatively reveal the implicit relationship between the microscopic characteristics of materials (e.g., d-electron number, bond length) and their macrocatalytic properties. This ability makes it possible to design rational catalysts at the atomic structure level and also provides guidance for the realization of specific catalytic functions. In ML workflows, feature importance analysis (e.g., analysis based on XGBoost or random forest models) and SHapley additive exPlanations (SHAP) analysis can quantify the contribution of different descriptors to catalytic performance. These methods directly link macroscopic performance with microscopic electronic and geometric parameters, thus forming specific design criteria. For example, through ML analysis, the first ionization energy and the d-band center of the catalyst, two electronic structural characteristics, are identified as the most critical factors determining the reaction potential barrier [9] . These findings have led to the transformation of catalyst design from a practice that relies on experience to rational regulation based on a clear electronic structure descriptor. Besides, the products generated by electrocatalytic CO 2 RR are complex and diverse, with multiple selectivities, involving multiple competing reaction paths. After correlation analysis and pattern recognition on large-scale catalyst performance datasets, ML can infer potential common reaction mechanisms and path branches, thus improving the product selectivity of electrocatalytic CO 2 RR. This correlation analysis based on large datasets can grasp the overall catalytic trend and mechanism analysis, supplementing the shortcomings of traditional deep mechanism studies dedicated to a single system [26, 42] . More recently, reverse design has arisen as a more difficult yet potentially rewarding application, which starts from the desired catalytic performance and reversely deduces the catalyst structure that meets this performance requirement. This approach reverses the traditional forward thinking from structure design to performance testing; instead, it begins with the expected performance target to inversely identify the catalyst structure capable of achieving this goal. Intelligent algorithms like Bayesian optimization and generative adversarial networks (GANs) are powerful enablers for reverse design. These algorithms can intelligently explore the vast catalyst design space, proactively propose new SAC structures with potentially superior performance, iteratively suggest optimal candidate structures with the minimum number of attempts, and continuously optimize the model through loop feedback, ultimately guiding researchers to synthesize \"on-demand customized\" catalysts [32, 137, 138] . Besides, strategies such as AL are also a robust technique to tackle the challenge of scarce data to obtain the optimal model with the minimum number of samples and achieve reverse design combined an AL framework with DFT for screening highperformance catalysts for CO 2 RR. After four rounds of iterations, the model achieved an accurate prediction (R 2 ≈ 0.94) of the adsorption energies for crucial intermediates, even when only a limited amount of data is available, and successfully discovered a variety of previously unexplored high-performance catalysts. However, the practical implementation of inverse design faces several fundamental challenges. The difficulty of inverse design first stems from the inherent complexity of the catalytic system itself. Heterogeneous catalyst surfaces exhibit significant structural complexity, accompanied by coupled surface-adsorbate interactions spanning a vast chemical space that is difficult to explore effectively through conventional screening methods [141] . Taking inorganic compounds alone as an example, their chemical space encompasses approximately 10 N possible configurations (N atoms in the unit cell). Identifying novel and useful candidate materials within such a vast space is highly challenging. Although conventional forward design approaches have been widely adopted, their fundamental limitation lies in their inability to generate new materials that go beyond existing structural prototypes. Current inverse design methods also face multiple constraints: first, different generative models must be trained for different target properties, lacking universality [137]; second, ML models are often unreliable in high-dimensional spaces, prone to predictive bias, and struggle to effectively incorporate domain expert knowledge; third, the inherent \"black-box\" nature of generative models renders them lacking physical interpretability, limiting researchers' mechanistic understanding of the design outcomes; fourth, the conflict between the high-dimensional compositional space of materials and the limited availability of experimental data constitutes a fundamental data bottleneck [142] . Critically, in reverse design workflows, the experimental validation rate of ML-generated candidate materials remains below 5%-10%, and rare ML-designed materials have yet surpassed the current state-ofthe-art in the combined metrics of activity, selectivity, stability, and cost [143] . The primary reasons for this problem lie in the following: regarding synthetic feasibility, the core challenge facing SACs is their intrinsic thermodynamic instability. SACs are highly susceptible to Ostwald ripening under hightemperature conditions or during prolonged catalytic applications, leading to sintering and deactivation, a consequence rooted in the weak interaction between metal atoms and the support. The regeneration and recycling of deactivated catalysts will substantially increase both the time and economic costs of industrial production. Consequently, developing SACs with high thermal stability to meet industrial requirements has become an urgent priority in this field. Meanwhile, the morphology and coordination environment of metal centers during synthesis also affect the thermal stability of the resulting products, making it difficult to precisely reproduce theoretically predicted ideal coordination configurations under complex and variable experimental conditions [144] . These factors therefore collectively constitute the deep-seated barriers that impede the translation of machine A complete",
+      "results": "",
+      "discussion": "Through the circumvention of the intrinsic restrictions that characterize traditional trial-and-error approaches, ML makes it remarkably feasible to perform fast, expandable, and forecasting modeling over broad compositional and structural spaces. From intelligent guidance of coordination environment engineering to feature extraction and mechanism elucidation, recent work has made it increasingly clear that the feasibility of ML-driven frameworks can assist SACs rational design. Even with the considerable progress that has been made, significant obstacles still stand in the way of broadening the use of ML-driven investigation frameworks (Figure 13 ). In particular, the following aspects deserve much attention: i. Building a high-throughput synthesis platform for SACs: Further progress in the exploration of SACs hinges considerably on the establishment of flexible, scalable preparation methods. Significantly different physical/ chemical properties make it difficult to devise a versatile synthetic strategy for producing SACs that possess a broad spectrum of metal sites and supports, considering the solubility, reactivity, and thermal stability of metal precursors, as well as surface coordination and support wettability [275]. Additionally, across different synthesis protocols, variables like concentration, temperature, stirring rate, and the pH of the solution have been found to significantly impact how the metal species aggregate. Based on these multiple factors, these chemical methods lack broad versatility and do not translate well to the synthesis of SACs featuring various metal sites and supports. Therefore, it has become a scientific imperative to establish a synthesis route that is both versatile and continuous; achieving this essentially requires a direct and practical approach to fabricating SACs. Adopting HT continuous preparation methods, which steadily raise production over time, offers a viable alternative to the current batch-type processes. Developing universal synthetic methods for SACs has been the focus of several recent investigations, such as precursor-atomization strategy [276], rapid pyrolysis methods [14], and flash Joule heating [277]. Despite the impressive progress achieved in laboratory-scale synthesis, bringing electrocatalyst production to gram or kilogram levels without compromising performance and cost-efficiency now draws increasing concern as a central challenge. Therefore, moving SACs toward practical industrial CO 2 RR electrolysis now calls for the creation of green, scalable, and straightforward synthetic routes that are able to deliver high-performance catalysts bearing well-defined nanostructures. ii. Advancing in situ characterization techniques and computational simulations: The electrocatalytic CO 2 RR requires multiple electron and proton transfers. Although metal sites can possess considerably diverse coordination environments, electronic structures, and CO 2 RR intermediates and their adsorption modes are generally described through a simplified, uniform picture. Particularly, the recently developed dual-atom SACs, doped SACs, and high-entropy SACs feature several potential active centers. Additionally, the support material is also critically important for SACs [259, 278]. Although sophisticated analytical probes, in particular x-ray absorption spectroscopy and AC-TEM, are capable of delivering precise data on the coordination environment of synthesized SACs, they are limited in differentiating the spatial distribution of adjacent single metal atoms and identifying the true active sites for specific intermediates [279, 280]. More crucially, under specific potential, pH, and solvent conditions, the active site can convert into thermodynamically different structures, with a strong impact on the reaction pathway and the resulting selectivity. A comprehensive grasp of electronic configurations, particularly their transient dynamics under true operando conditions, essentially remains a significant knowledge gap [172]. Therefore, though stricter testing conditions are required, tracking active-site dynamics and capturing intermediates via in situ methods (e.g., operando time-resolved XANES) proves indispensable for gaining insight into the intrinsic mechanism of electrocatalysts for CO 2 RR. Besides, bringing together in situ devices and computational simulations provides a powerful way to probe the catalytic mechanism and dynamics of SACs under realistic operating conditions, and to guide the design of improved catalysts iii. Improving availability and quality: Data imperfections hinder the application of ML and the sharing of SACs results, stemming from inconsistent theoretical frameworks and heterogeneous experimental protocols across studies, which severely compromise model accuracy and limit generalizability. Transfer learning provides powerful tools to overcome this limitation, whereby knowledge acquired from specific domains directly informs models in different contexts, augmented by multi-fidelity frameworks that reconcile data from disparate quality sources [128] . Even with the increasing accessibility of standardized databases, for instance, the NREL Materials Database, Inorganic Materials Database, the NIST databases, and the Crystallography Open Database, the literature still often lacks properly recorded data curation before ML modeling, making it difficult to achieve reproducibility. Many studies fail to report crucial specifics, e.g., the manner in which data are allocated to training, validation, and test splits, and the validation methods that were used. In addition, codes and datasets are seldom shared openly, thus making it harder to ensure both reproducibility and collaborative advancement in the field. Moreover, a particularly easily overlooked problem is the serious lack of reports of experimental uncertainty. If there is a lack of quantitative error bars or measurement accuracy, the real prediction error of the ML model will not be reliably evaluated, which may lead to misleading performance indicators. In this regard, the widely adopted standardized reporting framework, such as the framework advocated by Materials Data Facility and FAIR data principles [281, 282] , is also mandatory to be included in the verification protocol and error propagation analysis, which will significantly improve the credibility, practicality, and transformative influence of ML in materials science. iv. Enhancing interpretability of ML models: In view of the inherent complexity of the multi-electron catalytic path and the high-dimensional parameter space that dominates the catalytic performance, the interpretability of ML models within CO 2 RR research has always been a continuous challenge. As the demand for prediction accuracy drives the construction of descriptors to evolve into increasingly nonlinear and high-order analytical expressions, the models obtained are often at the expense of the physical transparency of the atomic scale. This limits their practical value in clarifying the reaction mechanism or guiding the design of rational catalysts. In this case, human insight and expertise are still irreplaceable in identifying issues, choosing which parameters to quantify and incorporate into the model, and constraining the variable space of interest (i.e., the range of components and the experimental conditions used). In addition, in order to connect data-based predictions with an understanding of the mechanisms,",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.1002/rar2.70688",
+      "key_idea": "Through the circumvention of the intrinsic restrictions that characterize traditional trial-and-error approaches, ML makes it remarkably feasible to perform fast, expandable, and forecasting modeling over broad compositional and structural spaces. From intelligent guidance of coo",
+      "extraction_date": "2026-11-07",
+      "extraction_version": 3,
+      "sections_available": [
+        "methods",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-07"
   },
   {
     "title": "Digital distractions and memory confidence in mobile academic reading: A structural equation modelling study",
@@ -43127,7 +43157,15 @@
       "last_at": "2026-11-07",
       "next_at": "2026-11-28",
       "attempts": 1
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-07T10:06:12+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-21T10:06:12+00:00"
+    },
+    "open_access_url": "https://arxiv.org/abs/2610.38326"
   },
   {
     "title": "Can Academia Ethically Use Tools of Techno-Colonial Extraction? The “Problem” of GenAI",
@@ -43288,7 +43326,15 @@
       "last_at": "2026-11-07",
       "next_at": "2026-11-28",
       "attempts": 1
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-07T10:06:12+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-21T10:06:12+00:00"
+    },
+    "open_access_url": "https://arxiv.org/abs/2610.41045"
   },
   {
     "title": "The evolution of tool use in LLM agents: from single-tool call to multi-tool orchestration",
@@ -43370,7 +43416,15 @@
       "providers": [
         "unpaywall_checked"
       ]
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-07T10:06:12+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-21T10:06:12+00:00"
+    },
+    "open_access_url": "https://doi.org/10.1007/s10462-026-11700-9"
   },
   {
     "title": "Machine Learning for Stress Detection: A LightGBM-Based Approach Using Bayesian Optimization",
@@ -43445,7 +43499,15 @@
       "last_at": "2026-11-07",
       "next_at": "2026-11-09",
       "attempts": 1
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-07T10:06:12+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-21T10:06:12+00:00"
+    },
+    "open_access_url": "https://doi.org/10.53799/s67m2287"
   },
   {
     "title": "Making metacognition visible: AI-generated learning clues as signals of self-regulation and competence",
@@ -45176,7 +45238,15 @@
       "providers": [
         "unpaywall_no_entry"
       ]
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-07T10:06:12+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-21T10:06:13+00:00"
+    },
+    "open_access_url": "https://arxiv.org/abs/2610.38869"
   },
   {
     "title": "MAQASID SHARIAH APPROACH FOR GAMIFIED AI MONITORING ON ETHICS AND PRODUCTIVITY IN ISLAMIC ORGANIZATIONS",
