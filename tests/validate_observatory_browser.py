@@ -113,6 +113,33 @@ def check(page, url, width, out):
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('#paper h1')).to_be_visible()
     overflow(); screenshot('reading')
+    # A former generic-question reading now retains a supported method and result.
+    navigate('library')
+    page.locator('#library-reset').click()
+    page.locator('#search').fill('ChatGPT as cognitive scaffold')
+    expect(page.locator('.library-story')).to_have_count(1)
+    page.locator('.library-story h3 button').click()
+    expect(page.locator('#paper')).to_be_visible()
+    expect(page.locator('.rv-content')).not_to_contain_text('Method details are not clear enough')
+    expect(page.locator('.rv-coverage-table')).to_be_visible()
+    reader=page.locator('.rv-source-excerpts')
+    reader.locator(':scope > summary').focus()
+    page.keyboard.press('Enter')
+    expect(reader.locator('.rv-reader-contents')).to_be_visible()
+    reader.get_by_role('button', name='Abstract', exact=True).click()
+    # The source name can differ by index provider, so locate by its actual title.
+    abstract=reader.locator('.rv-source-section').filter(has=page.locator('summary span').filter(has_text='Abstract'))
+    expect(abstract.locator('.rv-prose')).to_be_visible()
+    assert abstract.locator('.rv-prose p').count()>1
+    overflow(); screenshot('source-reader')
+    reader.get_by_role('button',name='Expand all sections',exact=True).click()
+    assert reader.locator('.rv-source-section').evaluate_all('es => es.every(e => e.open)')
+    reader.get_by_role('button',name='Collapse all sections',exact=True).click()
+    assert reader.locator('.rv-source-section').evaluate_all('es => es.every(e => !e.open)')
+    reader.locator(':scope > summary').click()
+    reader.locator(':scope > summary').click()
+    expect(reader.locator('.rv-reader-contents')).to_be_visible()
+    overflow()
     # Every main destination remains available, with no page-level horizontal scroll.
     for route in ['issue', 'perspectives', 'atlas', 'about', 'home']:
         navigate(route)
@@ -137,9 +164,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
     parser.add_argument('--screenshots', type=Path)
+    parser.add_argument('--executable-path', type=str)
     args = parser.parse_args()
     with server() as url, sync_playwright() as p:
-        browser = getattr(p, args.browser).launch()
+        browser = getattr(p, args.browser).launch(**({"executable_path":args.executable_path} if args.executable_path else {}))
         for width in [1280, 768, 390, 320]:
             context = browser.new_context(reduced_motion='reduce')
             try:

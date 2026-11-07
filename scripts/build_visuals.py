@@ -7,7 +7,7 @@ effect-size chart, infer causation, or reproduce copyrighted paper figures.
 from __future__ import annotations
 
 
-def compact(value: object, limit: int = 230) -> str:
+def compact(value: object, limit: int = 600) -> str:
     """Reject incomplete or boilerplate extracts rather than truncate claims."""
     text = " ".join(str(value or "").strip().split())
     if (not text or len(text) > limit or text.endswith("…") or
@@ -32,9 +32,9 @@ def visual_spec(record: dict) -> dict:
     if record.get("kind") != "scholarly":
         return {"kind": "illustration_only", "reason": "nonempirical_or_commentary"}
 
-    approach = compact(digest.get("approach"), 210)
-    finding = compact(digest.get("finding"), 230)
-    limitation = compact(digest.get("limitation"), 190)
+    approach = compact(digest.get("approach"), 600)
+    finding = compact(digest.get("finding"), 600)
+    limitation = compact(digest.get("limitation"), 600)
     basis = "full_text" if reading.get("level") == "full_text" else "abstract"
     finding_source = digest.get("finding_source")
     if finding_source not in ("full_text", "abstract", "editorial"):

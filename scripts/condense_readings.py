@@ -140,6 +140,7 @@ RESULT_CLAIM = re.compile(
  r"(?:positively|negatively) (?:associated|correlated)|"
  r"(?:analysis|analyses) (?:identified|revealed|showed)|"
  r"(?:was|were) (?:higher|lower)|"
+ r"(?:participants|students|respondents|workers|patients) (?:in [^.]{0,100} )?reported (?:significantly )?(?:higher|lower)|"
  r"(?:predicted|increased|decreased|moderated|mediated))\b",re.I)
 UNTESTED = re.compile(
  r"\b(?:hypothesi[sz]|we (?:propose|expect|aim|seek|explore|test)|"
@@ -147,7 +148,14 @@ UNTESTED = re.compile(
  r"may (?:be|lead|affect)|future research|should be studied|"
  r"previous research (?:suggests|shows)|prior studies|recent work|"
  r"evidence on whether|evidence (?:is|remains) (?:mixed|divided)|"
- r"sharply divided|remains? unclear|little is known)\b",re.I)
+ r"sharply divided|remains? unclear|little is known|"
+ r"(?:examine[ds]?|investigate[ds]?|explore[ds]?|test(?:ed|s)?) whether|"
+ r"(?:aim|aimed|aims|seek|seeks|sought) to|research questions?|"
+ r"(?:previous|prior|earlier) (?:research|studies|work)|"
+ r"concluding subsection|same pattern|"
+ r"(?:to|we) (?:examine|investigate|explore|test)|"
+ r"(?:study|paper) (?:employed|examined|investigated|explored)|"
+ r"will (?:examine|test|explore))\b",re.I)
 STOPWORDS = {"the","and","with","from","into","among","through","between",
              "about","under","using","used","study","studies","analysis",
              "effects","effect","model","models","role","research","findings"}
@@ -163,7 +171,7 @@ def reported_result(source,title="",maxlen=300):
         if x not in STOPWORDS}
  candidates=[]
  for position,s in enumerate(sentence_list(source or "")):
-  if len(s)<45 or DIAGNOSTIC.search(s) or UNTESTED.search(s):continue
+  if len(s)<45 or len(s)>maxlen or s.endswith(("…", "...")) or DIAGNOSTIC.search(s) or UNTESTED.search(s):continue
   if not FINDING_VERBS.search(s):continue
   # Context words alone ("associated", "effects") are insufficient if the
   # sentence is merely introducing the research question.
@@ -260,17 +268,31 @@ def concept_tags(record):
  ]
  tags=[label for label,pattern in clusters if re.search(pattern,text)]
  return tags[:3]
-def source_snippet(text, role, limit=185):
- """Surface only interpretable source statements, not truncated section dumps."""
+def source_snippet(text, role, limit=600):
+ """Keep a complete, source-supported statement instead of a clipped teaser.
+
+ Try every intact sentence: a long opening sentence must not hide a later
+ informative method. Role checks fail closed, so a scene-setting sentence
+ cannot fill the methods or limitations slot merely because it is short.
+ """
+ from build_readings import METHOD, LIMIT
  if not text:return ""
- phrase=condensed(text,role,maxlen=260) if role!="idea" else first_source_sentence(text)
- phrase=readable_excerpt(phrase,role,limit)
- # An ellipsis is honest, but on a reading card it obscures the claim.
- # Leave the raw source available in the disclosure instead.
- if phrase.endswith("…") or len(phrase)<30:return ""
- if re.match(r"^(?:\d+(?:\.\d+)*\s+)?(?:methods?|results?|discussion|conclusions?|limitations?)\b",phrase,re.I):
-  return ""
- return phrase
+ candidates=sentence_list(text)
+ if role=="approach":
+  # Prefer the actual participants/procedure to generic methodological framing.
+  candidates=sorted(candidates,key=lambda line: (
+   bool(re.search(r"\b(?:n\s*=|\d+ (?:participants|students|respondents)|recruited|randomly assigned|data were collected|were compared|we (?:collected|conducted))\b",line,re.I)),
+   bool(re.search(r"\b(?:survey|interview|experiment|randomi[sz]|sample|participants|regression|thematic analysis)\b",line,re.I))),reverse=True)
+ for line in candidates:
+  if line.endswith(("…", "...")) or len(line)>limit:continue
+  if role=="approach" and (not METHOD.search(line) or re.search(r"\b(?:future research|prior studies|previous research|should be|could be)\b",line,re.I)):continue
+  if role=="limitations" and not (LIMIT.search(line) or re.search(
+      r"\b(?:cannot|could not|limited to|self.report|cross.sectional|generalizability|generalisation|generalization|selection bias|convenience sampl)\b",line,re.I)):continue
+  phrase=readable_excerpt(line,role,limit)
+  if phrase.endswith("…") or len(phrase)<30:continue
+  if re.match(r"^(?:\d+(?:\.\d+)*\s+)?(?:methods?|results?|discussion|conclusions?|limitations?)\b",phrase,re.I):continue
+  return phrase
+ return ""
 
 def first_source_sentence(text):
  parts=sentence_list(text)
@@ -507,23 +529,23 @@ def annotate(record):
   fulltext=level=="full_text"
   results=(record.get("analysis") or {}).get("results") if fulltext else ""
   if not results:results=r.get("findings") or ""
-  finding=reported_result(results,record.get("title",""))
+  finding=reported_result(results,record.get("title",""),maxlen=600)
   finding_source="full_text" if finding and fulltext else "abstract" if finding else "none"
   if not finding and level in ("abstract","full_text"):
-   finding=reported_result(record.get("abstract_text") or "",record.get("title",""))
+   finding=reported_result(record.get("abstract_text") or "",record.get("title",""),maxlen=600)
    finding_source="abstract" if finding else "none"
-  reported=readable_excerpt(finding,"finding",185) if finding else ""
+  reported=readable_excerpt(finding,"finding",600) if finding else ""
   if reported.endswith("…") or len(reported)<36:
    reported="";finding_source="none"
   question=research_question(record)
   digest={
-   "idea":reported or question,
+   "idea":reported if reported and len(reported)<=230 else question,
    "explain":short_source_context(record) if not reported else "",
-   "approach":source_snippet(r.get("methods") or record.get("abstract_text") or "","approach",175),
+   "approach":source_snippet((record.get("analysis") or {}).get("methods") or (record.get("abstract_text") if not fulltext else r.get("methods")) or "","approach") or source_snippet(record.get("abstract_text") or "","approach"),
    "finding":reported,
    "finding_source":finding_source,
    "interpretation":"",
-   "limitation":source_snippet(r.get("limitations"),"limitations",170),
+   "limitation":source_snippet((record.get("analysis") or {}).get("limitations") or r.get("limitations"),"limitations"),
    "tags":concept_tags(record),
    "status":"automatically_condensed_source_text",
    "editorial_basis":"full_text" if fulltext else "abstract",

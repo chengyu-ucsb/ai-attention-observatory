@@ -28,7 +28,7 @@ const doc={createElement:tag=>new Element(tag),querySelector:q=>q==="#paper-cont
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unable to load application functions");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
-vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,featureCoverage,renderBacklog,issueSourceShelfItem,readableSourceTitle,editorialImage,make,S};",ctx);
+vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,featureCoverage,renderBacklog,issueSourceShelfItem,readableSourceTitle,editorialImage,make,S,readingParagraphs,sourceFields};",ctx);
 const nodes=root=>[root,...root.children.flatMap(nodes)];
 const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
@@ -391,3 +391,31 @@ assert.equal(title,"AI use can support attention.");
 assert.throws(()=>vm.runInContext('TEST.make("div","x",document.createElement("span"))',ctx),/accepts text only/);
 console.log("Validated",checked,"reading pages including",edited,"edited notes and",sourceOnly,"automated/publisher readings, plus synthetic original-summary/source-version/excerpt regressions.");
 
+
+// The source reader preserves richness and source separation, not a clipped card.
+const longPassage="Participants completed the task while notifications were delivered at fixed intervals. ".repeat(35)+"Final source detail must remain visible.";
+const richSource={...future,analysis:{fulltext_url:"https://example.org/source.pdf",methods:longPassage,results:"The source reports a result with its own qualification."},abstract_text:"An abstract that remains distinguishable from the indexed full-text methods."};
+ctx.selected=richSource;vm.runInContext("TEST.showPaper(selected)",ctx);
+const sourceReader=match(paperContainer,"rv-source-excerpts");
+const sourceSections=matching(sourceReader,"rv-source-section");
+assert(sourceSections.length>=3,"All available source sections need independent disclosures");
+assert(sourceSections.every(section=>section.tag==="details"&&!section.open),"Sections begin collapsed rather than reveal a wall of text");
+const methodProse=match(sourceSections[0],"rv-prose");
+assert(methodProse.children.length>3,"Long source text must be split into readable paragraphs");
+assert.equal(methodProse.children.map(p=>p.textContent).join(" "),longPassage.trim(),"Formatting must preserve every source word");
+assert(textContent(sourceReader).includes("Final source detail must remain visible."),"The complete indexed section must not be clipped to reading-card length");
+assert(match(sourceReader,"rv-reader-contents"),"Source sections need navigation");
+const controls=matching(sourceReader,"rv-reader-control");
+controls[0].onclick();assert(sourceSections.every(s=>s.open),"Expand all failed");
+controls[1].onclick();assert(sourceSections.every(s=>!s.open),"Collapse all failed");
+matching(sourceReader,"rv-reader-jump")[0].onclick();assert(sourceSections[0].open,"Section navigation must open the selected source section");
+assert(!sourceSections[1].open,"Section navigation should leave other sections unchanged");
+assert(match(paperContainer,"rv-coverage-table"),"Every scholarly reading needs a source-coverage table");
+ctx.selected=unknown;vm.runInContext("TEST.showPaper(selected)",ctx);
+for(const placeholder of ["Method details are not clear enough", "A source-specific limitation could not be verified"])
+ assert(!textContent(paperContainer).includes(placeholder),"Generic placeholder must not substitute for a source-specific appraisal");
+assert(textContent(paperContainer).includes("Not indexed"),"Missing source fields need honest availability labels");
+assert(textContent(paperContainer).includes("not a flaw in the study"),"Coverage must be distinct from research quality");
+const rawParagraphs=vm.runInContext("TEST.readingParagraphs('Sentence with p = 0.047 and a 95% CI [0.02, 0.15]. Another result remains qualified.')",ctx);
+assert.equal(rawParagraphs.join(" "),"Sentence with p = 0.047 and a 95% CI [0.02, 0.15]. Another result remains qualified.","Numeric tokens must remain unchanged");
+console.log("Source-reader preservation, section navigation, disclosure controls, and missing-field tests passed.");

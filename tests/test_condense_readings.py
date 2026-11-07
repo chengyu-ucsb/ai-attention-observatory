@@ -139,4 +139,30 @@ class CondensedReadingTests(unittest.TestCase):
   from condense_readings import PUBLIC_COMMENTARY
   for idea in PUBLIC_COMMENTARY.values():
    self.assertNotRegex(idea,r"(?i)^(?:the authors|the source|one interpretation is that|the paper)")
+class ReadingCompletenessTests(unittest.TestCase):
+ def test_long_intact_result_is_not_discarded_to_fit_a_card(self):
+  result="The results showed that AI assistance was associated with stronger self-reported monitoring during the writing task, although the association was not observed for independent performance after the tool was removed."
+  paper={"kind":"scholarly","title":"AI and monitoring", "abstract_text":result,
+   "reading":{"level":"abstract","findings":result}}
+  digest=annotate(paper)["reading"]["digest"]
+  self.assertEqual(digest["finding"],readable_excerpt(result,limit=600))
+  self.assertIn("although",digest["finding"])
+  self.assertNotIn("…",digest["finding"])
+ def test_methods_try_a_later_intact_sentence(self):
+  from condense_readings import source_snippet
+  background="This extremely detailed background about methods and research paradigms is not a usable procedural account "*8+". "
+  method="Two naturally occurring course sections (n = 47) were compared using multiple regression and inductive content analysis."
+  self.assertEqual(source_snippet(background+method,"approach"),method)
+ def test_research_aim_and_anaphoric_result_are_not_findings(self):
+  for statement in [
+   "This exploratory study examined whether structured AI scaffolding is associated with different outcomes in computational thinking and metacognitive regulation.",
+   "To examine cognitive consequences, this study employed a field design to investigate how feedback was associated with cognitive load during a business simulation.",
+   "While confidence was descriptively lower in one group, we find the same pattern in the comparison group."]:
+   self.assertEqual(reported_result(statement,maxlen=600),"")
+ def test_generic_background_is_not_a_method(self):
+  from condense_readings import source_snippet
+  self.assertEqual(source_snippet("AI has become increasingly important for how people learn and work in a changing society.","approach"),"")
+ def test_missing_limitations_stay_missing(self):
+  paper={"kind":"scholarly","title":"An AI study","abstract_text":"The authors surveyed 47 students about their learning activities.","reading":{"level":"abstract","limitations":""}}
+  self.assertEqual(annotate(paper)["reading"]["digest"]["limitation"],"")
 if __name__=="__main__":unittest.main()
