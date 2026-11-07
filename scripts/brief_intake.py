@@ -8,13 +8,15 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 from urllib.parse import quote
 from priority_research import crossref_article
+from arxiv_publication import ArxivPublicationVerifier
+from collection_window import previous_week, weekly_eligible
 from update import request, key
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'data'
 
 def get_atom(url):
-    req = urllib.request.Request(url, headers={'User-Agent': 'AttentionAIObservatory/1.1 (contact: fangcu@ucmail.uc.edu)'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'AttentionAIObservatory/1.1 (public metadata research)'})
     with urllib.request.urlopen(req, timeout=25) as response:
         return response.read(2_000_000).decode('utf-8')
 
@@ -23,22 +25,18 @@ def verify_arxiv(lead, today, fetch_atom=get_atom):
     if not match:
         raise ValueError('Only DOI and canonical arXiv leads support automatic verification')
     identifier = match[1]
-    root = ET.fromstring(fetch_atom('https://export.arxiv.org/api/query?id_list=' + identifier))
-    ns = {'a': 'http://www.w3.org/2005/Atom'}
-    entries = root.findall('a:entry', ns)
-    if len(entries) != 1:
-        raise ValueError('arXiv record unavailable')
-    entry = entries[0]
-    source_id = entry.findtext('a:id', '', ns)
-    if not re.fullmatch(r'https?://arxiv\.org/abs/' + re.escape(identifier) + r'(?:v\d+)?', source_id):
-        raise ValueError('arXiv identifier mismatch')
-    title = ' '.join(entry.findtext('a:title', '', ns).split())
-    published = entry.findtext('a:published', '', ns)[:10]
-    if not same_title(lead['title'], title) or dt.date.fromisoformat(published) > today:
-        raise ValueError('arXiv title or publication-date mismatch')
+    captured=[]
+    def capture(url):
+        raw=fetch_atom(url);captured.append(raw);return raw
+    published,provenance=ArxivPublicationVerifier(fetch=capture,limit=1).verify(lead)
+    if not published or dt.date.fromisoformat(published)>today:
+        raise ValueError('arXiv v1 identity or original publication date unverified')
+    root=ET.fromstring(captured[0]);ns={'a':'http://www.w3.org/2005/Atom'}
+    entry=root.find('a:entry',ns)
+    title=' '.join(entry.findtext('a:title','',ns).split())
     abstract = ' '.join(entry.findtext('a:summary', '', ns).split())
     return dict(title=title, authors=[a.findtext('a:name', '', ns) for a in entry.findall('a:author', ns)],
-        published=published, venue='arXiv', doi='', url='https://arxiv.org/abs/' + identifier,
+        published=published, publication_date_provenance=provenance, venue='arXiv', doi='', url='https://arxiv.org/abs/' + identifier+'v1',
         abstract_text=abstract, abstract_source='arXiv author-supplied abstract', preview=abstract[:420],
         kind='scholarly', lane=lead['lane'], relation='AI-related literature',
         evidence='Preprint; article screening required', source='Weekly brief lead verified against arXiv',
@@ -94,6 +92,9 @@ def main():
                     if attempt == 2:
                         raise
                     time.sleep(3 * (attempt + 1))
+            if not weekly_eligible(record,*previous_week(today)):
+                status.append({**lead,"status":"outside_previous_week_or_date_unverified"})
+                continue
             records[key(record)] = record
             status.append({**lead, 'status': 'verified_imported'})
         except Exception as exc:
@@ -109,3 +110,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

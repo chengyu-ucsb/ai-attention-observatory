@@ -45,6 +45,7 @@ def build(root=ROOT):
             pending.append(packet['edition_date'])
     status = {
         'discovery_date': date,
+        'publication_window': weekly['run'].get('publication_window'),
         'discovery_status': weekly['run'].get('stats', {}).get('discovery_status', 'unknown'),
         'source_backed_weekly_count': len(weekly['items']),
         'editorial_source_count': len(current.get('sources', [])),
@@ -61,6 +62,9 @@ def build(root=ROOT):
         'source_nominations': 'Optional verified DOI/URL leads; routine discovery does not depend on chat',
         'publication': 'Built payload; successful Pages deployment must be verified in Actions',
     }
+    editorial=weekly['run'].get('stats',{}).get('editorial_feeds',{})
+    if editorial.get('status'):
+        status['editorial_discovery_status']=editorial['status']
     status.update(weekly_freshness(date, featured.get('edition_date')))
     if status['pipeline_health'] != 'current':
         print('::warning::Observatory publication health: ' + status['pipeline_health'])
@@ -82,3 +86,4 @@ def build(root=ROOT):
 
 if __name__ == '__main__':
     build()
+

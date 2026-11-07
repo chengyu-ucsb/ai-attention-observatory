@@ -1,13 +1,13 @@
 """Reproducible search plan for AI and human attention.
 
-Recent surveillance and historical coverage are separate operations. Historical
-years are rotated during ordinary weekly runs; explicit backfills search the
-entire post-ChatGPT research window. This is a *structured discovery index*,
+Weekly surveillance covers only the previous completed UTC publication week.
+Historical coverage is a separate, explicitly requested backfill operation. This is a *structured discovery index*,
 not a claim of exhaustive systematic-review retrieval or field-wide trends.
 """
 from __future__ import annotations
 import datetime as dt
 import re
+from collection_window import previous_week, publication_date
 
 START_YEAR=2023
 LANES={
@@ -43,24 +43,27 @@ HISTORICAL_TERMS={
 }
 
 def plan(today=None, mode="weekly"):
-    today=today or dt.date.today()
-    all_years=list(range(START_YEAR,today.year))
+    today=publication_date(today or dt.datetime.now(dt.timezone.utc))
+    if today is None:raise ValueError("A complete run date is required")
+    if mode not in {"weekly", "backfill"}:raise ValueError("Unsupported search mode: "+mode)
     tasks=[]
-    # Current research first; balanced across all four questions rather
-    # than multiple near-identical broad queries for one subtopic.
-    begin=today-dt.timedelta(days=60)
+    if mode=="weekly":
+        begin,end=previous_week(today)
+        for lane,queries in LANES.items():
+            for q in queries:
+                tasks.append((lane,q,begin.isoformat(),end.isoformat(),"previous_publication_week"))
+        return tasks
+    # Manual backfill searches the current year and the complete historical
+    # matrix. No historical task is mixed into the normal weekly collector.
     for lane,queries in LANES.items():
         for q in queries[:2]:
-            tasks.append((lane,q,begin.isoformat(),today.isoformat(),"recent"))
-    # A weekly issue backfills one historical year per theme so older studies
-    # aren't frozen. A manually initiated backfill covers all historical years.
-    weekly_index=(today.toordinal()//7)
+            tasks.append((lane,q,f"{today.year}-01-01",today.isoformat(),f"historical:{today.year}"))
+    weekly_index=today.toordinal()//7
     for index,(lane,queries) in enumerate(LANES.items()):
-        chosen=all_years if mode=="backfill" else [all_years[(weekly_index+index)%len(all_years)]] if all_years else []
-        for year in chosen:
+        for year in range(START_YEAR,today.year):
             options=HISTORICAL_TERMS[lane]
             start=(year-START_YEAR+index+weekly_index)%len(options)
-            n_queries=2 if mode=="backfill" and year in (2023,2024) else 1
+            n_queries=2 if year in (2023,2024) else 1
             for offset in range(n_queries):
                 q=options[(start+offset)%len(options)]
                 tasks.append((lane,q,f"{year}-01-01",f"{year}-12-31",f"historical:{year}"))
@@ -80,3 +83,4 @@ def source_class(record):
         return "Earlier digital-attention foundation" if not direct else "Historical AI context"
     if direct:return "AI-specific"
     return "Adjacent digital-attention evidence"
+

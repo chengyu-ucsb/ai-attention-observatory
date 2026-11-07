@@ -249,12 +249,12 @@ function renderIssue(){
  $("#issue-qualification").textContent=published?issue.editorial_note||"":"";
  $("#issue-qualification").hidden=!published||!issue.editorial_note;
  const sourceList=issue.sources||[],earlier=sourceList.filter(source=>source.editorial_role==="previously_indexed_context").length,collection=sourceList.filter(source=>source.editorial_role==="collection_week").length;
- $("#issue-coverage").textContent=sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
+ $("#issue-coverage").textContent=issue.publication_window?sourceList.length+" sources originally published "+date(issue.publication_window.from)+"–"+date(issue.publication_window.to)+" (UTC). No older context sources are included.":sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries()){
   const r=make("div","issue-shelf-item"),resolved=record(src.id),candidate=resolved&&depth(resolved)!=="citation_only"?resolved:null;
   const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",id(candidate))):link(readableSourceTitle(src),src.url||"#library");
-  const role=src.editorial_role==="previously_indexed_context"?"Earlier context":src.editorial_role==="collection_week"?"Collection-week reading":"";
+  const role=src.editorial_role==="previously_indexed_context"?"Earlier context":src.editorial_role==="collection_week"?"Collection-week reading":src.editorial_role==="publication_week"?"Published in previous week":"";
   const metadata=[src.venue,candidate?depthName(candidate):"Not in current reading library · Original source",candidate?.first_seen?"First indexed "+date(candidate.first_seen):"",role].filter(Boolean).join(" · ");
   add(r,make("span","issue-shelf-number",String(i+1).padStart(2,"0")),add(make("div","issue-shelf-content"),title,make("p","",metadata)));
   shelf.append(r);
@@ -264,7 +264,7 @@ function renderIssue(){
 function home(){
  const run=S.week.run||{},all=(S.week.items||[]).map(x=>record(id(x))||S.records.find(r=>r.title===x.title)||x);
  const top=all.filter(x=>x.kind==="scholarly"&&depth(x)!=="citation_only"&&x.reading?.digest?.finding).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.digest?.finding)).slice(0,3);
- const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??all.length)+" in latest collection · "+S.records.length+" in library";
+ const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??all.length)+" in latest collection · "+S.records.length+" in library"+(run.publication_window?" · Published "+date(run.publication_window.from)+"–"+date(run.publication_window.to)+" UTC":"");
  const root=$("#feature-grid");root.replaceChildren();
  if(!top.length)root.append(make("div","empty-state","The latest index contains no source-rich highlights yet. Browse the research library."));
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");

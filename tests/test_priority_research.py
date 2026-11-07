@@ -45,7 +45,7 @@ class PriorityLiteratureTests(unittest.TestCase):
   irrelevant=work(doi="10.1016/j.example.2026.000002",title="Thermal performance of refrigeration devices")
   irrelevant["abstract"]="Heating and refrigerant systems were benchmarked in a laboratory."
   result=pr.discover(lambda url:{"message":good} if "/works/10." in url else {"message":{"items":[wrong,irrelevant,good]}},
-                     TODAY,manifest=manifest())
+                     TODAY,manifest=manifest(),mode="backfill")
   rows,errors,stats=result
   self.assertEqual(len(rows),1) # DOI deduplication across priority and targeted journal
   self.assertEqual(rows[0]["doi"],DOI)
@@ -68,8 +68,10 @@ class PriorityLiteratureTests(unittest.TestCase):
   target=next(u for u in urls if "query.container-title" in u)
   params=parse_qs(urlparse(target).query)
   self.assertEqual(params["query.container-title"],["Computers & Education"])
-  self.assertIn("until-pub-date:2026-10-22",params["filter"][0])
-  self.assertIn("from-pub-date:2026-06-24",params["filter"][0])
+  self.assertIn("until-pub-date:2026-10-18",params["filter"][0])
+  self.assertIn("from-pub-date:2026-10-12",params["filter"][0])
+  self.assertNotIn("mailto",params)
+  self.assertFalse(any("/works/10." in url for url in urls))
 
  def test_weekly_index_does_not_delete_unverified_old_scholarship(self):
   old={"title":"Unverified journal but promising human attention study","kind":"scholarly",
@@ -88,3 +90,4 @@ class PriorityLiteratureTests(unittest.TestCase):
 
 if __name__=="__main__":
  unittest.main()
+

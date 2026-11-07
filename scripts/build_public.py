@@ -17,6 +17,7 @@ from editorial_corrections import apply as apply_editorial_corrections
 from source_quality import screen as screen_source
 from news_quality import substantive_article
 from editorial_source_reviews import apply as apply_source_reviews
+from collection_window import previous_week, weekly_eligible, window_metadata
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
 
@@ -36,12 +37,27 @@ def record_id(x):
     return (x.get("doi") or "").lower() or x.get("url") or x.get("title") or ""
 
 def editorial_shelf(weekly, canonical, minimum=8, max_items=12):
-    """Expand a thin new-source week with clearly marked, source-backed context.
+    """Keep dated editions strictly inside their original-publication week.
 
-    The new-research RSS and public-weekly.json remain strictly the current
-    discovery set. Older readings appear only in the editorial evidence packet.
+    Legacy undated fixtures retain their old fallback for compatibility. Real
+    dated editions never pad a thin week with older contextual readings.
     """
     from compose_issue import evidence
+
+    run=weekly.get('run') or {}
+    window=run.get('publication_window') or (window_metadata(run['date']) if run.get('date') else None)
+    if window:
+        start,end=previous_week(weekly['run']['date'])
+        if window.get('from')!=start.isoformat() or window.get('to')!=end.isoformat() or window.get('timezone')!='UTC':
+            raise ValueError('Weekly publication window does not match the previous completed UTC week')
+        if any(not weekly_eligible(x,start,end) for x in weekly['items']):
+            raise ValueError('Out-of-window source cannot enter the weekly editorial shelf')
+        return {**weekly,'run':{**weekly['run'],
+            'publication_window':window,
+            'publication_week_source_count':len(weekly['items']),
+            'context_source_count':0,
+            'editorial_selection_note':'Only sources originally published in the previous completed UTC week; no older context padding.'},
+            'items':[{**x,'editorial_role':'publication_week'} for x in weekly['items']]}
 
     # Offline projection tests may have an undated fixture. Real discovery
     # always supplies a dated run; undated inputs retain only their own items.
@@ -122,6 +138,8 @@ def build():
     canonical=[x for x in selected if not x.get("companion_to")]
     by_id={record_id(x):x for x in canonical}
     week=json.loads((DATA/"weekly.json").read_text())
+    if week.get("run",{}).get("date"):
+        week["run"].setdefault("publication_window",window_metadata(week["run"]["date"]))
     week["items"]=apply_source_reviews(apply_editorial_corrections(week.get("items",[])))
     # Weekly source entries are snapshots and may be older than the final enrichment.
     # A linked explainer brings its original paper into this week's reading set,
@@ -135,6 +153,10 @@ def build():
         original=linked if linked in by_id else record_id(incoming)
         wanted.add(original)
     items=[x for x in canonical if record_id(x) in wanted]
+    if (week.get('run') or {}).get('publication_window'):
+        start,end=previous_week(week['run']['date'])
+        # A current explainer must not pull its older original paper into the new-publication set.
+        items=[x for x in items if weekly_eligible(x,start,end)]
     items.sort(key=lambda x:(x.get("published") or "",x.get("first_seen") or ""),reverse=True)
     run=dict(week.get("run") or {})
     run["total"]=len(canonical)
