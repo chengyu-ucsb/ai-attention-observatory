@@ -82,7 +82,9 @@ class CompositionTests(unittest.TestCase):
         repair=model.create_chat_completion.call_args_list[2].kwargs['messages']
         self.assertEqual(repair[2]['role'],'assistant')
         self.assertEqual(json.loads(repair[2]['content'])['text'],bad['text'])
-        self.assertIn('Preserve the substantive prose',repair[3]['content'])
+        self.assertIn('Keep only valid claims and fields',repair[3]['content'])
+        self.assertIn('Rewrite copied or unsupported prose',repair[3]['content'])
+        self.assertNotIn('Preserve the substantive prose',repair[3]['content'])
 
     def test_failure_never_overwrites_published_copy_and_existing_week_is_idempotent(self):
         _, packet = self.fixture()
@@ -154,6 +156,207 @@ class CompositionTests(unittest.TestCase):
                 composer.qualify_section({'text':'The study established a broad improvement.'},[source])
         composer.qualify_section({'text':'The abstract reports a limited comparison.'},[{'level':'abstract'}])
         composer.qualify_section({'text':'The commentary proposes a design question.'},[{'kind':'nonacademic'}])
+
+
+    def preprint_fixture(self):
+        draft, packet = self.fixture()
+        for source in packet:
+            source.update(kind='scholarly', level='full_text', preprint=True,
+                          research_type='observational',
+                          review_scope='Peer review is not verified.',
+                          review_label='Preprint, not verified peer-reviewed evidence.')
+        for section in draft['signals'] + [draft['tension']]:
+            section['text'] += (' These preprints are not verified peer-reviewed evidence; '
+                                'their results do not establish strong causal evidence.')
+        return draft, packet
+
+    def test_unverified_peer_review_qualifications_preserve_uncertainty(self):
+        _, packet = self.preprint_fixture()
+        for phrase in ('not verified peer-reviewed evidence', 'not verified as peer reviewed',
+                       'peer review is unverified', 'peer-review status is not verified'):
+            for causal in ('does not establish causality', 'do not establish strong causal evidence',
+                           'cannot establish causal effects', 'cannot establish a strong causal effect'):
+                with self.subTest(phrase=phrase, causal=causal):
+                    composer.qualify_section({'text':f'Preprint: {phrase}; the evidence {causal}.'}, packet[:2])
+        with self.assertRaisesRegex(ValueError, 'does not mean verified absence'):
+            composer.qualify_section({'text':'This preprint is not peer reviewed and does not establish causality.'}, packet[:2])
+        composer.qualify_section({'text':
+            'These preprints are not verified peer-reviewed evidence; their results do not establish '
+            'strong causal evidence. Self-report cannot establish causal mediation. A brief session '
+            'cannot establish causal or lasting learning effects.'}, packet[:2])
+
+    def test_frame_cannot_convert_unverified_review_into_absence(self):
+        draft, packet = self.preprint_fixture()
+        for field in ('headline', 'deck', 'letter', 'closer'):
+            bad = copy.deepcopy(draft)
+            bad[field] += ' These preprints are not peer reviewed.'
+            with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'does not mean verified absence'):
+                composer.validate(bad, packet)
+            good = copy.deepcopy(draft)
+            good[field] += ' These preprints have peer review status unverified.'
+            composer.validate(good, packet)
+
+    def test_evidence_anchor_word_bounds_are_five_through_twelve(self):
+        draft, packet = self.preprint_fixture()
+        source_words = composer.normalize(packet[0]['evidence']).split()
+        for count in (4, 5, 12, 13):
+            candidate = copy.deepcopy(draft)
+            candidate['signals'][0]['evidence'][0]['quote'] = ' '.join(source_words[:count])
+            with self.subTest(count=count):
+                if count in (5, 12):
+                    composer.validate(candidate, packet)
+                else:
+                    with self.assertRaisesRegex(ValueError, '5–12 normalized words'):
+                        composer.validate(candidate, packet)
+
+    def test_original_comparison_can_retain_labels_and_exact_denominators(self):
+        draft, packet = self.preprint_fixture()
+        for source in packet:
+            source['evidence'] += (
+                ' Methods: The synthetic classroom sample has 112 enrolled pupils and 89 paired observations. '
+                'Findings: The study codes critical engagement and conceptual/procedural help as separate labels. '
+                'Limitations: Preprint, not verified peer-reviewed evidence. Article screening is not peer review; '
+                'reported results do not establish strong causal evidence.')
+        for section in draft['signals'] + [draft['tension']]:
+            section['text'] += (
+                ' The account describes 112 participants, but the model uses 89 matched cases. '
+                'Its critical engagement measure is distinct from conceptual/procedural help.')
+        composer.validate(draft, packet)
+
+    def test_valid_caveat_does_not_hide_positive_peer_review_or_causal_claim(self):
+        draft, packet = self.preprint_fixture()
+        for overclaim in ('This is peer-reviewed evidence.', 'These findings prove a lasting benefit.',
+                          'This causes independent learning.', 'This establishes causality.',
+                          'This provides strong causal evidence.', 'Peer review is verified.',
+                          'This has confirmed peer review.',
+                          'The findings establish a causal effect.',
+                          'The findings establish strong causality.',
+                          'The findings do not establish causality but do establish strong causal effects.',
+                          'The findings cannot establish a causal effect but establish a strong causal effect.'):
+            for field in ('title', 'text'):
+                bad = copy.deepcopy(draft)
+                bad['signals'][0][field] += ' ' + overclaim
+                with self.subTest(overclaim=overclaim, field=field), self.assertRaisesRegex(ValueError, 'unsupported peer-review or causal'):
+                    composer.validate(bad, packet)
+            bad = copy.deepcopy(draft)
+            bad['letter'] += ' ' + overclaim
+            with self.subTest(overclaim=overclaim, field='letter'), self.assertRaisesRegex(ValueError, 'unsupported peer-review or causal'):
+                composer.validate(bad, packet)
+
+    def test_full_validator_accepts_original_qualified_fixture_without_repairing_prose(self):
+        draft, packet = self.preprint_fixture()
+        before = copy.deepcopy(draft)
+        result = composer.validate(draft, packet)
+        for new, old in zip(result['signals'] + [result['tension']], before['signals'] + [before['tension']]):
+            for field in ('short', 'title', 'text', 'evidence'):
+                self.assertEqual(new[field], old[field])
+        for field in ('headline', 'deck', 'letter', 'closer'):
+            self.assertEqual(result[field], before[field])
+
+    def test_explicit_causal_demonstration_rejects_claim_without_masking_contrast(self):
+        draft, packet = self.preprint_fixture()
+        for statement in ('The result demonstrates causality.',
+                          'The results demonstrate a strong causal effect.',
+                          'The result demonstrated causal effects.',
+                          'The result does not demonstrate causality but demonstrates causality.',
+                          'The results cannot demonstrate a causal effect but demonstrate strong causal evidence.'):
+            for field in ('headline', 'deck', 'letter', 'closer', 'signal_text'):
+                bad = copy.deepcopy(draft)
+                if field == 'signal_text': bad['signals'][0]['text'] += ' ' + statement
+                else: bad[field] += ' ' + statement
+                with self.subTest(statement=statement, field=field), self.assertRaisesRegex(ValueError, 'unsupported peer-review or causal'):
+                    composer.validate(bad, packet)
+        for negative in ('The result does not demonstrate causality.',
+                         'The results do not demonstrate strong causal effects.',
+                         'The result did not demonstrate a causal effect.',
+                         'The result cannot demonstrate causal evidence.'):
+            good = copy.deepcopy(draft)
+            good['signals'][0]['text'] += ' ' + negative
+            good['letter'] += ' ' + negative
+            composer.validate(good, packet)
+
+    def test_outcome_gain_headings_are_not_repaired_by_body_caveats(self):
+        draft, packet = self.preprint_fixture()
+        for title in ("GenAI's Role in Enhancing Critical Thinking Across Cultures",
+                      'AI improves independent learning in classrooms', 'AI produces lasting learning gains'):
+            for field in ('headline', 'signal_title', 'short', 'tension_title'):
+                bad = copy.deepcopy(draft)
+                if field == 'headline': bad[field] = title
+                elif field == 'tension_title': bad['tension']['title'] = title
+                else: bad['signals'][0]['short' if field == 'short' else 'title'] = title
+                with self.subTest(title=title, field=field), self.assertRaisesRegex(ValueError, 'neutral preprint heading'):
+                    composer.validate(bad, packet)
+        composer.validate_title('Reported engagement and open learning questions', packet)
+
+    def test_copy_guards_reject_long_and_stitched_passages_but_allow_short_caveat(self):
+        passage = ('Observers recorded each participant choosing between possible explanations during practice. '
+                   'Interviewees described uncertainty about interpreting unfamiliar feedback from the classroom assistant. '
+                   'The authors warned that self reports alone cannot measure sustained independent skill development.')
+        packet = [{'key':'S1', 'evidence':passage}]
+        with self.assertRaisesRegex(ValueError, 'copies a long source passage'):
+            composer.validate_original_prose(passage, packet)
+        stitched = ('Observers recorded each participant choosing between possible explanations during practice. '
+                    'A separate issue emerges. Interviewees described uncertainty about interpreting unfamiliar feedback '
+                    'from the classroom assistant. Consider another limitation. The authors warned that self reports '
+                    'alone cannot measure sustained independent skill development.')
+        # Every copied run is below sixteen words, but most of the paragraph is excerpts.
+        with self.assertRaisesRegex(ValueError, 'stitches together source passages'):
+            composer.validate_original_prose(stitched, packet)
+        composer.validate_original_prose(
+            'A cautious comparison begins with the available observations. Observers recorded each '
+            'participant choosing between possible explanations during practice. That narrow task '
+            'would need separate evaluation before it could answer a broader question about transfer.', packet)
+
+    def test_staged_repairs_recheck_copy_numbers_plan_titles_and_frame(self):
+        draft, packet = self.preprint_fixture()
+        pairs = [['S1','S2'], ['S2','S3'], ['S3','S4']]
+        plan = {'themes':[{'short':'A theme', 'title':'Assistance and independent learning', 'keys':p} for p in pairs]}
+        bad_plan = copy.deepcopy(plan)
+        bad_plan['themes'][0]['title'] = "GenAI's Role in Enhancing Critical Thinking Across Cultures"
+        bad_copy = copy.deepcopy(draft['signals'][0])
+        bad_copy['text'] += ' ' + packet[0]['evidence']
+        bad_number = copy.deepcopy(draft['signals'][0])
+        bad_number['text'] += ' The sample contained 789 people.'
+        frame = {k:copy.deepcopy(v) for k,v in draft.items() if k != 'signals'}
+        frame['tension'].pop('evidence')
+        bad_frame = copy.deepcopy(frame)
+        bad_frame['headline'] = 'AI improves independent learning in classrooms'
+        bad_anchor = copy.deepcopy(draft['signals'][1])
+        bad_anchor['evidence'][0]['quote'] = ' '.join(composer.normalize(packet[1]['evidence']).split()[:13])
+        replies = [bad_plan, plan, bad_copy, bad_number, draft['signals'][0],
+                   bad_anchor] + draft['signals'][1:] + [bad_frame, frame]
+        model = Mock()
+        model.create_chat_completion.side_effect = [{'choices':[{'message':{'content':json.dumps(x)}}]} for x in replies]
+        audit = {}
+        result = composer.draft_in_stages(model, packet, audit)
+        self.assertEqual(result['headline'], draft['headline'])
+        errors = [s.get('validation_error', '') for s in audit['stages']]
+        for expected in ('neutral preprint heading', 'copies a long source passage', 'Unsupported numeric claim',
+                         '5–12 normalized words'):
+            self.assertTrue(any(expected in error for error in errors), expected)
+        self.assertTrue(any(s['stage'] == 'editorial frame' and s.get('validation_error') for s in audit['stages']))
+        overview = model.create_chat_completion.call_args_list[0].kwargs['messages'][1]['content']
+        self.assertIn('review_scope', overview)
+        self.assertIn('limitations_preview', overview)
+        self.assertIn('Peer review is not verified', overview)
+
+    def test_repeated_invalid_candidates_receive_rewrite_feedback_and_remain_rejected(self):
+        _, packet = self.preprint_fixture()
+        invalid = {'themes':[]}
+        model = Mock()
+        model.create_chat_completion.return_value = {'choices':[{'message':{'content':json.dumps(invalid)}}]}
+        audit = {}
+        with self.assertRaises(ValueError): composer.draft_in_stages(model, packet, audit)
+        self.assertEqual([s['repeated_candidate'] for s in audit['stages']], [False, True, True])
+        self.assertIn('Make a substantive correction', model.create_chat_completion.call_args_list[2].kwargs['messages'][-1]['content'])
+        self.assertNotIn('candidate', audit)  # No final draft was fabricated.
+
+    def test_prompt_does_not_order_false_review_status_or_preserve_flawed_prose(self):
+        _, packet = self.preprint_fixture()
+        instruction = composer.prompt(packet)
+        self.assertIn('Preserve unverified peer review as uncertainty', instruction)
+        self.assertIn('never copy sixteen consecutive source words', instruction)
+        self.assertNotIn('explicitly say "preprint", "not peer reviewed"', instruction)
 
 
 if __name__=='__main__': unittest.main()
