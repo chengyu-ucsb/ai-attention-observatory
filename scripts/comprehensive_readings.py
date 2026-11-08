@@ -369,16 +369,37 @@ def due(record,today):
     return (record.get('complete_reading_attempt') or {}).get('next_at','')<=today
 
 
+def reading_queue_key(record):
+    """Oldest eligible work first, with a stable identity tie-break.
+
+    A retry re-enters at its persisted next_at, rather than retaining priority
+    from its publication date or available indexed sections. New articles enter
+    at first_seen, so neither fresh arrivals nor repeatedly failing articles
+    can jump ahead of older waiting work. This uses the existing checkpoint;
+    reloading/reordering the library does not reset the queue.
+
+    Legacy attempts without next_at use last_at. Undated, never-attempted rows
+    start at the front once and acquire a dated checkpoint on their first turn.
+    Publication dates are deliberately not queue dates (backfills can be old).
+    Fair opportunities do not guarantee accepted summaries or faster throughput.
+    """
+    attempt=record.get('complete_reading_attempt') or {}
+    ready_at=attempt.get('next_at') or attempt.get('last_at') or record.get('first_seen') or ''
+    identity=tuple(str(record.get(key) or '') for key in ('doi','url','title','kind'))
+    return (ready_at,*identity)
+
+
 def process(records,model,limit=2,retriever=retrieve):
     stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
            'failed':0,'failure_reasons':{},'failure_stages':{},
            'source_text_saved':False,'skipped_no_model':model is None}
     if model is None: return stats
-    today=date.today().isoformat()
+    run_date=date.today()
+    today=run_date.isoformat()
     candidates=[r for r in records if r.get('kind') in FIELDS and due(r,today)
                 and (r['kind']!='scholarly' or screen_source(r)['decision']=='include')]
-    candidates.sort(key=lambda r:(bool(r.get('analysis')),r.get('first_seen',''),r.get('published','')),reverse=True)
-    for record in candidates[:limit]:
+    candidates.sort(key=reading_queue_key)
+    for record in candidates[:max(0,limit)]:
         stats['attempted']+=1
         diagnostics=[]
         stage='retrieval'
@@ -409,7 +430,7 @@ def process(records,model,limit=2,retriever=retrieve):
             else: record['deep_analysis']=result
             record['reading_coverage']=result['coverage']
             record['complete_reading_attempt']={'status':'summarized' if complete else 'partial_summary',
-                'last_at':today,'next_at':(date.today()+timedelta(days=30 if complete else 7)).isoformat(),
+                'last_at':today,'next_at':(run_date+timedelta(days=30 if complete else 7)).isoformat(),
                 'provider_diagnostics':diagnostics}
             stats['summaries_completed']+=1
         except Exception as exc:
@@ -418,7 +439,7 @@ def process(records,model,limit=2,retriever=retrieve):
             stats['failure_reasons'][reason]=stats['failure_reasons'].get(reason,0)+1
             stats['failure_stages'][stage]=stats['failure_stages'].get(stage,0)+1
             record['complete_reading_attempt']={'status':reason,'stage':stage,'last_at':today,
-                'next_at':(date.today()+timedelta(days=2)).isoformat(),
+                'next_at':(run_date+timedelta(days=2)).isoformat(),
                 'provider_diagnostics':diagnostics}
     return stats
 
