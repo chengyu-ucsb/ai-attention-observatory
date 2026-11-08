@@ -57,7 +57,7 @@ def source_links(issue,ids):
         original=source.get('original_summary') and safe_original_url(source.get('source_url'))
         url=source['source_url'] if original else safe_url(source.get('url'))
         version=(' · '+readable_version(source.get('source_version'))) if original else ''
-        out.append('<a class="source-link" href="'+esc(url)+'" title="'+esc(source.get('title') or 'Original source')+'">'+esc('Reading '+str(number)+version)+' ↗</a>')
+        out.append('<a class="source-link" href="'+esc(url)+'" title="'+esc(source.get('title') or 'Original source')+'">'+esc('Reading '+str(number)+version)+'</a>')
     return ' · '.join(out)
 
 def source_shelf(issue, disclosure=True):
@@ -136,7 +136,7 @@ def question_and_try(issue):
 def bottom(issue):
     return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+source_shelf(issue)+'</main><footer><div class="shell">'
             '<p><strong>THE ATTENTION BRIEF</strong></p><p>A weekly look at what AI changes about thinking, focus, and human agency.</p>'
-            '<p><a href="'+BASE+'issues/">Past editions ↗</a> · <a href="'+FEED+'">Weekly RSS ↗</a> · <a href="https://chengyufang.org/">About the editor ↗</a></p>'
+            '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
             '<p>Read online or follow via RSS. Email subscriptions are not active.</p></div></footer></body></html>')
 
 def render_issue(issue):
@@ -145,7 +145,7 @@ def render_issue(issue):
     return top_html(issue)+opening(issue)+overview(issue)+signal_cards(issue)+question_and_try(issue)+bottom(issue)
 
 def render_index(issues):
-    links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+i['edition_date'])+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition ↗</strong></a>' for i in issues]
+    links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+i['edition_date'])+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]
     return top_html({'subject':'The Attention Brief · Archive'})+'<h1>The Attention Brief.</h1><p>Past issues, ready to revisit.</p>'+(''.join(links) if links else '<p>No approved issues yet.</p>')+'</main></body></html>'
 
 def rss_content(issue):

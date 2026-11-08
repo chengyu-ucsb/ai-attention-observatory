@@ -1,9 +1,9 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
-const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#36594f"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","↗","#b97958"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#778769"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#84758c"]];
+const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#36594f"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","direction-mark","#b97958"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#778769"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#84758c"]];
 const depths=[["full_text","Full-text material","#36594f"],["abstract","Abstract-based","#a5b89a"],["curated","Curated synopsis","#d3d9c5"]];
-function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
+function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s==="direction-mark"){e.className+=(e.className?" ":"")+"font-independent-arrow";e.setAttribute("aria-hidden","true");return e}if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
@@ -281,10 +281,10 @@ function renderIssue(){
  const signs=published?issue.signals||[]:[];
  signs.forEach((sig,i)=>{
    const tile=make("a","weekly-signal");tile.href="#issue";tile.setAttribute("aria-label","Read signal "+(i+1)+": "+sig.short);
-   const mark=make("div","weekly-signal-symbol",["◎","↗","◇"][i%3]);
+   const mark=make("div","weekly-signal-symbol",["◎","direction-mark","◇"][i%3]);
    add(tile,mark,make("span","weekly-signal-no",String(i+1).padStart(2,"0")+" · SIGNAL"),make("h4","",sig.short),make("span","weekly-signal-arrow","Explore the thread →"));strips.append(tile);
    const panel=make("article","issue-signal"),header=make("div","issue-signal-header");
-   add(header,make("span","issue-signal-icon",["◎","↗","◇"][i%3]),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
+   add(header,make("span","issue-signal-icon",["◎","direction-mark","◇"][i%3]),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
    add(panel,header,make("h3","",sig.title),evidenceTags((issue.sources||[]).filter(source=>(sig.source_ids||[]).includes(source.id))),compactReading(sig.text,"Evidence, differences & limits"),
        make("span","issue-cited-label","READINGS BEHIND THIS SIGNAL"),
        issueRefs(sig.source_ids));
@@ -318,11 +318,11 @@ function issueSourceShelfItem(src,index){
   // later accepted version must not relabel an earlier working-paper source.
   content.append(make("p","issue-source-version","Checked source: "+checkedSourceLabel(src)));
   const sourceUrl=httpsSourceUrl(src.source_url),links=make("div","issue-source-links");
-  if(sourceUrl)links.append(add(make("p"),link("Read checked source: "+checkedSourceLabel(src)+" ↗",sourceUrl,"issue-source-checked-link")));
+  if(sourceUrl)links.append(add(make("p"),link("Read checked source: "+checkedSourceLabel(src)+"",sourceUrl,"issue-source-checked-link")));
   const related=src.related_journal_doi&&src.related_journal_doi!==src.source_doi;
   const publicationUrl=related?doiUrl(src.related_journal_doi):httpsSourceUrl(src.url);
   if(publicationUrl&&publicationUrl!==sourceUrl)
-   links.append(add(make("p"),link(related?"Related journal publication (not the checked source) ↗":"Publication record ↗",publicationUrl,"issue-source-publication-link")));
+   links.append(add(make("p"),link(related?"Related journal publication (not the checked source)":"Publication record",publicationUrl,"issue-source-publication-link")));
   if(links.children.length)content.append(links);
   const review=make("details","issue-source-review"),scope=make("div","issue-source-review-body");
   scope.append(checkedReadingContext(src,"issue-source-review-label"));
@@ -342,8 +342,8 @@ function home(){
  const root=$("#feature-grid");root.replaceChildren();
  if(!top.length)root.append(make("div","empty-state","The latest index contains no source-rich highlights yet. Browse the research library."));
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
- add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","↗","✳"][i]));
- add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence ↗",()=>goto("paper",id(x)),"feature-go"));
+ add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","direction-mark","✳"][i]));
+ add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence",()=>goto("paper",id(x)),"feature-go"));
  add(c,head,editorialMedia(x,"feature"),make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),originalSummary(x)?make("p","source-meta",cut(x.reading.digest?.explain,220)):null,make("p","feature-source-title",readableSourceTitle(x)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
@@ -351,7 +351,7 @@ function home(){
  const grid=$("#lens-grid");grid.replaceChildren();themes.forEach((t,i)=>{const a=link("",libraryHash(t[0]),"lens");a.setAttribute("aria-label","Explore "+t[0]);a.setAttribute("data-theme",String(i));add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||"")).slice(0,7);
- for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("↗",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.first_seen)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
+ for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("Read",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.first_seen)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
 }
 
 function renderEditorial(){
@@ -364,7 +364,7 @@ function renderEditorial(){
   const card=make("article","editorial-card"),label=make("span","editorial-category",x.format||"Expert perspective");
   const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x,92),()=>goto("paper",id(x))));
   const foot=make("div","editorial-foot");
-  add(foot,make("span","",x.venue||"Original source"),btn("Explore ↗",()=>goto("paper",id(x)),"editorial-cta"));
+  add(foot,make("span","",x.venue||"Original source"),btn("Explore",()=>goto("paper",id(x)),"editorial-cta"));
   add(card,editorialMedia(x,"editorial"),label,articleTitle,make("p","editorial-source-title",readableSourceTitle(x)),foot);root.append(card)
  }
 }
@@ -380,12 +380,12 @@ function renderPerspectives(){
   records.sort((a,b)=>(b.published||"").localeCompare(a.published||""));
   for(const x of records){
     const item=make("article","perspective-item");
-    const icon=make("div","perspective-glyph",x.source==="Official product documentation"?"◈":x.format==="Policy analysis"?"◇":"↗");
+    const icon=make("div","perspective-glyph",x.source==="Official product documentation"?"◈":x.format==="Policy analysis"?"◇":"direction-mark");
     const label=make("div","perspective-type",x.format||"Reporting & analysis");
     const title=make("h3");title.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));
     const summary=make("p","perspective-source-title",readableSourceTitle(x));
     const bottom=make("div","perspective-bottom");
-    add(bottom,make("span","",x.venue||"Original source"),btn("Read source notes ↗",()=>goto("paper",id(x)),"editorial-cta"));
+    add(bottom,make("span","",x.venue||"Original source"),btn("Read source notes",()=>goto("paper",id(x)),"editorial-cta"));
     add(item,editorialMedia(x,"perspective"),icon,label,title,summary,bottom);container.append(item);
   }
  }
@@ -557,7 +557,7 @@ function additionalArtwork(x){
    ],"A proposed six-step theoretical account simplified into three stages. This is a hypothesis, not an observed longitudinal progression.");
   case "10.3389/fpsyg.2026.1960382":
    return visualComparison("Two appraisals of algorithmic management",[
-    ["↗","Challenge","More positive appraisal was associated with better workplace well-being."],
+    ["direction-mark","Challenge","More positive appraisal was associated with better workplace well-being."],
     ["↘","Threat","More threatening appraisal was associated with poorer well-being."]
    ],"Survey of 389 food-delivery workers in China. These are reported associations, not causal effects.");
   case "10.1177/21582440261497404":
@@ -578,7 +578,7 @@ function additionalArtwork(x){
    ],"Classroom activity undertaken by 104 undergraduates. Students reported positive experiences; this sequence does not prove learning gains.");
   case "10.48550/arxiv.2609.38029":
    return visualComparison("The 14-student pilot had mixed learning measures",[
-    ["↗","Course learning and AI literacy","Pre/post scores rose in reported measures."],
+    ["direction-mark","Course learning and AI literacy","Pre/post scores rose in reported measures."],
     ["=","Standardized critical thinking","Test percentiles did not change."]
    ],"Small uncontrolled design-based research pilot; the graphic shows reported directional differences, not comparable effect sizes.");
   case "10.21203/rs.3.rs-10212076/v1":
@@ -662,7 +662,7 @@ function conceptArtwork(x){
   ],"The three-wave survey reports associations with perceived functioning. This graphic contrasts concepts; it does not reproduce a causal diagram or quantify effect sizes.");
  if(doi==="10.3390/jintelligence14080182")return comparisonArtwork("Whose work does AI-assisted teaching feel like?",[
    ["239","Preservice teachers","Survey respondents recruited by convenience sampling in eastern China."],
-   ["↗","Ownership concern","Dependency was associated with concern over the ownership of one's instructional design work."]
+   ["direction-mark","Ownership concern","Dependency was associated with concern over the ownership of one's instructional design work."]
   ],"Source-derived study design and association. The cross-sectional survey cannot establish which came first or prove AI caused the concern.");
  if(doi==="10.3390/bs16071150")return reviewArtwork();
  if(doi==="10.2196/69533")return wellbeingArtwork();
@@ -841,7 +841,7 @@ function sourceReader(x){
   "Machine-indexed source passages, not an independent appraisal. Paragraph breaks are added for readability; extraction can retain citation, equation or table artifacts."));
  if(a.provenance||r.provenance)intro.append(make("p","rv-reader-basis",a.provenance||r.provenance));
  const url=httpsSourceUrl(a.fulltext_url)||(!original?httpsSourceUrl(x.url):null);
- if(url)intro.append(link("Open indexed reference source ↗",url,"rv-secondary-link"));
+ if(url)intro.append(link("Open indexed reference source",url,"rv-secondary-link"));
  panel.append(intro);
  const contents=make("nav","rv-reader-contents");contents.setAttribute("aria-label","Source sections");
  const drawerBody=make("div","rv-drawer-body"),sections=[];
@@ -889,7 +889,7 @@ function showPaper(x){
   const note=make("section","rv-source-gap");
   add(note,make("h2","","What is missing?"),
     make("p","","The article still needs source-level review of its reasoning, examples and qualifications before it can appear in the Observatory's editorial library."));
-  if(/^https:\/\//.test(x.url||""))note.append(link("Read the original article ↗",x.url,"rv-secondary-link"));
+  if(/^https:\/\//.test(x.url||""))note.append(link("Read the original article",x.url,"rv-secondary-link"));
   page.append(note);root.append(page);return;
  }
  const r=x.reading||{},d=r.digest||{},original=originalSummary(x),editorial=d.status==="editorially_written_from_indexed_sections";
@@ -1059,15 +1059,15 @@ function showPaper(x){
   // Preserve distinct legacy basis text without repeating an entire typed notice.
 
   const sourceUrl=httpsSourceUrl(r.source_url);
-  if(sourceUrl)cite.append(link("Read the source ↗",sourceUrl,"rv-primary-link"));
+  if(sourceUrl)cite.append(link("Read the source",sourceUrl,"rv-primary-link"));
   if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)
-   cite.append(link("Related journal publication (not the checked source) ↗",doiUrl(r.related_journal_doi),"rv-secondary-link"));
+   cite.append(link("Related journal publication (not the checked source)",doiUrl(r.related_journal_doi),"rv-secondary-link"));
  }else{
-  if(x.url&&/^https:\/\//.test(x.url))cite.append(link("Open publication ↗",x.url,"rv-primary-link"));
+  if(x.url&&/^https:\/\//.test(x.url))cite.append(link("Open publication",x.url,"rv-primary-link"));
   if(x.analysis?.fulltext_url&&/^https:\/\//.test(x.analysis.fulltext_url))
-   cite.append(link("Read accessible full text ↗",x.analysis.fulltext_url,"rv-secondary-link"));
+   cite.append(link("Read accessible full text",x.analysis.fulltext_url,"rv-secondary-link"));
   if(x.source_review?.source_url&&/^https:\/\//.test(x.source_review.source_url))
-   cite.append(link("Read verified full-text republication ↗",x.source_review.source_url,"rv-secondary-link"));
+   cite.append(link("Read verified full-text republication",x.source_review.source_url,"rv-secondary-link"));
  }
  const provenance=make("details","rv-provenance"),provenanceBody=make("div","rv-provenance-body");
  provenanceBody.append(make("p","",r.provenance||"Publisher/source index"));
@@ -1116,7 +1116,7 @@ function showPaper(x){
    const article=make("div","rv-excerpt");
    add(article,make("h3","",readableSourceTitle(companion)),
      make("p","",companion.companion_relation||"Author commentary"));
-   if(/^https:\/\//.test(companion.url||""))article.append(link("Read the commentary ↗",companion.url,"rv-secondary-link"));
+   if(/^https:\/\//.test(companion.url||""))article.append(link("Read the commentary",companion.url,"rv-secondary-link"));
    origin.append(article);
   }
   side.append(origin);

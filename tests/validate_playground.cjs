@@ -247,7 +247,7 @@ for(const mode of ["reflect","hint","answer"]){
   assert.equal(by("assist-feedback").hidden,false);
   assert.equal(doc.activeElement,by("assist-feedback"));
   assert.match(by("assist-feedback").children[0].textContent,/Supported conclusion/);
-  assert.equal(by("assist-next").textContent,i===3?"Replay the first scenario ↗":"Try another scenario ↗");
+  assert.equal(by("assist-next").textContent,i===3?"Replay the first scenario":"Try another scenario");
   by("assist-next").click();assert.equal(doc.activeElement,by("assist-prompt"));
  }
 }
