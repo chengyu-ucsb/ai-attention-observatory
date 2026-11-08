@@ -167,12 +167,31 @@ def openalex_candidates(identifier, get=None):
         raise ValueError('locator_identity_mismatch')
     ident = str(work.get('id', '')).rsplit('/', 1)[-1]
     url = (work.get('content_urls') or {}).get('grobid_xml') or ''
-    if not re.fullmatch(r'W\d+', ident) or not (work.get('open_access') or {}).get('is_oa'):
+    if not re.fullmatch(r'W\d+', ident):
         return []
-    if url != 'https://content.openalex.org/works/' + ident + '.grobid-xml':
-        return []
-    return [{**candidate(url, 'OpenAlex content API', identifier, 'provider_cached_article_xml'),
-             'structured_format': 'tei'}]
+    rows = []
+    if ((work.get('open_access') or {}).get('is_oa') and
+            url == 'https://content.openalex.org/works/' + ident + '.grobid-xml'):
+        rows.append({**candidate(url, 'OpenAlex content API', identifier, 'provider_cached_article_xml'),
+                     'structured_format': 'tei'})
+    # Content XML is absent for many papers that do have repository versions.
+    # Reuse this exact-DOI response rather than paying for another lookup.
+    from full_document_access import anonymous_source_url
+    seen = {row['url'] for row in rows}
+    locations = [work.get('best_oa_location')] + (work.get('locations') or [])
+    for location in locations[:40]:
+        if not isinstance(location, dict) or location.get('is_oa') is not True:
+            continue
+        version = location.get('version') or 'unspecified'
+        for key in ('pdf_url', 'landing_page_url'):
+            target = location.get(key)
+            if not isinstance(target, str) or not anonymous_source_url(target) or target in seen:
+                continue
+            seen.add(target)
+            rows.append({**candidate(target, 'OpenAlex OA location', identifier,
+                                     version, location.get('license')),
+                         'discovery_basis': 'exact_doi_open_access_location'})
+    return rows
 
 
 def fetch_structured(candidate, record):
