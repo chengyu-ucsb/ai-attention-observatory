@@ -104,13 +104,13 @@ def check(page, url, width, out):
     page.locator('#library-sort').select_option('added')
     added = [datetime.strptime(t.removeprefix('Added '), '%b %d, %Y') for t in page.locator('.card-added').all_text_contents() if t != 'Added date not recorded']
     assert added == sorted(added, reverse=True), 'Recently added must use first-indexed date'
-    page.locator('.library-refine summary').click()
+    page.locator('.library-refine > summary').click()
     page.locator('#scope-filter').select_option('historical')
     expect(page.locator('#library-context')).to_contain_text('Earlier foundations')
     if not page.locator('.library-story').count():
         expect(page.locator('#library-results')).to_contain_text('No source-backed items')
     page.locator('#library-reset').click()
-    page.locator('.library-refine summary').click()
+    page.locator('.library-refine > summary').click()
     page.locator('.library-story h3 button').first.click()
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('#paper h1')).to_be_visible()
@@ -168,8 +168,13 @@ def check(page, url, width, out):
         expect(page.locator(f'#{route}')).to_be_visible()
         overflow(); screenshot(route)
         if route == 'issue':
-            page.locator('.issue-reading-shelf summary').click()
+            source_shelf = page.locator('.issue-reading-shelf > details')
+            expect(source_shelf).to_have_count(1)
+            expect(source_shelf).not_to_have_attribute('open', '')
+            source_shelf.locator(':scope > summary').click()
+            expect(source_shelf).to_have_attribute('open', '')
             assert page.locator('.issue-shelf-item').count() > 0
+            expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
             expect(page.locator('#issue-coverage')).to_contain_text('sources in this edition')
             screenshot('issue-sources')
     # Visual routes have ordinary destinations and no tracking/persistence.
@@ -181,6 +186,54 @@ def check(page, url, width, out):
     expect(page.locator('#scope-filter')).to_have_value('all')
     assert page.locator('.library-story').count() > 0
     assert not errors, errors
+
+
+def check_standalone_brief(page, url, width, out):
+    """Exercise generated weekly prose and the RSS landing page at every width."""
+    import json
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.set_viewport_size({'width': width, 'height': 900})
+    published = [json.loads(path.read_text()) for path in
+                 sorted((ROOT / 'data/approved-issues').glob('????-??-??.json'), reverse=True)]
+    latest = next(issue for issue in published if issue.get('status') == 'published')
+    base = 'https://chengyu-ucsb.github.io/ai-attention-observatory/'
+    for name in ('newsletter', 'subscribe'):
+        page.goto(url + name + '.html', wait_until='networkidle')
+        expect(page.locator('h1')).to_have_count(1)
+        expect(page.locator('h1')).to_be_visible()
+        if name == 'newsletter':
+            expect(page.locator('h1')).to_have_text(latest['headline'])
+            expect(page.locator('header a[href="' + base + '"]')).to_be_visible()
+            expect(page.locator('header a[href="' + base + 'issues/"]')).to_be_visible()
+            expect(page.locator('a[href="' + base + 'issue-feed.xml"]')).to_have_count(1)
+        else:
+            expect(page.locator('h1')).to_contain_text('One good idea a week.')
+            expect(page.locator('header a[href="./"]')).to_be_visible()
+            expect(page.locator('header a[href="./#issue"]')).to_be_visible()
+            expect(page.locator('#feed-url')).to_have_value(base + 'issue-feed.xml')
+            expect(page.locator('.actions a[href="newsletter.html"]')).to_be_visible()
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{name} overflow at {width}px'
+        if out:
+            out.mkdir(parents=True, exist_ok=True)
+            page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=True)
+        if name == 'newsletter':
+            opening = page.locator('main details').first
+            expect(opening).not_to_have_attribute('open', '')
+            expect(opening.locator(':scope > p').first).not_to_be_visible()
+            opening.locator(':scope > summary').focus()
+            page.keyboard.press('Enter')
+            expect(opening).to_have_attribute('open', '')
+            expect(opening.locator(':scope > p').first).to_be_visible()
+            expect(opening.locator(':scope > p').first).not_to_be_empty()
+            assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Expanded newsletter overflow at {width}px'
+            if out:
+                page.screenshot(path=str(out / f'observatory-{width}-newsletter-expanded.png'), full_page=True)
+            opening.locator(':scope > summary').focus()
+            page.keyboard.press('Enter')
+            expect(opening.locator(':scope > p').first).not_to_be_visible()
+    assert not errors, errors
+
 
 def typed_reading_payloads():
     """Build only synthetic receipts through the production publication boundary."""
@@ -288,13 +341,13 @@ def check_typed_readings(page, url, width, out):
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', commentary['reading']['source_url'])
     evidence = paper.locator('.rv-evidence')
     expect(evidence).not_to_have_attribute('open', '')
-    evidence.locator('summary').click()
+    evidence.locator(':scope > summary').click()
     expect(evidence.locator('.rv-source-locator')).to_have_count(5)
     expect(evidence.locator('.rv-source-locator').first).to_be_visible()
     expect(evidence).to_contain_text('extracted block 1')
-    evidence.locator('summary').click()
+    evidence.locator(':scope > summary').click()
     expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
-    evidence.locator('summary').click()
+    evidence.locator(':scope > summary').click()
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed reading overflow at {width}px'
     if out:
         out.mkdir(parents=True, exist_ok=True)
@@ -306,17 +359,21 @@ def check_typed_readings(page, url, width, out):
     expect(paper).to_contain_text('not verified peer-reviewed evidence')
     expect(paper).to_contain_text('How it was studied')
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', preprint['reading']['source_url'])
-    paper.locator('.rv-evidence summary').click()
+    paper.locator('.rv-evidence > summary').click()
     expect(paper.locator('.rv-evidence')).to_contain_text('page 2')
     expect(paper.locator('.rv-evidence')).not_to_contain_text('extracted block')
     page.goto(url + '#issue', wait_until='networkidle')
     issue_view = page.locator('#issue')
     expect(issue_view).to_be_visible()
-    issue_view.locator('.issue-reading-shelf > details > summary').click()
+    source_shelf = issue_view.locator('.issue-reading-shelf > details')
+    expect(source_shelf).to_have_count(1)
+    source_shelf.locator(':scope > summary').click()
+    expect(source_shelf).to_have_attribute('open', '')
+    expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
     shelf = issue_view.locator('.issue-shelf-item').first
     expect(shelf).to_contain_text(temporal)
     expect(shelf).to_contain_text('Synthetic policy author')
-    shelf.locator('.rv-evidence summary').click()
+    shelf.locator('.rv-evidence > summary').click()
     expect(shelf.locator('.rv-source-locator').first).to_be_visible()
     expect(shelf).to_contain_text('extracted block 1')
     expect(issue_view.locator('.issue-shelf-item').nth(1)).to_contain_text('not verified peer-reviewed evidence')
@@ -407,7 +464,7 @@ def check_registered_readings(page, url, width, out, payloads):
         expect(paper.locator('.automatic-evidence, .rv-artwork, .rv-original-figure')).to_have_count(0)
         evidence = paper.locator('.rv-evidence')
         expect(evidence).to_have_count(1)
-        evidence.locator('summary').click()
+        evidence.locator(':scope > summary').click()
         locators = [locator for values in reading['evidence'].values() for locator in values]
         expect(evidence.locator('.rv-source-locator')).to_have_count(len(locators))
         for locator in locators:
@@ -418,9 +475,9 @@ def check_registered_readings(page, url, width, out, payloads):
                 label = 'extracted block ' if commentary and reading['source_format'] == 'html' else 'paragraph '
                 expect(evidence).to_contain_text(label + str(locator['paragraph']))
         expect(evidence.locator('.rv-source-locator').first).to_be_visible()
-        evidence.locator('summary').click()
+        evidence.locator(':scope > summary').click()
         expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
-        evidence.locator('summary').click()
+        evidence.locator(':scope > summary').click()
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Registered reading overflow: {identifier} at {width}px'
         if out:
             out.mkdir(parents=True, exist_ok=True)
@@ -437,6 +494,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # Exercise the actual publication projection, not a stale committed payload.
     subprocess.run([sys.executable, str(ROOT / "scripts/build_public.py")], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts/build_newsletter.py")], cwd=ROOT, check=True)
     registered = registered_reading_payloads()
     with server() as url, sync_playwright() as p:
         browser = getattr(p, args.browser).launch(**({"executable_path":args.executable_path} if args.executable_path else {}))
@@ -444,9 +502,10 @@ if __name__ == '__main__':
             context = browser.new_context(reduced_motion='reduce')
             try:
                 check(context.new_page(), url, width, args.screenshots)
+                check_standalone_brief(context.new_page(), url, width, args.screenshots)
                 check_typed_readings(context.new_page(), url, width, args.screenshots)
                 check_registered_readings(context.new_page(), url, width, args.screenshots, registered)
             finally:
                 context.close()
-        print(f'Observatory browsing passed in {args.browser}: 1280, 768, 390, 320px; theme navigation, filters, dates, reading pages and all routes.')
+        print(f'Observatory browsing passed in {args.browser}: 1280, 768, 390, 320px; theme navigation, filters, dates, reading pages, all routes, generated newsletter and RSS subscription pages.')
         browser.close()

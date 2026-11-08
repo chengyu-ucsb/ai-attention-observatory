@@ -785,6 +785,24 @@ function readingBullets(content){
  for(const sentence of textSentences(content))list.append(make("li","",sentence));
  return list;
 }
+function readingQualifications(content){
+ // Only these exact recurring process notices move backstage. Source-specific
+ // limits and explicit preprint status remain ordinary, visible list items.
+ const processNotices=new Set(["Limited reading.","Article screening is not peer review; reported results do not establish strong causal evidence."]);
+ const sentences=textSentences(content);
+ if(!sentences.some(sentence=>processNotices.has(sentence)))return readingBullets(content);
+ const box=make("div","rv-qualifications");
+ const substantive=sentences.filter(sentence=>!processNotices.has(sentence));
+ // The mixed process sentence also carries a material causal qualification.
+ // Keep that caution visible unless a source-specific causal limit already does.
+ const mixedNotice="Article screening is not peer review; reported results do not establish strong causal evidence.";
+ const hasCausalLimit=substantive.some(sentence=>/\b(?:cannot|can not|does not|do not|not establish|no|without|unverified|uncertain|limited|lack)\b[^.!?]*\bcausal(?:ity)?\b|\bcausal(?:ity)?\b[^.!?]*\b(?:cannot|not|unverified|uncertain|limited|lack)\b/i.test(sentence));
+ if(sentences.includes(mixedNotice)&&!hasCausalLimit)substantive.push("Reported results do not establish strong causal evidence.");
+ if(substantive.length)box.append(readingBullets(substantive.join(" ")));
+ const full=make("details","rv-full-qualifications");
+ add(full,make("summary","","Full qualifications"),readingProse(content));
+ box.append(full);return box;
+}
 function readingProse(content,className=""){
  const prose=make("div","rv-prose "+className);
  for(const paragraph of readingParagraphs(content))prose.append(make("p","",paragraph));
@@ -982,7 +1000,7 @@ function showPaper(x){
  }
  if(d.limitation){
   const caveat=make("section","rv-context");
-  add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),readingBullets(d.limitation));context.append(caveat);
+  add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),readingQualifications(d.limitation));context.append(caveat);
  }
  if(!commentary&&(scholarly||original)&&!autoGraphic)body.append(context);
  if(!commentary&&(original||(scholarly&&editorial))&&d.interpretation){
@@ -1041,7 +1059,7 @@ function showPaper(x){
   // Preserve distinct legacy basis text without repeating an entire typed notice.
 
   const sourceUrl=httpsSourceUrl(r.source_url);
-  if(sourceUrl)cite.append(link("Read checked source: "+checkedSourceLabel(r)+" ↗",sourceUrl,"rv-primary-link"));
+  if(sourceUrl)cite.append(link("Read the source ↗",sourceUrl,"rv-primary-link"));
   if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)
    cite.append(link("Related journal publication (not the checked source) ↗",doiUrl(r.related_journal_doi),"rv-secondary-link"));
  }else{
@@ -1055,7 +1073,6 @@ function showPaper(x){
  provenanceBody.append(make("p","",r.provenance||"Publisher/source index"));
  if(original){
   provenanceBody.append(status);
-  if(r.source_version)provenanceBody.append(make("p","","Source version identifier: "+r.source_version));
   provenanceBody.append(checkedReadingContext(r,"rv-reading-notice"));
   if(d.basis&&!String(r.notice||"").includes(d.basis))provenanceBody.append(make("p","rv-review-basis",d.basis));
  }else provenanceBody.append(status);
