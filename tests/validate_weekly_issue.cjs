@@ -58,5 +58,9 @@ if(issue.status==="published"){
  }
 }
 const rss=text("issue-feed.xml");
-assert(rss.includes("The Attention Brief"),"Missing synthesized editorial feed");
+// Source-only changes may precede the publication workflow regenerating RSS.
+// Preserve the stable subscription endpoint and accept only the two real mastheads;
+// current-generator branding is checked independently in test_newsletter_feed.py.
+assert(/<channel>\s*<title>The Attention (?:Brief|Edit) \| AI &amp; Attention Observatory<\/title>/.test(rss),"Missing synthesized editorial feed masthead");
+assert(/<atom:link\b[^>]*href="https:\/\/chengyu-ucsb\.github\.io\/ai-attention-observatory\/issue-feed\.xml"[^>]*rel="self"[^>]*type="application\/rss\+xml"/.test(rss),"Editorial feed must retain its canonical subscription endpoint");
 console.log("Weekly issue test passed:",issue.status,issue.source_count,"source-backed readings, complete shelf, source-linked themes.");
