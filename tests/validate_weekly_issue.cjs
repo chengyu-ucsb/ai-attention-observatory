@@ -24,7 +24,7 @@ assert(app.includes("function renderIssue()"),"Missing issue renderer");
 const deployment=text(".github/workflows/publish.yml");
 assert(deployment.includes("Catch up full-text research backlog"),"Catch-up results must trigger a Pages redeployment");
 assert(!site.includes('id="issue-source-landscape"'),"Internal source-coverage dashboard should not appear in the public edition");
-assert(!site.includes('THE ATTENTION EDIT · IN PREPARATION'),"Editorial workflow statuses leaked into public markup");
+assert(!site.includes('THE ATTENTION BRIEF · IN PREPARATION'),"Editorial workflow statuses leaked into public markup");
 const featured=JSON.parse(text("data/public-featured-issue.json"));
 assert(featured.status==="published"||featured.status==="none","Only completed editorials may appear as featured issues");
 if(featured.status==="published"){
@@ -58,5 +58,9 @@ if(issue.status==="published"){
  }
 }
 const rss=text("issue-feed.xml");
-assert(rss.includes("The Attention Edit"),"Missing synthesized editorial feed");
+// Source-only changes may precede the publication workflow regenerating RSS.
+// Preserve the stable subscription endpoint and accept only the two real mastheads;
+// current-generator branding is checked independently in test_newsletter_feed.py.
+assert(/<channel>\s*<title>The Attention (?:Brief|Edit) \| AI &amp; Attention Observatory<\/title>/.test(rss),"Missing synthesized editorial feed masthead");
+assert(/<atom:link\b[^>]*href="https:\/\/chengyu-ucsb\.github\.io\/ai-attention-observatory\/issue-feed\.xml"[^>]*rel="self"[^>]*type="application\/rss\+xml"/.test(rss),"Editorial feed must retain its canonical subscription endpoint");
 console.log("Weekly issue test passed:",issue.status,issue.source_count,"source-backed readings, complete shelf, source-linked themes.");

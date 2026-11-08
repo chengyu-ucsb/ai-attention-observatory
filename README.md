@@ -1,6 +1,6 @@
 # AI & Attention Observatory
 
-**[Website](https://chengyu-ucsb.github.io/ai-attention-observatory/)** · **[The Weekly Edit](https://chengyu-ucsb.github.io/ai-attention-observatory/#issue)** · **[Newsletter preview](https://chengyu-ucsb.github.io/ai-attention-observatory/newsletter.html)** · **[RSS subscription](https://chengyu-ucsb.github.io/ai-attention-observatory/subscribe.html)**
+**[Website](https://chengyu-ucsb.github.io/ai-attention-observatory/)** · **[The Weekly Brief](https://chengyu-ucsb.github.io/ai-attention-observatory/#issue)** · **[Newsletter preview](https://chengyu-ucsb.github.io/ai-attention-observatory/newsletter.html)** · **[RSS subscription](https://chengyu-ucsb.github.io/ai-attention-observatory/subscribe.html)**
 
 ## About
 
@@ -12,7 +12,7 @@ Developed by [Chengyu Fang](https://chengyufang.org/). This is an evolving resea
 
 | Section | What's there |
 | --- | --- |
-| [The Weekly Edit](https://chengyu-ucsb.github.io/ai-attention-observatory/#issue) | A short, cross-source editorial with key themes, productive tensions, and a small experiment |
+| [The Weekly Brief](https://chengyu-ucsb.github.io/ai-attention-observatory/#issue) | A short, cross-source editorial with key themes, productive tensions, and a small experiment |
 | [Research library](https://chengyu-ucsb.github.io/ai-attention-observatory/#library) | Searchable, source-attributed readings with explicitly marked levels of access |
 | [Evidence atlas](https://chengyu-ucsb.github.io/ai-attention-observatory/#atlas) | Visualizations of the *indexed collection*, not population-level research estimates |
 | [Experimental Lab](https://chengyu-ucsb.github.io/ai-attention-observatory/#lab) | Browser-local design prototypes exploring attention, interruptions, and graduated AI assistance |
@@ -21,7 +21,7 @@ Developed by [Chengyu Fang](https://chengyufang.org/). This is an evolving resea
 
 **Direct feed:** https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml
 
-RSS follows published weekly editions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
+RSS follows published weekly briefions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
 
 ## Private Zotero access
 
@@ -317,7 +317,7 @@ conversation. Optional source nominations can still be added in
 `data/brief-leads.json` with a title, DOI (or canonical arXiv URL), lane,
 discovery-week date and human-readable origin. Do not add private chat URLs.
 
-`Publish weekly edition` runs after successful full-text acquisition, with
+`Publish weekly briefion` runs after successful full-text acquisition, with
 Monday/Tuesday recovery checks. It checks for an existing edition before
 downloading a model or generating anything. For a new week,
 `scripts/compose_issue.py` runs Qwen2.5-7B-Instruct locally on the GitHub runner,
