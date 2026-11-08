@@ -84,3 +84,34 @@ prompts, larger local models, claim-list assembly, or alternative synthesis
 systems need end-to-end source-reviewed generated-summary evaluation before
 unattended publication. Preserve existing holds and the separate unseen claim
 holdout; do not tune on it to obtain a passing score.
+
+## Repeat-discovery evidence regression (2026-11-08)
+
+[PR #53](https://github.com/chengyu-ucsb/ai-attention-observatory/pull/53)
+correctly stabilized `publication_date_provenance.checked_at` when publisher
+verification repeated unchanged evidence. It did not cover the full recovery
+workflow: cached feed discovery ran first and replaced the stronger publisher
+provenance with RSS-only evidence. The next publisher check reconstructed the
+same evidence without its original timestamp. Bot commit
+[`fd3a9ff`](https://github.com/chengyu-ucsb/ai-attention-observatory/commit/fd3a9ff6da2407872a293f46f5d540e1731dcf85)
+therefore changed only that bound timestamp on three EFF records and excluded
+their accepted readings.
+
+Discovery now retains independently verified publisher provenance only when
+the incoming RSS/Atom observation is already an exact member of its normalized
+evidence. A matching date alone is insufficient: new feed sources or bases
+still change the binding, conflicting dates still quarantine the article, and
+new publisher evidence still invalidates the existing receipt. Latest discovery
+and publisher-check times remain in their separate operational reports.
+
+The three EFF evidence timestamps were reconciled against `fd3a9ff^`. For every
+record, restoring only that timestamp made the entire bound record context
+exactly equal to the prior version and its existing article-screen SHA-256.
+No article screen, source-check receipt, publication approval, or source text
+was changed. The latest `editorial_metadata.checked_at` remains intact. The
+parenting article's later modification still excludes it from the historical
+weekly shelf; accepting its current reading does not create an older snapshot.
+
+Offline lifecycle regressions cover rediscovery → verification, retained
+receipts, changed feed/publisher evidence, persistent conflicts, and the real
+EFF records. This reconciles existing decisions; it is not a new source check.

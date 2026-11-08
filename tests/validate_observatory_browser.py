@@ -443,6 +443,13 @@ def registered_reading_payloads():
     cognitive_ease = [row for row in originals if row.get('doi') == '10.1016/j.chb.2024.108386']
     assert len(cognitive_ease) == 1, 'Accepted Cognitive Ease reading was not admitted'
     assert cognitive_ease[0]['reading']['source_version'] == 'publishedVersion'
+    # Exercise the restored commentary through the real builder and DOM rather
+    # than letting timestamp churn quietly reduce the set being tested.
+    admitted_ids = {row['reading']['original_summary_id'] for row in originals}
+    for note_id in ('checked-eff-moderation-2026-10-27',
+                    'checked-eff-parenting-2026-10-29',
+                    'checked-eff-siri-controls-2026-10-28'):
+        assert note_id in admitted_ids, 'Accepted EFF reading was not admitted: ' + note_id
     if weekly.get('run', {}).get('publication_window'):
         start, end = previous_week(weekly['run']['date'])
         weekly_ids = {build_public.record_id(row) for row in weekly['items']}
