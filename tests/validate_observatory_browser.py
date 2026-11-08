@@ -140,7 +140,11 @@ def check(page, url, width, out):
     expect(page.locator('#paper h1')).to_be_visible()
     assert page.locator('.rv-head').evaluate('(e) => getComputedStyle(e).display') == 'block'
     overflow(); screenshot('reading-head')
-    expect(page.locator('.rv-head .story-visual-reading')).to_have_count(0)
+    expect(page.locator('.rv-head .story-visual-reading')).to_have_count(1)
+    expect(page.locator('.rv-head .story-image')).to_have_attribute('alt', re.compile(r'.{10,}'))
+    assert page.locator('.rv-head .story-image').evaluate('(e) => e.complete && e.naturalWidth > 0'), 'Editorial art failed to load'
+    assert page.locator('.rv-head .story-visual-reading').evaluate('(e) => e.lastElementChild.getBoundingClientRect().bottom <= e.getBoundingClientRect().bottom + 1'), 'Illustration caption was cropped'
+    expect(page.locator('.rv-head .story-visual-caption')).to_have_text('Editorial illustration')
     provenance = page.locator('.rv-provenance')
     expect(provenance).not_to_have_attribute('open', '')
     provenance.locator(':scope > summary').focus()

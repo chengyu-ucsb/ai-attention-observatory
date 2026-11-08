@@ -10,6 +10,7 @@ from collections import Counter
 from pathlib import Path
 from condense_readings import annotate
 from build_visuals import visual_spec
+from article_art import attach_art
 from search_plan import source_class
 from source_lineage import prepare
 from build_readings import make_note
@@ -139,6 +140,11 @@ def build():
         published["source_group"]=source_class(source)
         published["visual"]=visual_spec(published)
         selected.append(published)
+    # Editorial illustrations are a separate presentation layer, created only
+    # after every source-depth and publication gate above has passed. They never
+    # alter evidence graphics, source provenance, eligibility, or public counts.
+    art_root=DATA.parent if DATA.name=="data" else DATA
+    attach_art(selected,root=art_root,manifest=DATA/"article-art-overrides.json")
     selection_ids={record_id(x) for x in selected}
     canonical=[x for x in selected if not x.get("companion_to")]
     by_id={record_id(x):x for x in canonical}

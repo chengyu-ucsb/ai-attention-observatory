@@ -18,6 +18,8 @@ on:
       - 'scripts/source_audit.py'
       - 'scripts/export_zotero_backlog.py'
       - 'scripts/build_visuals.py'
+      - 'scripts/article_art.py'
+      - 'tests/test_article_art.py'
       - 'scripts/build_issue.py'
       - 'scripts/build_newsletter.py'
       - 'scripts/condense_readings.py'
@@ -100,6 +102,7 @@ jobs:
           cp index.html subscribe.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
           mkdir -p _site/assets
           cp assets/reading-*.svg assets/feed.xsl _site/assets/
+          cp -R assets/article-art assets/editorial-covers _site/assets/
           mkdir -p _site/exports
           cp exports/zotero-fulltext-backlog.ris _site/exports/
           mkdir -p _site/issues

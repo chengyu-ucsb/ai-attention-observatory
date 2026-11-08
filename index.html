@@ -17,6 +17,18 @@
   <script src="lab-play.js" defer></script>
 </head>
 <body>
+  <svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true" focusable="false"><defs><symbol id="icon-focus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></symbol>
+<symbol id="icon-switch" viewBox="0 0 24 24"><path d="M3 6h5c4 0 4 12 8 12h5m-4-4 4 4-4 4M3 18h5c1.5 0 2.5-1.8 3.3-4M14 9c.6-1.7 1.2-3 2-3h5m-4-4 4 4-4 4"/></symbol>
+<symbol id="icon-design" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3" fill="var(--paper,#fffefa)"/><circle cx="16" cy="17" r="3" fill="var(--paper,#fffefa)"/></symbol>
+<symbol id="icon-network" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><path d="m6 7 5 10m7-10-5 10M7 5h10"/></symbol>
+<symbol id="icon-external" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+<symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></symbol>
+<symbol id="icon-menu" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></symbol>
+<symbol id="icon-book" viewBox="0 0 24 24"><path d="M12 5C8 2 4 3 2 4v15c3-1 6-1 10 1 4-2 7-2 10-1V4c-3-1-6-2-10 1v15"/></symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24"><path d="m12 2 8 3v6c0 5-4 9-8 11-4-2-8-6-8-11V5zM8 12l3 3 5-6"/></symbol>
+<symbol id="icon-conversation" viewBox="0 0 24 24"><path d="M21 3H3v13h5l4 5v-5h9zM7 8h10M7 12h6"/></symbol>
+<symbol id="icon-rss" viewBox="0 0 24 24"><circle cx="5" cy="19" r="1" fill="currentColor"/><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/></symbol>
+<symbol id="icon-experiment" viewBox="0 0 24 24"><path d="M9 3h6m-5 0v7L4 20h16l-6-10V3M8 14h8"/></symbol></defs></svg>
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="shell header-inner">
@@ -24,7 +36,7 @@
         <span class="identity-mark" aria-hidden="true">A<span>/</span>A</span>
         <span class="identity-text"><strong>AI &amp; ATTENTION</strong><small>THE RESEARCH OBSERVATORY</small></span>
       </a>
-      <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="site-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
+      <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="site-navigation" hidden>Menu <span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-menu"></use></svg></span></button>
       <nav id="site-navigation" class="main-nav" aria-label="Main navigation">
         <a href="#home" data-route="home">Overview</a>
         <a href="#issue" data-route="issue">Weekly Brief</a>
@@ -34,7 +46,7 @@
         <a href="#lab" data-route="lab">Try the Lab</a>
         <a href="#about" data-route="about">About</a>
       </nav>
-      <a class="header-link" href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">By Chengyu Fang <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></a>
+      <a class="header-link" href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">By Chengyu Fang <span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></a>
     </div>
   </header>
 
@@ -48,7 +60,7 @@
       <section class="shell home-edition" aria-labelledby="weekly-title">
         <div class="weekly-cover">
           <div class="weekly-cover-copy"><p class="eyebrow" id="weekly-kicker">THE ATTENTION BRIEF</p><h2 id="weekly-title">This week's big idea</h2><p id="weekly-deck"></p>
-            <div class="weekly-cover-actions"><a class="button button-red" href="#issue">Read this issue <i class="font-independent-arrow" aria-hidden="true"></i></a><a class="edition-secondary" href="#library">Explore the research</a></div>
+            <div class="weekly-cover-actions"><a class="button button-red" href="#issue">Read this issue <span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a><a class="edition-secondary" href="#library">Explore the research</a></div>
             <p id="weekly-scope" class="weekly-scope"></p>
           </div>
           <svg class="weekly-cover-art observation-art" viewBox="0 0 600 450" role="img" aria-labelledby="observation-title observation-desc">
@@ -69,10 +81,10 @@
       <section class="shell field-guide" aria-labelledby="field-guide-title">
         <div class="field-guide-heading"><span class="eyebrow">EXPLORE THE FIELD</span><h2 id="field-guide-title">Four lenses. One human question.</h2></div>
         <div class="field-guide-grid">
-          <a href="#library?theme=AI%20%26%20cognition&amp;scope=all" class="field-question" data-explore-theme="AI &amp; cognition"><span class="question-number">01</span><strong>Cognition</strong><span class="question-cta">What do we hand over to AI?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
-          <a href="#library?theme=Fragmentation&amp;scope=all" class="field-question" data-explore-theme="Fragmentation"><span class="question-number">02</span><strong>Attention</strong><span class="question-cta">What happens between tasks?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
-          <a href="#library?theme=Interventions&amp;scope=all" class="field-question" data-explore-theme="Interventions"><span class="question-number">03</span><strong>Design</strong><span class="question-cta">Can technology protect focus?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
-          <a href="#library?theme=Technology%20%26%20society&amp;scope=all" class="field-question" data-explore-theme="Technology &amp; society"><span class="question-number">04</span><strong>Agency</strong><span class="question-cta">Who gets to shape our attention?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
+          <a href="#library?theme=AI%20%26%20cognition&amp;scope=all" class="field-question" data-explore-theme="AI &amp; cognition"><span class="question-number">01</span><strong>Cognition</strong><span class="question-cta">What do we hand over to AI?</span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a>
+          <a href="#library?theme=Fragmentation&amp;scope=all" class="field-question" data-explore-theme="Fragmentation"><span class="question-number">02</span><strong>Attention</strong><span class="question-cta">What happens between tasks?</span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a>
+          <a href="#library?theme=Interventions&amp;scope=all" class="field-question" data-explore-theme="Interventions"><span class="question-number">03</span><strong>Design</strong><span class="question-cta">Can technology protect focus?</span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a>
+          <a href="#library?theme=Technology%20%26%20society&amp;scope=all" class="field-question" data-explore-theme="Technology &amp; society"><span class="question-number">04</span><strong>Agency</strong><span class="question-cta">Who gets to shape our attention?</span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a>
         </div>
       </section>
       <section class="issue-strip">
@@ -94,7 +106,7 @@
           <div class="visual-panel topic-panel">
             <div class="panel-header"><h3>Where the literature clusters</h3><span class="tiny-label">INDEXED SOURCES BY THEME</span></div>
             <div id="topic-bars" class="topic-bars"></div>
-            <div class="panel-foot">Select a theme to explore its sources <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></div>
+            <div class="panel-foot">Select a theme to explore its sources <span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></div>
           </div>
           <div class="visual-panel depth-panel">
             <div class="panel-header"><h3>Inside the collection</h3><span class="tiny-label">SOURCE COVERAGE</span></div>
@@ -127,7 +139,7 @@
         <section class="issue-extras" id="issue-extras"><div class="issue-tension"><p class="eyebrow">THE PRODUCTIVE TENSION</p><h2 id="issue-tension-title"></h2><div id="issue-tension-text"></div><div id="issue-tension-refs" class="issue-references"></div></div>
         <div class="issue-experiment"><p class="eyebrow">ONE TINY EXPERIMENT</p><h2 id="issue-experiment-title"></h2><p id="issue-experiment-text"></p><p id="issue-experiment-caution"></p><a href="#lab" class="quiet-link">Try the Experimental Lab</a></div></section>
         <section class="issue-closing"><p id="issue-closer"></p><details class="issue-editorial-details"><summary>About this synthesis</summary><p id="issue-qualification" hidden></p></details></section>
-        <section class="issue-reading-shelf"><div class="section-heading"><div><p class="eyebrow">FURTHER READING</p><h2>Follow the sources<span class="red-period">.</span></h2><p id="issue-coverage" class="section-deck"></p></div></div><details><summary>Browse the complete source list and reading pages <span><i class="font-independent-arrow" aria-hidden="true"></i></span></summary><div id="issue-sources" class="issue-sources"></div></details></section>
+        <section class="issue-reading-shelf"><div class="section-heading"><div><p class="eyebrow">FURTHER READING</p><h2>Follow the sources<span class="red-period">.</span></h2><p id="issue-coverage" class="section-deck"></p></div></div><details><summary>Browse the complete source list and reading pages <span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></summary><div id="issue-sources" class="issue-sources"></div></details></section>
         <section class="issue-follow"><div><p class="eyebrow">KEEP EXPLORING</p><h2>More ideas, less noise.</h2><p>Follow new editions through RSS, or explore the research library.</p></div><div><a class="button button-red" href="subscribe.html">Follow the weekly feed</a><p><a class="quiet-link" href="issues/">Read past issues</a></p></div></section>
       </div>
     </section>
@@ -169,12 +181,12 @@
           <div class="library-discovery-title"><div><p class="eyebrow">START WITH A QUESTION</p><h2>Find your thread.</h2></div><p>Choose a theme, search an idea, or refine the evidence.</p></div>
           <div class="theme-browser" role="group" aria-label="Browse by research theme">
             <button type="button" data-library-theme="" aria-pressed="true">All themes</button>
-            <button type="button" data-library-theme="AI &amp; cognition" aria-pressed="false"><span aria-hidden="true">◎</span> AI &amp; cognition</button>
-            <button type="button" data-library-theme="Fragmentation" aria-pressed="false"><span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span> Fragmentation</button>
-            <button type="button" data-library-theme="Interventions" aria-pressed="false"><span aria-hidden="true">✳</span> Interventions</button>
-            <button type="button" data-library-theme="Technology &amp; society" aria-pressed="false"><span aria-hidden="true">◇</span> Technology &amp; society</button>
+            <button type="button" data-library-theme="AI &amp; cognition" aria-pressed="false"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-focus"></use></svg></span> AI &amp; cognition</button>
+            <button type="button" data-library-theme="Fragmentation" aria-pressed="false"><span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-switch"></use></svg></span></span> Fragmentation</button>
+            <button type="button" data-library-theme="Interventions" aria-pressed="false"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-design"></use></svg></span> Interventions</button>
+            <button type="button" data-library-theme="Technology &amp; society" aria-pressed="false"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-network"></use></svg></span> Technology &amp; society</button>
           </div>
-          <label class="search-wrap"><span class="search-glyph" aria-hidden="true">⌕</span><input id="search" type="search" autocomplete="off" placeholder="Search a topic, method, author, or finding…" aria-label="Search research"></label>
+          <label class="search-wrap"><span class="ui-icon search-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-search"></use></svg></span><input id="search" type="search" autocomplete="off" placeholder="Search a topic, method, author, or finding…" aria-label="Search research"></label>
           <details class="library-refine"><summary>Refine the collection <span>Scope, reading depth &amp; source type</span></summary>
             <div class="library-controls">
               <label>Evidence scope<select id="scope-filter" aria-label="Choose evidence scope"><option value="core" selected>AI-specific research</option><option value="adjacent">Adjacent digital-attention research</option><option value="historical">Earlier foundations</option><option value="all">All sources</option></select></label>
@@ -184,7 +196,7 @@
             </div>
           </details>
         </div>
-        <div class="library-results-heading"><div><p id="library-context" class="eyebrow">AI-SPECIFIC RESEARCH</p><div class="library-count" id="library-count" role="status" aria-live="polite" aria-atomic="true"></div></div><div class="library-order"><label for="library-sort">Order by<select id="library-sort"><option value="added">Recently added</option><option value="published">Publication date</option></select></label><button type="button" id="library-reset">Show all sources <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></button></div></div>
+        <div class="library-results-heading"><div><p id="library-context" class="eyebrow">AI-SPECIFIC RESEARCH</p><div class="library-count" id="library-count" role="status" aria-live="polite" aria-atomic="true"></div></div><div class="library-order"><label for="library-sort">Order by<select id="library-sort"><option value="added">Recently added</option><option value="published">Publication date</option></select></label><button type="button" id="library-reset">Show all sources <span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button></div></div>
         <div id="library-results" class="library-results"></div>
       </div>
     </section>
@@ -237,9 +249,9 @@
           <p id="play-session-status" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
         <div class="play-tabs" role="tablist" aria-label="Attention activities">
-          <button type="button" class="play-tab is-active" id="tab-switch" aria-label="Switch Lab" data-play-tab="switch" role="tab" aria-selected="true" aria-controls="play-switch"><span class="play-tab-num">01</span><span>Switch Lab<small>How does switching feel?</small></span><span class="play-tab-icon"><i class="font-independent-arrow" aria-hidden="true"></i></span></button>
+          <button type="button" class="play-tab is-active" id="tab-switch" aria-label="Switch Lab" data-play-tab="switch" role="tab" aria-selected="true" aria-controls="play-switch"><span class="play-tab-num">01</span><span>Switch Lab<small>How does switching feel?</small></span><span class="play-tab-icon"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button>
           <button type="button" class="play-tab" id="tab-recovery" aria-label="Return Point" data-play-tab="recovery" role="tab" aria-selected="false" aria-controls="play-recovery" tabindex="-1"><span class="play-tab-num">02</span><span>Return Point<small>Find your way back</small></span><span class="play-tab-icon">↩</span></button>
-          <button type="button" class="play-tab" id="tab-assist" aria-label="Assistance Dial" data-play-tab="assist" role="tab" aria-selected="false" aria-controls="play-assist" tabindex="-1"><span class="play-tab-num">03</span><span>Assistance Dial<small>Choose how AI helps</small></span><span class="play-tab-icon">◎</span></button>
+          <button type="button" class="play-tab" id="tab-assist" aria-label="Assistance Dial" data-play-tab="assist" role="tab" aria-selected="false" aria-controls="play-assist" tabindex="-1"><span class="play-tab-num">03</span><span>Assistance Dial<small>Choose how AI helps</small></span><span class="ui-icon play-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-design"></use></svg></span></button>
         </div>
         <div class="play-stage" id="play-switch" role="tabpanel" aria-labelledby="tab-switch">
           <div class="play-stage-side">
@@ -266,7 +278,7 @@
                 <button type="button" id="switch-right" class="switch-answer" disabled><span>→</span><small>EVEN / HIGH</small></button>
               </div>
               <button type="button" id="switch-next" class="play-primary" hidden>Next turn</button>
-              <button type="button" id="switch-start" class="play-primary">Start 20-trial snapshot <span><i class="font-independent-arrow" aria-hidden="true"></i></span></button>
+              <button type="button" id="switch-start" class="play-primary">Start 20-trial snapshot <span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button>
             </div>
             <div class="play-results" id="switch-results" hidden tabindex="-1"></div>
           </div>
@@ -292,7 +304,7 @@
               <h4 id="recovery-headline" tabindex="-1" aria-describedby="recovery-round-context recovery-description">A half-finished project</h4>
               <p id="recovery-description">You're writing about AI and attention. You just read two studies. Your next step is to compare how they measured cognitive effort.</p>
               <div id="recovery-interaction" class="recovery-interaction"></div>
-              <button type="button" class="play-primary" id="recovery-start">Begin interruption <span><i class="font-independent-arrow" aria-hidden="true"></i></span></button>
+              <button type="button" class="play-primary" id="recovery-start">Begin interruption <span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button>
             </div>
             <div id="recovery-comparison-results" class="play-results" tabindex="-1" hidden></div>
             <div id="recovery-history" class="play-results" aria-live="polite"></div>
@@ -316,12 +328,12 @@
               <p class="assist-pick-label">What do you conclude?</p>
               <div class="assist-choices" id="assist-choices"></div>
               <div id="assist-feedback" class="assist-feedback" hidden tabindex="-1"></div>
-              <button type="button" id="assist-next" class="play-primary" hidden>Try another scenario <span><i class="font-independent-arrow" aria-hidden="true"></i></span></button>
+              <button type="button" id="assist-next" class="play-primary" hidden>Try another scenario <span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button>
             </div>
           </div>
         </div>
         <div class="play-note">
-          <span class="play-note-icon">✳</span><div><strong>Prototype, not a diagnostic tool.</strong> The demonstrations are simplified, include practice and order effects, and cannot measure your real-world ability to concentrate. No scores or typed content are transmitted or saved. Nothing in this lab establishes an intervention's effectiveness.</div>
+          <span class="ui-icon play-note-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-experiment"></use></svg></span><div><strong>Prototype, not a diagnostic tool.</strong> The demonstrations are simplified, include practice and order effects, and cannot measure your real-world ability to concentrate. No scores or typed content are transmitted or saved. Nothing in this lab establishes an intervention's effectiveness.</div>
         </div>
         <section class="play-precedents">
           <div class="section-heading"><div><p class="eyebrow">OUTSIDE THE LAB / DESIGN PRECEDENTS</p><h2>How products approach focus<span class="red-period">.</span></h2><p class="section-deck">Compare design mechanisms, without mistaking product claims for outcome evidence.</p></div></div>

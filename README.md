@@ -414,6 +414,7 @@ Then visit http://localhost:8000/. To validate reading and publishing logic:
 ```bash
 python -m unittest discover -s tests -v
 node tests/validate_playground.cjs
+python scripts/article_art.py  # Generate lightweight editorial art; no API key/network.
 node tests/validate_article_ui.cjs
 node tests/validate_weekly_issue.cjs
 ```
