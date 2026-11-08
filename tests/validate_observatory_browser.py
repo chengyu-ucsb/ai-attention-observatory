@@ -431,6 +431,9 @@ def registered_reading_payloads():
     with tempfile.TemporaryDirectory(prefix='registered-reading-browser-') as tmp:
         data = Path(tmp) / 'data'
         shutil.copytree(ROOT / 'data', data)
+        # A registered-reading fixture retains curated-art references. Copy the
+        # matching local assets as well, then let its isolated build make SVGs.
+        shutil.copytree(ROOT / 'assets' / 'editorial-covers', Path(tmp) / 'assets' / 'editorial-covers')
         with patch.object(build_public, 'DATA', data), patch.object(original_readings, 'MANIFEST', data / 'original-readings.json'):
             library, weekly = build_public.build()
         pending = json.loads((data / 'public-pending-sources.json').read_text())
