@@ -1,51 +1,57 @@
-# Article illustration pipeline
+# Contextual article illustrations
 
-Every eligible public reading receives an `editorial_art` object. This is a presentation layer, not research evidence. `build_visuals.visual_spec`, reading depth, publication gates, source citations, and source provenance are unchanged.
+Every eligible public reading receives an `editorial_art` object, but not every reading receives an image. Artwork is a downstream presentation layer. Reading depth, publication eligibility, article counts, citations, source provenance and `build_visuals.visual_spec` remain unchanged, including when artwork needs review.
 
-## Automatic generation
+## Publication and review states
 
-Run the normal publication build:
+Run the ordinary publication build:
 
 ```sh
 python scripts/build_public.py
 ```
 
-The existing weekly and deployment workflows already run that build. After source-quality and reading-depth gates, it creates missing/changed covers under `assets/article-art/` and attaches their metadata to the public library and weekly projections. Deployment must copy the generated directory with the other assets. There is no new schedule, API key, paid service, network call, or external graphics dependency.
+The existing build attaches art only after its source-quality and reading-depth gates. No source acquisition, external image service, paid API, new schedule or graphics dependency is added. The caller must use `attach_art` on the complete admitted collection: `create_art` constructs one candidate and cannot independently enforce collection-wide uniqueness.
 
-Generated SVGs are intentionally not checked in. The renderer is standard-library Python. A normal image is approximately 3–4 KB, with a hard 32 KB limit. Each contains only a closed vocabulary of SVG paths, groups, circles and rectangles: no scripts, fonts, external resources, source figures, or embedded text.
+An accepted image has `status: "ready"`, a local `src`, descriptive `alt`, `concept`, provenance and content fingerprints. If source context is insufficient or a candidate duplicates already accepted artwork, it has `status: "needs_review"`, explicit `review_reasons`, and **no `src` or `thumbnail_src`**. The article remains published with its evidence intact. Consumers must not replace missing editorial art with a shared topic cover or repurpose an evidence graphic as decoration.
 
-For a standalone review of the already-public collection:
+Review reasons include:
 
-```sh
-python scripts/article_art.py --report /tmp/article-art-report.json \
-  --contact-sheet /tmp/article-art-contact.html
-```
+- `insufficient_specific_context`: fewer than two grounded subjects are available.
+- `duplicate_semantic_concept`: an accepted article already uses the concept signature.
+- `duplicate_foreground_subjects`: the same dominant subject pair is already used, even if reordered or given a different frame.
+- `duplicate_foreground_geometry`: the actual foreground pair repeats, including equivalent glyphs with different subject names.
+- `duplicate_composition`: actual generated SVG composition bytes match.
+- `duplicate_asset_bytes` or `duplicate_thumbnail_bytes`: actual validated asset bytes match another accepted article, including renamed files.
+- `near_visual_twin`: a generated scene is too similar under the conservative coarse visual screen, despite having different labels or bytes.
+- `visual_similarity_unavailable`: the generated SVG cannot be assessed by the supported coarse renderer. It is held rather than bypassing the check.
 
-This command creates assets and review files, but does not rewrite public JSON or run source acquisition. It rechecks publication eligibility and refuses an internal `library.json` input. `--root` selects another checkout. A contact sheet is a local HTML file; the report lists every asset, its concept, evidence-independent semantic cues, byte budget and collision audit.
+Collision metadata identifies the accepted article responsible for each conflict. The same canonical paper can appear in multiple projections without being treated as a different article. An unchanged, already accepted `editorial_art` allocation supplied in the input keeps priority. When no current allocation is supplied, canonical identity order determines acceptance, independent of input order. No separate allocation registry is persisted.
 
-## What is unique, and what is shared
+## Context and geometry
 
-These are procedural, source-theme illustrations, not individually art-directed covers. Twenty primary metaphor families include offloading cranes, reconstruction bridges, verification lenses, reflection mirrors, shared puzzle pieces, interruption envelopes, attention apertures and adjustable shutters. A separate subject vocabulary adds concrete objects for writing, mathematics, language, music, governance, sleep, games, teaching, cognitive effort and other source topics.
+The renderer selects a theme and two concrete subjects from source-related editorial text. `source_grounding` retains the matched phrase and the input field that licensed each subject. `visual_subjects` records the visible pair. Generic tags alone cannot qualify an image as contextual. A broad fallback theme may still be described in review metadata, but it is not rendered as a generic fallback image.
 
-Public titles and digest prose choose the primary metaphor, a second subject, a spatial relationship and a setting. Ten settings replace a repeated universal background: studio, library, workbench, classroom, folded paper, quiet room, night window, digital window, threshold and reading room. Six arrangements express inspecting, sharing, separation, comparison, protection or pairing. No numerical study findings determine shapes, quantities, proportions, or directional effects.
+The two source-grounded subjects dominate the illustration. A primary metaphor relates them through a crane, lens, mirror, threshold, shared table or another conceptual frame. Subjects include settings and tasks such as doctoral work, undergraduate mathematics, programming, language instruction, clinical work, music, governance, phones and writing. These are editorial metaphors, never representations of measured study results. Numerical findings do not choose shapes, proportions, quantities or effect directions.
 
-The identity hash changes only small print/layout details. It does **not** choose the meaning. Each record has a `semantic_signature` and a `composition_fingerprint`. The latter is calculated with all identity-based microvariation disabled, so the report cannot claim semantic uniqueness merely because filenames or pixels differ. Repeated compositions are reported explicitly in `semantic_collision_groups`. Similar future articles may legitimately reuse a metaphor and need editorial review rather than arbitrary extra shapes.
+Identity hashes no longer change the scene, colors, rotation or small marks. Identical concepts produce identical geometry instead of an artificially unique image. The acceptance guard checks the semantic signature, the unordered dominant noun pair, the actual foreground glyph pair at canonical coordinates, and the full generated composition independently. It writes generated files only for accepted candidates.
 
-The initial 88-record collection has 85 generated covers plus three curated covers. Review the current report for the exact geometry count and collisions after any corpus change. `semantic_basis` distinguishes `title`, `digest`, `title_and_digest`, `topic_fallback`, and `editor_selected`. A topic fallback is labeled as such; it is never described as source-specific art.
+`scripts/art_similarity.py` adds a dependency-free coarse raster screen for generated SVGs. It approximates the renderer's closed vector vocabulary on an 80 × 50 RGB grid, stores a compact signature, and checks every candidate against accepted generated scenes. Near-twin decisions combine full-scene color difference, color difference over the foreground union, and foreground overlap. Tiny extra marks cannot count as a new illustration merely because the SVG bytes change. The report records the method, thresholds and suspect pair scores.
 
-Prefer curated, individually reviewed overrides for featured stories, nuanced claims, weak keyword matches, or repeated concepts. A meaningful concept sentence and a visibly different composition matter more than a uniqueness counter.
+These checks do **not** establish perceptual pixel uniqueness. The coarse renderer approximates curves, strokes and rasterization; it is not the browser's rendering engine. Different scenes can still look similar at card size. Curated raster overrides receive the byte-level checks, not this SVG approximation; different raster encodings can contain the same pixels. A successful automated report means the stated automated checks passed, not that a person has reviewed every cover.
 
-## Determinism and cache behavior
+Generated SVGs use a closed vocabulary of paths, groups, circles and rectangles with no embedded text, script, fonts, external references or source figures. The hard per-file limit is 32 KB. Generated files under `assets/article-art/` are not checked in and must be copied with the other assets at deployment.
 
-DOIs are normalized case-insensitively, including DOI URLs. Source URLs retain case-sensitive paths and meaningful query parameters, while tracking parameters and fragments are removed. A title hash is an explicit last-resort identity for records without a DOI or URL.
+## Determinism and caching
 
-Filenames contain an identity digest and an SVG content digest, never raw titles or identifiers. Input fingerprints cover the canonical identity, public editorial text and renderer version. A change to the digest invalidates the cache, even though numerical findings never become drawing instructions. Collection dates and unrelated acquisition metadata do not churn art. Generation has no timestamps and writes a file only if its content differs. Increment `RENDERER_VERSION` when changing the design contract.
+DOIs are case-normalized, including DOI URLs. Source URLs retain meaningful query parameters and case-sensitive paths but omit tracking parameters and fragments. A title hash is the explicit last-resort identity.
 
-Old generated files are not deleted automatically. This prevents breaking older payloads or deployment races. A clean deployment checkout generates only the assets it needs. Curated assets live in a separate folder and are never pruned by the renderer.
+Filenames contain identity and rendered-content hashes, never raw identifiers or titles. Input fingerprints include canonical identity, public editorial input and renderer version. A digest revision updates the input fingerprint. If the drawing has not changed, its content-addressed asset stays unchanged; adding a reported finding must not invent a different image. Dates, citation counts and unrelated acquisition metadata do not churn art. The renderer uses no timestamps and does not rewrite unchanged files.
+
+Increment `RENDERER_VERSION` when changing the design contract. Old generated assets are not deleted automatically, so an older payload remains usable during deployment transitions. Curated assets live separately and are never pruned by the renderer.
 
 ## Curated overrides
 
-Create `data/article-art-overrides.json`:
+For individually reviewed original artwork, create `data/article-art-overrides.json`:
 
 ```json
 {
@@ -64,18 +70,30 @@ Create `data/article-art-overrides.json`:
 }
 ```
 
-Keys must use the exact canonical `doi:` or `url:` identity. Required fields are `src`, `alt`, `concept`, and `provenance`. Thumbnails and dimensions are optional; dimensions, when supplied, must match the actual raster. Thumbnail dimensions must not exceed the cover and must preserve its aspect ratio.
+Required fields are `src`, `alt`, `concept` and `provenance`. Keys must use the canonical `doi:`, `url:` or title-hash identity. Optional dimensions must match the actual raster. Thumbnails must preserve aspect ratio and be no larger than the cover.
 
-Paths must be flat lowercase letters/digits/hyphens under `assets/editorial-covers/` or `assets/article-art/`, ending in `.webp`, `.png`, or `.jpg`. No URLs, nested folders, traversal, SVG overrides, or external symlinks are allowed. Images must exist, have supported raster headers, and be at most 2 MB each. Two articles cannot share the same override cover. Missing manifests use procedural art; malformed manifests stop validation before publication rather than publishing a broken image. Overrides do not make ineligible articles public.
+Overrides are explicitly editor-declared concepts, not automatically verified source interpretations. Their metadata preserves the declared concept and provenance rather than claiming that a procedural noun pair produced their pixels. A valid override can supply specific art when keyword matching is insufficient. Different original overrides are not rejected merely because their articles would have selected the same procedural pair.
 
-The public record retains explicit per-asset provenance and checksums. Use only original or appropriately licensed art. A provenance field is not proof of permission and does not grant rights to publisher figures or copyrighted source images. This feature adds no license to research content. The three initial curated covers are original generated editorial work, with their specific provenance recorded in the manifest.
+Paths must be flat lowercase letters, digits and hyphens under `assets/editorial-covers/` or `assets/article-art/`, ending in `.webp`, `.png` or `.jpg`. URLs, traversal, nested folders, SVG overrides and external symlinks are forbidden. Assets must exist, have supported raster headers and fit the 2 MB limit. The loader calculates hashes from actual bytes, including thumbnails. Reusing a path or renaming identical bytes cannot bypass the collection collision gate. A duplicate candidate becomes review-needed; malformed manifests and invalid assets still raise before publication.
 
-## Review and tests
+Use only original or appropriately licensed artwork. A provenance declaration is not proof of permission and grants no rights to publisher figures or copyrighted research content.
+
+## Audit and tests
+
+Review an already-public collection without rewriting it or running acquisition:
 
 ```sh
+python scripts/article_art.py --report /tmp/article-art-report.json \
+  --contact-sheet /tmp/article-art-contact.html
 python -m unittest discover -s tests -p test_article_art.py -v
 ```
 
-Tests cover actual and synthetic records, meaningful topic families, geometry/semantic audits, deterministic bytes and write-if-unchanged behavior, canonical identities and path collisions, source changes, SVG safety, override validation, size budgets, contact-sheet escaping, and publication quarantine. Compare the full public projection with the art attachment disabled to verify that the only new information is `editorial_art`.
+The standalone command rechecks publication eligibility and refuses an internal `library.json` input. `--root` selects another checkout. The contact sheet shows accepted images and explicit review notices without broken image tags. The report lists ready/review counts, reasons, source-grounding phrases, collision groups and accepted asset bytes. `distinct_generated_compositions` counts accepted generated compositions; collision groups also retain held candidates so rejection is visible rather than hidden by a success counter.
 
-Inspect a contact sheet after modifying selection rules or object drawing. Keyword rules can misread a title, miss a qualification, or overemphasize a secondary topic. Art does not verify an article's findings and must never stand in for the evidence layer. Card images can use empty alt text when redundant with the adjacent title; a reading-page illustration can use its descriptive metaphor alt text.
+Tests cover real public records, realistic repeated research concepts, repeated foreground pairs with different frames, independent geometry checks, tiny-decoration visual twins, changed dominant scenes, unsupported coarse-renderer handling, insufficient context, renamed identical rasters, repeated thumbnails, canonical-paper reuse, stable ordering, retained acceptance, content-addressed caching, safe SVG/path handling and honest review reports. Publication tests compare the full build with art disabled and verify that evidence, provenance, weekly membership and quarantine are unchanged. Run `python -m unittest discover -s tests -p test_art_similarity.py -v` for the coarse rasterizer's own geometry and metric tests.
+
+### Production visual checks
+
+Run visual QA after the normal build, on the exact deployment payload and image URLs. Include library cards, featured stories, weekly cards and reading pages at desktop and mobile sizes. Confirm that review-needed records have no rendered editorial `<img>` or shared fallback, and that accepted images load with nonzero natural dimensions. Check stale cached payloads and broken asset paths separately from artistic similarity.
+
+For a stronger future pixel guard, render each **actual served crop** in a deterministic browser viewport. Compare decoded RGBA hashes for exact duplicates, then rank near-duplicate candidates using perceptual hashes plus foreground/cropped image differences. Compare all pairs, not only equal motif labels. Save suspect side-by-side thumbnails and source-grounding phrases for editorial review. Thresholds need calibration against known duplicated and genuinely different covers; a single hash-distance cutoff is not a reliable declaration of contextual uniqueness. Re-run the image audit whenever renderer rules, curated assets or the published corpus change.
