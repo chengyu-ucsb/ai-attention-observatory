@@ -175,7 +175,8 @@ def check(page, url, width, out):
             expect(source_shelf).to_have_attribute('open', '')
             assert page.locator('.issue-shelf-item').count() > 0
             expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
-            expect(page.locator('#issue-coverage')).to_contain_text('sources in this edition')
+            shelf_count = page.locator('.issue-shelf-item').count()
+            expect(page.locator('#issue-coverage')).to_contain_text(re.compile(r'^' + str(shelf_count) + r' sources (?:originally published|in this edition)'))
             screenshot('issue-sources')
     # Visual routes have ordinary destinations and no tracking/persistence.
     page.locator('.reading-routes a[href="#atlas"]').click()
