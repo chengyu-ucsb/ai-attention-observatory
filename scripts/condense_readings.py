@@ -268,36 +268,86 @@ def concept_tags(record):
  ]
  tags=[label for label,pattern in clusters if re.search(pattern,text)]
  return tags[:3]
-def source_snippet(text, role, limit=600):
- """Keep a complete, source-supported statement instead of a clipped teaser.
+def method_specificity(line):
+ """Prefer the actual design/sample to preliminary administrative procedures."""
+ patterns=[
+  (8,r"\bn\s*=\s*\d+|\b\d+\s+(?:(?:valid|university|college|school|undergraduate|graduate)\s+)?(?:participants|students|respondents|responses|teachers|workers|adults)\b"),
+  (5,r"\b(?:randomly assigned|randomi[sz]ed|cross.sectional|longitudinal|systematic review|meta.analysis|mixed.methods)\b"),
+  (3,r"\b(?:survey|interview|experiment|sample|participants|recruited|were compared|thematic analysis)\b"),
+  (1,r"\b(?:regression|data were collected)\b")]
+ return sum(weight for weight,pattern in patterns if re.search(pattern,line,re.I))
 
- Try every intact sentence: a long opening sentence must not hide a later
- informative method. Role checks fail closed, so a scene-setting sentence
- cannot fill the methods or limitations slot merely because it is short.
- """
+LIMITATION_CONTENT=re.compile(
+ r"\b(?:cannot|could not|limited|limits?|lack|absence|small|not representative|"
+ r"nonrepresentative|not representatively|solely|only|self.report\w*|cross.sectional|"
+ r"generalizability|generalisation|generalization|selection bias|convenience sampl\w*|"
+ r"confound\w*|unmeasured|not measured|not assessed|not tested|no follow.up|possibility|bias|missed)\b",re.I)
+
+def source_snippet(text, role, limit=600):
+ """Return a complete specific statement, never a generic section introduction."""
  from build_readings import METHOD, LIMIT
  if not text:return ""
  candidates=sentence_list(text)
  if role=="approach":
-  # Prefer the actual participants/procedure to generic methodological framing.
-  def method_score(line):
-   patterns=[
-    (8,r"\bn\s*=\s*\d+|\b\d+\s+(?:valid\s+)?(?:participants|students|respondents|responses|teachers|workers|adults)\b"),
-    (5,r"\b(?:randomly assigned|randomi[sz]ed|cross.sectional|longitudinal|systematic review|meta.analysis|mixed.methods)\b"),
-    (3,r"\b(?:survey|interview|experiment|sample|participants|recruited|were compared|thematic analysis)\b"),
-    (1,r"\b(?:regression|data were collected)\b")]
-   return sum(weight for weight,pattern in patterns if re.search(pattern,line,re.I))
-  candidates=sorted(candidates,key=method_score,reverse=True)
+  candidates=sorted(candidates,key=method_specificity,reverse=True)
  for line in candidates:
   if line.endswith(("…", "...")) or len(line)>limit or not re.search(r'[.!?]["”’\)\]]*$',line):continue
-  if role=="approach" and (not (METHOD.search(line) or re.search(r"\b(?:interviews|surveys|experiments)\b",line,re.I)) or re.search(r"\b(?:future research|prior studies|previous research|should be|could be)\b",line,re.I)):continue
-  if role=="limitations" and not (LIMIT.search(line) or re.search(
-      r"\b(?:(?:cannot|could not) (?:establish|infer|determine|conclude|disentangle|rule out|exclude|generaliz\w*)|limited to|self.report\w*|cross.sectional|generalizability|generalisation|generalization|selection bias|convenience sampl\w*)\b",line,re.I)):continue
+  if role=="approach" and (not (METHOD.search(line) or re.search(r"\b(?:interviews|surveys|experiments|randomly assigned|randomi[sz]ed (?:controlled|trial|experiment|study|comparison))\b",line,re.I)) or re.search(r"\b(?:future research|prior studies|previous research|one study|another study|(?:studies|research)[^.]{0,100}(?:needed|required)|should be|could be)\b",line,re.I)):continue
+  if role=="limitations" and (not LIMITATION_CONTENT.search(line) or not (LIMIT.search(line) or re.search(
+      r"\b(?:(?:cannot|could not) (?:establish|infer|determine|conclude|disentangle|rule out|exclude|generaliz\w*)|limited to|self.report\w*|cross.sectional|generalizability|generalisation|generalization|selection bias|convenience sampl\w*|absence of|limits? the|not representatively)\b",line,re.I))):continue
   phrase=readable_excerpt(line,role,limit)
   if phrase.endswith("…") or len(phrase)<30:continue
   if re.match(r"^(?:\d+(?:\.\d+)*\s+)?(?:methods?|results?|discussion|conclusions?|limitations?)\b",phrase,re.I):continue
   return phrase
  return ""
+
+def reported_result_bundle(source, title="", limit=600):
+ """Keep adjacent contrasting/null outcomes with an explicit result sentence.
+
+ This is still source extraction, not an original narrative. Never draw a new
+ finding from Discussion or add an unsupported caveat. Complete sentences and
+ their original ordering are preserved; no clause is clipped to fit a card.
+ """
+ primary=reported_result(source,title,maxlen=limit)
+ if not primary:return ""
+ # Do not filter short sentences: an intervening caveat breaks adjacency.
+ parts=[p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",clean(source)) if p.strip()]
+ if primary not in parts:return ""
+ start=parts.index(primary)
+ selected=[readable_excerpt(primary,"finding",limit)]
+ for line in parts[start+1:start+3]:
+  if (UNTESTED.search(line) or DIAGNOSTIC.search(line) or line.endswith(("…","..."))
+      or not re.search(r'[.!?]["”’\)\]]*$',line)):break
+  if re.search(r"\b(?:it is possible|perhaps|might|may|could|would|"
+      r"we (?:believe|argue|suggest)|the authors (?:believe|argue|suggest)|"
+      r"their sample|another sample|et al\.)|\b[A-Z][a-z]+(?: and [A-Z][a-z]+)? \(\d{4}\)",line):break
+  contrast=re.match(r"^(?:However|Further|Nevertheless|In contrast|By contrast|Conversely|Yet)\b",line,re.I)
+  adjacent_null=re.match(r"^(?:(?:The|These|Both) (?:groups|conditions) did not|"
+      r"There (?:was|were) no|No (?:statistically )?significant)\b",line,re.I)
+  observed=re.search(r"\b(?:demonstrated (?:significantly )?(?:higher|lower)|"
+    r"did not (?:differ|show)|(?:was|were) no (?:statistically )?significant|"
+    r"no (?:statistically )?significant (?:differences?|effects?|associations?)|"
+    r"(?:was|were) (?:higher|lower))\b",line,re.I)
+  if not ((contrast or adjacent_null) and (reported_result(line,title,maxlen=limit) or observed)):break
+  addition=readable_excerpt(line,"finding",limit)
+  if addition.endswith("…") or len(" ".join(selected+[addition]))>limit:break
+  selected.append(addition)
+ return " ".join(selected)
+
+
+def result_headline(reported, question):
+ """A retained tradeoff must not regress to a benefit-only headline."""
+ if reported and len(reported)<=230:return reported
+ parts=sentence_list(reported)
+ if len(parts)>=2:
+  # The first result is retained, so remove only a redundant transition that
+  # repeats its change. Do not clip a qualification or invent a short claim.
+  second=re.sub(r"^However,\s+despite this (?:reduction|increase|improvement),\s+","",parts[1],flags=re.I)
+  if second:second=second[0].upper()+second[1:]
+  pair=parts[0]+" "+second
+  if len(pair)<=230:return pair
+ return question
+
 
 def first_source_sentence(text):
  parts=sentence_list(text)
@@ -534,24 +584,27 @@ def annotate(record):
   fulltext=level=="full_text"
   results=(record.get("analysis") or {}).get("results") if fulltext else ""
   if not results:results=r.get("findings") or ""
-  finding=reported_result(results,record.get("title",""),maxlen=600)
+  finding=reported_result_bundle(results,record.get("title",""))
   finding_source="full_text" if finding and fulltext else "abstract" if finding else "none"
   if not finding and level in ("abstract","full_text"):
-   finding=reported_result(record.get("abstract_text") or "",record.get("title",""),maxlen=600)
+   finding=reported_result_bundle(record.get("abstract_text") or "",record.get("title",""))
    finding_source="abstract" if finding else "none"
-  reported=readable_excerpt(finding,"finding",600) if finding else ""
+  reported=finding
   if reported.endswith("…") or len(reported)<36:
    reported="";finding_source="none"
   methods=((record.get("analysis") or {}).get("methods") or r.get("methods") or "") if fulltext else record.get("abstract_text") or r.get("methods") or ""
   approach=source_snippet(methods,"approach")
   approach_source=("full_text" if fulltext else "abstract") if approach else "none"
-  if not approach:
-   approach=source_snippet(record.get("abstract_text") or "","approach")
-   approach_source="abstract" if approach else "none"
+  abstract_approach=source_snippet(record.get("abstract_text") or "","approach")
+  # A full-text label does not make a generic procedure more informative than
+  # the abstract's explicit design/sample. Retain the selected line's own basis.
+  if abstract_approach and (not approach or method_specificity(abstract_approach)>method_specificity(approach)):
+   approach=abstract_approach
+   approach_source="abstract"
   limitation=source_snippet((record.get("analysis") or {}).get("limitations") or r.get("limitations"),"limitations")
   question=research_question(record)
   digest={
-   "idea":reported if reported and len(reported)<=230 else question,
+   "idea":result_headline(reported,question),
    "explain":short_source_context(record) if not reported else "",
    "approach":approach,
    "approach_source":approach_source,
