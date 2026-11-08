@@ -43,11 +43,12 @@ def check(page, url, width, out):
         box = node.bounding_box()
         assert box['width'] >= 44 and box['height'] >= 44
     def screenshot(name):
+        name = re.sub(r'[^a-zA-Z0-9_-]', '-', name)
         if out:
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=False)
         # Compact, public-page review frames remain inspectable alongside the PNG artifacts.
-        if args.browser == 'chromium' and width in (1280, 390) and name in ('home', 'issue', 'reading-head'):
+        if args.browser == 'chromium' and ((width in (1280, 390) and name in ('home', 'issue', 'reading-head')) or name.startswith('overflow')):
             frame = page.screenshot(type='jpeg', quality=55, full_page=False)
             print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
     def overflow():
