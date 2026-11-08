@@ -3,7 +3,12 @@ const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(
 const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#E00122"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","direction-mark","#A8001A"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#646464"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#9A9193"]];
 const depths=[["full_text","Full-text material","#E00122"],["abstract","Abstract-based","#666666"],["curated","Curated synopsis","#C6C0C1"]];
-function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s==="direction-mark"){e.className+=(e.className?" ":"")+"font-independent-arrow";e.setAttribute("aria-hidden","true");return e}if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
+function uiIcon(name,cls=""){
+ const wrap=document.createElement("span");wrap.className="ui-icon"+(cls?" "+cls:"");wrap.setAttribute("aria-hidden","true");
+ const svg=document.createElementNS("http://www.w3.org/2000/svg","svg"),use=document.createElementNS("http://www.w3.org/2000/svg","use");
+ svg.setAttribute("viewBox","0 0 24 24");svg.setAttribute("focusable","false");use.setAttribute("href","#icon-"+name);svg.append(use);wrap.append(svg);return wrap;
+}
+function make(t,c,s){if(s==="direction-mark")return uiIcon("external",c);const e=document.createElement(t);if(c)e.className=c;if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
@@ -69,22 +74,23 @@ function artTopic(x){
  if(lane==="Technology & society")return "society";
  return "focus";
 }
+function editorialArt(x){
+ const art=x?.editorial_art,valid=src=>typeof src==="string"&&/^assets\/(?:article-art|editorial-covers)\/[a-z0-9-]+\.(?:svg|webp|png|jpg)$/.test(src);
+ if(!art||art.kind!=="editorial_illustration"||!valid(art.src)||typeof art.alt!=="string"||!art.alt.trim())return null;
+ return {...art,thumbnail_src:valid(art.thumbnail_src)?art.thumbnail_src:null};
+}
 function editorialImage(x,context="reading"){
- const img=make("img","story-image");
- img.src="assets/reading-"+artTopic(x)+".svg";
- img.alt="Conceptual editorial illustration for "+(x?.lane||"the research theme")+
-   "; it does not show measured study data";
- img.loading=context==="reading"?"eager":"lazy";
- img.decoding="async";
- img.width=880;img.height=530;
+ const img=make("img","story-image"),art=editorialArt(x),reading=context==="reading";
+ img.src=art?(reading?art.src:art.thumbnail_src||art.src):"assets/reading-"+artTopic(x)+".svg";
+ // Repeated card covers are decorative; the visible headline names the link.
+ img.alt=reading&&art?art.alt:"";
+ img.loading=reading?"eager":"lazy";img.decoding="async";
+ img.width=art?.width||1200;img.height=art?.height||760;
  return img;
 }
 function editorialMedia(x,context="reading"){
- const fig=make("figure","story-visual story-visual-"+context);
- fig.append(editorialImage(x,context));
- if(context==="reading")
-  fig.append(make("figcaption","story-visual-caption",
-    "Editorial illustration · not a visualization of study findings"));
+ const fig=make("figure","story-visual story-visual-"+context);fig.append(editorialImage(x,context));
+ if(context==="reading")fig.append(make("figcaption","story-visual-caption","Editorial illustration"));
  return fig;
 }
 
@@ -281,10 +287,10 @@ function renderIssue(){
  const signs=published?issue.signals||[]:[];
  signs.forEach((sig,i)=>{
    const tile=make("a","weekly-signal");tile.href="#issue";tile.setAttribute("aria-label","Read signal "+(i+1)+": "+sig.short);
-   const mark=make("div","weekly-signal-symbol",["◎","direction-mark","◇"][i%3]);
+   const mark=uiIcon(["focus","switch","network"][i%3],"weekly-signal-symbol");
    add(tile,mark,make("span","weekly-signal-no",String(i+1).padStart(2,"0")+" / IN THIS ISSUE"),make("h4","",sig.short),make("span","weekly-signal-arrow","Read the connection"));strips.append(tile);
    const panel=make("article","issue-signal"),header=make("div","issue-signal-header");
-   add(header,make("span","issue-signal-icon",["◎","direction-mark","◇"][i%3]),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
+   add(header,uiIcon(["focus","switch","network"][i%3],"issue-signal-icon"),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
    add(panel,header,make("h3","",sig.title),evidenceTags((issue.sources||[]).filter(source=>(sig.source_ids||[]).includes(source.id))),compactReading(sig.text,"Evidence, differences & limits"),
        make("span","issue-cited-label","READINGS BEHIND THIS SIGNAL"),
        issueRefs(sig.source_ids));
@@ -342,7 +348,7 @@ function home(){
  const root=$("#feature-grid");root.replaceChildren();
  if(!top.length)root.append(make("div","empty-state","The latest index contains no source-rich highlights yet. Browse the research library."));
  top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
- add(head,make("span","feature-number",String(i+1).padStart(2,"0")),make("span","feature-icon",["◎","direction-mark","✳"][i]));
+ add(head,make("span","feature-number",String(i+1).padStart(2,"0")),uiIcon(["focus","switch","design"][i%3],"feature-icon"));
  add(foot,make("span","source-pill",depthName(x)),btn("Read the evidence",()=>goto("paper",id(x)),"feature-go"));
  add(c,head,editorialMedia(x,"feature"),make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),originalSummary(x)?make("p","source-meta",cut(x.reading.digest?.explain,220)):null,make("p","feature-source-title",readableSourceTitle(x)),make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
  // Provider diagnostics belong in repository workflow logs, never in public content.
@@ -380,7 +386,7 @@ function renderPerspectives(){
   records.sort((a,b)=>(b.published||"").localeCompare(a.published||""));
   for(const x of records){
     const item=make("article","perspective-item");
-    const icon=make("div","perspective-glyph",x.source==="Official product documentation"?"◈":x.format==="Policy analysis"?"◇":"direction-mark");
+    const icon=uiIcon(x.source==="Official product documentation"?"book":x.format==="Policy analysis"?"shield":"external","perspective-glyph");
     const label=make("div","perspective-type",x.format||"Reporting & analysis");
     const title=make("h3");title.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));
     const summary=make("p","perspective-source-title",readableSourceTitle(x));
@@ -909,13 +915,15 @@ function showPaper(x){
  const title=make("h1","rv-headline",readingTitles[id(x)]||(original?headline:cleanLead(headline,readableSourceTitle(x))));
  const intro=(scholarly||original)&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title);
- if(readingTitles[id(x)]&&d.idea)head.append(make("p","rv-summary-idea",d.idea));
- if(intro){const overview=make("details","rv-overview");add(overview,make("summary","","Read the full overview"),readingProse(d.explain));head.append(overview);}
+ const introCopy=make("div","rv-intro-copy");
+ if(readingTitles[id(x)]&&d.idea)introCopy.append(make("p","rv-summary-idea",d.idea));
+ if(intro){const overview=make("details","rv-overview");add(overview,make("summary","","Read the full overview"),readingProse(d.explain));introCopy.append(overview);}
  const sourceRow=make("div","rv-source-row");
  add(sourceRow,make("span","",[x.venue,date(x.published)].filter(Boolean).join(" · ")),make("span","",original?checkedSourceLabel(r):depthName(x)));
- head.append(sourceRow);
- if(original&&r.temporal_notice){const dates=make("details","rv-source-dates");add(dates,make("summary","","Source dates"),make("p","rv-reading-notice",r.temporal_notice));head.append(dates);}
- // Illustration is a small identifying thumbnail in the reading header, not a full-width pseudo-figure.
+ introCopy.append(sourceRow);
+ if(original&&r.temporal_notice){const dates=make("details","rv-source-dates");add(dates,make("summary","","Source dates"),make("p","rv-reading-notice",r.temporal_notice));introCopy.append(dates);}
+ // Editorial art is separate from the source-grounded figures below.
+ if(editorialArt(x)){const lede=make("div","rv-lede-layout");add(lede,introCopy,editorialMedia(x,"reading"));head.append(lede);}else head.append(introCopy);
 
  main.append(back,head);
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");

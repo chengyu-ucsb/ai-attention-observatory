@@ -1135,3 +1135,27 @@ summary{cursor:pointer;font:600 14px/1.6 var(--brand);min-height:44px;color:var(
 /* Keep thumbnails inside their editorial grid tracks and metadata readable. */
 #home .editorial-card .story-visual-editorial{width:86px;height:86px;max-width:100%}.card-foot,.card-added,.card-source-version,.library-story .library-kicker,.editorial-category,.arrival-source-title,#paper-content .rv-source-row{font-size:12px!important}
 @media(max-width:600px){#home .editorial-card .story-visual-editorial{width:68px;height:68px}.masthead-topline{font-size:10px;letter-spacing:.04em}.masthead-topline>a{max-width:none;white-space:nowrap}.masthead-topline>span{min-width:0}#paper-content .rv-source-row{gap:8px;font-size:12px}}
+
+/* Article-specific editorial art and a single, font-independent icon family. */
+.icon-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+.ui-icon{display:inline-flex;width:1.25em;height:1.25em;flex:none;vertical-align:-.2em;align-items:center;justify-content:center}
+.ui-icon svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ui-icon use{pointer-events:none}.nav-toggle .ui-icon{margin-left:7px;width:20px;height:20px}.button .ui-icon{width:18px;height:18px;margin-left:6px}
+.field-question>.ui-icon{position:absolute;right:20px;top:22px;width:20px;height:20px;color:var(--red)}
+.theme-browser .ui-icon{width:20px;height:20px}.search-wrap>.ui-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:21px;height:21px;color:var(--muted)}
+#home .weekly-signal-symbol{display:none}.issue-signal-icon{width:28px;height:28px;color:var(--red)}.feature-icon{width:24px;height:24px}.perspective-glyph{width:32px;height:32px}
+.story-visual .story-image{object-fit:cover;filter:none;transition:none}.story-visual{background:#f6f2ea!important;filter:none!important}
+#home .editorial-card{grid-template-columns:138px minmax(0,1fr);gap:0 22px}
+#home .editorial-card .story-visual-editorial{width:138px;height:92px;border:0}
+.library-card.library-story{grid-template-columns:126px minmax(0,1fr)}
+.library-card.library-story .story-visual-card{width:126px;height:84px;border:0;filter:none}
+#paper-content .rv-lede-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,38%);gap:40px;align-items:start;margin-top:24px}
+#paper-content .rv-intro-copy{min-width:0}
+#paper-content .rv-lede-layout .story-visual-reading{display:block;width:100%;max-width:none;margin:0;border:0;border-radius:0;grid-area:auto;background:transparent!important}
+#paper-content .rv-lede-layout .story-image{display:block;width:100%;height:auto;aspect-ratio:3/2;object-fit:cover}
+#paper-content .rv-lede-layout .story-visual-caption{padding:8px 0 0;font:400 12px/1.5 var(--sans);color:var(--muted);background:transparent;text-align:left}
+#paper-content .rv-lede-layout .rv-summary-idea{margin-top:0;font-size:18px;line-height:1.65}
+@media(max-width:850px){#home .editorial-card{grid-template-columns:110px minmax(0,1fr);gap:0 18px}#home .editorial-card .story-visual-editorial{width:110px;height:74px}.library-card.library-story{grid-template-columns:100px minmax(0,1fr)}.library-card.library-story .story-visual-card{width:100px;height:67px}#paper-content .rv-lede-layout{gap:25px;grid-template-columns:minmax(0,1fr) minmax(240px,38%)}}
+@media(max-width:600px){#home .editorial-card{grid-template-columns:84px minmax(0,1fr);gap:0 16px}#home .editorial-card .story-visual-editorial{width:84px;height:62px}.library-card.library-story{grid-template-columns:76px minmax(0,1fr);gap:16px}.library-card.library-story .story-visual-card{width:76px;height:58px}#paper-content .rv-lede-layout{grid-template-columns:minmax(0,1fr);gap:24px;margin-top:22px}#paper-content .rv-lede-layout .story-visual-reading{grid-row:1}#paper-content .rv-lede-layout .rv-summary-idea{font-size:16px;line-height:1.75}.field-question>.ui-icon{right:16px;top:23px}}
+#paper-content .rv-lede-layout .story-visual-reading{height:auto;aspect-ratio:auto;overflow:visible}
+.search-wrap{position:relative}.search-wrap input{padding-left:46px!important}
