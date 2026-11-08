@@ -48,7 +48,7 @@ def check(page, url, width, out):
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=False)
         # Compact, public-page review frames remain inspectable alongside the PNG artifacts.
-        if args.browser == 'chromium' and ((width in (1280, 390) and name in ('home', 'issue', 'reading-head')) or name.startswith('overflow')):
+        if args.browser == 'chromium' and ((width in (1280, 390) and name in ('home', 'issue', 'reading-head', 'library')) or name.startswith('overflow')):
             frame = page.screenshot(type='jpeg', quality=55, full_page=False)
             print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
     def overflow():
@@ -75,10 +75,14 @@ def check(page, url, width, out):
     expect(page.locator('.publication-masthead h1')).to_contain_text('AI')
     expect(page.locator('.observation-art title')).to_have_text('The attention lens')
     assert page.locator('body').evaluate("(e) => getComputedStyle(e).getPropertyValue('--red').trim().toLowerCase()") == '#e00122'
+    assert page.locator('.weekly-cover-art').evaluate('(e) => getComputedStyle(e).position') == 'static'
     overflow(); screenshot('home')
     if out:
         for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.field-guide','themes')]:
             page.locator('#home '+section).screenshot(path=str(out / f'observatory-{width}-{name}.png'), style='.site-header { visibility: hidden !important; }')
+            if args.browser == 'chromium' and ((width == 1280 and name == 'perspectives-preview') or (width == 390 and name == 'themes')):
+                frame = page.locator('#home '+section).screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
+                print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
     assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url
@@ -106,6 +110,9 @@ def check(page, url, width, out):
     assert page.locator('.card-added').count() == page.locator('.library-story').count()
     if out:
         page.locator('.library-story').first.screenshot(path=str(out / f'observatory-{width}-card.png'), style='.site-header { visibility: hidden !important; }')
+        if args.browser == 'chromium' and width in (1280, 390):
+            frame = page.locator('.library-story').first.screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
+            print(f'DESIGN_REVIEW_IMAGE:{width}:library-card:' + base64.b64encode(frame).decode('ascii'), flush=True)
     # Added date is distinct from publication date; both order modes retain all records.
     count = page.locator('.library-story').count()
     page.locator('#library-sort').select_option('published')
@@ -125,6 +132,7 @@ def check(page, url, width, out):
     page.locator('.library-story h3 button').first.click()
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('#paper h1')).to_be_visible()
+    assert page.locator('.rv-head').evaluate('(e) => getComputedStyle(e).display') == 'block'
     overflow(); screenshot('reading-head')
     expect(page.locator('.rv-head .story-visual-reading')).to_have_count(0)
     provenance = page.locator('.rv-provenance')
@@ -232,6 +240,9 @@ def check_standalone_brief(page, url, width, out):
         if out:
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=True)
+        if args.browser == 'chromium' and width in (1280, 390):
+            frame = page.screenshot(type='jpeg', quality=55, full_page=False)
+            print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
         if name == 'newsletter':
             opening = page.locator('main details').first
             expect(opening).not_to_have_attribute('open', '')
