@@ -1,0 +1,137 @@
+{
+  "source_commit": "c8143e1",
+  "source_path": "data/weekly-source-acquisition.json",
+  "note": "Metadata-only production regression fixture; no article text. Row and provider pauses retained verbatim.",
+  "publication_window": {
+    "from": "2026-10-26",
+    "to": "2026-11-01",
+    "timezone": "UTC"
+  },
+  "record": {
+    "title": "Empowering Edupreneurship through AI-Based Creative Journalism Education",
+    "doi": "10.33050/corisinta.v2i2.112",
+    "url": "https://doi.org/10.33050/corisinta.v2i2.112",
+    "kind": "scholarly",
+    "published": "2026-10-30",
+    "publication_date_provenance": {
+      "source": "Crossref publisher metadata",
+      "evidence": [
+        {
+          "field": "published-online",
+          "date_parts": [
+            2026,
+            10,
+            30
+          ],
+          "precision": "day"
+        },
+        {
+          "field": "published",
+          "date_parts": [
+            2026,
+            10,
+            30
+          ],
+          "precision": "day"
+        },
+        {
+          "field": "issued",
+          "date_parts": [
+            2026,
+            10,
+            30
+          ],
+          "precision": "day"
+        }
+      ],
+      "policy": "earliest precise publication event; no registry timestamp fallback",
+      "status": "day_known",
+      "field": "published-online",
+      "value": "2026-10-30"
+    }
+  },
+  "row": {
+    "fingerprint": "0dad75b6a6348853af282a2a0aa8a27ab8e554960f03dd2b2dc066355da8cf58",
+    "kind": "scholarly",
+    "published": "2026-10-30",
+    "source_url": "https://doi.org/10.33050/corisinta.v2i2.112",
+    "status": "in_progress",
+    "complete": false,
+    "attempts": 9,
+    "cursor": {
+      "known": 0,
+      "provider": 3,
+      "provider_tried": []
+    },
+    "tried_sources": [
+      "990f6ea20c0ae8f45b160945ae6e93ee03ef640c8a57efdb95a14eec16c77c21"
+    ],
+    "plan": {
+      "known_routes": [],
+      "known_sources_only": false,
+      "doi_lookup_permitted": true
+    },
+    "excluded_related_or_outside_window_routes": 0,
+    "diagnostics": [
+      {
+        "status": "no_exact_match",
+        "retryable": false,
+        "stage": "discovery",
+        "provider": "Europe PMC XML",
+        "candidates": 0
+      },
+      {
+        "status": "candidates",
+        "retryable": false,
+        "stage": "discovery",
+        "provider": "OpenAIRE",
+        "candidates": 1
+      },
+      {
+        "status": "host_requires_review",
+        "retryable": false,
+        "stage": "article",
+        "provider": "OpenAIRE",
+        "url": "https://doi.org/10.33050/corisinta.v2i2.112"
+      },
+      {
+        "status": "candidate_budget_exhausted",
+        "retryable": false,
+        "stage": "retrieval",
+        "candidates_attempted": 1
+      },
+      {
+        "status": "no_exact_match",
+        "retryable": false,
+        "stage": "discovery",
+        "provider": "CORE",
+        "candidates": 0
+      },
+      {
+        "status": "http_429",
+        "retryable": true,
+        "stage": "discovery",
+        "provider": "Semantic Scholar",
+        "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.33050/corisinta.v2i2.112",
+        "candidates": 0,
+        "retry_after_seconds": 3600
+      },
+      {
+        "status": "http_429",
+        "retryable": true,
+        "stage": "discovery",
+        "provider": "Semantic Scholar",
+        "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.33050/corisinta.v2i2.112",
+        "candidates": 0,
+        "retry_after_seconds": 3600
+      }
+    ],
+    "source_text_saved": false,
+    "last_attempt_at": "2026-11-08T09:30:09.842146+00:00",
+    "last_outcome": "interrupted_attempt"
+  },
+  "provider_pauses": {
+    "provider:CORE": "2026-11-07T09:56:54.053140+00:00",
+    "provider:Semantic Scholar": "2026-11-07T19:51:44.602942+00:00"
+  }
+}

@@ -954,8 +954,13 @@ def advance(row, result, plan, routes, known_only, now):
             row['cursor']['provider_tried'] = []
     if stage_plan(routes, row['cursor'], known_only, plan['publication_window'],
                   row['tried_sources'], row['plan']['doi_lookup_permitted']) is None:
-        row.update(complete=True, status=('partial_full_text_not_reviewed' if row.get('document')
-                                        else failure_status(row['diagnostics'])))
+        # Current retryable failures returned above. Older rate limits/outages
+        # remain audit evidence, not a new retry state after every route is done.
+        # Retain access-denial history and any retrieved partial document.
+        terminal = ('partial_full_text_not_reviewed' if row.get('document') else
+                    'access_blocked' if any(d['status'] in BLOCKED for d in row['diagnostics']) else
+                    'source_unavailable')
+        row.update(complete=True, status=terminal)
     else:
         row['status'] = 'pending_routes'
 
