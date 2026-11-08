@@ -261,7 +261,7 @@ def choose_concept(inputs: dict) -> dict:
     title_label = f'For “{title}”, ' if title else "For this reading, "
     concept = title_label + objects + " evokes " + meaning + "."
     if basis == "topic_fallback":
-        concept = "Topic-based illustration: " + objects + "; " + meaning + "."
+        concept = "Topic-based illustration: " + title_label + objects + "; " + meaning + "."
     concept += " Paired with " + subject_object + ", the scene connects that metaphor to the article's " + subject.replace("_", " ") + " theme."
     signature = "|".join((family, subject, context, relation, setting))
     return {"motif": family, "semantic_basis": basis, "context": context, "relation": relation,

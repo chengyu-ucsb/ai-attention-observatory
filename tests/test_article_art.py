@@ -3,6 +3,7 @@ import copy
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import struct
 import subprocess
 import sys
@@ -170,6 +171,27 @@ class ArticleArtTests(unittest.TestCase):
         self.assertEqual(spec["semantic_basis"], "topic_fallback")
         self.assertEqual(spec["motif"], "reflection")
         self.assertTrue(spec["concept"].startswith("Topic-based illustration:"))
+        self.assertIn(row["title"], spec["concept"])
+
+    def test_newly_admitted_readings_have_valid_art_after_real_rebuild(self):
+        # Test the current registry, not only the last checked-in projection.
+        # Newly admitted commentary can use a topic fallback absent from that
+        # older file. Keep the real build-before-validation production order.
+        import original_readings
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            data = root / "data"
+            shutil.copytree(ROOT / "data", data)
+            shutil.copytree(ROOT / "assets/editorial-covers", root / "assets/editorial-covers")
+            with patch.object(build_public, "DATA", data), patch.object(original_readings, "MANIFEST", data / "original-readings.json"):
+                rebuilt, _ = build_public.build()
+            self.assertTrue(rebuilt)
+            for row in rebuilt:
+                illustration = row["editorial_art"]
+                self.assertTrue((root / illustration["src"]).is_file())
+                if illustration["semantic_basis"] != "editor_selected":
+                    self.assertIn(row["title"], illustration["concept"])
+                    self.assertIn("Not a depiction of study results", illustration["alt"])
 
     def test_canonical_identity_normalizes_doi_tracking_but_not_meaningful_urls(self):
         variants = ({"doi": "10.1234/ABC"}, {"doi": "https://doi.org/10.1234/abc"},
