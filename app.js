@@ -76,12 +76,14 @@ function artTopic(x){
 }
 function editorialArt(x){
  const art=x?.editorial_art,valid=src=>typeof src==="string"&&/^assets\/(?:article-art|editorial-covers)\/[a-z0-9-]+\.(?:svg|webp|png|jpg)$/.test(src);
- if(!art||art.kind!=="editorial_illustration"||!valid(art.src)||typeof art.alt!=="string"||!art.alt.trim())return null;
+ if(!art||art.status==="needs_review"||art.kind!=="editorial_illustration"||!valid(art.src)||typeof art.alt!=="string"||!art.alt.trim())return null;
  return {...art,thumbnail_src:valid(art.thumbnail_src)?art.thumbnail_src:null};
 }
 function editorialImage(x,context="reading"){
- const img=make("img","story-image"),art=editorialArt(x),reading=context==="reading";
- img.src=art?(reading?art.src:art.thumbnail_src||art.src):"assets/reading-"+artTopic(x)+".svg";
+ const art=editorialArt(x),reading=context==="reading";
+ if(!art)return null;
+ const img=make("img","story-image");
+ img.src=reading?art.src:art.thumbnail_src||art.src;
  // Repeated card covers are decorative; the visible headline names the link.
  img.alt=reading&&art?art.alt:"";
  img.loading=reading?"eager":"lazy";img.decoding="async";
@@ -89,7 +91,8 @@ function editorialImage(x,context="reading"){
  return img;
 }
 function editorialMedia(x,context="reading"){
- const fig=make("figure","story-visual story-visual-"+context);fig.append(editorialImage(x,context));
+ const img=editorialImage(x,context);if(!img)return null;
+ const fig=make("figure","story-visual story-visual-"+context);fig.append(img);
  if(context==="reading")fig.append(make("figcaption","story-visual-caption","Editorial illustration"));
  return fig;
 }
@@ -431,11 +434,13 @@ function showLibrary(){
  for(const x of xs){
   const c=make("article","library-card library-story"),body=make("div","library-story-body"),h=make("h3"),foot=make("div","card-foot");
   const image=editorialMedia(x,"card");
+  if(image){
   image.onclick=()=>goto("paper",id(x));
   image.setAttribute("role","button");
   image.setAttribute("aria-label","Read: "+shortIdea(x,115));
   image.tabIndex=0;
   image.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();goto("paper",id(x));}});
+  }else c.className+=" library-story-no-art";
   h.append(btn(shortIdea(x,115),()=>goto("paper",id(x))));
   add(foot,make("span","card-source-meta",(x.venue||"Original source")+" · Published "+date(x.published)),make("span","card-added",x.first_seen?"Added "+date(x.first_seen):"Added date not recorded"),make("span","card-depth",depthName(x)));
   if(/^(Earlier|Historical)/.test(x.source_group||""))foot.append(make("span","", "Earlier foundation"));

@@ -543,6 +543,56 @@ def check_registered_readings(page, url, width, out, payloads):
     assert not errors, errors
 
 
+def check_artwork_uniqueness(page, url):
+    """Decode the served images, not their filenames or geometry metadata.
+
+    Conservative visual-twin tripwires catch tiny redraws. Passing them does not
+    establish conceptual quality; contact-sheet review remains required.
+    """
+    page.goto(url, wait_until='networkidle')
+    audit = page.evaluate("""async () => {
+      const records = await (await fetch('data/public-library.json')).json();
+      const frames = [];
+      for (const r of records) {
+        const art=r.editorial_art;
+        if(!art || art.status==='needs_review') {
+          if(art?.src || art?.thumbnail_src) throw new Error('Review-required art retained a served image');
+          continue;
+        }
+        const img=new Image(); img.src=art.thumbnail_src||art.src;
+        await img.decode();
+        for(const [w,h] of [[120,76],[76,58]]) {
+          const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+          const ctx=canvas.getContext('2d',{willReadFrequently:true});
+          ctx.fillStyle='#f4f0e8';ctx.fillRect(0,0,w,h);
+          const scale=Math.min(w/img.naturalWidth,h/img.naturalHeight);
+          const dw=img.naturalWidth*scale,dh=img.naturalHeight*scale;
+          ctx.drawImage(img,(w-dw)/2,(h-dh)/2,dw,dh);
+          frames.push({id:r.doi||r.url,title:r.title,width:w,pixels:Array.from(ctx.getImageData(0,0,w,h).data)});
+        }
+      }
+      const close=[];let closest=1;
+      for(let i=0;i<frames.length;i++)for(let j=i+1;j<frames.length;j++) {
+        const a=frames[i],b=frames[j];if(a.width!==b.width || a.id===b.id)continue;
+        let total=0,foreground=0,count=0;
+        for(let p=0;p<a.pixels.length;p+=4) {
+          const d=(Math.abs(a.pixels[p]-b.pixels[p])+Math.abs(a.pixels[p+1]-b.pixels[p+1])+Math.abs(a.pixels[p+2]-b.pixels[p+2]))/3;
+          total+=d;
+          const ink=[0,1,2].some(k=>Math.abs(a.pixels[p+k]-[244,240,232][k])>30 || Math.abs(b.pixels[p+k]-[244,240,232][k])>30);
+          if(ink){foreground+=d;count++;}
+        }
+        const mean=total/(a.pixels.length/4)/255,fg=foreground/Math.max(count,1)/255;
+        closest=Math.min(closest,mean);
+        if(mean<0.025 && fg<0.12)close.push({left:a.title,right:b.title,width:a.width,mean,foreground:fg});
+      }
+      return {images:frames.length/2,closest,close};
+    }""")
+    assert audit['images'] > 50, 'Artwork audit did not inspect the real corpus'
+    assert not audit['close'], f"Near-duplicate served thumbnails require redesign/review: {audit['close']}"
+    print(f"Decoded artwork audit: {audit['images']} covers at 120×76 and 76×58; no visual-twin tripwire; closest full RGB difference {audit['closest']:.4f}")
+    page.close()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
@@ -555,6 +605,11 @@ if __name__ == '__main__':
     registered = registered_reading_payloads()
     with server() as url, sync_playwright() as p:
         browser = getattr(p, args.browser).launch(**({"executable_path":args.executable_path} if args.executable_path else {}))
+        art_context=browser.new_context()
+        try:
+            check_artwork_uniqueness(art_context.new_page(),url)
+        finally:
+            art_context.close()
         for width in [1280, 768, 390, 320]:
             context = browser.new_context(reduced_motion='reduce')
             try:

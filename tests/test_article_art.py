@@ -24,7 +24,7 @@ def public_records():
     return json.loads((ROOT / "data/public-library.json").read_text())
 
 
-def article(title="Cognitive offloading in learning", doi="10.1234/example"):
+def article(title="Cognitive offloading in undergraduate mathematical learning", doi="10.1234/example"):
     return {"doi": doi, "title": title, "kind": "scholarly", "reading": {"level": "abstract",
         "digest": {"idea": title, "explain": "Examining how people use tools."}}}
 
@@ -37,19 +37,32 @@ def png(width=12, height=8):
 
 
 class ArticleArtTests(unittest.TestCase):
-    def test_actual_public_records_have_unique_existing_assets_and_small_budget(self):
+    def test_context_cues_do_not_confuse_substrings_or_unrelated_subjects(self):
+        self.assertFalse(art.matches("restrictions for students", ("rest", "or ")))
+        self.assertFalse(art.matches("rather than treating constant monitoring as the default", ("monitoring",)))
+        self.assertTrue(art.matches("mathematical learning", ("mathemat",)))
+        self.assertTrue(art.matches("reflective learning dashboards", ("dashboard",)))
+        spec = art.choose_concept(art.public_inputs(article(
+            "Metacognitive disengagement and knowledge innovation quality in human–AI collaboration")))
+        self.assertIn("knowledge", spec["visual_subjects"])
+        self.assertNotIn("art", spec["visual_subjects"])
+        spec = art.choose_concept(art.public_inputs(article("Siri app access and intention tracking")))
+        self.assertNotIn("inequality", spec["visual_subjects"])
+
+    def test_actual_public_records_publish_distinct_grounded_art_or_explicit_review(self):
         records = public_records()
         self.assertGreater(len(records), 50)
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             art.attach_art(records, root)
-            paths = [r["editorial_art"]["src"] for r in records]
+            ready = [r for r in records if r["editorial_art"]["status"] == "ready"]
+            self.assertGreater(len(ready), len(records) // 2)
+            paths = [r["editorial_art"]["src"] for r in ready]
             contents = [(root / p).read_bytes() for p in paths]
             self.assertEqual(len(paths), len(set(paths)))
             self.assertEqual(len(contents), len(set(contents)))
-            # Real shape/object/setting differences, with all identity-based
-            # rotation/position/print microvariation disabled in this digest.
-            self.assertEqual(len(records), len({r["editorial_art"]["composition_fingerprint"] for r in records}))
+            self.assertEqual(len(ready), len({r["editorial_art"]["composition_fingerprint"] for r in ready}))
+            self.assertEqual(len(ready), len({r["editorial_art"]["foreground_signature"] for r in ready}))
             self.assertLess(sum(map(len, contents)), 600_000)
             self.assertLess(max(map(len, contents)), art.MAX_SVG_BYTES)
             self.assertGreaterEqual(len({r["editorial_art"]["motif"] for r in records}), 12)
@@ -58,6 +71,20 @@ class ArticleArtTests(unittest.TestCase):
                 self.assertEqual(a["kind"], "editorial_illustration")
                 self.assertIn("Not a depiction of study results", a["alt"])
                 self.assertIn(r["title"], a["concept"])
+                if a["status"] == "needs_review":
+                    self.assertTrue(a["review_reasons"])
+                    self.assertNotIn("src", a)
+                    self.assertNotIn("thumbnail_src", a)
+                    continue
+                self.assertFalse(a["review_reasons"])
+                self.assertEqual(len(a["source_grounding"]), 2)
+                inputs = art.public_inputs(r)
+                for ground in a["source_grounding"]:
+                    self.assertIn(ground["subject"], a["visual_subjects"])
+                    self.assertIn(ground["field"], ("title", "source_context"))
+                    self.assertTrue(ground["phrases"])
+                    for phrase in ground["phrases"]:
+                        self.assertIn(phrase.casefold().strip(), inputs[ground["field"]].casefold())
                 self.assertRegex(a["src"], r"^assets/article-art/[a-f0-9]{20}-[a-f0-9]{24}\.svg$")
 
     def test_synthetic_topics_select_concrete_different_families(self):
@@ -90,7 +117,12 @@ class ArticleArtTests(unittest.TestCase):
                     record = article(title, "10.1234/" + family)
                     a = art.create_art(record, Path(d))
                     self.assertEqual(a["motif"], family)
+                    if a["status"] == "needs_review":
+                        self.assertEqual(a["review_reasons"], ["insufficient_specific_context"])
+                        self.assertNotIn("src", a)
+                        continue
                     images.append((Path(d) / a["src"]).read_bytes())
+            self.assertTrue(images)
             self.assertEqual(len(images), len(set(images)))
 
     def test_deterministic_and_write_if_unchanged_preserves_mtime(self):
@@ -106,11 +138,176 @@ class ArticleArtTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), first["asset_fingerprint"])
 
     def test_record_order_does_not_change_art(self):
-        records = [article("Cognitive offloading", "10.1234/a"), article("Metacognition", "10.1234/b")]
+        records = [article(doi="10.1234/a"), article(doi="10.1234/b")]
         with tempfile.TemporaryDirectory() as d:
             forward = art.attach_art(copy.deepcopy(records), Path(d))
             backward = art.attach_art(list(reversed(copy.deepcopy(records))), Path(d))
             self.assertEqual([r["editorial_art"] for r in forward], list(reversed([r["editorial_art"] for r in backward])))
+            self.assertEqual([r["editorial_art"]["status"] for r in forward], ["ready", "needs_review"])
+
+    def test_repeated_realistic_source_concept_is_held_without_decorative_variation(self):
+        rows = [article("Cognitive offloading in mathematical learning among undergraduate students", "10.1234/a"),
+                article("Cognitive offloading in undergraduate mathematical learning: a replication", "10.1234/b")]
+        before = copy.deepcopy(rows)
+        for row in rows:
+            row["visual"] = visual_spec(row)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            art.attach_art(rows, root)
+            accepted, held = (row["editorial_art"] for row in rows)
+            self.assertEqual(accepted["status"], "ready")
+            self.assertEqual(held["status"], "needs_review")
+            self.assertIn("duplicate_semantic_concept", held["review_reasons"])
+            self.assertIn("duplicate_foreground_subjects", held["review_reasons"])
+            self.assertIn("duplicate_composition", held["review_reasons"])
+            self.assertNotIn("src", held)
+            self.assertNotIn("thumbnail_src", held)
+            self.assertEqual(len(list((root / "assets/article-art").glob("*.svg"))), 1)
+            for prior, row in zip(before, rows):
+                self.assertEqual(row["reading"], prior["reading"])
+                self.assertEqual(row["visual"], visual_spec(prior))
+            summary = art.report(rows, root)
+            self.assertEqual(summary["ready_count"], 1)
+            self.assertEqual(summary["needs_review_count"], 1)
+            self.assertTrue(summary["semantic_collision_groups"])
+            self.assertTrue(summary["composition_collision_groups"])
+
+    def test_same_foreground_pair_is_held_even_with_a_different_motif(self):
+        rows = [article("Cognitive offloading in doctoral academic writing", "10.1234/a"),
+                article("Reflective learning in doctoral academic writing", "10.1234/b")]
+        with tempfile.TemporaryDirectory() as d:
+            art.attach_art(rows, Path(d))
+        a, b = (row["editorial_art"] for row in rows)
+        self.assertNotEqual(a["motif"], b["motif"])
+        self.assertNotEqual(a["composition_fingerprint"], b["composition_fingerprint"])
+        self.assertEqual(b["status"], "needs_review")
+        self.assertIn("duplicate_foreground_subjects", b["review_reasons"])
+        self.assertIn("duplicate_foreground_geometry", b["review_reasons"])
+        self.assertNotIn("src", b)
+
+    def test_equivalent_glyph_labels_cannot_evade_foreground_geometry_guard(self):
+        rows = [article("Cognitive offloading in doctoral work", "10.1234/a"),
+                article("Reflective learning in doctoral work", "10.1234/b")]
+        choose = art.choose_concept
+        draw = art.draw_subject
+        def alias_pair(inputs):
+            spec = choose(inputs)
+            # Simulate equivalent glyphs. Keep different semantic signatures
+            # and motif frames to isolate the independent geometry gate.
+            spec["visual_subjects"] = ["doctoral", "language" if spec["motif"] == "offloading" else "interview"]
+            spec["semantic_signature"] = "|".join([spec["motif"]] + spec["visual_subjects"])
+            spec["review_reasons"] = []
+            return spec
+        def alias_glyph(canvas, spec, **kwargs):
+            if spec["secondary_subject"] == "interview":
+                spec = {**spec, "secondary_subject": "language"}
+            return draw(canvas, spec, **kwargs)
+        with tempfile.TemporaryDirectory() as d, patch.object(art, "choose_concept", side_effect=alias_pair), \
+                patch.object(art, "draw_subject", side_effect=alias_glyph):
+            art.attach_art(rows, Path(d))
+        a, b = (row["editorial_art"] for row in rows)
+        self.assertNotEqual(a["foreground_signature"], b["foreground_signature"])
+        self.assertNotEqual(a["composition_fingerprint"], b["composition_fingerprint"])
+        self.assertEqual(a["foreground_geometry_fingerprint"], b["foreground_geometry_fingerprint"])
+        self.assertIn("duplicate_foreground_geometry", b["review_reasons"])
+        self.assertNotIn("src", b)
+
+    def test_geometry_guard_is_independent_of_semantic_labels(self):
+        rows = [article(doi="10.1234/a"), article("Clinical stress and insomnia", "10.1234/b")]
+        with tempfile.TemporaryDirectory() as d, patch.object(art, "render_svg", return_value=b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760"><rect x="200" y="100" width="800" height="550" fill="#171714"/></svg>'):
+            art.attach_art(rows, Path(d))
+        a, b = (row["editorial_art"] for row in rows)
+        self.assertNotEqual(a["semantic_signature"], b["semantic_signature"])
+        self.assertNotEqual(a["foreground_signature"], b["foreground_signature"])
+        self.assertEqual(b["status"], "needs_review")
+        self.assertIn("duplicate_composition", b["review_reasons"])
+        self.assertNotIn("src", b)
+
+    def test_tiny_decorative_difference_cannot_evade_coarse_visual_twin_guard(self):
+        rows = [article(doi="10.1234/a"), article("Clinical stress and insomnia", "10.1234/b")]
+        def almost_same_scene(identity, inputs, spec, **kwargs):
+            extra = '<rect x="1100" y="700" width="12" height="12" fill="#E00122"/>' if identity.endswith("/b") else ""
+            return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760">'
+                    '<rect x="200" y="100" width="800" height="550" fill="#171714"/>' + extra + '</svg>').encode()
+        with tempfile.TemporaryDirectory() as d, patch.object(art, "render_svg", side_effect=almost_same_scene):
+            art.attach_art(rows, Path(d))
+            summary = art.report(rows, Path(d))
+        a, b = (row["editorial_art"] for row in rows)
+        self.assertNotEqual(a["semantic_signature"], b["semantic_signature"])
+        self.assertNotEqual(a["foreground_geometry_fingerprint"], b["foreground_geometry_fingerprint"])
+        self.assertNotEqual(a["composition_fingerprint"], b["composition_fingerprint"])
+        self.assertIn("near_visual_twin", b["review_reasons"])
+        self.assertNotIn("src", b)
+        self.assertEqual(summary["needs_review_count"], 1)
+        self.assertTrue(summary["near_visual_twin_candidates"])
+
+    def test_known_v1_duplicate_scene_is_caught_despite_different_geometry_bytes(self):
+        import art_similarity
+        fixtures = ROOT / "tests/fixtures/article-art-duplicates"
+        left = (fixtures / "baseline-offloading-framework.svg").read_bytes()
+        right = (fixtures / "baseline-offloading-students.svg").read_bytes()
+        self.assertNotEqual(left, right)
+        scores = art_similarity.compare(art_similarity.rasterize(left), art_similarity.rasterize(right))
+        self.assertTrue(art_similarity.is_near_twin(scores), scores)
+
+    def test_distinct_dominant_scenes_pass_the_coarse_visual_guard(self):
+        rows = [article(doi="10.1234/a"), article("Clinical stress and insomnia", "10.1234/b")]
+        def distinct_scene(identity, inputs, spec, **kwargs):
+            shape = ('<circle cx="900" cy="350" r="230" fill="#E00122"/>' if identity.endswith("/b") else
+                     '<rect x="100" y="100" width="300" height="550" fill="#171714"/>')
+            return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760">' + shape + '</svg>').encode()
+        with tempfile.TemporaryDirectory() as d, patch.object(art, "render_svg", side_effect=distinct_scene):
+            art.attach_art(rows, Path(d))
+        self.assertEqual([row["editorial_art"]["status"] for row in rows], ["ready", "ready"])
+
+    def test_unsupported_similarity_rendering_is_held_instead_of_bypassing_guard(self):
+        import art_similarity
+        row = article()
+        before = copy.deepcopy(row)
+        with tempfile.TemporaryDirectory() as d, patch.object(art_similarity, "rasterize", side_effect=ValueError("Unsupported SVG command")):
+            art.attach_art([row], Path(d))
+        result = row.pop("editorial_art")
+        self.assertEqual(row, before)
+        self.assertEqual(result["status"], "needs_review")
+        self.assertIn("visual_similarity_unavailable", result["review_reasons"])
+        self.assertNotIn("src", result)
+
+    def test_insufficient_context_never_uses_a_tag_or_generic_cover(self):
+        row = article("A new perspective on contemporary questions")
+        row["reading"]["digest"] = {"idea": "A new perspective.", "tags": ["Metacognition", "Learning", "Mathematics"]}
+        row["visual"] = {"kind": "source_figure", "src": "https://example.org/verified-figure.png", "provenance": "Verified permission"}
+        row["source_quality"] = {"decision": "include", "evidence": "Preserve this source review"}
+        before = copy.deepcopy(row)
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            art.attach_art([row], root)
+            result = row.pop("editorial_art")
+            self.assertEqual(result["status"], "needs_review")
+            self.assertIn("insufficient_specific_context", result["review_reasons"])
+            self.assertNotIn("src", result)
+            self.assertFalse((root / "assets/article-art").exists())
+            self.assertEqual(row, before)
+
+    def test_same_canonical_paper_can_appear_more_than_once(self):
+        rows = [article(), article(doi="https://doi.org/10.1234/EXAMPLE")]
+        with tempfile.TemporaryDirectory() as d:
+            art.attach_art(rows, Path(d))
+            self.assertEqual(rows[0]["editorial_art"], rows[1]["editorial_art"])
+            self.assertEqual(rows[0]["editorial_art"]["status"], "ready")
+            self.assertFalse(art.report(rows, Path(d))["semantic_collision_groups"])
+
+    def test_unchanged_accepted_paper_keeps_art_when_a_later_duplicate_arrives(self):
+        existing = article(doi="10.1234/z-existing")
+        newcomer = article(doi="10.1234/a-new")
+        with tempfile.TemporaryDirectory() as d:
+            root = Path(d)
+            art.attach_art([existing], root)
+            accepted = copy.deepcopy(existing["editorial_art"])
+            rows = art.attach_art([newcomer, existing], root)
+            self.assertEqual(existing["editorial_art"], accepted)
+            self.assertEqual(newcomer["editorial_art"]["status"], "needs_review")
+            again = art.attach_art(copy.deepcopy(list(reversed(rows))), root)
+            self.assertEqual([row["editorial_art"] for row in rows], list(reversed([row["editorial_art"] for row in again])))
 
     def test_changed_public_text_regenerates_without_changing_evidence(self):
         record = article()
@@ -119,7 +316,8 @@ class ArticleArtTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             first = art.create_art(record, Path(d))
             self.assertEqual(record, before)
-            record["reading"]["digest"]["idea"] = "Accountable reconstruction without AI."
+            record["title"] = "Critical thinking and verification in undergraduate mathematics"
+            record["reading"]["digest"]["idea"] = record["title"]
             second = art.create_art(record, Path(d))
             self.assertNotEqual(first["input_fingerprint"], second["input_fingerprint"])
             self.assertNotEqual(first["src"], second["src"])
@@ -140,7 +338,8 @@ class ArticleArtTests(unittest.TestCase):
             record["reading"]["digest"]["finding"] = "An unverified claim of 99 percent improvement."
             after = art.create_art(record, Path(d))
             self.assertNotEqual(before["input_fingerprint"], after["input_fingerprint"])
-            self.assertNotEqual(before["src"], after["src"])
+            self.assertEqual(before["src"], after["src"])
+            self.assertEqual(before["composition_fingerprint"], after["composition_fingerprint"])
             self.assertEqual(before["concept"], after["concept"])
             self.assertEqual(before["motif"], after["motif"])
             self.assertNotIn(b"percent", (Path(d) / after["src"]).read_bytes())
@@ -151,7 +350,8 @@ class ArticleArtTests(unittest.TestCase):
         self.assertEqual(a, b)
         with tempfile.TemporaryDirectory() as d:
             aa, bb = art.create_art(left, Path(d)), art.create_art(right, Path(d))
-            self.assertNotEqual((Path(d) / aa["src"]).read_bytes(), (Path(d) / bb["src"]).read_bytes())
+            self.assertEqual((Path(d) / aa["src"]).read_bytes(), (Path(d) / bb["src"]).read_bytes())
+            self.assertEqual(aa["composition_fingerprint"], bb["composition_fingerprint"])
 
     def test_context_and_relationship_change_objects_not_only_color(self):
         a = article("Critical thinking in students", "10.1234/context")
@@ -162,7 +362,8 @@ class ArticleArtTests(unittest.TestCase):
         # Different scene structures, not an embedded title making bytes unique.
         xa = ET.fromstring(art.render_svg("same", art.public_inputs(a), sa))
         xb = ET.fromstring(art.render_svg("same", art.public_inputs(b), sb))
-        self.assertNotEqual(len(list(xa.iter())), len(list(xb.iter())))
+        self.assertNotEqual(sa["visual_subjects"], sb["visual_subjects"])
+        self.assertNotEqual([node.get("d") for node in xa.iter()], [node.get("d") for node in xb.iter()])
 
     def test_topic_fallback_is_honestly_labeled(self):
         row = article("Some new paper")
@@ -175,8 +376,8 @@ class ArticleArtTests(unittest.TestCase):
 
     def test_newly_admitted_readings_have_valid_art_after_real_rebuild(self):
         # Test the current registry, not only the last checked-in projection.
-        # Newly admitted commentary can use a topic fallback absent from that
-        # older file. Keep the real build-before-validation production order.
+        # Newly admitted commentary may need review rather than topic fallback
+        # artwork. Keep the real build-before-validation production order.
         import original_readings
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
@@ -188,7 +389,13 @@ class ArticleArtTests(unittest.TestCase):
             self.assertTrue(rebuilt)
             for row in rebuilt:
                 illustration = row["editorial_art"]
-                self.assertTrue((root / illustration["src"]).is_file())
+                if illustration["status"] == "ready":
+                    self.assertTrue((root / illustration["src"]).is_file())
+                else:
+                    self.assertEqual(illustration["status"], "needs_review")
+                    self.assertTrue(illustration["review_reasons"])
+                    self.assertNotIn("src", illustration)
+                    self.assertNotIn("thumbnail_src", illustration)
                 if illustration["semantic_basis"] != "editor_selected":
                     self.assertIn(row["title"], illustration["concept"])
                     self.assertIn("Not a depiction of study results", illustration["alt"])
@@ -203,7 +410,7 @@ class ArticleArtTests(unittest.TestCase):
         self.assertNotEqual(a, art.canonical_identity({"url": "https://example.com/Path?item=2"}))
 
     def test_untrusted_identifiers_cannot_inject_paths_or_svg(self):
-        row = article('<script>alert(1)</script> ../../bad " <image href="https://evil.test">', "../../../../bad<script>")
+        row = article('<script>alert(1)</script> ../../bad " <image href="https://evil.test"> Mathematical learning in undergraduate students', "../../../../bad<script>")
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
             a = art.create_art(row, root)
@@ -223,6 +430,9 @@ class ArticleArtTests(unittest.TestCase):
             rows = public_records()
             art.attach_art(rows, Path(d))
             for row in rows:
+                if row["editorial_art"]["status"] == "needs_review":
+                    self.assertNotIn("src", row["editorial_art"])
+                    continue
                 data = (Path(d) / row["editorial_art"]["src"]).read_bytes()
                 root = ET.fromstring(data)
                 for node in root.iter():
@@ -276,8 +486,61 @@ class OverrideTests(unittest.TestCase):
         for key in ("src", "alt", "concept", "provenance", "width", "height", "thumbnail_src"):
             self.assertEqual(out[key], self.value[key])
         self.assertEqual(out["semantic_basis"], "editor_selected")
+        self.assertEqual(out["status"], "ready")
+        self.assertEqual(out["source_grounding"][0]["phrases"], [self.value["concept"]])
         self.assertEqual(out["thumbnail_width"], 6)
         self.assertFalse((self.root / "assets/article-art").exists())
+
+    def test_explicit_editorial_override_survives_missing_keyword_context(self):
+        self.manifest()
+        row = article("A new perspective")
+        art.attach_art([row], self.root)
+        self.assertEqual(row["editorial_art"]["status"], "ready")
+        self.assertEqual(row["editorial_art"]["src"], self.value["src"])
+        self.assertEqual(row["editorial_art"]["review_reasons"], [])
+        self.assertEqual(row["editorial_art"]["visual_subjects"], [])
+
+    def test_identical_raster_bytes_under_different_names_are_held(self):
+        renamed = "assets/editorial-covers/renamed.png"
+        (self.root / renamed).write_bytes((self.root / self.value["src"]).read_bytes())
+        self.manifest().write_text(json.dumps({"version": 1, "overrides": {
+            "doi:10.1234/example": self.value,
+            "doi:10.1234/second": {**self.value, "src": renamed, "concept": "A different declared concept."}}}))
+        rows = [article(), article("A second paper", "10.1234/second")]
+        art.attach_art(rows, self.root)
+        a, b = (row["editorial_art"] for row in rows)
+        self.assertEqual(a["status"], "ready")
+        self.assertEqual(b["status"], "needs_review")
+        self.assertIn("duplicate_asset_bytes", b["review_reasons"])
+        self.assertEqual(a["asset_fingerprint"], b["asset_fingerprint"])
+        self.assertNotIn("src", b)
+        self.assertNotIn("thumbnail_src", b)
+
+    def test_reused_path_is_reviewable_rather_than_a_malformed_manifest(self):
+        self.manifest().write_text(json.dumps({"version": 1, "overrides": {
+            "doi:10.1234/example": self.value,
+            "doi:10.1234/second": {**self.value, "concept": "A different declared concept."}}}))
+        rows = [article(), article("A second paper", "10.1234/second")]
+        art.attach_art(rows, self.root)
+        self.assertEqual(rows[0]["editorial_art"]["status"], "ready")
+        self.assertEqual(rows[1]["editorial_art"]["status"], "needs_review")
+        self.assertIn("duplicate_asset_bytes", rows[1]["editorial_art"]["review_reasons"])
+
+    def test_distinct_covers_cannot_hide_a_duplicated_card_thumbnail(self):
+        other = "assets/editorial-covers/other.png"
+        (self.root / other).write_bytes(png(24, 16))
+        self.manifest().write_text(json.dumps({"version": 1, "overrides": {
+            "doi:10.1234/example": self.value,
+            "doi:10.1234/second": {**self.value, "src": other, "width": 24, "height": 16,
+                                   "concept": "A different declared concept."}}}))
+        rows = [article(), article("A second paper", "10.1234/second")]
+        art.attach_art(rows, self.root)
+        a, b = (row["editorial_art"] for row in rows)
+        self.assertNotEqual(a["asset_fingerprint"], b["asset_fingerprint"])
+        self.assertEqual(b["status"], "needs_review")
+        self.assertIn("duplicate_thumbnail_bytes", b["review_reasons"])
+        self.assertNotIn("src", b)
+        self.assertNotIn("thumbnail_src", b)
 
     def test_absent_override_generates_safe_existing_svg(self):
         row = article()
@@ -379,20 +642,26 @@ class PublicationBoundaryTests(unittest.TestCase):
             self.assertTrue(all("editorial_art" not in r for r in hidden))
 
     def test_contact_sheet_and_report_are_safe_repeatable_deliverables(self):
-        row = article('<script>alert("x")</script> critical thinking')
+        row = article('<script>alert("x")</script> critical thinking in undergraduate mathematics')
+        pending = article("A new perspective", "10.1234/pending")
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
-            art.attach_art([row], root)
+            art.attach_art([row, pending], root)
             target = root / "review/contact.html"
-            art.contact_sheet([row], root, target)
+            art.contact_sheet([row, pending], root, target)
             self.assertNotIn('<script>', target.read_text())
             self.assertIn('&lt;script&gt;', target.read_text())
+            self.assertIn('Artwork needs review', target.read_text())
+            self.assertEqual(target.read_text().count('<img '), 1)
             first = target.read_bytes()
-            art.contact_sheet([row], root, target)
+            art.contact_sheet([row, pending], root, target)
             self.assertEqual(first, target.read_bytes())
-            summary = art.report([row], root)
-            self.assertEqual(summary["article_count"], 1)
+            summary = art.report([row, pending], root)
+            self.assertEqual(summary["article_count"], 2)
             self.assertEqual(summary["unique_asset_count"], 1)
+            self.assertEqual(summary["ready_count"], 1)
+            self.assertEqual(summary["needs_review_count"], 1)
+            self.assertEqual(summary["review_reasons"], {"insufficient_specific_context": 1})
             self.assertNotIn("generated_at", summary)
 
     def test_cli_refuses_internal_acquisition_index(self):
