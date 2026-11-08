@@ -28,7 +28,8 @@
           "aa43ce2b28d9ef0827b0aa26ab667a417af0ff078c71303729f26a6efa4d49de"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 2,
       "diagnostics": [
@@ -393,7 +394,8 @@
           "a1a190f0c34ff7ad19bd25d938830aa4b8243849dc63be9d993e8d15003c3136"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": false
+        "doi_lookup_permitted": false,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
@@ -739,21 +741,23 @@
       "kind": "scholarly",
       "published": "2026-10-30",
       "source_url": "https://doi.org/10.33050/corisinta.v2i2.135",
-      "status": "rate_limited",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [
-        "3a50e02776b5d491ec77ce8998f1b0a544a81bbd00a97560a7ecfe757f079c13"
+        "3a50e02776b5d491ec77ce8998f1b0a544a81bbd00a97560a7ecfe757f079c13",
+        "ca2b89bfae89d3bed56f809fa936e9c50c295a35056c33527b1de726048a1248"
       ],
       "plan": {
         "known_routes": [],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
@@ -790,12 +794,25 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://journal.corisinta.org/corisinta/article/download/135/42"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-07T18:51:43.277001+00:00",
-      "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-08T12:38:32.795794+00:00"
+      "last_attempt_at": "2026-11-08T19:11:10.693351+00:00",
+      "last_outcome": "source_unavailable"
     },
     "aa304c545f704ae3a5c595352a67f2072a1cfa6eec122261dfe6708585a13cc1": {
       "fingerprint": "089d62491938453a8f64da712e485a7b0f18f16bb934b0c67f965a11cfd5e5ff",
@@ -818,7 +835,8 @@
           "669dc8e364848de6410099ec04453ed25532a521584ff2ff6283213c745f409e"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": false
+        "doi_lookup_permitted": false,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
@@ -1094,21 +1112,23 @@
       "kind": "scholarly",
       "published": "2026-10-30",
       "source_url": "https://doi.org/10.33050/corisinta.v2i2.118",
-      "status": "rate_limited",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 6,
+      "attempts": 7,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [
-        "27c9f655beb0cae224bee5e01f8cdf66def9e01340bfcfc6a8a94cc5cb3d1ef9"
+        "27c9f655beb0cae224bee5e01f8cdf66def9e01340bfcfc6a8a94cc5cb3d1ef9",
+        "8d50f8e2bb14d57e8bfb2ec2764ea206bf5f2ea61fcedb7f70ce042261582407"
       ],
       "plan": {
         "known_routes": [],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
@@ -1172,12 +1192,25 @@
           "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.33050/corisinta.v2i2.118",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://journal.corisinta.org/corisinta/article/download/118/37"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-08T11:38:32.086252+00:00",
-      "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-08T12:38:32.795794+00:00"
+      "last_attempt_at": "2026-11-08T19:11:10.693351+00:00",
+      "last_outcome": "source_unavailable"
     },
     "82cf3951eafec1c18ac4e10d7b2638736f4b81a0051dad351adec755daed4b04": {
       "fingerprint": "0dad75b6a6348853af282a2a0aa8a27ab8e554960f03dd2b2dc066355da8cf58",
@@ -1186,20 +1219,22 @@
       "source_url": "https://doi.org/10.33050/corisinta.v2i2.112",
       "status": "source_unavailable",
       "complete": true,
-      "attempts": 10,
+      "attempts": 11,
       "cursor": {
         "known": 0,
-        "provider": 4,
+        "provider": 5,
         "provider_tried": []
       },
       "tried_sources": [
+        "3b13d949fb80c6cd7dd04192865be359c79b9f3feb5a058c8b506f3c4a743672",
         "602f2bf387bc1c466145ed603ae78dc4554c749270a966cd474807eff63ec7d0",
         "990f6ea20c0ae8f45b160945ae6e93ee03ef640c8a57efdb95a14eec16c77c21"
       ],
       "plan": {
         "known_routes": [],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
@@ -1268,10 +1303,24 @@
           "stage": "article",
           "provider": "Semantic Scholar",
           "url": "https://journal.corisinta.org/corisinta/article/download/112/35"
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://journal.corisinta.org/corisinta/article/view/112"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-08T11:38:32.086252+00:00",
+      "last_attempt_at": "2026-11-08T19:11:10.693351+00:00",
       "last_outcome": "source_unavailable"
     },
     "e6ef505b140af79ad5cf559409c9cf8566ee11eab721da3f125af5ba5541e071": {
@@ -1295,7 +1344,8 @@
           "16da7f38ce285d31801d73ba44d6d0002a1a4d3ee7643facae8241ee3d0d8a34"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 2,
       "diagnostics": [
@@ -1815,7 +1865,8 @@
           "d40a0d0bb1f1d68789fa264a7c8317de5eff51212c0ec0f3d6d9dc36db399627"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 2,
       "diagnostics": [
@@ -2275,7 +2326,8 @@
           "7465900b91e57c1c6a15dae6766d9124c410ab1dad5ca5a30715cbfd431b6a39"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": true,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 2,
       "diagnostics": [
@@ -2600,7 +2652,8 @@
           "4a9da56bfdf5db6acb2a732e3e3a4b68b11ebdf25b9f9ff79a200e931a527983"
         ],
         "known_sources_only": false,
-        "doi_lookup_permitted": false
+        "doi_lookup_permitted": false,
+        "provider_plan_version": 2
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
@@ -2827,7 +2880,7 @@
       "last_outcome": "partial_full_text"
     }
   },
-  "cursor": 7,
+  "cursor": 5,
   "provider_pauses": {
     "provider:CORE": "2026-11-07T09:56:54.053140+00:00",
     "provider:Semantic Scholar": "2026-11-08T12:38:32.795794+00:00"
@@ -10011,19 +10064,19 @@
     }
   ],
   "input_fingerprint": "0936d4a5b6500bb0341fb951fdf0f349e539baf499d98f536d4920e20cd5a7b7",
-  "state_sha256": "1b169a72773d319d65943927b9efed29b26fad0b8eccf9e5c20666a738dfee07",
+  "state_sha256": "52f9bbc440ed1374ef81eaac04169f5363d65845b05685d0320c43d770458023",
   "run": {
-    "checked_at": "2026-11-08T11:38:32.086252+00:00",
+    "checked_at": "2026-11-08T19:11:10.693351+00:00",
     "selected_records": 10,
     "attempted_records": 3,
     "attempted_stages": 3,
     "completed_records": 8,
     "pending_records": 2,
-    "deferred_retry_records": 2,
+    "deferred_retry_records": 0,
     "statuses": {
       "full_document_retrieved_not_reviewed": 4,
       "partial_full_text_not_reviewed": 3,
-      "rate_limited": 2,
+      "pending_routes": 2,
       "source_unavailable": 1
     },
     "excluded": {},
@@ -10034,9 +10087,7 @@
     "time_budget_seconds": 540.0,
     "item_time_budget_seconds": 60.0,
     "max_candidates_per_provider_stage": 8,
-    "active_provider_pauses": {
-      "provider:Semantic Scholar": "2026-11-08T12:38:32.795794+00:00"
-    },
+    "active_provider_pauses": {},
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
     "publication_or_review_performed": false
