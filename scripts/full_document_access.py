@@ -744,7 +744,10 @@ def retrieve(record,max_candidates=8,providers=None,*,known_sources=None,anonymo
             raise ValueError('invalid_host_cooldown')
         deadlines[host]=max(deadlines.get(host,0),time.monotonic()+seconds)
     cooldown_scope=HOST_COOLDOWNS.set(deadlines)
-    denial_scope=HOST_DENIALS.set(set(HOST_DENIALS.get() or set()))
+    # Reuse an explicit enclosing scope so swallowed nested-PDF denials
+    # remain visible to sibling candidates. Standalone calls stay isolated.
+    inherited_denials=HOST_DENIALS.get()
+    denial_scope=HOST_DENIALS.set(inherited_denials if inherited_denials is not None else set())
     scope=ANONYMOUS_ONLY.set(ANONYMOUS_ONLY.get() or anonymous_only)
     try:
         return _retrieve(record,max_candidates,providers,known_sources=known_sources)

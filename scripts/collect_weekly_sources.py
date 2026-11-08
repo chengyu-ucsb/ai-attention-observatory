@@ -740,6 +740,9 @@ def perform_stage(record, plan, max_candidates):
         return {'diagnostics': [{'status': 'route_policy_excluded', 'retryable': False}], 'tried_sources': []}
     diagnostics = []; tried = []; best = None; host_waits = []
     stage_started = time.monotonic()
+    host_backoff = dict(plan.get('host_backoff', {}))
+    denied_hosts = set(access.HOST_DENIALS.get() or ())
+    unavailable_hosts = set()
     if plan['kind'] == 'known':
         candidates = [pin_arxiv_route(plan['source'], record)]
         if not route_permitted(plan['source'], record, window):
@@ -769,14 +772,33 @@ def perform_stage(record, plan, max_candidates):
         diagnostics.append(diagnostic(discovery))
     for route in candidates[:max_candidates]:
         host = urlsplit(access.diagnostic_url(route['url'])).hostname
-        wait = plan.get('host_backoff', {}).get(host, 0) - (time.monotonic() - stage_started)
+        wait = host_backoff.get(host, 0) - (time.monotonic() - stage_started)
         if wait > 0:
             host_waits.append(max(1, math.ceil(wait)))
             continue
         remaining_backoff = {host: max(0, seconds - (time.monotonic() - stage_started))
-                             for host, seconds in plan.get('host_backoff', {}).items()}
-        doc, ledger = access.retrieve(record, max_candidates=1, providers=[], known_sources=[route],
-                                      anonymous_only=True, host_backoff=remaining_backoff)
+                             for host, seconds in host_backoff.items()}
+        # retrieve scopes its own context. Carry observed failures across calls,
+        # including failures on nested URLs rather than just the landing host.
+        denial_scope = access.HOST_DENIALS.set(denied_hosts)
+        try:
+            doc, ledger = access.retrieve(record, max_candidates=1, providers=[], known_sources=[route],
+                                          anonymous_only=True, host_backoff=remaining_backoff)
+        finally:
+            access.HOST_DENIALS.reset(denial_scope)
+        for entry in ledger:
+            target = entry.get('failure_url') or entry.get('url') or ''
+            failed_host = urlsplit(access.diagnostic_url(target)).hostname
+            status = entry.get('status')
+            if not failed_host or entry.get('stage') != 'article':
+                continue
+            if status in {'article_http_401', 'article_http_403', 'http_401', 'http_403'}:
+                denied_hosts.add(failed_host)
+            if status == 'source_unavailable_page':
+                unavailable_hosts.add(failed_host)
+                seconds = max(1, min(entry.get('retry_after_seconds', 3600), 604800))
+                host_backoff[failed_host] = max(host_backoff.get(failed_host, 0),
+                    time.monotonic() - stage_started + seconds)
         pinned = verified_arxiv_v1(record)
         if doc is not None and pinned:
             if not is_pinned_arxiv_url(doc.url, pinned):
@@ -795,7 +817,9 @@ def perform_stage(record, plan, max_candidates):
             if (best is None or meta['evidence_status'] == 'full_document_retrieved'
                     or meta['characters_retrieved'] > best['characters_retrieved']):
                 best = meta
-        if any(row.get('status') == 'rate_limit_pause' or
+        if any((row.get('status') == 'rate_limit_pause'
+                and urlsplit(access.diagnostic_url(row.get('failure_url') or row.get('url') or '')).hostname
+                    not in unavailable_hosts) or
                str(row.get('status', '')).endswith('http_429') for row in ledger):
             break
         if best and best['evidence_status'] == 'full_document_retrieved':
@@ -1067,7 +1091,10 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
             row = deepcopy(old)
             # Only selected, unchanged current-window rows adopt the appended route.
             # Historical snapshots keep their original plan and exhaustion semantics.
-            if row['plan'].get('provider_plan_version', 1) < PROVIDER_PLAN_VERSION:
+            # Refresh histories require terminal HTML evidence: leave their legacy
+            # plan intact until a separate provenance-safe migration is available.
+            if (row['plan'].get('provider_plan_version', 1) < PROVIDER_PLAN_VERSION
+                    and 'html_refresh' not in row):
                 row['plan']['provider_plan_version'] = PROVIDER_PLAN_VERSION
                 if (row['complete'] and row['plan']['doi_lookup_permitted']
                         and row['status'] != 'full_document_retrieved_not_reviewed'):
@@ -1146,11 +1173,13 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         else:
             advance(row, result, plan, routes, known_sources_only, response_at)
         quota = [d for d in result.get('diagnostics', [])
-                 if str(d.get('status', '')).endswith('http_429')]
+                 if str(d.get('status', '')).endswith('http_429')
+                 or d.get('status') == 'source_unavailable_page']
         for entry in quota:
             seconds = max(1, min(entry.get('retry_after_seconds', 3600), 604800))
             until = (response_at + timedelta(seconds=seconds)).isoformat()
-            keys = {pause_key}
+            # An unavailable article host does not pause an independent locator API.
+            keys = set() if entry.get('status') == 'source_unavailable_page' else {pause_key}
             if entry.get('stage') == 'article':
                 target = entry.get('failure_url') or entry.get('url') or ''
                 host = urlsplit(access.diagnostic_url(target)).hostname

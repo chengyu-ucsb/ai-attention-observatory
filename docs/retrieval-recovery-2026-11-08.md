@@ -35,10 +35,14 @@ checkpoints remain valid under their original provider plan. Only selected,
 unchanged current-week records migrate to the new plan, preserving denied-source
 history, fingerprints, cursors, pauses and already successful documents. Exhausted
 non-full records receive only the new route, not a replay of old requests.
+Completed legacy HTML rows with parser-refresh history retain their original
+provider plan and evidence until a separate provenance-safe migration is available.
 
 HTTP-200 pages titled "Site Unavailable" are now distinguished from incorrect
 article identity. They receive a one-hour cooldown; another same-host location
-is not immediately tried. Publication, identity, rights and historical-date gates
+is not immediately tried. The pause survives separate weekly candidate calls and
+is checkpointed for later records without pausing independent locator APIs.
+Publication, identity, rights and historical-date gates
 remain intact. The access pilot includes the three recovered copies and retains
 previous portal 401/403 outcomes without reprobing them on every code push.
 

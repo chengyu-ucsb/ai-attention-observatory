@@ -193,5 +193,171 @@ class ProviderMigrationTests(unittest.TestCase):
             queue.validate_diagnostic({**diagnostic, 'retryable': True})
 
 
+class ProviderStageFailureScopeTests(unittest.TestCase):
+    def stage(self, candidates, fetch):
+        plan = {'kind': 'provider', 'name': CROSSREF, 'publication_window': WINDOW,
+                'tried_sources': []}
+        with patch.object(access, 'default_providers', return_value=[(CROSSREF, lambda _: candidates)]), \
+             patch.object(access, 'fetch_candidate', side_effect=fetch):
+            return queue.perform_stage(item(), plan, 8)
+
+    def test_unavailable_host_skipped_but_independent_host_attempted(self):
+        urls = ['https://www.econstor.eu/a.pdf', 'https://www.econstor.eu/b.pdf',
+                'https://www.eff.org/c.pdf']
+        fetched = []
+        def fetch(route, record):
+            fetched.append(route['url'])
+            if route['url'] == urls[0]:
+                raise access.SourceUnavailablePage(urls[0])
+            raise ValueError('insufficient_document_text')
+        result = self.stage([{'url': u, 'doi': item()['doi']} for u in urls], fetch)
+        self.assertEqual(fetched, [urls[0], urls[2]])
+        self.assertNotIn(queue.digest(urls[0]), result['tried_sources'])
+        self.assertNotIn(queue.digest(urls[1]), result['tried_sources'])
+        self.assertIn(queue.digest(urls[2]), result['tried_sources'])
+        self.assertTrue(any(d['status'] == 'source_unavailable_page' for d in result['diagnostics']))
+
+    def test_denied_host_not_fetched_again_and_independent_host_allowed(self):
+        from urllib.error import HTTPError
+        for status in (401, 403):
+            with self.subTest(status=status):
+                urls = ['https://www.econstor.eu/a.pdf', 'https://www.econstor.eu/b.pdf',
+                        'https://www.eff.org/c.pdf']
+                fetched = []
+                def fetch(route, record):
+                    fetched.append(route['url'])
+                    raise HTTPError(route['url'], status, 'denied', {}, None)
+                result = self.stage([{'url': u, 'doi': item()['doi']} for u in urls], fetch)
+                self.assertEqual(fetched, [urls[0], urls[2]])
+                self.assertEqual(result['tried_sources'], sorted(queue.digest(u) for u in urls))
+                self.assertIn('host_access_denied_this_run', [d['status'] for d in result['diagnostics']])
+        self.assertIsNone(access.HOST_DENIALS.get())
+
+    def test_nested_failure_tracks_actual_host_and_protects_nested_requests(self):
+        from urllib.error import HTTPError
+        nested = 'https://www.eff.org/nested.pdf'
+        routes = ['https://www.econstor.eu/a.pdf', 'https://www.econstor.eu/b.pdf',
+                  'https://www.eff.org/c.pdf', 'https://zenodo.org/d.pdf']
+        for unavailable in (True, False):
+            with self.subTest(unavailable=unavailable):
+                fetched = []; nested_fetched = []
+                def fetch(route, record):
+                    fetched.append(route['url'])
+                    if route['url'] == routes[-1]:
+                        raise ValueError('insufficient_document_text')
+                    access.check_host_cooldown(nested)
+                    nested_fetched.append(nested)
+                    if unavailable:
+                        raise access.SourceUnavailablePage(nested)
+                    raise HTTPError(nested, 403, 'denied', {}, None)
+                result = self.stage([{'url': u, 'doi': item()['doi']} for u in routes], fetch)
+                self.assertEqual(fetched, routes[:2] + routes[-1:])
+                self.assertEqual(nested_fetched, [nested])
+                self.assertEqual(next(d for d in result['diagnostics'] if 'failure_url' in d)['failure_url'], nested)
+
+    def test_unavailable_host_pause_persists_across_records_without_api_pause(self):
+        records = [item(1), item(2)]
+        fetched = []
+        def fetch(route, record):
+            fetched.append(route['url'])
+            raise access.SourceUnavailablePage(route['url'])
+        with patch.object(access, 'fetch_candidate', side_effect=fetch):
+            state = queue.run(weekly(*records), now=NOW, clock=lambda: 0,
+                attempt=lambda r, p, n, t: queue.perform_stage(r, p, n))
+        self.assertEqual(len(fetched), 1)
+        self.assertEqual(state['provider_pauses'], {'host:www.econstor.eu': '2026-11-07T13:00:00+00:00'})
+        self.assertTrue(all(row.get('next_retry_at') for row in rows(state)))
+        queue.validate_state(state)
+        # A provider result with a nested article outage pauses only that host.
+        state = legacy_state()
+        def nested_failure(*args):
+            return {'diagnostics': [{'stage': 'article', 'status': 'source_unavailable_page',
+                'url': 'https://www.econstor.eu/page', 'failure_url': 'https://www.eff.org/file.pdf',
+                'retryable': True, 'retry_after_seconds': 3600}]}
+        updated = resume(state, attempt=nested_failure)
+        self.assertEqual(updated['provider_pauses'], {'host:www.eff.org': '2026-11-07T13:00:00+00:00'})
+
+    def test_legacy_partial_html_refresh_history_stays_valid_and_unmigrated(self):
+        text = 'Synthetic substantial evidence and qualifications about human attention. ' * 100
+        html_doc = access.Document([{'location': 'body', 'text': text}], item()['url'],
+            'publishedVersion', {'evidence_status': 'partial_full_text',
+                                 'html_completeness': 'not_verified'})
+        state = legacy_state(attempt=lambda *a: result_for(html_doc))
+        row = rows(state)[0]
+        row['html_refresh'] = {'version': queue.HTML_EXTRACTION_VERSION,
+                              'attempted_at': NOW.isoformat(), 'outcome': 'source_unavailable_page'}
+        row['html_refresh_attempts'] = [copy.deepcopy(row['html_refresh'])]
+        row['attempts'] += 1
+        row['last_attempt_at'] = NOW.isoformat()
+        state.pop('run')
+        queue.seal_state(state)
+        before = copy.deepcopy(row)
+        for limit in (0, 10):
+            stage = Mock()
+            updated = resume(state, attempt=stage, limit=limit)
+            stage.assert_not_called()
+            self.assertEqual(rows(updated)[0], before)
+            queue.validate_state(updated)
+
+
+class NestedPdfDenialScopeTests(unittest.TestCase):
+    def test_real_candidate_partial_fallback_retains_nested_denial_across_stage(self):
+        from urllib.error import HTTPError
+        nested = 'https://www.eff.org/article.pdf'
+        urls = ['https://www.econstor.eu/a', 'https://www.econstor.eu/b']
+        html = ('<html><head><meta name="citation_pdf_url" content="' + nested
+                + '"><meta name="citation_doi" content="' + item()['doi']
+                + '"></head><body>Article</body></html>').encode()
+        plan = {'kind': 'provider', 'name': CROSSREF, 'publication_window': WINDOW,
+                'tried_sources': []}
+        for status in (401, 403):
+            with self.subTest(status=status):
+                requested = []
+                def request(url, *args, **kwargs):
+                    access.check_host_cooldown(url)
+                    requested.append(url)
+                    if url == nested:
+                        exc = HTTPError(url, status, 'denied', {}, None)
+                        access.remember_host_failure(exc)
+                        raise exc
+                    return html, url, 'text/html'
+                def parse(raw, identity, url, version, target):
+                    return access.Document([{'location': 'body', 'text': 'Verified article body. ' * 300}],
+                        url, version, {'evidence_status': 'partial_full_text',
+                                       'html_completeness': 'not_verified'})
+                candidates = [{'url': url, 'doi': item()['doi']} for url in urls]
+                with patch.object(access, 'default_providers', return_value=[(CROSSREF, lambda _: candidates)]), \
+                     patch.object(access, 'robots_allowed', return_value=True), \
+                     patch.object(access, 'request', side_effect=request), \
+                     patch.object(access, 'document_from_html', side_effect=parse):
+                    result = queue.perform_stage(item(), plan, 8)
+                self.assertEqual(requested, [urls[0], nested, urls[1]])
+                self.assertEqual(result['document']['source_url'], urls[0])
+                self.assertEqual(result['document']['evidence_status'], 'partial_full_text')
+                self.assertIn('host_access_denied_this_run', [d['status'] for d in result['diagnostics']])
+                self.assertIsNone(access.HOST_DENIALS.get())
+
+    def test_denial_scope_is_shared_only_when_explicitly_inherited(self):
+        from urllib.error import HTTPError
+        def deny(*args, **kwargs):
+            access.remember_host_failure(HTTPError('https://www.eff.org/a', 403, 'denied', {}, None))
+            return None, []
+        inherited = set()
+        token = access.HOST_DENIALS.set(inherited)
+        try:
+            with patch.object(access, '_retrieve', side_effect=deny):
+                access.retrieve(item(), providers=[])
+            self.assertIs(access.HOST_DENIALS.get(), inherited)
+            self.assertEqual(inherited, {'www.eff.org'})
+        finally:
+            access.HOST_DENIALS.reset(token)
+        self.assertIsNone(access.HOST_DENIALS.get())
+        with patch.object(access, '_retrieve', side_effect=deny):
+            access.retrieve(item(), providers=[])
+        self.assertIsNone(access.HOST_DENIALS.get())
+        with patch.object(access, '_retrieve', side_effect=lambda *a, **k: (None, list(access.HOST_DENIALS.get()))):
+            self.assertEqual(access.retrieve(item(), providers=[]), (None, []))
+
+
 if __name__ == '__main__':
     unittest.main()
