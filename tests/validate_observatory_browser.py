@@ -438,6 +438,11 @@ def registered_reading_payloads():
             library, weekly = build_public.build()
         pending = json.loads((data / 'public-pending-sources.json').read_text())
     originals = [row for row in library if row.get('reading', {}).get('original_summary')]
+    # This accepted historical journal reading must reach the actual DOM,
+    # not silently fall back to its older benefit-only automatic excerpt.
+    cognitive_ease = [row for row in originals if row.get('doi') == '10.1016/j.chb.2024.108386']
+    assert len(cognitive_ease) == 1, 'Accepted Cognitive Ease reading was not admitted'
+    assert cognitive_ease[0]['reading']['source_version'] == 'publishedVersion'
     if weekly.get('run', {}).get('publication_window'):
         start, end = previous_week(weekly['run']['date'])
         weekly_ids = {build_public.record_id(row) for row in weekly['items']}
@@ -483,6 +488,12 @@ def check_registered_readings(page, url, width, out, payloads):
         expect(paper).to_contain_text('not human review')
         if reading.get('quality_note'):
             expect(paper).to_contain_text(reading['quality_note'])
+        if identifier == '10.1016/j.chb.2024.108386':
+            expect(paper).to_contain_text('91 university students were analyzed after one exclusion')
+            expect(paper).to_contain_text('1.20 versus 1.87 out of seven possible')
+            expect(paper).to_contain_text('did not differ significantly')
+            expect(paper).to_contain_text('does not establish equivalence')
+            expect(paper).to_contain_text('The load and quality comparisons adjusted')
         if reading.get('temporal_notice'):
             expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
             expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
