@@ -83,6 +83,12 @@ def check(page, url, width, out):
             if args.browser == 'chromium' and ((width == 1280 and name == 'perspectives-preview') or (width == 390 and name == 'themes')):
                 frame = page.locator('#home '+section).screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
                 print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
+    # Fixed-size artwork must never cover adjacent editorial headlines.
+    for card in page.locator('#home .editorial-card').all():
+        artwork = card.locator('.story-visual-editorial')
+        if artwork.count():
+            art_box, title_box = artwork.bounding_box(), card.locator('h3').bounding_box()
+            assert art_box['x'] + art_box['width'] <= title_box['x'] - 8, 'Editorial thumbnail overlaps its headline'
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
     assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url

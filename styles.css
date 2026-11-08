@@ -1131,3 +1131,7 @@ summary{cursor:pointer;font:600 14px/1.6 var(--brand);min-height:44px;color:var(
 #home .field-question:focus-visible{outline:3px solid #E00122;outline-offset:4px}.issue-experiment summary{color:#fff}.issue-experiment a:focus-visible,.issue-experiment summary:focus-visible,#issue .issue-hero a:focus-visible{outline-color:#fff}
 
 #paper-content .rv-source-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}#paper-content .rv-source-row>span:last-child{background:#f3f0ee;padding:3px 7px;font-size:12px}.follow-section a:focus-visible{outline-color:#fff}
+
+/* Keep thumbnails inside their editorial grid tracks and metadata readable. */
+#home .editorial-card .story-visual-editorial{width:86px;height:86px;max-width:100%}.card-foot,.card-added,.card-source-version,.library-story .library-kicker,.editorial-category,.arrival-source-title,#paper-content .rv-source-row{font-size:12px!important}
+@media(max-width:600px){#home .editorial-card .story-visual-editorial{width:68px;height:68px}.masthead-topline{font-size:10px;letter-spacing:.04em}.masthead-topline>a{max-width:none;white-space:nowrap}.masthead-topline>span{min-width:0}#paper-content .rv-source-row{gap:8px;font-size:12px}}
