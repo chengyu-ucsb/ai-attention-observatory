@@ -3,6 +3,7 @@
 Playwright browser builds are not a substitute for device/screen-reader testing.
 """
 import argparse
+import base64
 from contextlib import contextmanager
 from datetime import datetime
 import re
@@ -45,6 +46,10 @@ def check(page, url, width, out):
         if out:
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=False)
+        # Compact, public-page review frames remain inspectable alongside the PNG artifacts.
+        if args.browser == 'chromium' and width in (1280, 390) and name in ('home', 'issue', 'reading-head'):
+            frame = page.screenshot(type='jpeg', quality=55, full_page=False)
+            print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
     def overflow():
         if not page.evaluate('document.documentElement.scrollWidth <= innerWidth'):
             screenshot('overflow-'+page.url.split('#')[-1].split('?')[0])
@@ -64,9 +69,14 @@ def check(page, url, width, out):
         page.keyboard.press('Escape')
         expect(page.locator('#nav-toggle')).to_be_focused()
         expect(page.locator('#nav-toggle')).to_have_attribute('aria-expanded','false')
+    # Publication hierarchy stays issue-led, with four compact subject links below it.
+    assert page.locator('.home-edition').evaluate("(e) => e.compareDocumentPosition(document.querySelector('.field-guide')) & Node.DOCUMENT_POSITION_FOLLOWING")
+    expect(page.locator('.publication-masthead h1')).to_contain_text('AI')
+    expect(page.locator('.observation-art title')).to_have_text('The attention lens')
+    assert page.locator('body').evaluate("(e) => getComputedStyle(e).getPropertyValue('--red').trim().toLowerCase()") == '#e00122'
     overflow(); screenshot('home')
     if out:
-        for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.lenses-grid','themes')]:
+        for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.field-guide','themes')]:
             page.locator('#home '+section).screenshot(path=str(out / f'observatory-{width}-{name}.png'), style='.site-header { visibility: hidden !important; }')
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
@@ -114,6 +124,7 @@ def check(page, url, width, out):
     page.locator('.library-story h3 button').first.click()
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('#paper h1')).to_be_visible()
+    overflow(); screenshot('reading-head')
     expect(page.locator('.rv-head .story-visual-reading')).to_have_count(0)
     provenance = page.locator('.rv-provenance')
     expect(provenance).not_to_have_attribute('open', '')
@@ -181,7 +192,7 @@ def check(page, url, width, out):
             expect(page.locator('#issue-coverage')).to_contain_text(re.compile(r'^' + str(shelf_count) + r' sources (?:originally published|in this edition)'))
             screenshot('issue-sources')
     # Visual routes have ordinary destinations and no tracking/persistence.
-    page.locator('.reading-routes a[href="#atlas"]').click()
+    navigate('atlas')
     expect(page.locator('#atlas')).to_be_visible()
     navigate('perspectives')
     page.locator('#perspectives-library-link').click()
