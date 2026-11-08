@@ -275,7 +275,7 @@ assert(textContent(evidence).includes("Section: Results · page 7 · paragraph 2
 assert(textContent(evidence).includes(original.reading.source_version));
 const citation=match(originalPage,"rv-source"),sourceLink=match(citation,"rv-primary-link");
 assert.equal(sourceLink.href,original.reading.source_url,"Checked source link must open the exact version read");
-assert.equal(sourceLink.textContent,"Read the source ↗","Source action should be concise; version stays in source metadata");
+assert.equal(sourceLink.textContent,"Read the source","Source action should be concise; version stays in source metadata");
 assert.equal(proseText(match(originalPage,"rv-provenance")).split("Source version identifier: "+original.reading.source_version).length-1,1,"Source version identifier must not be duplicated in provenance");
 assert(textContent(citation).includes("AI source-check scope: "+original.reading.review_scope));
 assert.equal(textContent(citation).split("AI source-check scope: "+original.reading.review_scope).length-1,1,"Do not repeat the source-check scope in the citation sidebar");
@@ -337,7 +337,7 @@ Object.assign(publisherSummary.reading.digest,{
 delete publisherSummary.reading.related_journal_doi;
 ctx.selected=publisherSummary;vm.runInContext("TEST.showPaper(selected)",ctx);
 assert.equal(match(paperContainer,"rv-primary-link").href,publisherSummary.reading.source_url);
-assert.equal(match(paperContainer,"rv-primary-link").textContent,"Read the source ↗");
+assert.equal(match(paperContainer,"rv-primary-link").textContent,"Read the source");
 assert(textContent(match(paperContainer,"rv-source-row")).includes("Publisher version of record · HTML"));
 assert(!textContent(match(paperContainer,"rv-source")).includes("Related journal DOI"),"One source DOI must not be relabeled as a separate journal version");
 
@@ -630,3 +630,12 @@ ctx.qualifications=processNotices.join(" ")+" Cross-sectional self-reports canno
 const causallyLimited=vm.runInContext("TEST.readingQualifications(qualifications)",ctx);
 assert(visibleText(causallyLimited).includes("Cross-sectional self-reports cannot establish causal mediation."));
 assert(!visibleText(causallyLimited).includes("Reported results do not establish strong causal evidence."),"Do not duplicate an already visible substantive causal limit");
+
+// Public arrows must not depend on installed symbol fonts.
+for(const source of ["app.js","lab-play.js","index.html","subscribe.html","styles.css","assets/feed.xsl","scripts/build_newsletter.py"])
+ assert(!read(source).includes(String.fromCodePoint(0x2197)),"Font-dependent diagonal arrow in "+source);
+const direction=vm.runInContext('TEST.make("span","issue-signal-icon","direction-mark")',ctx);
+assert.equal(direction.textContent,"");
+assert(direction.className.includes("font-independent-arrow"));
+assert.equal(direction.attributes["aria-hidden"],"true");
+assert(styles.includes(".font-independent-arrow::before")&&styles.includes(".font-independent-arrow::after"),"Direction mark must be drawn without fonts");

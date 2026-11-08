@@ -91,7 +91,7 @@
     $("#switch-note").textContent=correct?"✓ Correct":"↪ Different rule—keep going";
     g.trial+=1;g.shownAt=null;
     if(!g.timed){
-      $("#switch-next").hidden=false;$("#switch-next").textContent=g.trial>=g.length?"See debrief ↗":"Next turn ↗";
+      $("#switch-next").hidden=false;$("#switch-next").textContent=g.trial>=g.length?"See debrief":"Next turn";
       $("#switch-announcement").textContent=(correct?"Correct.":"Different choice. Check the rule.")+" Choose "+(g.trial>=g.length?"See debrief":"Next turn")+" when ready.";
       $("#switch-next").focus();
     } else {
@@ -213,7 +213,7 @@
     $("#recovery-headline").textContent="A half-finished project";
     $("#recovery-description").textContent=story.context+" Your next action: "+story.next+".";
     $("#recovery-interaction").replaceChildren();
-    $("#recovery-start").hidden=false;$("#recovery-start").textContent="Begin interruption ↗";
+    $("#recovery-start").hidden=false;$("#recovery-start").textContent="Begin interruption";
   }
   $$("[data-recovery-mode]").forEach(btn=>btn.addEventListener("click",()=>{
     if(practice.recovery.comparison)return;
@@ -272,7 +272,7 @@
     $("#recovery-headline").setAttribute("aria-describedby","recovery-round-context recovery-description");
     const place=$("#recovery-interaction");place.replaceChildren();
     add(place,E("div","recovery-outcome",correct?"✓ Correct next action":"↩ Notice what was lost"),E("div","recovery-time",elapsed===null?"Timing omitted: you left this activity before choosing.":elapsed+" ms to choose"));
-    $("#recovery-start").hidden=false;$("#recovery-start").textContent=c?(c.step===0?"Preview second round ↗":"Try another comparison ↗"):"Try another round ↗";
+    $("#recovery-start").hidden=false;$("#recovery-start").textContent=c?(c.step===0?"Preview second round":"Try another comparison"):"Try another round";
     if(c){
       if(c.results.length===2)recoveryComparisonFinish();
       else $("#recovery-headline").focus();
@@ -354,7 +354,7 @@
     const root=$("#assist-feedback");root.replaceChildren();
     add(root,E("strong","",ok?"✓ Supported conclusion":"↩ Another interpretation is stronger"),E("p","",data.feedback));
     root.hidden=false;$("#assist-next").hidden=false;root.focus();
-    $("#assist-next").textContent=r.scenario<scenarios.length-1?"Try another scenario ↗":"Replay the first scenario ↗";
+    $("#assist-next").textContent=r.scenario<scenarios.length-1?"Try another scenario":"Replay the first scenario";
   }
   $$("[data-assist-mode]").forEach(b=>b.addEventListener("click",()=>{
     const r=practice.assist;r.mode=b.dataset.assistMode;

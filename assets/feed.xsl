@@ -16,14 +16,14 @@
  <h1><xsl:value-of select="channel/title"/></h1>
  <p class="intro"><xsl:value-of select="channel/description"/></p>
  <div class="notice">You're viewing an RSS feed in a browser. To follow updates automatically, copy this page's URL into an RSS reader. You can also read the latest edition directly on the site.</div>
- <div class="actions"><a href="subscribe.html">How to subscribe ↗</a><a class="secondary" href="./">Visit the Observatory ↗</a><a class="secondary" href="issues/">Published editions ↗</a></div>
+ <div class="actions"><a href="subscribe.html">How to subscribe</a><a class="secondary" href="./">Visit the Observatory</a><a class="secondary" href="issues/">Published editions</a></div>
  <p class="eyebrow">Available entries</p>
  <xsl:for-each select="channel/item">
   <article class="item">
    <p class="meta"><xsl:value-of select="pubDate"/></p>
    <h2><a href="{link}"><xsl:value-of select="title"/></a></h2>
    <p><xsl:value-of select="description"/></p>
-   <a href="{link}">Read the source or edition ↗</a>
+   <a href="{link}">Read the source or edition</a>
   </article>
  </xsl:for-each>
  <p class="footer">A public research project exploring AI, attention, and human agency. Source links and dates remain available in the underlying RSS data.</p>

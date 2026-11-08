@@ -1079,3 +1079,8 @@ button,summary,a{touch-action:manipulation}.eyebrow{color:var(--red);font-size:1
 /* Retain card insets over legacy adjacent-card selectors. */
 #paper-content .rv-context+.rv-context{padding:22px;border:1px solid var(--line)}
 @media(max-width:650px){#paper-content .rv-context+.rv-context{padding:20px;border:1px solid var(--line)}}
+
+/* Diagonal direction marks use CSS geometry, never an optional font glyph. */
+.font-independent-arrow{display:inline-block;position:relative;width:1em;height:1em;flex:none;vertical-align:middle}
+.font-independent-arrow::before{content:"";position:absolute;width:.9em;height:.07em;left:.05em;top:.48em;background:currentColor;transform:rotate(-45deg)}
+.font-independent-arrow::after{content:"";position:absolute;width:.52em;height:.52em;right:.12em;top:.12em;border-top:.07em solid currentColor;border-right:.07em solid currentColor}
