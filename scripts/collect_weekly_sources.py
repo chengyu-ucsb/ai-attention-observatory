@@ -32,11 +32,14 @@ VERSION = 2
 MAX_HTML_REFRESH_ATTEMPTS = 8
 # Reuse only existing anonymous locator functions. Never enable a new account,
 # contact-address transmission, key, model, or hosted inference service here.
-PROVIDERS = ('Europe PMC XML', 'OpenAIRE', 'CORE', 'Semantic Scholar')
+# Append only: persisted numeric cursors retain their original meaning.
+LEGACY_PROVIDERS = ('Europe PMC XML', 'OpenAIRE', 'CORE', 'Semantic Scholar')
+PROVIDER_PLAN_VERSION = 2
+PROVIDERS = LEGACY_PROVIDERS + ('Crossref publisher locations',)
 SUCCESS = {'full_document_retrieved', 'partial_full_text'}
 BLOCKED = {'article_http_401', 'article_http_403', 'http_401', 'http_403',
            'access_challenge_not_article', 'robots_disallow_or_unavailable',
-           'related_version_verification_unavailable'}
+           'related_version_verification_unavailable', 'host_access_denied_this_run'}
 CODES = BLOCKED | SUCCESS | {
     'no_exact_match', 'candidates', 'candidate_budget_exhausted',
     'host_requires_review', 'unapproved_host', 'unapproved_redirect',
@@ -54,7 +57,7 @@ CODES = BLOCKED | SUCCESS | {
     'deferred_time_budget', 'interrupted_attempt', 'worker_failed',
     'retrieval_error', 'coverage_gap', 'invalid_document_locations',
     'route_policy_excluded', 'metadata_budget_exhausted', 'rate_limit_pause',
-    'credentialed_source_url_disallowed', 'source_version_unverified',
+    'credentialed_source_url_disallowed', 'source_version_unverified', 'source_unavailable_page',
 }
 SAFE_PROVIDERS = set(PROVIDERS) | {
     'explicit_source', 'existing_source', 'known_open_access_source',
@@ -283,7 +286,11 @@ def validate_row(row, window):
             and publication_date(row['published']).isoformat() == row['published']
             and date_in_window(row['published'], window['from'], window['to']))
     integer(row['attempts']); integer(row['excluded_related_or_outside_window_routes'])
-    shape(row['plan'], {'known_routes', 'known_sources_only', 'doi_lookup_permitted'})
+    shape(row['plan'], {'known_routes', 'known_sources_only', 'doi_lookup_permitted'},
+          {'provider_plan_version'})
+    plan_version = row['plan'].get('provider_plan_version', 1)
+    require(type(plan_version) is int and plan_version in {1, PROVIDER_PLAN_VERSION})
+    provider_count = len(LEGACY_PROVIDERS) if plan_version == 1 else len(PROVIDERS)
     known = row['plan']['known_routes']
     require(type(known) is list and type(row['plan']['known_sources_only']) is bool
             and type(row['plan']['doi_lookup_permitted']) is bool)
@@ -296,7 +303,7 @@ def validate_row(row, window):
     require(row['tried_sources'] == sorted(set(row['tried_sources'])))
     cursor = row['cursor']
     shape(cursor, {'known', 'provider', 'provider_tried'})
-    integer(cursor['known'], len(known)); integer(cursor['provider'], len(PROVIDERS))
+    integer(cursor['known'], len(known)); integer(cursor['provider'], provider_count)
     tried = cursor['provider_tried']
     require(type(tried) is list)
     for identity in tried:
@@ -304,11 +311,11 @@ def validate_row(row, window):
     require(tried == sorted(set(tried)) and set(tried) <= set(row['tried_sources']))
     if cursor['known'] < len(known) or not row['plan']['doi_lookup_permitted']:
         require(cursor['provider'] == 0 and not tried)
-    if cursor['provider'] == len(PROVIDERS):
+    if cursor['provider'] == provider_count:
         require(not tried)
     require(row['attempts'] >= cursor['known'] + cursor['provider'])
     exhausted = cursor['known'] == len(known) and (not row['plan']['doi_lookup_permitted']
-                                                or cursor['provider'] == len(PROVIDERS))
+                                                or cursor['provider'] == provider_count)
     require(type(row['diagnostics']) is list and len(row['diagnostics']) <= 96)
     for entry in row['diagnostics']:
         validate_diagnostic(entry)
@@ -709,7 +716,8 @@ def new_row(record, fingerprint, excluded, routes, known_only):
         'source_url': access.diagnostic_url(record.get('url')),
         'status': 'pending', 'complete': False, 'attempts': 0,
         'cursor': {'known': 0, 'provider': 0, 'provider_tried': []}, 'tried_sources': [],
-        'plan': {'known_routes': [digest(route) for route in routes], 'known_sources_only': known_only,
+        'plan': {'provider_plan_version': PROVIDER_PLAN_VERSION,
+                 'known_routes': [digest(route) for route in routes], 'known_sources_only': known_only,
                  'doi_lookup_permitted': not known_only and bool(access.DOI.fullmatch(access.doi(record.get('doi'))))},
         'excluded_related_or_outside_window_routes': excluded,
         'diagnostics': [], 'source_text_saved': False,
@@ -732,6 +740,9 @@ def perform_stage(record, plan, max_candidates):
         return {'diagnostics': [{'status': 'route_policy_excluded', 'retryable': False}], 'tried_sources': []}
     diagnostics = []; tried = []; best = None; host_waits = []
     stage_started = time.monotonic()
+    host_backoff = dict(plan.get('host_backoff', {}))
+    denied_hosts = set(access.HOST_DENIALS.get() or ())
+    unavailable_hosts = set()
     if plan['kind'] == 'known':
         candidates = [pin_arxiv_route(plan['source'], record)]
         if not route_permitted(plan['source'], record, window):
@@ -761,14 +772,33 @@ def perform_stage(record, plan, max_candidates):
         diagnostics.append(diagnostic(discovery))
     for route in candidates[:max_candidates]:
         host = urlsplit(access.diagnostic_url(route['url'])).hostname
-        wait = plan.get('host_backoff', {}).get(host, 0) - (time.monotonic() - stage_started)
+        wait = host_backoff.get(host, 0) - (time.monotonic() - stage_started)
         if wait > 0:
             host_waits.append(max(1, math.ceil(wait)))
             continue
         remaining_backoff = {host: max(0, seconds - (time.monotonic() - stage_started))
-                             for host, seconds in plan.get('host_backoff', {}).items()}
-        doc, ledger = access.retrieve(record, max_candidates=1, providers=[], known_sources=[route],
-                                      anonymous_only=True, host_backoff=remaining_backoff)
+                             for host, seconds in host_backoff.items()}
+        # retrieve scopes its own context. Carry observed failures across calls,
+        # including failures on nested URLs rather than just the landing host.
+        denial_scope = access.HOST_DENIALS.set(denied_hosts)
+        try:
+            doc, ledger = access.retrieve(record, max_candidates=1, providers=[], known_sources=[route],
+                                          anonymous_only=True, host_backoff=remaining_backoff)
+        finally:
+            access.HOST_DENIALS.reset(denial_scope)
+        for entry in ledger:
+            target = entry.get('failure_url') or entry.get('url') or ''
+            failed_host = urlsplit(access.diagnostic_url(target)).hostname
+            status = entry.get('status')
+            if not failed_host or entry.get('stage') != 'article':
+                continue
+            if status in {'article_http_401', 'article_http_403', 'http_401', 'http_403'}:
+                denied_hosts.add(failed_host)
+            if status == 'source_unavailable_page':
+                unavailable_hosts.add(failed_host)
+                seconds = max(1, min(entry.get('retry_after_seconds', 3600), 604800))
+                host_backoff[failed_host] = max(host_backoff.get(failed_host, 0),
+                    time.monotonic() - stage_started + seconds)
         pinned = verified_arxiv_v1(record)
         if doc is not None and pinned:
             if not is_pinned_arxiv_url(doc.url, pinned):
@@ -787,7 +817,9 @@ def perform_stage(record, plan, max_candidates):
             if (best is None or meta['evidence_status'] == 'full_document_retrieved'
                     or meta['characters_retrieved'] > best['characters_retrieved']):
                 best = meta
-        if any(row.get('status') == 'rate_limit_pause' or
+        if any((row.get('status') == 'rate_limit_pause'
+                and urlsplit(access.diagnostic_url(row.get('failure_url') or row.get('url') or '')).hostname
+                    not in unavailable_hosts) or
                str(row.get('status', '')).endswith('http_429') for row in ledger):
             break
         if best and best['evidence_status'] == 'full_document_retrieved':
@@ -1055,13 +1087,23 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
                         if entry['record_key'] == key and entry['publication_window'] == window
                         and entry['record']['fingerprint'] == fingerprint), None)
         if old and old['fingerprint'] == fingerprint:
-            require(old['plan'] == {'known_routes': [digest(route) for route in routes],
+            require({k: v for k, v in old['plan'].items() if k != 'provider_plan_version'} == {'known_routes': [digest(route) for route in routes],
                                     'known_sources_only': known_sources_only,
                                     'doi_lookup_permitted': not known_sources_only and bool(access.DOI.fullmatch(access.doi(record.get('doi'))))})
             require(old['source_url'] == access.diagnostic_url(record.get('url'))
                     and old['published'] == publication_date(record.get('published')).isoformat()
                     and old['kind'] == record.get('kind'))
             row = deepcopy(old)
+            # Only selected, unchanged current-window rows adopt the appended route.
+            # Historical snapshots keep their original plan and exhaustion semantics.
+            # Refresh histories require terminal HTML evidence: leave their legacy
+            # plan intact until a separate provenance-safe migration is available.
+            if (row['plan'].get('provider_plan_version', 1) < PROVIDER_PLAN_VERSION
+                    and 'html_refresh' not in row):
+                row['plan']['provider_plan_version'] = PROVIDER_PLAN_VERSION
+                if (row['complete'] and row['plan']['doi_lookup_permitted']
+                        and row['status'] != 'full_document_retrieved_not_reviewed'):
+                    row.update(complete=False, status='pending_routes')
         else:
             row = new_row(record, fingerprint, group['excluded'], routes, known_sources_only)
         if row.get('status') == 'in_progress':
@@ -1136,11 +1178,13 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         else:
             advance(row, result, plan, routes, known_sources_only, response_at)
         quota = [d for d in result.get('diagnostics', [])
-                 if str(d.get('status', '')).endswith('http_429')]
+                 if str(d.get('status', '')).endswith('http_429')
+                 or d.get('status') == 'source_unavailable_page']
         for entry in quota:
             seconds = max(1, min(entry.get('retry_after_seconds', 3600), 604800))
             until = (response_at + timedelta(seconds=seconds)).isoformat()
-            keys = {pause_key}
+            # An unavailable article host does not pause an independent locator API.
+            keys = set() if entry.get('status') == 'source_unavailable_page' else {pause_key}
             if entry.get('stage') == 'article':
                 target = entry.get('failure_url') or entry.get('url') or ''
                 host = urlsplit(access.diagnostic_url(target)).hostname

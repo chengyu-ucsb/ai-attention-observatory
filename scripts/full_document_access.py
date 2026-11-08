@@ -41,10 +41,19 @@ ARTICLE_HOSTS=set(LEGACY_HOSTS) | set(EDITORIAL_HOSTS) | {
     'www.microsoft.com','research.aalto.fi','epub.ub.uni-muenchen.de','iagen.unam.mx',
     'opus.lib.uts.edu.au','www.martinreimann.com','ndownloader.figshare.com',
     'ijlter.org','www.ijlter.org',
+    'researchmgt.monash.edu','static1.squarespace.com',
     # Exact official publishers from the reviewed weekly feed registry.
     'eff.org','www.eff.org','niemanlab.org','www.niemanlab.org',
     'ainowinstitute.org','www.ainowinstitute.org','themarkup.org','www.themarkup.org',
     'nngroup.com','www.nngroup.com',
+}
+# A shared asset CDN is not an institutional repository. Approve the reviewed
+# author's exact file only, plus robots.txt for the normal access check.
+SCOPED_ARTICLE_PATHS={
+    'static1.squarespace.com': {
+        '/robots.txt',
+        '/static/57a40c19414fb54f51f8095f/t/685daca461a93c25f5b3dabe/1750969509917/2019%2BFitz%2BBatching.pdf',
+    },
 }
 API_HOSTS={'api.unpaywall.org','api.core.ac.uk','api.semanticscholar.org',
            'api.crossref.org','api.openaire.eu','api.openalex.org','www.ebi.ac.uk'}
@@ -63,6 +72,27 @@ class HostRateLimitPause(ValueError):
         super().__init__('rate_limit_pause')
         self.url=diagnostic_url(url)
         self.retry_after_seconds=max(1,min(math.ceil(seconds),604800))
+
+
+class SourceUnavailablePage(ValueError):
+    """Some publishers return a tiny temporary-error page with HTTP 200."""
+    def __init__(self,url):
+        super().__init__('source_unavailable_page')
+        self.url=diagnostic_url(url)
+        self.retry_after_seconds=3600
+
+
+def check_html_availability(page,url):
+    # Match only the title of a small error response, not a phrase quoted by a
+    # real article. Availability failures are not identity failures or denials.
+    title=re.search(r'<title\b[^>]*>\s*([^<]+?)\s*</title>',page[:10000],re.I)
+    if len(page)<10000 and title and re.fullmatch(
+            r'(?:site|service|temporarily|page) unavailable',
+            ' '.join(title.group(1).lower().split())):
+        if HOST_COOLDOWNS.get() is not None:
+            host=urlsplit(url).hostname
+            HOST_COOLDOWNS.get()[host]=max(HOST_COOLDOWNS.get().get(host,0),time.monotonic()+3600)
+        raise SourceUnavailablePage(url)
 
 
 def check_host_cooldown(url):
@@ -134,6 +164,8 @@ def safe_url(url, hosts=ARTICLE_HOSTS):
         host=(p.hostname or '').lower()
         # Exact hosts, plus known editorial subdomains; never arbitrary .edu/.org.
         allowed=host in hosts or (hosts is ARTICLE_HOSTS and any(host.endswith('.'+h) for h in EDITORIAL_HOSTS))
+        if hosts is ARTICLE_HOSTS and host in SCOPED_ARTICLE_PATHS:
+            allowed=allowed and p.path in SCOPED_ARTICLE_PATHS[host]
         return bool(p.scheme=='https' and allowed and not p.username and not p.password
                     and p.port in (None,443) and len(url)<2000)
     except ValueError:
@@ -314,6 +346,7 @@ def document_from_pdf(raw,record,url,version='unspecified',candidate_doi=''):
 
 def document_from_html(raw,record,url,version='unspecified',candidate_doi=''):
     page=raw.decode('utf-8','replace')
+    check_html_availability(page,url)
     if BLOCKED.search(page[:18000]): raise ValueError('access_challenge_not_article')
     meta=CitationMetadata(); meta.feed(page)
     if not identity_matches(record,page[:60000],candidate_doi,meta.values):
@@ -361,6 +394,7 @@ def candidate_identity(option,record):
     raw,_,kind=request(verification,limit=2_000_000)
     if 'html' not in kind: raise ValueError('related_version_verification_unavailable')
     page=raw.decode('utf-8','replace')
+    check_html_availability(page,verification)
     if BLOCKED.search(page[:18000]): raise ValueError('access_challenge_not_article')
     meta=CitationMetadata(); meta.feed(page)
     if not (doi(meta.values.get('citation_doi'))==parent and
@@ -403,6 +437,7 @@ def fetch_candidate(candidate,record):
         return finish(document_from_pdf(raw,identity,final,version,target))
     if 'html' not in kind: raise ValueError('unsupported_content_type')
     page=raw.decode('utf-8','replace')
+    check_html_availability(page,final)
     if BLOCKED.search(page[:18000]): raise ValueError('access_challenge_not_article')
     partial_pdf=None
     for pdf in publisher_pdf_links(page,final,identity,target):
@@ -546,6 +581,9 @@ def known_candidates(record):
 def failure_diagnostic(exc,article=False):
     """Classify failures without putting exception URLs or credentials in logs."""
     result={'retryable':False}
+    if isinstance(exc,SourceUnavailablePage):
+        return {'status':'source_unavailable_page','retryable':True,
+                'retry_after_seconds':exc.retry_after_seconds,'failure_url':exc.url}
     if isinstance(exc,HostRateLimitPause):
         return {'status':'rate_limit_pause','retryable':True,
                 'retry_after_seconds':exc.retry_after_seconds,'failure_url':exc.url}
@@ -706,7 +744,10 @@ def retrieve(record,max_candidates=8,providers=None,*,known_sources=None,anonymo
             raise ValueError('invalid_host_cooldown')
         deadlines[host]=max(deadlines.get(host,0),time.monotonic()+seconds)
     cooldown_scope=HOST_COOLDOWNS.set(deadlines)
-    denial_scope=HOST_DENIALS.set(set(HOST_DENIALS.get() or set()))
+    # Reuse an explicit enclosing scope so swallowed nested-PDF denials
+    # remain visible to sibling candidates. Standalone calls stay isolated.
+    inherited_denials=HOST_DENIALS.get()
+    denial_scope=HOST_DENIALS.set(inherited_denials if inherited_denials is not None else set())
     scope=ANONYMOUS_ONLY.set(ANONYMOUS_ONLY.get() or anonymous_only)
     try:
         return _retrieve(record,max_candidates,providers,known_sources=known_sources)
