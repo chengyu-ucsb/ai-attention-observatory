@@ -600,7 +600,7 @@ class WeeklyQueueTests(unittest.TestCase):
         with patch.object(access, 'default_providers', return_value=[(name, lambda _: [candidate]) for name in queue.PROVIDERS]), \
              patch.object(access, 'fetch_candidate', fetch):
             state = None
-            for _ in range(5):
+            for _ in range(1 + len(queue.PROVIDERS)):
                 state = queue.run(weekly(record), state, now=NOW,
                     attempt=lambda r, p, n, t: queue.perform_stage(r, p, n))
         self.assertEqual(fetch.call_count, 1)

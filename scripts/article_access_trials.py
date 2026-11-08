@@ -3,8 +3,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 import json
 from urllib.error import HTTPError
+from urllib.parse import urlsplit
 from full_document_access import (request, fetch_candidate, candidate,
-    unpaywall_candidates,core_candidates,semantic_candidates,failure_diagnostic)
+    unpaywall_candidates,core_candidates,semantic_candidates,failure_diagnostic,
+    registry_candidates)
 from comprehensive_readings import chunk_document,coverage_is_complete
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -14,6 +16,49 @@ PORTALS=[
  ('SSRN','https://papers.ssrn.com/sol3/papers.cfm?abstract_id=5383106'),
 ]
 PORTAL_HOSTS={'www.researchgate.net','researchgate.net','papers.ssrn.com','ssrn.com'}
+RECOVERED_IDENTIFIERS=('10.1016/j.chb.2019.07.016','10.14742/ajet.11584',
+                       '10.1016/j.compedu.2025.105448')
+
+
+def prior_access_denials():
+    """A code push is not a reason to repeat a previously denied portal probe."""
+    path=ROOT/'data/fulltext-access-tests.json'
+    if not path.exists(): return {}
+    previous=json.loads(path.read_text())
+    denied={}
+    for row in previous.get('tests',[]):
+        if row.get('status') in {'http_401','http_403','article_http_401','article_http_403',
+                                 'access_challenge','access_challenge_not_article'}:
+            host=urlsplit(row.get('url','')).hostname
+            if host:
+                denied[host]={'status':row['status'],
+                              'source_checked_at':row.get('source_checked_at') or previous.get('checked_at'),
+                              'prior_denial_retained':True,'network_attempted':False}
+    return denied
+
+
+def recovered_source_pilot():
+    """Test the three recovered exact copies, without publishing source prose."""
+    library=json.loads((ROOT/'data/library.json').read_text())
+    rows=[]
+    for identifier in RECOVERED_IDENTIFIERS:
+        record=next(r for r in library if r.get('doi')==identifier)
+        route=registry_candidates(record)[0]
+        row={'site':route['provider'],'url':route['url'],'doi':identifier,
+             'fulltext_retrieved':False,'summary_completed':False,
+             'pilot':'recovered_backlog_sources_2026_11_08'}
+        try:
+            doc=fetch_candidate(route,record)
+            chunks=chunk_document(doc)
+            complete=doc.coverage.get('evidence_status')=='full_document_retrieved'
+            row.update(status='document_text_retrieved_not_reviewed' if complete else 'partial_text_retrieved_not_reviewed',
+                       fulltext_retrieved=complete,coverage=doc.manifest(),chunks=len(chunks),
+                       all_retrieved_text_retained=coverage_is_complete(doc,chunks))
+            del doc,chunks
+        except Exception as exc:
+            row.update(failure_diagnostic(exc,article=True))
+        rows.append(row)
+    return rows
 
 
 def free_source_pilot():
@@ -47,6 +92,7 @@ def free_source_pilot():
 
 
 def run():
+    denied=prior_access_denials()
     result={'checked_at':datetime.now(timezone.utc).isoformat(),
       'scope':'Two exact-DOI tests and limited direct public access checks; not corpus-wide recovery.',
       'reddit_thread_verified':False,'source_text_saved':False,'tests':[]}
@@ -63,6 +109,10 @@ def run():
             result['tests'].append(row)
     for name,url in PORTALS:
         row={'site':name,'url':url,'fulltext_retrieved':False}
+        if urlsplit(url).hostname in denied:
+            row.update(denied[urlsplit(url).hostname])
+            result['tests'].append(row)
+            continue
         try:
             raw,final,kind=request(url,PORTAL_HOSTS,2_000_000)
             text=raw.decode('utf-8','replace').lower()
@@ -90,8 +140,9 @@ def run():
     except HTTPError as exc: row['status']='http_'+str(exc.code)
     except Exception as exc: row['status']=str(exc) if isinstance(exc,ValueError) else type(exc).__name__
     result['tests'].append(row)
-    result['scope']='Two exact-DOI locator checks, historical EconStor access, and six bounded official free-source routes; not corpus-wide recovery or summary validation.'
+    result['scope']='Two exact-DOI locator checks, historical EconStor access, six bounded official routes and three newly recovered sources; not corpus-wide recovery or summary validation. Previously denied portals are not retried.'
     result['tests'].extend(free_source_pilot())
+    result['tests'].extend(recovered_source_pilot())
     (ROOT/'data/fulltext-access-tests.json').write_text(json.dumps(result,indent=2)+'\n',encoding='utf-8')
     print('ACCESS_TEST_RESULTS_BEGIN')
     print(json.dumps(result,indent=2))
