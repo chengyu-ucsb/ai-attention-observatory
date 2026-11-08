@@ -506,7 +506,25 @@ def apply_discovery_evidence(data, status):
         match = verified.get(key)
         if (match and match["published"] == row.get("published")
                 and prior.get("status") not in unresolved):
-            row["publication_date_provenance"] = match["publication_date_provenance"]
+            incoming = match["publication_date_provenance"]
+            # Rediscovery must not downgrade a checked publisher date to the
+            # same RSS observation already included in its evidence. Otherwise
+            # the next publisher check reconstructs the identical evidence with
+            # a fresh timestamp and invalidates an unchanged article receipt.
+            # Compare the verifier's exact normalized evidence, not date alone:
+            # a new feed source or basis must still change the bound context.
+            from editorial_metadata import prior_evidence
+            observation = prior_evidence({"publication_date_provenance": incoming})
+            known_observation = (
+                prior.get("status") == "day_known"
+                and prior.get("independently_verified") is True
+                and (prior.get("value") or prior.get("date")) == row["published"]
+                and incoming.get("basis") in {"publisher_rss_pubDate", "publisher_atom_published"}
+                and len(observation) == 1
+                and observation[0] in (prior.get("evidence") or [])
+            )
+            if not known_observation:
+                row["publication_date_provenance"] = incoming
             row["discovery_provenance"] = match["discovery_provenance"]
     return data
 
