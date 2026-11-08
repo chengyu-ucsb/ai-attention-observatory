@@ -278,7 +278,7 @@ def validate_row(row, window):
         'attempts', 'cursor', 'plan', 'tried_sources', 'excluded_related_or_outside_window_routes',
         'diagnostics', 'source_text_saved'},
         {'document', 'document_evidence', 'last_outcome', 'next_retry_at', 'last_attempt_at',
-         'html_refresh', 'html_refresh_attempts', 'previous_documents'})
+         'html_refresh', 'html_refresh_attempts', 'previous_documents', 'provider_fallbacks', 'provider_attempted_at'})
     hash_value(row['fingerprint']); saved_url(row['source_url'], allow_empty=True)
     require(row['kind'] in {'scholarly', 'nonacademic'} and type(row['complete']) is bool)
     require(type(row['status']) is str and row['status'] in STATUSES and row['source_text_saved'] is False)
@@ -313,7 +313,31 @@ def validate_row(row, window):
         require(cursor['provider'] == 0 and not tried)
     if cursor['provider'] == provider_count:
         require(not tried)
-    require(row['attempts'] >= cursor['known'] + cursor['provider'])
+    fallbacks = row.get('provider_fallbacks', {})
+    require(type(fallbacks) is dict)
+    for index, progress in fallbacks.items():
+        require(type(index) is str and index.isdigit() and str(int(index)) == index
+                and cursor['provider'] < int(index) < provider_count
+                and cursor['known'] == len(known) and row['plan']['doi_lookup_permitted'])
+        shape(progress, {'complete', 'tried_sources', 'status', 'attempted_at'}, {'next_retry_at'})
+        timestamp(progress['attempted_at'])
+        require(type(progress['complete']) is bool
+                and progress['status'] in RETRY | {'pending_routes', 'in_progress', 'exhausted', 'full_document_retrieved'})
+        require(progress['complete'] == (progress['status'] in {'exhausted', 'full_document_retrieved'}))
+        if progress['status'] == 'full_document_retrieved':
+            require(row['complete'] and row['status'] == 'full_document_retrieved_not_reviewed')
+        require(type(progress['tried_sources']) is list
+                and progress['tried_sources'] == sorted(set(progress['tried_sources']))
+                and set(progress['tried_sources']) <= set(row['tried_sources']))
+        for identity in progress['tried_sources']:
+            hash_value(identity)
+        require(('next_retry_at' in progress) == (progress['status'] in RETRY))
+        if 'next_retry_at' in progress:
+            timestamp(progress['next_retry_at'])
+    require(row['attempts'] >= cursor['known'] + cursor['provider'] + len(fallbacks))
+    if 'provider_attempted_at' in row:
+        require(row['attempts'] > 0 and cursor['known'] == len(known)
+                and row['plan']['doi_lookup_permitted'] and cursor['provider'] < provider_count)
     exhausted = cursor['known'] == len(known) and (not row['plan']['doi_lookup_permitted']
                                                 or cursor['provider'] == provider_count)
     require(type(row['diagnostics']) is list and len(row['diagnostics']) <= 96)
@@ -349,7 +373,7 @@ def validate_row(row, window):
         require('next_retry_at' in row)
     elif row['status'] != 'in_progress':
         require('next_retry_at' not in row)
-    for key in ('next_retry_at', 'last_attempt_at'):
+    for key in ('next_retry_at', 'last_attempt_at', 'provider_attempted_at'):
         if key in row:
             timestamp(row[key])
     if row['attempts']:
@@ -733,6 +757,64 @@ def stage_plan(routes, cursor, known_only, window, tried_sources=(), providers_e
     return None
 
 
+def fallback_stage_plan(row, window, pauses, now, prefer_primary=False):
+    """Try one later independent provider while the primary checkpoint waits.
+
+    The primary cursor and retry deadline stay intact. This is not a retry of
+    the paused provider, a mirror workaround, or permission to bypass a host
+    cooldown: perform_stage still receives all active article-host pauses.
+    """
+    if (not row['plan']['doi_lookup_permitted']
+            or row['cursor']['known'] < len(row['plan']['known_routes'])):
+        return None
+    count = (len(LEGACY_PROVIDERS) if row['plan'].get('provider_plan_version', 1) == 1
+             else len(PROVIDERS))
+    available = []
+    for index in range(row['cursor']['provider'] + 1, count):
+        progress = row.get('provider_fallbacks', {}).get(str(index), {})
+        pause = pauses.get('provider:' + PROVIDERS[index])
+        if (progress.get('complete')
+                or (progress.get('next_retry_at') and utc_now(progress['next_retry_at']) > now)
+                or (pause and utc_now(pause) > now)):
+            continue
+        available.append((progress.get('attempted_at', ''), index))
+    if not available:
+        return None
+    attempted_at, index = min(available)
+    # Retry-After is a minimum delay, not a reason to retry the same provider
+    # first forever when cron runs less often than the cooldown. Oldest ready
+    # checkpoint wins; untouched independent providers get their first turn.
+    if prefer_primary and row.get('provider_attempted_at', row.get('last_attempt_at', '')) <= attempted_at:
+        return None
+    return {'kind': 'provider', 'name': PROVIDERS[index], 'fallback_provider': index,
+            'tried_sources': list(row['tried_sources']), 'publication_window': window}
+
+
+def provider_stage_complete(ledger):
+    count = sum(d.get('stage') == 'article' for d in ledger)
+    remaining = max([d.get('candidates', 0) for d in ledger if d.get('stage') == 'discovery'] or [0])
+    return not (count and remaining > count)
+
+
+def consume_provider_fallbacks(row):
+    """Advance past completed fallback stages, or adopt their pending cursor."""
+    progress = row.get('provider_fallbacks', {})
+    while str(row['cursor']['provider']) in progress:
+        saved = progress.pop(str(row['cursor']['provider']))
+        if saved['complete']:
+            row['cursor']['provider'] += 1
+            row['cursor']['provider_tried'] = []
+        else:
+            row['cursor']['provider_tried'] = saved['tried_sources']
+            row['provider_attempted_at'] = saved['attempted_at']
+            row['status'] = saved['status']
+            if 'next_retry_at' in saved:
+                row['next_retry_at'] = saved['next_retry_at']
+            break
+    if not progress:
+        row.pop('provider_fallbacks', None)
+
+
 def perform_stage(record, plan, max_candidates):
     """Bounded stage; never continue to another source after a rate limit."""
     window = plan['publication_window']
@@ -931,14 +1013,34 @@ def advance(row, result, plan, routes, known_only, now):
     if plan['kind'] == 'known' and not any(d.get('retryable') for d in ledger):
         tried = tried + [digest(plan['source']['url'])]
     row['tried_sources'] = sorted(set(row['tried_sources']) | set(tried))
-    if plan['kind'] == 'provider':
+    if plan['kind'] == 'provider' and 'fallback_provider' not in plan:
         row['cursor']['provider_tried'] = sorted(set(row['cursor']['provider_tried']) | set(tried))
     row['last_outcome'] = (retrieved or {}).get('evidence_status') or failure_status(ledger)
-    row.pop('next_retry_at', None)
-    if retrieved and retrieved.get('evidence_status') == 'full_document_retrieved':
-        row.update(status='full_document_retrieved_not_reviewed', complete=True)
-        return
     retry = [d for d in ledger if d.get('retryable')]
+    if retrieved and retrieved.get('evidence_status') == 'full_document_retrieved':
+        row.pop('next_retry_at', None)
+        row.update(status='full_document_retrieved_not_reviewed', complete=True)
+        if 'fallback_provider' in plan:
+            progress = row['provider_fallbacks'][str(plan['fallback_provider'])]
+            progress.update(complete=True, status='full_document_retrieved',
+                            tried_sources=sorted(set(progress['tried_sources']) | set(tried)))
+            progress.pop('next_retry_at', None)
+        return
+    if 'fallback_provider' in plan:
+        progress = row.setdefault('provider_fallbacks', {}).setdefault(str(plan['fallback_provider']),
+            {'complete': False, 'tried_sources': [], 'status': 'pending_routes', 'attempted_at': now.isoformat()})
+        progress['tried_sources'] = sorted(set(progress['tried_sources']) | set(tried))
+        progress.pop('next_retry_at', None)
+        if retry:
+            seconds = max(max(1, d.get('retry_after_seconds', 3600)) for d in retry)
+            progress.update(status=failure_status(ledger), complete=False,
+                next_retry_at=(now + timedelta(seconds=seconds)).isoformat())
+        else:
+            complete = provider_stage_complete(ledger)
+            progress.update(complete=complete, status='exhausted' if complete else 'pending_routes')
+        # Keep the primary provider's status, cursor and Retry-After unchanged.
+        return
+    row.pop('next_retry_at', None)
     if retry:
         seconds = max(max(1, d.get('retry_after_seconds', 3600)) for d in retry)
         row.update(status=failure_status(ledger),
@@ -947,11 +1049,11 @@ def advance(row, result, plan, routes, known_only, now):
     if plan['kind'] == 'known':
         row['cursor']['known'] += 1
     else:
-        count = sum(d.get('stage') == 'article' for d in ledger)
-        remaining = max([d.get('candidates', 0) for d in ledger if d.get('stage') == 'discovery'] or [0])
-        if not (count and remaining > count):
+        if provider_stage_complete(ledger):
             row['cursor']['provider'] += 1
             row['cursor']['provider_tried'] = []
+            row.pop('provider_attempted_at', None)
+            consume_provider_fallbacks(row)
     if stage_plan(routes, row['cursor'], known_only, plan['publication_window'],
                   row['tried_sources'], row['plan']['doi_lookup_permitted']) is None:
         # Current retryable failures returned above. Older rate limits/outages
@@ -961,7 +1063,7 @@ def advance(row, result, plan, routes, known_only, now):
                     'access_blocked' if any(d['status'] in BLOCKED for d in row['diagnostics']) else
                     'source_unavailable')
         row.update(complete=True, status=terminal)
-    else:
+    elif 'next_retry_at' not in row:
         row['status'] = 'pending_routes'
 
 
@@ -1132,7 +1234,10 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         refresh_plan = html_refresh_plan(row, routes, record, window)
         if row.get('complete') and refresh_plan is None:
             continue
-        if row.get('next_retry_at') and utc_now(row['next_retry_at']) > now:
+        waiting = bool(row.get('next_retry_at') and utc_now(row['next_retry_at']) > now)
+        fallback = (fallback_stage_plan(row, window, state['provider_pauses'], now, prefer_primary=not waiting)
+                    if row['status'] in RETRY else None)
+        if waiting and fallback is None:
             continue
         remaining = time_budget - (clock() - started)
         if attempted >= limit or remaining <= 0:
@@ -1140,31 +1245,45 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
             state['next_cursor'] = index
             break
         record, routes = selected[key]
-        plan = refresh_plan or stage_plan(routes, row['cursor'], known_sources_only, window, row['tried_sources'],
+        plan = fallback or refresh_plan or stage_plan(routes, row['cursor'], known_sources_only, window, row['tried_sources'],
                                           row['plan']['doi_lookup_permitted'])
         if plan is None:
             row.update(complete=True, status='source_unavailable')
             continue
         stage_now = now + timedelta(seconds=max(0, time_budget - remaining))
-        plan['host_backoff'] = {key[5:]: max(1, math.ceil((utc_now(until) - stage_now).total_seconds()))
-            for key, until in state['provider_pauses'].items()
-            if key.startswith('host:') and utc_now(until) > stage_now}
         pause_key = ('host:' + (urlsplit(access.diagnostic_url(plan['source']['url'])).hostname or '')
                      if plan['kind'] == 'known' else 'provider:' + plan['name'])
         pause = state['provider_pauses'].get(pause_key)
         if pause and utc_now(pause) > now:
             if refresh_plan is None:
                 row.update(status='rate_limited', next_retry_at=pause, last_outcome='rate_limited')
-            continue
-        row.pop('next_retry_at', None)
+            plan = fallback_stage_plan(row, window, state['provider_pauses'], stage_now)
+            if plan is None:
+                continue
+            pause_key = 'provider:' + plan['name']
+        plan['host_backoff'] = {key[5:]: max(1, math.ceil((utc_now(until) - stage_now).total_seconds()))
+            for key, until in state['provider_pauses'].items()
+            if key.startswith('host:') and utc_now(until) > stage_now}
+        if 'fallback_provider' not in plan:
+            row.pop('next_retry_at', None)
+        if plan['kind'] == 'provider':
+            if 'fallback_provider' not in plan:
+                row['provider_attempted_at'] = now.isoformat()
+            elif 'provider_attempted_at' not in row and row.get('last_attempt_at'):
+                row['provider_attempted_at'] = row['last_attempt_at']
         row.update(attempts=row['attempts'] + 1, last_attempt_at=now.isoformat())
         if refresh_plan is not None:
             # Save before I/O: interruption must not cause automatic repeated fetches.
             row['html_refresh'] = {'version': HTML_EXTRACTION_VERSION,
                 'attempted_at': now.isoformat(), 'outcome': 'interrupted_attempt'}
             row.setdefault('html_refresh_attempts', []).append(row['html_refresh'])
-        else:
+        elif 'fallback_provider' not in plan:
             row['status'] = 'in_progress'
+        else:
+            progress = row.setdefault('provider_fallbacks', {}).setdefault(str(plan['fallback_provider']),
+                {'complete': False, 'tried_sources': [], 'status': 'pending_routes', 'attempted_at': now.isoformat()})
+            progress.update(status='in_progress', complete=False, attempted_at=now.isoformat())
+            progress.pop('next_retry_at', None)
         seal_state(state)
         if save:
             save(state)

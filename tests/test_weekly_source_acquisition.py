@@ -350,7 +350,9 @@ class WeeklyQueueTests(unittest.TestCase):
         records = [item(i, url=f'https://doi.org/10.5555/weekly{i}') for i in (1, 2)]
         rate.reset_mock()
         state = queue.run(weekly(*records), now=NOW, attempt=rate)
-        self.assertEqual(rate.call_count, 1)
+        self.assertEqual(rate.call_count, 2)
+        self.assertEqual([call.args[1]['name'] for call in rate.call_args_list],
+                         ['Europe PMC XML', 'OpenAIRE'])
         self.assertIn('provider:Europe PMC XML', state['provider_pauses'])
 
     def test_new_host_allowlist_is_exact_and_does_not_allow_subdomain_lookalikes(self):
