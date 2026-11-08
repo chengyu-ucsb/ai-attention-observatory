@@ -7,6 +7,9 @@ on:
     paths:
       - 'scripts/enrich_deep_readings.py'
       - 'scripts/full_document_access.py'
+      - 'scripts/crossref_locations.py'
+      - 'scripts/structured_article_access.py'
+      - 'scripts/openaire_locations.py'
       - 'scripts/comprehensive_readings.py'
       - 'scripts/condense_readings.py'
       - 'app.js'
@@ -57,6 +60,9 @@ jobs:
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
           DEEP_READING_LIMIT: '2'
+          # Reuse the provider secret already used by research backfill.
+          # Only trusted scheduled/manual runs reach this step; never PRs.
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python scripts/comprehensive_readings.py
       - name: Validate completed notes before saving
         if: github.event_name != 'pull_request'

@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import re
 import time
+import unicodedata
 from urllib.parse import urlsplit, urlencode, quote, urljoin, unquote, parse_qsl
 from urllib.request import Request, build_opener, HTTPRedirectHandler
 from urllib.error import HTTPError, URLError
@@ -53,6 +54,7 @@ MAX_BYTES=20_000_000
 SOURCE_HINTS=Path(__file__).resolve().parents[1]/'data/fulltext-source-hints.json'
 ANONYMOUS_ONLY=ContextVar('anonymous_article_sources',default=False)
 HOST_COOLDOWNS=ContextVar('article_host_cooldowns',default=None)
+HOST_DENIALS=ContextVar('article_host_denials',default=None)
 
 
 class HostRateLimitPause(ValueError):
@@ -66,6 +68,8 @@ class HostRateLimitPause(ValueError):
 def check_host_cooldown(url):
     try: host=urlsplit(url).hostname
     except (TypeError,ValueError): return
+    if host in (HOST_DENIALS.get() or set()):
+        raise ValueError('host_access_denied_this_run')
     until=(HOST_COOLDOWNS.get() or {}).get(host,0)
     remaining=until-time.monotonic()
     if remaining>0: raise HostRateLimitPause(url,remaining)
@@ -85,7 +89,9 @@ ARXIV_ID=re.compile(r'^(?:\d{4}\.\d{4,5}|[a-z.-]+/\d{7})(?:v\d+)?$',re.I)
 
 
 def normal(value):
-    return re.sub(r'[^a-z0-9]+','',str(value).lower())
+    # PDF ligatures/accents are typography, not a changed title. This is still
+    # exact normalized matching, never fuzzy topic or author similarity.
+    return re.sub(r'[^a-z0-9]+','',unicodedata.normalize('NFKD',str(value)).lower())
 
 
 def doi(value):
@@ -155,12 +161,28 @@ def request(url, hosts=ARTICLE_HOSTS, limit=MAX_BYTES, headers=None):
         raise ValueError('credentialed_source_url_disallowed')
     if not safe_url(url,hosts): raise ValueError('unapproved_host')
     req=Request(url,headers={'User-Agent':AGENT,**(headers or {})})
-    with build_opener(Guard(hosts)).open(req,timeout=22) as response:
-        size=response.headers.get('Content-Length')
-        if size and int(size)>limit: raise ValueError('document_too_large')
-        body=response.read(limit+1)
-        if len(body)>limit: raise ValueError('document_too_large')
-        return body,response.geturl(),response.headers.get('Content-Type','')
+    try:
+        with build_opener(Guard(hosts)).open(req,timeout=22) as response:
+            size=response.headers.get('Content-Length')
+            if size and int(size)>limit: raise ValueError('document_too_large')
+            body=response.read(limit+1)
+            if len(body)>limit: raise ValueError('document_too_large')
+            return body,response.geturl(),response.headers.get('Content-Type','')
+    except HTTPError as exc:
+        remember_host_failure(exc)
+        raise
+
+
+def remember_host_failure(exc):
+    """A denial or Retry-After applies to nested requests and later candidates."""
+    if not isinstance(exc,HTTPError): return
+    host=urlsplit(exc.url).hostname
+    if exc.code in (401,403) and HOST_DENIALS.get() is not None:
+        HOST_DENIALS.get().add(host)
+    detail=failure_diagnostic(exc)
+    if detail.get('retryable') and HOST_COOLDOWNS.get() is not None:
+        HOST_COOLDOWNS.get()[host]=max(HOST_COOLDOWNS.get().get(host,0),
+                                     time.monotonic()+detail['retry_after_seconds'])
 
 
 def json_request(url,headers=None):
@@ -374,6 +396,8 @@ def fetch_candidate(candidate,record):
         document.coverage['retrieval_provider']=candidate.get('provider','explicit_source')
         document.coverage['reported_license']=candidate.get('license')
         document.coverage['redistribution_granted']=False
+        for key in ('discovery_basis','declared_link_purpose','declared_content_type'):
+            if candidate.get(key): document.coverage[key]=candidate[key]
         return document
     if raw.startswith(b'%PDF'):
         return finish(document_from_pdf(raw,identity,final,version,target))
@@ -460,7 +484,8 @@ def openaire_candidates(identifier,get=json_request):
 
 def default_providers():
     from structured_article_access import europe_pmc_candidates, openalex_candidates
-    return [('Europe PMC XML',europe_pmc_candidates),('OpenAlex XML',openalex_candidates),('OpenAIRE',openaire_candidates),('Unpaywall',unpaywall_candidates),
+    from crossref_locations import crossref_candidates
+    return [('Europe PMC XML',europe_pmc_candidates),('Crossref publisher locations',crossref_candidates),('OpenAlex XML and OA locations',openalex_candidates),('OpenAIRE',openaire_candidates),('Unpaywall',unpaywall_candidates),
             ('CORE',core_candidates),('Semantic Scholar',semantic_candidates)]
 
 
@@ -563,10 +588,14 @@ def provider_candidates(name,provider,identifier):
             try: path=urlsplit(url).path.lower()
             except ValueError: path=''
             return (not safe_url(url),not (path.endswith('.pdf') or '/pdf/' in path or '/download/' in path))
-        found=sorted(found,key=priority)
+        count=len(found)
+        # Public metadata can contain signed or credential-bearing locations.
+        # They are not an authorization to transmit credentials to that host.
+        found=[row for row in found if anonymous_source_url(row['url'])]
+        found=sorted(found,key=priority)[:64]
         return found,{'stage':'discovery','provider':name,
                       'status':'candidates' if found else 'no_exact_match',
-                      'candidates':len(found),'retryable':False}
+                      'candidates':count,'candidates_retained':len(found),'retryable':False}
     except Exception as exc:
         return [],{'stage':'discovery','provider':name,**failure_diagnostic(exc)}
 
@@ -597,39 +626,66 @@ def _retrieve(record,max_candidates=8,providers=None,*,known_sources=None):
     """
     diagnostics=[]; seen=set(); attempted=0; partial=None
     budget=max(0,min(32,int(max_candidates)))
-    def attempt(options):
+    def attempt(options,per_provider_limit=None):
         nonlocal attempted,partial
+        used=0; deferred=[]
         for option in options:
             url=option.get('url')
             if not url or url in seen: continue
             if attempted>=budget: break
-            seen.add(url); attempted+=1
             result={'stage':'article','provider':option.get('provider','explicit_source'),
                     'url':diagnostic_url(url)}
+            from structured_article_access import XML_HOSTS
+            allowed=safe_url(url,XML_HOSTS) if option.get('structured_format') else safe_url(url)
+            # Rejected locations are useful diagnostics, not document attempts.
+            # Otherwise eight mirror/doi.org URLs can starve every later source.
+            if not allowed:
+                seen.add(url)
+                diagnostics.append({**result,'status':'host_requires_review','retryable':False,
+                                    'network_attempted':False})
+                continue
+            try: check_host_cooldown(url)
+            except Exception as exc:
+                seen.add(url)
+                diagnostics.append({**result,**failure_diagnostic(exc,article=True),'network_attempted':False})
+                continue
+            if per_provider_limit is not None and used>=per_provider_limit:
+                deferred.append(option)
+                continue
+            seen.add(url); attempted+=1; used+=1
             try:
                 doc=fetch_candidate(option,record)
                 complete=doc.coverage.get('evidence_status')=='full_document_retrieved'
                 diagnostics.append({**result,'status':'full_document_retrieved' if complete else 'partial_full_text',
                                     'final_url':diagnostic_url(doc.url),'retryable':False})
-                if complete: return doc
+                if complete: return doc,deferred
                 # A mostly scanned PDF must not displace a richer HTML body.
                 # Neither partial source is promoted to complete by this rank.
                 score=lambda item: sum(len(u['text']) for u in item.units)
                 if partial is None or score(doc)>score(partial): partial=doc
             except Exception as exc:
+                remember_host_failure(exc)
                 diagnostics.append({**result,**failure_diagnostic(exc,article=True)})
-        return None
-    full=attempt(known_candidates(record) if known_sources is None else known_sources)
+        return None,deferred
+    full,_=attempt(known_candidates(record) if known_sources is None else known_sources)
     if full is not None: return full,diagnostics
     identifier=doi(record.get('doi'))
     if DOI.fullmatch(identifier) and attempted<budget:
+        deferred=[]
         for name,provider in (default_providers() if providers is None else providers):
             found,result=provider_candidates(name,provider,identifier)
             diagnostics.append(result)
-            full=attempt(found)
+            # Give each locator one initial document attempt before revisiting
+            # additional locations. One prolific index must not crowd out
+            # independently hosted versions from later providers.
+            full,later=attempt(found,per_provider_limit=1)
+            deferred.extend(later)
             if full is not None: return full,diagnostics
             if attempted>=budget: break
             time.sleep(.25)
+        if attempted<budget:
+            full,_=attempt(deferred)
+            if full is not None: return full,diagnostics
     if attempted>=budget:
         diagnostics.append({'stage':'retrieval','status':'candidate_budget_exhausted',
                             'candidates_attempted':attempted,'retryable':False})
@@ -650,9 +706,11 @@ def retrieve(record,max_candidates=8,providers=None,*,known_sources=None,anonymo
             raise ValueError('invalid_host_cooldown')
         deadlines[host]=max(deadlines.get(host,0),time.monotonic()+seconds)
     cooldown_scope=HOST_COOLDOWNS.set(deadlines)
+    denial_scope=HOST_DENIALS.set(set(HOST_DENIALS.get() or set()))
     scope=ANONYMOUS_ONLY.set(ANONYMOUS_ONLY.get() or anonymous_only)
     try:
         return _retrieve(record,max_candidates,providers,known_sources=known_sources)
     finally:
         ANONYMOUS_ONLY.reset(scope)
         HOST_COOLDOWNS.reset(cooldown_scope)
+        HOST_DENIALS.reset(denial_scope)
