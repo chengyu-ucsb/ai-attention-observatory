@@ -122,6 +122,8 @@ def check(page, url, width, out):
     expect(provenance.locator('.rv-status')).to_be_visible()
     provenance.locator(':scope > summary').click()
     expect(provenance.locator('.rv-status')).not_to_be_visible()
+    for card in page.locator('.rv-context:visible').all():
+        assert card.evaluate("el => parseFloat(getComputedStyle(el).paddingLeft) >= 16 && parseFloat(getComputedStyle(el).paddingRight) >= 16"), 'Reading context card lost its text inset'
     overflow(); screenshot('reading')
     # A former generic-question reading now retains a supported method and result.
     navigate('library')

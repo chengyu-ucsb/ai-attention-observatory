@@ -1075,3 +1075,6 @@ button,summary,a{touch-action:manipulation}.eyebrow{color:var(--red);font-size:1
 @media(max-width:600px){#paper-content .rv-head>.rv-headline{font-size:33px}#paper-content .rv-summary-idea{font-size:15px}}
 #home .hero-credit{color:#647574;font-size:11px}#paper-content .rv-source-dates{margin-top:8px}#paper-content .rv-source-dates summary{font-size:11px;color:#526564;min-height:36px;padding-block:6px}#paper-content .rv-source-dates p{font-size:12px;color:#526564;max-width:76ch}
 .card-reading-details{flex-basis:100%;border-top:1px solid var(--line);margin-top:6px}.card-reading-details summary{font-size:11px;color:#36594f;min-height:40px;padding-block:10px}.card-reading-details p{font-size:11px!important;line-height:1.65!important;color:#526564!important}.card-source-version{font-size:10px;color:#36594f;line-height:1.6}
+
+/* Retain card insets over the legacy stacked-context selector. */
+@media(max-width:650px){#paper-content .rv-context+.rv-context{padding:20px;border:1px solid var(--line)}}
