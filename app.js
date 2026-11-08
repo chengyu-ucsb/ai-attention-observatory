@@ -1,8 +1,8 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
 const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
-const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#36594f"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","direction-mark","#b97958"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#778769"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#84758c"]];
-const depths=[["full_text","Full-text material","#36594f"],["abstract","Abstract-based","#a5b89a"],["curated","Curated synopsis","#d3d9c5"]];
+const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#E00122"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","direction-mark","#A8001A"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#646464"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#9A9193"]];
+const depths=[["full_text","Full-text material","#E00122"],["abstract","Abstract-based","#666666"],["curated","Curated synopsis","#C6C0C1"]];
 function make(t,c,s){const e=document.createElement(t);if(c)e.className=c;if(s==="direction-mark"){e.className+=(e.className?" ":"")+"font-independent-arrow";e.setAttribute("aria-hidden","true");return e}if(s!==undefined){if(s!==null&&typeof s==="object")throw new TypeError("make() accepts text only; use add() to append elements");e.textContent=String(s)}return e}
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
@@ -269,7 +269,7 @@ function renderIssue(){
  const edition=issue.edition_date||S.week.run?.date||"";
  const sourceCount=Number(issue.source_count)||0;
  renderIssueLandscape(issue);
- $("#weekly-kicker").textContent=published?"THE ATTENTION BRIEF · ISSUE "+issue.number:"THE ATTENTION BRIEF";
+ $("#weekly-kicker").textContent=published?"THE WEEKLY BRIEF / ISSUE "+String(issue.number).padStart(2,"0"):"THE ATTENTION BRIEF";
  $("#weekly-title").textContent=published?issue.headline:"Good questions about AI and attention.";
  $("#weekly-deck").textContent=published?issue.deck:"Browse research and ideas about thinking, distraction, and how we work with AI.";
  $("#weekly-scope").textContent=published?"An issue of The Attention Brief · "+date(edition):"Browse the research library for the latest findings.";
@@ -282,7 +282,7 @@ function renderIssue(){
  signs.forEach((sig,i)=>{
    const tile=make("a","weekly-signal");tile.href="#issue";tile.setAttribute("aria-label","Read signal "+(i+1)+": "+sig.short);
    const mark=make("div","weekly-signal-symbol",["◎","direction-mark","◇"][i%3]);
-   add(tile,mark,make("span","weekly-signal-no",String(i+1).padStart(2,"0")+" · SIGNAL"),make("h4","",sig.short),make("span","weekly-signal-arrow","Explore the thread →"));strips.append(tile);
+   add(tile,mark,make("span","weekly-signal-no",String(i+1).padStart(2,"0")+" / IN THIS ISSUE"),make("h4","",sig.short),make("span","weekly-signal-arrow","Read the connection"));strips.append(tile);
    const panel=make("article","issue-signal"),header=make("div","issue-signal-header");
    add(header,make("span","issue-signal-icon",["◎","direction-mark","◇"][i%3]),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
    add(panel,header,make("h3","",sig.title),evidenceTags((issue.sources||[]).filter(source=>(sig.source_ids||[]).includes(source.id))),compactReading(sig.text,"Evidence, differences & limits"),
@@ -348,7 +348,7 @@ function home(){
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
  topicBars("#topic-bars");donut();
- const grid=$("#lens-grid");grid.replaceChildren();themes.forEach((t,i)=>{const a=link("",libraryHash(t[0]),"lens");a.setAttribute("aria-label","Explore "+t[0]);a.setAttribute("data-theme",String(i));add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});
+ const grid=$("#lens-grid");if(grid){grid.replaceChildren();themes.forEach((t,i)=>{const a=link("",libraryHash(t[0]),"lens");a.setAttribute("aria-label","Explore "+t[0]);a.setAttribute("data-theme",String(i));add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});}
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||"")).slice(0,7);
  for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));name.append(make("span","arrival-source-title",readableSourceTitle(x)));go.append(btn("Read",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.first_seen)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
@@ -910,7 +910,7 @@ function showPaper(x){
  const intro=(scholarly||original)&&d.explain?make("p","rv-deck",d.explain):null;
  add(head,metadata,title);
  if(readingTitles[id(x)]&&d.idea)head.append(make("p","rv-summary-idea",d.idea));
- if(intro){const overview=make("details","rv-overview");add(overview,make("summary","","The overview"),readingProse(d.explain));head.append(overview);}
+ if(intro){const overview=make("details","rv-overview");add(overview,make("summary","","Read the full overview"),readingProse(d.explain));head.append(overview);}
  const sourceRow=make("div","rv-source-row");
  add(sourceRow,make("span","",[x.venue,date(x.published)].filter(Boolean).join(" · ")),make("span","",original?checkedSourceLabel(r):depthName(x)));
  head.append(sourceRow);
@@ -925,8 +925,8 @@ function showPaper(x){
  const art=original?null:conceptArtwork(x);
  const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
  const lead=make("div","rv-section-head");
- add(lead,make("span","rv-section-overline","01 / UNDER THE HOOD"),
-  make("h2","rv-section-title",conceptual?"What the paper proposes":scholarly?isQuestion?"Explore the source":"What the evidence actually says":"The argument in context"));
+ add(lead,make("span","rv-section-overline","RESEARCH AT A GLANCE"),
+  make("h2","rv-section-title",conceptual?"What the paper proposes":scholarly?isQuestion?"Explore the source":"Finding, method & limits":"The argument in context"));
  body.append(lead);
  if(original&&!commentary){
   // A conceptual summary can intentionally have no measured finding. Its

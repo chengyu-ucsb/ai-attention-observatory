@@ -3,10 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#172f31">
+  <meta name="theme-color" content="#E00122">
   <meta name="description" content="An open research observatory on artificial intelligence, attention, cognitive effort, and the tools that could help us stay focused.">
   <title>Attention / AI · The Research Observatory</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gentium+Book+Plus:ital,wght@0,400;0,700;1,400&family=Jost:wght@400;500;600;700;800&family=Open+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="lab-play.css">
   <link rel="alternate" type="application/rss+xml" title="The Attention Brief weekly synthesis" href="issue-feed.xml">
@@ -18,8 +21,8 @@
   <header class="site-header">
     <div class="shell header-inner">
       <a class="identity" href="#home" aria-label="Attention / AI home">
-        <span class="identity-mark" aria-hidden="true">a<span>·</span></span>
-        <span class="identity-text"><strong>ATTENTION / AI</strong><small>THE RESEARCH OBSERVATORY</small></span>
+        <span class="identity-mark" aria-hidden="true">A<span>/</span>A</span>
+        <span class="identity-text"><strong>AI &amp; ATTENTION</strong><small>THE RESEARCH OBSERVATORY</small></span>
       </a>
       <button type="button" id="nav-toggle" class="nav-toggle" aria-expanded="false" aria-controls="site-navigation" hidden>Menu <span aria-hidden="true">☰</span></button>
       <nav id="site-navigation" class="main-nav" aria-label="Main navigation">
@@ -37,61 +40,43 @@
 
   <main id="main">
     <section id="home" class="view">
-      <div class="hero">
-        <div class="shell hero-grid">
-          <div class="hero-copy">
-            <p class="eyebrow light">AI × ATTENTION × HUMAN AGENCY</p>
-            <h1>Think clearly.<br>Stay <em>curious.</em></h1>
-            <p class="hero-sub">Explore how AI changes the way we think, focus, and learn. Research, fresh perspectives, and small experiments for a more intentional digital life.</p>
-            <div class="hero-actions">
-              <a class="button button-light" href="#library">Explore the research <span><i class="font-independent-arrow" aria-hidden="true"></i></span></a>
-              <a class="hero-secondary" href="#atlas">See the evidence map <span><i class="font-independent-arrow" aria-hidden="true"></i></span></a>
-            </div>
-            <div class="hero-credit"><span class="hero-credit-line"></span> An independent observatory by Chengyu Fang</div>
-          </div>
-          <div class="field-guide" aria-labelledby="field-guide-title">
-            <div class="field-guide-heading"><span class="eyebrow light">START WITH A QUESTION</span><h2 id="field-guide-title">Four ways in.</h2><p></p></div>
-            <div class="field-guide-grid">
-              <a href="#library?theme=AI%20%26%20cognition&amp;scope=all" class="field-question" data-explore-theme="AI &amp; cognition"><span class="question-art art-cognition" aria-hidden="true"><i></i><i></i><i></i></span><span class="question-number">01 / THINKING</span><strong>What do we hand over to AI?</strong><span class="question-cta">Cognition &amp; offloading <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></span></a>
-              <a href="#library?theme=Fragmentation&amp;scope=all" class="field-question" data-explore-theme="Fragmentation"><span class="question-art art-fragmentation" aria-hidden="true"><i></i><i></i></span><span class="question-number">02 / SWITCHING</span><strong>What happens between tasks?</strong><span class="question-cta">Attention &amp; interruptions <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></span></a>
-              <a href="#library?theme=Interventions&amp;scope=all" class="field-question" data-explore-theme="Interventions"><span class="question-art art-interventions" aria-hidden="true"><i></i><i></i><i></i></span><span class="question-number">03 / DESIGNING</span><strong>Can technology protect focus?</strong><span class="question-cta">Tools &amp; interventions <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></span></a>
-              <a href="#library?theme=Technology%20%26%20society&amp;scope=all" class="field-question" data-explore-theme="Technology &amp; society"><span class="question-art art-society" aria-hidden="true"><i></i><i></i><i></i></span><span class="question-number">04 / CHOOSING</span><strong>Who gets to shape our attention?</strong><span class="question-cta">Platforms &amp; agency <span aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></span></span></a>
-            </div>
-
-          </div>
-        </div>
+      <div class="publication-masthead shell">
+        <div class="masthead-topline"><span>AN INDEPENDENT RESEARCH OBSERVATORY</span><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">BY CHENGYU FANG</a></div>
+        <div class="masthead-name"><h1>AI <span>&amp;</span> ATTENTION</h1><p>How technology changes<br>the way we think, focus, and act.</p></div>
+        <div class="masthead-rule" aria-hidden="true"></div>
       </div>
-
-      <section class="issue-strip">
-        <div class="shell issue-inner">
-          <div class="issue-kicker"><span class="pulse-dot"></span><span id="issue-label">LOADING THE LATEST INDEX</span></div>
-          <div id="issue-meta">Searching indexed research…</div>
-          <a href="issue-feed.xml" class="issue-rss">Follow the weekly feed</a>
-        </div>
-      </section>
-
-      <nav class="shell reading-routes" aria-label="Choose a way to explore">
-        <a href="#issue"><span class="route-number">01</span><span><small>THE WEEKLY VIEW</small><strong>Connect the ideas</strong><span>A source-linked synthesis</span></span><b aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></b></a>
-        <a href="#atlas"><span class="route-number">02</span><span><small>THE WIDER PICTURE</small><strong>Explore the landscape</strong><span>See what this collection covers</span></span><b aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></b></a>
-        <a href="#lab"><span class="route-number">03</span><span><small>THE HANDS-ON ROUTE</small><strong>Try an experiment</strong><span>Three short, exploratory demos</span></span><b aria-hidden="true"><i class="font-independent-arrow" aria-hidden="true"></i></b></a>
-      </nav>
-
-      <section class="shell home-edition pad-top">
-        <div class="section-heading"><div><p class="eyebrow">THE ATTENTION BRIEF</p><h2>This week, in focus<span class="red-period">.</span></h2></div></div>
+      <section class="shell home-edition" aria-labelledby="weekly-title">
         <div class="weekly-cover">
-          <div class="weekly-cover-copy"><p class="eyebrow" id="weekly-kicker">THE ATTENTION BRIEF</p><h3 id="weekly-title">This week's big idea</h3><p id="weekly-deck"></p>
-            <div class="weekly-cover-actions"><a class="button button-red" href="#issue">Read this issue</a></div>
+          <div class="weekly-cover-copy"><p class="eyebrow" id="weekly-kicker">THE ATTENTION BRIEF</p><h2 id="weekly-title">This week's big idea</h2><p id="weekly-deck"></p>
+            <div class="weekly-cover-actions"><a class="button button-red" href="#issue">Read this issue <i class="font-independent-arrow" aria-hidden="true"></i></a><a class="edition-secondary" href="#library">Explore the research</a></div>
             <p id="weekly-scope" class="weekly-scope"></p>
           </div>
-          <svg class="weekly-cover-art" viewBox="0 0 330 268" role="img" aria-label="Conceptual illustration of a question branching into ideas and practical experiments">
-            <rect width="330" height="268" rx="8" fill="#f5e5e1"/><path d="M65 190Q145 74 254 83 M65 190Q168 120 255 199" fill="none" stroke="#ba7982" stroke-width="2" stroke-dasharray="3 6"/>
-            <path d="M64 190L165 138L257 83 M165 138L256 198" fill="none" stroke="#9f3c50" stroke-width="2"/><circle cx="65" cy="190" r="32" fill="#a73146"/><circle cx="65" cy="190" r="9" fill="#fff4ee"/>
-            <circle cx="165" cy="138" r="25" fill="#e1afb0"/><circle cx="165" cy="138" r="7" fill="#922b40"/><circle cx="256" cy="83" r="31" fill="#fff8f4" stroke="#be7784" stroke-width="2"/><circle cx="256" cy="198" r="24" fill="#bc6d79"/>
-            <g font-family="Arial,sans-serif" fill="#a64656" font-size="10" letter-spacing="1.3"><text x="28" y="242">QUESTION</text><text x="126" y="99">TENSION</text><text x="221" y="39">IDEAS</text><text x="212" y="238" fill="#a64656">TRY</text></g>
-          </svg>
+          <svg class="weekly-cover-art observation-art" viewBox="0 0 600 450" role="img" aria-labelledby="observation-title observation-desc">
+<title id="observation-title">The attention lens</title><desc id="observation-desc">An editorial illustration of many signal paths meeting a single focus. Observe, interpret, choose.</desc>
+<defs><pattern id="signal-lines" width="600" height="24" patternUnits="userSpaceOnUse"><path d="M0 12H600" fill="none" stroke="white" stroke-opacity=".17" stroke-width="1"/></pattern><clipPath id="lens-clip"><circle cx="310" cy="214" r="113"/></clipPath></defs>
+<rect width="600" height="450" fill="#E00122"/><rect x="0" y="60" width="600" height="305" fill="url(#signal-lines)"/>
+<g fill="none" stroke="#fff"><circle cx="310" cy="214" r="153" opacity=".25"/><circle cx="310" cy="214" r="132" opacity=".35"/><circle cx="310" cy="214" r="113" stroke-width="2"/>
+<path d="M-20 121C105 121 121 277 254 277S432 99 620 99" opacity=".45" stroke-width="2"/><path d="M-20 298C102 298 190 141 304 141S459 302 620 302" opacity=".45" stroke-width="2"/>
+<path d="M-10 214H610" stroke-width="3"/><path d="M408 311L500 403" stroke-width="14"/></g>
+<g clip-path="url(#lens-clip)"><rect x="195" y="99" width="230" height="230" fill="#fff"/><path d="M180 214H440" stroke="#E00122" stroke-width="4"/><path d="M180 184H440M180 244H440" stroke="#E00122" stroke-opacity=".2" stroke-width="1"/><circle cx="310" cy="214" r="31" fill="#E00122"/><circle cx="310" cy="214" r="9" fill="#fff"/></g>
+<g fill="#fff" font-family="Arial,sans-serif"><text x="30" y="34" font-size="12" letter-spacing="2">THE HUMAN IN THE LOOP</text><text x="570" y="34" text-anchor="end" font-size="12">A / A</text><text x="30" y="410" font-size="12" letter-spacing="1.5">OBSERVE</text><text x="176" y="410" font-size="12" letter-spacing="1.5">INTERPRET</text><text x="338" y="410" font-size="12" letter-spacing="1.5">CHOOSE</text></g>
+<path d="M30 377H425" stroke="#fff" stroke-opacity=".5"/>
+</svg>
         </div>
         <div id="weekly-signal-strip" class="weekly-signal-strip"></div>
-        <details class="home-source-drawer"><summary>Explore a few of the underlying studies <span><i class="font-independent-arrow" aria-hidden="true"></i></span></summary><div id="feature-grid" class="feature-grid"></div></details>
+        <details class="home-source-drawer"><summary>Sources behind this issue</summary><div id="feature-grid" class="feature-grid"></div></details>
+      </section>
+      <section class="shell field-guide" aria-labelledby="field-guide-title">
+        <div class="field-guide-heading"><span class="eyebrow">EXPLORE THE FIELD</span><h2 id="field-guide-title">Four lenses. One human question.</h2></div>
+        <div class="field-guide-grid">
+          <a href="#library?theme=AI%20%26%20cognition&amp;scope=all" class="field-question" data-explore-theme="AI &amp; cognition"><span class="question-number">01</span><strong>Cognition</strong><span class="question-cta">What do we hand over to AI?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
+          <a href="#library?theme=Fragmentation&amp;scope=all" class="field-question" data-explore-theme="Fragmentation"><span class="question-number">02</span><strong>Attention</strong><span class="question-cta">What happens between tasks?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
+          <a href="#library?theme=Interventions&amp;scope=all" class="field-question" data-explore-theme="Interventions"><span class="question-number">03</span><strong>Design</strong><span class="question-cta">Can technology protect focus?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
+          <a href="#library?theme=Technology%20%26%20society&amp;scope=all" class="field-question" data-explore-theme="Technology &amp; society"><span class="question-number">04</span><strong>Agency</strong><span class="question-cta">Who gets to shape our attention?</span><i class="font-independent-arrow" aria-hidden="true"></i></a>
+        </div>
+      </section>
+      <section class="issue-strip">
+        <div class="shell issue-inner"><div class="issue-kicker"><span class="pulse-dot"></span><span id="issue-label">LOADING THE LATEST INDEX</span></div><div id="issue-meta">Searching indexed research…</div><a href="issue-feed.xml" class="issue-rss">Follow the weekly feed</a></div>
       </section>
 
       <section class="shell editorial-section" id="beyond-journals">
@@ -120,13 +105,6 @@
         </div>
       </section>
 
-      <section class="soft-section">
-        <div class="shell">
-          <div class="section-heading"><div><p class="eyebrow">04 / FOUR LENSES</p><h2>The questions shaping the field<span class="red-period">.</span></h2></div></div>
-          <div class="lenses-grid" id="lens-grid"></div>
-        </div>
-      </section>
-
       <section class="shell lab-teaser"><div class="lab-teaser-inner play-teaser-inner"><div class="play-teaser-copy"><p class="eyebrow">EXPLORE / THE EXPERIMENTAL LAB</p><h2>Can you feel the difference?</h2><p>Switch rules. Recover from a distraction. Decide how much AI help you want. Three short experiences—not another wall of text.</p><div class="play-teaser-steps"><span>01 · SWITCH</span><span>02 · RECOVER</span><span>03 · DECIDE</span></div><a href="#lab" class="button button-red">Try the playground</a></div><div class="play-teaser-demo" aria-hidden="true"><span class="play-teaser-counter">QUICK PREVIEW / 01</span><span class="play-teaser-rule">ODD OR EVEN?</span><strong>7</strong><div class="play-teaser-keys"><span>← ODD</span><span>EVEN →</span></div></div></div></section>
       <section class="shell arrivals-section">
         <div class="section-heading"><div><p class="eyebrow">05 / FROM THE INDEX</p><h2>Recently added<span class="red-period">.</span></h2></div><a class="quiet-link" href="#library">Search the full library</a></div>
@@ -135,7 +113,7 @@
 
       <section class="shell follow-section">
         <div class="follow-art" aria-hidden="true"><span>◎</span><i></i><i></i><i></i></div>
-        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>One considered update<br>at a time.</h2><p>Research connections, open questions, and something to try. Read online or follow the RSS feed.</p></div>
+        <div class="follow-copy"><p class="eyebrow light">STAY WITH THE QUESTION</p><h2>The next question<br>is worth your attention.</h2><p>Research connections, open questions, and something to try. Read online or follow the RSS feed.</p></div>
         <div class="follow-actions"><a class="button button-light" href="subscribe.html">Follow the weekly brief</a><a class="button button-outline-light" href="mailto:fangcu@ucmail.uc.edu?subject=AI%20Attention%20Observatory%20newsletter">Ask about email updates</a></div>
       </section>
     </section>
@@ -409,7 +387,7 @@
     </section>
   </main>
 
-  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">a<span>·</span></span><div><strong>ATTENTION / AI</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#issue">Weekly Brief</a><a href="#library">Research library</a><a href="#perspectives">Ideas & tools</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Research on attention. Room for questions.</div></div></footer>
+  <footer class="site-footer"><div class="shell footer-grid"><div class="footer-brand"><span class="footer-mark">A<span>/</span>A</span><div><strong>AI &amp; ATTENTION</strong><small>A PUBLIC RESEARCH OBSERVATORY</small></div></div><div class="footer-links"><a href="#issue">Weekly Brief</a><a href="#library">Research library</a><a href="#perspectives">Ideas & tools</a><a href="#atlas">Evidence atlas</a><a href="#lab">Experimental Lab</a><a href="feed.xml">RSS</a><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">chengyufang.org</a><a href="mailto:fangcu@ucmail.uc.edu">Contact</a></div><div class="footer-note">© 2026 Chengyu Fang · Independent research project<br>Research on attention. Room for questions.</div></div></footer>
   <div class="toast" id="site-toast" hidden role="status"></div>
 </body>
 </html>

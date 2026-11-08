@@ -3,6 +3,7 @@
 Playwright browser builds are not a substitute for device/screen-reader testing.
 """
 import argparse
+import base64
 from contextlib import contextmanager
 from datetime import datetime
 import re
@@ -42,9 +43,14 @@ def check(page, url, width, out):
         box = node.bounding_box()
         assert box['width'] >= 44 and box['height'] >= 44
     def screenshot(name):
+        name = re.sub(r'[^a-zA-Z0-9_-]', '-', name)
         if out:
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=False)
+        # Compact, public-page review frames remain inspectable alongside the PNG artifacts.
+        if args.browser == 'chromium' and ((width in (1280, 390) and name in ('home', 'issue', 'reading-head', 'library')) or name.startswith('overflow')):
+            frame = page.screenshot(type='jpeg', quality=55, full_page=False)
+            print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
     def overflow():
         if not page.evaluate('document.documentElement.scrollWidth <= innerWidth'):
             screenshot('overflow-'+page.url.split('#')[-1].split('?')[0])
@@ -64,10 +70,25 @@ def check(page, url, width, out):
         page.keyboard.press('Escape')
         expect(page.locator('#nav-toggle')).to_be_focused()
         expect(page.locator('#nav-toggle')).to_have_attribute('aria-expanded','false')
+    # Publication hierarchy stays issue-led, with four compact subject links below it.
+    assert page.locator('.home-edition').evaluate("(e) => e.compareDocumentPosition(document.querySelector('.field-guide')) & Node.DOCUMENT_POSITION_FOLLOWING")
+    expect(page.locator('.publication-masthead h1')).to_contain_text('AI')
+    expect(page.locator('.observation-art title')).to_have_text('The attention lens')
+    assert page.locator('body').evaluate("(e) => getComputedStyle(e).getPropertyValue('--red').trim().toLowerCase()") == '#e00122'
+    assert page.locator('.weekly-cover-art').evaluate('(e) => getComputedStyle(e).position') == 'static'
     overflow(); screenshot('home')
     if out:
-        for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.lenses-grid','themes')]:
+        for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.field-guide','themes')]:
             page.locator('#home '+section).screenshot(path=str(out / f'observatory-{width}-{name}.png'), style='.site-header { visibility: hidden !important; }')
+            if args.browser == 'chromium' and ((width == 1280 and name == 'perspectives-preview') or (width == 390 and name == 'themes')):
+                frame = page.locator('#home '+section).screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
+                print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
+    # Fixed-size artwork must never cover adjacent editorial headlines.
+    for card in page.locator('#home .editorial-card').all():
+        artwork = card.locator('.story-visual-editorial')
+        if artwork.count():
+            art_box, title_box = artwork.bounding_box(), card.locator('h3').bounding_box()
+            assert art_box['x'] + art_box['width'] <= title_box['x'] - 8, 'Editorial thumbnail overlaps its headline'
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
     assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url
@@ -95,6 +116,9 @@ def check(page, url, width, out):
     assert page.locator('.card-added').count() == page.locator('.library-story').count()
     if out:
         page.locator('.library-story').first.screenshot(path=str(out / f'observatory-{width}-card.png'), style='.site-header { visibility: hidden !important; }')
+        if args.browser == 'chromium' and width in (1280, 390):
+            frame = page.locator('.library-story').first.screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
+            print(f'DESIGN_REVIEW_IMAGE:{width}:library-card:' + base64.b64encode(frame).decode('ascii'), flush=True)
     # Added date is distinct from publication date; both order modes retain all records.
     count = page.locator('.library-story').count()
     page.locator('#library-sort').select_option('published')
@@ -114,6 +138,8 @@ def check(page, url, width, out):
     page.locator('.library-story h3 button').first.click()
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('#paper h1')).to_be_visible()
+    assert page.locator('.rv-head').evaluate('(e) => getComputedStyle(e).display') == 'block'
+    overflow(); screenshot('reading-head')
     expect(page.locator('.rv-head .story-visual-reading')).to_have_count(0)
     provenance = page.locator('.rv-provenance')
     expect(provenance).not_to_have_attribute('open', '')
@@ -181,7 +207,7 @@ def check(page, url, width, out):
             expect(page.locator('#issue-coverage')).to_contain_text(re.compile(r'^' + str(shelf_count) + r' sources (?:originally published|in this edition)'))
             screenshot('issue-sources')
     # Visual routes have ordinary destinations and no tracking/persistence.
-    page.locator('.reading-routes a[href="#atlas"]').click()
+    navigate('atlas')
     expect(page.locator('#atlas')).to_be_visible()
     navigate('perspectives')
     page.locator('#perspectives-library-link').click()
@@ -220,6 +246,9 @@ def check_standalone_brief(page, url, width, out):
         if out:
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=True)
+        if args.browser == 'chromium' and width in (1280, 390):
+            frame = page.screenshot(type='jpeg', quality=55, full_page=False)
+            print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
         if name == 'newsletter':
             opening = page.locator('main details').first
             expect(opening).not_to_have_attribute('open', '')
