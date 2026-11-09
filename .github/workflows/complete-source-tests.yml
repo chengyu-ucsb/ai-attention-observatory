@@ -29,12 +29,12 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
           fetch-depth: 0
           persist-credentials: ${{ github.event_name != 'pull_request' }}
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.11'
       - name: Install PDF text reader
@@ -45,10 +45,12 @@ jobs:
           python -m unittest discover -s tests -v
           node tests/validate_article_ui.cjs
           node tests/validate_weekly_issue.cjs
+      # Historical live probes are opt-in diagnostics, not offline CI checks.
       - name: Test real access routes without retaining article text
+        if: github.event_name == 'workflow_dispatch'
         run: python scripts/article_access_trials.py
       - name: Record diagnostics in the cloud run summary
-        if: always()
+        if: always() && github.event_name == 'workflow_dispatch'
         run: |
           python - <<'PY'
           import json,os
@@ -59,7 +61,7 @@ jobs:
                   out.write('# Access tests\n\nRetrieval outcomes, not a guarantee of article access or summary accuracy. No source text saved.\n\n```json\n'+p.read_text()+'\n```\n')
           PY
       - name: Save verified diagnostics on main only
-        if: github.event_name != 'pull_request'
+        if: github.event_name == 'workflow_dispatch'
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

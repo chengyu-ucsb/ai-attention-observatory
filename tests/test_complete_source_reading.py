@@ -1,6 +1,7 @@
 """Offline regression tests. No article access, keys or model downloads."""
 import json
 from pathlib import Path
+import re
 import sys
 import unittest
 from unittest.mock import Mock, patch
@@ -8,6 +9,50 @@ from urllib.error import HTTPError
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import full_document_access as access
 import comprehensive_readings as reading
+
+
+class CompleteSourceWorkflowTests(unittest.TestCase):
+    def setUp(self):
+        root=Path(__file__).resolve().parents[1]
+        self.workflow=(root/'.github/workflows/complete-source-tests.yml').read_text()
+        self.steps=re.split(r'^      - ',self.workflow,flags=re.MULTILINE)[1:]
+
+    def step(self,name):
+        matches=[step for step in self.steps if step.startswith(f'name: {name}\n')]
+        self.assertEqual(len(matches),1,name)
+        return matches[0]
+
+    def test_live_diagnostics_and_saved_results_require_manual_dispatch(self):
+        expected={
+            'Test real access routes without retaining article text':
+                "github.event_name == 'workflow_dispatch'",
+            'Record diagnostics in the cloud run summary':
+                "always() && github.event_name == 'workflow_dispatch'",
+            'Save verified diagnostics on main only':
+                "github.event_name == 'workflow_dispatch'",
+        }
+        for name,condition in expected.items():
+            with self.subTest(step=name):
+                self.assertEqual(re.findall(r'^        if: (.+)$',self.step(name),re.MULTILINE),[condition])
+
+    def test_offline_checks_remain_automatic_on_prs_and_pushes(self):
+        triggers=self.workflow.split('on:\n',1)[1].split('\npermissions:',1)[0]
+        self.assertEqual(re.findall(r'^  (\w+):',triggers,re.MULTILINE),
+                         ['pull_request','push','workflow_dispatch'])
+        for event in ('pull_request','push'):
+            block=triggers.split(f'  {event}:\n',1)[1].split('\n  ',1)[0]
+            self.assertIn('    branches: [main]',block)
+        job=self.workflow.split('  verify:\n',1)[1].split('    steps:',1)[0]
+        self.assertNotRegex(job,r'(?m)^    if:')
+        offline=self.step('Run complete offline suite and browser checks')
+        for step in self.steps[:self.steps.index(offline)+1]:
+            self.assertNotRegex(step,r'(?m)^        (?:if|continue-on-error):')
+        for command in ('python -m compileall -q scripts tests',
+                        'python -m unittest discover -s tests -v',
+                        'node tests/validate_article_ui.cjs',
+                        'node tests/validate_weekly_issue.cjs'):
+            self.assertIn(command,offline)
+        self.assertNotIn('article_access_trials.py',offline)
 
 
 class CompleteSourceTests(unittest.TestCase):
