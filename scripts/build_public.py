@@ -10,7 +10,7 @@ from collections import Counter
 from pathlib import Path
 from condense_readings import annotate
 from build_visuals import visual_spec
-from article_art import attach_art
+from article_art_queue import attach_persistent_art as attach_art
 from search_plan import source_class
 from source_lineage import prepare
 from build_readings import make_note
@@ -144,7 +144,10 @@ def build():
     # after every source-depth and publication gate above has passed. They never
     # alter evidence graphics, source provenance, eligibility, or public counts.
     art_root=DATA.parent if DATA.name=="data" else DATA
-    attach_art(selected,root=art_root,manifest=DATA/"article-art-overrides.json")
+    attach_art(selected,root=art_root,manifest=DATA/"article-art-overrides.json",
+               state_path=DATA/"article-art-state.json",previous_public=DATA/"public-library.json")
+    print(json.dumps({"article_art_retry_status": dict(sorted(Counter(
+        (item.get("editorial_art") or {}).get("retry_status", "unknown") for item in selected).items()))}))
     selection_ids={record_id(x) for x in selected}
     canonical=[x for x in selected if not x.get("companion_to")]
     by_id={record_id(x):x for x in canonical}

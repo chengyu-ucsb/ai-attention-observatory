@@ -143,15 +143,16 @@ class ArticleArtTests(unittest.TestCase):
             forward = art.attach_art(copy.deepcopy(records), Path(d))
             backward = art.attach_art(list(reversed(copy.deepcopy(records))), Path(d))
             self.assertEqual([r["editorial_art"] for r in forward], list(reversed([r["editorial_art"] for r in backward])))
-            self.assertEqual([r["editorial_art"]["status"] for r in forward], ["ready", "needs_review"])
+            self.assertEqual([r["editorial_art"]["status"] for r in forward], ["ready", "ready"])
+            self.assertGreater(forward[1]["editorial_art"]["candidate_index"], 0)
 
-    def test_repeated_realistic_source_concept_is_held_without_decorative_variation(self):
+    def test_primary_repeated_source_concept_is_held_without_decorative_variation(self):
         rows = [article("Cognitive offloading in mathematical learning among undergraduate students", "10.1234/a"),
                 article("Cognitive offloading in undergraduate mathematical learning: a replication", "10.1234/b")]
         before = copy.deepcopy(rows)
         for row in rows:
             row["visual"] = visual_spec(row)
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory() as d, patch.object(art, "candidate_specs", side_effect=lambda inputs: [art.choose_concept(inputs)]):
             root = Path(d)
             art.attach_art(rows, root)
             accepted, held = (row["editorial_art"] for row in rows)
@@ -175,7 +176,7 @@ class ArticleArtTests(unittest.TestCase):
     def test_same_foreground_pair_is_held_even_with_a_different_motif(self):
         rows = [article("Cognitive offloading in doctoral academic writing", "10.1234/a"),
                 article("Reflective learning in doctoral academic writing", "10.1234/b")]
-        with tempfile.TemporaryDirectory() as d:
+        with tempfile.TemporaryDirectory() as d, patch.object(art, "candidate_specs", side_effect=lambda inputs: [art.choose_concept(inputs)]):
             art.attach_art(rows, Path(d))
         a, b = (row["editorial_art"] for row in rows)
         self.assertNotEqual(a["motif"], b["motif"])
@@ -203,6 +204,7 @@ class ArticleArtTests(unittest.TestCase):
                 spec = {**spec, "secondary_subject": "language"}
             return draw(canvas, spec, **kwargs)
         with tempfile.TemporaryDirectory() as d, patch.object(art, "choose_concept", side_effect=alias_pair), \
+                patch.object(art, "candidate_specs", side_effect=lambda inputs: [art.choose_concept(inputs)]), \
                 patch.object(art, "draw_subject", side_effect=alias_glyph):
             art.attach_art(rows, Path(d))
         a, b = (row["editorial_art"] for row in rows)
@@ -305,7 +307,8 @@ class ArticleArtTests(unittest.TestCase):
             accepted = copy.deepcopy(existing["editorial_art"])
             rows = art.attach_art([newcomer, existing], root)
             self.assertEqual(existing["editorial_art"], accepted)
-            self.assertEqual(newcomer["editorial_art"]["status"], "needs_review")
+            self.assertEqual(newcomer["editorial_art"]["status"], "ready")
+            self.assertGreater(newcomer["editorial_art"]["candidate_index"], 0)
             again = art.attach_art(copy.deepcopy(list(reversed(rows))), root)
             self.assertEqual([row["editorial_art"] for row in rows], list(reversed([row["editorial_art"] for row in again])))
 
@@ -512,6 +515,10 @@ class OverrideTests(unittest.TestCase):
         self.assertEqual(a["status"], "ready")
         self.assertEqual(b["status"], "needs_review")
         self.assertIn("duplicate_asset_bytes", b["review_reasons"])
+        self.assertEqual(b["retry_status"], "editorial_review")
+        self.assertEqual(b["attempt_count"], 1)
+        self.assertEqual(b["candidate_count"], 1)
+        self.assertFalse((self.root / art.GENERATED_DIR).exists())
         self.assertEqual(a["asset_fingerprint"], b["asset_fingerprint"])
         self.assertNotIn("src", b)
         self.assertNotIn("thumbnail_src", b)

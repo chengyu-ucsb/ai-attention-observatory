@@ -19,8 +19,11 @@ on:
       - 'scripts/export_zotero_backlog.py'
       - 'scripts/build_visuals.py'
       - 'scripts/article_art.py'
+      - 'scripts/article_art_queue.py'
       - 'scripts/art_similarity.py'
       - 'tests/test_article_art.py'
+      - 'tests/test_article_art_candidates.py'
+      - 'tests/test_article_art_queue.py'
       - 'tests/test_art_similarity.py'
       - 'scripts/build_issue.py'
       - 'scripts/build_newsletter.py'
@@ -67,6 +70,15 @@ jobs:
           python scripts/build_newsletter.py
           python scripts/pipeline_status.py
           python scripts/feed.py
+      - name: Retain artwork retry state
+        # Data-writing workflows also commit this state. Publish-only runs keep
+        # a recoverable record without granting write access or creating loops.
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: article-art-state-${{ github.run_id }}-${{ github.run_attempt }}
+          path: data/article-art-state.json
+          retention-days: 90
+          if-no-files-found: error
       - name: Validate published application
         run: |
           node --check app.js
