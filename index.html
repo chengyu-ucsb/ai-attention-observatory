@@ -239,8 +239,8 @@
       </div>
       <div class="shell play-wrap">
         <details class="play-update">
-          <summary><span>November lab update</span><span>Updated <time datetime="2026-11-06">6 Nov 2026</time> · What changed?</span></summary>
-          <p>Return Point now offers paired comparisons with parallel fictional tasks, randomized condition and task order, and shuffled answers. The debrief keeps paired results separate and explains what two rounds cannot show. Untimed play, separate practice and stop/reset remain available. Design precedents now use mechanism sketches and expandable access/source notes, keeping the key limits visible without hiding the detail.</p>
+          <summary><span>November lab update</span><span>Updated <time datetime="2026-11-09">9 Nov 2026</time> · What changed?</span></summary>
+          <p>Assistance Dial adds a fifth scenario: whose experience did a study actually test? A question picker lets you jump straight to it. Its expandable source note connects the fictional example to the published 7 November issue and distinguishes expert role-play from evidence about students. Paired Return Point comparisons, untimed play, practice, reset and source-linked design precedents remain available.</p>
           <p>We review the improvement plan alongside new weekly issues and develop the tools continuously. This date records an actual content and behavior update, not an automatic refresh. <a href="https://github.com/chengyu-ucsb/ai-attention-observatory/blob/main/docs/lab-backlog.md">See the improvement plan</a></p>
         </details>
         <div class="play-intro-row"><div><p class="eyebrow">CHOOSE AN EXPERIMENT</p><h2>Pick something to play.</h2></div><p>About 1–3 minutes each · exploratory demos, not scientific tests</p></div>
@@ -313,6 +313,15 @@
         <div class="play-stage" id="play-assist" role="tabpanel" aria-labelledby="tab-assist" hidden>
           <div class="play-stage-side"><span class="play-kicker">03 / AN AI-ASSISTANCE EXPERIMENT</span><h3>Assistance Dial</h3>
             <p>Same reasoning problem, three ways an assistant might respond. Choose a level of help, then make the call yourself.</p>
+            <label class="assist-scenario-label" for="assist-scenario">Choose a question</label>
+            <select id="assist-scenario" class="assist-scenario-select" aria-describedby="assist-scenario-help">
+              <option value="0">1 · Association or cause?</option>
+              <option value="1">2 · Which outcome changed?</option>
+              <option value="2">3 · Confidence or evidence?</option>
+              <option value="3">4 · Performance or learning?</option>
+              <option value="4">5 · Whose experience was tested?</option>
+            </select>
+            <p id="assist-scenario-help" class="play-small">Jump to any question. Changing it clears the current answer and keeps your help level.</p>
             <div class="assist-modes" role="group" aria-label="Choose assistance level">
               <button type="button" data-assist-mode="reflect" class="assist-mode is-active" aria-pressed="true"><span>◌</span> Reflection<small>Question first</small></button>
               <button type="button" data-assist-mode="hint" class="assist-mode" aria-pressed="false"><span>◒</span> Hint<small>One clue</small></button>
@@ -322,8 +331,8 @@
           </div>
           <div class="play-stage-main">
             <div class="play-screen assist-screen">
-              <div class="play-screen-top"><span>REASONING CHALLENGE</span><span id="assist-counter">SCENARIO 1 / 4</span></div>
-              <h4 class="assist-prompt" id="assist-prompt" tabindex="-1" aria-describedby="assist-counter assist-reply"></h4>
+              <div class="play-screen-top"><span>REASONING CHALLENGE</span><span id="assist-counter">SCENARIO 1 / 5</span></div>
+              <h4 class="assist-prompt" id="assist-prompt" tabindex="-1" aria-live="polite" aria-describedby="assist-counter assist-reply"></h4>
               <div class="assist-reply" id="assist-reply" aria-live="polite"></div>
               <p class="assist-pick-label">What do you conclude?</p>
               <div class="assist-choices" id="assist-choices"></div>
@@ -403,6 +412,7 @@
   <div class="toast" id="site-toast" hidden role="status"></div>
 </body>
 </html>
+
 
 
 

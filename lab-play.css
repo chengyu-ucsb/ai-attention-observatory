@@ -177,3 +177,17 @@
 .precedent-details-body{padding:4px 0 0}
 .precedent-details-body .precedent-links{margin-top:0}
 @media(prefers-reduced-motion:no-preference){.precedent-details summary:hover{color:var(--red)}}
+
+
+/* Keep source context optional without hiding the central inference limit. */
+.assist-source{margin-top:14px;border-top:1px solid var(--line);padding-top:8px;text-align:left}
+.assist-source summary{cursor:pointer;min-height:44px;padding:10px 0;font-size:12px;font-weight:700;color:var(--red)}
+.assist-source p{font-size:12px;line-height:1.7}
+.assist-source-links{display:flex;flex-wrap:wrap;gap:4px 18px}
+.assist-source-links a{display:inline-flex;align-items:center;min-height:44px;padding:8px 0;color:var(--red);font-size:12px;text-decoration:underline;text-underline-offset:3px}
+.assist-source summary:focus-visible,.assist-source-links a:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+
+.assist-scenario-label{display:block;margin:22px 0 7px;font-size:12px;font-weight:700;color:var(--ink)}
+.assist-scenario-select{width:100%;min-width:0;min-height:44px;border:1px solid var(--line);background:white;padding:10px 12px;color:var(--ink);font:inherit;font-size:12px}
+#assist-scenario-help{margin-top:8px}
+.assist-scenario-select:focus-visible{outline:2px solid var(--red);outline-offset:3px}

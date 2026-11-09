@@ -304,7 +304,8 @@
     if(r.stage==="ready")recoveryDistract();
   });
   recoveryPreview();
-  // 3 / Assistance Dial: explore four fictional research-interpretation decisions.
+  // 3 / Assistance Dial: five fictional research-interpretation decisions.
+  // Source-informed update: 2026-11-09; sources support context, not Lab validity.
   const scenarios=[
     {prompt:"A survey finds that students using AI summaries report spending less time reading. Can we conclude AI caused weaker comprehension?",
       options:["Yes. AI caused the comprehension change.","Not from this survey; cause and comprehension remain untested.","Yes, because the sample includes students."],
@@ -333,17 +334,28 @@
       modes:{reflect:"Is performing a task with help the same outcome as remembering how to do it later?",
              hint:"The measured outcome is completion speed. A later unassisted test would address retention.",
              answer:"The study supports a conclusion about task speed in that setting, not about retained learning. Both stronger and weaker learning remain untested."},
-      feedback:"Assisted performance and retained learning are distinct outcomes. A delayed, unassisted assessment would help test the learning claim."}
+      feedback:"Assisted performance and retained learning are distinct outcomes. A delayed, unassisted assessment would help test the learning claim."},
+    {prompt:"A design team interviews adult researchers who try a learning chatbot while imagining being students. What can this study tell us?",
+      options:["It shows the chatbot improves students' learning.","How these adults experienced the prototype; student outcomes still need testing.","Nothing useful, because interviews are not experiments."],
+      correct:1,
+      modes:{reflect:"Who actually took part? What did the researchers observe, and whose experience remains untested?",
+             hint:"Adults imagining student use can raise design questions. They are not a sample of students learning with the tool.",
+             answer:"The interviews can inform design through these adults' experiences. They do not establish students' experiences or learning outcomes."},
+      feedback:"Match the conclusion to the people and activity studied. Qualitative feedback can identify useful design tensions without establishing an effect for intended users.",
+      context:{note:"This fictional teaching example is informed by Lin and colleagues’ exploratory v1 preprint, not a replication. Seven adult researchers role-played student use of one AI peer prototype, then gave interviews. The study examined expert interpretations; it did not test student learning or compare teaching conditions. Peer review is unverified. These accounts can inform design questions, but do not establish benefits for learners or validate this Lab.",
+               source:"https://arxiv.org/pdf/2610.38990v1#page=6",
+               issue:"https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-07.html"}}
   ];
   function assistDraw(){
     const r=practice.assist,data=scenarios[r.scenario];r.chosen=false;
+    $("#assist-scenario").value=String(r.scenario);
     $("#assist-counter").textContent="SCENARIO "+(r.scenario+1)+" / "+scenarios.length;
     $("#assist-prompt").textContent=data.prompt;
     const reply=$("#assist-reply");reply.replaceChildren();
     const box=E("div","assist-bubble");
     add(box,E("span","assist-bubble-label",r.mode==="reflect"?"REFLECTION FIRST":r.mode==="hint"?"JUST A HINT":"FULL ANSWER"),E("p","",data.modes[r.mode]));
     reply.append(box);
-    $("#assist-feedback").hidden=true;$("#assist-next").hidden=true;
+    $("#assist-feedback").replaceChildren();$("#assist-feedback").hidden=true;$("#assist-next").hidden=true;
     const choices=$("#assist-choices");choices.replaceChildren();
     data.options.forEach((x,i)=>choices.append(button(x,()=>assistChoose(i),"assist-option")));
   }
@@ -353,6 +365,15 @@
     $$("#assist-choices .assist-option").forEach((b,n)=>{b.disabled=true;if(n===data.correct)b.classList.add("correct");if(n===i&&!ok)b.classList.add("incorrect")});
     const root=$("#assist-feedback");root.replaceChildren();
     add(root,E("strong","",ok?"✓ Supported conclusion":"↩ Another interpretation is stronger"),E("p","",data.feedback));
+    if(data.context){
+      const details=E("details","assist-source"),summary=E("summary","","Source and limits");
+      add(details,summary,E("p","",data.context.note));
+      const sources=E("div","assist-source-links");
+      [["Original study (v1, PDF)",data.context.source],["Published issue · 7 Nov",data.context.issue]].forEach(([label,url])=>{
+        const a=E("a","",label);a.setAttribute("href",url);a.setAttribute("target","_blank");a.setAttribute("rel","noopener noreferrer");sources.append(a);
+      });
+      add(details,sources);root.append(details);
+    }
     root.hidden=false;$("#assist-next").hidden=false;root.focus();
     $("#assist-next").textContent=r.scenario<scenarios.length-1?"Try another scenario":"Replay the first scenario";
   }
@@ -361,6 +382,11 @@
     $$("[data-assist-mode]").forEach(x=>{let active=x===b;x.classList.toggle("is-active",active);x.setAttribute("aria-pressed",String(active))});
     assistDraw();$("#assist-prompt").focus();
   }));
+  $("#assist-scenario").addEventListener("change",()=>{
+    const index=Number($("#assist-scenario").value);
+    if(!Number.isInteger(index)||index<0||index>=scenarios.length)return;
+    practice.assist.scenario=index;assistDraw();
+  });
   $("#assist-next").addEventListener("click",()=>{practice.assist.scenario=(practice.assist.scenario+1)%scenarios.length;assistDraw();$("#assist-prompt").focus()});
   $("#play-reset").addEventListener("click",()=>{
     cancelSwitch();
@@ -382,5 +408,6 @@
   assistDraw();
   activate("switch");
 })();
+
 
 
