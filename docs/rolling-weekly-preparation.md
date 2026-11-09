@@ -113,6 +113,48 @@ changes the evidence and must be revalidated.
 Quarantine retains unresolved/conflicting evidence and its history; it never
 falls back to `first_seen` to become a candidate.
 
+### Changed content at an acquired source
+
+A fresh reader/closeout fetch that disagrees with an acquisition receipt holds
+publication and records a metadata-only observation against that exact input
+and receipt. A later acquisition turn can refresh only the same currently
+permitted known URL and version, through the normal access, rights, identity
+and date checks. It must reproduce the observed replacement metadata, including
+text/byte hashes. No discovery cursor or unrelated record is reset.
+
+The optional `source_refreshes` ledger retains old receipts and evidence. It
+allows at most two fetch attempts per observed receipt (retryable failures keep
+their deadline), and at most eight distinct receipts per unchanged input.
+A fixed-size `source_refresh_hold` still invalidates cached closeout when the
+ledger is full, a receipt recurs, or an unknown returned version normalizes to
+the old label. Existing host/provider pauses and denials still apply. Interrupted attempts,
+newly moving sources, actual version changes and unknown scholarly versions
+stay held. Locator-only/redirect-only sources without a matching current known
+route require separate verified metadata resolution; this is not a broader
+source search or permission to substitute arXiv versions.
+
+An observed mismatch invalidates a cached closeout success immediately. A
+successful replacement invalidates the affected staged analysis, including
+byte-only changes, and requires a fresh reading and post-closeout validation.
+It never transfers independent approval. Current-parser HTML can be refreshed,
+but its partial-coverage label and publication limits remain unchanged. No
+source body or PDF bytes are saved in this recovery trail.
+
+The canonical `Deepen source readings` workflow also preserves validated
+`weekly-source-acquisition.json` requests and access controls when reading or
+later validation fails. Its recovery snapshot includes `library.json` only
+after successful reading/validation and an enrichment-only delta check against
+the Git baseline. A clean detached worktree saves only those validated files,
+so failed runner output cannot enter a recovery commit or block its rebase.
+Push races retry the saved commit, never source/model work. Before each push,
+a post-rebase guard requires each saved file to still match the original
+validated snapshot and revalidates acquisition metadata. Unrelated files may
+advance, but even a clean same-file merge stops for reconciliation rather than
+attaching old notes to a corrected identity or changed receipt. Conflicts retain
+a seven-day validated recovery artifact. A 50-minute reading
+step cap inside the 95-minute job leaves time for validation and checkpoint save;
+these limits are not measured production throughput or a delivery guarantee.
+
 ## Sunday closure and normal weekly validation
 
 After Sunday 23:59:59 UTC has passed:
@@ -294,6 +336,29 @@ rewrite observation dates, source publication dates, existing issue IDs or RSS
 identities. A genuinely different publication week remains eligible.
 
 ## Lead-time evidence, not a publication promise
+
+### Bounded discovery fairness
+
+Rolling and closeout discovery share one metadata checkpoint across daily slices.
+General and journal searches take least-attempted turns before publication-date
+verification. At the normal 48-request cap, up to 40 requests advance searches
+and at least 8 remain available for due DOI/arXiv date checks; unused search
+capacity is also available to verification. Due slices share that verification
+budget so an older backlog cannot consume every fresh day's turn. The existing
+240-second deadline and provider restrictions still take precedence.
+
+Failed date lookups have a separate bounded retry ledger, with delays starting
+at one hour and increasing to seven days. These entries are scheduling metadata,
+never publication evidence. Successful but imprecise or conflicting date evidence
+remains quarantined. Completed query cursors are preserved, old checkpoints remain
+valid, and no source becomes eligible merely because a retry was postponed.
+
+Offline repeated-run regressions cover persistent 404s, a finite multi-day search
+backlog, healthy recovery and provider denials/cooldowns. They demonstrate forward
+progress within the request cap, not comprehensive provider coverage or successful
+live completion of the current publication week.
+
+### Observed timing
 
 Observed cron delays were approximately **4–8 hours**, synthesis **12–18 minutes**,
 and Pages about **1 minute**. Together that is **4h13m–8h19m** for the known

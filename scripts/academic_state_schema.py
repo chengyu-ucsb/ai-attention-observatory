@@ -20,10 +20,12 @@ PROVIDERS = {"Crossref", "OpenAlex", "arXiv"}
 PUBLICATION_FIELDS = {"published-online", "published-print", "published", "issued"}
 PROVIDER_FIELDS = {"blocked", "last_http_status", "reason", "next_retry_at", "consecutive_failures", "last_request_at"}
 QUERY_REQUIRED = {"provider", "params", "page_size", "cursor", "seen_cursors", "rows", "pages", "records_seen", "provider_total", "status", "started_at"}
-QUERY_FIELDS = QUERY_REQUIRED | {"reason", "observed_at"}
+QUERY_FIELDS = QUERY_REQUIRED | {"reason", "observed_at", "attempts", "last_attempt_at"}
 PROVENANCE_FIELDS = {"source", "evidence", "policy", "status", "field", "value", "reason",
                      "openalex_publication_date", "crossref_publication_date", "requires_explicit_date_resolution",
                      "basis", "requested_id", "source_url", "version_url", "raw", "source_id", "verification_error"}
+MAX_DATE_RETRIES = 5000
+DATE_RETRY_FIELDS = {"provider", "attempts", "last_attempt_at", "next_retry_at", "outcome"}
 HASH = re.compile(r"[0-9a-f]{64}")
 DOI = re.compile(r"(?:https?://(?:dx\.)?doi\.org/)?10\.\d{4,9}/\S+", re.I)
 
@@ -242,7 +244,27 @@ def date_evidence(values, *, arxiv=False, candidates=()):
 
 
 def validate_state(data):
-    obj(data, {"schema_version", "providers", "windows"}, {"schema_version", "providers", "windows"})
+    obj(data, {"schema_version", "providers", "windows", "date_retries", "date_retry_cursors"}, {"schema_version", "providers", "windows"})
+    cursors = data.get("date_retry_cursors", {})
+    obj(cursors, {"Crossref", "arXiv"})
+    for cursor in cursors.values():
+        text(cursor, maximum=64, empty=False)
+        if not HASH.fullmatch(cursor): invalid()
+    retries = data.get("date_retries", {})
+    obj(retries)
+    if len(retries) > MAX_DATE_RETRIES: invalid()
+    for identity, retry in retries.items():
+        if not HASH.fullmatch(identity): invalid()
+        obj(retry, DATE_RETRY_FIELDS, DATE_RETRY_FIELDS)
+        text(retry["provider"])
+        if retry["provider"] not in {"Crossref", "arXiv"}: invalid()
+        integer(retry["attempts"], minimum=1)
+        if retry["attempts"] > 32: invalid()
+        number(retry["last_attempt_at"]); number(retry["next_retry_at"])
+        delay = min(7 * 86400, 3600 * 2 ** min(retry["attempts"] - 1, 8))
+        if retry["next_retry_at"] != retry["last_attempt_at"] + delay: invalid()
+        text(retry["outcome"])
+        if retry["outcome"] not in {"unavailable", "unresolved"}: invalid()
     if type(data["schema_version"]) is not int or data["schema_version"] != SCHEMA: invalid()
     obj(data["providers"], PROVIDERS)
     for provider in data["providers"].values():
@@ -286,6 +308,8 @@ def validate_state(data):
             integer(query["provider_total"], nullable=True)
             number(query["started_at"])
             if "observed_at" in query: number(query["observed_at"])
+            if "last_attempt_at" in query: number(query["last_attempt_at"])
+            if "attempts" in query: integer(query["attempts"])
             text(query["status"])
             if query["status"] not in {"pending", "complete", "truncated", "error"}: invalid()
             if query["status"] == "complete" and query["pages"] == 0: invalid()

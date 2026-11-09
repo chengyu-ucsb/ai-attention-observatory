@@ -213,7 +213,10 @@ def _retrieve_for_reading(record, *, state_path=STATE, weekly_path=WEEKLY,
         return None, diagnostics
     if pinned and (not queue.is_pinned_arxiv_url(document.url, pinned)
                    or document.version != 'arxiv_preprint_v1'):
-        return None, diagnostics + [note('acquisition_source_version_changed')]
+        observed = (receipt_change_note(record, row, document, queue)
+                    if receipt and access.diagnostic_url(document.url) == receipt['source_url']
+                    else note('acquisition_source_version_changed'))
+        return None, diagnostics + [observed]
     if not receipt:
         return document, diagnostics
     source = access.diagnostic_url(document.url)
@@ -226,12 +229,23 @@ def _retrieve_for_reading(record, *, state_path=STATE, weekly_path=WEEKLY,
     manifest = document.manifest()
     fields = ('document_version', 'source_sha256', 'source_bytes_sha256',
               'source_byte_count', 'evidence_status', 'html_extraction_version')
-    if any(key in receipt and manifest.get(key) != receipt[key] for key in fields):
-        return None, diagnostics + [note('acquisition_receipt_content_changed', url=source)]
+    if any(manifest.get(key) != receipt.get(key) for key in fields):
+        return None, diagnostics + [receipt_change_note(record, row, document, queue)]
     document.coverage.update(acquisition_state_sha256=state['state_sha256'],
                              acquisition_input_fingerprint=row['fingerprint'],
                              acquisition_receipt_status='revalidated_not_reviewed')
     return document, diagnostics + [note('acquisition_receipt_revalidated', url=source)]
+
+
+def receipt_change_note(record, row, document, queue):
+    """No prose, approval or replacement receipt: only a bound observation."""
+    observed = queue.document_metadata(document)
+    receipt = row['document']
+    status = ('acquisition_source_version_changed'
+              if document.version != receipt['document_version'] else 'acquisition_receipt_content_changed')
+    return note(status, url=observed['source_url'], receipt_observation={
+        'record_key': queue.record_key(record), 'input_fingerprint': row['fingerprint'],
+        'receipt_sha256': queue.digest(receipt), 'document': observed})
 
 
 HANDOFF_HOLDS = {
@@ -252,6 +266,15 @@ def retrieve_for_reading(record, *, diagnostic_observer=None, **options):
     # Callers may persist metadata here; no approval or source prose is passed.
     if diagnostic_observer is not None:
         diagnostic_observer(diagnostics)
+    elif options.get('state') is None and any(entry.get('receipt_observation') for entry in diagnostics):
+        # The ordinary canonical reader has no preparation wrapper. Persist its
+        # request against the latest checkpoint, checking the receipt again so
+        # an observation for a superseded receipt cannot request another refresh.
+        import collect_weekly_sources as queue
+        path = options.get('state_path', STATE)
+        current = read_metadata(path)
+        updated = controls.merge_diagnostics_into_state(current, diagnostics, now=options.get('now'))
+        queue.atomic_save(Path(path), updated)
     for entry in diagnostics:
         if entry.get('stage') == 'handoff' and entry.get('status') in HANDOFF_HOLDS:
             raise ValueError(entry['status'])

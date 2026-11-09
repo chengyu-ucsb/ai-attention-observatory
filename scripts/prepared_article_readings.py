@@ -66,9 +66,11 @@ def validate_bundle(value, window, now=None):
         queue.hash_value(key)
         if (not isinstance(item, dict) or not isinstance(item.get("record"), dict)
                 or not {"input_fingerprint", "record"} <= set(item)
-                or set(item) - {"input_fingerprint", "record", "revalidation"}):
+                or set(item) - {"input_fingerprint", "record", "revalidation", "acquisition_receipt_sha256"}):
             raise ValueError("invalid_prepared_readings")
         queue.hash_value(item.get("input_fingerprint"))
+        if "acquisition_receipt_sha256" in item:
+            queue.hash_value(item["acquisition_receipt_sha256"])
         if key != queue.record_key(item["record"]):
             raise ValueError("invalid_prepared_readings")
         validate_saved_record(item["record"], now=now)
@@ -97,6 +99,8 @@ def reconcile(packet, state, previous=None, *, now=None):
         record = strip_staged_enrichment(candidate)
         saved = previous["records"].get(key)
         item = {"input_fingerprint": row["fingerprint"], "record": record}
+        if row.get("document"):
+            item["acquisition_receipt_sha256"] = queue.digest(row["document"])
         if (saved and queue.prepare(saved["record"], window, row["plan"]["known_sources_only"])[2] == saved["input_fingerprint"]
                 and same_input(record, saved["record"], window, row["plan"]["known_sources_only"])):
             for field in FIELDS:
@@ -107,18 +111,32 @@ def reconcile(packet, state, previous=None, *, now=None):
             # New, materially fuller source evidence gets a new reading turn.
             old_coverage = (record.get("deep_analysis") or {}).get("coverage") or {}
             receipt = row.get("document") or {}
-            if old_coverage and (not receipt or any(old_coverage.get(k) != receipt.get(k)
-                    for k in ("source_sha256", "document_version", "source_url", "evidence_status"))):
+            receipt_changed = (saved.get("acquisition_receipt_sha256") is not None
+                and saved["acquisition_receipt_sha256"] != item.get("acquisition_receipt_sha256"))
+            if receipt_changed or (old_coverage and (not receipt or any(old_coverage.get(k) != receipt.get(k)
+                    for k in ("source_sha256", "source_bytes_sha256", "source_byte_count",
+                              "html_extraction_version", "document_version", "source_url", "evidence_status")))):
                 # An unchanged input's failed attempt still owns its cooldown.
                 # Removing stale analysis must not make the same failed source
                 # immediately eligible again on every preparation schedule.
                 attempt = record.get("complete_reading_attempt") or {}
                 failed = attempt.get("stage") in {"retrieval", "synthesis"}
+                refreshed = any(event["status"] == "refreshed"
+                    and event["replacement_sha256"] == item.get("acquisition_receipt_sha256")
+                    and queue.digest(event["receipt"]["document"]) == saved.get("acquisition_receipt_sha256")
+                    for event in row.get("source_refreshes", []))
                 for field in FIELDS:
-                    if field == "complete_reading_attempt" and failed:
+                    if field == "complete_reading_attempt" and failed and not refreshed:
                         continue
                     record.pop(field, None)
                 item.pop("revalidation", None)
+        # A newly observed mismatch also invalidates an older cached success
+        # before reacquisition. Retaining the old receipt is not permission to
+        # publish stale analysis while recovery is pending or held.
+        if ((row.get("source_refresh_hold") or (row.get("source_refreshes")
+                and row["source_refreshes"][-1]["status"] != "refreshed"))
+                and (item.get("revalidation") or {}).get("status") == "source_revalidated"):
+            item.pop("revalidation", None)
         records[key] = item
     return sealed({"schema_version": 1, "kind": "prepared_article_readings", "publication_window": window,
         "observation_at": now.isoformat(), "packet_sha256": queue.digest(packet),
@@ -133,6 +151,32 @@ def acquire(packet, state=None, *, now=None, shared_controls=None, **options):
                              shared_controls=shared_controls, **options)
 
 
+def observe_retrieval(state, diagnostics, now, save_state=None):
+    """Keep newly observed restrictions and receipt requests in the retained state."""
+    from source_access_controls import merge_diagnostics_into_state
+    updated = merge_diagnostics_into_state(state, diagnostics, now=now)
+    state.clear(); state.update(updated)
+    if save_state is not None:
+        save_state(state)
+
+
+def observed_retriever(packet, state, now, data_dir=None, save_state=None):
+    def moment():
+        return queue.utc_now(now() if callable(now) else now)
+    def retrieve(record):
+        return retrieve_for_reading(record, state=state, payload=packet, now=moment(),
+            controls_data_dir=data_dir, diagnostic_observer=lambda diagnostics:
+                observe_retrieval(state, diagnostics, moment(), save_state))
+    return retrieve
+
+
+def observe_document_mismatch(record, document, state, now):
+    from acquisition_handoff import receipt_change_note
+    row = state["records"][queue.record_key(record)]
+    if row.get("document") and queue.document_metadata(document)["source_url"] == row["document"]["source_url"]:
+        observe_retrieval(state, [receipt_change_note(record, row, document, queue)], now)
+
+
 def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=None, data_dir=None):
     now = queue.utc_now(now)
     bundle = reconcile(packet, state, previous, now=now)
@@ -141,9 +185,7 @@ def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=
         if state["records"][key].get("document"):
             candidates.append(item["record"])
     if retriever is None:
-        def retriever(record):
-            return retrieve_for_reading(record, state=state, payload=packet, now=now,
-                                         controls_data_dir=data_dir)
+        retriever = observed_retriever(packet, state, now, data_dir)
     def receipt_checked_retriever(record):
         document, diagnostics = retriever(record)
         if document is None:
@@ -155,10 +197,12 @@ def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=
         # Include byte/parser/interval evidence, not just an extracted-text hash.
         if (not receipt or current.get("document_version") != receipt.get("document_version")
                 or queue.document_metadata(document) != receipt):
+            observe_document_mismatch(record, document, state, now)
             raise ValueError("prepared_acquisition_receipt_mismatch")
         return document, diagnostics
     stats = readings.process(candidates, model, limit=limit, retriever=receipt_checked_retriever, run_date=now.date())
     bundle["review_run"] = stats
+    bundle["acquisition_state_sha256"] = state["state_sha256"]
     return validate_bundle(sealed(bundle), bundle["publication_window"], now=now)
 
 
@@ -171,9 +215,7 @@ def revalidate(packet, state, bundle, *, now=None, limit=10, retriever=None, dat
     queue.validate_window(closed_packet(packet, now=now), now)
     bundle = reconcile(packet, state, bundle, now=now)
     if retriever is None:
-        def retriever(record):
-            return retrieve_for_reading(record, state=state, payload=packet, now=now,
-                                         controls_data_dir=data_dir)
+        retriever = observed_retriever(packet, state, now, data_dir)
     attempted = 0
     def oldest_check(entry):
         checked = (entry[1].get("revalidation") or {}).get("checked_at")
@@ -203,7 +245,12 @@ def revalidate(packet, state, bundle, *, now=None, limit=10, retriever=None, dat
             if document is None:
                 raise ValueError("prepared_source_unavailable")
             current = document.manifest()
-            for field in ("source_sha256", "source_url", "document_version", "evidence_status"):
+            receipt = state["records"][key].get("document")
+            if queue.document_metadata(document) != receipt:
+                observe_document_mismatch(item["record"], document, state, now)
+                raise ValueError("prepared_source_changed")
+            for field in ("source_sha256", "source_bytes_sha256", "source_byte_count",
+                          "html_extraction_version", "source_url", "document_version", "evidence_status"):
                 if current.get(field) != coverage.get(field):
                     raise ValueError("prepared_source_changed")
             if current.get("evidence_status") != "full_document_retrieved":
@@ -214,6 +261,7 @@ def revalidate(packet, state, bundle, *, now=None, limit=10, retriever=None, dat
             result["reason"] = str(exc) if isinstance(exc, ValueError) and str(exc).replace("_", "").isalnum() else type(exc).__name__
         item["revalidation"] = result
     bundle["revalidation_run"] = {"attempted": attempted, "source_text_saved": False, "approved": False}
+    bundle["acquisition_state_sha256"] = state["state_sha256"]
     return validate_bundle(sealed(bundle), window, now=now)
 
 
@@ -314,16 +362,8 @@ def main():
     if state is None:
         print(json.dumps({"status": "awaiting_acquisition", "approved": False})); return
     bundle = read(bundle_path) if bundle_path.exists() else None
-    def tracked_retriever(record):
-        nonlocal state
-        from source_access_controls import merge_diagnostics_into_state
-        def observe(diagnostics):
-            nonlocal state
-            state = merge_diagnostics_into_state(state, diagnostics, now=datetime.now(timezone.utc))
-            queue.atomic_save(state_path, state)
-        document, diagnostics = retrieve_for_reading(record, state=state, payload=packet,
-            now=datetime.now(timezone.utc), controls_data_dir=data, diagnostic_observer=observe)
-        return document, diagnostics
+    tracked_retriever = observed_retriever(packet, state, lambda: datetime.now(timezone.utc), data,
+        save_state=lambda value: queue.atomic_save(state_path, value))
     if args.stage == "review":
         model_path = Path(os.getenv("LOCAL_READING_MODEL", "/tmp/attention-model.gguf"))
         if not model_path.is_file():

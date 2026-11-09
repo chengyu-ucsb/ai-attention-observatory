@@ -20,7 +20,7 @@ import re
 import tempfile
 import time
 
-from academic_state import DiscoveryState, ProviderDeferred
+from academic_state import DiscoveryState, ProviderDeferred, prefetch_searches
 from academic_state_schema import strict_json_loads
 from collection_window import (previous_week, publication_date, weekly_eligible,
                                reconcile_publication_evidence, window_metadata)
@@ -500,10 +500,47 @@ class BoundedDiscoveryState(DiscoveryState):
     def fetch(self, provider, url, request):
         if self.budget["remaining"] <= 0 or time.monotonic() >= self.budget["deadline"]:
             raise ProviderDeferred(provider, "Preparation request/time budget reached")
+        if self.budget.get("search_remaining", 1) <= 0:
+            raise ProviderDeferred(provider, "Preparation search share reached; date checks retain their turn")
+        if self.budget.get("date_remaining", 1) <= 0:
+            raise ProviderDeferred(provider, "Preparation date share reached; later slices retain their turn")
         def bounded_request(value):
+            if "date_remaining" in self.budget:
+                self.budget["date_remaining"] -= 1
+            if "search_remaining" in self.budget:
+                self.budget["search_remaining"] -= 1
             self.budget["remaining"] -= 1
             return request(value)
         return super().fetch(provider, url, bounded_request)
+
+def has_due_date_checks(state, window_id):
+    """Find replayed candidates needing verification, never infer eligibility."""
+    window = state.data["windows"][window_id]
+    bounds = window["window"]
+    for query in window["queries"].values():
+        if query["provider"] != "OpenAlex":
+            continue
+        for row in query["rows"].values():
+            title = row.get("title") or ""
+            day = publication_date(row.get("publication_date"))
+            if (not title or row.get("is_retracted") or day is None
+                    or not bounds["from"] <= day.isoformat() <= bounds["to"]
+                    or not update.KEYWORDS.search(title + " " + update.abstract(row.get("abstract_inverted_index")))):
+                continue
+            doi = doi_id(row.get("doi"))
+            identifier = update.arxiv_identifier({"doi": doi, "url": row.get("id", "")})
+            if identifier:
+                provider, identity = "arXiv", identifier + ":" + title
+                if identity in window.get("arxiv_date_evidence", {}): continue
+            elif doi and doi not in window["date_evidence"]:
+                provider, identity = "Crossref", doi
+            else:
+                continue
+            pause = state.data["providers"].get(provider, {})
+            if not pause.get("blocked") and pause.get("next_retry_at", 0) <= state.now() and state.date_retry_due(provider, identity):
+                return True
+    return False
+
 
 def merge_candidates(records, candidates, corrections, now, state):
     """Reconcile metadata without overwriting prepared source analysis or receipts."""
@@ -598,18 +635,52 @@ def prepare(root=ROOT, *, now=None, closeout=False, closeout_pass=None, max_requ
                     for i in range((now.date() - start).days + 1)]
     academic_reports, errors = [], []
     all_corrections = deepcopy((previous or {}).get("coverage", {}).get("publication_date_corrections", {}))
+    # Search across all active slices/groups before spending requests on date
+    # checks. A failed DOI in Monday's replay cannot consume Tuesday's budget.
+    # One shared object preserves provider pauses and every committed cursor.
+    from priority_research import discovery_queries as journal_queries, load_manifest
+    manifest = load_manifest() if manifest is None else manifest
+    state = BoundedDiscoveryState(data / "academic-discovery-state.json", mode=mode,
+                window={"from": slices[0][0].isoformat(), "to": slices[0][1].isoformat()},
+                budget=budget, now=lambda: now.timestamp())
+    query_groups = []
     for begin, stop in slices:
         bounds = {"from": begin.isoformat(), "to": stop.isoformat()}
-        state = BoundedDiscoveryState(data / "academic-discovery-state.json", mode=mode,
-                    window=bounds, budget=budget, now=lambda: now.timestamp())
+        state.select_window(mode,bounds)
+        general = update.discovery_queries(now.date(),mode,bounds,page_size)
+        journals = journal_queries(now.date(),mode,bounds,page_size,manifest)
+        state.register_plan("general",general)
+        state.register_plan("journals",journals)
+        for group in (general,journals):
+            query_groups.append([(mode,bounds,*query) for query in group])
+    # Round-robin groups and dates for ties in durable least-attempted ordering.
+    jobs = [group[i] for i in range(max(map(len,query_groups),default=0))
+                      for group in query_groups if i < len(group)]
+    # Preserve a small date-verification share even while broad search cursors
+    # are advancing. Under the normal 48-request ceiling this protects 8 checks;
+    # unused search requests are available to verification as well.
+    reserve = max_requests // 6
+    budget["search_remaining"] = max_requests - reserve
+    prefetch_searches(academic_request or update.request,jobs,state=state,max_pages=max_pages)
+    del budget["search_remaining"]
+    due_windows = {f"{mode}:{begin.isoformat()}:{stop.isoformat()}" for begin, stop in slices
+                   if has_due_date_checks(state, f"{mode}:{begin.isoformat()}:{stop.isoformat()}")}
+    for begin, stop in slices:
+        bounds = {"from": begin.isoformat(), "to": stop.isoformat()}
+        state.select_window(mode,bounds)
+        # Split due verification turns across slices; an older failed batch
+        # cannot consume the entire share before a fresh daily candidate.
+        budget["date_remaining"] = ((budget["remaining"] + len(due_windows) - 1) // len(due_windows)
+                                    if state.window_id in due_windows else 0)
+        due_windows.discard(state.window_id)
         # Production collectors use this injected transport without replacing TODAY.
         # A local callable parameter avoids any global monkeypatching/concurrency.
         candidates, issues, stats = update.discover(mode=mode, state=state, observed_on=now,
-                    publication_window=bounds, max_pages=max_pages, page_size=page_size,
+                    publication_window=bounds, max_pages=0, page_size=page_size,
                     metadata_request=academic_request)
         priority, extra_issues, priority_stats = discover_priority(academic_request or update.request,
                     now.date(), mode=mode, state=state, manifest=manifest,
-                    publication_window=bounds, max_pages=max_pages, page_size=page_size)
+                    publication_window=bounds, max_pages=0, page_size=page_size)
         corrections = stats.pop("publication_date_corrections", {})
         for doi, evidence in priority_stats.pop("publication_date_corrections", {}).items():
             corrections[doi] = reconcile_publication_evidence(corrections.get(doi), evidence)
@@ -621,6 +692,7 @@ def prepare(root=ROOT, *, now=None, closeout=False, closeout_pass=None, max_requ
         errors.extend(issues + extra_issues)
         academic_reports.append({"window": bounds, "checkpoint": state.summary(),
                                  "general": stats, "journals": priority_stats})
+    del budget["date_remaining"]
     selected_feeds = editorial.FEEDS if feeds is None else feeds
     cache_path = data / "editorial-feed-cache.json"
     cache = feeds_cache.load_cache(cache_path, selected_feeds)
