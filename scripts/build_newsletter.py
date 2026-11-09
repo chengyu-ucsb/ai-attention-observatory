@@ -7,6 +7,7 @@ from __future__ import annotations
 from datetime import date, datetime, time, timezone
 from email.utils import format_datetime
 from original_readings import safe_url as safe_original_url
+from build_issue import citation_url, validate_issue_citations, validate_section_citations
 import html
 import json
 import re
@@ -56,9 +57,9 @@ def source_links(issue,ids):
         source=lookup.get(ident)
         if not source:continue
         original=source.get('original_summary') and safe_original_url(source.get('source_url'))
-        url=source['source_url'] if original else safe_url(source.get('url'))
+        url=citation_url(source)
         version=(' · '+readable_version(source.get('source_version'))) if original else ''
-        out.append('<a class="source-link" href="'+esc(url)+'" title="'+esc(source.get('title') or 'Original source')+'">'+esc('Reading '+str(number)+version)+'</a>')
+        out.append('<a class="source-link" href="'+esc(url)+'" title="'+esc(source.get('title') or 'Original source')+'">'+esc((source.get('title') or 'Original source')+version)+'</a>')
     return ' · '.join(out)
 
 def source_shelf(issue, disclosure=True):
@@ -66,7 +67,7 @@ def source_shelf(issue, disclosure=True):
     rows=[]
     for source in issue.get('sources',[]):
         original=source.get('original_summary') and safe_original_url(source.get('source_url'))
-        url=source['source_url'] if original else safe_url(source.get('url'))
+        url=citation_url(source)
         row='<li><a href="'+esc(url)+'">'+esc(source.get('title') or 'Original source')+'</a>'
         meta=[source.get(k) for k in ('kind','venue','published','reading_level','source_version') if source.get(k)]
         row+='<p class="source-meta">'+esc(' · '.join(meta))+'</p>'
@@ -79,7 +80,7 @@ def source_shelf(issue, disclosure=True):
                 row+='<p>'+esc(notice)+'</p>'
                 notices.append(notice)
         rows.append(row+'</li>')
-    note='<p>'+esc(issue.get('editorial_note',''))+'</p>'
+    note=render_text(issue.get('editorial_note',''),issue)
     if any(s.get('original_summary') for s in issue.get('sources',[])):
         note+='<p>AI source-check, not human review or independent replication. Version-specific scope and limitations are listed with each source.</p>'
     content=note+'<ol>'+''.join(rows)+'</ol>'
@@ -98,44 +99,93 @@ def publication_scope(issue):
     return ('Sources originally published '+str(window.get('from'))+' through '+str(window.get('to'))+
             ' (UTC). Older background sources are not included.') if window else ''
 
-def long_copy(text,label='Read the full analysis'):
-    # Keep exact published prose, rather than generating a new summary or dropping caveats.
+def glossary_id(index,entry):
+    slug=re.sub(r'[^a-z0-9]+','-',entry['term'].casefold()).strip('-') or 'definition'
+    return 'term-'+slug+'-'+str(index)
+
+def text_spans(text,issue=None,section=None):
+    issue=issue or {};section=section or {}
+    sources={s['id']:s for s in issue.get('sources',[])}
+    spans=[]
+    for citation in validate_section_citations(section,issue.get('sources',[])) if section else []:
+        start=text.index(citation['text']);source=sources[citation['source_id']]
+        url=citation_url(source)
+        path=urlsplit(url).path.lower()
+        if citation.get('page') and (path.endswith('.pdf') or '/pdf/' in path):
+            url=url.split('#',1)[0]+'#page='+str(citation['page'])
+        title=source.get('title','')+(' · '+citation['locator'] if citation.get('locator') else '')
+        spans.append((start,start+len(citation['text']),url,title,'inline-citation'))
+    for index,entry in enumerate(issue.get('glossary',[]),1):
+        for match in re.finditer(r'(?<!\w)'+re.escape(entry['term'])+r'(?!\w)',text,re.I):
+            start,end=match.span()
+            if not any(start<b and end>a for a,b,*_ in spans):
+                spans.append((start,end,'#'+glossary_id(index,entry),entry['definition'],'glossary-term'))
+    return sorted(spans)
+
+def render_text(text,issue=None,section=None,end=None,css='long-copy'):
+    """Escape plain-text segments separately, never search or replace HTML."""
+    text=str(text or '');end=len(text) if end is None else end
+    spans=text_spans(text,issue,section)
+    paragraphs=[]
+    # Keep exact paragraph boundaries. A citation spanning a break is split into
+    # two links to the same source, preserving valid paragraph markup.
+    start=0
+    for paragraph in re.split(r'\n\s*\n',text[:end]):
+        stop=start+len(paragraph);cursor=start;parts=[]
+        for a,b,url,title,kind in spans:
+            left=max(a,start);right=min(b,stop)
+            if left>=right:continue
+            parts.append(esc(text[cursor:left]))
+            parts.append('<a class="'+kind+'" href="'+esc(url)+'" title="'+esc(title)+'">'+esc(text[left:right])+'</a>')
+            cursor=right
+        parts.append(esc(text[cursor:stop]))
+        paragraphs.append('<p'+(' class="'+css+'"' if css else '')+'>'+''.join(parts)+'</p>')
+        separator=re.match(r'\n\s*\n',text[stop:end])
+        start=stop+(separator.end() if separator else 0)
+    return ''.join(paragraphs)
+
+def glossary_html(issue):
+    entries=issue.get('glossary',[])
+    if not entries:return ''
+    return '<section class="glossary" aria-label="Plain-language glossary"><h2>A few useful terms</h2><dl>'+''.join(
+        '<dt id="'+glossary_id(i,e)+'"><strong>'+esc(e['term'])+'</strong></dt><dd>'+esc(e['definition'])+'</dd>'
+        for i,e in enumerate(entries,1))+'</dl></section>'
+
+def long_copy(text,label='Read the full analysis',issue=None,section=None):
     text=str(text or '')
-    if len(text)<260:return '<p class="long-copy">'+esc(text)+'</p>'
-    # A sentence boundary must precede whitespace (not a decimal or URL dot).
-    # Avoid common abbreviations; no rephrasing or inferred claims are introduced.
+    full=render_text(text,issue,section)
+    if len(text)<260:return full
     end=len(text)
     for match in re.finditer(r'[.!?][”’"\']?(?=\s|$)',text):
         prefix=text[:match.end()]
-        if re.search(r'\b(?:e\.g|i\.e|et al|Dr|Mr|Ms|Prof|Fig|vs)\.$',prefix,re.I):
-            continue
-        if re.search(r'\b[A-Z]\.$',prefix):
-            continue
-        end=match.end()
-        break
-    preview=text[:end]
-    if end==len(text):return '<p class="long-copy">'+esc(text)+'</p>'
-    return '<p class="long-copy preview-copy">'+esc(preview)+'</p><details><summary>'+esc(label)+'</summary><p class="long-copy">'+esc(text)+'</p></details>'
+        if re.search(r'\b(?:e\.g|i\.e|et al|Dr|Mr|Ms|Prof|Fig|vs)\.$',prefix,re.I):continue
+        if re.search(r'\b[A-Z]\.$',prefix):continue
+        end=match.end();break
+    # Do not cut a source phrase in half at a sentence boundary.
+    for start,stop,*_ in text_spans(text,issue,section):
+        if start<end<stop:end=stop
+    if end==len(text):return full
+    return render_text(text,issue,section,end=end,css='long-copy preview-copy')+'<details><summary>'+esc(label)+'</summary>'+full+'</details>'
 
 def opening(issue):
     return (section_label('Issue '+str(issue.get('number','—'))+' · '+issue['edition_date'])
             +'<h1>'+esc(issue['headline'])+'</h1><p class="deck">'+esc(issue.get('deck',''))+'</p>'
-            +long_copy(issue.get('letter',''),'Read the opening argument')
+            +long_copy(issue.get('letter',''),'Read the opening argument',issue)
             +('<p class="scope">'+esc(publication_scope(issue))+'</p>' if publication_scope(issue) else ''))
 
 def overview(issue):
     return '<ul class="overview">'+''.join('<li><a href="#signal-'+str(i)+'">'+esc(s.get('short',s.get('title','')))+'</a></li>' for i,s in enumerate(issue.get('signals',[]),1))+'</ul>'
 
 def signal_cards(issue):
-    return ''.join('<section class="signal" id="signal-'+str(i)+'">'+section_label('Signal '+str(i).zfill(2))+'<h2>'+esc(s['title'])+'</h2>'+long_copy(s['text'])+'<p class="source-links">'+source_links(issue,s.get('source_ids',[]))+'</p></section>' for i,s in enumerate(issue.get('signals',[]),1))
+    return ''.join('<section class="signal" id="signal-'+str(i)+'">'+section_label('Signal '+str(i).zfill(2))+'<h2>'+esc(s['title'])+'</h2>'+long_copy(s['text'],issue=issue,section=s)+'<p class="source-links">'+source_links(issue,s.get('source_ids',[]))+'</p></section>' for i,s in enumerate(issue.get('signals',[]),1))
 
 def question_and_try(issue):
     t=issue['tension'];p=issue['experiment']
-    return ('<div class="pair"><section class="card">'+section_label('The productive tension')+'<h3>'+esc(t['title'])+'</h3>'+long_copy(t['text'],'Explore the tension')+'<p class="source-links">'+source_links(issue,t.get('source_ids',[]))+'</p></section>'
-            '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+long_copy(p['text'],'See the activity')+'<p class="caution">'+esc(p.get('caution',''))+'</p></section></div>')
+    return ('<div class="pair"><section class="card">'+section_label('The productive tension')+'<h3>'+esc(t['title'])+'</h3>'+long_copy(t['text'],'Explore the tension',issue,t)+'<p class="source-links">'+source_links(issue,t.get('source_ids',[]))+'</p></section>'
+            '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+long_copy(p['text'],'See the activity',issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p></section></div>')
 
 def bottom(issue):
-    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+source_shelf(issue)+'</main><footer><div class="shell">'
+    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue)+source_shelf(issue)+'</main><footer><div class="shell">'
             '<p><strong>THE ATTENTION BRIEF</strong></p><p>A weekly look at what AI changes about thinking, focus, and human agency.</p>'
             '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
             '<p>Read online or follow via RSS. Email subscriptions are not active.</p></div></footer></body></html>')
@@ -143,6 +193,7 @@ def bottom(issue):
 def render_issue(issue):
     if issue.get('status')!='published':
         return top_html({'subject':'The Attention Brief · Ideas about AI and attention'})+'<h1>A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></main></body></html>'
+    validate_issue_citations(issue)
     return top_html(issue)+opening(issue)+overview(issue)+signal_cards(issue)+question_and_try(issue)+bottom(issue)
 
 def render_index(issues):
@@ -151,18 +202,19 @@ def render_index(issues):
 
 def rss_content(issue):
     """The same published copy, with sources, for downstream RSS/chat delivery."""
+    validate_issue_citations(issue)
     parts=['<h1>'+esc(issue['headline'])+'</h1>']
     if publication_scope(issue):parts.append('<p>'+esc(publication_scope(issue))+'</p>')
-    parts += ['<p>'+esc(issue.get(k,''))+'</p>' for k in ('deck','letter')]
+    parts += [render_text(issue.get(k,''),issue) for k in ('deck','letter')]
     for section in issue.get('signals',[]) + [issue.get('tension',{})]:
         parts += ['<h2>'+esc(section.get('title',''))+'</h2>',
-                  '<p>'+esc(section.get('text',''))+'</p>',
+                  render_text(section.get('text',''),issue,section),
                   '<p>'+source_links(issue, section.get('source_ids',[]))+'</p>']
     experiment=issue.get('experiment',{})
     parts += ['<h2>'+esc(experiment.get('title',''))+'</h2>',
-              '<p>'+esc(experiment.get('text',''))+'</p>',
+              render_text(experiment.get('text',''),issue),
               '<p>'+esc(experiment.get('caution',''))+'</p>']
-    parts += ['<p>'+esc(issue.get('closer',''))+'</p>', source_shelf(issue, disclosure=False)]
+    parts += ['<p>'+esc(issue.get('closer',''))+'</p>', glossary_html(issue), source_shelf(issue, disclosure=False)]
     return ''.join(parts)
 
 
@@ -218,6 +270,7 @@ def build():
     approved=DATA/"approved-issues"
     approved.mkdir(parents=True,exist_ok=True)
     if current.get("status")=="published":
+        validate_issue_citations(current)
         date.fromisoformat(current["edition_date"])
         (approved/(current["edition_date"]+".json")).write_text(
             json.dumps(current,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"

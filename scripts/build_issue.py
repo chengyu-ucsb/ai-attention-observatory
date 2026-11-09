@@ -6,6 +6,7 @@ The issue includes citations to the exact source records and a complete source s
 """
 from __future__ import annotations
 import json,datetime,pathlib,re
+from urllib.parse import urlsplit
 from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for, identifier
 from checked_reading_types import record_context, RECORD_FIELDS
 from collection_window import window_metadata,previous_week,weekly_eligible
@@ -15,6 +16,64 @@ def find(needle,items):
  hits=[i for i,x in enumerate(items) if needle.casefold() in x.get("title","").casefold()]
  if len(hits)!=1:raise ValueError("Issue anchor must match exactly one source: "+needle+" (matches "+str(len(hits))+")")
  return items[hits[0]]
+def citation_url(source):
+ """Prefer the actual edition read; allow ordinary HTTPS publisher URLs."""
+ for value in (source.get("source_url"),source.get("url")):
+  if not isinstance(value,str) or re.search(r'\s|\\|[\x00-\x1f]',value):continue
+  try:
+   parsed=urlsplit(value)
+   if parsed.scheme=="https" and parsed.hostname and not parsed.username and not parsed.password:
+    parsed.port  # Reject malformed ports.
+    return value
+  except ValueError:pass
+ raise ValueError("Citation source requires a valid HTTPS source URL: "+str(source.get("title","")))
+
+def validate_section_citations(section,sources,required=False):
+ """Resolve exact visible spans before publication; never edit escaped HTML."""
+ text=section.get("text","")
+ entries=section.get("citations",[])
+ if not isinstance(entries,list):raise ValueError("Section citations must be a list")
+ resolved=[];spans=[]
+ allowed=section.get("source_ids",[])
+ for entry in entries:
+  if not isinstance(entry,dict):raise ValueError("Invalid inline citation")
+  phrase=entry.get("text")
+  if not isinstance(phrase,str) or not phrase.strip():raise ValueError("Citation text must not be empty")
+  starts=[m.start() for m in re.finditer('(?='+re.escape(phrase)+')',text)]
+  if len(starts)!=1:raise ValueError("Citation text must occur exactly once: "+phrase)
+  hits=[s for s in sources if s.get("id") in allowed and
+        (s.get("title")==entry["source"] if "source" in entry else s.get("id")==entry.get("source_id"))]
+  if len(hits)!=1:raise ValueError("Citation must resolve to exactly one section source: "+str(entry))
+  source=hits[0]
+  if entry.get("source_id") and entry["source_id"]!=source["id"]:raise ValueError("Citation source identity mismatch")
+  citation_url(source)
+  if "page" in entry and (type(entry["page"]) is not int or entry["page"]<1):raise ValueError("Citation page must be a positive integer")
+  if "locator" in entry and (not isinstance(entry["locator"],str) or not entry["locator"].strip()):raise ValueError("Citation locator must be nonempty text")
+  start=starts[0];end=start+len(phrase)
+  if any(start<b and end>a for a,b in spans):raise ValueError("Inline citation spans overlap")
+  spans.append((start,end))
+  resolved.append({**entry,"source_id":source["id"],"text":phrase})
+ if required and (not allowed or set(allowed)!={c["source_id"] for c in resolved}):
+  raise ValueError("Each section source needs an explicit inline citation")
+ return resolved
+
+def validate_issue_citations(issue):
+ version=issue.get("citation_schema_version")
+ if version is not None and (type(version) is not int or version!=1):raise ValueError("Unsupported citation schema version")
+ for section in issue.get("signals",[])+[issue.get("tension",{})]:
+  citations=validate_section_citations(section,issue.get("sources",[]),required=version==1)
+  if "citations" in section or version==1:section["citations"]=citations
+ glossary=issue.get("glossary",[])
+ if not isinstance(glossary,list):raise ValueError("Glossary must be a list")
+ seen=set()
+ for entry in glossary:
+  if not isinstance(entry,dict) or any(not isinstance(entry.get(k),str) or not entry[k].strip() for k in ("term","definition")):
+   raise ValueError("Glossary entries require a term and definition")
+  term=entry["term"].casefold()
+  if term in seen:raise ValueError("Duplicate glossary term")
+  seen.add(term)
+ return issue
+
 def checked_source_metadata(item):
  reading=item.get("reading") or {}
  source=reading if reading.get("original_summary") else item
@@ -65,7 +124,8 @@ def resolve_queued_original(item):
  record["reading"]=note_for(record)
  return record
 
-def build(edition_date=None):
+def build(edition_date=None, use_published_sources=False):
+ if use_published_sources and not edition_date:raise ValueError("Published source correction requires an explicit edition date")
  weekly=json.loads((DATA/"public-weekly.json").read_text())
  editorial_path=DATA/"editorial-weekly.json"
  if not edition_date and editorial_path.exists():
@@ -76,7 +136,9 @@ def build(edition_date=None):
    raise ValueError("Editorial evidence packet is stale; rebuild public readings")
  if edition_date:
   datetime.date.fromisoformat(edition_date)
-  packet=json.loads((DATA/"editorial-queue"/(edition_date+".json")).read_text(encoding="utf-8"))
+  packet_path=DATA/("approved-issues" if use_published_sources else "editorial-queue")/(edition_date+".json")
+  packet=json.loads(packet_path.read_text(encoding="utf-8"))
+  if use_published_sources and packet.get("status")!="published":raise ValueError("Correction requires an existing published edition")
   weekly={"run":{"date":edition_date,"publication_window":packet.get("publication_window") or window_metadata(edition_date)},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
  issue_date=(weekly.get("run") or {}).get("date") or ""
  drafts=json.loads((DATA/"issue-editorial.json").read_text())
@@ -131,10 +193,13 @@ def build(edition_date=None):
   tension=draft["tension"].copy()
   tension["source_ids"]=[source_id(find(name,items)) for name in tension["sources"]]
   schema.update({k:draft[k] for k in ("number","subject","headline","deck","letter","experiment","closer","editorial_note")})
+  for key in ("citation_schema_version","glossary"):
+   if key in draft:schema[key]=draft[key]
   schema["signals"]=cards
   schema["tension"]=tension
   schema["status"]="published"
   schema["note"]="Published edition; see editorial_note for evidence and synthesis qualifications."
+ if schema["status"]=="published":validate_issue_citations(schema)
  (DATA/"public-issue.json").write_text(json.dumps(schema,ensure_ascii=False,indent=2)+"\n")
  # Readers see the latest completed issue while the next week's editorial
  # work stays private. Keep the newest unreviewed source shelf in public-issue
@@ -153,5 +218,7 @@ if __name__=="__main__":
  import argparse
  parser=argparse.ArgumentParser()
  parser.add_argument("--edition-date",help="Build a reviewed issue from its saved source shelf")
- build(parser.parse_args().edition_date)
+ parser.add_argument("--use-published-sources",action="store_true",help="Correct an archived edition against its frozen source shelf, revalidating current review and original dates")
+ args=parser.parse_args()
+ build(args.edition_date,use_published_sources=args.use_published_sources)
 

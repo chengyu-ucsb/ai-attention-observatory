@@ -192,6 +192,12 @@ function route(event){
   closeNavigation();
   const heading=$("#"+page+" h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
  }
+ if(page==="issue")focusIssueTerm(raw);
+}
+function focusIssueTerm(raw){
+ const term=new URLSearchParams(raw.split("?")[1]||"").get("term");
+ const target=term?.startsWith("issue-term-")?document.getElementById(term):null;
+ if(target){target.focus({preventScroll:true});target.scrollIntoView({block:"center"})}
 }
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
 function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>goto("library",t[0]),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
@@ -217,6 +223,87 @@ function issueRefs(ids,target){
    container.append(b);
  }
  return container;
+}
+// Weekly editorial prose has its own span renderer. Article summaries keep
+// their existing paragraph and disclosure behavior.
+function issueCitationUrl(source,citation={}){
+ for(const value of [source?.source_url,source?.url]){
+  if(typeof value!=="string"||/[\s\\\x00-\x1f]/.test(value))continue;
+  try{
+   const parsed=new URL(value);
+   if(parsed.protocol!=="https:"||!parsed.hostname||parsed.username||parsed.password)continue;
+   if(Number.isInteger(citation.page)&&citation.page>0&&(/\.pdf$/i.test(parsed.pathname)||parsed.pathname.includes("/pdf/")))parsed.hash="page="+citation.page;
+   return parsed.href;
+  }catch{}
+ }
+ return "";
+}
+function issueTermId(entry,index){return "issue-term-"+(String(entry.term).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"definition")+"-"+(index+1)}
+function issueTextSpans(text,section={},issue=S.issue||{}){
+ const spans=[];
+ for(const citation of section.citations||[]){
+  const phrase=citation.text;
+  if(typeof phrase!=="string"||!phrase.trim())continue;
+  const start=text.indexOf(phrase),end=start+phrase.length;
+  if(start<0||text.indexOf(phrase,start+1)!==-1||spans.some(s=>start<s.end&&end>s.start))continue;
+  const hits=(issue.sources||[]).filter(source=>(section.source_ids||[]).includes(source.id)&&(citation.source_id?source.id===citation.source_id:source.title===citation.source));
+  if(hits.length!==1)continue;
+  const url=issueCitationUrl(hits[0],citation);if(!url)continue;
+  spans.push({start,end,url,title:hits[0].title+(citation.locator?" · "+citation.locator:""),className:"issue-inline-citation"});
+ }
+ for(const [index,entry] of (issue.glossary||[]).entries()){
+  if(!entry.term||!entry.definition)continue;
+  const pattern=new RegExp("(?<![\\p{L}\\p{N}_])"+String(entry.term).replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![\\p{L}\\p{N}_])","giu");
+  for(const match of text.matchAll(pattern)){
+   const start=match.index,end=start+match[0].length;
+   if(!spans.some(s=>start<s.end&&end>s.start))spans.push({start,end,url:"#issue?term="+issueTermId(entry,index),title:entry.definition,className:"issue-glossary-term"});
+  }
+ }
+ return spans.sort((a,b)=>a.start-b.start);
+}
+function issueProse(value,section={},issue=S.issue||{},from=0,to=String(value||"").length){
+ const text=String(value||""),spans=issueTextSpans(text,section,issue),prose=make("div","rv-prose issue-prose");
+ let offset=from;
+ for(const paragraph of text.slice(from,to).split(/\n\s*\n/)){
+  const end=offset+paragraph.length,p=make("p");let cursor=offset;
+  for(const span of spans){
+   const left=Math.max(span.start,offset),right=Math.min(span.end,end);if(left>=right)continue;
+   p.append(document.createTextNode(text.slice(cursor,left)));
+   const anchor=link(text.slice(left,right),span.url,span.className);anchor.title=span.title;
+   p.append(anchor);cursor=right;
+  }
+  p.append(document.createTextNode(text.slice(cursor,end)));prose.append(p);
+  const separator=text.slice(end,to).match(/^\n\s*\n/);offset=end+(separator?separator[0].length:0);
+ }
+ return prose;
+}
+function compactIssueReading(section,label="Read the full analysis",issue=S.issue||{}){
+ const text=String(section.text||""),full=issueProse(text,section,issue);
+ if(text.length<260)return full;
+ let end=text.length;
+ for(const match of text.matchAll(/[.!?][”’"']?(?=\s|$)/g)){
+  const prefix=text.slice(0,match.index+match[0].length);
+  if(/\b(?:e\.g|i\.e|et al|Dr|Mr|Ms|Prof|Fig|vs|[A-Z])\.$/i.test(prefix))continue;
+  end=match.index+match[0].length;break;
+ }
+ for(const span of issueTextSpans(text,section,issue))if(span.start<end&&span.end>end)end=span.end;
+ if(end===text.length)return full;
+ const box=make("div","compact-reading issue-compact-reading"),preview=issueProse(text,section,issue,0,end);
+ preview.classList.add("compact-lead");
+ return add(box,preview,add(make("details","reading-expansion"),make("summary","",label),full));
+}
+function renderIssueGlossary(issue){
+ let glossary=$("#issue-glossary");
+ if(!glossary){glossary=make("section","issue-glossary");glossary.id="issue-glossary";$(".issue-reading-shelf").before(glossary)}
+ glossary.replaceChildren();glossary.hidden=issue.status!=="published"||!issue.glossary?.length;
+ if(glossary.hidden)return;
+ glossary.setAttribute("aria-label","Plain-language glossary");
+ const definitions=make("dl");
+ for(const [index,entry] of issue.glossary.entries()){
+  const term=make("dt","",entry.term);term.id=issueTermId(entry,index);term.tabIndex=-1;
+  add(definitions,term,make("dd","",entry.definition));
+ }
+ add(glossary,make("h2","","A few useful terms"),definitions);
 }
 function renderIssueLandscape(issue){
  const root=$("#issue-source-landscape");if(!root)return;root.replaceChildren();
@@ -278,6 +365,7 @@ function renderIssue(){
  const edition=issue.edition_date||S.week.run?.date||"";
  const sourceCount=Number(issue.source_count)||0;
  renderIssueLandscape(issue);
+ renderIssueGlossary(issue);
  $("#weekly-kicker").textContent=published?"THE WEEKLY BRIEF / ISSUE "+String(issue.number).padStart(2,"0"):"THE ATTENTION BRIEF";
  $("#weekly-title").textContent=published?issue.headline:"Good questions about AI and attention.";
  $("#weekly-deck").textContent=published?issue.deck:"Browse research and ideas about thinking, distraction, and how we work with AI.";
@@ -285,7 +373,7 @@ function renderIssue(){
  $("#issue-edition").textContent=published?"THE ATTENTION BRIEF / ISSUE "+issue.number+" / "+date(edition):"THE ATTENTION BRIEF";
  $("#issue-headline").textContent=published?issue.headline:"Ideas for thinking clearly.";
  $("#issue-deck").textContent=published?issue.deck:"Explore research, commentary, and experiments about AI and attention.";
- $("#issue-letter-text").replaceChildren(readingProse(published?issue.letter:"Start with a question, follow the evidence, and explore the research library."));
+ $("#issue-letter-text").replaceChildren(issueProse(published?issue.letter:"Start with a question, follow the evidence, and explore the research library.",{},issue));
  const strips=$("#weekly-signal-strip"),main=$("#issue-signals");strips.replaceChildren();main.replaceChildren();
  const signs=published?issue.signals||[]:[];
  signs.forEach((sig,i)=>{
@@ -294,7 +382,7 @@ function renderIssue(){
    add(tile,mark,make("span","weekly-signal-no",String(i+1).padStart(2,"0")+" / IN THIS ISSUE"),make("h4","",sig.short),make("span","weekly-signal-arrow","Read the connection"));strips.append(tile);
    const panel=make("article","issue-signal"),header=make("div","issue-signal-header");
    add(header,uiIcon(["focus","switch","network"][i%3],"issue-signal-icon"),make("span","issue-signal-no","THREAD "+String(i+1).padStart(2,"0")));
-   add(panel,header,make("h3","",sig.title),evidenceTags((issue.sources||[]).filter(source=>(sig.source_ids||[]).includes(source.id))),compactReading(sig.text,"Evidence, differences & limits"),
+   add(panel,header,make("h3","",sig.title),evidenceTags((issue.sources||[]).filter(source=>(sig.source_ids||[]).includes(source.id))),compactIssueReading(sig,"Evidence, differences & limits",issue),
        make("span","issue-cited-label","READINGS BEHIND THIS SIGNAL"),
        issueRefs(sig.source_ids));
    main.append(panel);
@@ -302,13 +390,14 @@ function renderIssue(){
  $("#issue-extras").hidden=!published;
  $(".issue-closing").hidden=!published;
  $("#issue-tension-title").textContent=published?issue.tension.title:"";
- $("#issue-tension-text").replaceChildren(compactReading(published?issue.tension.text:"","Explore the question"));
+ $("#issue-tension-text").replaceChildren(compactIssueReading(published?issue.tension:{text:""},"Explore the question",issue));
  const ref=$("#issue-tension-refs");ref.replaceChildren();if(published)issueRefs(issue.tension.source_ids,ref);
  $("#issue-experiment-title").textContent=published?issue.experiment.title:"";
  $("#issue-experiment-text").textContent=published?issue.experiment.text:"";
  $("#issue-experiment-caution").textContent=published?issue.experiment.caution:"";
  $("#issue-closer").textContent=published?issue.closer:"";
- $("#issue-qualification").textContent=published?issue.editorial_note||"":"";
+ const qualification=$("#issue-qualification");qualification.replaceChildren();
+ if(published&&issue.editorial_note)qualification.replaceChildren(...issueProse(issue.editorial_note,{},issue).firstElementChild.childNodes);
  $("#issue-qualification").hidden=!published||!issue.editorial_note;
  const sourceList=issue.sources||[],earlier=sourceList.filter(source=>source.editorial_role==="previously_indexed_context").length,collection=sourceList.filter(source=>source.editorial_role==="collection_week").length;
  $("#issue-coverage").textContent=issue.publication_window?sourceList.length+" sources originally published "+date(issue.publication_window.from)+"–"+date(issue.publication_window.to)+" (UTC). No older context sources are included.":sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");

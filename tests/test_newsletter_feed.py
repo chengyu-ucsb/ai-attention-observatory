@@ -2,6 +2,7 @@
 from datetime import datetime
 import copy
 import html
+from html.parser import HTMLParser
 import json
 import tempfile
 from unittest.mock import patch
@@ -15,6 +16,14 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import build_newsletter
 from build_newsletter import FEED, build_rss
+
+class VisibleText(HTMLParser):
+ def __init__(self,value):
+  super().__init__(convert_charrefs=True);self.parts=[];self.feed(value)
+ def handle_data(self,data):self.parts.append(data)
+ def handle_endtag(self,tag):
+  if tag in ('p','div','h1','h2','h3','li','summary'):self.parts.append(' ')
+ def text(self):return ' '.join(''.join(self.parts).split())
 
 class WeeklyFeedTests(unittest.TestCase):
  def latest_published_issue(self):
@@ -40,8 +49,8 @@ class WeeklyFeedTests(unittest.TestCase):
   texts += [s['text'] for s in issue['signals']]
   texts += [issue['tension']['text'],issue['experiment']['text'],issue['experiment']['caution']]
   for text in texts:
-   self.assertIn(html.escape(text,quote=True),page)
-   self.assertIn(html.escape(text,quote=True),rss)
+   self.assertIn(' '.join(text.split()),VisibleText(page).text())
+   self.assertIn(' '.join(text.split()),VisibleText(rss).text())
   for source in issue['sources']:
    self.assertIn(html.escape(source['title'],quote=True),page)
    for key in ('source_version','source_doi','related_journal_doi','review_scope','quality_note','notice','temporal_notice'):
