@@ -177,3 +177,25 @@
 .precedent-details-body{padding:4px 0 0}
 .precedent-details-body .precedent-links{margin-top:0}
 @media(prefers-reduced-motion:no-preference){.precedent-details summary:hover{color:var(--red)}}
+
+/* Debriefs keep the limits visible and make deeper interpretation optional. */
+.play-results .play-result-metric{font-size:13px;line-height:1.7;color:#6d555b;margin:12px 0}
+.play-results .play-result-limit{font-size:13px;line-height:1.75;color:#673f46;background:#fff8f6;border-left:3px solid #b9828b;padding:11px 13px;margin:18px 0 12px}
+.play-result-facts{font-size:13px;line-height:1.75;color:#635658;padding-left:20px;margin:0 0 16px}
+.play-result-facts li+li{margin-top:5px}
+.play-result-details{border-top:1px solid #e7dad8;border-bottom:1px solid #e7dad8;margin:16px 0}
+.play-result-details summary{cursor:pointer;min-height:48px;padding:14px 0;font-size:13px;font-weight:700;line-height:20px;color:#783746}
+.play-result-details summary:focus-visible{outline:2px solid var(--red);outline-offset:3px}
+.play-result-details-body{padding:0 0 16px}
+.play-results .play-result-details-body p{font-size:14px;line-height:1.8;margin:4px 0 12px}
+.play-results .play-result-details-body p:last-child{margin-bottom:0}
+.play-reflection{background:#f4e8e6;border:1px solid #e7dad8;padding:17px 19px;margin-top:18px;color:#55383d}
+.play-reflection h5{font-family:var(--display);font-size:22px;font-weight:500;line-height:1.25;margin:6px 0 10px}
+.play-reflection .play-kicker{margin:0;font-size:10px}
+.play-results .play-reflection p:not(.play-kicker),.play-reflection li{font-size:14px;line-height:1.75;margin:0}
+.play-reflection ul{padding-left:18px;margin:8px 0}
+.play-reflection li+li{margin-top:5px}
+.play-results .play-reflection .play-reflection-note{font-size:13px;margin-top:12px}
+.recovery-comparison-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.recovery-comparison-result{border:1px solid #e7dad8;background:#fff8f6;padding:14px;min-width:0}
+@media(max-width:600px){.recovery-comparison-list{grid-template-columns:1fr}.play-reflection{padding:15px}.play-reflection h5{font-size:21px}}
