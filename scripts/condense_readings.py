@@ -335,18 +335,15 @@ def reported_result_bundle(source, title="", limit=600):
  return " ".join(selected)
 
 
-def result_headline(reported, question):
- """A retained tradeoff must not regress to a benefit-only headline."""
- if reported and len(reported)<=230:return reported
- parts=sentence_list(reported)
- if len(parts)>=2:
-  # The first result is retained, so remove only a redundant transition that
-  # repeats its change. Do not clip a qualification or invent a short claim.
-  second=re.sub(r"^However,\s+despite this (?:reduction|increase|improvement),\s+","",parts[1],flags=re.I)
-  if second:second=second[0].upper()+second[1:]
-  pair=parts[0]+" "+second
-  if len(pair)<=230:return pair
- return question
+def source_title_headline(record):
+ """Use attribution when no source-checked editorial headline is available.
+
+ An extracted result is evidence for the body, not an edited headline, even
+ when it happens to be short. Never manufacture a claim from a topic, remove
+ statistical qualifiers, or select only one side of a result to fit a heading.
+ Preserve the complete publication title, including subtitles and qualifiers.
+ """
+ return re.sub(r"\s+", " ", html.unescape(record.get("title") or "")).strip() or "Untitled source"
 
 
 def first_source_sentence(text):
@@ -535,11 +532,9 @@ def annotate(record):
   notes=record.get("editorial_notes") or {}
   rewritten=public_commentary_idea(record)
   depth=deep_perspective(record,notes)
-  # When locally read source content exists, use its actual claim rather than
-  # falling back to a generic question inferred from the headline.
-  machine_idea=(depth.get("thesis") or "").split(". ")[0].strip()
-  if len(machine_idea)>195:machine_idea=""
-  idea=record.get("editorial_takeaway") or rewritten or (machine_idea if depth["source_depth"]=="machine_read_full_article" else "") or research_question(record)
+  # Only an explicitly edited takeaway is a headline. A thesis excerpt may
+  # omit the qualification in its next sentence; retain it in the body.
+  idea=record.get("editorial_takeaway") or rewritten or source_title_headline(record)
   base["reading"]["digest"]={
    "idea":idea,
    "explain":depth["thesis"] or "",
@@ -557,7 +552,7 @@ def annotate(record):
   return base
  if record.get("research_type")=="conceptual_framework":
   framework=record.get("framework_notes") or {}
-  idea=framework.get("idea") or research_question(record)
+  idea=framework.get("idea") or source_title_headline(record)
   base["reading"]["digest"]={
    "idea":idea,
    "explain":"A proposed staged approach to AI use in formal learning; distinguish foundational independent work from guided and selective offloading.",
@@ -602,9 +597,8 @@ def annotate(record):
    approach=abstract_approach
    approach_source="abstract"
   limitation=source_snippet((record.get("analysis") or {}).get("limitations") or r.get("limitations"),"limitations")
-  question=research_question(record)
   digest={
-   "idea":result_headline(reported,question),
+   "idea":source_title_headline(record),
    "explain":short_source_context(record) if not reported else "",
    "approach":approach,
    "approach_source":approach_source,

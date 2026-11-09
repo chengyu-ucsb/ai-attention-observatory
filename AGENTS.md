@@ -102,3 +102,10 @@ This policy is stored in the repository so future assistants working on it can s
 - Use DOI and source metadata to check early anchor literature, but never invent an abstract or full-text interpretation when only metadata is available. Bibliographic-only records stay out of the public collection.
 - Full-text processing should try Europe PMC and licensed machine-readable OpenAlex articles, retain substantial Methods, Results, Discussion, and Limitations sections when lawfully accessible, and track the extraction version/depth. Keep Results and author interpretation distinct. Never silently treat an OA link, a short diagnostic excerpt, or an abstract as a complete paper analysis.
 - After editing a discovery or full-text workflow, inspect the real scheduled/push-triggered run, quota/pause information, resulting year mix, and changes in full-text coverage. Report measured gains, not projected ones.
+
+## Reader-facing headings and evidence labels
+
+- Keep article headings separate from result excerpts. Use a concise source-checked editorial idea when available; otherwise retain the complete publication title. Never promote a raw results sentence, first thesis sentence, statistical fragment, or clipped qualifier into a heading, even when it fits a character limit.
+- Home cards, the library, related readings, and article pages must use the same headline policy. Regeneration must repair stale automatic headings without changing body findings or source passages.
+- Use short reader-oriented content labels such as Research, Commentary, Conceptual framework, and Product guide. Put reading depth in source metadata rather than a prominent process label. An abstract-derived finding remains abstract-based even if other full-text sections are available.
+- Test current-corpus and future-record headings, conceptual/commentary distinctions, mixed source depth, and keyboard/mobile rendering.

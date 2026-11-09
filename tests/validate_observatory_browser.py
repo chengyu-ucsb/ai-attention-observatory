@@ -483,7 +483,7 @@ def check_typed_readings(page, url, width, out):
     dates.locator(':scope > summary').click()
     for key in ('thesis', 'reasoning', 'examples', 'tension', 'qualification'):
         expect(paper).to_contain_text(commentary['reading']['digest']['longform'][key])
-    for forbidden in ('How it was studied', 'Study approach', 'Reported finding', 'REPORTED FINDING', 'Stale visual sentinel'):
+    for forbidden in ('How it was studied', 'Study approach', 'Reported finding', 'Main finding', 'Stale visual sentinel'):
         expect(paper).not_to_contain_text(forbidden)
     expect(paper.locator('.automatic-evidence, .rv-original-figure, .rv-context-grid')).to_have_count(0)
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', commentary['reading']['source_url'])
@@ -624,7 +624,7 @@ def check_registered_readings(page, url, width, out, payloads):
                 actual = paper.evaluate("el => { const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); const parts = []; while (walk.nextNode()) parts.push(walk.currentNode.textContent); return parts.join(' ').replace(/\\s+/g, ' ').trim(); }")
                 assert re.sub(r'\s+', ' ', value).strip() in actual, field
         if commentary:
-            for label in ('How it was studied', 'Study approach', 'REPORTED FINDING', 'Methods as indexed', 'Results as indexed'):
+            for label in ('How it was studied', 'Study approach', 'Main finding', 'Methods as indexed', 'Results as indexed'):
                 expect(paper).not_to_contain_text(label)
             expect(paper.locator('.rv-context-grid')).to_have_count(0)
         if 'Preprint, not verified peer-reviewed evidence' in reading['notice']:
@@ -705,6 +705,51 @@ def check_artwork_uniqueness(page, url):
     page.close()
 
 
+def check_reader_headings(page, url, width):
+    """Headings and metadata work for live-shaped records, at every supported width."""
+    page.set_viewport_size({'width': width, 'height': 900})
+    page.goto(url, wait_until='networkidle')
+    expect(page.locator('#library-count')).to_contain_text('matching sources')
+    audit = page.evaluate("""() => S.records.map(x => ({
+      title: readingHeadline(x), source: readableSourceTitle(x),
+      automatic: x.reading?.digest?.status === 'automatically_condensed_source_text',
+      type: readingKind(x), basis: readingBasisName(x)
+    }))""")
+    assert len(audit) > 50
+    for row in audit:
+        assert row['type'] in ('Research', 'Commentary', 'Conceptual framework', 'Product guide')
+        assert not re.search(r'\b(?:p|r|b|se|sd)\s*[=<>]|β\s*=', row['title'], re.I)
+        if row['automatic']:
+            assert row['title'] == row['source']
+    page.evaluate("goto('library')")
+    expect(page.locator('#library')).to_be_visible()
+    for label in page.locator('.card-type').all_text_contents():
+        assert '/' not in label and 'RESULT' not in label
+    sample = page.evaluate("""() => {
+      const x = S.records.find(x => x.doi === '10.3389/fpsyg.2026.1971672');
+      goto('paper', id(x));
+      return {title:readableSourceTitle(x), finding:x.reading.digest.finding};
+    }""")
+    expect(page.locator('.rv-headline')).to_have_text(sample['title'])
+    assert page.locator('.rv-headline').evaluate('(el) => document.activeElement === el'), 'Navigation must focus the complete heading'
+    expect(page.locator('.rv-content')).to_contain_text(sample['finding'])
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    # Full-text availability cannot relabel a finding taken from the abstract.
+    page.evaluate("""() => {
+      const x={kind:'scholarly',doi:'10.0000/browser-label-regression',
+        title:'A study of AI literacy and cognitive load',
+        reading:{level:'full_text',digest:{status:'automatically_condensed_source_text',
+          idea:'In contrast, cognitive load was negatively correlated with AI literacy (r = −0.361, p < 0.01).',
+          finding:'Cognitive load was negatively correlated with AI literacy (r = −0.361, p < 0.01).',finding_source:'abstract'}}};
+      S.records.push(x);goto('paper',id(x));
+    }""")
+    expect(page.locator('.rv-headline')).to_have_text('A study of AI literacy and cognitive load')
+    expect(page.locator('.rv-source-row')).to_contain_text('Based on the abstract')
+    expect(page.locator('.rv-claim')).to_contain_text('r = −0.361, p < 0.01')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    page.close()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
@@ -730,6 +775,7 @@ if __name__ == '__main__':
                 check_standalone_brief(context.new_page(), url, width, args.screenshots)
                 check_typed_readings(context.new_page(), url, width, args.screenshots)
                 check_registered_readings(context.new_page(), url, width, args.screenshots, registered)
+                check_reader_headings(context.new_page(), url, width)
             finally:
                 context.close()
         print(f'Observatory browsing passed in {args.browser}: 1280, 768, 390, 320px; theme navigation, filters, dates, reading pages, all routes, generated newsletter and RSS subscription pages.')

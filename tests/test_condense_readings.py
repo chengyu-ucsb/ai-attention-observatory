@@ -101,8 +101,7 @@ class CondensedReadingTests(unittest.TestCase):
   digest=annotate(paper)["reading"]["digest"]
   self.assertEqual(digest["finding"],"")
   self.assertEqual(digest["finding_source"],"none")
-  self.assertEqual(digest["idea"],"How does switching between tasks affect attention?")
-  self.assertNotEqual(digest["idea"],paper["title"])
+  self.assertEqual(digest["idea"],paper["title"])
   self.assertEqual(digest["interpretation"],"")
  def test_source_snippets_do_not_publish_half_sentences(self):
   from condense_readings import source_snippet
@@ -139,6 +138,52 @@ class CondensedReadingTests(unittest.TestCase):
   from condense_readings import PUBLIC_COMMENTARY
   for idea in PUBLIC_COMMENTARY.values():
    self.assertNotRegex(idea,r"(?i)^(?:the authors|the source|one interpretation is that|the paper)")
+class HeadlinePolicyTests(unittest.TestCase):
+ def test_raw_statistics_are_never_promoted_to_a_headline(self):
+  result=("In contrast, cognitive load was negatively correlated with AI Literacy "
+          "(r = −0.361, p < 0.01), self-reported Complex Problem-Solving Skills "
+          "(r = −0.368, p < 0.01), and Systematic Thinking Skills (r = −0.271, p < 0.01).")
+  paper={"kind":"scholarly","title":"AI literacy and cognitive load",
+         "abstract_text":result,"reading":{"level":"abstract","findings":result}}
+  published=annotate(paper)
+  digest=published["reading"]["digest"]
+  self.assertEqual(digest["idea"],paper["title"])
+  self.assertIn("negatively correlated",digest["finding"])
+  self.assertIn("p < 0.01",digest["finding"])
+  self.assertEqual(published["reading"]["findings"],result)
+  self.assertEqual(published["abstract_text"],result)
+
+ def test_even_short_clean_findings_need_editorial_work(self):
+  result="Results showed that AI use was associated with higher self-reported attention."
+  paper={"kind":"scholarly","title":"Reported attention and AI use",
+         "reading":{"level":"abstract","findings":result}}
+  digest=annotate(paper)["reading"]["digest"]
+  self.assertEqual(digest["idea"],paper["title"])
+  self.assertIn("associated",digest["finding"])
+
+ def test_source_title_keeps_long_subtitle_and_qualification(self):
+  title=("AI assistance and learning: "+"Evidence from a specific educational setting "*6+
+         "without evidence of independent learning gains")
+  paper={"kind":"scholarly","title":title,"reading":{"level":"abstract"}}
+  self.assertEqual(annotate(paper)["reading"]["digest"]["idea"],title)
+
+ def test_machine_thesis_is_not_split_into_a_benefit_only_headline(self):
+  thesis="AI makes assignments easier. However, independent learning may suffer."
+  paper={"kind":"nonacademic","title":"The tradeoffs of AI in education",
+         "reading":{"level":"full_text"},
+         "deep_analysis":{"kind":"nonacademic","source_depth":"source_html","thesis":thesis}}
+  digest=annotate(paper)["reading"]["digest"]
+  self.assertEqual(digest["idea"],paper["title"])
+  self.assertEqual(digest["explain"],thesis)
+
+ def test_rebuilding_replaces_a_stale_extracted_headline(self):
+  result="Results showed that AI use was associated with higher self-reported attention."
+  paper={"kind":"scholarly","title":"Reported attention and AI use",
+         "reading":{"level":"abstract","findings":result,"digest":{"idea":result}}}
+  once=annotate(paper)
+  self.assertEqual(once["reading"]["digest"]["idea"],paper["title"])
+  self.assertEqual(annotate(once),once)
+
 class ReadingCompletenessTests(unittest.TestCase):
  def test_long_intact_result_is_not_discarded_to_fit_a_card(self):
   result="The results showed that AI assistance was associated with stronger self-reported monitoring during the writing task, although the association was not observed for independent performance after the tool was removed."

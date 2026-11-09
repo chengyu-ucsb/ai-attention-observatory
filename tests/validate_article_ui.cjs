@@ -35,7 +35,7 @@ const doc={createElement:tag=>new Element(tag),createElementNS:(_ns,tag)=>new El
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unable to load application functions");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
-vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,featureCoverage,renderBacklog,issueSourceShelfItem,readableSourceTitle,editorialImage,make,S,readingParagraphs,sourceFields,readingBullets,readingQualifications,compactReading};",ctx);
+vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,featureCoverage,renderBacklog,issueSourceShelfItem,readableSourceTitle,readingHeadline,readingKind,readingBasisName,editorialImage,make,S,readingParagraphs,sourceFields,readingBullets,readingQualifications,compactReading};",ctx);
 const nodes=root=>[root,...root.children.flatMap(nodes)];
 const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
@@ -113,7 +113,7 @@ for(const r of db){
    assert(!match(page,"rv-research-longform"),"Original summary must not borrow older research prose");
    if(commentary){
      assert(match(page,"rv-longform")&&!match(page,"rv-context-grid"),"Original commentary must retain its argument structure");
-     for(const label of ["How it was studied","Study approach","REPORTED FINDING","Methods as indexed","Results as indexed"])
+     for(const label of ["How it was studied","Study approach","Main finding","Methods as indexed","Results as indexed"])
        assert(!textContent(page).includes(label),"Original commentary inherited a scholarly label: "+label);
    }else{
      assert(match(page,"rv-context-grid"),"Original scholarly method and qualifications must remain visible");
@@ -305,7 +305,7 @@ assert.equal(JSON.stringify(original),originalBefore,"Rendering must never rewri
 assert.equal(vm.runInContext("TEST.shortIdea(selected,200)",ctx),originalDigest.idea);
 assert.equal(vm.runInContext("TEST.processedIdea(selected)",ctx),originalDigest.idea);
 assert.equal(vm.runInContext("TEST.ideaInfo(selected).text",ctx),originalDigest.idea);
-assert.equal(vm.runInContext("TEST.ideaInfo(selected).label",ctx),"RESEARCH READING");
+assert.equal(vm.runInContext("TEST.ideaInfo(selected).label",ctx),"Research");
 const coverage=vm.runInContext("TEST.featureCoverage(selected)",ctx);
 assert(textContent(coverage).includes(original.reading.source_version));
 assert(matching(coverage,"feature-evidence-mark").some(n=>n.title==="Checked source text"));
@@ -358,8 +358,8 @@ assert(!textContent(match(paperContainer,"rv-source")).includes("Related journal
 const conceptualOriginal={...original,research_type:"conceptual_framework"};
 ctx.selected=conceptualOriginal;vm.runInContext("TEST.showPaper(selected)",ctx);
 assert.equal(match(paperContainer,"rv-headline").textContent,originalDigest.idea);
-assert(textContent(match(paperContainer,"rv-claim")).includes("PROPOSED MODEL, NOT A TESTED EFFECT"));
-assert(vm.runInContext("TEST.ideaInfo(selected).label",ctx).includes("CONCEPTUAL PROPOSAL"));
+assert(textContent(match(paperContainer,"rv-claim")).includes("Proposed framework"));
+assert(vm.runInContext("TEST.ideaInfo(selected).label",ctx).includes("Conceptual framework"));
 const conceptualWithoutFinding={...conceptualOriginal,
  framework_notes:{idea:"Legacy framework idea sentinel.",stages:["First: Legacy framework stage sentinel."]},
  reading:{...conceptualOriginal.reading,findings:"",digest:{...conceptualOriginal.reading.digest,finding:""}}
@@ -486,7 +486,7 @@ ctx.selected=commentary;vm.runInContext("TEST.showPaper(selected)",ctx);
 const commentaryText=textContent(paperContainer);
 assert(textContent(match(paperContainer,"rv-head")).includes(commentary.reading.temporal_notice),"Date-version caveat must remain accessible from the header");
 for(const value of Object.values(lenses))assert(commentaryText.includes(value),"Missing commentary lens: "+value);
-for(const forbidden of ["How it was studied","Study approach","REPORTED FINDING","Reported finding","Methods as indexed","Stale unreviewed"])
+for(const forbidden of ["How it was studied","Study approach","Main finding","Reported finding","Methods as indexed","Stale unreviewed"])
  assert(!commentaryText.includes(forbidden),"Commentary borrowed scholarly content: "+forbidden);
 assert(!match(paperContainer,"rv-context-grid"));assert(!match(paperContainer,"automatic-evidence"));
 assert(!match(paperContainer,"rv-source-excerpts"),"Checked commentary must not inherit an indexed-source reader");
@@ -671,3 +671,49 @@ ctx.artRecord={...db[0],editorial_art:undefined};
 assert.equal(vm.runInContext('TEST.editorialImage(artRecord,"reading")',ctx),null,"Missing art must not silently reuse a topic cover");
 assert(html.includes('id="icon-focus"')&&html.includes('id="icon-search"'),"Icon sprite missing");
 console.log("Article-specific asset safety, thumbnail loading, decorative alt and SVG icon tests passed.");
+
+// Headings describe the reading; raw evidence stays in the body. Test both
+// old committed payloads and future records without relying on a DOI allowlist.
+const statisticalHeading=/\b(?:p|r|b|t|f|se|sd|cfi|rmsea)\s*(?:\([^)]*\))?\s*[=<>≤≥]|[βχ]\s*[=<>]/i;
+const obsoleteLabels=/RESULT FROM (?:FULL TEXT|ABSTRACT)|RESEARCH TOPIC \/|EDITORIAL TAKEAWAY \/|NOT AN ESTABLISHED FINDING|SOURCE-DERIVED RESULT|PERSPECTIVE \/ ATTRIBUTED/;
+for(const row of db){
+ ctx.selected=row;
+ const heading=vm.runInContext('TEST.readingHeadline(selected)',ctx);
+ assert.equal(vm.runInContext('TEST.shortIdea(selected,12)',ctx),heading,"Card titles must not clip a qualifier");
+ assert.equal(vm.runInContext('TEST.processedIdea(selected)',ctx),heading,"Every heading surface needs the same policy");
+ assert(!statisticalHeading.test(heading),"Statistical extract leaked into heading: "+row.title);
+ assert(!/(?:…|\.\.\.)$/.test(heading),"Headline was truncated");
+ if(row.reading?.digest?.status==='automatically_condensed_source_text')
+  assert.equal(heading,vm.runInContext('TEST.readableSourceTitle(selected)',ctx),'Unedited readings should retain their source title');
+ vm.runInContext('TEST.showPaper(selected)',ctx);
+ assert.equal(match(paperContainer,'rv-headline').textContent,heading);
+ assert(!obsoleteLabels.test(textContent(paperContainer)),"Internal evidence label leaked into reader");
+ assert(['Research','Commentary','Conceptual framework','Product guide'].includes(vm.runInContext('TEST.ideaInfo(selected).label',ctx)));
+}
+const rawStats='In contrast, cognitive load was negatively correlated with AI Literacy ( r = −0.361, p < 0.01), self-reported Complex Problem-Solving Skills ( r = −0.368, p < 0.01), and Systematic Thinking Skills ( r = −0.271, p < 0.01).';
+const headlineFixture={kind:'scholarly',title:'AI literacy, cognitive load, and problem-solving skills',doi:'10.0000/future-headline',reading:{level:'full_text',digest:{status:'automatically_condensed_source_text',idea:rawStats,finding:rawStats,finding_source:'full_text'}}};
+ctx.selected=headlineFixture;vm.runInContext('TEST.showPaper(selected)',ctx);
+assert.equal(match(paperContainer,'rv-headline').textContent,headlineFixture.title);
+assert(textContent(match(paperContainer,'rv-content')).includes(rawStats),'The fix must preserve exact statistics in the findings');
+for(const bad of [rawStats, "AI literacy and cognitive load were correlated (ρ = −0.36).", "A group difference was found (χ²(1) = 4.8).", "The model explained variance (R^2 = .21).",'A long statement '.repeat(25)+'with a necessary final qualification.','A promising result, but…','Results: A result detached from its context.']){
+ ctx.selected={...headlineFixture,reading:{...headlineFixture.reading,digest:{...headlineFixture.reading.digest,status:'editorially_written_from_indexed_sections',idea:bad}}};
+ assert.equal(vm.runInContext('TEST.readingHeadline(selected)',ctx),headlineFixture.title,'Unsafe edited candidate must fall back intact');
+}
+const completeTitle='The relationship between '+('a named construct and ').repeat(16)+'the final qualifying study population';
+ctx.selected={...headlineFixture,title:completeTitle};
+assert.equal(vm.runInContext('TEST.shortIdea(selected,30)',ctx),completeTitle,'Do not clip a long source title or drop its final qualifier');
+for(const source of ['abstract','full_text']){
+ const mixed={...headlineFixture,reading:{...headlineFixture.reading,digest:{...headlineFixture.reading.digest,finding_source:source}}};
+ ctx.selected=mixed;vm.runInContext('TEST.showPaper(selected)',ctx);
+ const rowText=textContent(match(paperContainer,'rv-source-row'));
+ assert(rowText.includes(source==='abstract'?'Based on the abstract':'Full-text sections'),'Finding basis must remain visible independently of headline');
+ assert.equal(vm.runInContext('TEST.ideaInfo(selected).label',ctx),'Research');
+}
+ctx.selected={...headlineFixture,research_type:'conceptual_framework',reading:{level:'abstract',digest:{idea:'A proposed model',finding:'',status:'conceptual_framework'}}};
+vm.runInContext('TEST.showPaper(selected)',ctx);
+assert.equal(vm.runInContext('TEST.ideaInfo(selected).label',ctx),'Conceptual framework');
+assert(textContent(paperContainer).includes('Proposed framework'),'Conceptual work must remain distinct from measured findings');
+assert(!textContent(match(paperContainer,'rv-content')).includes('What the study reports'));
+ctx.selected={kind:'nonacademic',title:'A product focus guide',reading:{level:'curated',digest:{longform:{source_depth:'product_documentation'}}}};
+assert.equal(vm.runInContext('TEST.ideaInfo(selected).label',ctx),'Product guide');
+console.log('Reader-oriented labels and whole-corpus heading safeguards passed: no raw results, clipped qualifiers, or lost source-depth distinctions.');
