@@ -103,7 +103,7 @@ class CitationTests(unittest.TestCase):
         i=fixture();i['glossary'].append({'term':'Alpha','definition':'A named source.'})
         rendered=bn.render_issue(i)
         self.assertIn('class="glossary-term" href="#term-uncertainty-1"',rendered)
-        self.assertIn('<dt id="term-uncertainty-1">',rendered)
+        self.assertIn('<dt id="term-uncertainty-1" tabindex="-1">',rendered)
         self.assertNotIn('href="#term-alpha-2"',rendered)
         self.assertIn('What we do not yet know.',bn.rss_content(i))
 

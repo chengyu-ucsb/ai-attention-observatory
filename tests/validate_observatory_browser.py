@@ -304,9 +304,28 @@ def check_weekly_citations(page, url, width, out):
         page.keyboard.press('Enter')
     expect(page).to_have_url(archive_url + fragment)
     target = page.locator(fragment)
-    expect(target).to_be_visible()
-    expect(target.locator('xpath=following-sibling::dd[1]')).to_be_visible()
-    assert target.evaluate('(e) => { const r=e.getBoundingClientRect(); return r.top>=0 && r.top<innerHeight; }')
+    definition = target.locator('xpath=following-sibling::dd[1]')
+    expect(target).to_be_focused()
+    # Native fragment scrolling can settle after the URL changes, and fractional
+    # CSS pixels can round across zero. Retry actual viewport checks, not merely
+    # DOM visibility; retain precise geometry if a browser still misses its target.
+    try:
+        expect(target).to_be_in_viewport()
+        expect(definition).to_be_in_viewport()
+        page.wait_for_function('''id => {
+            const term = document.getElementById(id), definition = term.nextElementSibling;
+            return [term, definition].every(e => {
+                const r = e.getBoundingClientRect();
+                return r.top >= -1 && r.bottom <= innerHeight + 1 && r.height > 0;
+            });
+        }''', arg=fragment[1:])
+    except Exception as error:
+        geometry = target.evaluate('''e => ({
+            term: e.getBoundingClientRect().toJSON(),
+            definition: e.nextElementSibling.getBoundingClientRect().toJSON(),
+            viewport: {width: innerWidth, height: innerHeight}, scrollY
+        })''')
+        raise AssertionError(f'Archive glossary scroll/focus failed at {width}px: {geometry}') from error
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Archive glossary overflow at {width}px'
     page.go_back()
     expect(page).to_have_url(archive_url)
