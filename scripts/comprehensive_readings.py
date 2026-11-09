@@ -389,6 +389,30 @@ def reading_queue_key(record):
     return (ready_at,*identity)
 
 
+def source_coverage_basis(document):
+    """Describe the retrieved representation, never guess it from kind or URL."""
+    coverage=document.coverage
+    if coverage.get('evidence_status')!='full_document_retrieved':
+        return 'Partial source coverage; not a whole-article review.'
+    format=coverage.get('document_format')
+    # PDF and HTML parsers predate document_format. Use their actual coverage
+    # metadata when no explicit format is supplied, not a misleading URL suffix.
+    if not format:
+        if 'html_body_selection' in coverage or 'html_completeness' in coverage:
+            format='html'
+        elif 'pages_total' in coverage:
+            format='pdf'
+    if format in ('jats','tei','xml'):
+        return 'All supplied article XML text retrieved; equivalence to the original PDF is not verified.'
+    if format=='pdf':
+        return 'Whole PDF text retrieved.'
+    if format in ('html','xhtml'):
+        return 'All supplied article HTML text retrieved.'
+    if format in ('text','plain_text','txt'):
+        return 'All supplied plain text retrieved.'
+    return 'All supplied source text retrieved; document format is not verified.'
+
+
 def process(records,model,limit=2,retriever=None,run_date=None):
     stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
            'failed':0,'failure_reasons':{},'failure_stages':{},
@@ -424,8 +448,7 @@ def process(records,model,limit=2,retriever=None,run_date=None):
                 model='Qwen2.5-1.5B-Instruct (on-runner; chunked with claim checking)',
                 basis=('Every retrieved text chunk processed; claim-level machine checks. '
                        'Not independently reviewed. Figures, tables and supplements not visually verified. '
-                       + (('All supplied article XML text retrieved; equivalence to the original PDF is not verified.'
-                          if document.coverage.get('document_format') in ('jats','tei') else 'Whole PDF text retrieved.') if complete else 'Partial source coverage; not a whole-article review.')),
+                       + source_coverage_basis(document)),
                 review_status='machine_checked_not_independently_reviewed',created_at=today)
             previous=record.get('deep_analysis') or {}
             if not complete and previous.get('source_depth') in ('full_text','source_html'):

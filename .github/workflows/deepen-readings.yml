@@ -11,6 +11,12 @@ on:
       - 'scripts/structured_article_access.py'
       - 'scripts/openaire_locations.py'
       - 'scripts/comprehensive_readings.py'
+      - 'scripts/acquisition_handoff.py'
+      - 'scripts/collect_weekly_sources.py'
+      - 'scripts/source_receipt_refresh.py'
+      - 'scripts/source_access_controls.py'
+      - 'scripts/reading_checkpoint.py'
+      - 'scripts/prepared_reading_schema.py'
       - 'scripts/condense_readings.py'
       - 'app.js'
       - 'tests/**'
@@ -27,28 +33,33 @@ concurrency:
 jobs:
   deepen:
     runs-on: ubuntu-24.04
-    timeout-minutes: 45
+    # Reserve checkpoint/recovery time after the bounded 50-minute reading step.
+    timeout-minutes: 95
     steps:
-      - uses: actions/checkout@v7
+      # Official Node 24 releases and ubuntu-24.04 compatibility checked Nov 9, 2026.
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
           fetch-depth: 0
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.11'
       - name: Validate pipeline and page rendering without network
+        timeout-minutes: 5
         run: |
           python -m compileall -q scripts tests
           python -m unittest discover -s tests -v
           node --check app.js
           node tests/validate_article_ui.cjs
       - name: Install PDF extraction and local CPU inference
+        timeout-minutes: 8
         if: github.event_name != 'pull_request'
         run: |
           python -m pip install --disable-pip-version-check --prefer-binary \
             --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
             'llama-cpp-python>=0.3.0,<0.4' 'pypdf>=6.0,<7.0'
       - name: Download open model weights without hosted inference
+        timeout-minutes: 8
         if: github.event_name != 'pull_request'
         run: |
           curl --fail --location --retry 2 --connect-timeout 15 --max-time 420 \
@@ -56,6 +67,8 @@ jobs:
             --output /tmp/attention-model.gguf
           test "$(stat -c '%s' /tmp/attention-model.gguf)" -gt 900000000
       - name: Read complete retrieved text and check each claim
+        id: readings
+        timeout-minutes: 50
         if: github.event_name != 'pull_request'
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
@@ -65,33 +78,52 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python scripts/comprehensive_readings.py
       - name: Validate completed notes before saving
+        id: validation
+        timeout-minutes: 5
         if: github.event_name != 'pull_request'
         run: |
           python -m unittest discover -s tests -v
           python -m json.tool data/library.json >/dev/null
-      - name: Save original notes and coverage only
-        if: github.event_name != 'pull_request'
+      - name: Preserve independently validated acquisition metadata after reading
+        id: checkpoint
+        timeout-minutes: 2
+        if: always() && github.event_name != 'pull_request' && (steps.readings.outcome == 'success' || steps.readings.outcome == 'failure' || steps.readings.outcome == 'cancelled')
+        env:
+          INCLUDE_LIBRARY: ${{ steps.readings.outcome == 'success' && steps.validation.outcome == 'success' }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/library.json
-          if ! git diff --cached --quiet; then
-            git commit -m "Save claim-checked readings with source coverage"
-            pushed=false
-            for attempt in 1 2 3; do
-              if git push; then pushed=true; break; fi
-              git fetch origin main
-              if ! git rebase origin/main; then
-                git rebase --abort || true
-                echo "::error::Data conflicts require reconciliation; source text is not persisted."
-                exit 1
-              fi
-              sleep 2
-            done
-            if [ "$pushed" != true ]; then
-              echo "::error::Could not save completed readings."
+          args=()
+          if [ "$INCLUDE_LIBRARY" = true ]; then args+=(--include-library); fi
+          python scripts/reading_checkpoint.py snapshot --destination "$RUNNER_TEMP/validated-readings" "${args[@]}"
+      - name: Save exact validated checkpoint without replaying source or model work
+        timeout-minutes: 4
+        if: always() && github.event_name != 'pull_request' && steps.checkpoint.outputs.valid == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          save_tree="$RUNNER_TEMP/reading-checkpoint-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python scripts/reading_checkpoint.py commit --destination "$RUNNER_TEMP/validated-readings" --worktree "$save_tree"
+          # No local change means there is no saved result to rebase or push.
+          if [ "$(git -C "$save_tree" rev-parse HEAD)" = "$(git rev-parse HEAD)" ]; then exit 0; fi
+          cd "$save_tree"
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo '::error::Checkpoint conflict; preserved validated artifact requires reconciliation.'
               exit 1
             fi
-          fi
-
-
+            python "$GITHUB_WORKSPACE/scripts/reading_checkpoint.py" verify --root "$GITHUB_WORKSPACE" --destination "$RUNNER_TEMP/validated-readings" --worktree "$save_tree"
+            if git push origin HEAD:main; then exit 0; fi
+            sleep "$((attempt * 2))"
+          done
+          echo '::error::Could not save validated reading checkpoint.'
+          exit 1
+      - name: Retain validated recovery metadata and permitted original notes
+        timeout-minutes: 2
+        if: always() && github.event_name != 'pull_request' && steps.checkpoint.outputs.valid == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: reading-checkpoint-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validated-readings/
+          retention-days: 7
+          if-no-files-found: error

@@ -27,7 +27,7 @@ from urllib.parse import urlencode
 
 
 from academic_state_schema import (SCHEMA, SAFE_PARAMS, PROVIDERS, digest, fingerprint,
-                                   validate_state, validate_row, project_publication_event, strict_json_loads)
+                                   validate_state, validate_row, project_publication_event, strict_json_loads, MAX_DATE_RETRIES)
 RETRYABLE = {429, 500, 502, 503, 504}
 
 
@@ -74,6 +74,11 @@ class DiscoveryState:
         if self.path and self.path.exists():
             self.data = strict_json_loads(self.path.read_text())
             validate_state(self.data)
+        self.prefetched_queries = {}
+        self.select_window(mode, window)
+
+    def select_window(self, mode, window):
+        """Switch slices in one shared state without losing provider cooldowns."""
         self.window = dict(window or {"from": "unspecified", "to": "unspecified"})
         self.window_id = f"{mode}:{self.window['from']}:{self.window['to']}"
         self.had_window = self.window_id in self.data["windows"]
@@ -81,6 +86,49 @@ class DiscoveryState:
             "mode": mode, "window": self.window, "queries": {}, "plans": {}, "date_evidence": {}})
         self.validate_window(mode, window)
         validate_state(self.data)
+
+    def date_retry_key(self, provider, identity):
+        return digest({"provider": provider, "identity": identity})
+
+    def date_retry_order(self, provider, identity):
+        key = self.date_retry_key(provider, identity)
+        retry = self.data.get("date_retries", {}).get(key, {})
+        cursor = self.data.get("date_retry_cursors", {}).get(provider, "")
+        # Untracked candidates precede due retries. Rotate their hashed identity
+        # order so capacity eviction cannot repeatedly favor the original head.
+        return (retry.get("next_retry_at", 0), retry.get("attempts", 0),
+                retry.get("last_attempt_at", 0), key <= cursor if cursor else False, key if cursor else "")
+
+    def date_retry_due(self, provider, identity):
+        return self.date_retry_order(provider, identity)[0] <= self.now()
+
+    def record_date_retry(self, provider, identity, *, resolved=False, unavailable=False):
+        """Scheduling only: no date, provider body, URL, or provenance is accepted.
+
+        Resolved means the metadata lookup completed, not publication eligibility.
+
+        One failure per candidate, shared across daily/closeout namespaces. Retry
+        after 1, 2, 4, ... hours, capped at 7 days. Provider-wide pauses still win.
+        Old inactive entries expire after 90 days; the oldest attempted entry is
+        evicted at capacity. Neither eviction nor success changes provider state.
+        """
+        retries = self.data.setdefault("date_retries", {})
+        key = self.date_retry_key(provider, identity)
+        self.data.setdefault("date_retry_cursors", {})[provider] = key
+        if resolved:
+            retries.pop(key, None)
+            self.save()
+            return
+        now = self.now()
+        for stale in [k for k, v in retries.items() if v["last_attempt_at"] < now - 90 * 86400]:
+            del retries[stale]
+        attempts = min(32, retries.get(key, {}).get("attempts", 0) + 1)
+        if key not in retries and len(retries) >= MAX_DATE_RETRIES:
+            del retries[min(retries, key=lambda k: (retries[k]["last_attempt_at"], k))]
+        retries[key] = {"provider": provider, "attempts": attempts,
+                        "last_attempt_at": now, "next_retry_at": now + min(7 * 86400, 3600 * 2 ** min(attempts - 1, 8)),
+                        "outcome": "unavailable" if unavailable else "unresolved"}
+        self.save()
 
     def validate_window(self, mode, window):
         if window is not None and (self.current["mode"] != mode or self.current["window"] != dict(window)):
@@ -257,6 +305,9 @@ def cursor_search(request, provider, params, *, state=None, max_pages=5, page_si
     state = state or DiscoveryState()
     validate_state(state.data)
     query_id = state.query_id(provider, params, page_size)
+    prefetched = state.prefetched_queries.get((state.window_id, query_id))
+    if prefetched is not None:
+        return copy.deepcopy(prefetched)
     if state.resume_only and query_id not in {q for p in state.current["plans"].values() for q in p["active"]}:
         return [], {"provider": provider, "query_id": query_id, "query": params.get("search") or params.get("query.bibliographic") or params.get("query.title", ""),
                     "filter": params.get("filter", ""), "status": "deferred", "truncated": True,
@@ -269,6 +320,7 @@ def cursor_search(request, provider, params, *, state=None, max_pages=5, page_si
     errors, run_pages = [], 0
     before_requests = state.requests.get(provider, 0)
     cached_pages = q["pages"]
+    prior_attempts = q.get("attempts", cached_pages)
     try:
         while q["status"] != "complete" and run_pages < max_pages:
             cursor = q["cursor"]
@@ -326,6 +378,11 @@ def cursor_search(request, provider, params, *, state=None, max_pages=5, page_si
         q.update(status="error", reason=reason)
         state.save()
         errors.append(provider + " search unavailable: " + reason)
+    attempted = state.requests.get(provider, 0) - before_requests
+    if attempted:
+        q["attempts"] = prior_attempts + attempted
+        q["last_attempt_at"] = state.now()
+        state.save()
     if max_pages < 1 and q["status"] != "complete":
         q.update(status="truncated", reason="page budget is zero")
         state.save()
@@ -348,3 +405,37 @@ def cursor_search(request, provider, params, *, state=None, max_pages=5, page_si
         if p.get("last_http_status") == 429:
             audit["quota_exhausted"] = True
     return copy.deepcopy(list(q["rows"].values())), audit, errors
+
+
+def prefetch_searches(request, jobs, *, state, max_pages=1):
+    """Protect search progress across slices and groups before date verification.
+
+    Jobs are (mode, window, provider, params, page_size), interleaved by caller.
+    Each query gets one page per turn. Least-attempted/oldest attempts go first;
+    completed cursors are replayed without requests. Results retain the real
+    per-run audit when the normal article collectors consume their cached pages.
+    """
+    results = {}
+    def order(job):
+        mode, window, provider, params, size = job
+        window_id = f"{mode}:{window['from']}:{window['to']}"
+        qid = state.query_id(provider, params, size)
+        q = state.data["windows"].get(window_id, {}).get("queries", {}).get(qid, {})
+        return (q.get("attempts", q.get("pages", 0)), q.get("last_attempt_at", q.get("observed_at", 0)))
+    for _ in range(max_pages):
+        for mode, window, provider, params, size in sorted(jobs, key=order):
+            state.select_window(mode, window)
+            qid = state.query_id(provider, params, size)
+            q = state.current["queries"].get(qid, {})
+            if q.get("status") == "complete": continue
+            rows, audit, errors = cursor_search(request, provider, params, state=state, max_pages=1, page_size=size)
+            key = (state.window_id, qid)
+            previous = results.get(key)
+            if previous:
+                audit["requests_this_run"] += previous[1]["requests_this_run"]
+                audit["pages_this_run"] += previous[1]["pages_this_run"]
+                audit["cached_pages"] = previous[1]["cached_pages"]
+                errors = previous[2] + errors
+            audit["max_pages"] = max_pages
+            results[key] = (rows, audit, errors)
+    state.prefetched_queries.update(results)

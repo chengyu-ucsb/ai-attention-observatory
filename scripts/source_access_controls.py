@@ -124,13 +124,16 @@ def merge_diagnostics_into_state(state, diagnostics, *, now=None):
     """Return sealed acquisition metadata after a reader's independent retrieval.
 
     Callers can save immediately before model/receipt validation. No article
-    records, attempts, cursors, input fingerprints or source receipts change.
+    cursors or input fingerprints change. Receipt-bound mismatch observations
+    can request a bounded refresh; they never replace a receipt or grant review.
     """
     import collect_weekly_sources as queue
     shared = merge_controls(controls_from_state(state), controls_from_diagnostics(diagnostics, now))
     updated = deepcopy(state)
     updated['access_controls'] = shared
     updated['provider_pauses'] = dict(shared['provider_pauses'])
+    from source_receipt_refresh import observe
+    observe(updated, diagnostics, queue.utc_now(now))
     if 'run' in updated:
         checked = queue.utc_now(updated['run']['checked_at'])
         updated['run']['active_provider_pauses'] = {key: until for key, until in updated['provider_pauses'].items()

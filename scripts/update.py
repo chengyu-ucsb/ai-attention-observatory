@@ -57,6 +57,21 @@ def openalex_search(params, *, max_pages=5, page_size=100, state=None):
  return cursor_search(request,"OpenAlex",params,state=state,max_pages=max_pages,page_size=page_size)
 
 
+def discovery_queries(today, mode, publication_window, page_size):
+ """The same general query plan used by preparation's fair search scheduler."""
+ scopes=plan(today,mode,publication_window=publication_window)
+ return queries_for_scopes(scopes,page_size)
+
+
+def queries_for_scopes(scopes,page_size):
+ queries=[]
+ for lane,q,start,end,scope in scopes:
+  queries.extend([("OpenAlex",{"search":q,"filter":"from_publication_date:"+start+",to_publication_date:"+end,
+                **({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})},page_size),
+                  ("Crossref",{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},page_size)])
+ return queries
+
+
 def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=100,arxiv_verifier=None,state=None,*,observed_on=None,publication_window=None,metadata_request=None):
  """Collect metadata within explicit publication windows, with coverage limits."""
  fetch_metadata=metadata_request or request
@@ -69,10 +84,7 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
  window={"from":start_window.isoformat(),"to":end_window.isoformat()}
  state=state or DiscoveryState(mode=mode,window=window)
  state.validate_window(mode,window)
- planned=[]
- for lane,q,start,end,scope in scopes:
-  planned.extend([("OpenAlex",{"search":q,"filter":"from_publication_date:"+start+",to_publication_date:"+end},page_size),
-                  ("Crossref",{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},page_size)])
+ planned=queries_for_scopes(scopes,page_size)
  state.register_plan("general",planned)
  stats["search_scopes"]=[{"theme":lane,"period":scope,"from":start,"to":end,"query":q} for lane,q,start,end,scope in scopes]
  stats["queries_planned"]=2*len(scopes);stats["queries_attempted"]=0
@@ -130,15 +142,25 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
    pending.update(published="",publication_date_provenance=evidence,acquisition_status="original_publication_date_required")
    quarantined[key(x)]=pending
   for x in uncertain:quarantine(x,"Crossref original-publication day unavailable or unresolved")
-  for x in found:
+  def retry_order(x):
+   identifier=arxiv_identifier(x)
+   return state.date_retry_order("arXiv",identifier+":"+x["title"]) if identifier else state.date_retry_order("Crossref",x.get("doi", ""))
+  for x in sorted(found,key=retry_order):
    if x["source"]=="OpenAlex" and arxiv_identifier(x):
     arxiv_key=arxiv_identifier(x)+":"+x["title"]
     arxiv_cache=state.current.setdefault("arxiv_date_evidence",{})
     if arxiv_key in arxiv_cache:
      day,provenance=arxiv_cache[arxiv_key]
     else:
+     if not state.date_retry_due("arXiv",arxiv_key):
+      deferred.add(arxiv_key);quarantine(x,"Original-day verification deferred by metadata retry schedule");continue
+     before=state.requests.get("arXiv",0)
      day,provenance=arxiv.verify(x)
-     if day:arxiv_cache[arxiv_key]=(day,provenance);state.save()
+     if day:
+      arxiv_cache[arxiv_key]=(day,provenance);state.save()
+      state.record_date_retry("arXiv",arxiv_key,resolved=True)
+     elif state.requests.get("arXiv",0)>before:
+      state.record_date_retry("arXiv",arxiv_key,unavailable=bool(provenance.get("verification_error")))
     if x.get("doi"):crossref_dates[x["doi"]]=(day,provenance)
     x["publication_date_provenance"]=provenance
     if day:
@@ -153,16 +175,22 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
    if x["source"]=="OpenAlex" and x.get("doi"):
     doi=x["doi"]
     if doi not in crossref_dates:
-     if quota or stats["date_lookups"]>=max_date_lookups:
-      deferred.add(doi);quarantine(x,"Original-day verification deferred by provider or lookup budget");continue
+     if quota or stats["date_lookups"]>=max_date_lookups or not state.date_retry_due("Crossref",doi):
+      deferred.add(doi);quarantine(x,"Original-day verification deferred by provider, lookup budget, or retry schedule");continue
      stats["date_lookups"]+=1
+     before=state.requests.get("Crossref",0)
      try:
       result=state.fetch("Crossref","https://api.crossref.org/works/"+urllib.parse.quote(doi,safe="/"),fetch_metadata)
       work=result.get("message") or {}
       if doi_id(work.get("DOI"))!=doi:raise ValueError("DOI identity mismatch")
       crossref_dates[doi]=crossref_publication(work)
       state.current["date_evidence"][doi]=crossref_dates[doi];state.save()
+      # A valid imprecise response remains evidence-review quarantine. It is
+      # not a transport failure that a later convenient date may resolve.
+      state.record_date_retry("Crossref",doi,resolved=True)
      except Exception as exc:
+      if state.requests.get("Crossref",0)>before:
+       state.record_date_retry("Crossref",doi,unavailable=True)
       reason="HTTP "+str(exc.code) if getattr(exc,"code",None) else type(exc).__name__
       errors.append("Original publication date unavailable for "+doi+": "+reason)
       crossref_dates[doi]=("",{"source":"Crossref","status":"unresolved","reason":reason,"verification_error":True})

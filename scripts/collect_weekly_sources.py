@@ -61,7 +61,7 @@ CODES = BLOCKED | SUCCESS | {
     'deferred_time_budget', 'interrupted_attempt', 'worker_failed',
     'retrieval_error', 'coverage_gap', 'invalid_document_locations',
     'route_policy_excluded', 'metadata_budget_exhausted', 'rate_limit_pause',
-    'credentialed_source_url_disallowed', 'source_version_unverified', 'source_unavailable_page',
+    'credentialed_source_url_disallowed', 'source_version_unverified', 'source_unavailable_page', 'receipt_refresh_changed_again',
 }
 SAFE_PROVIDERS = set(CONTROL_PROVIDERS) | {
     'explicit_source', 'existing_source', 'known_open_access_source',
@@ -282,7 +282,8 @@ def validate_row(row, window):
         'attempts', 'cursor', 'plan', 'tried_sources', 'excluded_related_or_outside_window_routes',
         'diagnostics', 'source_text_saved'},
         {'document', 'document_evidence', 'last_outcome', 'next_retry_at', 'last_attempt_at',
-         'html_refresh', 'html_refresh_attempts', 'previous_documents', 'provider_fallbacks', 'provider_attempted_at'})
+         'html_refresh', 'html_refresh_attempts', 'previous_documents', 'provider_fallbacks', 'provider_attempted_at',
+         'source_refreshes', 'source_refresh_hold'})
     hash_value(row['fingerprint']); saved_url(row['source_url'], allow_empty=True)
     require(row['kind'] in {'scholarly', 'nonacademic'} and type(row['complete']) is bool)
     require(type(row['status']) is str and row['status'] in STATUSES and row['source_text_saved'] is False)
@@ -356,8 +357,19 @@ def validate_row(row, window):
         require(row['attempts'] > 0)
     else:
         require('document_evidence' not in row)
+    if 'source_refreshes' in row:
+        import source_receipt_refresh
+        source_receipt_refresh.validate(row)
+    if 'source_refresh_hold' in row:
+        import source_receipt_refresh
+        source_receipt_refresh.validate_hold(row)
     if {'previous_documents', 'html_refresh', 'html_refresh_attempts'} & set(row):
-        validate_html_refresh(row)
+        history_row = row
+        if row.get('source_refreshes'):
+            # Parser migration history ends at the receipt preceding content recovery.
+            history_row = {**row, **row['source_refreshes'][0]['receipt'],
+                           'last_attempt_at': row['html_refresh']['attempted_at']}
+        validate_html_refresh(history_row)
     if row['complete']:
         require(row['status'] in TERMINAL and 'next_retry_at' not in row)
         if row['status'] == 'full_document_retrieved_not_reviewed':
@@ -913,16 +925,21 @@ def _perform_stage(record, plan, max_candidates, stage_started):
                 seconds = max(1, min(entry.get('retry_after_seconds', 3600), 604800))
                 host_backoff[failed_host] = max(host_backoff.get(failed_host, 0),
                     time.monotonic() - stage_started + seconds)
+        if (doc is not None and 'receipt_refresh_version' in plan
+                and doc.version != plan['receipt_refresh_version']):
+            # Reject unknown returned labels before document_metadata can
+            # normalize them to unspecified. A refresh cannot relabel versions.
+            ledger = [{**entry, 'status': 'source_version_unverified'}
+                      if entry.get('status') in SUCCESS else entry for entry in ledger]
+            doc = None
         pinned = verified_arxiv_v1(record)
         if doc is not None and pinned:
-            if not is_pinned_arxiv_url(doc.url, pinned):
+            if not is_pinned_arxiv_url(doc.url, pinned) or doc.version != 'arxiv_preprint_v1':
                 # Redirects or provider substitutions cannot make a latest
                 # version into first-version evidence. Retain only a failure.
                 ledger = [{**entry, 'status': 'source_version_unverified'}
                           if entry.get('status') in SUCCESS else entry for entry in ledger]
                 doc = None
-            else:
-                doc.version = 'arxiv_preprint_v1'
         diagnostics.extend(diagnostic(row) for row in ledger)
         if not any(row.get('retryable') for row in ledger):
             tried.append(digest(route['url']))
@@ -1107,7 +1124,7 @@ def html_refresh_plan(row, routes, record, window):
     is eligible. Locator-only and redirect-only sources require separate review.
     """
     meta = row.get('document', {})
-    if (not row['complete'] or not is_html_document(meta)
+    if (row.get('source_refreshes') or row.get('source_refresh_hold') or not row['complete'] or not is_html_document(meta)
             or meta.get('html_extraction_version') == HTML_EXTRACTION_VERSION
             or len(row.get('html_refresh_attempts', [])) >= MAX_HTML_REFRESH_ATTEMPTS
             or any(attempt['version'] == HTML_EXTRACTION_VERSION
@@ -1254,7 +1271,8 @@ def _run_window(payload, state=None, *, window, now=None, limit=10, time_budget=
             # Refresh histories require terminal HTML evidence: leave their legacy
             # plan intact until a separate provenance-safe migration is available.
             if (row['plan'].get('provider_plan_version', 1) < PROVIDER_PLAN_VERSION
-                    and 'html_refresh' not in row):
+                    and 'html_refresh' not in row and 'source_refreshes' not in row
+                    and 'source_refresh_hold' not in row):
                 row['plan']['provider_plan_version'] = PROVIDER_PLAN_VERSION
                 if (row['complete'] and row['plan']['doi_lookup_permitted']
                         and row['status'] != 'full_document_retrieved_not_reviewed'):
@@ -1284,7 +1302,9 @@ def _run_window(payload, state=None, *, window, now=None, limit=10, time_budget=
         index = (state['cursor'] + offset) % len(order)
         key = order[index]; row = state['records'][key]
         record, routes = selected[key]
-        refresh_plan = html_refresh_plan(row, routes, record, window)
+        import source_receipt_refresh
+        content_plan = source_receipt_refresh.plan(row, routes, record, window, state['access_controls'], now)
+        refresh_plan = content_plan or html_refresh_plan(row, routes, record, window)
         if row.get('complete') and refresh_plan is None:
             continue
         waiting = bool(row.get('next_retry_at') and utc_now(row['next_retry_at']) > now)
@@ -1327,7 +1347,9 @@ def _run_window(payload, state=None, *, window, now=None, limit=10, time_budget=
             elif 'provider_attempted_at' not in row and row.get('last_attempt_at'):
                 row['provider_attempted_at'] = row['last_attempt_at']
         row.update(attempts=row['attempts'] + 1, last_attempt_at=now.isoformat())
-        if refresh_plan is not None:
+        if content_plan is not None:
+            source_receipt_refresh.start(row, now)
+        elif refresh_plan is not None:
             # Save before I/O: interruption must not cause automatic repeated fetches.
             row['html_refresh'] = {'version': HTML_EXTRACTION_VERSION,
                 'attempted_at': now.isoformat(), 'outcome': 'interrupted_attempt'}
@@ -1347,7 +1369,9 @@ def _run_window(payload, state=None, *, window, now=None, limit=10, time_budget=
         except Exception as exc:
             result = {'diagnostics': [diagnostic(access.failure_diagnostic(exc, article=True))]}
         response_at = now + timedelta(seconds=max(0, clock() - started))
-        if refresh_plan is not None:
+        if content_plan is not None:
+            source_receipt_refresh.finish(row, result, response_at)
+        elif refresh_plan is not None:
             finish_html_refresh(row, result)
         else:
             advance(row, result, plan, routes, known_sources_only, response_at)

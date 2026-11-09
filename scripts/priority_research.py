@@ -70,6 +70,13 @@ def crossref_article(work, *, lane, scope, query, today, expected_venue=None, ed
     return candidate
 
 
+def discovery_queries(today, mode, publication_window, page_size, manifest):
+    since,until=discovery_window(today,mode,publication_window)
+    return [("Crossref",{"query.title":p["q"],"query.container-title":p["venue"],
+             "filter":"from-pub-date:"+since.isoformat()+",until-pub-date:"+until.isoformat()},page_size)
+            for p in manifest.get("venue_queries",[]) if venue_class(p["venue"]) in ("priority","specialist")]
+
+
 def discover(request, today, *, mode="weekly", existing_dois=None, manifest=None,
              max_venue_queries=None, max_pages=5, page_size=100, state=None, publication_window=None):
     """Discover previous-week publications; nominated historical DOI leads are backfill only."""

@@ -166,7 +166,8 @@ class AcquisitionHandoffTests(unittest.TestCase):
             else: doc.coverage['evidence_status'] = 'partial_full_text'
             (retrieved, ledger), _ = self.retrieve(doc=doc)
             self.assertIsNone(retrieved)
-            self.assertEqual(ledger[-1]['status'], 'acquisition_receipt_content_changed')
+            self.assertEqual(ledger[-1]['status'], 'acquisition_source_version_changed' if key == 'version'
+                             else 'acquisition_receipt_content_changed')
 
     def test_partial_html_is_revalidated_but_never_promoted_to_complete(self):
         doc = access.Document([{'location': 'paragraph:1', 'text': 'Full article paragraph. '*200}],

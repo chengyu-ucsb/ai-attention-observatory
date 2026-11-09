@@ -25,12 +25,15 @@ class ReadingWorkflowTests(unittest.TestCase):
             'Download open model weights without hosted inference',
             'Read complete retrieved text and check each claim',
             'Validate completed notes before saving',
-            'Save original notes and coverage only',
+            'Preserve independently validated acquisition metadata after reading',
+            'Save exact validated checkpoint without replaying source or model work',
+            'Retain validated recovery metadata and permitted original notes',
         )
         for name in production_steps:
             with self.subTest(step=name):
-                self.assertIn('- name: ' + name +
-                              "\n        if: github.event_name != 'pull_request'", text)
+                step = text.split('      - name: ' + name + '\n', 1)[1].split('      - name:', 1)[0]
+                condition = next(line.strip() for line in step.splitlines() if line.strip().startswith('if:'))
+                self.assertRegex(condition, r"^if: (?:always\(\) && )?github.event_name != 'pull_request'(?:$| && )")
 
     def test_claim_benchmark_models_run_only_on_explicit_manual_request(self):
         text = WORKFLOW.with_name('claim-quality-evaluation.yml').read_text()
