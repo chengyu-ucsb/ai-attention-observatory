@@ -1,7 +1,9 @@
-"""Offline process regressions with real parsed documents and mocked synthesis.
+"""Offline process regressions with document fixtures and mocked synthesis.
 
-All fixture prose is synthetic. PDF/HTML/XML bytes are parsed in memory; no
-source retrieval, external provider, model, or canonical data write is needed.
+All fixture prose is synthetic. Core PDF cases mock only the optional reader;
+HTML/XML parsing and all coverage/label assertions run without dependencies.
+Real-byte PDF integration also runs when pypdf is installed. No source retrieval,
+external provider, model, or canonical data write is needed.
 """
 from copy import deepcopy
 from datetime import date
@@ -10,11 +12,9 @@ from io import BytesIO
 import json
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 import unittest
 from unittest.mock import Mock, patch
-
-from pypdf import PdfWriter
-from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import comprehensive_readings as reading
@@ -41,6 +41,25 @@ def record(kind='scholarly'):
 
 
 def pdf_document(blank_page=False):
+    # Match the dependency-free PDF-reader fixture in test_article_retrieval_routes.
+    # The production parser still derives complete/partial coverage from pages.
+    pages = [SimpleNamespace(extract_text=Mock(return_value=TITLE + '\n' + PROSE * 24)),
+             SimpleNamespace(extract_text=Mock(return_value='' if blank_page else PROSE * 24))]
+    reader = SimpleNamespace(PdfReader=Mock(return_value=SimpleNamespace(pages=pages)))
+    with patch.dict(sys.modules, {'pypdf': reader}):
+        return access.document_from_pdf(b'%PDF-1.7 SYNTHETIC_READER_FIXTURE', record(),
+                                        'https://www.econstor.eu/source.html', VERSION)
+
+
+def parsed_pdf_document(blank_page=False):
+    try:
+        from pypdf import PdfWriter
+    except ModuleNotFoundError as exc:
+        if exc.name != 'pypdf':
+            raise
+        raise unittest.SkipTest('Optional pypdf integration; core PDF assertions run without it') from exc
+    from pypdf.generic import DecodedStreamObject, DictionaryObject, NameObject
+
     writer = PdfWriter()
     font = writer._add_object(DictionaryObject({
         NameObject('/Type'): NameObject('/Font'),
@@ -135,7 +154,7 @@ class ReadingFormatLabelTests(unittest.TestCase):
             self.assertNotIn(key, row)
         return row
 
-    def test_real_pdf_page_coverage_is_not_guessed_from_url_or_kind(self):
+    def test_pdf_page_coverage_is_not_guessed_from_url_or_kind(self):
         document = pdf_document()
         self.assertNotIn('document_format', document.coverage)
         for kind in reading.FIELDS:
@@ -143,6 +162,14 @@ class ReadingFormatLabelTests(unittest.TestCase):
                 row = self.process_document(document, kind, 'Whole PDF text retrieved.')
                 self.assertEqual(row['deep_analysis']['coverage']['source_bytes_sha256'],
                                  sha256(document.source_bytes).hexdigest())
+
+    def test_installed_pdf_reader_preserves_full_and_partial_format_labels(self):
+        for blank_page in (False, True):
+            document = parsed_pdf_document(blank_page)
+            expected = PARTIAL if blank_page else 'Whole PDF text retrieved.'
+            for kind in reading.FIELDS:
+                with self.subTest(blank_page=blank_page, kind=kind):
+                    self.process_document(document, kind, expected)
 
     def test_real_jats_and_tei_keep_pdf_equivalence_caveat(self):
         for format in ('jats', 'tei'):
