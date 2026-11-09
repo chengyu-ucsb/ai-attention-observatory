@@ -42,16 +42,37 @@ HISTORICAL_TERMS={
  "Technology & society":["ChatGPT human agency","generative AI attention economy","AI information overload"]
 }
 
-def plan(today=None, mode="weekly"):
+def discovery_window(today, mode="weekly", publication_window=None):
+    """Explicit private preparation never changes the default public-week gate."""
+    today = publication_date(today)
+    if today is None:
+        raise ValueError("A complete observation date is required")
+    if mode in {"weekly", "backfill"}:
+        if publication_window is not None:
+            raise ValueError("Public weekly/backfill windows cannot be overridden")
+        return previous_week(today) if mode == "weekly" else (dt.date(START_YEAR, 1, 1), today)
+    if mode not in {"preparation", "closeout", "closeout_late_index"} or not isinstance(publication_window, dict):
+        raise ValueError("Preparation requires an explicit publication window")
+    start, end = (publication_date(publication_window.get(k)) for k in ("from", "to"))
+    if start is None or end is None or start > end:
+        raise ValueError("Invalid preparation publication window")
+    monday = today - dt.timedelta(days=today.weekday())
+    if mode == "preparation" and not monday <= start <= end <= today:
+        raise ValueError("Preparation must stay within the observed current UTC week")
+    if mode in {"closeout", "closeout_late_index"} and (start, end) != previous_week(today):
+        raise ValueError("Closeout requires the actual previous completed UTC week")
+    return start, end
+
+
+def plan(today=None, mode="weekly", *, publication_window=None):
     today=publication_date(today or dt.datetime.now(dt.timezone.utc))
     if today is None:raise ValueError("A complete run date is required")
-    if mode not in {"weekly", "backfill"}:raise ValueError("Unsupported search mode: "+mode)
+    begin,end=discovery_window(today,mode,publication_window)
     tasks=[]
-    if mode=="weekly":
-        begin,end=previous_week(today)
+    if mode!="backfill":
         for lane,queries in LANES.items():
             for q in queries:
-                tasks.append((lane,q,begin.isoformat(),end.isoformat(),"previous_publication_week"))
+                tasks.append((lane,q,begin.isoformat(),end.isoformat(),"previous_publication_week" if mode=="weekly" else mode))
         return tasks
     # Manual backfill searches the current year and the complete historical
     # matrix. No historical task is mixed into the normal weekly collector.

@@ -20,7 +20,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('acquisition-skip-{0}', github.run_id) || 'observatory-weekly-acquisition' }}
+  group: ${{ github.event_name == 'pull_request' && format('weekly-source-check-{0}', github.ref) || (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('acquisition-skip-{0}', github.run_id) || 'observatory-index' }}
   queue: max
   cancel-in-progress: false
 jobs:

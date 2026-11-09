@@ -1,7 +1,7 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
 import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
 from academic_state import DiscoveryState, ProviderDeferred, cursor_search
-from search_plan import plan,source_class
+from search_plan import plan,source_class,discovery_window
 from arxiv_publication import ArxivPublicationVerifier, identifier_for as arxiv_identifier, fetch_atom
 from priority_research import discover as discover_priority, crossref_article, crossref_search, doi_id, load_manifest as priority_manifest
 from collection_window import (crossref_publication, date_in_window, previous_week,
@@ -16,11 +16,12 @@ ATTENTION_TOPIC=re.compile(r"attention|focus|distract|interrupt|offload|critical
 ADJACENT_TOPIC=re.compile(r"attention (?:fragmentation|residue|economy|control|span)|digital distraction|distracted (?:work|learning)|notification(?:s)?|task.switch|multitask|sustained attention|focus(?:ed)? work",re.I)
 EXCLUDE_TITLE=re.compile(r"gaining .*attention|stock price|share price|trading|market investment|marketing personalization|consumer engagement|car.following|warehouse logistics|diabetes mellitus|security tools",re.I)
 TRUSTED_OUTLETS=re.compile(r"The Atlantic|WIRED|MIT Technology Review|Nature|Science|The Verge|Tech Policy Press|The Guardian|The Conversation|Ars Technica|Harvard Business Review|New York Times|Financial Times|Bloomberg|BBC|NPR|Vox|IEEE Spectrum|Quanta|The Decoder|Inside Higher Ed|EdSurge|PsyPost|New Scientist|Washington Post|Psychology Today|Communications of the ACM|The Economist|Rest of World",re.I)
-def relevant(x):
+def relevant(x, today=None):
+ today=publication_date(today or TODAY).isoformat()
  if x.get("curated"):return True
  if x.get("kind")=="nonacademic" and x.get("source")=="Publisher RSS / Google News RSS":
-  return (not x.get("published") or x["published"]<=TODAY) and bool(AI_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")) and ATTENTION_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")))
- if x.get("published") and x["published"]>TODAY:return False
+  return (not x.get("published") or x["published"]<=today) and bool(AI_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")) and ATTENTION_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")))
+ if x.get("published") and x["published"]>today:return False
  title=x.get("title","");blurb=x.get("preview","")
  if EXCLUDE_TITLE.search(title):return False
  direct=(bool(AI_TOPIC.search(title)) and bool(ATTENTION_TOPIC.search(title+" "+blurb))) or (bool(ATTENTION_TOPIC.search(title)) and bool(AI_TOPIC.search(blurb)))
@@ -56,14 +57,15 @@ def openalex_search(params, *, max_pages=5, page_size=100, state=None):
  return cursor_search(request,"OpenAlex",params,state=state,max_pages=max_pages,page_size=page_size)
 
 
-def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=100,arxiv_verifier=None,state=None):
+def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=100,arxiv_verifier=None,state=None,*,observed_on=None,publication_window=None,metadata_request=None):
  """Collect metadata within explicit publication windows, with coverage limits."""
+ fetch_metadata=metadata_request or request
  found=[];errors=[];stats={"openalex":0,"crossref":0,"provider_windows":[],
                          "publication_date_rejected":0,"publication_date_unverified":0,"publication_date_quarantine":[],
                          "date_lookups":0,"date_lookups_deferred":0}
- today=datetime.date.fromisoformat(TODAY)
- scopes=plan(today,mode)
- start_window,end_window=previous_week(today) if mode=="weekly" else (datetime.date(2023,1,1),today)
+ today=publication_date(observed_on or TODAY)
+ start_window,end_window=discovery_window(today,mode,publication_window)
+ scopes=plan(today,mode,publication_window=publication_window) if publication_window is not None else plan(today,mode)
  window={"from":start_window.isoformat(),"to":end_window.isoformat()}
  state=state or DiscoveryState(mode=mode,window=window)
  state.validate_window(mode,window)
@@ -78,7 +80,8 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
  for lane,q,start,end,scope in scopes:
   params={"search":q,"filter":"from_publication_date:"+start+",to_publication_date:"+end,
           **({"api_key":os.environ["OPENALEX_API_KEY"]} if os.getenv("OPENALEX_API_KEY") else {})}
-  works,audit,provider_errors=openalex_search(params,max_pages=max_pages,page_size=page_size,state=state)
+  works,audit,provider_errors=(cursor_search(fetch_metadata,"OpenAlex",params,max_pages=max_pages,page_size=page_size,state=state)
+                               if metadata_request is not None else openalex_search(params,max_pages=max_pages,page_size=page_size,state=state))
   audit.update(theme=lane,scope=scope);stats["provider_windows"].append(audit)
   errors.extend(provider_errors);stats["openalex"]+=len(works);stats["queries_attempted"]+=int(audit.get("requests_this_run",0)>0)
   for w in works:
@@ -94,18 +97,18 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
      "preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.",
      "abstract_text":ab[:3800],"abstract_source":"OpenAlex abstract index" if ab else "","kind":"scholarly","lane":lane,
      "relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence",
-     "evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":TODAY,
+     "evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":today.isoformat(),
      "discovery_scope":scope,"discovery_query":q,"historical_backfill":mode=="backfill"})
   if audit.get("requests_this_run"):time.sleep(.3)
  for lane,q,start,end,scope in scopes:
-  works,audit,provider_errors=crossref_search(request,{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},max_pages=max_pages,page_size=page_size,state=state)
+  works,audit,provider_errors=crossref_search(fetch_metadata,{"query.bibliographic":q,"filter":"from-pub-date:"+start+",until-pub-date:"+end},max_pages=max_pages,page_size=page_size,state=state)
   audit.update(theme=lane,scope=scope);stats["provider_windows"].append(audit)
   errors.extend(provider_errors);stats["crossref"]+=len(works);stats["queries_attempted"]+=int(audit.get("requests_this_run",0)>0)
   for w in works:
    doi=doi_id(w.get("DOI"));datev,provenance=crossref_publication(w)
    if doi:crossref_dates[doi]=reconcile_publication_evidence(crossref_dates.get(doi),(datev,provenance))
    x=crossref_article(w,lane=lane,scope=scope,query=q,today=today,screen=False,allow_unresolved=True)
-   if x and not datev and mode=="weekly" and relevant(x):
+   if x and not datev and mode!="backfill" and relevant(x,today):
     uncertain.append(x)
    if not x or not date_in_window(datev,start,end):stats["publication_date_rejected"]+=1;continue
    x["source"]="Crossref";x["historical_backfill"]=mode=="backfill"
@@ -116,8 +119,8 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
  # A print/issue date must not turn an old online-first paper into new work.
  # Verify DOI-backed OpenAlex candidates against the publication events in
  # Crossref. Missing registry evidence is fail-closed for the weekly set.
- if mode=="weekly":
-  start,end=previous_week(today)
+ if mode!="backfill":
+  start,end=start_window,end_window
   kept=[];deferred=set();quarantined={};conflicts={};quota=crossref_paused
   arxiv=arxiv_verifier or ArxivPublicationVerifier(fetch=lambda url:state.fetch("arXiv",url,fetch_atom))
   def quarantine(x,reason):
@@ -154,7 +157,7 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
       deferred.add(doi);quarantine(x,"Original-day verification deferred by provider or lookup budget");continue
      stats["date_lookups"]+=1
      try:
-      result=state.fetch("Crossref","https://api.crossref.org/works/"+urllib.parse.quote(doi,safe="/"),request)
+      result=state.fetch("Crossref","https://api.crossref.org/works/"+urllib.parse.quote(doi,safe="/"),fetch_metadata)
       work=result.get("message") or {}
       if doi_id(work.get("DOI"))!=doi:raise ValueError("DOI identity mismatch")
       crossref_dates[doi]=crossref_publication(work)

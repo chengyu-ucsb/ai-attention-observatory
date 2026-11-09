@@ -21,6 +21,7 @@ import threading
 from urllib.parse import urlsplit, parse_qsl
 
 import full_document_access as access
+import source_access_controls as controls
 from article_body_parser import EXTRACTION_VERSION as HTML_EXTRACTION_VERSION
 from collection_window import date_in_window, previous_week, publication_date, weekly_eligible
 from comprehensive_readings import chunk_document, coverage_is_complete
@@ -36,10 +37,13 @@ MAX_HTML_REFRESH_ATTEMPTS = 8
 LEGACY_PROVIDERS = ('Europe PMC XML', 'OpenAIRE', 'CORE', 'Semantic Scholar')
 PROVIDER_PLAN_VERSION = 2
 PROVIDERS = LEGACY_PROVIDERS + ('Crossref publisher locations',)
+# Reader-only providers may contribute restrictions, never acquisition stages.
+CONTROL_PROVIDERS = PROVIDERS + ('OpenAlex XML and OA locations', 'Unpaywall')
 SUCCESS = {'full_document_retrieved', 'partial_full_text'}
 BLOCKED = {'article_http_401', 'article_http_403', 'http_401', 'http_403',
            'access_challenge_not_article', 'robots_disallow_or_unavailable',
-           'related_version_verification_unavailable', 'host_access_denied_this_run'}
+           'related_version_verification_unavailable', 'host_access_denied_this_run',
+           'source_access_denied_this_run', 'provider_access_denied_history'}
 CODES = BLOCKED | SUCCESS | {
     'no_exact_match', 'candidates', 'candidate_budget_exhausted',
     'host_requires_review', 'unapproved_host', 'unapproved_redirect',
@@ -59,7 +63,7 @@ CODES = BLOCKED | SUCCESS | {
     'route_policy_excluded', 'metadata_budget_exhausted', 'rate_limit_pause',
     'credentialed_source_url_disallowed', 'source_version_unverified', 'source_unavailable_page',
 }
-SAFE_PROVIDERS = set(PROVIDERS) | {
+SAFE_PROVIDERS = set(CONTROL_PROVIDERS) | {
     'explicit_source', 'existing_source', 'known_open_access_source',
     'original_article', 'arXiv_identifier', 'Europe PMC full-text API',
     'OpenAIRE', 'CORE', 'Semantic Scholar', 'source_route',
@@ -278,7 +282,7 @@ def validate_row(row, window):
         'attempts', 'cursor', 'plan', 'tried_sources', 'excluded_related_or_outside_window_routes',
         'diagnostics', 'source_text_saved'},
         {'document', 'document_evidence', 'last_outcome', 'next_retry_at', 'last_attempt_at',
-         'html_refresh', 'html_refresh_attempts', 'previous_documents'})
+         'html_refresh', 'html_refresh_attempts', 'previous_documents', 'provider_fallbacks', 'provider_attempted_at'})
     hash_value(row['fingerprint']); saved_url(row['source_url'], allow_empty=True)
     require(row['kind'] in {'scholarly', 'nonacademic'} and type(row['complete']) is bool)
     require(type(row['status']) is str and row['status'] in STATUSES and row['source_text_saved'] is False)
@@ -313,7 +317,31 @@ def validate_row(row, window):
         require(cursor['provider'] == 0 and not tried)
     if cursor['provider'] == provider_count:
         require(not tried)
-    require(row['attempts'] >= cursor['known'] + cursor['provider'])
+    fallbacks = row.get('provider_fallbacks', {})
+    require(type(fallbacks) is dict)
+    for index, progress in fallbacks.items():
+        require(type(index) is str and index.isdigit() and str(int(index)) == index
+                and cursor['provider'] < int(index) < provider_count
+                and cursor['known'] == len(known) and row['plan']['doi_lookup_permitted'])
+        shape(progress, {'complete', 'tried_sources', 'status', 'attempted_at'}, {'next_retry_at'})
+        timestamp(progress['attempted_at'])
+        require(type(progress['complete']) is bool
+                and progress['status'] in RETRY | {'pending_routes', 'in_progress', 'exhausted', 'full_document_retrieved'})
+        require(progress['complete'] == (progress['status'] in {'exhausted', 'full_document_retrieved'}))
+        if progress['status'] == 'full_document_retrieved':
+            require(row['complete'] and row['status'] == 'full_document_retrieved_not_reviewed')
+        require(type(progress['tried_sources']) is list
+                and progress['tried_sources'] == sorted(set(progress['tried_sources']))
+                and set(progress['tried_sources']) <= set(row['tried_sources']))
+        for identity in progress['tried_sources']:
+            hash_value(identity)
+        require(('next_retry_at' in progress) == (progress['status'] in RETRY))
+        if 'next_retry_at' in progress:
+            timestamp(progress['next_retry_at'])
+    require(row['attempts'] >= cursor['known'] + cursor['provider'] + len(fallbacks))
+    if 'provider_attempted_at' in row:
+        require(row['attempts'] > 0 and cursor['known'] == len(known)
+                and row['plan']['doi_lookup_permitted'] and cursor['provider'] < provider_count)
     exhausted = cursor['known'] == len(known) and (not row['plan']['doi_lookup_permitted']
                                                 or cursor['provider'] == provider_count)
     require(type(row['diagnostics']) is list and len(row['diagnostics']) <= 96)
@@ -349,7 +377,7 @@ def validate_row(row, window):
         require('next_retry_at' in row)
     elif row['status'] != 'in_progress':
         require('next_retry_at' not in row)
-    for key in ('next_retry_at', 'last_attempt_at'):
+    for key in ('next_retry_at', 'last_attempt_at', 'provider_attempted_at'):
         if key in row:
             timestamp(row[key])
     if row['attempts']:
@@ -409,7 +437,7 @@ def validate_html_refresh(row):
 def validate_pauses(pauses):
     require(type(pauses) is dict)
     for key, value in pauses.items():
-        require(type(key) is str and (key in {'provider:' + name for name in PROVIDERS}
+        require(type(key) is str and (key in {'provider:' + name for name in CONTROL_PROVIDERS}
             or re.fullmatch(r'host:[a-z0-9](?:[a-z0-9.-]{0,251}[a-z0-9])?', key)))
         timestamp(value)
 
@@ -423,7 +451,7 @@ def validate_state(state):
     try:
         shape(state, {'schema_version', 'publication_window', 'source_text_saved', 'records',
             'cursor', 'provider_pauses', 'closed_windows', 'dispositions',
-            'input_fingerprint', 'state_sha256'}, {'next_cursor', 'run'})
+            'input_fingerprint', 'state_sha256'}, {'next_cursor', 'run', 'access_controls'})
         require(type(state['schema_version']) is int and state['schema_version'] == VERSION)
         hash_value(state['state_sha256'])
         require(state['state_sha256'] == digest({k: v for k, v in state.items() if k != 'state_sha256'}))
@@ -438,6 +466,8 @@ def validate_state(state):
         require(state['input_fingerprint'] == digest([(key, state['records'][key]['fingerprint'])
                                                       for key in sorted(state['records'])]))
         validate_pauses(state['provider_pauses'])
+        if 'access_controls' in state:
+            controls.validate_controls(state['access_controls'])
         require(type(state['closed_windows']) is list and type(state['dispositions']) is list)
         for closed in state['closed_windows']:
             shape(closed, {'publication_window', 'selected_records', 'completed_records',
@@ -733,13 +763,95 @@ def stage_plan(routes, cursor, known_only, window, tried_sources=(), providers_e
     return None
 
 
+def fallback_stage_plan(row, window, pauses, now, prefer_primary=False):
+    """Try one later independent provider while the primary checkpoint waits.
+
+    The primary cursor and retry deadline stay intact. This is not a retry of
+    the paused provider, a mirror workaround, or permission to bypass a host
+    cooldown: perform_stage still receives all active article-host pauses.
+    """
+    if (not row['plan']['doi_lookup_permitted']
+            or row['cursor']['known'] < len(row['plan']['known_routes'])):
+        return None
+    count = (len(LEGACY_PROVIDERS) if row['plan'].get('provider_plan_version', 1) == 1
+             else len(PROVIDERS))
+    available = []
+    for index in range(row['cursor']['provider'] + 1, count):
+        progress = row.get('provider_fallbacks', {}).get(str(index), {})
+        pause = pauses.get('provider:' + PROVIDERS[index])
+        if (progress.get('complete')
+                or (progress.get('next_retry_at') and utc_now(progress['next_retry_at']) > now)
+                or (pause and utc_now(pause) > now)):
+            continue
+        available.append((progress.get('attempted_at', ''), index))
+    if not available:
+        return None
+    attempted_at, index = min(available)
+    # Retry-After is a minimum delay, not a reason to retry the same provider
+    # first forever when cron runs less often than the cooldown. Oldest ready
+    # checkpoint wins; untouched independent providers get their first turn.
+    if prefer_primary and row.get('provider_attempted_at', row.get('last_attempt_at', '')) <= attempted_at:
+        return None
+    return {'kind': 'provider', 'name': PROVIDERS[index], 'fallback_provider': index,
+            'tried_sources': list(row['tried_sources']), 'publication_window': window}
+
+
+def provider_stage_complete(ledger):
+    count = sum(d.get('stage') == 'article' for d in ledger)
+    remaining = max([d.get('candidates', 0) for d in ledger if d.get('stage') == 'discovery'] or [0])
+    return not (count and remaining > count)
+
+
+def consume_provider_fallbacks(row):
+    """Advance past completed fallback stages, or adopt their pending cursor."""
+    progress = row.get('provider_fallbacks', {})
+    while str(row['cursor']['provider']) in progress:
+        saved = progress.pop(str(row['cursor']['provider']))
+        if saved['complete']:
+            row['cursor']['provider'] += 1
+            row['cursor']['provider_tried'] = []
+        else:
+            row['cursor']['provider_tried'] = saved['tried_sources']
+            row['provider_attempted_at'] = saved['attempted_at']
+            row['status'] = saved['status']
+            if 'next_retry_at' in saved:
+                row['next_retry_at'] = saved['next_retry_at']
+            break
+    if not progress:
+        row.pop('provider_fallbacks', None)
+
+
 def perform_stage(record, plan, max_candidates):
+    """Apply serialized restrictions inside spawn, not just parent ContextVars."""
+    shared = controls.validate_controls(plan.get('access_controls', controls.empty_controls()))
+    effective = controls.stage_controls(shared, plan.get('controls_checked_at'))
+    if plan['kind'] == 'provider':
+        name = plan['name']
+        if name in effective['denied_providers']:
+            return {'diagnostics': [{'stage': 'discovery', 'provider': name,
+                'status': 'provider_access_denied_history', 'retryable': False}], 'tried_sources': []}
+        if name in effective['paused_providers']:
+            until = shared['provider_pauses']['provider:' + name]
+            seconds = max(1, math.ceil((utc_now(until) - utc_now(plan.get('controls_checked_at'))).total_seconds()))
+            return {'diagnostics': [{'stage': 'discovery', 'provider': name,
+                'status': 'rate_limit_pause', 'retryable': True,
+                'retry_after_seconds': min(604800, seconds)}], 'tried_sources': []}
+    scoped_plan = dict(plan)
+    scoped_plan['host_backoff'] = dict(plan.get('host_backoff', {}))
+    for host, seconds in effective['host_backoff'].items():
+        scoped_plan['host_backoff'][host] = max(scoped_plan['host_backoff'].get(host, 0), seconds)
+    stage_started = time.monotonic()
+    with controls.retrieval_scope(effective['denied_hosts'], effective['blocked_urls'],
+                                  scoped_plan['host_backoff'], started=stage_started):
+        return _perform_stage(record, scoped_plan, max_candidates, stage_started)
+
+
+def _perform_stage(record, plan, max_candidates, stage_started):
     """Bounded stage; never continue to another source after a rate limit."""
     window = plan['publication_window']
     if verified_arxiv_v1(record) == '':
         return {'diagnostics': [{'status': 'route_policy_excluded', 'retryable': False}], 'tried_sources': []}
     diagnostics = []; tried = []; best = None; host_waits = []
-    stage_started = time.monotonic()
     host_backoff = dict(plan.get('host_backoff', {}))
     denied_hosts = set(access.HOST_DENIALS.get() or ())
     unavailable_hosts = set()
@@ -786,6 +898,8 @@ def perform_stage(record, plan, max_candidates):
                                           anonymous_only=True, host_backoff=remaining_backoff)
         finally:
             access.HOST_DENIALS.reset(denial_scope)
+        local = controls.diagnostic_controls(diagnostic(entry) for entry in ledger)
+        access.SOURCE_DENIALS.get().update(local['blocked_urls'])
         for entry in ledger:
             target = entry.get('failure_url') or entry.get('url') or ''
             failed_host = urlsplit(access.diagnostic_url(target)).hostname
@@ -931,14 +1045,34 @@ def advance(row, result, plan, routes, known_only, now):
     if plan['kind'] == 'known' and not any(d.get('retryable') for d in ledger):
         tried = tried + [digest(plan['source']['url'])]
     row['tried_sources'] = sorted(set(row['tried_sources']) | set(tried))
-    if plan['kind'] == 'provider':
+    if plan['kind'] == 'provider' and 'fallback_provider' not in plan:
         row['cursor']['provider_tried'] = sorted(set(row['cursor']['provider_tried']) | set(tried))
     row['last_outcome'] = (retrieved or {}).get('evidence_status') or failure_status(ledger)
-    row.pop('next_retry_at', None)
-    if retrieved and retrieved.get('evidence_status') == 'full_document_retrieved':
-        row.update(status='full_document_retrieved_not_reviewed', complete=True)
-        return
     retry = [d for d in ledger if d.get('retryable')]
+    if retrieved and retrieved.get('evidence_status') == 'full_document_retrieved':
+        row.pop('next_retry_at', None)
+        row.update(status='full_document_retrieved_not_reviewed', complete=True)
+        if 'fallback_provider' in plan:
+            progress = row['provider_fallbacks'][str(plan['fallback_provider'])]
+            progress.update(complete=True, status='full_document_retrieved',
+                            tried_sources=sorted(set(progress['tried_sources']) | set(tried)))
+            progress.pop('next_retry_at', None)
+        return
+    if 'fallback_provider' in plan:
+        progress = row.setdefault('provider_fallbacks', {}).setdefault(str(plan['fallback_provider']),
+            {'complete': False, 'tried_sources': [], 'status': 'pending_routes', 'attempted_at': now.isoformat()})
+        progress['tried_sources'] = sorted(set(progress['tried_sources']) | set(tried))
+        progress.pop('next_retry_at', None)
+        if retry:
+            seconds = max(max(1, d.get('retry_after_seconds', 3600)) for d in retry)
+            progress.update(status=failure_status(ledger), complete=False,
+                next_retry_at=(now + timedelta(seconds=seconds)).isoformat())
+        else:
+            complete = provider_stage_complete(ledger)
+            progress.update(complete=complete, status='exhausted' if complete else 'pending_routes')
+        # Keep the primary provider's status, cursor and Retry-After unchanged.
+        return
+    row.pop('next_retry_at', None)
     if retry:
         seconds = max(max(1, d.get('retry_after_seconds', 3600)) for d in retry)
         row.update(status=failure_status(ledger),
@@ -947,11 +1081,11 @@ def advance(row, result, plan, routes, known_only, now):
     if plan['kind'] == 'known':
         row['cursor']['known'] += 1
     else:
-        count = sum(d.get('stage') == 'article' for d in ledger)
-        remaining = max([d.get('candidates', 0) for d in ledger if d.get('stage') == 'discovery'] or [0])
-        if not (count and remaining > count):
+        if provider_stage_complete(ledger):
             row['cursor']['provider'] += 1
             row['cursor']['provider_tried'] = []
+            row.pop('provider_attempted_at', None)
+            consume_provider_fallbacks(row)
     if stage_plan(routes, row['cursor'], known_only, plan['publication_window'],
                   row['tried_sources'], row['plan']['doi_lookup_permitted']) is None:
         # Current retryable failures returned above. Older rate limits/outages
@@ -961,7 +1095,7 @@ def advance(row, result, plan, routes, known_only, now):
                     'access_blocked' if any(d['status'] in BLOCKED for d in row['diagnostics']) else
                     'source_unavailable')
         row.update(complete=True, status=terminal)
-    else:
+    elif 'next_retry_at' not in row:
         row['status'] = 'pending_routes'
 
 
@@ -1024,9 +1158,26 @@ def finish_html_refresh(row, result):
 
 def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         item_time_budget=60, max_candidates=8, known_sources_only=False,
-        attempt=bounded_stage, save=None, clock=time.monotonic):
+        attempt=bounded_stage, save=None, clock=time.monotonic, shared_controls=None):
+    """Production entry point: only the previous completed UTC week."""
     now = utc_now(now)
     window = validate_window(payload, now)
+    return _run_window(payload, state, window=window, now=now, limit=limit,
+        time_budget=time_budget, item_time_budget=item_time_budget,
+        max_candidates=max_candidates, known_sources_only=known_sources_only,
+        attempt=attempt, save=save, clock=clock, shared_controls=shared_controls)
+
+
+def _run_window(payload, state=None, *, window, now=None, limit=10, time_budget=300,
+                item_time_budget=60, max_candidates=8, known_sources_only=False,
+                attempt=bounded_stage, save=None, clock=time.monotonic, shared_controls=None):
+    """Shared engine for separately validated production/preparation packets.
+
+    The preparation wrapper owns its open-week boundary and isolated output.
+    This private function does not relax the production CLI's date gate.
+    """
+    now = utc_now(now)
+    saved_window(window)
     if (type(limit) is not int or limit < 0 or limit > 1000 or
             not 0 < time_budget <= 86400 or not 0 < item_time_budget <= 3600
             or type(max_candidates) is not int or not 1 <= max_candidates <= 32):
@@ -1035,9 +1186,13 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         raise ValueError('weekly_items_required')
     started = clock()
     previous = deepcopy(validate_state(state)) if state is not None else {}
+    shared = controls.merge_controls(
+        controls.controls_from_state(previous) if previous else controls.empty_controls(),
+        shared_controls if shared_controls is not None else controls.empty_controls())
     state = {'schema_version': VERSION, 'publication_window': window,
              'source_text_saved': False, 'records': {}, 'cursor': previous.get('cursor', 0),
-             'provider_pauses': dict(previous.get('provider_pauses') or {}),
+             'provider_pauses': dict(shared['provider_pauses']),
+             'access_controls': shared,
              'closed_windows': list(previous.get('closed_windows') or []),
              'dispositions': list(previous.get('dispositions') or [])}
     if previous.get('publication_window') and previous['publication_window'] != window:
@@ -1132,7 +1287,10 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
         refresh_plan = html_refresh_plan(row, routes, record, window)
         if row.get('complete') and refresh_plan is None:
             continue
-        if row.get('next_retry_at') and utc_now(row['next_retry_at']) > now:
+        waiting = bool(row.get('next_retry_at') and utc_now(row['next_retry_at']) > now)
+        fallback = (fallback_stage_plan(row, window, state['provider_pauses'], now, prefer_primary=not waiting)
+                    if row['status'] in RETRY else None)
+        if waiting and fallback is None:
             continue
         remaining = time_budget - (clock() - started)
         if attempted >= limit or remaining <= 0:
@@ -1140,31 +1298,47 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
             state['next_cursor'] = index
             break
         record, routes = selected[key]
-        plan = refresh_plan or stage_plan(routes, row['cursor'], known_sources_only, window, row['tried_sources'],
+        plan = fallback or refresh_plan or stage_plan(routes, row['cursor'], known_sources_only, window, row['tried_sources'],
                                           row['plan']['doi_lookup_permitted'])
         if plan is None:
             row.update(complete=True, status='source_unavailable')
             continue
         stage_now = now + timedelta(seconds=max(0, time_budget - remaining))
-        plan['host_backoff'] = {key[5:]: max(1, math.ceil((utc_now(until) - stage_now).total_seconds()))
-            for key, until in state['provider_pauses'].items()
-            if key.startswith('host:') and utc_now(until) > stage_now}
         pause_key = ('host:' + (urlsplit(access.diagnostic_url(plan['source']['url'])).hostname or '')
                      if plan['kind'] == 'known' else 'provider:' + plan['name'])
         pause = state['provider_pauses'].get(pause_key)
         if pause and utc_now(pause) > now:
             if refresh_plan is None:
                 row.update(status='rate_limited', next_retry_at=pause, last_outcome='rate_limited')
-            continue
-        row.pop('next_retry_at', None)
+            plan = fallback_stage_plan(row, window, state['provider_pauses'], stage_now)
+            if plan is None:
+                continue
+            pause_key = 'provider:' + plan['name']
+        plan['access_controls'] = deepcopy(state['access_controls'])
+        plan['controls_checked_at'] = stage_now.isoformat()
+        plan['host_backoff'] = {key[5:]: max(1, math.ceil((utc_now(until) - stage_now).total_seconds()))
+            for key, until in state['provider_pauses'].items()
+            if key.startswith('host:') and utc_now(until) > stage_now}
+        if 'fallback_provider' not in plan:
+            row.pop('next_retry_at', None)
+        if plan['kind'] == 'provider':
+            if 'fallback_provider' not in plan:
+                row['provider_attempted_at'] = now.isoformat()
+            elif 'provider_attempted_at' not in row and row.get('last_attempt_at'):
+                row['provider_attempted_at'] = row['last_attempt_at']
         row.update(attempts=row['attempts'] + 1, last_attempt_at=now.isoformat())
         if refresh_plan is not None:
             # Save before I/O: interruption must not cause automatic repeated fetches.
             row['html_refresh'] = {'version': HTML_EXTRACTION_VERSION,
                 'attempted_at': now.isoformat(), 'outcome': 'interrupted_attempt'}
             row.setdefault('html_refresh_attempts', []).append(row['html_refresh'])
-        else:
+        elif 'fallback_provider' not in plan:
             row['status'] = 'in_progress'
+        else:
+            progress = row.setdefault('provider_fallbacks', {}).setdefault(str(plan['fallback_provider']),
+                {'complete': False, 'tried_sources': [], 'status': 'pending_routes', 'attempted_at': now.isoformat()})
+            progress.update(status='in_progress', complete=False, attempted_at=now.isoformat())
+            progress.pop('next_retry_at', None)
         seal_state(state)
         if save:
             save(state)
@@ -1192,6 +1366,9 @@ def run(payload, state=None, *, now=None, limit=10, time_budget=300,
             for pause_target in keys:
                 if not state['provider_pauses'].get(pause_target) or utc_now(state['provider_pauses'][pause_target]) < utc_now(until):
                     state['provider_pauses'][pause_target] = until
+        observed = controls.diagnostic_controls(diagnostic(entry) for entry in result.get('diagnostics', []))
+        observed['provider_pauses'] = dict(state['provider_pauses'])
+        state['access_controls'] = controls.merge_controls(state['access_controls'], observed)
         attempted += 1; attempted_records.add(key)
         state['next_cursor'] = (index + 1) % len(order)
         seal_state(state)
@@ -1242,11 +1419,12 @@ def main():
     try:
         payload = json.loads(options.input.read_text(encoding='utf-8'))
         state = json.loads(options.state.read_text(encoding='utf-8')) if options.state.exists() else None
-        state = run(payload, state, limit=options.limit, time_budget=options.time_budget,
+        shared = controls.load_shared_controls(controls.data_root_for_state(options.state), states=[state] if state is not None else [])
+        state = run(payload, state, shared_controls=shared, limit=options.limit, time_budget=options.time_budget,
             item_time_budget=options.item_time_budget, max_candidates=options.max_candidates,
             known_sources_only=options.known_sources_only, save=lambda data: atomic_save(options.state, data))
     except Exception as exc:
-        allowed = {'previous_completed_utc_week_required', 'invalid_acquisition_budget', 'weekly_items_required', STATE_ERROR}
+        allowed = {'previous_completed_utc_week_required', 'invalid_acquisition_budget', 'weekly_items_required', STATE_ERROR, controls.ERROR}
         print(json.dumps({'status': str(exc) if isinstance(exc, ValueError) and str(exc) in allowed else 'acquisition_input_or_state_error',
                           'source_text_saved': False}))
         return 2

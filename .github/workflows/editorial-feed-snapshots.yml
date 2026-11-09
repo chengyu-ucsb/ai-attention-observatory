@@ -20,7 +20,7 @@ on:
 permissions:
   contents: read
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('feed-cache-check-{0}', github.ref) || 'observatory-feed-cache' }}
+  group: ${{ github.event_name == 'pull_request' && format('feed-cache-check-{0}', github.ref) || 'observatory-index' }}
   queue: max
   cancel-in-progress: false
 jobs:

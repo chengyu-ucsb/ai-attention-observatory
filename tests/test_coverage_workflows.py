@@ -16,9 +16,10 @@ class CoverageWorkflowTests(unittest.TestCase):
         self.assertIn('git add data/editorial-feed-cache.json',text)
         self.assertIn('load_cache(path, ed.FEEDS)',text)
 
-    def test_resume_does_not_start_new_sweep_or_repeat_live_feed_search(self):
+    def test_resume_advances_only_one_late_generation_without_live_feed_search(self):
         text=(ROOT/'.github/workflows/resume-weekly-discovery.yml').read_text()
-        self.assertIn("DISCOVERY_RESUME_ONLY: '1'",text)
+        self.assertIn('preparation_pipeline.py closeout --expected-week "${{ steps.closeout_scope.outputs.week }}" --max-requests 48 --max-feed-requests 0 --time-budget 240',text)
+        self.assertNotIn('scripts/update.py',text)
         self.assertIn("ACADEMIC_MAX_PAGES: '1'",text)
         self.assertIn("ACADEMIC_MAX_DATE_LOOKUPS: '12'",text)
         self.assertIn('scripts/discover_editorial.py --cached-only',text)
@@ -30,10 +31,10 @@ class CoverageWorkflowTests(unittest.TestCase):
 
     def test_resume_controls_are_scoped_to_academic_step_not_validation(self):
         text=(ROOT/'.github/workflows/resume-weekly-discovery.yml').read_text()
-        step=text.index('      - name: Resume existing academic cursors and date checks only')
+        step=text.index('      - name: Advance the one late-index pass or resume its existing cursors')
         following=text.index('      - name: Admit only staged',step)
         block=text[step:following]
-        for variable in ('DISCOVERY_RESUME_ONLY','ACADEMIC_MAX_PAGES','ACADEMIC_MAX_DATE_LOOKUPS','ACADEMIC_MAX_INLINE_WAIT_SECONDS','OPENALEX_API_KEY'):
+        for variable in ('ACADEMIC_MAX_PAGES','ACADEMIC_MAX_DATE_LOOKUPS','ACADEMIC_MAX_INLINE_WAIT_SECONDS','OPENALEX_API_KEY'):
             self.assertIn(variable,block)
             self.assertNotIn(variable,text[:step])
             self.assertNotIn(variable,text[following:])

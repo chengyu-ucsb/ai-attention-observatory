@@ -20,6 +20,7 @@ import urllib.error
 import xml.etree.ElementTree as ET
 
 from collection_window import previous_week, date_in_window, weekly_eligible, window_metadata
+from search_plan import discovery_window
 from news_quality import useful_description, publisher_url
 from editorial_corrections import apply as apply_editorial_corrections
 from editorial_source_reviews import apply as apply_source_reviews
@@ -300,11 +301,11 @@ def quarantine_item(item, feed, reason):
             "eligible_for_weekly": False}
 
 
-def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, sleep=time.sleep, cached_items=None, cache_coverage=None, live=True):
+def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, sleep=time.sleep, cached_items=None, cache_coverage=None, live=True, mode="weekly", publication_window=None):
     today = now or TODAY
     if isinstance(today, datetime.datetime):
         today = today.astimezone(datetime.timezone.utc).date() if today.tzinfo else today.date()
-    start, end = previous_week(today)
+    start, end = discovery_window(today, mode, publication_window)
     feeds = FEEDS if feeds is None else feeds
     searches = GOOGLE_SEARCHES if searches is None else searches
     seen = {url_key(x["url"]) for x in existing if x.get("url")}
@@ -469,7 +470,8 @@ def collect(existing, *, now=None, feeds=None, searches=None, fetcher=get_xml, s
         sleep(.25)
     quarantine = list({(x["url"], x["status"]): x for x in quarantine}.values())
     status = {"schema_version": 1, "checked_on": today.isoformat(),
-        "publication_window": window_metadata(today),
+        "publication_window": window_metadata(today) if mode == "weekly" else {
+            "from": start.isoformat(), "to": end.isoformat(), "timezone": "UTC", "scope": mode},
         "date_policy": "Publisher original publication field only; never modified, indexed, Google News or first-seen dates.",
         "scope": "Configured feeds and explicit search queries, not exhaustive coverage of online publishing.",
         "status": "partial" if any(x["status"] in ("failed", "partial", "deferred") for x in reports) else "completed_configured_sources",

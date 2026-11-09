@@ -141,7 +141,7 @@ class WeeklyPublicationBoundaryTests(unittest.TestCase):
         self.assertIn('for attempt in 1 2 3',workflow)
         self.assertIn('actions/upload-artifact@v7.0.2',workflow)
         self.assertIn('validated-weekly-acquisition.json',workflow)
-        self.assertIn("|| 'observatory-weekly-acquisition' }}",workflow)
-        self.assertNotIn("|| 'observatory-index' }}",workflow)
+        self.assertIn("|| 'observatory-index' }}",workflow)
+        self.assertNotIn("|| 'observatory-weekly-acquisition' }}",workflow)
 
 if __name__=='__main__':unittest.main()

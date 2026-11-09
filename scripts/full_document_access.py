@@ -64,6 +64,7 @@ SOURCE_HINTS=Path(__file__).resolve().parents[1]/'data/fulltext-source-hints.jso
 ANONYMOUS_ONLY=ContextVar('anonymous_article_sources',default=False)
 HOST_COOLDOWNS=ContextVar('article_host_cooldowns',default=None)
 HOST_DENIALS=ContextVar('article_host_denials',default=None)
+SOURCE_DENIALS=ContextVar('article_source_denials',default=None)
 
 
 class HostRateLimitPause(ValueError):
@@ -96,6 +97,8 @@ def check_html_availability(page,url):
 
 
 def check_host_cooldown(url):
+    if diagnostic_url(url) in (SOURCE_DENIALS.get() or set()):
+        raise ValueError('source_access_denied_this_run')
     try: host=urlsplit(url).hostname
     except (TypeError,ValueError): return
     if host in (HOST_DENIALS.get() or set()):

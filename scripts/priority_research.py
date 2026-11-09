@@ -14,6 +14,7 @@ import re
 from urllib.parse import quote, urlencode
 from source_quality import normal, topic_class, venue_class
 from academic_state import DiscoveryState, cursor_search
+from search_plan import discovery_window
 from collection_window import crossref_publication, date_in_window, previous_week, reconcile_publication_evidence
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -70,11 +71,10 @@ def crossref_article(work, *, lane, scope, query, today, expected_venue=None, ed
 
 
 def discover(request, today, *, mode="weekly", existing_dois=None, manifest=None,
-             max_venue_queries=None, max_pages=5, page_size=100, state=None):
+             max_venue_queries=None, max_pages=5, page_size=100, state=None, publication_window=None):
     """Discover previous-week publications; nominated historical DOI leads are backfill only."""
-    if mode not in {"weekly", "backfill"}:raise ValueError("Unsupported discovery mode: "+mode)
     manifest=manifest if manifest is not None else load_manifest()
-    since,until=previous_week(today) if mode=="weekly" else (dt.date(2023,1,1),today)
+    since,until=discovery_window(today,mode,publication_window)
     window={"from":since.isoformat(),"to":until.isoformat()}
     state=state or DiscoveryState(mode=mode,window=window)
     state.validate_window(mode,window)
@@ -124,10 +124,10 @@ def discover(request, today, *, mode="weekly", existing_dois=None, manifest=None
         for w in works:
             doi=doi_id(w.get("DOI"))
             if doi:stats["publication_date_corrections"][doi]=reconcile_publication_evidence(stats["publication_date_corrections"].get(doi),crossref_publication(w))
-            scope="venue_targeted" if mode=="weekly" else "historical:venue_targeted"
+            scope="venue_targeted" if mode!="backfill" else "historical:venue_targeted"
             entry=crossref_article(w,lane=p["lane"],scope=scope,query=p["q"],today=today,expected_venue=p["venue"],allow_unresolved=True)
             if not entry:continue
-            if not entry["published"] and mode=="weekly":
+            if not entry["published"] and mode!="backfill":
                 entry["acquisition_status"]="original_publication_date_required"
                 stats["publication_date_quarantine"].append(entry)
             if not date_in_window(entry["published"],since,until):
@@ -136,7 +136,7 @@ def discover(request, today, *, mode="weekly", existing_dois=None, manifest=None
                 entry["historical_backfill"]=mode=="backfill"
                 found.append(entry);found_dois.add(entry["doi"])
                 stats["journal_relevant"]+=1
-    if mode=="weekly":
+    if mode!="backfill":
         for entry in found:
             canonical=stats["publication_date_corrections"].get(entry["doi"])
             if canonical:entry["published"],entry["publication_date_provenance"]=canonical

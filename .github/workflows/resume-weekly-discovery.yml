@@ -74,16 +74,19 @@ jobs:
           if not ready:
               print('Recovery skipped. Scheduled weekly discovery must establish the current window first.')
           PY
-      - name: Resume existing academic cursors and date checks only
+      - name: Capture the actual closeout namespace
+        id: closeout_scope
+        if: steps.window.outputs.ready == 'true'
+        run: python scripts/preparation_pipeline.py scope --phase closed
+      - name: Advance the one late-index pass or resume its existing cursors
         if: steps.window.outputs.ready == 'true'
         env:
           MODE: weekly
-          DISCOVERY_RESUME_ONLY: '1'
           ACADEMIC_MAX_PAGES: '1'
           ACADEMIC_MAX_DATE_LOOKUPS: '12'
           ACADEMIC_MAX_INLINE_WAIT_SECONDS: '2'
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
-        run: python scripts/update.py
+        run: python scripts/preparation_pipeline.py closeout --expected-week "${{ steps.closeout_scope.outputs.week }}" --max-requests 48 --max-feed-requests 0 --time-budget 240
       - name: Admit only staged previous-week publisher metadata
         if: steps.window.outputs.ready == 'true'
         run: python scripts/discover_editorial.py --cached-only
@@ -129,6 +132,37 @@ jobs:
             done
             exit 1
           fi
+      - name: Protect valid closeout checkpoints after interrupted downstream work
+        id: closeout_checkpoint
+        if: failure() && steps.closeout_scope.outputs.week != ''
+        run: python scripts/preparation_pipeline.py checkpoint --phase closed --week "${{ steps.closeout_scope.outputs.week }}" --destination "$RUNNER_TEMP/validated-closeout"
+      - name: Save validated closeout work without replaying collection
+        if: always() && steps.closeout_checkpoint.outputs.valid == 'true'
+        run: |
+          save_tree="$RUNNER_TEMP/closeout-checkpoint-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          python scripts/preparation_pipeline.py checkpoint-commit --destination "$RUNNER_TEMP/validated-closeout" --worktree "$save_tree"
+          cd "$save_tree"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo 'Closeout checkpoint conflict; keep the validated recovery artifact.'
+              exit 1
+            fi
+            if git push origin HEAD:main; then exit 0; fi
+            sleep "$((attempt * 2))"
+          done
+          exit 1
+      - name: Retain only validated closeout metadata
+        if: always() && steps.closeout_checkpoint.outputs.valid == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: resume-weekly-discovery-closeout-recovery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validated-closeout/
+          retention-days: 7
+          if-no-files-found: error
       - name: Preserve recovery files if validation or saving fails
         if: failure() && steps.window.outputs.ready == 'true'
         uses: actions/upload-artifact@v7.0.2
