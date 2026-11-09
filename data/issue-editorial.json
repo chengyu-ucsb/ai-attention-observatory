@@ -174,57 +174,143 @@
     "editorial_note": "Automatically synthesized from the website’s source-backed readings using a local open model. Citation and source-anchor checks passed; this is not an independently reviewed systematic review. Abstract-based evidence and interpretations retain their limits. Earlier source-backed readings were carried forward as context, not presented as newly discovered or newly published material."
   },
   "2026-11-07": {
-    "headline": "Where judgment remains when systems assist",
-    "deck": "The available readings distinguish checking an answer, performing without assistance, and setting boundaries on automated systems. They offer different ways to ask who retains control, but no common demonstration that assistance strengthens independent judgment.",
-    "letter": "A useful thread through this collection is the difference between having help and retaining a decision. The research readings consider reported evaluation of AI output, performance after mathematics practice, and reactions to a prototype companion. The commentary shifts the question to control over application access and moderation decisions. Those are distinct settings and kinds of evidence, not a shared test of autonomy. The preprints have unverified review status and substantial design or reporting limits; the EFF pieces make attributed arguments. Read together, they support a more precise editorial question: what would count as retained judgment in each setting, and what would have to be measured before claiming it?",
+    "citation_schema_version": 1,
+    "headline": "When AI helps, what do we still do ourselves?",
+    "deck": "Checking an AI answer, solving a problem without it, and choosing what it can access are different kinds of control. This week’s readings make those differences concrete, from students asking for math help to phone owners protecting their messages.",
+    "letter": "It is easy to call someone an active AI user. It is harder to say what they are actually doing: checking a claim, working through a problem, or simply keeping a conversation going. This week, start with those actions. Two studies compare students’ accounts or chat behavior with different outcomes. A prototype study asks what makes a chatbot feel like a classmate. Two EFF essays tackle a separate, practical problem: how people can limit or challenge an automated system. The useful connections are specific, not a single verdict on whether AI helps us think.",
     "signals": [
       {
-        "short": "Separate outcomes",
-        "title": "Reported engagement and independent performance",
-        "text": "The critical-engagement preprint uses a single student survey, whereas the mathematics-interaction preprint relates practice conversations to an immediate test taken without AI. In the survey, reported coordination and reflection were associated with a reported act of critical engagement. In the classroom account, shifts toward conceptual or procedural help were associated with test performance, although reporting inconsistencies make that result uncertain. Neither observation shows that AI improves critical-thinking skill. For both preprints, peer review is unverified and the evidence does not establish causality. Their limits differ: the survey relies on overlapping self-reports and exploratory model choices; the classroom analysis follows one session and contains unresolved statistical and coding-reporting discrepancies. These outcomes should remain separate, rather than become a single story about learning gains.",
+        "short": "Checking versus learning",
+        "title": "Saying you checked an answer is different from solving the next problem",
+        "text": "In Akgun and Toker’s survey of 891 college students in the US and Türkiye, students who reported coordinating work with AI and reworking its suggestions were also more likely to report thinking critically about its output. Their critical-thinking measure was a yes/no answer, followed by a checklist of tactics such as checking AI output against other sources. Nobody took a critical-thinking test. The survey connects students’ accounts of related habits; it does not show that AI improved their ability.\n\nAbdelghani, Kaiser and Murayama took a different approach: they observed 112 ninth-graders in three German schools practicing math with Mistral, a general-purpose chatbot, then tested them without AI. Their analysis of 89 students linked a shift toward requests for explanations or methods with better immediate test scores, after accounting for initial scores and other chat measures. On average, though, requests shifted in the opposite direction. The promising clue is how a conversation changes, rather than a count of “good” prompts. The paper’s text and table report different p-values for the same model comparison. The discrepancy does not reverse the authors’ conclusion, but it needs clarification. And observation alone cannot show that changing someone’s prompts would improve their learning.",
         "sources": [
           "When Does GenAI Use Support Critical Thinking? A Cross-Cultural Structural Account of Transactive Memory with GenAI",
           "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI"
+        ],
+        "citations": [
+          {
+            "text": "Akgun and Toker’s survey",
+            "source": "When Does GenAI Use Support Critical Thinking? A Cross-Cultural Structural Account of Transactive Memory with GenAI",
+            "page": 6,
+            "locator": "§4.3–4.4, pp. 6–8; Results §5.1, pp. 12–13"
+          },
+          {
+            "text": "Abdelghani, Kaiser and Murayama",
+            "source": "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
+            "page": 5,
+            "locator": "Methods §4; Results §§5.3–5.4"
+          },
+          {
+            "text": "The paper’s text and table",
+            "source": "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
+            "page": 11,
+            "locator": "§5.4 p. 11 and Table 2 p. 12: p=.006 versus p<.001 for the same model increment"
+          }
         ]
       },
       {
-        "short": "Interaction and assessment",
-        "title": "A conversation is not a learning outcome",
-        "text": "The classroom preprint and prototype preprint ask different questions about mathematics conversations. In the classroom account, the authors propose examining how requests unfold instead of grading isolated prompts as good or bad. The prototype work interviewed researchers who acted as students, so its accounts of pacing, uncertainty and shared control describe an exploratory role-play. Participants described problems with premature answers and automatic agreement, but the work did not assess student learning or compare alternative designs. Both sources are preprints; peer review is unverified, and this evidence does not establish causality. Unresolved reporting discrepancies limit the classroom result. Mathematical errors in depicted prototype exchanges also caution against treating the prototype as verified instruction. A productive next question is whether these interaction features matter when actual learners work independently.",
+        "short": "A helpful classmate?",
+        "title": "A chatbot can feel friendly while getting the math wrong",
+        "text": "In Lin and colleagues’ Exploring AI Peer in Collaborative Mathematics Learning, seven researchers spent about 20 minutes imagining themselves as students solving equations with a chatbot. In interviews, they described feeling less judged than with a human classmate. But collaboration broke down when the bot rushed to an answer, took over the pace, or agreed too readily. Mistakes made it feel more like a peer to some participants and less useful to others.\n\nOne illustrated exchange makes the problem tangible: for x² + 5x − 6 = 0, the bot asks for numbers that multiply to +6, when they should multiply to −6. This is an error in a depicted example, not a measured error rate. The interviews tell us what these adults liked or resisted; they do not tell us whether students learned. Set beside Abdelghani and colleagues’ math study, the design question becomes sharper: can a chatbot leave room for a learner’s ideas, help them notice errors, and still prepare them to solve a problem alone? That is a question to test, not a benefit either study has established.",
         "sources": [
           "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
           "Exploring AI Peer in Collaborative Mathematics Learning"
+        ],
+        "citations": [
+          {
+            "text": "Lin and colleagues’ Exploring AI Peer in Collaborative Mathematics Learning",
+            "source": "Exploring AI Peer in Collaborative Mathematics Learning",
+            "page": 6,
+            "locator": "Methods §4.2; Results §§5.1–5.2"
+          },
+          {
+            "text": "One illustrated exchange",
+            "source": "Exploring AI Peer in Collaborative Mathematics Learning",
+            "page": 7,
+            "locator": "Figure 2"
+          },
+          {
+            "text": "Abdelghani and colleagues’ math study",
+            "source": "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
+            "page": 11,
+            "locator": "§5.4: immediate assessment without AI"
+          }
         ]
       },
       {
-        "short": "Control and recourse",
-        "title": "Different ways to limit automated decisions",
-        "text": "EFF's Siri commentary welcomes excluding selected apps from assistant access and argues for simpler controls. Its election-moderation essay instead emphasizes what happens after an automated decision, proposing human appeals, clearer disclosure and oversight. The comparison concerns different forms of control: limiting access in advance and challenging a decision afterwards. EFF also describes trade-offs, including lost assistant features and the difficulty of interpreting context at platform scale. These are attributed policy and product arguments, not evidence that those arrangements work as intended. The readings do not independently test software settings, audit security or demonstrate the effectiveness of moderation safeguards. Their contemporary HTML was checked without a verified historical snapshot, so the account should not imply exact reconstruction of either page during publication week.",
+        "short": "Limits and appeals",
+        "title": "Control also means being able to say no, or ask for another look",
+        "text": "EFF’s guide to excluding apps from Siri AI gives a concrete example of setting a boundary before a system acts. EFF reports that excluding Messages removes Siri’s ability to read and reply to messages. The loss of convenience is part of the trade-off: a meaningful restriction should stop the assistant doing something. This is EFF’s account of the settings, not our own software or security test.\n\nEFF’s essay on election moderation tackles what happens after a system acts. When a platform removes a post, the writer needs a way to explain context an automated filter may have missed. EFF argues for appeals to human reviewers, clearer disclosure and oversight. These are policy proposals, not measured proof that the safeguards work. Unlike the learning studies, these essays are about permission and recourse: who can prevent an action, and who can challenge it afterwards. A tool that helps someone think and a tool they can refuse need different kinds of evaluation.",
         "sources": [
           "Victory! You Can Now Exclude Apps from Siri AI",
           "Social Media When Elections Are Close: Doing the Impossible Better"
+        ],
+        "citations": [
+          {
+            "text": "EFF’s guide to excluding apps from Siri AI",
+            "source": "Victory! You Can Now Exclude Apps from Siri AI"
+          },
+          {
+            "text": "EFF’s essay on election moderation",
+            "source": "Social Media When Elections Are Close: Doing the Impossible Better"
+          }
         ]
       }
     ],
     "tension": {
-      "title": "What would retained judgment look like in each setting?",
-      "text": "How could future evaluations distinguish the opportunity to exercise judgment from evidence that people actually do so? The survey, classroom conversations and prototype interviews do not measure the same outcome. Their preprint status also matters: peer review is unverified, and this evidence does not establish causality. EFF's commentary offers proposals about boundaries and recourse, not a test that settles the research question. An evaluation would need to specify whose decision is retained, when assistance is absent, and which outcome is being assessed. That is an editorial question suggested by these contrasts, not a finding that one intervention works across learning, privacy and public discussion.",
+      "title": "What should we ask a learning tool to leave behind?",
+      "text": "A useful next test would connect the experience of using a chatbot with what a learner can do later. Lin and colleagues’ interviews suggest choices worth comparing, such as letting the learner set the pace rather than jumping ahead. Abdelghani and colleagues’ study points to a way of checking the result: look at the conversation, then assess the learner without AI. A follow-up could compare specific designs and repeat the assessment after a delay. That would help distinguish a pleasant interaction, immediate success and learning that lasts. It would still be a learning test, not an answer to EFF’s separate questions about privacy or appeal rights.",
       "sources": [
-        "When Does GenAI Use Support Critical Thinking? A Cross-Cultural Structural Account of Transactive Memory with GenAI",
         "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
         "Exploring AI Peer in Collaborative Mathematics Learning",
         "Victory! You Can Now Exclude Apps from Siri AI",
         "Social Media When Elections Are Close: Doing the Impossible Better"
+      ],
+      "citations": [
+        {
+          "text": "Lin and colleagues’ interviews",
+          "source": "Exploring AI Peer in Collaborative Mathematics Learning",
+          "page": 8,
+          "locator": "Results §§5.1–5.2"
+        },
+        {
+          "text": "Abdelghani and colleagues’ study",
+          "source": "Student-LLM Interactions During Math Learning: Limited Epistemic Proactivity Overall, but Within-chat Change Predicts Performance Without AI",
+          "page": 11,
+          "locator": "§5.4"
+        },
+        {
+          "text": "privacy",
+          "source": "Victory! You Can Now Exclude Apps from Siri AI"
+        },
+        {
+          "text": "appeal rights",
+          "source": "Social Media When Elections Are Close: Doing the Impossible Better"
+        }
       ]
     },
-    "closer": "Which observable decision would show that a learner or user retained judgment, and how would that observation differ from a favorable report about the system?",
+    "closer": "After the chat ends, what can the learner explain or solve on their own?",
     "number": "04",
-    "subject": "The Attention Edit #04 — Where judgment remains when systems assist",
+    "subject": "The Attention Brief #04 — When AI helps, what do we still do ourselves?",
     "experiment": {
-      "title": "Keep one decision visible",
-      "text": "Before using AI on a task, write down one judgment you want to make yourself. Afterwards, note what evidence changed that judgment.",
-      "caution": "A reflection prompt, not a tested intervention."
+      "title": "Try explaining it without the chat",
+      "text": "After asking AI for help with a problem, close the conversation and explain the next step in your own words. Note where you get stuck.",
+      "caution": "A personal reflection prompt, not a proven way to improve learning."
     },
-    "editorial_note": "AI-assisted synthesis of the website’s source-checked readings. A separate AI pass reviewed this draft against those readings; this is not human editorial review or independent verification of the underlying studies. Citation, numeric-claim and copying checks passed. The sources include limited preprint readings and attributed commentary; discovery coverage is partial."
+    "editorial_note": "The three research papers are preprints; peer review is unverified. They do not establish that AI causes better learning. This edition was rewritten against the linked source versions and reviewed in a separate AI pass, not by a human expert or through replication. The EFF articles are attributed commentary checked in current HTML; their original-week wording, software behavior and linked claims were not independently verified. Source coverage is partial. Details and source versions are listed below.",
+    "glossary": [
+      {
+        "term": "preprints",
+        "definition": "Research manuscripts shared publicly, usually before formal review by other researchers is complete. The review status of these three papers is unverified."
+      },
+      {
+        "term": "p-values",
+        "definition": "A low p-value means results at least this extreme would be unusual if there were no relationship and the statistical model’s assumptions held. It does not measure importance or prove cause and effect."
+      },
+      {
+        "term": "recourse",
+        "definition": "A way to challenge a decision and seek a correction, such as asking a human to review a removed post."
+      }
+    ]
   }
 }

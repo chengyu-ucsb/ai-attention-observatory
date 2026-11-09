@@ -18,7 +18,7 @@ class CompositionTests(unittest.TestCase):
         passage = ('The classroom comparison followed students using different forms of support. '
                    'Researchers reported changes in engagement but did not establish lasting independent learning. '
                    'The limited sample and short observation period constrain conclusions about transfer across contexts.')
-        packet = [{'key': f'S{i}', 'title': f'Source {i}', 'id': str(i), 'evidence': passage} for i in range(1, 5)]
+        packet = [{'key': f'S{i}', 'title': f'Source {i}', 'id': str(i), 'url': f'https://example.org/source-{i}', 'evidence': passage + ' Source labels: 1 2 3 4.'} for i in range(1, 5)]
         paragraph = ('A useful distinction runs through these readings: the quality of work completed with assistance '
                      'can differ from the ability a learner retains afterwards. These accounts invite closer examination '
                      'of the decisions students continue to make themselves. Their different settings and methods '
@@ -26,7 +26,8 @@ class CompositionTests(unittest.TestCase):
                      'rather than establish a shared causal effect. Future studies could separate immediate task success '
                      'from later performance on a comparable task completed independently, while observing how participants '
                      'check suggestions and revise their own explanations. These abstract-based accounts require full-text confirmation.')
-        section = lambda a,b: dict(short='A theme', title='Assistance and learning', text=paragraph,
+        section = lambda a,b: dict(short='A theme', title='Assistance and learning', text=f'Source {a[1:]} and Source {b[1:]} address this question. '+paragraph,
+            citations=[{'key':a,'text':f'Source {a[1:]}'},{'key':b,'text':f'Source {b[1:]}'}],
             evidence=[{'key':a,'quote':'did not establish lasting independent learning'},
                       {'key':b,'quote':'limited sample and short observation period'}])
         draft = dict(headline='What remains when the assistance ends?', deck=' '.join(paragraph.split()[:30]),

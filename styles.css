@@ -1161,3 +1161,11 @@ summary{cursor:pointer;font:600 14px/1.6 var(--brand);min-height:44px;color:var(
 @media(max-width:600px){#home .editorial-card{grid-template-columns:84px minmax(0,1fr);gap:0 16px}#home .editorial-card .story-visual-editorial{width:84px;height:62px}.library-card.library-story{grid-template-columns:76px minmax(0,1fr);gap:16px}.library-card.library-story .story-visual-card{width:76px;height:58px}#paper-content .rv-lede-layout{grid-template-columns:minmax(0,1fr);gap:24px;margin-top:22px}#paper-content .rv-lede-layout .story-visual-reading{grid-row:1}#paper-content .rv-lede-layout .rv-summary-idea{font-size:16px;line-height:1.75}.field-question>.ui-icon{right:16px;top:23px}}
 #paper-content .rv-lede-layout .story-visual-reading{height:auto;aspect-ratio:auto;overflow:visible}
 .search-wrap{position:relative}.search-wrap input{padding-left:46px!important}
+
+/* Citation anchors and touch/keyboard-accessible definitions: weekly issue only. */
+.issue-prose .issue-inline-citation{color:var(--red,#b6001c);text-decoration:underline;text-underline-offset:.18em;overflow-wrap:anywhere}
+.issue-prose .issue-glossary-term{color:inherit;text-decoration:underline dotted;text-underline-offset:.2em}
+.issue-prose a:focus-visible,.issue-glossary dt:focus{outline:3px solid #E00122;outline-offset:4px}
+.issue-glossary{border-top:1px solid #d7d1d2;padding:32px 0;margin:24px 0;max-width:78ch}
+.issue-glossary dt{font-weight:700;scroll-margin-top:100px;margin-top:20px}
+.issue-glossary dd{margin:6px 0 20px;line-height:1.7}
