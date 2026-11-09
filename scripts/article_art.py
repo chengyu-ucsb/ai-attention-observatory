@@ -28,8 +28,10 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
+import copy
 import hashlib
 import html
+from itertools import combinations
 import json
 from pathlib import Path, PurePosixPath
 import re
@@ -39,6 +41,8 @@ from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 RENDERER_VERSION = "editorial-svg-2"
+CANDIDATE_POLICY_VERSION = "grounded-pairs-1"
+MAX_ART_CANDIDATES = 6
 RED, INK, PAPER, MUTED = "#E00122", "#171714", "#F4F0E8", "#D8D1C5"
 MAX_SVG_BYTES = 32_000
 MAX_OVERRIDE_BYTES = 2_000_000
@@ -225,7 +229,7 @@ SUBJECTS.update({
 
 # All noun choices retain the exact source phrase and field that licensed them.
 # Generic generated questions and tags cannot supply the required context.
-def contextual_subjects(inputs: dict, spec: dict) -> list[dict]:
+def contextual_subjects(inputs: dict, spec: dict, *, limit: int | None = 2) -> list[dict]:
     ranked = []
     for order, (name, (cues, _, _)) in enumerate(SUBJECTS.items()):
         hits = matches(inputs["title"], cues)
@@ -251,7 +255,7 @@ def contextual_subjects(inputs: dict, spec: dict) -> list[dict]:
             continue
         seen.add(glyph)
         selected.append(item)
-        if len(selected) == 2:
+        if limit is not None and len(selected) == limit:
             break
     return selected
 
@@ -304,7 +308,7 @@ def matches(text: str, phrases: tuple) -> list[str]:
     return found
 
 
-def choose_concept(inputs: dict) -> dict:
+def choose_concept(inputs: dict, *, _grounded_subjects: list[dict] | None = None) -> dict:
     title = inputs["title"]
     prose = " ".join(inputs[k] for k in ("idea", "explain", "overview"))
     ranked = []
@@ -357,21 +361,93 @@ def choose_concept(inputs: dict) -> dict:
             "uniqueness": "source_theme_composition",
             "matched_cues": sorted(set(title_hits + digest_hits)), "concept": concept,
             "alt": "Editorial illustration of " + objects + ", paired with " + subject_object + ". Not a depiction of study results."}
-    subjects = contextual_subjects(inputs, spec)
-    spec["source_grounding"] = subjects
-    spec["visual_subjects"] = [x["subject"] for x in subjects]
-    # No source context means no invented contextual artwork. The caller exposes
-    # review state without replacing it with a reused topic image.
-    spec["review_reasons"] = [] if len(subjects) >= 2 else ["insufficient_specific_context"]
-    spec["semantic_signature"] = "|".join([family] + spec["visual_subjects"])
-    spec["uniqueness"] = "contextual_object_pair"
+    subjects = contextual_subjects(inputs, spec) if _grounded_subjects is None else _grounded_subjects[:2]
+    return contextual_spec(inputs, spec, subjects)
+
+
+def contextual_spec(inputs: dict, spec: dict, subjects: list[dict]) -> dict:
+    """Describe exactly the grounded pair that will actually be drawn."""
+    spec = {**spec, "source_grounding": subjects,
+            "visual_subjects": [x["subject"] for x in subjects],
+            "review_reasons": [] if len(subjects) >= 2 else ["insufficient_specific_context"],
+            "uniqueness": "contextual_object_pair"}
+    spec["semantic_signature"] = "|".join([spec["motif"]] + spec["visual_subjects"])
     if len(subjects) >= 2:
         a, b = (SUBJECTS[x["subject"]][1] for x in subjects)
+        title_label = f'For “{inputs["title"]}”, ' if inputs["title"] else "For this reading, "
         spec["alt"] = "Editorial illustration: " + a + " with " + b + ". Not a depiction of study results."
-        spec["concept"] = title_label + a + " and " + b + " frame " + meaning + "."
+        spec["concept"] = title_label + a + " and " + b + " frame " + MOTIFS[spec["motif"]][2] + "."
         if set(spec["visual_subjects"]) == {"apps", "pause"}:
             spec["alt"] = "Editorial illustration of a phone resting sideways in a cradle with a pause symbol. Not a depiction of study results."
     return spec
+
+
+def candidate_specs(inputs: dict) -> list[dict]:
+    """At most six actual subject pairs, in source-specificity order.
+
+    The original first choice is unchanged. Alternatives replace a dominant
+    source-grounded object, never merely its placement, color, label or frame.
+    Every noun must be licensed by the same public source fields as the first
+    choice. No tags, generated questions, identity hashes or fallback inventions
+    can manufacture another candidate when that source vocabulary runs out.
+    """
+    subjects = contextual_subjects(inputs, {}, limit=None)
+    primary = choose_concept(inputs, _grounded_subjects=subjects)
+    if primary.get("review_reasons"):
+        return [primary]
+    # Do not let weaker homonyms uncovered only by retry expansion introduce a
+    # different topic: "exercise agency" is not sport, "the rest" is not sleep,
+    # and "at scale" is not a measurement instrument. Existing primary artwork
+    # remains stable; alternatives need an unambiguous cue for each new subject.
+    ambiguous = {"physical": {"exercise"}, "sleep": {"rest"}, "time": {"wait"},
+                 "measurement": {"scale"}, "interview": {"accounts", "perspectives"},
+                 "review": {"synthesis"}, "teacher": {"instruction"}}
+    primary_names = set(primary["visual_subjects"])
+    subjects = [item for item in subjects if item["subject"] in primary_names
+                or set(item["phrases"]) - ambiguous.get(item["subject"], set())]
+    specs = [primary]
+    seen = {tuple(sorted(primary["visual_subjects"]))}
+    pairs = sorted(combinations(range(len(subjects)), 2), key=lambda pair: (sum(pair), pair))
+    for i, j in pairs:
+        pair = [subjects[i], subjects[j]]
+        key = tuple(sorted(x["subject"] for x in pair))
+        if key in seen:
+            continue
+        seen.add(key)
+        specs.append(contextual_spec(inputs, primary, pair))
+        if len(specs) == MAX_ART_CANDIDATES:
+            break
+    return specs
+
+
+def _fingerprint(value: object) -> str:
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+
+def _candidate_plan(record: dict, overrides: dict | None = None) -> dict:
+    """One invocation-local plan; never cached across source/policy changes."""
+    from art_similarity import RASTERIZER_VERSION, NEAR_TWIN_LIMITS
+    identity, inputs = canonical_identity(record), public_inputs(record)
+    override = (overrides or {}).get(identity)
+    specs = candidate_specs(inputs)
+    pool = _fingerprint({"identity": identity, "inputs": inputs,
+        "renderer_version": RENDERER_VERSION, "candidate_policy_version": CANDIDATE_POLICY_VERSION,
+        "max_candidates": MAX_ART_CANDIDATES,
+        "coarse_screen": [RASTERIZER_VERSION, NEAR_TWIN_LIMITS],
+        "candidates": [override] if override is not None else specs})
+    return {"identity": identity, "inputs": inputs, "specs": specs, "override": override,
+            "pool": pool, "input_fingerprint": _fingerprint({"identity": identity, "inputs": inputs,
+                                                           "renderer_version": RENDERER_VERSION})}
+
+
+def candidate_pool_fingerprint(record: dict, overrides: dict | None = None) -> str:
+    """Durable retry key. Pass validated load_overrides() output when present.
+
+    Identity and public source changes, the candidate policy, renderer, coarse
+    screen, or validated curated cover bytes invalidate an exhausted queue entry.
+    This does no rendering, disk writes, or retrieval.
+    """
+    return _candidate_plan(record, overrides)["pool"]
 
 
 
@@ -1145,18 +1221,27 @@ def load_overrides(root: Path, manifest: Path | None = None) -> dict:
     return result
 
 
-def create_art(record: dict, root: Path = ROOT, overrides: dict | None = None, *, write_asset: bool = True) -> dict:
-    """Build one candidate. Collection-wide acceptance belongs to attach_art."""
-    identity, inputs = canonical_identity(record), public_inputs(record)
-    spec = choose_concept(inputs)
-    fingerprint = hashlib.sha256(json.dumps({"identity": identity, "inputs": inputs,
-        "renderer_version": RENDERER_VERSION}, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+def _candidate_metadata(record: dict, overrides: dict | None, candidate_index: int, *,
+                        plan: dict | None = None) -> tuple[dict, dict]:
+    plan = plan if plan is not None else _candidate_plan(record, overrides)
+    identity, inputs, specs = plan["identity"], plan["inputs"], plan["specs"]
+    is_override = plan["override"] is not None
+    count = 1 if is_override else len(specs)
+    if type(candidate_index) is not int or not 0 <= candidate_index < count:
+        raise ValueError("Article art candidate index is outside the bounded source-grounded pool")
+    spec = specs[0 if is_override else candidate_index]
+    fingerprint = plan["input_fingerprint"]
     metadata = {"kind": "editorial_illustration", "status": "ready", "renderer_version": RENDERER_VERSION,
                 "input_fingerprint": fingerprint, **spec,
                 "provenance": "Original procedurally composed editorial SVG; not a source figure or empirical diagram."}
-    if identity in (overrides or {}):
-        override = overrides[identity]
-        return {**metadata, **{k: override[k] for k in ("src", "alt", "concept", "provenance", "asset_fingerprint", "width", "height", "thumbnail_src", "thumbnail_fingerprint", "thumbnail_width", "thumbnail_height") if k in override},
+    pool = plan["pool"]
+    metadata.update(candidate_index=candidate_index, candidate_count=count,
+                    candidate_policy_version=CANDIDATE_POLICY_VERSION,
+                    candidate_pool_fingerprint=pool,
+                    candidate_fingerprint=_fingerprint({"pool": pool, "index": candidate_index, "spec": spec}))
+    if is_override:
+        override = plan["override"]
+        metadata = {**metadata, **{k: override[k] for k in ("src", "alt", "concept", "provenance", "asset_fingerprint", "width", "height", "thumbnail_src", "thumbnail_fingerprint", "thumbnail_width", "thumbnail_height") if k in override},
                 "renderer_version": "editorial-override-1", "semantic_basis": "editor_selected",
                 "motif": "editor_selected", "format": Path(override["src"]).suffix.lstrip("."),
                 "review_reasons": [], "visual_subjects": [],
@@ -1164,6 +1249,16 @@ def create_art(record: dict, root: Path = ROOT, overrides: dict | None = None, *
                 "source_grounding": [{"field": "editorial_override.concept", "subject": "editor_selected",
                                       "phrases": [override["concept"]]}],
                 "uniqueness": "editor_declared_concept_and_raster_bytes"}
+    return metadata, inputs
+
+
+def create_art(record: dict, root: Path = ROOT, overrides: dict | None = None, *,
+               write_asset: bool = True, candidate_index: int = 0, _plan: dict | None = None) -> dict:
+    """Build one bounded candidate. Collection acceptance belongs to attach_art."""
+    metadata, inputs = _candidate_metadata(record, overrides, candidate_index, plan=_plan)
+    spec, identity = metadata, canonical_identity(record)
+    if metadata["semantic_basis"] == "editor_selected":
+        return metadata
     if spec.get("review_reasons"):
         return {**metadata, "status": "needs_review"}
     content = render_svg(identity, inputs, spec)
@@ -1200,68 +1295,212 @@ def create_art(record: dict, root: Path = ROOT, overrides: dict | None = None, *
     return {**metadata, "src": src, "asset_fingerprint": asset_hash, "format": "svg", "width": 1200, "height": 760}
 
 
-def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = None) -> list[dict]:
-    """Decorate ONLY records that the caller has already admitted for publication.
+# Safe persisted diagnostics. Descriptive fields and source quotations are always
+# re-derived from the current public record; a held result never restores a URL.
+RETRY_STATE_FIELDS = (
+    "input_fingerprint", "asset_fingerprint", "thumbnail_fingerprint",
+    "composition_fingerprint", "foreground_signature", "foreground_geometry_fingerprint",
+    "coarse_raster_version", "coarse_raster_size", "coarse_raster_signature", "coarse_raster_fingerprint",
+    "format", "width", "height", "thumbnail_width", "thumbnail_height",
+    "review_reasons", "review_collisions", "visual_similarity_detail",
+    "retry_attempts", "attempt_count", "retry_status",
+)
 
-    This is deliberately downstream from build_public's gates. It never promotes
-    a record, changes reading depth, replaces visual evidence, or touches provenance.
+
+def _attempt(candidate: dict) -> dict:
+    return {key: copy.deepcopy(candidate[key]) for key in
+            ("candidate_index", "candidate_fingerprint", "status", "review_reasons", "review_collisions")
+            if key in candidate}
+
+
+COLLISION_REASONS = {"duplicate_semantic_concept", "duplicate_foreground_subjects", "duplicate_foreground_geometry",
+                     "duplicate_composition", "duplicate_asset_bytes", "duplicate_thumbnail_bytes", "near_visual_twin"}
+
+
+def _valid_retry_history(record: dict, overrides: dict, prior: dict, *, plan: dict | None = None) -> bool:
+    """Validate a persisted ledger against the actual bounded candidate pool.
+
+    A matching pool hash alone cannot make an empty, incomplete, or corrupted
+    attempt ledger evidence of exhaustion. This validation does not rasterize.
+    """
+    plan = plan if plan is not None else _candidate_plan(record, overrides)
+    attempts = prior.get("retry_attempts")
+    if not isinstance(attempts, list) or not 0 < len(attempts) <= MAX_ART_CANDIDATES:
+        return False
+    if type(prior.get("attempt_count")) is not int or prior["attempt_count"] != len(attempts):
+        return False
+    index = prior.get("candidate_index")
+    if type(index) is not int:
+        return False
+    try:
+        current, _ = _candidate_metadata(record, overrides, index, plan=plan)
+    except ValueError:
+        return False
+    if any(prior.get(key) != current[key] for key in ("candidate_pool_fingerprint", "candidate_fingerprint", "input_fingerprint", "candidate_count")):
+        return False
+    seen = set()
+    for position, attempt in enumerate(attempts):
+        if not isinstance(attempt, dict):
+            return False
+        candidate_index = attempt.get("candidate_index")
+        if type(candidate_index) is not int or candidate_index in seen:
+            return False
+        seen.add(candidate_index)
+        try:
+            expected, _ = _candidate_metadata(record, overrides, candidate_index, plan=plan)
+        except ValueError:
+            return False
+        if attempt.get("candidate_fingerprint") != expected["candidate_fingerprint"]:
+            return False
+        reasons = attempt.get("review_reasons")
+        if not isinstance(reasons, list) or not all(isinstance(reason, str) and reason for reason in reasons):
+            return False
+        if attempt.get("status") == "ready":
+            if reasons or position != len(attempts) - 1 or prior.get("status") != "ready":
+                return False
+        elif attempt.get("status") != "needs_review" or not reasons:
+            return False
+        elif expected["review_reasons"]:
+            if reasons != expected["review_reasons"]:
+                return False
+        else:
+            collisions = attempt.get("review_collisions")
+            if not isinstance(collisions, list) or not collisions or not set(reasons).issubset(COLLISION_REASONS):
+                return False
+            if not all(isinstance(c, dict) and isinstance(c.get("identity"), str) and c.get("reason") in reasons for c in collisions):
+                return False
+            if {c["reason"] for c in collisions} != set(reasons):
+                return False
+    if attempts[-1] != _attempt(prior):
+        return False
+    status = prior.get("retry_status")
+    if prior.get("status") == "ready":
+        return status == "accepted"
+    if status == "exhausted":
+        return len(attempts) == current["candidate_count"] and seen == set(range(current["candidate_count"]))
+    if status == "insufficient_context":
+        return len(attempts) == 1 and current["review_reasons"] == ["insufficient_specific_context"]
+    if status == "editorial_review":
+        return len(attempts) == 1 and current["semantic_basis"] == "editor_selected"
+    return False
+
+
+def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = None, *,
+               reuse_exhausted: bool = False) -> list[dict]:
+    """Allocate bounded contextual candidates ONLY to already-public records.
+
+    Hydrated editorial_art can preserve a prior accepted alternative. Callers may
+    reuse exhausted holds only after verifying the corpus/allocation is unchanged;
+    this function additionally verifies each source/candidate-pool fingerprint.
+    A changed pool always gets a fresh bounded pass. No source is fetched, no
+    article is promoted, and a rejected curated cover never gets auto-replaced.
+    attempt_count counts distinct tried candidates, never the number of builds.
     """
     overrides = load_overrides(Path(root), manifest)
     from art_similarity import compare, decode_signature, is_near_twin
     candidates = []
     for record in records:
-        candidate = create_art(record, root, overrides, write_asset=False)
         prior = record.get("editorial_art") or {}
-        # Retain an already accepted allocation only when it still describes
-        # this exact candidate. Old v1 decorative differences grant no priority.
+        plan = _candidate_plan(record, overrides)
+        base, _ = _candidate_metadata(record, overrides, 0, plan=plan)
+        same_pool = prior.get("candidate_pool_fingerprint") == base["candidate_pool_fingerprint"]
+        index = prior.get("candidate_index", 0) if same_pool else 0
+        valid_index = type(index) is int and 0 <= index < base["candidate_count"]
+        if not valid_index:
+            index = 0
+        if (reuse_exhausted and same_pool and valid_index and prior.get("status") == "needs_review"
+                and prior.get("retry_status") in {"exhausted", "insufficient_context", "editorial_review"}
+                and prior.get("review_reasons") and _valid_retry_history(record, overrides, prior, plan=plan)):
+            # Defer cached holds until all accepted blockers have revalidated.
+            base, _ = _candidate_metadata(record, overrides, index, plan=plan)
+            candidates.append((2, canonical_identity(record), base, record, prior, plan))
+            continue
+        # Rebuild the retained candidate from current source text and renderer,
+        # rather than trusting serialized prose, geometry, or a saved URL.
+        initial_index = index if prior.get("status") == "ready" else 0
+        candidate = create_art(record, root, overrides, write_asset=False, candidate_index=initial_index, _plan=plan)
         retained = (prior.get("status") == "ready" and prior.get("src") == candidate.get("src")
                     and prior.get("input_fingerprint") == candidate.get("input_fingerprint")
                     and prior.get("asset_fingerprint") == candidate.get("asset_fingerprint")
                     and prior.get("renderer_version") == candidate.get("renderer_version"))
-        candidates.append((not retained, canonical_identity(record), candidate, record))
+        if not retained and initial_index:
+            candidate = create_art(record, root, overrides, write_asset=False, candidate_index=0, _plan=plan)
+        candidates.append((not retained, canonical_identity(record), candidate, record, prior, plan))
     owners = {key: {} for key in ("semantic_signature", "foreground_signature", "foreground_geometry_fingerprint", "composition_fingerprint", "bytes")}
     reasons = {"semantic_signature": "duplicate_semantic_concept", "foreground_signature": "duplicate_foreground_subjects",
                "foreground_geometry_fingerprint": "duplicate_foreground_geometry",
                "composition_fingerprint": "duplicate_composition"}
     accepted_rasters = []
-    for _, identity, candidate, record in sorted(candidates, key=lambda item: (item[0], item[1], item[2]["input_fingerprint"])):
-        if candidate["status"] == "needs_review":
-            record["editorial_art"] = candidate
-            continue
-        checks = [(key, candidate[key], reasons[key]) for key in reasons if candidate.get(key)]
-        # These fingerprints come from validated file bytes, not names or an
-        # editor-supplied checksum. Check thumbnails as well as full-size covers.
-        checks += [("bytes", candidate[key], reason) for key, reason in
-                   (("asset_fingerprint", "duplicate_asset_bytes"), ("thumbnail_fingerprint", "duplicate_thumbnail_bytes"))
-                   if candidate.get(key)]
-        collisions = [{"reason": reason, "identity": owners[key][signature]}
-                      for key, signature, reason in checks
-                      if signature in owners[key] and owners[key][signature] != identity]
-        pixels = decode_signature(candidate["coarse_raster_signature"]) if candidate.get("coarse_raster_signature") else None
-        if pixels is not None:
-            for accepted_identity, accepted_pixels in accepted_rasters:
-                if accepted_identity == identity:
-                    continue
-                metrics = compare(pixels, accepted_pixels)
-                if is_near_twin(metrics):
-                    collisions.append({"reason": "near_visual_twin", "identity": accepted_identity,
-                                       "metrics": {key: round(value, 6) if isinstance(value, float) else value for key, value in metrics.items()}})
-        if collisions:
-            candidate["status"] = "needs_review"
-            candidate["review_reasons"] = sorted({c["reason"] for c in collisions})
-            candidate["review_collisions"] = collisions
-            # A review state never contains a usable image URL, including a
-            # thumbnail; consumers can show the article without fallback art.
-            candidate.pop("src", None)
-            candidate.pop("thumbnail_src", None)
-        else:
+    accepted_identities = set()
+    can_reuse_holds = reuse_exhausted and all(item[0] in (False, 2) for item in candidates)
+    for not_retained, identity, first, record, prior, plan in sorted(candidates, key=lambda item: (item[0], item[1], item[2]["input_fingerprint"])):
+        if not_retained == 2:
+            blockers_exist = all(collision["identity"] in accepted_identities and collision["identity"] != identity
+                                 for attempt in prior["retry_attempts"] for collision in attempt.get("review_collisions", []))
+            if can_reuse_holds and blockers_exist:
+                held, _ = _candidate_metadata(record, overrides, first["candidate_index"], plan=plan)
+                held.update({key: copy.deepcopy(prior[key]) for key in RETRY_STATE_FIELDS if key in prior})
+                held.update(status="needs_review")
+                held.pop("src", None)
+                held.pop("thumbnail_src", None)
+                record["editorial_art"] = held
+                continue
+            first = create_art(record, root, overrides, write_asset=False, _plan=plan)
+        attempts = []
+        indices = [first["candidate_index"]] + [i for i in range(first["candidate_count"]) if i != first["candidate_index"]]
+        for index in indices:
+            candidate = first if index == first["candidate_index"] else create_art(
+                record, root, overrides, write_asset=False, candidate_index=index, _plan=plan)
+            if candidate["status"] == "needs_review":
+                attempts.append(_attempt(candidate))
+                candidate["retry_status"] = ("insufficient_context" if "insufficient_specific_context" in candidate["review_reasons"]
+                                             else "validation_failed")
+                break
+            checks = [(key, candidate[key], reasons[key]) for key in reasons if candidate.get(key)]
+            # Fingerprints come from validated bytes, not names or supplied hashes.
+            checks += [("bytes", candidate[key], reason) for key, reason in
+                       (("asset_fingerprint", "duplicate_asset_bytes"), ("thumbnail_fingerprint", "duplicate_thumbnail_bytes"))
+                       if candidate.get(key)]
+            collisions = [{"reason": reason, "identity": owners[key][signature]}
+                          for key, signature, reason in checks
+                          if signature in owners[key] and owners[key][signature] != identity]
+            pixels = decode_signature(candidate["coarse_raster_signature"]) if candidate.get("coarse_raster_signature") else None
+            if pixels is not None:
+                for accepted_identity, accepted_pixels in accepted_rasters:
+                    if accepted_identity == identity:
+                        continue
+                    metrics = compare(pixels, accepted_pixels)
+                    if is_near_twin(metrics):
+                        collisions.append({"reason": "near_visual_twin", "identity": accepted_identity,
+                                           "metrics": {key: round(value, 6) if isinstance(value, float) else value for key, value in metrics.items()}})
+            if collisions:
+                candidate.update(status="needs_review", review_reasons=sorted({c["reason"] for c in collisions}),
+                                 review_collisions=collisions)
+                candidate.pop("src", None)
+                candidate.pop("thumbnail_src", None)
+                attempts.append(_attempt(candidate))
+                candidate["retry_status"] = "editorial_review" if candidate["semantic_basis"] == "editor_selected" else "exhausted"
+                continue
             for key, signature, _ in checks:
                 owners[key][signature] = identity
+            accepted_identities.add(identity)
             if candidate["semantic_basis"] != "editor_selected":
                 accepted_rasters.append((identity, pixels))
-                # The candidate's path was already validated; redraw its exact
-                # accepted scene without repeating the coarse raster analysis.
                 write_if_changed(Path(root) / candidate["src"], render_svg(identity, public_inputs(record), candidate))
+            attempts.append(_attempt(candidate))
+            candidate["retry_status"] = "accepted"
+            # Preserve the verified allocation's original bounded attempt ledger.
+            # It records why that alternative was chosen, not new attempts per run.
+            previous_attempts = prior.get("retry_attempts")
+            if (not not_retained and index == first["candidate_index"]
+                    and prior.get("candidate_pool_fingerprint") == candidate["candidate_pool_fingerprint"]
+                    and _valid_retry_history(record, overrides, prior, plan=plan)
+                    and previous_attempts[-1] == _attempt(candidate)):
+                attempts = copy.deepcopy(previous_attempts)
+            break
+        candidate.update(retry_attempts=attempts, attempt_count=len(attempts))
+        if prior.get("status") == "ready" and (candidate["status"] != "ready" or candidate.get("src") != prior.get("src")):
+            can_reuse_holds = False
         record["editorial_art"] = candidate
     return records
 
@@ -1280,6 +1519,10 @@ def report(records: list[dict], root: Path) -> dict:
     paths = {item["src"] for item in ready}
     return {"renderer_version": RENDERER_VERSION, "article_count": len(items),
             "ready_count": len(ready), "needs_review_count": len(pending),
+            "candidate_policy_version": CANDIDATE_POLICY_VERSION, "max_art_candidates": MAX_ART_CANDIDATES,
+            "retried_ready_count": sum(item.get("candidate_index", 0) > 0 for item in ready),
+            "candidate_attempt_count": sum(item.get("attempt_count", 1) for item in items),
+            "retry_statuses": dict(sorted(Counter(item.get("retry_status", "unknown") for item in items).items())),
             "review_reasons": dict(sorted(Counter(reason for item in pending for reason in item.get("review_reasons", [])).items())),
             "distinct_generated_compositions": len({item["composition_fingerprint"] for item in ready if item.get("composition_fingerprint")}),
             "composition_audit": "Dominant source-grounded noun pairs, semantic signatures, exact SVG geometry, and validated raster bytes; not a perceptual pixel-uniqueness guarantee",

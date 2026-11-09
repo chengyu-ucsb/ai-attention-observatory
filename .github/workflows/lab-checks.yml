@@ -7,11 +7,15 @@ on:
       - 'app.js'
       - 'styles.css'
       - 'scripts/article_art.py'
+      - 'scripts/article_art_queue.py'
       - 'scripts/art_similarity.py'
       - 'scripts/build_public.py'
       - 'data/article-art-overrides.json'
+      - 'data/article-art-state.json'
       - 'assets/editorial-covers/**'
       - 'tests/test_article_art.py'
+      - 'tests/test_article_art_candidates.py'
+      - 'tests/test_article_art_queue.py'
       - 'tests/test_art_similarity.py'
       - 'tests/validate_article_ui.cjs'
       - 'lab-play.*'
@@ -25,11 +29,15 @@ on:
       - 'app.js'
       - 'styles.css'
       - 'scripts/article_art.py'
+      - 'scripts/article_art_queue.py'
       - 'scripts/art_similarity.py'
       - 'scripts/build_public.py'
       - 'data/article-art-overrides.json'
+      - 'data/article-art-state.json'
       - 'assets/editorial-covers/**'
       - 'tests/test_article_art.py'
+      - 'tests/test_article_art_candidates.py'
+      - 'tests/test_article_art_queue.py'
       - 'tests/test_art_similarity.py'
       - 'tests/validate_article_ui.cjs'
       - 'lab-play.*'
@@ -52,7 +60,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      # Official releases and node24 runtimes verified 2026-11-06.
+      # Official releases and node24 runtimes verified 2026-11-09.
       - uses: actions/checkout@v7.0.1
         with:
           persist-credentials: false
