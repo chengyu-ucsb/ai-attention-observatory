@@ -8,7 +8,7 @@ class Element{
  setAttribute(){} addEventListener(){}
 }
 const elements=new Map();
-const doc={createElement:tag=>new Element(tag),createElementNS:(_ns,tag)=>new Element(tag),querySelector:q=>{
+const doc={createTextNode:text=>Object.assign(new Element("#text"),{textContent:text}),createElement:tag=>new Element(tag),createElementNS:(_ns,tag)=>new Element(tag),querySelector:q=>{
  if(q==='#issue-source-landscape')return null;
  if(!elements.has(q))elements.set(q,new Element('div'));
  return elements.get(q);

@@ -221,6 +221,99 @@ def check(page, url, width, out):
     assert not errors, errors
 
 
+
+def check_weekly_citations(page, url, width, out):
+    """Exercise real published source spans and definitions, without JSON fixtures."""
+    import json
+    from urllib.parse import parse_qs, urlsplit, urlunsplit
+    issue = json.loads((ROOT / 'data/public-featured-issue.json').read_text())
+    archived = json.loads((ROOT / 'data/approved-issues' / (issue['edition_date'] + '.json')).read_text())
+    assert issue == archived, 'Featured citation checks must use the actual archived edition'
+    assert issue.get('citation_schema_version') == 1 and issue.get('glossary'), 'Current edition lacks inline citations/glossary'
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.set_viewport_size({'width': width, 'height': 900})
+    page.goto(url + '#issue', wait_until='networkidle')
+    expect(page.locator('#issue')).to_be_visible()
+    expect(page.locator('#issue-headline')).to_have_text(issue['headline'])
+    # Open real disclosures with keyboard so all full-analysis spans are checked.
+    for summary in page.locator('#issue .reading-expansion > summary, #issue .issue-letter > summary').all():
+        summary.focus()
+        page.keyboard.press('Enter')
+        expect(summary.locator('..')).to_have_attribute('open', '')
+    sources = {source['id']: source for source in issue['sources']}
+
+    def verify_citations(scope, section, css):
+        for citation in section['citations']:
+            source = sources[citation['source_id']]
+            href = source.get('source_url') or source['url']
+            parsed = urlsplit(href)
+            if citation.get('page') and (parsed.path.endswith('.pdf') or '/pdf/' in parsed.path):
+                href = urlunsplit(parsed._replace(fragment='page=' + str(citation['page'])))
+            anchors = scope.locator(css).filter(has_text=re.compile('^' + re.escape(citation['text']) + '$'))
+            assert anchors.count() > 0, 'Missing rendered citation: ' + citation['text']
+            for anchor in anchors.all():
+                expect(anchor).to_have_text(citation['text'])
+                expect(anchor).to_have_attribute('href', href)
+                expect(anchor).to_have_attribute('title', re.compile(re.escape(source['title'])))
+                if citation.get('locator'):
+                    expect(anchor).to_have_attribute('title', re.compile(re.escape(citation['locator'])))
+    for index, section in enumerate(issue['signals']):
+        verify_citations(page.locator('#issue-signals .issue-signal').nth(index), section, 'a.issue-inline-citation')
+    verify_citations(page.locator('#issue-tension-text'), issue['tension'], 'a.issue-inline-citation')
+    # Native links support desktop Enter and real touch events at narrow widths.
+    term = page.locator('#issue a.issue-glossary-term:visible').first
+    target_id = parse_qs(urlsplit(term.get_attribute('href')[1:]).query)['term'][0]
+    if width <= 600:
+        term.tap()
+    else:
+        term.focus()
+        page.keyboard.press('Enter')
+    definition = page.locator('#' + target_id)
+    expect(definition).to_be_focused()
+    expect(page.locator('#issue')).to_be_visible()
+    expect(definition.locator('xpath=following-sibling::dd[1]')).to_be_visible()
+    assert definition.evaluate('(e) => { const r=e.getBoundingClientRect(); return r.top>=0 && r.bottom<=innerHeight; }')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Weekly glossary overflow at {width}px'
+    if out:
+        out.mkdir(parents=True, exist_ok=True)
+        page.screenshot(path=str(out / f'observatory-{width}-weekly-glossary.png'))
+    page.go_back()
+    expect(page).to_have_url(url + '#issue')
+    expect(page.locator('#issue')).to_be_visible()
+    # Repeated navigation must not strand the reader on Home or a stale target.
+    page.go_forward()
+    expect(definition).to_be_focused()
+    expect(page.locator('#issue')).to_be_visible()
+
+    archive_url = url + 'issues/' + issue['edition_date'] + '.html'
+    page.goto(archive_url, wait_until='networkidle')
+    expect(page.locator('h1')).to_have_text(issue['headline'])
+    for summary in page.locator('main details > summary').all():
+        summary.focus()
+        page.keyboard.press('Enter')
+    for index, section in enumerate(issue['signals']):
+        verify_citations(page.locator('#signal-' + str(index + 1)), section, 'a.inline-citation')
+    archive_term = page.locator('a.glossary-term:visible').first
+    fragment = archive_term.get_attribute('href')
+    assert fragment.startswith('#term-'), 'Archive glossary link must target a real definition'
+    if width <= 600:
+        archive_term.tap()
+    else:
+        archive_term.focus()
+        page.keyboard.press('Enter')
+    expect(page).to_have_url(archive_url + fragment)
+    target = page.locator(fragment)
+    expect(target).to_be_visible()
+    expect(target.locator('xpath=following-sibling::dd[1]')).to_be_visible()
+    assert target.evaluate('(e) => { const r=e.getBoundingClientRect(); return r.top>=0 && r.top<innerHeight; }')
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Archive glossary overflow at {width}px'
+    page.go_back()
+    expect(page).to_have_url(archive_url)
+    assert not errors, errors
+    print(f'Published weekly citations and glossary passed at {width}px: exact source/page links, keyboard/touch, focus, Back/Forward, archive definitions.')
+
+
 def check_standalone_brief(page, url, width, out):
     """Exercise generated weekly prose and the RSS landing page at every width."""
     import json
@@ -611,9 +704,10 @@ if __name__ == '__main__':
         finally:
             art_context.close()
         for width in [1280, 768, 390, 320]:
-            context = browser.new_context(reduced_motion='reduce')
+            context = browser.new_context(reduced_motion='reduce', has_touch=width <= 600)
             try:
                 check(context.new_page(), url, width, args.screenshots)
+                check_weekly_citations(context.new_page(), url, width, args.screenshots)
                 check_standalone_brief(context.new_page(), url, width, args.screenshots)
                 check_typed_readings(context.new_page(), url, width, args.screenshots)
                 check_registered_readings(context.new_page(), url, width, args.screenshots, registered)
