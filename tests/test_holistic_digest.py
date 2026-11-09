@@ -89,8 +89,8 @@ class HolisticDigestTests(unittest.TestCase):
          if r.get('doi')=='10.1016/j.chb.2024.108386')
   d=annotate(r)['reading']['digest']
   self.assertIn('lower-quality reasoning',d['finding'])
-  self.assertIn('lower-quality reasoning',d['idea'])
-  self.assertLessEqual(len(d['idea']),230)
+  # An unedited result bundle belongs in the body, not a raw or benefit-only heading.
+  self.assertEqual(d['idea'],r['title'])
   self.assertIn('did not differ significantly',d['finding'])
   self.assertEqual(d['finding_source'],'abstract')
   self.assertIn('91 university students',d['approach'])
