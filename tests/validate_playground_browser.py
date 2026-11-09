@@ -281,20 +281,66 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     page.locator("#tab-assist").click()
     for mode in ("reflect", "hint", "answer"):
         page.locator(f'[data-assist-mode="{mode}"]').click()
-        for i, correct_index in enumerate((1, 0, 1, 2), 1):
-            assert page.locator("#assist-counter").inner_text() == f"SCENARIO {i} / 4"
+        for i, correct_index in enumerate((1, 0, 1, 2, 1), 1):
+            assert page.locator("#assist-counter").inner_text() == f"SCENARIO {i} / 5"
             page.locator(".assist-option").nth(correct_index).focus()
             page.keyboard.press("Enter")
             assert page.evaluate("document.activeElement.id") == "assist-feedback"
             assert "Supported conclusion" in page.locator("#assist-feedback").inner_text()
             page.keyboard.press("Tab")
+            if i == 5:
+                details = page.locator(".assist-source")
+                summary = details.locator("summary")
+                assert summary.evaluate("el => el === document.activeElement")
+                assert not details.evaluate("el => el.open")
+                page.keyboard.press("Enter")
+                assert details.evaluate("el => el.open")
+                assert "did not test student learning" in details.inner_text()
+                links = details.locator("a")
+                assert links.count() == 2
+                assert links.nth(0).get_attribute("href") == "https://arxiv.org/pdf/2610.38990v1#page=6"
+                assert links.nth(1).get_attribute("href").endswith("/issues/2026-11-07.html")
+                for link in links.all():
+                    page.keyboard.press("Tab")
+                    assert link.evaluate("el => el === document.activeElement")
+                    box = link.bounding_box()
+                    assert box["height"] >= 44
+                if screenshots and mode == "reflect":
+                    page.screenshot(path=str(screenshots / f"lab-study-context-{width}-zoom{zoom}.png"), full_page=True)
+                summary.focus()
+                page.keyboard.press("Space")
+                assert not details.evaluate("el => el.open")
+                page.keyboard.press("Tab")
             assert page.evaluate("document.activeElement.id") == "assist-next"
             page.keyboard.press("Enter")
             assert page.evaluate("document.activeElement.id") == "assist-prompt"
+            assert page.locator(".assist-source").count() == 0
+    # Native keyboard selection must not steal focus after the first change.
+    picker = page.locator("#assist-scenario")
+    picker.focus()
+    page.keyboard.press("ArrowDown")
+    assert page.evaluate("document.activeElement.id") == "assist-scenario"
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Enter")
+    assert picker.input_value() == "2"
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 3 / 5"
+    assert page.evaluate("document.activeElement.id") == "assist-scenario"
+    # Jump directly to the new question, then leave an answered question safely.
+    picker.select_option("4")
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 5 / 5"
+    assert page.evaluate("document.activeElement.id") == "assist-scenario"
+    page.locator(".assist-option").nth(0).click()
+    assert "Another interpretation" in page.locator("#assist-feedback").inner_text()
+    assert page.locator(".assist-source").is_visible()
+    page.locator("#assist-scenario").select_option("1")
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 2 / 5"
+    assert page.locator("#assist-feedback").is_hidden()
+    assert page.locator(".assist-source").count() == 0
+    assert "FULL ANSWER" in page.locator("#assist-reply").inner_text()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     page.locator("#play-reset").click()
     assert page.locator("#recovery-history").inner_text() == ""
-    assert page.locator("#assist-counter").inner_text() == "SCENARIO 1 / 4"
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 1 / 5"
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     assert not errors, errors
@@ -346,5 +392,6 @@ if __name__ == "__main__":
             page.close()
         finally:
             browser.close()
+
 
 

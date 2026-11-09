@@ -69,7 +69,12 @@ Keep these checks green on future changes.
 
 ### P2 · Extend the scenario bank with a weekly source-informed question
 
-Status: ready after source review. First candidate: performance versus learning.
+Status: five scenarios prepared, including the 9 November source-informed
+question about expert role-play versus intended-user outcomes. A question picker
+makes each scenario directly reachable. The final PR checks and Pages deployment
+determine which revision is published. Next: use a genuinely different question
+from a later published issue, rather than adding another version of speed versus
+learning or expert feedback versus learner outcomes.
 
 - Review the current published issue for a meaningful task-design tension.
 - Add one concise scenario with reflection, hint, full answer and feedback, or
@@ -247,6 +252,38 @@ determine publication status, not this date.
   desktop and 320 px WebKit card screenshots were inspected. The final PR
   checks and actual Pages deployment remain authoritative for the release.
 
+### 9 November 2026 · Whose experience was tested?
+
+- Reviewed the latest actually published issue, [The Attention Brief #04,
+  7 November](https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-07.html).
+  The 9 November source packet was not a new published issue at review time.
+- Added a fifth original Assistance Dial question: interviews with researchers
+  role-playing students can inform design, without establishing students'
+  experiences or learning benefits. Reflection, hint and answer levels retain
+  that distinction; the main feedback states it before any disclosure is opened.
+- Added a native question picker that preserves the help level, keeps keyboard
+  focus while announcing the chosen question and clears the previous response. Replay, next and reset
+  remain available. No persistence, telemetry or external inference was added.
+- An optional source note links the pinned v1 preprint and the published issue.
+  Source checked: Lin, Deng, Pan, Yu and Cristea, *Exploring AI Peer in
+  Collaborative Mathematics Learning*, 28 October 2026,
+  [Methods §4.2, p. 6](https://arxiv.org/pdf/2610.38990v1#page=6) and
+  [Limitations §7, p. 11](https://arxiv.org/pdf/2610.38990v1#page=11).
+  Seven researchers took a student perspective with one prototype, then gave
+  interviews. No student learning test or comparison of teaching conditions was
+  reported. This is an exploratory preprint with unverified peer-review status;
+  the Lab question is not a replication or a validated assessment.
+- Added deterministic checks for every question/help level, direct selection,
+  incorrect answers, source-link identity and clearing stale feedback. Browser
+  checks now cover the new question, keyboard selection and disclosure opening/closing, link
+  focus/target sizes and selection/reset at all existing viewport/engine sizes.
+- Preserved pending PR #38's separate layered-debrief work and unrelated open
+  reading/source-pipeline changes. No research collection or publication workflow
+  was modified or manually dispatched.
+- Local JavaScript syntax, deterministic Lab regressions and Python compilation
+  pass. Hosted engine checks and final Pages publication must be verified on the
+  exact PR revision; this record alone is not a deployment claim.
+
 ## Checks for every release
 
 1. `node --check lab-play.js`
@@ -269,5 +306,6 @@ passed all 216 Python tests and 69 reading-page checks. Local Chromium launch wa
 unavailable, so browser verification used the repository's hosted test runner.
 The current PR's latest checks and the Pages deployment remain the authoritative
 release status, not this historical record.
+
 
 
