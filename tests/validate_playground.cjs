@@ -236,28 +236,52 @@ by("recovery-compare").click();by("recovery-start").click();by("play-reset").cli
 assert.equal(by("recovery-comparison-plan").hidden,true);assert.equal(by("recovery-comparison-results").hidden,true);
 assert.equal(by("recovery-compare").disabled,false);assert.equal(by("recovery-history").children.length,0);
 assert.equal(doc.activeElement,by("play-reset"));
-// All four fictional scenarios are reachable under all three help settings.
+// All five fictional scenarios are reachable under all three help settings.
 by("tab-assist").click();
 for(const mode of ["reflect","hint","answer"]){
  doc.querySelectorAll("[data-assist-mode]").find(x=>x.dataset.assistMode===mode).click();
- for(let i=0;i<4;i++){
-  assert.equal(by("assist-counter").textContent,`SCENARIO ${i+1} / 4`);
+ for(let i=0;i<5;i++){
+  assert.equal(by("assist-counter").textContent,`SCENARIO ${i+1} / 5`);
+  assert.equal(by("assist-feedback").children.length,0,"New prompt must clear prior source notes and feedback");
   const options=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
-  assert.equal(options.length,3);options[[1,0,1,2][i]].click();
+  assert.equal(options.length,3);options[[1,0,1,2,1][i]].click();
   assert.equal(by("assist-feedback").hidden,false);
   assert.equal(doc.activeElement,by("assist-feedback"));
   assert.match(by("assist-feedback").children[0].textContent,/Supported conclusion/);
-  assert.equal(by("assist-next").textContent,i===3?"Replay the first scenario":"Try another scenario");
+  const details=descendants(by("assist-feedback")).filter(x=>x.className==="assist-source");
+  assert.equal(details.length,i===4?1:0);
+  if(i===4){
+   assert.equal(details[0].tagName,"DETAILS");
+   const content=descendants(details[0]);
+   assert(content.some(x=>x.textContent.includes("Seven adult researchers")));
+   assert(content.some(x=>x.textContent.includes("did not test student learning")));
+   const links=content.filter(x=>x.tagName==="A");
+   assert.deepEqual(links.map(x=>x.getAttribute("href")),["https://arxiv.org/pdf/2610.38990v1#page=6","https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-07.html"]);
+   assert(links.every(x=>x.getAttribute("rel")==="noopener noreferrer"));
+  }
+  assert.equal(by("assist-next").textContent,i===4?"Replay the first scenario":"Try another scenario");
   by("assist-next").click();assert.equal(doc.activeElement,by("assist-prompt"));
  }
 }
+// Direct question selection keeps help level and clears stale answers/source notes.
+by("assist-scenario").focus();by("assist-scenario").value="4";by("assist-scenario").handlers.change[0]();
+assert.equal(by("assist-counter").textContent,"SCENARIO 5 / 5");assert.equal(doc.activeElement,by("assist-scenario"));
+let directOptions=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
+directOptions[0].click();assert.match(by("assist-feedback").children[0].textContent,/Another interpretation/);
+assert(descendants(by("assist-feedback")).some(x=>x.className==="assist-source"));
+by("assist-scenario").value="1";by("assist-scenario").handlers.change[0]();
+assert.equal(by("assist-counter").textContent,"SCENARIO 2 / 5");assert.equal(by("assist-feedback").children.length,0);
+assert.equal(by("assist-next").hidden,true);assert(descendants(by("assist-reply")).some(x=>x.textContent==="FULL ANSWER"));
+for(const invalid of ["-1","5","bad"]){by("assist-scenario").value=invalid;by("assist-scenario").handlers.change[0]();assert.equal(by("assist-counter").textContent,"SCENARIO 2 / 5")}
 // Reset clears all activities while retaining explicit mode choices and focus.
 by("play-reset").click();assert.equal(by("recovery-history").children.length,0);
-assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 4");
+assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 5");
 assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").value,"timed");
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
-assert(html.includes('datetime="2026-11-06"'));
+assert(html.includes('datetime="2026-11-09"'));
+assert(html.includes('Official guides · Checked <time datetime="2026-11-06">6 Nov 2026</time>'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
-console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 4 scenarios at all 3 assistance levels.");
+console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 5 scenarios at all 3 assistance levels with source/limit disclosures.");
+
 
 
