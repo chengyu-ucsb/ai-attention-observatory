@@ -260,7 +260,7 @@ def validate_state(data):
     for window_id, window in data["windows"].items():
         obj(window, {"mode", "window", "queries", "plans", "date_evidence", "arxiv_date_evidence"}, {"mode", "window", "queries", "plans", "date_evidence"})
         text(window["mode"])
-        if window["mode"] not in {"weekly", "backfill"}: invalid()
+        if window["mode"] not in {"weekly", "backfill", "preparation", "closeout", "closeout_late_index"}: invalid()
         bounds = window["window"]
         obj(bounds, {"from", "to"}, {"from", "to"})
         if bounds != {"from": "unspecified", "to": "unspecified"}:

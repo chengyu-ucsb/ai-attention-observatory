@@ -94,12 +94,15 @@ class ProviderMigrationTests(unittest.TestCase):
                                   'host:www.econstor.eu': row['next_retry_at']}
         state.pop('run')
         queue.seal_state(state)
-        stage = Mock()
+        stage = Mock(side_effect=unavailable)
         updated = resume(state, attempt=stage)
-        stage.assert_not_called()
+        self.assertEqual(stage.call_count, 1)
+        self.assertEqual(stage.call_args.args[1]['name'], 'CORE')
         after = rows(updated)[0]
-        for key in ('cursor', 'tried_sources', 'next_retry_at', 'attempts', 'diagnostics'):
+        for key in ('cursor', 'tried_sources', 'next_retry_at'):
             self.assertEqual(after[key], row[key])
+        self.assertEqual(after['diagnostics'][:-1], row['diagnostics'])
+        self.assertEqual(after['attempts'], row['attempts'] + 1)
         self.assertEqual(updated['provider_pauses'], state['provider_pauses'])
 
     def test_in_progress_resumes_existing_provider_not_restarted_plan(self):

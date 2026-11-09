@@ -154,7 +154,7 @@ def retry_time(error, now, attempt):
 
 
 def capture(state=None, *, feeds=None, now=None, fetcher=None, max_requests=24,
-            deadline_seconds=240, monotonic=time.monotonic, checkpoint=None):
+            deadline_seconds=240, monotonic=time.monotonic, checkpoint=None, observer=None):
     import discover_editorial as ed
     feeds = ed.FEEDS if feeds is None else feeds
     fetcher = ed.get_xml if fetcher is None else fetcher
@@ -220,6 +220,8 @@ def capture(state=None, *, feeds=None, now=None, fetcher=None, max_requests=24,
             try:
                 root = fetcher(current)
                 items = ed.parse_feed(root)
+                if observer:
+                    observer(feed, items)
                 pages += 1
                 for item in items:
                     if item.get("date"):
@@ -296,11 +298,12 @@ def capture(state=None, *, feeds=None, now=None, fetcher=None, max_requests=24,
         "scope": "Rolling publisher-feed metadata only. No current-week articles retrieved or published; coverage is not exhaustive."}
 
 
-def candidate_items(state, feeds, *, now=None):
+def candidate_items(state, feeds, *, now=None, mode="weekly", publication_window=None):
     """Serve only exact previous-week dates from unchanged source configurations."""
     import discover_editorial as ed
     validate_state(state, feeds)
-    start, end = previous_week(now)
+    from search_plan import discovery_window
+    start, end = discovery_window(utc(now), mode, publication_window)
     output = {}
     # A canonical article can occur in multiple feeds with contradictory dates.
     # Select relevant identities globally before including all their evidence.
@@ -325,9 +328,10 @@ def candidate_items(state, feeds, *, now=None):
     return output
 
 
-def coverage_report(state, feeds, *, now=None):
+def coverage_report(state, feeds, *, now=None, mode="weekly", publication_window=None):
     validate_state(state, feeds)
-    start, end = previous_week(now)
+    from search_plan import discovery_window
+    start, end = discovery_window(utc(now), mode, publication_window)
     beginning = utc(start.isoformat())
     closing = utc((end + timedelta(days=1)).isoformat())
     report = {}

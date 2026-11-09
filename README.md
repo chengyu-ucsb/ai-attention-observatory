@@ -390,18 +390,45 @@ automatic draft passes its checks or a manual edition is supplied, the previous
 published issue stays featured. Earlier failed weeks remain in the editorial
 queue for recovery; they are not silently filled with invented copy.
 
-Weekly discovery remains Monday at 12:23 UTC (08:23 New York daylight time,
-07:23 standard time); GitHub may delay scheduled starts. Manual runs default
-to weekly mode, with backfill and rebuild available explicitly. Code and lead-file
-pushes use rebuild mode: nominated citations are checked, but the full external
-search and metadata-enrichment sweep are not repeated. Both data-writing jobs
-check out the current main revision after acquiring their shared queue lock,
-with full history for rebasing. On failure they preserve a seven-day recovery
-artifact; inspect and validate it before restoring data rather than rerunning
-external searches to recover from a push conflict. After a change,
-check the discovery and publishing Actions runs, warnings, the deployed
-`data/pipeline-status.json`, and both RSS feeds. Restore the previous commit
-to roll back code; retain source records and approved issue archives.
+The [rolling preparation lane](docs/rolling-weekly-preparation.md) stages the
+actual current publication week daily at **01:29 UTC**, including bounded
+acquisition and up to two machine-reading attempts. Staging is unpublished and
+excluded from Pages, not confidential storage in this public repository.
+
+Weekly closeout runs Monday at **00:23 UTC**, with one separate late-index sweep
+after **06:37 UTC** and recovery opportunities at **12:53 and 19:53 UTC**.
+Original publications must still fall in the previous Monday–Sunday UTC window.
+Actual observation dates and provider pauses are retained; repeated runs resume
+existing closeout generations instead of resetting finished cursors. The existing
+four-times-daily discovery-resume workflow can advance or resume the same later
+generation. A daily **08:41 UTC** missed-launch watchdog may request only a
+completely absent weekly attempt, after the primary time plus eight hours.
+It never automatically replays an attempted or failed collection.
+
+A separate final-reading stage consumes the closed late-index packet before
+weekly synthesis. Its receipt binds the exact source, acquisition, reading and
+canonical inputs, and reports partial/failed machine work separately from
+already accepted original readings. It grants no independent approval.
+Publication retains the established labelled abstract-backed evidence policy
+and citation/source gates. Re-observing the same publication week on a later
+day does not create a duplicate edition or rewrite source/observation dates.
+
+GitHub may delay scheduled starts. Observed scheduling/synthesis/Pages time was
+approximately **4h13m–8h19m excluding acquisition and review**; full-review
+throughput and reliable end-to-end Monday delivery have not been verified.
+These checked-in workflows do not by themselves establish successful deployment
+or scheduled collection. Inspect actual runs and outputs before claiming that.
+
+Manual refreshes default to weekly mode, with backfill and rebuild available
+explicitly. Code and lead-file pushes use rebuild mode rather than another full
+external search. Shared metadata writers use the same queue lock. Failed later
+steps preserve independently validated staging and provider controls, using a
+clean worktree for recovery commits without overwriting dirty failed canonical
+outputs. Seven-day recovery artifacts exclude source documents. Rebase the
+saved result on a push race; never repeat provider/model work to fix Git state.
+After a change, check discovery, final reading, synthesis and Pages runs,
+warnings, deployed `data/pipeline-status.json`, and both RSS feeds. Restore the
+previous code commit to roll back; retain source records and published archives.
 
 The site is static HTML, CSS, and JavaScript. To preview it, serve the repository locally:
 

@@ -104,7 +104,8 @@ repository; do not commit real run outputs as code or test fixtures.
   completed and is not silently reclassified as new content.
 
 The default locators reuse existing Europe PMC, OpenAIRE, CORE, and Semantic
-Scholar functions with ordinary anonymous requests, only for a valid exact DOI.
+Scholar functions, followed by Crossref publisher locations, with ordinary anonymous
+requests only for a valid exact DOI.
 DOI-less news finishes its known sources without scholarly locator calls. This
 stage does not enable Unpaywall contact-email transmission or OpenAlex key-based
 access. Direct OpenAlex/TEI routes and credential-bearing source URL queries are
@@ -184,3 +185,39 @@ partial HTML, PDF/chunk coverage, rate and access failures, provider backoff,
 credential/exception redaction, killed workers, crash checkpoints, and old-week
 pending metadata. They do not establish live source availability or summary
 accuracy. Workflow scheduling/integration and its real run remain separate work.
+
+## Independent provider continuation
+
+A temporary locator outage must not prevent every later independent locator
+from being tried. When the current provider is waiting or repeatedly failing,
+the queue can use its next bounded record turn for a later provider. The primary
+cursor, retry deadline, diagnostic history and source hashes remain intact.
+`provider_fallbacks` stores metadata-only progress, last attempt time, exact tried
+URL hashes and any separate retry deadline for those later stages. Completed
+fallback stages are consumed when the primary cursor reaches them, never fetched
+again just to restore sequential order.
+
+Selection uses the oldest ready provider checkpoint, with untouched providers
+first. This matters when the six-hour schedule is slower than a one-hour
+Retry-After: the next run must not simply retry the same provider forever.
+No provider runs before its own deadline, and all active article-host cooldowns
+still apply to nested PDF, robots and redirect requests. A new 429 ends the
+current stage; another provider can run only on another bounded record turn.
+One stage per record per run and all existing item/run budgets remain unchanged.
+
+These optional fields extend the closed version-2 schema. Existing snapshots
+remain valid without being reset. Unchanged archived/disposition records stay
+unchanged. Crash checkpoints explicitly mark an unfinished fallback attempt;
+resumption does not misreport it as an exhausted provider. Whole-document
+success closes acquisition but is still not independent review or publication.
+
+This change addresses **locator-provider** starvation only. A temporarily failing
+known source can still defer its later known-source and provider routes. New
+weeks still archive unfinished prior-week metadata rather than treating it as
+new weekly content. These limits should remain visible in coverage reporting.
+
+Offline regressions in `tests/test_recurring_retrieval.py` exercise repeated
+six-hour runs, all-provider outages, independent successes and deadlines,
+partial-candidate continuation, crash checkpoints, permanent completion,
+closed-schema rejection, and cross-week preservation. They establish state
+machine behavior, not future external availability or summary quality.

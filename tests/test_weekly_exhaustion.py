@@ -158,11 +158,12 @@ class ExhaustionTests(unittest.TestCase):
         state['provider_pauses']['provider:Semantic Scholar'] = until
         queue.seal_state(state)
         updated, attempt = resume(payload, state)
-        attempt.assert_not_called()
+        self.assertEqual(attempt.call_count, 1)
+        self.assertEqual(attempt.call_args.args[1]['name'], 'Crossref publisher locations')
         after = rows(updated)[0]
         self.assertFalse(after['complete'])
         self.assertEqual(after['cursor'], rows(state)[0]['cursor'])
-        self.assertEqual(after['attempts'], 9)
+        self.assertEqual(after['attempts'], 10)
         self.assertEqual(after['next_retry_at'], until)
         self.assertEqual(updated['provider_pauses'], state['provider_pauses'])
 

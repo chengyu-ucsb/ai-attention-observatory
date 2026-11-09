@@ -1,0 +1,158 @@
+name: Finalize weekly source readings
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/**'
+      - 'tests/**'
+      - '.github/workflows/finalize-weekly-readings.yml'
+  workflow_run:
+    workflows: ['Update research library', 'Resume weekly source discovery']
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: '11 10,18 * * 1,2'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  # Preparation, closeout, feeds and acquisition share provider controls.
+  group: ${{ github.event_name == 'pull_request' && format('preparation-check-{0}-{1}', github.workflow, github.ref) || (github.event_name == 'workflow_run' && (github.event.workflow_run.conclusion != 'success' || github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.head_repository.full_name != github.repository || github.event.workflow_run.head_branch != 'main')) && format('preparation-skip-{0}', github.run_id) || 'observatory-index' }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Official Node 24 releases verified November 9, 2026.
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check 'pypdf>=6.0,<7.0'
+      - name: Check offline gates only
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_weekly_window.cjs
+  process:
+    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main'))
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    # 8m acquisition + 2 x 20m review, bounded revalidation, setup and validation.
+    # This cap is not a measured full-corpus review throughput estimate.
+    timeout-minutes: 80
+    env:
+      OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Capture the actual target namespace before doing work
+        id: scope
+        run: python scripts/preparation_pipeline.py scope --phase closed
+      - name: Check actual UTC packet and calendar phase
+        id: plan
+        run: python scripts/preparation_pipeline.py reading-plan --phase closed
+      - name: Skip an already finalized unchanged input set
+        id: existing
+        if: steps.plan.outputs.ready == 'true'
+        run: python scripts/preparation_pipeline.py edition-check
+      - name: Install bounded local inference and PDF parser
+        if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
+        run: |
+          python -m pip install --disable-pip-version-check --only-binary=llama-cpp-python \
+            --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
+            'llama-cpp-python>=0.3.0,<0.4' 'pypdf>=6.0,<7.0'
+      - name: Download the existing official open reading model
+        if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
+        run: |
+          curl --fail --location --retry 2 --connect-timeout 15 --max-time 420 \
+            'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf' \
+            --output /tmp/attention-model.gguf
+          test "$(stat -c '%s' /tmp/attention-model.gguf)" -gt 900000000
+      - name: Run real bounded acquisition and machine reading stages
+        id: readings
+        if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
+        env:
+          LOCAL_READING_MODEL: /tmp/attention-model.gguf
+        run: python scripts/preparation_pipeline.py readings --phase closed --expected-week "${{ steps.scope.outputs.week }}"
+      - name: Rebuild gated canonical projections and record exact final inputs
+        id: projections
+        if: steps.readings.outcome == 'success'
+        run: |
+          python scripts/build_readings.py
+          python scripts/build_weekly.py
+          python scripts/build_public.py
+          python scripts/build_issue.py
+          python scripts/build_newsletter.py
+          python scripts/pipeline_status.py
+          python scripts/feed.py
+          python scripts/preparation_pipeline.py finalize --expected-week "${{ steps.scope.outputs.week }}"
+      - name: Validate final local outputs
+        id: validation
+        if: steps.readings.outcome == 'success'
+        run: |
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          node --check app.js
+          node tests/validate_weekly_window.cjs
+      - name: Protect validated metadata even if later stages failed
+        id: checkpoint
+        if: always() && steps.scope.outputs.week != ''
+        run: |
+          python scripts/preparation_pipeline.py checkpoint --phase closed --week "${{ steps.scope.outputs.week }}" --destination "$RUNNER_TEMP/validated-preparation"
+      - name: Save checkpoints without repeating external work on a push race
+        if: always() && steps.checkpoint.outputs.valid == 'true'
+        env:
+          SAVE_CANONICAL: ${{ steps.validation.outcome == 'success' && steps.checkpoint.outcome == 'success' }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if [ "$SAVE_CANONICAL" = true ]; then
+            # Never sweep arbitrary staging files into a canonical save.
+            git add -- data/ ':!data/weekly-preparation/**' feed.xml issue-feed.xml newsletter.html issues/
+            while IFS= read -r -d '' file; do
+              target="${file#"$RUNNER_TEMP/validated-preparation/"}"
+              cp -- "$file" "$target"
+              git add -- "$target"
+            done < <(find "$RUNNER_TEMP/validated-preparation/data" -type f -print0)
+            git add -- "data/weekly-preparation/${{ steps.scope.outputs.week }}/reading-run.json" "data/weekly-preparation/${{ steps.scope.outputs.week }}/final-reading.json"
+            if ! git diff --cached --quiet; then
+              git commit -m 'Finalize bounded closed-week readings and coverage'
+            fi
+          else
+            save_tree="$RUNNER_TEMP/preparation-checkpoint-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+            python scripts/preparation_pipeline.py checkpoint-commit --destination "$RUNNER_TEMP/validated-preparation" --worktree "$save_tree"
+            cd "$save_tree"
+          fi
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo 'Checkpoint conflict; preserved validated artifacts require reconciliation.'
+              exit 1
+            fi
+            if git push origin HEAD:main; then exit 0; fi
+            sleep "$((attempt * 2))"
+          done
+          exit 1
+      - name: Retain only validated staging and provider metadata
+        if: always() && steps.checkpoint.outputs.valid == 'true'
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: closed-preparation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validated-preparation/
+          retention-days: 7
+          if-no-files-found: error

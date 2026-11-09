@@ -4,6 +4,7 @@ Downloaded PDFs are held in memory only and never committed or served. Only
 machine-extractable source sections are retained in the private index, with
 strong provenance and explicit license checks. This is not OCR and cannot
 recover image-only PDFs. PDF errors cannot block other acquisition sources.
+OpenAlex's XML and PDF stages share a persistent provider quota pause.
 """
 from __future__ import annotations
 import datetime as dt
@@ -16,6 +17,8 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+
+import enrich_openalex_fulltext as openalex
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
@@ -80,35 +83,54 @@ def work_url(record):
  if re.fullmatch(r"https://openalex\.org/W\d+",url):
   return url.replace("https://openalex.org/","https://api.openalex.org/works/")
  return ""
-def eligible(record,date):
+def eligible(record,date,at=None):
  if record.get("kind")!="scholarly" or record.get("analysis") or not work_url(record):return False
  attempt=record.get("pdf_fulltext_attempt") or {}
  if attempt.get("version")!=1:return True
+ if attempt.get("status")=="budget_retry":
+  return openalex.parse(attempt.get("next_at"))<=(at or openalex.now())
  try:return dt.date.fromisoformat(attempt.get("next_at","")[:10])<=date
  except ValueError:return True
 def state(record,kind,days,date):
  old=record.setdefault("pdf_fulltext_attempt",{})
  old.update(version=1,status=kind,last_at=date.isoformat(),next_at=(date+dt.timedelta(days=days)).isoformat(),
             attempts=old.get("attempts",0)+1)
-def run():
- rows=json.loads(LIB.read_text())
+def run(library_path=None,state_path=None):
+ # Keep run() and the existing environment controls compatible. A custom library
+ # uses its adjacent provider state, never the repository's live queue state.
+ library_path=pathlib.Path(library_path) if library_path is not None else LIB
+ state_path=pathlib.Path(state_path) if state_path is not None else library_path.with_name("fulltext-backfill-state.json")
+ rows=json.loads(library_path.read_text())
+ provider_state=openalex.read_json(state_path,{})
+ t=openalex.now()
+ stats={"lookup_attempts":0,"pdf_downloads":0,"request_attempts":0,"fulltexts_recovered":0,
+        "no_licensed_pdf":0,"no_machine_readable_sections":0,"errors":0,"rate_limited":0,
+        "status":"no_ready_sources","quota_pause_until":None,
+        "remaining_scholarly":sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in rows)}
+ if openalex.parse(provider_state.get("quota_pause_until"))>t:
+  stats.update(status="waiting_for_budget",quota_pause_until=provider_state["quota_pause_until"])
+  print(json.dumps(stats))
+  return stats
+ pause_changed=provider_state.get("quota_pause_until") is not None
+ provider_state["quota_pause_until"]=None
  key=os.getenv("OPENALEX_API_KEY","").strip()
  limit=max(1,min(int(os.getenv("PDF_FULLTEXT_LOOKUPS","22")),55))
  pdf_limit=max(1,min(int(os.getenv("PDF_FULLTEXT_DOWNLOADS","9")),25))
- date=dt.date.today()
- ready=[r for r in rows if eligible(r,date)]
+ date=t.date()
+ ready=[r for r in rows if eligible(r,date,t)]
  # Prioritize papers where XML retrieval was already attempted and failed.
  ready.sort(key=lambda r:(0 if r.get("fulltext_attempt",{}).get("status") in ("waiting_for_machine_text","source_unavailable","missing_sections") else 1,
                           0 if r.get("doi") else 1,
                           (r.get("pdf_fulltext_attempt") or {}).get("attempts",0),
                           -(int((r.get("published") or "0000")[:4]) if (r.get("published") or "")[:4].isdigit() else 0)))
- stats={"lookup_attempts":0,"pdf_downloads":0,"fulltexts_recovered":0,
-        "no_licensed_pdf":0,"no_machine_readable_sections":0,"errors":0}
+ if ready:stats["status"]="batch_processed"
  for paper in ready[:limit]:
   if stats["pdf_downloads"]>=pdf_limit:break
   try:
-   raw=fetch(work_url(paper),key)
+   # Count requests before dispatch, including HTTP failures and timeouts.
    stats["lookup_attempts"]+=1
+   stats["request_attempts"]+=1
+   raw=fetch(work_url(paper),key)
    work=json.loads(raw)
    lic=next(((loc.get("license") or "").lower() for loc in
              [work.get("best_oa_location") or {}]+(work.get("locations") or [])
@@ -117,6 +139,7 @@ def run():
    if not lic or not re.fullmatch(r"https://content\.openalex\.org/works/W\d+\.pdf",url):
     state(paper,"no_licensed_machine_pdf",21,date);stats["no_licensed_pdf"]+=1;continue
    stats["pdf_downloads"]+=1
+   stats["request_attempts"]+=1
    pdf=fetch(url,key,True)
    sections=extract_pdf(pdf)
    if not (sections.get("results") or sections.get("discussion")):
@@ -136,11 +159,26 @@ def run():
    state(paper,"full_text",365,date)
    stats["fulltexts_recovered"]+=1
   except (urllib.error.URLError,TimeoutError,ValueError,TypeError,KeyError,json.JSONDecodeError) as err:
+   if isinstance(err,urllib.error.HTTPError) and err.code==429:
+    until=openalex.pause_time(err)
+    provider_state.update(quota_pause_until=until,status="waiting_for_budget")
+    pause_changed=True
+    stats.update(status="waiting_for_budget",quota_pause_until=until)
+    stats["rate_limited"]+=1
+    state(paper,"budget_retry",0,date)
+    paper["pdf_fulltext_attempt"].update(last_at=openalex.iso(t),next_at=until)
+    # The provider is unavailable, not every remaining paper. Leave unattempted
+    # rows untouched so XML and PDF can resume after the shared reset.
+    break
    stats["errors"]+=1
    state(paper,"pdf_temporary_error",2,date)
    if stats["errors"]<=3:print("PDF fallback:",str(err)[:130])
   time.sleep(.25)
- LIB.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n")
+ library_path.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n")
+ if pause_changed:
+  if provider_state.get("status")=="waiting_for_budget" and stats["status"]!="waiting_for_budget":
+   provider_state["status"]=stats["status"]
+  state_path.write_text(json.dumps(provider_state,ensure_ascii=False,indent=2)+"\n")
  stats["remaining_scholarly"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in rows)
  print(json.dumps(stats))
  return stats

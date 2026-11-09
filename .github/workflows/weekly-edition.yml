@@ -1,7 +1,7 @@
 name: Publish weekly edition
 on:
   workflow_run:
-    workflows: ["Catch up full-text research backlog"]
+    workflows: ["Finalize weekly source readings"]
     types: [completed]
     branches: [main]
   push:
@@ -33,18 +33,22 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
           fetch-depth: 0
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: '3.11'
       - name: Validate offline
         run: python -m unittest discover -s tests -v
+      - name: Require final reading of the current late-index packet
+        id: final_reading
+        if: github.event_name != 'pull_request'
+        run: python scripts/preparation_pipeline.py edition-check
       - name: Check whether this week already has an edition
         id: edition
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && steps.final_reading.outputs.ready == 'true'
         run: |
           # Reconcile newly accepted/revoked readings before using a cached shelf.
           # This is local projection only, never discovery or source retrieval.

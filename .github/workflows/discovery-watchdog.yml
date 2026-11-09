@@ -1,0 +1,67 @@
+name: Recover missed weekly discovery
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/discovery_watchdog.py'
+      - 'scripts/collection_window.py'
+      - 'tests/test_discovery_watchdog.py'
+      - '.github/workflows/discovery-watchdog.yml'
+      - '.github/workflows/refresh.yml'
+  # A separate daily opportunity, not a guarantee of punctual GitHub scheduling.
+  schedule:
+    - cron: '41 8 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('discovery-watchdog-check-{0}', github.ref) || 'observatory-discovery-watchdog' }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Official Node 24 releases verified November 9, 2026.
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s tests -v
+  recover:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Inspect the workflow and complete run history
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/refresh.yml" > /tmp/discovery-workflow.json
+          gh api --paginate --slurp "repos/$GITHUB_REPOSITORY/actions/workflows/refresh.yml/runs?per_page=100" > /tmp/discovery-runs.json
+      - name: Plan recovery without fetching articles
+        id: plan
+        run: python scripts/discovery_watchdog.py --workflow /tmp/discovery-workflow.json --runs /tmp/discovery-runs.json
+      - name: Request only a missing current-week collection
+        if: steps.plan.outputs.dispatch == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Use the existing workflow; no new provider credentials or data writes.
+          # It rechecks history and freshness under the shared lock before search.
+          gh api --method POST "repos/$GITHUB_REPOSITORY/actions/workflows/refresh.yml/dispatches" \
+            -f ref=main -f 'inputs[mode]=weekly' -f 'inputs[only_if_due]=true'

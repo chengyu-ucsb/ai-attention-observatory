@@ -130,6 +130,36 @@ class CompositionTests(unittest.TestCase):
                 json.dumps({'run': {'date': '2026-11-02'}, 'items': []}), encoding='utf-8')
             self.assertIsNotNone(composer.pending(root, today=date(2026, 11, 3)))
 
+    def test_same_strict_window_is_not_reissued_when_observation_date_advances(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); data = root / 'data'; data.mkdir()
+            weekly = {'run': {'date': '2026-11-10', 'publication_window':
+                composer.window_metadata('2026-11-10')}, 'items': []}
+            (data / 'public-weekly.json').write_text(json.dumps(weekly))
+            drafts = {'2026-11-09': {'headline': 'Original Monday edition'}}
+            (data / 'issue-editorial.json').write_text(json.dumps(drafts))
+            self.assertIsNone(composer.pending(root, today=date(2026, 11, 10)))
+            self.assertEqual(json.loads((data / 'public-weekly.json').read_text()), weekly)
+            self.assertEqual(json.loads((data / 'issue-editorial.json').read_text()), drafts)
+            # An archive still prevents a duplicate when the draft has moved on.
+            (data / 'issue-editorial.json').write_text('{}')
+            (data / 'approved-issues').mkdir()
+            archive = data / 'approved-issues/2026-11-09.json'
+            archive.write_text(json.dumps({'edition_date': '2026-11-09', 'status': 'published',
+                'publication_window': composer.window_metadata('2026-11-09')}))
+            self.assertIsNone(composer.pending(root, today=date(2026, 11, 10)))
+            # Neither a different week nor an unapproved archive suppresses work.
+            archive.write_text(json.dumps({'edition_date': '2026-11-09', 'status': 'awaiting_publication'}))
+            self.assertIsNotNone(composer.pending(root, today=date(2026, 11, 10)))
+            archive.write_text(json.dumps({'edition_date': '2026-11-02', 'status': 'published'}))
+            self.assertIsNotNone(composer.pending(root, today=date(2026, 11, 10)))
+            # Invalid current windows still fail even if a matching draft exists.
+            (data / 'issue-editorial.json').write_text(json.dumps(drafts))
+            weekly['run']['publication_window']['from'] = '2026-11-03'
+            (data / 'public-weekly.json').write_text(json.dumps(weekly))
+            with self.assertRaisesRegex(ValueError, 'Publication window'):
+                composer.pending(root, today=date(2026, 11, 10))
+
     def test_rss_delivers_the_same_edition_copy_and_citations(self):
         issue={'headline':'Canonical & safe', 'letter':'The website opening.',
                'signals':[{'title':'A theme','text':'A published claim.','source_ids':['source']}],

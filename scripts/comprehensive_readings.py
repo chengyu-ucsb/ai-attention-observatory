@@ -389,12 +389,15 @@ def reading_queue_key(record):
     return (ready_at,*identity)
 
 
-def process(records,model,limit=2,retriever=retrieve):
+def process(records,model,limit=2,retriever=None,run_date=None):
     stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
            'failed':0,'failure_reasons':{},'failure_stages':{},
            'source_text_saved':False,'skipped_no_model':model is None}
     if model is None: return stats
-    run_date=date.today()
+    if retriever is None:
+        from acquisition_handoff import retrieve_for_reading
+        retriever=retrieve_for_reading
+    run_date=run_date or date.today()
     today=run_date.isoformat()
     candidates=[r for r in records if r.get('kind') in FIELDS and due(r,today)
                 and (r['kind']!='scholarly' or screen_source(r)['decision']=='include')]

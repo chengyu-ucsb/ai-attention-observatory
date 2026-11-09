@@ -273,10 +273,29 @@ def pending(root=ROOT, today=None):
             'Refresh the research library before composing a new edition.')
     if actual > now:
         raise ValueError(f'Weekly discovery date {date} is in the future relative to {now}.')
+    window = window_metadata(date)
+    supplied = weekly['run'].get('publication_window') or window
+    if any(supplied.get(key) != window[key] for key in ('from', 'to', 'timezone')):
+        raise ValueError('Publication window does not match previous completed UTC week')
     drafts = json.loads((data / 'issue-editorial.json').read_text(encoding='utf-8'))
-    archived = data / 'approved-issues' / (date + '.json')
-    if date in drafts or (archived.exists() and json.loads(archived.read_text(encoding='utf-8')).get('status') == 'published'):
+
+    def same_window(issue_date, issue):
+        # Older accepted drafts predate explicit window metadata. Their original
+        # edition key is sufficient to derive its strict week, not rewrite it.
+        try:
+            expected_window = window_metadata(issue_date)
+        except (TypeError, ValueError):
+            return False
+        declared = issue.get('publication_window') or expected_window
+        return (all(declared.get(key) == expected_window[key] for key in ('from', 'to', 'timezone'))
+                and all(declared.get(key) == window[key] for key in ('from', 'to', 'timezone')))
+
+    if any(same_window(issue_date, issue) for issue_date, issue in drafts.items()):
         return None
+    for path in (data / 'approved-issues').glob('????-??-??.json'):
+        issue = json.loads(path.read_text(encoding='utf-8'))
+        if issue.get('status') == 'published' and same_window(issue.get('edition_date') or path.stem, issue):
+            return None
     current_items = []
     for item in weekly.get('items', []):
         current = public_record(item, require_current=True)
@@ -284,10 +303,6 @@ def pending(root=ROOT, today=None):
             raise ValueError('Original reading changed or was revoked; rebuild the public source shelf before synthesis')
         current_items.append(current)
     weekly['items'] = current_items
-    window = window_metadata(date)
-    supplied = weekly['run'].get('publication_window') or window
-    if any(supplied.get(key) != window[key] for key in ('from', 'to', 'timezone')):
-        raise ValueError('Publication window does not match previous completed UTC week')
     if any(not weekly_eligible(item, *previous_week(date)) for item in weekly.get('items', [])):
         raise ValueError('Weekly source lacks verified previous-week original publication evidence; rebuild the source shelf')
     weekly['run']['publication_window'] = window
