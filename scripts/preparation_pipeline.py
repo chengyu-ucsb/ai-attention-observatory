@@ -12,6 +12,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -135,17 +136,163 @@ def bindings(root, folder, *, canonical=False):
     return {name: digest(read(path)) for name, path in names.items()}
 
 
-def validate_reading_inputs(folder, now):
+class ReadingInputsChanged(ValueError):
+    """Independently valid snapshots no longer describe the same input set."""
+
+    def __init__(self, changed_inputs):
+        super().__init__("reading_inputs_changed")
+        self.changed_inputs = changed_inputs
+
+
+def validate_reading_inputs(folder, now, *, allow_missing=False):
     import collect_weekly_sources as queue
     from prepared_article_readings import validate_bundle
-    packet, state, bundle = (read(folder / name) for name in ("packet.json", "acquisition.json", "readings.json"))
+    packet = read(folder / "packet.json")
     window = validate_packet(packet, now)
-    queue.validate_state(state)
-    validate_bundle(bundle, window, now=now)
-    if (state["publication_window"] != window or bundle["packet_sha256"] != queue.digest(packet)
-            or bundle["acquisition_state_sha256"] != state["state_sha256"]):
-        raise ValueError("reading_inputs_changed")
+    missing = set()
+    def load(name):
+        path = folder / name
+        if allow_missing and not path.exists():
+            missing.add(name)
+            return None
+        return read(path)
+    state, bundle = load("acquisition.json"), load("readings.json")
+    if "acquisition.json" not in missing:
+        queue.validate_state(state)
+        if state["publication_window"] != window:
+            raise ValueError("reading_acquisition_window_mismatch")
+    if "readings.json" not in missing:
+        validate_bundle(bundle, window, now=now)
+    if state is None or bundle is None:
+        return packet, state, bundle
+    changed = []
+    if bundle["packet_sha256"] != queue.digest(packet):
+        changed.append("packet.json")
+    if bundle["acquisition_state_sha256"] != state["state_sha256"]:
+        changed.append("acquisition.json")
+    if changed:
+        raise ReadingInputsChanged(changed)
     return packet, state, bundle
+
+
+def validate_counts(values):
+    import collect_weekly_sources as queue
+    queue.require(type(values) is dict)
+    for key, count in values.items():
+        queue.require(type(key) is str and re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,100}", key))
+        queue.integer(count)
+
+
+def validate_stage_report(stage, report):
+    import collect_weekly_sources as queue
+    if stage == "acquire":
+        counts = {"selected_records", "attempted_records", "attempted_stages", "completed_records",
+                  "pending_records", "deferred_retry_records", "duplicate_records", "limit",
+                  "max_candidates_per_provider_stage"}
+        queue.shape(report, counts | {"checked_at", "statuses", "excluded", "stop_reason", "known_sources_only",
+            "time_budget_seconds", "item_time_budget_seconds", "active_provider_pauses", "scope",
+            "model_used", "publication_or_review_performed"})
+        for key in counts:
+            queue.integer(report[key])
+        queue.timestamp(report["checked_at"])
+        validate_counts(report["statuses"]); validate_counts(report["excluded"])
+        queue.validate_pauses(report["active_provider_pauses"])
+        queue.require(type(report["known_sources_only"]) is bool and report["scope"] == queue.SCOPE
+                      and report["model_used"] is False and report["publication_or_review_performed"] is False
+                      and report["stop_reason"] in {"queue_checked", "record_limit", "time_budget"})
+        for key in ("time_budget_seconds", "item_time_budget_seconds"):
+            queue.require(type(report[key]) in (int, float) and 0 < report[key] <= 86400)
+    elif stage == "review":
+        counts = {"attempted", "summaries_completed", "failed"}
+        queue.shape(report, counts | {"skipped_no_model"},
+                    {"documents_retrieved", "partial_inputs", "failure_reasons", "failure_stages", "source_text_saved"})
+        for key in counts | ({"documents_retrieved", "partial_inputs"} & set(report)):
+            queue.integer(report[key])
+        queue.require(report["skipped_no_model"] is False
+                      and report["attempted"] == report["summaries_completed"] + report["failed"])
+        for key in ("failure_reasons", "failure_stages"):
+            if key in report:
+                validate_counts(report[key])
+    else:
+        count = "attempted" if stage == "revalidate" else "machine_checked_readings_applied"
+        queue.shape(report, {count, "approved"}, {"source_text_saved", "publication_window"})
+        queue.integer(report[count])
+        queue.require(report["approved"] is False)
+        if "publication_window" in report:
+            queue.saved_window(report["publication_window"])
+    queue.require(report.get("source_text_saved", False) is False)
+
+
+def validate_coverage(coverage):
+    import collect_weekly_sources as queue
+    counts = {"eligible_metadata", "eligible_canonical_records", "quarantined_metadata", "acquisition_records",
+        "full_documents_acquired", "partial_documents_acquired", "machine_checked_full_readings",
+        "machine_checked_partial_readings", "full_readings_source_revalidated", "readings_held_at_revalidation",
+        "separately_accepted_original_readings", "independent_approvals_granted_by_pipeline",
+        "review_attempted_this_run", "review_completed_this_run", "review_failed_this_run",
+        "machine_checked_readings_applied_this_run"}
+    queue.shape(coverage, counts | {"metadata_status", "configured_query_status",
+                "expert_review_verified_by_pipeline", "acquisition_statuses", "note"})
+    for key in counts:
+        queue.integer(coverage[key])
+    validate_counts(coverage["acquisition_statuses"])
+    queue.require(coverage["independent_approvals_granted_by_pipeline"] == 0
+                  and coverage["expert_review_verified_by_pipeline"] is False and coverage["note"] == NOTE
+                  and coverage["metadata_status"] in {"prepared", "partial"}
+                  and coverage["configured_query_status"] in {None, "partial", "complete_for_configured_queries"})
+
+
+def validate_reading_receipt(value, kind, now):
+    """Corrupt receipts are errors, not a request to retry provider/model work.
+
+    This checks the receipt itself. An otherwise valid receipt for older inputs
+    is stale, and the readiness check must hold it without claiming completion.
+    """
+    import collect_weekly_sources as queue
+    common = {"schema_version", "kind", "publication_window", "bindings", "approved", "source_text_saved"}
+    run = kind == "preparation_reading_run"
+    required = common | ({"phase", "started_at", "finished_at", "stages", "note"} if run else
+                         {"completed_at", "reading_run_sha256", "status", "coverage"})
+    names = {"packet.json", "acquisition.json", "readings.json"}
+    if not run:
+        names |= {"library.json", "weekly.json"}
+    try:
+        queue.shape(value, required)
+        queue.require(type(value["schema_version"]) is int and value["schema_version"] == 1
+                      and value["kind"] == kind and value["approved"] is False
+                      and value["source_text_saved"] is False)
+        queue.saved_window(value["publication_window"])
+        queue.shape(value["bindings"], names)
+        for bound in value["bindings"].values():
+            queue.hash_value(bound)
+        for field in (("started_at", "finished_at") if run else ("completed_at",)):
+            queue.timestamp(value[field])
+            queue.require(utc(value[field]) <= now)
+        if run:
+            queue.require(value["phase"] in {"preparing", "closed"} and value["note"] == NOTE
+                          and utc(value["started_at"]) <= utc(value["finished_at"]))
+            stages = {"acquire", "review"} | ({"revalidate", "apply"} if value["phase"] == "closed" else set())
+            queue.shape(value["stages"], stages)
+            for stage, report in value["stages"].items():
+                validate_stage_report(stage, report)
+            queue.require(utc(value["started_at"]) <= utc(value["stages"]["acquire"]["checked_at"])
+                          <= utc(value["finished_at"]))
+            if "apply" in stages and "publication_window" in value["stages"]["apply"]:
+                queue.require(value["stages"]["apply"]["publication_window"] == value["publication_window"])
+        else:
+            queue.hash_value(value["reading_run_sha256"])
+            queue.require(value["status"] in {"bounded_stage_completed", "completed_with_review_failures"}
+                          and type(value["coverage"]) is dict)
+            validate_coverage(value["coverage"])
+    except (ValueError, TypeError, KeyError, OverflowError):
+        raise ValueError("invalid_" + kind + "_receipt") from None
+    return value
+
+
+def current_reading_run(run, packet, current_bindings, now):
+    return (run["phase"] == "closed" and run["publication_window"] == packet["target_publication_window"]
+            and run["bindings"] == {key: current_bindings[key] for key in run["bindings"]}
+            and utc(packet["observation_at"]) <= utc(run["started_at"]) <= utc(run["finished_at"]) <= now)
 
 
 def run_readings(root=ROOT, now=None, phase="closed", runner=None, expected_week=None):
@@ -181,6 +328,7 @@ def run_readings(root=ROOT, now=None, phase="closed", runner=None, expected_week
         "started_at": now.isoformat(), "finished_at": finished.isoformat(),
         "publication_window": target_window(now, phase), "bindings": bindings(root, folder),
         "stages": reports, "approved": False, "source_text_saved": False, "note": NOTE}
+    validate_reading_receipt(receipt, "preparation_reading_run", finished)
     atomic_save(folder / "reading-run.json", receipt)
     return receipt
 
@@ -212,6 +360,16 @@ def coverage_report(packet, state, bundle, library):
         "acquisition_statuses": state.get("run", {}).get("statuses", {}), "note": NOTE}
 
 
+def final_coverage(packet, state, bundle, library, run):
+    coverage = coverage_report(packet, state, bundle, library)
+    review = run["stages"]["review"]
+    coverage["review_attempted_this_run"] = review["attempted"]
+    coverage["review_completed_this_run"] = review["summaries_completed"]
+    coverage["review_failed_this_run"] = review["failed"]
+    coverage["machine_checked_readings_applied_this_run"] = run["stages"]["apply"]["machine_checked_readings_applied"]
+    return coverage
+
+
 def finalize(root=ROOT, now=None, expected_week=None):
     now = utc(now)
     check_scope(expected_week, now, "closed")
@@ -220,45 +378,74 @@ def finalize(root=ROOT, now=None, expected_week=None):
         raise ValueError(plan["status"])
     folder = folder_for(root, now, "closed")
     packet, state, bundle = validate_reading_inputs(folder, now)
-    run = read(folder / "reading-run.json")
-    if (run.get("kind") != "preparation_reading_run" or run.get("phase") != "closed"
-            or run.get("publication_window") != packet["target_publication_window"]
-            or run.get("bindings") != bindings(root, folder) or run.get("approved") is not False
-            or set(run.get("stages", {})) != {"acquire", "review", "revalidate", "apply"}
-            or not utc(packet["observation_at"]) <= utc(run["started_at"]) <= utc(run["finished_at"]) <= now):
+    run = validate_reading_receipt(read(folder / "reading-run.json"), "preparation_reading_run", now)
+    current = bindings(root, folder, canonical=True)
+    if not current_reading_run(run, packet, current, now):
         raise ValueError("current_final_reading_run_required")
-    coverage = coverage_report(packet, state, bundle, read(Path(root) / "data/library.json"))
+    previous_path = folder / "final-reading.json"
+    if previous_path.exists():
+        previous = validate_reading_receipt(read(previous_path), "weekly_final_reading", now)
+        # Builders run between reading and finalization. Once that execution
+        # has been finalized, a later canonical writer cannot rebind it without
+        # the normal bounded reading sequence producing a new execution receipt.
+        if previous["reading_run_sha256"] == digest(run) and previous["bindings"] != current:
+            raise ValueError("current_final_reading_run_required")
+    coverage = final_coverage(packet, state, bundle, read(Path(root) / "data/library.json"), run)
     review = run["stages"]["review"]
-    coverage["review_attempted_this_run"] = review["attempted"]
-    coverage["review_completed_this_run"] = review["summaries_completed"]
-    coverage["review_failed_this_run"] = review["failed"]
-    coverage["machine_checked_readings_applied_this_run"] = run["stages"]["apply"]["machine_checked_readings_applied"]
     receipt = {"schema_version": 1, "kind": "weekly_final_reading", "completed_at": now.isoformat(),
-        "publication_window": packet["target_publication_window"], "bindings": bindings(root, folder, canonical=True),
+        "publication_window": packet["target_publication_window"], "bindings": current,
         "reading_run_sha256": digest(run), "approved": False, "source_text_saved": False,
         "status": "completed_with_review_failures" if review["failed"] else "bounded_stage_completed",
         "coverage": coverage}
+    validate_reading_receipt(receipt, "weekly_final_reading", now)
     atomic_save(folder / "final-reading.json", receipt)
     return receipt
 
 
 def edition_ready(root=ROOT, now=None):
+    """Read-only gate: stale valid inputs need real work, never a reused receipt.
+
+    The finalizer uses ready=false to enter its existing bounded reading stages;
+    the edition uses it to skip publication. Only the typed cross-snapshot
+    mismatch is recoverable here. Schema, checksum, date and namespace errors
+    still fail closed rather than starting work on corrupt evidence.
+    """
     now = utc(now)
     result = reading_plan(root, now)
     if not result["ready"]:
         return result
     folder = folder_for(root, now, "closed")
     result["ready"] = False
-    if not (folder / "final-reading.json").exists():
-        return dict(result, status="awaiting_final_reading")
-    receipt = read(folder / "final-reading.json")
-    packet, _, _ = validate_reading_inputs(folder, now)
-    if (receipt.get("kind") != "weekly_final_reading" or receipt.get("approved") is not False
-            or receipt.get("publication_window") != packet["target_publication_window"]
-            or receipt.get("bindings") != bindings(root, folder, canonical=True)
-            or receipt.get("reading_run_sha256") != digest(read(folder / "reading-run.json"))
-            or not utc(packet["observation_at"]) <= utc(receipt["completed_at"]) <= now):
-        return dict(result, status="final_reading_inputs_changed")
+    receipts = {}
+    for name, kind in (("final-reading.json", "weekly_final_reading"),
+                       ("reading-run.json", "preparation_reading_run")):
+        if (folder / name).exists():
+            receipts[name] = validate_reading_receipt(read(folder / name), kind, now)
+    changed = None
+    try:
+        packet, state, bundle = validate_reading_inputs(folder, now, allow_missing=True)
+    except ReadingInputsChanged as exc:
+        changed = exc.changed_inputs
+    if "final-reading.json" not in receipts:
+        return dict(result, status="awaiting_final_reading", next_action="readings")
+    if "reading-run.json" not in receipts:
+        return dict(result, status="awaiting_final_reading_run", next_action="readings")
+    receipt, run = receipts["final-reading.json"], receipts["reading-run.json"]
+    if changed:
+        return dict(result, status="reading_inputs_changed", next_action="readings", changed_inputs=changed)
+    if state is None or bundle is None:
+        return dict(result, status="awaiting_reading_inputs", next_action="readings")
+    current = bindings(root, folder, canonical=True)
+    if (receipt["publication_window"] != packet["target_publication_window"]
+            or receipt["bindings"] != current or not current_reading_run(run, packet, current, now)
+            or receipt["reading_run_sha256"] != digest(run)
+            or not utc(run["finished_at"]) <= utc(receipt["completed_at"]) <= now):
+        return dict(result, status="final_reading_inputs_changed", next_action="readings",
+                    changed_inputs=[key for key in current if receipt["bindings"][key] != current[key]])
+    expected_status = "completed_with_review_failures" if run["stages"]["review"]["failed"] else "bounded_stage_completed"
+    if (receipt["status"] != expected_status or receipt["coverage"] !=
+            final_coverage(packet, state, bundle, read(Path(root) / "data/library.json"), run)):
+        raise ValueError("invalid_weekly_final_reading_coverage_receipt")
     return dict(result, ready=True, status=receipt["status"], coverage=receipt["coverage"])
 
 
