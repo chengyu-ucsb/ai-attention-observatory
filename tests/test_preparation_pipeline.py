@@ -135,10 +135,265 @@ class PipelineTests(unittest.TestCase):
 
     def test_old_finalization_cannot_survive_new_reading_run_or_new_week(self):
         self.receipt(); pipeline.finalize(self.root, NOW)
-        receipt = pipeline.read(self.folder / 'reading-run.json'); receipt['stages']['review']['failed'] += 1
+        receipt = pipeline.read(self.folder / 'reading-run.json')
+        receipt['stages']['review']['failed'] += 1; receipt['stages']['review']['attempted'] += 1
         prep.atomic_save(self.folder / 'reading-run.json', receipt)
         self.assertFalse(pipeline.edition_ready(self.root, NOW)['ready'])
         self.assertFalse(pipeline.edition_ready(self.root, NOW + dt.timedelta(days=7))['ready'])
+
+    def test_valid_stale_packet_is_a_read_only_hold_not_a_validation_bypass(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        self.packet['status'] = 'prepared'; self.save_packet()
+        before = {p: p.read_bytes() for p in self.root.rglob('*.json')}
+        with patch.object(pipeline.subprocess, 'run') as execute:
+            result = pipeline.edition_ready(self.root, NOW)
+        self.assertFalse(result['ready'])
+        self.assertEqual(result['status'], 'reading_inputs_changed')
+        self.assertEqual(result['changed_inputs'], ['packet.json'])
+        self.assertEqual(result['next_action'], 'readings')
+        execute.assert_not_called()
+        self.assertEqual(before, {p: p.read_bytes() for p in self.root.rglob('*.json')})
+        with self.assertRaisesRegex(pipeline.ReadingInputsChanged, 'reading_inputs_changed'):
+            pipeline.finalize(self.root, NOW)
+
+    def test_stale_state_recovery_requires_the_actual_bounded_stage_sequence(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        self.state['provider_pauses']['provider:CORE'] = (NOW + dt.timedelta(hours=1)).isoformat()
+        self.state['run']['active_provider_pauses'] = deepcopy(self.state['provider_pauses'])
+        queue.seal_state(self.state)
+        prep.atomic_save(self.folder / 'acquisition.json', self.state)
+        result = pipeline.edition_ready(self.root, NOW)
+        self.assertEqual(result['changed_inputs'], ['acquisition.json'])
+        with self.assertRaises(pipeline.ReadingInputsChanged):
+            pipeline.finalize(self.root, NOW)
+        calls = []
+        def stage(args, **kwargs):
+            name = args[2]; calls.append((name, int(args[-1])))
+            if name == 'review':
+                bundle = readings.reconcile(self.packet, self.state, self.bundle, now=NOW)
+                prep.atomic_save(self.folder / 'readings.json', bundle)
+            return subprocess.CompletedProcess(args, 0, json.dumps(self.reports[name]))
+        real_utc = pipeline.utc
+        with patch.object(pipeline, 'utc', lambda value=None: real_utc(value or NOW)):
+            pipeline.run_readings(self.root, NOW, runner=stage)
+        self.assertEqual(calls, [('acquire', 12), ('review', 2), ('revalidate', 12), ('apply', 2)])
+        self.assertFalse(pipeline.edition_ready(self.root, NOW)['ready'])
+        pipeline.finalize(self.root, NOW)
+        self.assertTrue(pipeline.edition_ready(self.root, NOW)['ready'])
+        saved = pipeline.read(self.folder / 'acquisition.json')
+        self.assertEqual(saved['provider_pauses'], self.state['provider_pauses'])
+
+    def test_unchanged_finalization_is_idempotent_and_has_no_external_work(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        before = {p: p.read_bytes() for p in self.root.rglob('*.json')}
+        with patch.object(pipeline.subprocess, 'run') as execute:
+            first = pipeline.edition_ready(self.root, NOW)
+            second = pipeline.edition_ready(self.root, NOW + dt.timedelta(hours=1))
+        self.assertTrue(first['ready']); self.assertEqual(first, second)
+        execute.assert_not_called()
+        self.assertEqual(before, {p: p.read_bytes() for p in self.root.rglob('*.json')})
+
+    def test_new_packet_item_recovers_through_real_offline_reading_stages(self):
+        from test_weekly_source_acquisition import item, document, result_for
+        from test_prepared_article_readings import claim
+        import comprehensive_readings
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        moment = NOW + dt.timedelta(minutes=1)
+        self.packet['observation_at'] = moment.isoformat()
+        self.packet['items'] = [item(published='2026-11-04', kind='nonacademic')]
+        self.save_packet()
+        adoption = prep.adopt_closed_packet(self.packet, [], now=moment)
+        library, weekly = adoption['library'], adoption['weekly']
+        self.save('library.json', library); self.save('weekly.json', weekly)
+        self.assertEqual(pipeline.edition_ready(self.root, moment)['status'], 'reading_inputs_changed')
+        source = document(); calls = []
+        state_path, bundle_path = self.folder / 'acquisition.json', self.folder / 'readings.json'
+        def execute(args, **kwargs):
+            stage = args[2]; limit = int(args[-1]); calls.append(stage)
+            state, bundle = pipeline.read(state_path), pipeline.read(bundle_path)
+            if stage == 'acquire':
+                state = readings.acquire(self.packet, state, now=moment, limit=limit, known_sources_only=True,
+                    attempt=lambda *args: result_for(source), clock=lambda: 0)
+                prep.atomic_save(state_path, state); report = state['run']
+            elif stage == 'review':
+                with patch.object(comprehensive_readings, 'read_chunk', side_effect=claim):
+                    bundle = readings.review(self.packet, state, bundle, model=Mock(), now=moment, limit=limit,
+                        retriever=lambda record: (deepcopy(source), []))
+                prep.atomic_save(bundle_path, bundle); report = bundle['review_run']
+            elif stage == 'revalidate':
+                bundle = readings.revalidate(self.packet, state, bundle, now=moment, limit=limit,
+                    retriever=lambda record: (deepcopy(source), []))
+                prep.atomic_save(bundle_path, bundle); report = bundle['revalidation_run']
+            else:
+                library, report = readings.apply_closed(self.packet, state, bundle,
+                    pipeline.read(self.root / 'data/library.json'), weekly, now=moment)
+                self.save('library.json', library)
+            return subprocess.CompletedProcess(args, 0, json.dumps(report))
+        real_utc = pipeline.utc
+        with patch.object(pipeline, 'utc', lambda value=None: real_utc(value or moment)):
+            run = pipeline.run_readings(self.root, moment, runner=execute)
+        self.assertEqual(calls, ['acquire', 'review', 'revalidate', 'apply'])
+        self.assertEqual(run['stages']['review']['summaries_completed'], 1)
+        self.assertEqual(run['stages']['apply']['machine_checked_readings_applied'], 1)
+        self.assertFalse(pipeline.edition_ready(self.root, moment)['ready'])
+        final = pipeline.finalize(self.root, moment)
+        self.assertEqual(final['coverage']['machine_checked_full_readings'], 1)
+        self.assertFalse(final['approved'])
+        with patch.object(pipeline.subprocess, 'run') as execute_again:
+            self.assertTrue(pipeline.edition_ready(self.root, moment)['ready'])
+            self.assertTrue(pipeline.edition_ready(self.root, moment + dt.timedelta(minutes=1))['ready'])
+        execute_again.assert_not_called()
+
+    def test_missing_receipts_are_distinct_from_stale_and_malformed_receipts(self):
+        self.assertEqual(pipeline.edition_ready(self.root, NOW)['status'], 'awaiting_final_reading')
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        run_path = self.folder / 'reading-run.json'; saved = run_path.read_bytes()
+        run_path.unlink()
+        result = pipeline.edition_ready(self.root, NOW)
+        self.assertFalse(result['ready']); self.assertEqual(result['status'], 'awaiting_final_reading_run')
+        self.assertEqual(result['next_action'], 'readings')
+        run_path.write_bytes(saved)
+        run = pipeline.read(run_path); run['stages']['review']['failed'] += 1; run['stages']['review']['attempted'] += 1
+        prep.atomic_save(run_path, run)
+        self.assertEqual(pipeline.edition_ready(self.root, NOW)['status'], 'final_reading_inputs_changed')
+        (self.folder / 'final-reading.json').unlink()
+        run_path.write_text('{')
+        with self.assertRaises(ValueError): pipeline.edition_ready(self.root, NOW)
+
+    def test_malformed_receipts_fail_closed_even_when_other_inputs_are_stale(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        self.packet['status'] = 'prepared'; self.save_packet()
+        for name in ('reading-run.json', 'final-reading.json'):
+            path = self.folder / name; before = path.read_bytes()
+            original = pipeline.read(path)
+            variants = [[], {}, dict(original, schema_version=True), dict(original, approved=True),
+                        dict(original, source_text_saved=True), dict(original, raw_source='Unsafe prose'),
+                        dict(original, bindings={}), dict(original, publication_window={})]
+            if name == 'reading-run.json':
+                for bad in (True, -1, '1', None):
+                    altered = deepcopy(original); altered['stages']['review']['attempted'] = bad
+                    variants.append(altered)
+                altered = deepcopy(original); altered['stages']['apply']['approved'] = True
+                variants.append(altered)
+                altered = deepcopy(original)
+                altered['stages']['acquire']['checked_at'] = (NOW + dt.timedelta(minutes=1)).isoformat()
+                variants.append(altered)
+                variants.append(dict(original, finished_at='2099-01-01T00:00:00+00:00'))
+            else:
+                variants.extend([dict(original, status=True), dict(original, coverage=[]),
+                                 dict(original, reading_run_sha256='invalid')])
+            for value in variants:
+                with self.subTest(name=name, value=value):
+                    prep.atomic_save(path, value)
+                    with self.assertRaisesRegex(ValueError, 'invalid_.*_receipt'):
+                        pipeline.edition_ready(self.root, NOW)
+            path.write_bytes(before)
+
+    def test_receipts_cannot_add_nested_approvals_source_text_or_fabricated_coverage(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        run_path, final_path = self.folder / 'reading-run.json', self.folder / 'final-reading.json'
+        run, final = pipeline.read(run_path), pipeline.read(final_path)
+        for stage in ('acquire', 'review', 'revalidate', 'apply'):
+            bad_run = deepcopy(run); bad_run['stages'][stage]['raw_source'] = 'Unsafe source body'
+            bad_final = deepcopy(final); bad_final['reading_run_sha256'] = pipeline.digest(bad_run)
+            prep.atomic_save(run_path, bad_run); prep.atomic_save(final_path, bad_final)
+            with self.subTest(stage=stage), self.assertRaisesRegex(ValueError, 'invalid_preparation_reading_run_receipt'):
+                pipeline.edition_ready(self.root, NOW)
+            with self.assertRaisesRegex(ValueError, 'invalid_preparation_reading_run_receipt'):
+                pipeline.finalize(self.root, NOW)
+        prep.atomic_save(run_path, run)
+        for key, value in (('independent_approvals_granted_by_pipeline', 5),
+                           ('expert_review_verified_by_pipeline', True), ('unknown', 'Unsafe source body'),
+                           ('machine_checked_full_readings', 999)):
+            bad = deepcopy(final); bad['coverage'][key] = value; prep.atomic_save(final_path, bad)
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, 'invalid_weekly_final_reading_.*receipt'):
+                pipeline.edition_ready(self.root, NOW)
+
+    def test_missing_receipt_never_masks_invalid_present_staging(self):
+        for name in ('acquisition.json', 'readings.json'):
+            path = self.folder / name; before = path.read_bytes()
+            for invalid in (None, {}, {'unknown': 'Unsafe source body'}):
+                prep.atomic_save(path, invalid)
+                with self.subTest(name=name, invalid=invalid), self.assertRaises(ValueError):
+                    pipeline.edition_ready(self.root, NOW)
+            path.write_bytes(before)
+        (self.folder / 'acquisition.json').unlink(); (self.folder / 'readings.json').unlink()
+        result = pipeline.edition_ready(self.root, NOW)
+        self.assertFalse(result['ready']); self.assertEqual(result['status'], 'awaiting_final_reading')
+
+    def test_invalid_staging_is_never_misclassified_as_recoverable_staleness(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        self.packet['status'] = 'prepared'; self.save_packet()
+        for name in ('packet.json', 'acquisition.json', 'readings.json'):
+            path = self.folder / name; before = path.read_bytes(); value = pipeline.read(path)
+            if name == 'packet.json': value['approved'] = True
+            elif name == 'acquisition.json': value['state_sha256'] = '0' * 64
+            else: value['metadata_sha256'] = '0' * 64
+            prep.atomic_save(path, value)
+            with self.subTest(name=name), self.assertRaises(ValueError) as error:
+                pipeline.edition_ready(self.root, NOW)
+            self.assertNotIsInstance(error.exception, pipeline.ReadingInputsChanged)
+            path.write_bytes(before)
+        self.state['publication_window'] = {'from': '2026-10-26', 'to': '2026-11-01', 'timezone': 'UTC'}
+        queue.seal_state(self.state); prep.atomic_save(self.folder / 'acquisition.json', self.state)
+        with self.assertRaisesRegex(ValueError, 'reading_acquisition_window_mismatch'):
+            pipeline.edition_ready(self.root, NOW)
+
+    def test_other_canonical_writers_invalidate_receipt_without_recopying_staged_notes(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        for name, value in (('library.json', [{'title': 'New independently written library metadata'}]),
+                            ('weekly.json', dict(pipeline.read(self.root / 'data/weekly.json'), extra='New snapshot'))):
+            path = self.root / 'data' / name; before = path.read_bytes()
+            prep.atomic_save(path, value)
+            result = pipeline.edition_ready(self.root, NOW)
+            self.assertFalse(result['ready']); self.assertEqual(result['status'], 'final_reading_inputs_changed')
+            self.assertEqual(result['changed_inputs'], [name])
+            self.assertEqual(pipeline.read(path), value)
+            with self.assertRaisesRegex(ValueError, 'current_final_reading_run_required'):
+                pipeline.finalize(self.root, NOW)
+            path.write_bytes(before)
+        # Unchanged local projections can still be finalized idempotently.
+        self.assertEqual(pipeline.finalize(self.root, NOW), pipeline.read(self.folder / 'final-reading.json'))
+
+    def test_changed_source_receipts_hold_finalization_and_discard_stale_notes(self):
+        from test_weekly_source_acquisition import item, document, result_for
+        from test_prepared_article_readings import claim
+        import comprehensive_readings
+        self.packet['items'] = [item(published='2026-11-04', kind='nonacademic')]; self.save_packet()
+        self.save('weekly.json', prep.closed_packet(self.packet, NOW))
+        original_document = document(); original_document.source_bytes = b'%PDF-original'
+        state = readings.acquire(self.packet, now=NOW, known_sources_only=True,
+            attempt=lambda *args: result_for(original_document), clock=lambda: 0)
+        with patch.object(comprehensive_readings, 'read_chunk', side_effect=claim):
+            bundle = readings.review(self.packet, state, model=Mock(), now=NOW,
+                retriever=lambda record: (deepcopy(original_document), []))
+        bundle = readings.revalidate(self.packet, state, bundle, now=NOW,
+            retriever=lambda record: (deepcopy(original_document), []))
+        self.assertEqual(next(iter(bundle['records'].values()))['revalidation']['status'], 'source_revalidated')
+        prep.atomic_save(self.folder / 'acquisition.json', state)
+        prep.atomic_save(self.folder / 'readings.json', bundle)
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        for kind in ('source_url', 'version', 'text', 'bytes'):
+            changed = deepcopy(original_document)
+            if kind == 'source_url': changed.url = 'https://www.econstor.eu/changed.pdf'
+            elif kind == 'version': changed.version = 'acceptedVersion'
+            elif kind == 'text': changed.units[0]['text'] += ' Changed source content.'
+            else: changed.source_bytes = b'%PDF-changed'
+            replacement = readings.acquire(self.packet, now=NOW, known_sources_only=True,
+                attempt=lambda *args: result_for(changed), clock=lambda: 0)
+            prep.atomic_save(self.folder / 'acquisition.json', replacement)
+            with self.subTest(kind=kind):
+                result = pipeline.edition_ready(self.root, NOW)
+                self.assertEqual(result['changed_inputs'], ['acquisition.json'])
+                self.assertFalse(result['ready'])
+                with self.assertRaises(pipeline.ReadingInputsChanged): pipeline.finalize(self.root, NOW)
+                reconciled = readings.reconcile(self.packet, replacement, bundle, now=NOW)
+                staged = next(iter(reconciled['records'].values()))
+                self.assertNotIn('deep_analysis', staged['record']); self.assertNotIn('revalidation', staged)
+                output, report = readings.apply_closed(self.packet, replacement, bundle,
+                    self.packet['items'], prep.closed_packet(self.packet, NOW), now=NOW)
+                self.assertEqual(report['machine_checked_readings_applied'], 0)
+                self.assertNotIn('deep_analysis', output[0])
 
     def test_checkpoint_allowlist_excludes_raw_sources_and_reconstructs_status(self):
         prep.atomic_save(self.folder / 'status.json', {'raw_source': 'Never retain arbitrary status fields'})

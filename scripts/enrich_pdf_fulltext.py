@@ -13,19 +13,75 @@ import json
 import os
 import pathlib
 import re
+import tempfile
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 
 import enrich_openalex_fulltext as openalex
+from academic_state_schema import strict_json_loads
 
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 ALLOW={"cc-by","cc-by-sa","cc0","public-domain"}
 HEAD=re.compile(r"^\s*(?:(?:\d+(?:\.\d+){0,3})[\s.)-]+)?(materials and methods|methodology|methods?|study design|results?(?: and discussion)?|findings|discussion|general discussion|limitations|conclusions?(?: and future work)?|concluding remarks|empirical findings|evaluation results?|experimental results?|materials and methods|references|bibliography|acknowledgments)\s*[:.]?\s*$",re.I)
 PARA=re.compile(r"\s+")
+SURROGATE_PAIR=re.compile(r"[\ud800-\udbff][\udc00-\udfff]")
+SURROGATE=re.compile(r"[\ud800-\udfff]")
 USER_AGENT="AI-Attention-Observatory/4.1 (fangcu@ucmail.uc.edu)"
+class PDFTextEncodingError(ValueError):
+ """Malformed extraction; diagnostics contain no source passages."""
+ def __init__(self,field,offset,codepoint):
+  self.diagnostic={"reason":"unpaired_surrogate","field":field,
+                   "offset":offset,"codepoint":f"U+{codepoint:04X}"}
+  super().__init__(f"unpaired_surrogate in {field} at {offset}: U+{codepoint:04X}")
+
+def unicode_text(text,field):
+ """Join valid UTF-16 pairs without guessing or dropping malformed glyphs.
+
+ Run before any slicing: a length cap must not split a valid pair. Scalar
+ non-BMP characters, combining marks and all other source text stay unchanged.
+ """
+ text=SURROGATE_PAIR.sub(lambda m:chr(0x10000+((ord(m[0][0])-0xD800)<<10)
+                                      +ord(m[0][1])-0xDC00),text)
+ bad=SURROGATE.search(text)
+ if bad:raise PDFTextEncodingError(field,bad.start(),ord(bad[0]))
+ return text
+
+def json_bytes(value):
+ """Strictly encode before opening a destination, never escape bad source text."""
+ return (json.dumps(value,ensure_ascii=False,indent=2,allow_nan=False)+"\n").encode("utf-8")
+
+def atomic_write(path,payload):
+ """Replace one file on its own filesystem only after a full successful write."""
+ temporary=None
+ try:
+  with tempfile.NamedTemporaryFile(mode="wb",dir=path.parent,
+                                   prefix="."+path.name+"-",suffix=".tmp",delete=False) as handle:
+   temporary=pathlib.Path(handle.name)
+   handle.write(payload)
+   handle.flush()
+   os.fsync(handle.fileno())
+  os.replace(temporary,path)
+  temporary=None
+ finally:
+  if temporary is not None:temporary.unlink(missing_ok=True)
+
+def save_checkpoint(library_path,rows,state_path,provider_state,save_state):
+ # This is not a cross-file transaction. Preserve an independently valid
+ # active pause even when the library cannot be serialized; never let corrupt
+ # article data cause repeated requests to a provider that just returned 429.
+ state_payload=json_bytes(provider_state) if save_state else None
+ try:
+  library_payload=json_bytes(rows)
+ except (ValueError,TypeError):
+  if state_payload is not None and openalex.parse(provider_state.get("quota_pause_until"))>openalex.now():
+   atomic_write(state_path,state_payload)
+  raise
+ if state_payload is not None:atomic_write(state_path,state_payload)
+ atomic_write(library_path,library_payload)
+
 def clean(t):return PARA.sub(" ",str(t or "")).strip()
 def fetch(url,key="",binary=False):
  if not url.startswith(("https://api.openalex.org/works/","https://content.openalex.org/works/")):
@@ -47,8 +103,8 @@ def section_name(heading):
 def collect_sections(lines):
  sections={}
  current=None
- for line in lines:
-  stripped=clean(line)
+ for number,line in enumerate(lines,1):
+  stripped=clean(unicode_text(line,f"line {number}"))
   if len(stripped)>280:continue
   found=HEAD.match(stripped)
   if found:
@@ -67,13 +123,16 @@ def extract_pdf(pdf):
   reader=PdfReader(io.BytesIO(pdf),strict=False)
   if reader.is_encrypted:return {}
   lines=[]
-  for page in reader.pages[:35]:
+  for number,page in enumerate(reader.pages[:35],1):
    text=page.extract_text(extraction_mode="layout") or ""
+   text=unicode_text(text,f"page {number}")
    lines.extend(text.splitlines())
   sections=collect_sections(lines)
   # The Results or Discussion heading must be clearly identified.
   if not (sections.get("results") or sections.get("discussion")):return {}
   return sections
+ except PDFTextEncodingError:
+  raise
  except Exception:
   return {}
 def work_url(record):
@@ -93,6 +152,7 @@ def eligible(record,date,at=None):
  except ValueError:return True
 def state(record,kind,days,date):
  old=record.setdefault("pdf_fulltext_attempt",{})
+ old.pop("text_error",None)
  old.update(version=1,status=kind,last_at=date.isoformat(),next_at=(date+dt.timedelta(days=days)).isoformat(),
             attempts=old.get("attempts",0)+1)
 def run(library_path=None,state_path=None):
@@ -100,11 +160,18 @@ def run(library_path=None,state_path=None):
  # uses its adjacent provider state, never the repository's live queue state.
  library_path=pathlib.Path(library_path) if library_path is not None else LIB
  state_path=pathlib.Path(state_path) if state_path is not None else library_path.with_name("fulltext-backfill-state.json")
- rows=json.loads(library_path.read_text())
- provider_state=openalex.read_json(state_path,{})
+ if library_path.resolve()==state_path.resolve():raise ValueError("library and provider state paths must differ")
+ rows=strict_json_loads(library_path.read_text(encoding="utf-8"))
+ provider_state=strict_json_loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+ if not isinstance(rows,list) or any(not isinstance(row,dict) for row in rows):
+  raise ValueError("library must contain a list of records")
+ if not isinstance(provider_state,dict):raise ValueError("provider state must be an object")
+ # Reject corrupt pre-existing input before spending any provider requests.
+ json_bytes(rows)
+ json_bytes(provider_state)
  t=openalex.now()
  stats={"lookup_attempts":0,"pdf_downloads":0,"request_attempts":0,"fulltexts_recovered":0,
-        "no_licensed_pdf":0,"no_machine_readable_sections":0,"errors":0,"rate_limited":0,
+        "no_licensed_pdf":0,"no_machine_readable_sections":0,"invalid_unicode":0,"errors":0,"rate_limited":0,
         "status":"no_ready_sources","quota_pause_until":None,
         "remaining_scholarly":sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in rows)}
  if openalex.parse(provider_state.get("quota_pause_until"))>t:
@@ -126,6 +193,8 @@ def run(library_path=None,state_path=None):
  if ready:stats["status"]="batch_processed"
  for paper in ready[:limit]:
   if stats["pdf_downloads"]>=pdf_limit:break
+  previous_attempts=(paper.get("pdf_fulltext_attempt") or {}).get("attempts",0)
+  url=""
   try:
    # Count requests before dispatch, including HTTP failures and timeouts.
    stats["lookup_attempts"]+=1
@@ -141,13 +210,13 @@ def run(library_path=None,state_path=None):
    stats["pdf_downloads"]+=1
    stats["request_attempts"]+=1
    pdf=fetch(url,key,True)
-   sections=extract_pdf(pdf)
+   sections={name:unicode_text(text,name) for name,text in extract_pdf(pdf).items()}
    if not (sections.get("results") or sections.get("discussion")):
     state(paper,"pdf_has_no_recognized_sections",30,date)
     stats["no_machine_readable_sections"]+=1;continue
    landing=(work.get("best_oa_location") or {}).get("landing_page_url") or paper.get("url")
    if not landing or not landing.startswith("https://"):landing=paper.get("url") or ""
-   paper["analysis"]={
+   analysis={
      "provenance":"OpenAlex cached licensed OA PDF; local text extraction (not OCR)",
      "license":lic,"fulltext_url":landing,"license_url":landing,
      "methods":sections.get("methods",""),"results":sections.get("results",""),
@@ -156,8 +225,18 @@ def run(library_path=None,state_path=None):
      "extraction_date":date.isoformat(),"extraction_version":3,
      "sections_available":list(sections),
      "pdf_text_extraction":"pypdf; section boundary heuristics; check source"}
+   # Provider metadata must also be encodable before attaching any analysis.
+   json_bytes(analysis)
+   paper["analysis"]=analysis
    state(paper,"full_text",365,date)
    stats["fulltexts_recovered"]+=1
+  except PDFTextEncodingError as err:
+   state(paper,"pdf_invalid_unicode",30,date)
+   paper["pdf_fulltext_attempt"]["text_error"]={**err.diagnostic,"source_pdf":url}
+   stats["invalid_unicode"]+=1
+   stats["errors"]+=1
+   print("PDF fallback:",json.dumps({"doi":paper.get("doi"),
+                                   **paper["pdf_fulltext_attempt"]["text_error"]}))
   except (urllib.error.URLError,TimeoutError,ValueError,TypeError,KeyError,json.JSONDecodeError) as err:
    if isinstance(err,urllib.error.HTTPError) and err.code==429:
     until=openalex.pause_time(err)
@@ -173,12 +252,19 @@ def run(library_path=None,state_path=None):
    stats["errors"]+=1
    state(paper,"pdf_temporary_error",2,date)
    if stats["errors"]<=3:print("PDF fallback:",str(err)[:130])
+  finally:
+   # Retain completed outcomes and cooldowns before trying the next paper.
+   # Later extraction/process failures must not replay the completed batch.
+   if (paper.get("pdf_fulltext_attempt") or {}).get("attempts",0)!=previous_attempts:
+    if provider_state.get("status")=="waiting_for_budget" and stats["status"]!="waiting_for_budget":
+     provider_state["status"]=stats["status"]
+    save_checkpoint(library_path,rows,state_path,provider_state,pause_changed)
+    pause_changed=False
   time.sleep(.25)
- library_path.write_text(json.dumps(rows,ensure_ascii=False,indent=2)+"\n")
  if pause_changed:
   if provider_state.get("status")=="waiting_for_budget" and stats["status"]!="waiting_for_budget":
    provider_state["status"]=stats["status"]
-  state_path.write_text(json.dumps(provider_state,ensure_ascii=False,indent=2)+"\n")
+  save_checkpoint(library_path,rows,state_path,provider_state,True)
  stats["remaining_scholarly"]=sum(r.get("kind")=="scholarly" and not r.get("analysis") for r in rows)
  print(json.dumps(stats))
  return stats
