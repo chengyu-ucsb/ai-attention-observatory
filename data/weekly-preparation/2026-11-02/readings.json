@@ -6,9 +6,9 @@
     "to": "2026-11-08",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-09T23:42:28.748138+00:00",
+  "observation_at": "2026-11-10T01:31:28.281761+00:00",
   "packet_sha256": "a62e5a87db918f0de1548386532d2e106d653da100f3f8cca796412137323099",
-  "acquisition_state_sha256": "d3b21b5c48ca2a5aab8d73056dbf5a4da202042e4d5bd694ad88d37baae673ab",
+  "acquisition_state_sha256": "1cb8e41bf3ab2ac3da9c1b077de52cd008253deea7786493529f270d374edb8d",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -781,7 +781,8 @@
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-09T23:28:17.773247+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00"
-      }
+      },
+      "acquisition_receipt_sha256": "de36ab6dd77bf66c074ce35d229aeaf3b1670e636c2d1a8da55a62f0a065b92a"
     },
     "e97476b562161f4db5a06327e01fdfb764be1c66ef17db42f87ae5e3e4c64c77": {
       "input_fingerprint": "be54401d5a986f839968f8214163b383b80aa258892bda7d53d65337b62b3392",
@@ -825,7 +826,8 @@
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-09T23:28:17.773247+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00"
-      }
+      },
+      "acquisition_receipt_sha256": "223f84d06454d33a37618c5dee54e67a59dc5e1135dcb8f9550d334c77789f22"
     },
     "ee86f7588acda13acac036206c2a2ad081b0e38cac0be78da56f17b4c609a76f": {
       "input_fingerprint": "ea1c5a2f2e36e23da06e7720b9c53b00b7da8585cf27530d6e217f65dc8e3e2b",
@@ -1386,8 +1388,32 @@
         "first_seen": "2026-11-09",
         "content_access": "headline_only",
         "metadata_observed_at": "2026-11-07T02:13:44.163501+00:00",
-        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00"
-      }
+        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
+        "complete_reading_attempt": {
+          "status": "copied_source_passage",
+          "stage": "synthesis",
+          "last_at": "2026-11-10",
+          "next_at": "2026-11-12",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.eff.org/deeplinks/2026/11/eff-submission-ohchr-consultation-child-rights-and-safety-digital-environment",
+              "status": "partial_full_text",
+              "final_url": "https://www.eff.org/deeplinks/2026/11/eff-submission-ohchr-consultation-child-rights-and-safety-digital-environment",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.eff.org/deeplinks/2026/11/eff-submission-ohchr-consultation-child-rights-and-safety-digital-environment"
+            }
+          ]
+        }
+      },
+      "acquisition_receipt_sha256": "faa05dae347fbd849dee3ec79bf273dd42dbb7aad5f21ae93b8965d32a451601"
     },
     "ef8a6817c6f24c1ef14fde60576c93912d51440bdc92f673efd5c3a71094080b": {
       "input_fingerprint": "d4dd76f6bd47fe96213b4d6c211ecd5f737f2f61cea3beb2b94182d02ac7d0d2",
@@ -1584,5 +1610,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "4a54a966c302ab759792ad16dbfa3b4d8efe4a3a85c2bb4f21762852ae4ef0eb"
+  "metadata_sha256": "ca6a6e92c6e00a35e5b345bc628ab52da310397e9ad8315d385383bb55966693"
 }
