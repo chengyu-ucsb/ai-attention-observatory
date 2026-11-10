@@ -2,33 +2,33 @@
   "schema_version": 1,
   "kind": "preparation_reading_run",
   "phase": "closed",
-  "started_at": "2026-11-10T01:30:23.155769+00:00",
-  "finished_at": "2026-11-10T01:31:29.063808+00:00",
+  "started_at": "2026-11-10T23:19:22.383672+00:00",
+  "finished_at": "2026-11-10T23:19:50.124267+00:00",
   "publication_window": {
     "from": "2026-11-02",
     "to": "2026-11-08",
     "timezone": "UTC"
   },
   "bindings": {
-    "packet.json": "a62e5a87db918f0de1548386532d2e106d653da100f3f8cca796412137323099",
-    "acquisition.json": "8d50192aff4b76208797695dea644a33c2c18168947e423cbf31f51839450d24",
-    "readings.json": "270421c07b16ba6e70a1bfa48f71164dfc45915debc76b40efb545db541ff688"
+    "packet.json": "bf55b98966b80031f1fc8368bf5792a5b9c40bca0c0b4f9df49a95f4bdf35792",
+    "acquisition.json": "680a266e6786b0c3a4b962a4adcd6e10968e2b3c4e28dfd56550a2579281f978",
+    "readings.json": "5585c4a1455abc0b2fd565c5936d300f98febfc6c0f65b33d5dca3173018e1cc"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-10T01:30:23.381784+00:00",
-      "selected_records": 26,
+      "checked_at": "2026-11-10T23:19:22.990862+00:00",
+      "selected_records": 58,
       "attempted_records": 12,
       "attempted_stages": 12,
-      "completed_records": 6,
-      "pending_records": 20,
+      "completed_records": 8,
+      "pending_records": 50,
       "deferred_retry_records": 0,
       "statuses": {
         "access_blocked": 2,
-        "full_document_retrieved_not_reviewed": 2,
+        "full_document_retrieved_not_reviewed": 4,
         "partial_full_text_not_reviewed": 2,
-        "pending": 2,
-        "pending_routes": 18
+        "pending": 27,
+        "pending_routes": 23
       },
       "excluded": {},
       "duplicate_records": 0,
@@ -44,17 +44,13 @@
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 1,
-      "documents_retrieved": 1,
-      "partial_inputs": 1,
+      "attempted": 0,
+      "documents_retrieved": 0,
+      "partial_inputs": 0,
       "summaries_completed": 0,
-      "failed": 1,
-      "failure_reasons": {
-        "copied_source_passage": 1
-      },
-      "failure_stages": {
-        "synthesis": 1
-      },
+      "failed": 0,
+      "failure_reasons": {},
+      "failure_stages": {},
       "source_text_saved": false,
       "skipped_no_model": false
     },
