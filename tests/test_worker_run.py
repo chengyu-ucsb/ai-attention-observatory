@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 import json
+import re
 from pathlib import Path
 import sys
 import tempfile
@@ -13,6 +14,23 @@ NOW=datetime(2026,11,11,14,tzinfo=timezone.utc)
 
 
 class WorkerRunTests(unittest.TestCase):
+    def test_workflow_cron_fields_fit_github_ranges(self):
+        bounds = ((0,59),(0,23),(1,31),(1,12),(0,6))
+        workflows = Path(__file__).resolve().parents[1]/'.github/workflows'
+        for path in workflows.glob('*.yml'):
+            for cron in re.findall(r"cron:\s*['\"]([^'\"]+)['\"]",path.read_text()):
+                fields=cron.split()
+                self.assertEqual(len(fields),5,(path,cron))
+                for field,(low,high) in zip(fields,bounds):
+                    for part in field.split(','):
+                        span,*step=part.split('/')
+                        if step:
+                            self.assertGreater(int(step[0]),0,(path,cron))
+                        if span=='*': continue
+                        values=[int(v) for v in span.split('-')]
+                        self.assertTrue(all(low<=v<=high for v in values),(path,cron))
+                        self.assertEqual(values,sorted(values),(path,cron))
+
     def test_token_saved_privately_and_not_printed_or_returned(self):
         with tempfile.TemporaryDirectory() as tmp:
             file=Path(tmp)/'lease.json'
