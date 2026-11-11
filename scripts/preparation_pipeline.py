@@ -183,6 +183,9 @@ def validate_counts(values):
         queue.integer(count)
 
 
+READING_POLICY_VERSION = 2
+
+
 def validate_stage_report(stage, report):
     import collect_weekly_sources as queue
     if stage == "acquire":
@@ -205,7 +208,7 @@ def validate_stage_report(stage, report):
     elif stage == "review":
         counts = {"attempted", "summaries_completed", "failed"}
         queue.shape(report, counts | {"skipped_no_model"},
-                    {"documents_retrieved", "partial_inputs", "failure_reasons", "failure_stages", "source_text_saved"})
+                    {"documents_retrieved", "partial_inputs", "failure_reasons", "failure_stages", "source_text_saved", "selection"})
         for key in counts | ({"documents_retrieved", "partial_inputs"} & set(report)):
             queue.integer(report[key])
         queue.require(report["skipped_no_model"] is False
@@ -213,6 +216,8 @@ def validate_stage_report(stage, report):
         for key in ("failure_reasons", "failure_stages"):
             if key in report:
                 validate_counts(report[key])
+        if 'selection' in report:
+            validate_selection(report['selection'], report['attempted'])
     else:
         count = "attempted" if stage == "revalidate" else "machine_checked_readings_applied"
         queue.shape(report, {count, "approved"}, {"source_text_saved", "publication_window"})
@@ -221,6 +226,19 @@ def validate_stage_report(stage, report):
         if "publication_window" in report:
             queue.saved_window(report["publication_window"])
     queue.require(report.get("source_text_saved", False) is False)
+
+
+def validate_selection(value, attempted):
+    import collect_weekly_sources as queue
+    queue.shape(value, {'considered', 'eligible', 'deferred_by_limit', 'skipped'})
+    for key in ('considered', 'eligible', 'deferred_by_limit'):
+        queue.integer(value[key])
+    queue.require(type(value['skipped']) is dict and not set(value['skipped']) - {
+        'unsupported_kind', 'already_editorially_reviewed', 'complete_machine_reading',
+        'retry_cooldown', 'unverified_venue', 'off_topic', 'no_explicit_human_topic'})
+    validate_counts(value['skipped'])
+    queue.require(value['considered'] == value['eligible'] + sum(value['skipped'].values())
+                  and value['eligible'] == attempted + value['deferred_by_limit'])
 
 
 def validate_coverage(coverage):
@@ -257,7 +275,10 @@ def validate_reading_receipt(value, kind, now):
     if not run:
         names |= {"library.json", "weekly.json"}
     try:
-        queue.shape(value, required)
+        queue.shape(value, required, {'reading_policy_version'} if run else set())
+        if 'reading_policy_version' in value:
+            queue.require(type(value['reading_policy_version']) is int
+                          and 1 <= value['reading_policy_version'] <= READING_POLICY_VERSION)
         queue.require(type(value["schema_version"]) is int and value["schema_version"] == 1
                       and value["kind"] == kind and value["approved"] is False
                       and value["source_text_saved"] is False)
@@ -271,6 +292,8 @@ def validate_reading_receipt(value, kind, now):
         if run:
             queue.require(value["phase"] in {"preparing", "closed"} and value["note"] == NOTE
                           and utc(value["started_at"]) <= utc(value["finished_at"]))
+            if value.get('reading_policy_version', 1) >= 2:
+                queue.require('selection' in value['stages']['review'])
             stages = {"acquire", "review"} | ({"revalidate", "apply"} if value["phase"] == "closed" else set())
             queue.shape(value["stages"], stages)
             for stage, report in value["stages"].items():
@@ -290,7 +313,8 @@ def validate_reading_receipt(value, kind, now):
 
 
 def current_reading_run(run, packet, current_bindings, now):
-    return (run["phase"] == "closed" and run["publication_window"] == packet["target_publication_window"]
+    return (run.get("reading_policy_version", 1) == READING_POLICY_VERSION
+            and run["phase"] == "closed" and run["publication_window"] == packet["target_publication_window"]
             and run["bindings"] == {key: current_bindings[key] for key in run["bindings"]}
             and utc(packet["observation_at"]) <= utc(run["started_at"]) <= utc(run["finished_at"]) <= now)
 
@@ -325,6 +349,7 @@ def run_readings(root=ROOT, now=None, phase="closed", runner=None, expected_week
     finished = utc()  # A CLI cannot backdate its observed completion.
     validate_reading_inputs(folder, finished)
     receipt = {"schema_version": 1, "kind": "preparation_reading_run", "phase": phase,
+        "reading_policy_version": READING_POLICY_VERSION,
         "started_at": now.isoformat(), "finished_at": finished.isoformat(),
         "publication_window": target_window(now, phase), "bindings": bindings(root, folder),
         "stages": reports, "approved": False, "source_text_saved": False, "note": NOTE}
@@ -436,6 +461,8 @@ def edition_ready(root=ROOT, now=None):
     if state is None or bundle is None:
         return dict(result, status="awaiting_reading_inputs", next_action="readings")
     current = bindings(root, folder, canonical=True)
+    if run.get('reading_policy_version', 1) != READING_POLICY_VERSION:
+        return dict(result, status='final_reading_policy_changed', next_action='readings')
     if (receipt["publication_window"] != packet["target_publication_window"]
             or receipt["bindings"] != current or not current_reading_run(run, packet, current, now)
             or receipt["reading_run_sha256"] != digest(run)
