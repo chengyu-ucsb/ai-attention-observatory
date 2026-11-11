@@ -1,5 +1,5 @@
 import { generateKeyPair, SignJWT } from "jose";
-import { AUDIENCE, ISSUER, verifyGithubToken } from "./auth.ts";
+import { AUDIENCE, ISSUER, canManageRun, verifyGithubToken } from "./auth.ts";
 import { digest, validateRequest } from "./validation.ts";
 
 function assert(value: unknown) { if (!value) throw new Error("assertion_failed"); }
@@ -55,4 +55,19 @@ Deno.test("bridge accepts narrow operations and never arbitrary SQL or source pa
   await rejects(() => validateRequest({ ...checkpoint, result: { ...checkpoint.result,
     claims: [{ ...checkpoint.result.claims[0], quote: "Raw passage" }] } }));
   await rejects(() => validateRequest({ ...checkpoint, segment_id: "C0002" }));
+});
+
+Deno.test("reading leases require the correct workflow and never assert publication", async () => {
+  assert(!canManageRun(normal, "closed"));
+  const finalizer = { ...normal, workflow_ref: normal.workflow_ref.replace("database-check", "finalize-weekly-readings") };
+  assert(canManageRun(finalizer, "closed"));assert(!canManageRun(finalizer, "preparing"));
+  await validateRequest({ op: "begin_run", phase: "closed", week: "2026-11-02", inputs_hash: "a".repeat(64) });
+  await rejects(() => validateRequest({ op: "begin_run", phase: "admin", week: "2026-11-02", inputs_hash: "a".repeat(64) }));
+  const payload = { op: "finish_run", id: "11111111-1111-1111-1111-111111111111", lease_token: "22222222-2222-2222-2222-222222222222",
+    result: { phase: "closed", week: "2026-11-02", reading_run_sha256: "a".repeat(64), repository_commit: "a".repeat(40),
+      attempted: 2, completed: 0, failed: 2, deferred_by_limit: 8, source_text_saved: false, independently_approved: false, weekly_publication_verified: false } };
+  await validateRequest(payload);
+  await rejects(() => validateRequest({ ...payload, result: { ...payload.result, weekly_publication_verified: true } }));
+  await rejects(() => validateRequest({ ...payload, result: { ...payload.result, completed: 1 } }));
+  await rejects(() => validateRequest({ ...payload, result: { ...payload.result, attempted: -1 } }));
 });

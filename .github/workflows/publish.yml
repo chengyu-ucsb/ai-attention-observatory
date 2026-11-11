@@ -43,6 +43,12 @@ on:
     workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
     types: [completed]
     branches: [main]
+  # Refresh the honest publication-status payload even when an edition is held.
+  schedule:
+    - cron: '47 12,17 * * 1'
+      timezone: America/New_York
+    - cron: '47 12 * * 2-7'
+      timezone: America/New_York
   workflow_dispatch:
 permissions:
   contents: read

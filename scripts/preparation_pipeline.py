@@ -586,7 +586,24 @@ def edition_ready(root=ROOT, now=None, *, reconcile_legacy=False):
         raise ValueError("invalid_weekly_final_reading_coverage_receipt")
     if reconciliation:
         result["reconciliation"] = reconciliation
+    selection = pending_readings(packet, state, bundle, now)
+    if selection['eligible']:
+        return dict(result, ready=False, status='more_readings_due', next_action='readings', selection=selection)
     return dict(result, ready=True, status=receipt["status"], coverage=receipt["coverage"])
+
+
+def pending_readings(packet, state, bundle, now):
+    from prepared_article_readings import reconcile
+    from comprehensive_readings import reading_candidates
+    current = reconcile(packet, state, bundle, now=now)
+    _, selection = reading_candidates([item['record'] for item in current['records'].values()],
+                                      now.date().isoformat(), now)
+    return selection
+
+
+def worker_plan(root=ROOT, now=None):
+    """A valid bounded-pass receipt cannot hide remaining due reading work."""
+    return edition_ready(root, utc(now))
 
 
 def checkpoint(root, destination, now=None, phase="closed", week=None):
@@ -699,14 +716,14 @@ def lead_time():
     return {"measured_schedule_delay_hours": [4, 8], "measured_synthesis_minutes": [12, 18],
         "measured_pages_minutes": 1, "known_downstream_minutes_excluding_review": [253, 499],
         "full_review_throughput": "not_verified", "full_review_completion_estimate": None,
-        "planning": "Prepare daily from Monday through Sunday; close out after Monday 00:00 and once after 06:00 UTC. "
+        "planning": "Prepare twice daily; closeout attempts start at Monday 00:07 America/New_York. "
                     "Additional queue waits, discovery, model setup and remaining review time are unmeasured. "
                     "This is not a guaranteed Monday publication time."}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "readings", "finalize", "edition-check", "checkpoint", "checkpoint-commit", "scope", "lead-time"))
+    parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "readings", "finalize", "edition-check", "worker-plan", "checkpoint", "checkpoint-commit", "scope", "lead-time"))
     parser.add_argument("--reconcile-legacy-library", action="store_true",
         help="Opt-in read-only proof against exact local Git history; edition-check only")
     parser.add_argument("--phase", choices=("preparing", "closed"), default="closed")
@@ -730,6 +747,7 @@ def main():
     elif args.action == "readings": result = run_readings(args.root, phase=args.phase, expected_week=args.expected_week)
     elif args.action == "finalize": result = finalize(args.root, expected_week=args.expected_week)
     elif args.action == "edition-check": result = edition_ready(args.root, reconcile_legacy=args.reconcile_legacy_library)
+    elif args.action == "worker-plan": result = worker_plan(args.root)
     elif args.action == "lead-time": result = lead_time()
     elif args.action == "scope": result = {"week": target_window(utc(), args.phase)["from"], "phase": args.phase}
     elif args.action == "checkpoint-commit":

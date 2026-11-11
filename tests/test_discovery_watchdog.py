@@ -42,15 +42,19 @@ class DiscoveryWatchdogTests(unittest.TestCase):
         result = plan(pages(run()))
         self.assertTrue(result["dispatch"])
         self.assertEqual(result["status"], "missed_launch")
-        self.assertEqual(result["recovery_not_before"], "2026-11-09T08:23:00+00:00")
+        self.assertEqual(result["recovery_not_before"], "2026-11-09T08:07:00+00:00")
         self.assertEqual(result["expected_publication_window"]["from"], "2026-11-02")
         self.assertEqual(result["expected_publication_window"]["to"], "2026-11-08")
 
     def test_primary_schedule_plus_grace_and_exact_boundary(self):
-        for clock in (NOW.replace(hour=0, minute=0), NOW.replace(hour=0, minute=23),
-                      NOW.replace(hour=8, minute=22, second=59)):
+        for clock in (NOW.replace(hour=0, minute=0), NOW.replace(hour=5, minute=7),
+                      NOW.replace(hour=8, minute=6, second=59)):
             self.assertEqual(plan(now=clock)["status"], "not_due")
-        self.assertTrue(plan(now=NOW.replace(hour=8, minute=23))["dispatch"])
+        self.assertTrue(plan(now=NOW.replace(hour=8, minute=7))["dispatch"])
+
+    def test_recovery_grace_tracks_eastern_daylight_saving_time(self):
+        summer=plan(weekly=snapshot('2026-07-05'),now=dt.datetime(2026,7,6,8,tzinfo=UTC))
+        self.assertEqual(summer['recovery_not_before'],'2026-07-06T07:07:00+00:00')
 
     def test_current_week_never_collects_again(self):
         for date in ("2026-11-09", "2026-11-10"):
@@ -177,7 +181,9 @@ class DiscoveryWatchdogTests(unittest.TestCase):
         self.assertIn("if: needs.check_due.outputs.needed == 'true'", refresh)
         self.assertIn("github.event_name != 'workflow_dispatch' || !inputs.only_if_due || github.run_attempt == '1'", refresh)
         first = re.findall(r"^\s+- cron: '([^']+)'", refresh, flags=re.MULTILINE)[0]
-        self.assertEqual(first, f"{watchdog.PRIMARY_UTC.minute} {watchdog.PRIMARY_UTC.hour} * * 1")
+        self.assertEqual(first, f"{watchdog.PRIMARY_LOCAL.minute} {watchdog.PRIMARY_LOCAL.hour},2,6,10 * * 1")
+        self.assertIn('timezone: America/New_York',refresh)
+        self.assertIn('timezone: America/New_York',recovery)
 
 
 if __name__ == "__main__":

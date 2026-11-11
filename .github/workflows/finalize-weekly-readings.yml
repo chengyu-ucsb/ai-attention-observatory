@@ -1,5 +1,8 @@
 name: Finalize weekly source readings
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/finalize-weekly-readings.yml', 'scripts/worker_run.py']
   pull_request:
     branches: [main]
     paths:
@@ -11,7 +14,10 @@ on:
     types: [completed]
     branches: [main]
   schedule:
-    - cron: '11 10,18 * * 1,2'
+    - cron: '27 3,6,9,11,15 * * 1'
+      timezone: America/New_York
+    - cron: '27 9 * * 2-7'
+      timezone: America/New_York
   workflow_dispatch:
 permissions:
   contents: read
@@ -42,16 +48,18 @@ jobs:
           node --check app.js
           node tests/validate_weekly_window.cjs
   process:
-    if: github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main'))
+    if: github.event_name != 'pull_request' && (github.event_name != 'push' || contains(github.event.head_commit.message, '[run-readings]')) && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main'))
     permissions:
       contents: write
       id-token: write
+      actions: write
     runs-on: ubuntu-24.04
     # 8m acquisition + 2 x 20m review, bounded revalidation, setup and validation.
     # This cap is not a measured full-corpus review throughput estimate.
     timeout-minutes: 80
     env:
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+      OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
     steps:
       - uses: actions/checkout@v7.0.1
         with:
@@ -69,16 +77,20 @@ jobs:
       - name: Skip an already finalized unchanged input set
         id: existing
         if: steps.plan.outputs.ready == 'true'
-        run: python scripts/preparation_pipeline.py edition-check
-      - name: Install bounded local inference and PDF parser
+        run: python scripts/preparation_pipeline.py worker-plan
+      - name: Lease this reading pass in the private database
+        id: worker
         if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
+        run: python scripts/worker_run.py begin --phase closed --lease "$RUNNER_TEMP/observatory-worker.json"
+      - name: Install bounded local inference and PDF parser
+        if: steps.worker.outputs.claimed == 'true'
         run: |
           python -m pip install --disable-pip-version-check --only-binary=llama-cpp-python \
             --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
             'llama-cpp-python>=0.3.0,<0.4' 'pypdf>=6.0,<7.0'
           python -m pip install --disable-pip-version-check -r requirements-database.txt
       - name: Download the existing official open reading model
-        if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
+        if: steps.worker.outputs.claimed == 'true'
         run: |
           curl --fail --location --retry 2 --connect-timeout 15 --max-time 420 \
             'https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q4_k_m.gguf' \
@@ -86,7 +98,7 @@ jobs:
           test "$(stat -c '%s' /tmp/attention-model.gguf)" -gt 900000000
       - name: Run real bounded acquisition and machine reading stages
         id: readings
-        if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
+        if: steps.worker.outputs.claimed == 'true'
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
           OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
@@ -118,6 +130,7 @@ jobs:
         run: |
           python scripts/preparation_pipeline.py checkpoint --phase closed --week "${{ steps.scope.outputs.week }}" --destination "$RUNNER_TEMP/validated-preparation"
       - name: Save checkpoints without repeating external work on a push race
+        id: saved
         if: always() && steps.checkpoint.outputs.valid == 'true'
         env:
           SAVE_CANONICAL: ${{ steps.validation.outcome == 'success' && steps.checkpoint.outcome == 'success' }}
@@ -148,7 +161,10 @@ jobs:
               echo 'Checkpoint conflict; preserved validated artifacts require reconciliation.'
               exit 1
             fi
-            if git push origin HEAD:main; then exit 0; fi
+            if git push origin HEAD:main; then
+              printf 'commit=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
             sleep "$((attempt * 2))"
           done
           exit 1
@@ -160,3 +176,19 @@ jobs:
           path: ${{ runner.temp }}/validated-preparation/
           retention-days: 7
           if-no-files-found: error
+      - name: Record the actual reading outcome in the database
+        id: worker_receipt
+        if: always() && steps.worker.outputs.claimed == 'true'
+        env:
+          WORKER_SAVED: ${{ steps.readings.outcome == 'success' && steps.validation.outcome == 'success' && steps.saved.outcome == 'success' }}
+          WORKER_COMMIT: ${{ steps.saved.outputs.commit }}
+        run: python scripts/worker_run.py finish --lease "$RUNNER_TEMP/observatory-worker.json"
+      - name: Check for remaining due readings after saving
+        id: more
+        if: steps.worker_receipt.outcome == 'success' && steps.validation.outcome == 'success' && steps.saved.outcome == 'success'
+        run: python scripts/preparation_pipeline.py worker-plan
+      - name: Continue the bounded queue without waiting for tomorrow
+        if: steps.more.outputs.status == 'more_readings_due'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/$GITHUB_REPOSITORY/actions/workflows/finalize-weekly-readings.yml/dispatches" -f ref=main

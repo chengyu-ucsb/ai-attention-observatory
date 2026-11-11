@@ -14,6 +14,11 @@ const KEYS = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks`), {
   timeoutDuration: 5000, cooldownDuration: 30000,
 });
 
+export function canManageRun(identity: Record<string, unknown>, phase: string) {
+  const file = phase === "preparing" ? "prepare-weekly-readings.yml" : phase === "closed" ? "finalize-weekly-readings.yml" : "";
+  return file !== "" && identity.workflow_ref === `${REPOSITORY}/.github/workflows/${file}@refs/heads/main`;
+}
+
 export async function verifyGithubToken(token: string, keys: JWTVerifyGetKey | CryptoKey = KEYS) {
   const { payload } = await jwtVerify(token, keys, {
     algorithms: ["RS256"], issuer: ISSUER, audience: AUDIENCE,

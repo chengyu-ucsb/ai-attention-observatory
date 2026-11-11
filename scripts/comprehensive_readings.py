@@ -419,17 +419,8 @@ def source_coverage_basis(document):
     return 'All supplied source text retrieved; document format is not verified.'
 
 
-def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,checkpoint_factory=None):
-    stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
-           'failed':0,'failure_reasons':{},'failure_stages':{},
-           'source_text_saved':False,'skipped_no_model':model is None}
-    if model is None: return stats
-    if retriever is None:
-        from acquisition_handoff import retrieve_for_reading
-        retriever=retrieve_for_reading
-    run_date=run_date or date.today()
-    today=run_date.isoformat()
-    observed_at=run_at or datetime.combine(run_date,datetime.min.time(),tzinfo=timezone.utc)
+def reading_candidates(records, today, observed_at, limit=2):
+    """One pure selection policy for planning and actual inference."""
     candidates=[]
     selection={'considered':len(records), 'eligible':0, 'deferred_by_limit':0, 'skipped':{}}
     for record in records:
@@ -454,8 +445,22 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
             candidates.append(record)
     selection['eligible']=len(candidates)
     selection['deferred_by_limit']=max(0,len(candidates)-max(0,limit))
-    stats['selection']=selection
     candidates.sort(key=reading_queue_key)
+    return candidates,selection
+
+
+def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,checkpoint_factory=None):
+    stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
+           'failed':0,'failure_reasons':{},'failure_stages':{},
+           'source_text_saved':False,'skipped_no_model':model is None}
+    if model is None: return stats
+    if retriever is None:
+        from acquisition_handoff import retrieve_for_reading
+        retriever=retrieve_for_reading
+    run_date=run_date or date.today()
+    today=run_date.isoformat()
+    observed_at=run_at or datetime.combine(run_date,datetime.min.time(),tzinfo=timezone.utc)
+    candidates,stats['selection']=reading_candidates(records,today,observed_at,limit)
     for record in candidates[:max(0,limit)]:
         stats['attempted']+=1
         diagnostics=[]

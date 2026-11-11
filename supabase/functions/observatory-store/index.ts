@@ -1,6 +1,6 @@
 import postgres from "postgres";
-import { verifyGithubToken } from "./auth.ts";
-import { digest, validateRequest } from "./validation.ts";
+import { canManageRun, verifyGithubToken } from "./auth.ts";
+import { canonical, digest, validateRequest } from "./validation.ts";
 
 // This is a private backend bridge, never a browser/client API. The platform's
 // default connection stays inside Supabase; every query uses a restricted role.
@@ -39,6 +39,35 @@ Deno.serve(async (req) => {
     const result = await database.begin(async (sql) => {
       await sql`set local role observatory_worker`;
       await sql`set local statement_timeout = '15s'`;
+      const owner = `github:${identity.run_id}:${identity.run_attempt}`;
+      const runUrl = `https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/${identity.run_id}`;
+      if (input.op === "begin_run") {
+        if (!canManageRun(identity, input.phase)) throw new Error("workflow_scope_mismatch");
+        const start = new Date(); start.setUTCHours(0, 0, 0, 0);
+        start.setUTCDate(start.getUTCDate() - (start.getUTCDay() + 6) % 7 - (input.phase === "closed" ? 7 : 0));
+        if (start.toISOString().slice(0, 10) !== input.week) throw new Error("worker_week_changed");
+        const scope = `readings:${input.phase}:${input.week}`;
+        const [row] = await sql`select observatory.begin_worker_run(${scope},${input.inputs_hash},${owner},${runUrl}) as lease`;
+        return row.lease;
+      }
+      if (input.op === "finish_run" || input.op === "fail_run") {
+        const [job] = await sql`select * from observatory.jobs where id=${input.id} for update`;
+        if (!job || !canManageRun(identity, String(job.input.scope || "").split(":")[1])) throw new Error("workflow_scope_mismatch");
+        const leaseHash = await digest(input.lease_token);
+        const result = input.op === "finish_run" ? { ...input.result, run_url: runUrl, _worker: owner, _lease_hash: leaseHash } :
+          { reason: input.reason, run_url: runUrl, _worker: owner, _lease_hash: leaseHash, weekly_publication_verified: false };
+        // A lost HTTP response may retry an already committed write.
+        if (job.lease_owner === null && canonical(job.result) === canonical(result)) return { saved: true };
+        if (job.state !== "running" || job.lease_owner !== owner || job.lease_token !== input.lease_token) return { saved: false };
+        if (input.op === "finish_run") {
+          if (job.input.scope !== `readings:${input.result.phase}:${input.result.week}`) throw new Error("outcome_scope_mismatch");
+          const [row] = await sql`select observatory.finish_job(${input.id},${input.lease_token},${sql.json(result)}) as saved`;
+          return row;
+        }
+        const [row] = await sql`select observatory.fail_job(${input.id},${input.lease_token},'internal',${input.reason},900) as saved`;
+        if (row.saved) await sql`update observatory.jobs set result=${sql.json(result)} where id=${input.id}`;
+        return row;
+      }
       if (input.op === "put_source") {
         await sql`insert into observatory.sources(source_id,kind,canonical_url)
           values (${input.source_id},${input.kind},${input.canonical_url}) on conflict do nothing`;
@@ -81,7 +110,10 @@ Deno.serve(async (req) => {
         const [saved] = await sql`select id from observatory.jobs where dedupe_key=${key} and state='done'`;
         return { ...counts, receipt_id: saved.id, checkpoint_roundtrip: true, weekly_publication_verified: false };
       }
-      return counts;
+      const recent = await sql`select id,kind,state,attempts,input->>'scope' as scope,
+        result->>'run_url' as run_url,created_at,updated_at from observatory.jobs
+        where kind='review' order by updated_at desc limit 10`;
+      return { ...counts, recent_runs: recent };
     });
     return reply(result);
   } catch {
