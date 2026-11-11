@@ -10,7 +10,8 @@ on:
       - '.github/workflows/refresh.yml'
   # A separate daily opportunity, not a guarantee of punctual GitHub scheduling.
   schedule:
-    - cron: '41 8 * * *'
+    - cron: '41 3,8 * * *'
+      timezone: America/New_York
 permissions:
   contents: read
 concurrency:

@@ -24,11 +24,13 @@ when the operational database is unavailable.
 | Retry policy | Two bounded same-day retries for output-format errors; no promotion of unsupported claims | Existing reading runs |
 | Private database | Ten tables, row-level access controls, immutable evidence and editions, leased jobs and publication hashes | Installed and tested in the connected project |
 | Reading checkpoints | Reuses successfully checked sections only when source, parser, model and chunk hashes match | Scheduled readers use the private GitHub OIDC bridge |
-| Queue adapter | Deduplicated inserts; current/backfill lanes; leases and stale-worker fencing; typed failure delays | Ready for worker integration |
+| Reading workers | One live lease per reading phase/week; resumable sections; bounded retries; outcome and saved commit recorded | Preparation and final-reading workflows |
 
 Database activation is **not a complete worker-queue migration**. The current
-reading model, two-document run limit,
-shared GitHub writer lock and scheduling remain in service during this stage.
+reading model, two-document run limit and shared GitHub writer lock remain in
+service. Scheduling now uses America/New_York and retries due reading work.
+The database tracks bounded reading passes; individual article fan-out and
+synthesis-job migration remain separate work.
 End-to-end Monday delivery and improved review throughput remain unverified.
 
 ## Private worker connection
@@ -50,7 +52,7 @@ the function performs signature and claim verification before any database query
 No browser CORS policy or browser database credentials are enabled.
 
 The function uses Supabase's built-in server connection and executes every
-transaction as the restricted `observatory_worker` role. The three applied
+transaction as the restricted `observatory_worker` role. The applied
 migrations are:
 
 1. `20261111112523_observatory.sql`: private schema and recovery primitives.
@@ -58,9 +60,13 @@ migrations are:
 3. `20261111113632_observatory_edge_worker_role.sql`: permit the server connection
    to drop into the worker role; Supabase initially granted membership with
    `SET FALSE`. This grants no browser access or additional worker privileges.
+4. `20261111135507_observatory_worker_runs.sql`: exclusive leases for bounded
+   reading passes, recovery after expiration, and deduplication by exact inputs.
+5. `20261111140534_observatory_worker_budget.sql`: a conservative limit of
+   six claimed attempts per phase/week per Eastern calendar day.
 
 The Python bridge exposes only allowlisted metadata writes, checkpoint reads and
-writes, status and a connectivity probe. It cannot execute arbitrary SQL. It
+writes, restricted reading-run operations, status and a connectivity probe. It cannot execute arbitrary SQL. It
 rejects unexpected fields and raw passage fields, bounds requests and retries,
 never follows credential-bearing redirects, and never prints tokens or database
 errors. Checkpoints contain checked paraphrases and hashes of supporting spans;
@@ -156,3 +162,50 @@ expired-lease recovery, stale-token rejection and semantic holds inside a rolled
 back transaction. Test source rows were confirmed absent afterward. Security
 Advisor returned no findings after these migrations. The offline suite also
 verifies immutable editions and exact publication hash binding.
+
+## Active worker schedule
+
+GitHub's native `timezone: America/New_York` keeps these opportunities on the
+local clock through daylight-saving changes. Original-publication eligibility
+continues to use the prior completed Monday–Sunday UTC window.
+
+| Stage | Eastern-time opportunities |
+| --- | --- |
+| Rolling preparation | Every day at 6:17 a.m. and 6:17 p.m. |
+| Monday collection/closeout | 12:07, 2:07, 6:07 and 10:07 a.m. |
+| Monday final reading passes | 3:27, 6:27, 9:27 and 11:27 a.m.; 3:27 p.m. |
+| Later reading recovery | Tuesday–Sunday at 9:27 a.m. |
+| Monday composition attempts | 10:17 a.m., 12:17 p.m. and 4:17 p.m., plus successful finalizer completion |
+| Later composition recovery | Tuesday–Sunday at 12:17 p.m. |
+| Publication-status rebuild | Monday at 12:47 and 5:47 p.m.; other days at 12:47 p.m. |
+| Missing-discovery check | Daily at 3:41 and 8:41 a.m.; only a genuinely absent launch is eligible |
+
+Noon is a target, not a guaranteed delivery time. GitHub scheduling and the
+shared writer queue can delay starts. Evidence gates can also hold a draft.
+`pipeline-status.json` records the timezone-aware target, source window and an
+explicit notice when the current edition has not been published. The existing
+Monday 1 p.m. chat delivery checks the website independently and reports a delay
+instead of calling an old edition new.
+
+Both reading workflows acquire a Supabase lease before model setup. A second
+worker for that phase/week is blocked; a lost HTTP response can safely retry the
+same lease request. An interrupted lease expires after 110 minutes, longer than
+the 80-minute job cap. The token stays in private runner temporary storage.
+After validated results are pushed, the worker saves counts and the exact commit
+in Supabase. A failed Git save schedules an internal retry; it is not recorded as
+completed reading work. A completed pass may still contain failed reviews and
+always states `weekly_publication_verified: false`.
+
+A valid final-pass receipt no longer suppresses later due readings. The worker
+planner and the actual reader share the same eligibility/cooldown policy. When
+more readings are immediately due, a successful saved pass dispatches the next
+bounded pass automatically. The server enforces a conservative six-attempt
+daily cap, including retries; excess continuations stop before model setup.
+Publication waits for immediately due readings and still uses the independent
+input/citation gates. Access restrictions and semantic holds remain explicit;
+no failed reading is promoted to meet the publication target.
+
+To explicitly start a bounded final reading on a trusted main-branch code push,
+include `[run-readings]` in the commit message and change the finalizer workflow
+or `scripts/worker_run.py`. Ordinary code pushes do not use that direct recovery
+route. Existing trusted upstream-workflow triggers remain supported.

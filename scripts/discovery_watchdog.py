@@ -10,12 +10,13 @@ import datetime as dt
 import json
 import os
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from collection_window import window_metadata
 
 UTC = dt.timezone.utc
-PRIMARY_UTC = dt.time(0, 23, tzinfo=UTC)
-GRACE = dt.timedelta(hours=8)
+PRIMARY_LOCAL = dt.time(0, 7, tzinfo=ZoneInfo('America/New_York'))
+GRACE = dt.timedelta(hours=3)
 WORKFLOW_PATH = ".github/workflows/refresh.yml"
 
 
@@ -76,7 +77,7 @@ def plan(weekly, workflow, pages, *, now=None, current_run_id=None):
     now = now.astimezone(UTC)
     monday = now.date() - dt.timedelta(days=now.weekday())
     start = dt.datetime.combine(monday, dt.time(tzinfo=UTC))
-    due = dt.datetime.combine(monday, PRIMARY_UTC) + GRACE
+    due = (dt.datetime.combine(monday, PRIMARY_LOCAL) + GRACE).astimezone(UTC)
     result = {"dispatch": False, "status": "held", "expected_publication_window": window_metadata(now),
               "recovery_not_before": due.isoformat()}
 

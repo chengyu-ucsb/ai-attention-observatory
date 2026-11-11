@@ -66,6 +66,16 @@ def build(root=ROOT):
     if editorial.get('status'):
         status['editorial_discovery_status']=editorial['status']
     status.update(weekly_freshness(date, featured.get('edition_date')))
+    from worker_schedule import publication_target
+    status['publication_target'] = publication_target()
+    if not status['publication_current']:
+        status['reader_notice'] = (
+            'This week’s edition has not been published yet. '
+            if status['publication_target']['deadline_elapsed'] else
+            'This week’s edition is being prepared for Monday. '
+        ) + ('The latest published edition is ' + featured.get('edition_date', 'unavailable') + '.')
+    else:
+        status['reader_notice'] = ''
     if status['pipeline_health'] != 'current':
         print('::warning::Observatory publication health: ' + status['pipeline_health'])
     intake = data / 'brief-intake-status.json'

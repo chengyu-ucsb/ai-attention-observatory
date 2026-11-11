@@ -537,6 +537,20 @@ class PipelineTests(unittest.TestCase):
         self.assertIsNone(report['full_review_completion_estimate'])
         self.assertEqual(report['full_review_throughput'], 'not_verified')
 
+    def test_valid_final_receipt_does_not_hide_more_due_readings(self):
+        self.receipt(); pipeline.finalize(self.root, NOW)
+        self.assertTrue(pipeline.edition_ready(self.root,NOW)['ready'])
+        with patch('comprehensive_readings.reading_candidates',return_value=([{'id':'pending'}],{'eligible':1})):
+            plan=pipeline.worker_plan(self.root,NOW)
+        self.assertFalse(plan['ready'])
+        self.assertEqual(plan['status'],'more_readings_due')
+        self.assertTrue(pipeline.edition_ready(self.root,NOW)['ready'])
+
+    def test_publication_waits_for_due_readings_rather_than_freezing_early(self):
+        self.receipt(); pipeline.finalize(self.root,NOW)
+        with patch('comprehensive_readings.reading_candidates',return_value=([{'id':'pending'}],{'eligible':1})):
+            self.assertFalse(pipeline.edition_ready(self.root,NOW)['ready'])
+
 
 class WorkflowContractTests(unittest.TestCase):
     def test_all_shared_writers_are_serialized(self):
@@ -575,8 +589,20 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn('run: python scripts/update.py', stage)
         self.assertIn("if: env.MODE == 'weekly'", stage)
         self.assertIn('preparation_pipeline.py closeout', stage)
-        self.assertIn("cron: '23 0 * * 1'", text)
-        self.assertIn("cron: '37 6 * * 1'", text)
+        self.assertIn("cron: '7 0,2,6,10 * * 1'", text)
+        self.assertIn('timezone: America/New_York',text)
+
+    def test_reading_runs_require_a_lease_and_a_successful_cloud_save(self):
+        for name in ('prepare-weekly-readings','finalize-weekly-readings'):
+            text=(ROOT/'.github/workflows'/f'{name}.yml').read_text()
+            self.assertIn('worker_run.py begin',text)
+            self.assertIn("if: steps.worker.outputs.claimed == 'true'",text)
+            self.assertIn("steps.saved.outcome == 'success'",text)
+            self.assertIn('worker_run.py finish',text)
+            self.assertIn('timezone: America/New_York',text)
+        final=(ROOT/'.github/workflows/finalize-weekly-readings.yml').read_text()
+        self.assertIn('preparation_pipeline.py worker-plan',final)
+        self.assertIn('[run-readings]',final)
 
 
 if __name__ == '__main__': unittest.main()

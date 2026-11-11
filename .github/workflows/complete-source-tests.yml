@@ -72,6 +72,7 @@ jobs:
         run: |
           npm install --prefix "$RUNNER_TEMP/observatory-db-test" --no-audit --no-fund --ignore-scripts @electric-sql/pglite@0.5.16
           PGLITE_MODULE="$RUNNER_TEMP/observatory-db-test/node_modules/@electric-sql/pglite" node tests/validate_database.cjs
+          PGLITE_MODULE="$RUNNER_TEMP/observatory-db-test/node_modules/@electric-sql/pglite" node tests/validate_worker_runs.cjs
       # Historical live probes are opt-in diagnostics, not offline CI checks.
       - name: Test real access routes without retaining article text
         if: github.event_name == 'workflow_dispatch'

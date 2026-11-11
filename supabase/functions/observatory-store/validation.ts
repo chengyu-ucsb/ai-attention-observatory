@@ -29,6 +29,36 @@ export async function digest(value: unknown) {
 }
 export async function validateRequest(value: unknown): Promise<Record<string, any>> {
   object(value);
+  if (value.op === "begin_run") {
+    exact(value, ["op", "phase", "week", "inputs_hash"]); hash(value.inputs_hash);
+    if (!["preparing", "closed"].includes(String(value.phase)) ||
+        typeof value.week !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value.week)) throw new Error("invalid_worker_scope");
+    return value;
+  }
+  if (value.op === "finish_run" || value.op === "fail_run") {
+    exact(value, ["op", "id", "lease_token", value.op === "finish_run" ? "result" : "reason"]);
+    for (const field of ["id", "lease_token"]) {
+      if (typeof value[field] !== "string" || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(value[field])) throw new Error("invalid_lease");
+    }
+    if (value.op === "fail_run") {
+      if (value.reason !== "workflow_failed") throw new Error("invalid_failure");
+    } else {
+      object(value.result);
+      exact(value.result, ["phase", "week", "reading_run_sha256", "repository_commit", "attempted", "completed", "failed",
+        "deferred_by_limit", "source_text_saved", "independently_approved", "weekly_publication_verified"]);
+      hash(value.result.reading_run_sha256);
+      if (!["preparing", "closed"].includes(String(value.result.phase)) ||
+          !/^\d{4}-\d{2}-\d{2}$/.test(String(value.result.week)) ||
+          !/^[0-9a-f]{40}$/.test(String(value.result.repository_commit)) ||
+          value.result.source_text_saved !== false || value.result.independently_approved !== false ||
+          value.result.weekly_publication_verified !== false) throw new Error("invalid_worker_outcome");
+      for (const k of ["attempted", "completed", "failed", "deferred_by_limit"]) {
+        if (!Number.isInteger(value.result[k]) || Number(value.result[k]) < 0 || Number(value.result[k]) > 100000) throw new Error("invalid_worker_counts");
+      }
+      if (Number(value.result.completed) + Number(value.result.failed) !== value.result.attempted) throw new Error("invalid_worker_counts");
+    }
+    return value;
+  }
   if (value.op === "status" || value.op === "probe") {
     exact(value, ["op"]); return value;
   }
