@@ -197,7 +197,10 @@ completed reading work. A completed pass may still contain failed reviews and
 always states `weekly_publication_verified: false`.
 
 A valid final-pass receipt no longer suppresses later due readings. The worker
-planner and the actual reader share the same eligibility/cooldown policy. When
+planner and the actual reader require the same acquired-document receipts and
+share the same eligibility/cooldown policy. Metadata-only entries remain access
+gaps; they do not dispatch empty reading passes or hold an otherwise valid
+edition indefinitely. Existing acquisition schedules keep retrying those gaps. When
 more readings are immediately due, a successful saved pass dispatches the next
 bounded pass automatically. The server enforces a conservative six-attempt
 daily cap, including retries; excess continuations stop before model setup.

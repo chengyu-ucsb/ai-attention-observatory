@@ -180,13 +180,16 @@ def observe_document_mismatch(record, document, state, now):
         observe_retrieval(state, [receipt_change_note(record, row, document, queue)], now)
 
 
+def acquired_reading_records(bundle, state):
+    """Plan and execute readings from the same acquired-document receipts."""
+    return [item["record"] for key, item in bundle["records"].items()
+            if state["records"][key].get("document")]
+
+
 def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=None, data_dir=None, checkpoint_factory=None):
     now = queue.utc_now(now)
     bundle = reconcile(packet, state, previous, now=now)
-    candidates = []
-    for key, item in bundle["records"].items():
-        if state["records"][key].get("document"):
-            candidates.append(item["record"])
+    candidates = acquired_reading_records(bundle, state)
     if retriever is None:
         retriever = observed_retriever(packet, state, now, data_dir)
     def receipt_checked_retriever(record):

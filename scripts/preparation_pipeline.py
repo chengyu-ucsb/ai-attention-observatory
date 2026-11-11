@@ -593,10 +593,10 @@ def edition_ready(root=ROOT, now=None, *, reconcile_legacy=False):
 
 
 def pending_readings(packet, state, bundle, now):
-    from prepared_article_readings import reconcile
+    from prepared_article_readings import reconcile, acquired_reading_records
     from comprehensive_readings import reading_candidates
     current = reconcile(packet, state, bundle, now=now)
-    _, selection = reading_candidates([item['record'] for item in current['records'].values()],
+    _, selection = reading_candidates(acquired_reading_records(current, state),
                                       now.date().isoformat(), now)
     return selection
 
