@@ -1387,7 +1387,15 @@
       "providers": [
         "unpaywall_no_entry"
       ]
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-11T01:29:26+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-25T01:29:26+00:00"
+    },
+    "open_access_url": "https://arxiv.org/abs/2611.08188"
   },
   {
     "title": "Generative AI and Cognitive Processes in Education: A Narrative Review and Conceptual Framework",
@@ -8072,11 +8080,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-27T03:24:38+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-11T01:29:25+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-10T03:24:39+00:00"
+      "next_at": "2026-11-25T01:29:25+00:00"
     },
     "open_access_url": "https://doi.org/10.1007/s10389-026-02915-9",
     "pdf_fulltext_attempt": {
@@ -8498,11 +8506,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-27T03:24:40+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-11T01:29:26+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-10T03:24:40+00:00"
+      "next_at": "2026-11-25T01:29:27+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -33361,11 +33369,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-27T00:25:29+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-11T01:29:24+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-10T00:25:29+00:00"
+      "next_at": "2026-11-25T01:29:25+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -34968,11 +34976,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-27T00:25:29+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-11T01:29:25+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-10T00:25:29+00:00"
+      "next_at": "2026-11-25T01:29:25+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -36206,17 +36214,21 @@
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This research explored Large Language Models potential uses on formative assessment for mathematical problem-solving process.",
-      "methods": "",
-      "findings": "Results revealed potentialities and challenges on how to improve feedback on graduate-level math problems, by which both educators and students adapt teaching and learning strategies.",
-      "interpretation": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "This research explored Large Language Models potential uses on formative assessment for mathematical problem-solving process. The study provides a conceptual analysis of feedback and how the use of these models is related in the context of formative assessment for Linear Algebra problems.",
+      "methods": "To conduct this experiment, we chose the subject of Linear Algebra due to its recognition as a relevant mathematics. However, students find its learning challenging. Also, teachers find it challenging to teach. We used a popular book of Linear Algebra named \"Linear Algebra and its applications\" by Lay and other authors [42] which includes a special section \"Practice Problems\". These problems serve to address potential challenges within the exercises or serve as a valuable prelude, and their solutions often include beneficial tips and cautions concerning homework. We implemented a distance learning class, where students had to address, for this experiment, a set of five Linear Algebra practice problems from the specified textbook, aligning with the curriculum of a Linear Algebra course. Below, there are the five practice problems arranged from the easiest to the most difficult: Problem one. \"Construct one different augmented matrix for linear systems whose solution set is x1=-2, x2=1, x3=0\". Problem two. \"Suppose the solution set of a certain system of linear equations can be described as x1=5+4x3, x2=-2-7x3, with x3 free. Use vectors to describe this set as a line in R3\". Problem three. \"Suppose a 4x7 coefficient matrix for a system of equations has 4 pivots. Is the system consistent? If the system is consistent, how many solutions are there?\" Problem four. \"Suppose an economy has three sectors: Agriculture, Mining, and Manufacturing. Agriculture sells 5% of its output to Min",
+      "findings": "We present the results of the analysis conducted on the feedback from ChatGPT and the teachers in Table II . As observed, we transformed the model components of Hattie and Gan [32] (Task, Solving Process, Self-regulation, and Self) into a sequence of yes-no response questions, which were then used for the assessment. As seen in Table II , in the 'Task' component, teachers outperform ChatGPT, with an 85% accuracy compared to ChatGPT's 40%. Despite ChatGPT being capable of solving all five problems when requested individually, it makes errors when reviewing solutions generated by others. For instance, one of the most frequent errors was erroneously grading an incorrect student's response as correct. TABLE II. Evaluation of Formative Assessment on Math World Problems Component Feedback Frequency of Yes Answer ChatGPT Teacher Task Does the agent give a correct answer? 40% 85% Solving process Does the agent provide elements for understanding the problem? e.g., verbal, schematic, tabular, and so on. 90% 10% Does the agent model the problem? 90% 5% Does the agent provide calculations to resolve the model? 90% 5% Does the agent interpret output(s)? 90% 90% Does the agent evaluate the solution? 90% 90% Does the agent communicate the whole solution? 80% 5% Selfregulation Does the agent show any sort of self-management? a) Awareness of own errors No Yes b) Timing of feedback No Yes c) Level of detail No Yes d) Accuracy No Yes e) Tone No Yes Self Does the agent encourage engagement/ commitment through answers? 80% 60% Does the agent promote selfefficacy? (recommendations) 90% 90% In the 'Solution Process' component, we observe that there are some aspects in which ChatGPT shows better results than a human. This is because, being an automated process, it can generate longer responses tailored to each situation, including verbal elements to understand the problem, model the problem, display the procedure's calculations, and most of the time, communicate a final solution. On the other hand, human feedback was shorter (on average, three lines) and focused on determining whether the result was correct or incorrect. In the latter case, it briefly pointed out where in the procedure the student's first error occurred but did not provide an explanation of what the correct solution and procedure should be. It is important to note that the evaluators independently analyzed the 'task' component within the 'solution process' component. For instance, 'Does the agent provide calculations to resolve the model?' is assigned 'yes' when the agent tries to include such calculations in its feedback, regardless of whether they are correct or not. In the 'Self-regulation' component, evaluators decided that it was challenging to assess these aspects individually in each of the samples and that a global conclusion had to be drawn for the complete set of results. The conclusion was that although ChatGPT can regulate aspects such as tone, the level of detail in the response, etc., this",
+      "interpretation": "ChatGPT is an appropriate tool to provide more effective formative feedback due to the inclusion of four main aspects: tasks, problem solving, self-management, and self. Interpretation of Fig. 3 and Fig. 4 suggests that there is a need for reinforcement and improvement in students' performance concerning knowledge, attitude, and dominant emotions [11][13] . This interpretation is attributed to a low proficiency in Linear Algebra, lack of comprehension of the problems, and a prominent level of distraction hindering performance improvement. Based on these findings, the recommended approach for the instructor is to prioritize feedback, incorporating both quantitative and qualitative criteria of formative assessment. Implementing strategies like Polya's problem-solving method can aid in enhancing student understanding and regaining their self-confidence. As seen, in mathematical problems, when ChatGPT is employed independently, its performance is low. Something similar happens to the instructor. However, through the employment of the framework that includes both agents, feedback could improve learning outcomes. Additionally, the support of LLM for the students benefit their motivation to continue their math studies and reinforce math learning [26] . Nowadays, the use of these technologies is particularly important, such as LLM and the adequate use of prompts generators. Moreover, when the teachers function as a guide to construct them, recommendations are strong [44][45] . The transformative impact of LLM on mathematics learning presents key challenges that are central to the scope of this research, as follows: To effectively integrate tools like ChatGPT into educational settings, it is imperative to establish explicit guidelines encompassing teaching and learning assessmen",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": true
     },
@@ -36237,11 +36249,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-11-03T10:51:35+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-11T01:29:25+00:00",
       "pipeline_version": 3,
-      "status": "waiting_for_machine_text",
-      "next_at": "2026-11-10T10:51:35+00:00"
+      "status": "full_text",
+      "next_at": null
     },
     "repository_recovery": {
       "version": 1,
@@ -36253,7 +36265,27 @@
         "unpaywall_checked",
         "s2_candidate"
       ]
-    }
+    },
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "To conduct this experiment, we chose the subject of Linear Algebra due to its recognition as a relevant mathematics. However, students find its learning challenging. Also, teachers find it challenging to teach. We used a popular book of Linear Algebra named \"Linear Algebra and its applications\" by Lay and other authors [42] which includes a special section \"Practice Problems\". These problems serve to address potential challenges within the exercises or serve as a valuable prelude, and their solutions often include beneficial tips and cautions concerning homework. We implemented a distance learning class, where students had to address, for this experiment, a set of five Linear Algebra practice problems from the specified textbook, aligning with the curriculum of a Linear Algebra course. Below, there are the five practice problems arranged from the easiest to the most difficult: Problem one. \"Construct one different augmented matrix for linear systems whose solution set is x1=-2, x2=1, x3=0\". Problem two. \"Suppose the solution set of a certain system of linear equations can be described as x1=5+4x3, x2=-2-7x3, with x3 free. Use vectors to describe this set as a line in R3\". Problem three. \"Suppose a 4x7 coefficient matrix for a system of equations has 4 pivots. Is the system consistent? If the system is consistent, how many solutions are there?\" Problem four. \"Suppose an economy has three sectors: Agriculture, Mining, and Manufacturing. Agriculture sells 5% of its output to Mining and 30% to Manufacturing and retains the rest. Mining sells 20% of its output to Agriculture and 70% to Manufacturing and retains the rest. Manufacturing sells 20% of its output to Agriculture and 30% to Mining and retains the rest. Determine the exchange table for this economy, where the columns describe how the output of each sector is exchanged among the three sectors. \" Problem five. \"Let A be a 4 x4 matrix and let x be a vector in R4. What is the fastest way to compute A^2x? Count the multiplications. \" These exercises included two at a basic level, two at an intermediate level, and one at an advanced level. Additionally, a concluding question addressed students' emotional responses to the learning process, encompassing emotions such as boredom, anxiety, anger, indifference, and frustration [43] , which have been identified as pertinent emotional reactions to feedback in mathematical learning [29] . The process and results of each exercise, along with the emotion expressed by the learner, when applicable, were used to formulate a series of prompts. These prompts were designed to elicit feedback from the student before the instructor's review, considering both a problemsolving approach and the identification of compound emotions. Our experiment took place at the Faculty of Superior Studies Aragon from the National Autonomous University of Mexico. The online classes' main goal is to improve knowledge, comprehension and problem solving of Linear Algebra. We invited thirty-five low performance students from Industrial (60%), Mechanical (25%) and Electric-electronic (15%) careers to join the Linear Algebra course; therefore, the sample was non-probabilistic. The total duration of the course was 32 h with four sessions per week. Three experienced teachers instructed students with explanations of Linear Algebra's fundamental concepts and resolved problems to successfully tackle the set of five Linear Algebra practice problems. Also, as requested, each of the instructors provided help to participants during interventions with ChatGPT. Furthermore, these three teachers contributed to review and generate manual feedback to students' responses. Finally, three more teachers conducted a meta-evaluation of the feedback, as well as its comparison with ChatGPT's feedback. The main function of ChatGPT was to provide explicit feedback according to user's prompts. We informed all participants about the conducted experiment and obtained their consent for data collection during the process, including videotaping. As a first step, the participating students enrolled in a course of two-hour. They also engaged in assessment exercises and responded to surveys in which they provided information about their self-perception of learning difficulties. As a result of this process, information about whether the student has learned difficulties is stored in the \"Common Linear Algebra mistakes\" (Table I ). Table I lists a sample of a few common Linear Algebra mistakes related to concept development and problem solving. Three instructors analyzed answers. We classified outputs in accordance with Polya's strategy [22] and provided exemplifications of recommendations for students based on the prompts. The diagram on Fig. 1 , shows a general process to help the instructor to give better feedback to students based on the Polya's method, the student's emotion, and fundamental common Linear Algebra mistakes as an entrance to LLM. An expert in the math field is necessary to obtain effective feedback, by identifying common errors of the math discipline, which are then stored in the feedback database. In this case, we focus on Linear Algebra problems and utilize the Polya's method to identify whether the error generated belongs to the comprehension (understanding the problem), planning (find a strategy), doing (execute), or revision stage (looking back). The instructor uses this information from the problem selection and its solution, and adopts a multifaceted strategy encompassing problem-solving processes, self-regulation, self-reflection, and the acknowledgment of mistakes. Within this comprehensive strategy, the instructor leverages these elements to generate prompts, seeking enriched feedback from ChatGPT to provide more insightful and constructive learning experience. A relevant tool of LLM is the employment of natural language processing to generate prompts. Particularly in the context of this paper, establishing effective communication using LLM like ChatGPT is of great relevance to obtain clear and concrete answers. As we have mentioned throughout the document, it is important to provide formative assessment to the student and provide some enriched prompts that the student can use with LLM. To elicit an appropriate and constructive response from ChatGPT for students, one effective approach involves crafting specific questions. These questions serve to generate targeted feedback, incorporating motivating elements that enhance the overall quality of the student's training. According to the prompt generation stage, the required information is: For instance, generic prompts are: Prompt 1: I am (1) the interest is in the following math problem (i). Prompt 2: For the given problem consider the (ii) at the phase of (iii), use (iv) for (v).",
+      "results": "We present the results of the analysis conducted on the feedback from ChatGPT and the teachers in Table II . As observed, we transformed the model components of Hattie and Gan [32] (Task, Solving Process, Self-regulation, and Self) into a sequence of yes-no response questions, which were then used for the assessment. As seen in Table II , in the 'Task' component, teachers outperform ChatGPT, with an 85% accuracy compared to ChatGPT's 40%. Despite ChatGPT being capable of solving all five problems when requested individually, it makes errors when reviewing solutions generated by others. For instance, one of the most frequent errors was erroneously grading an incorrect student's response as correct. TABLE II. Evaluation of Formative Assessment on Math World Problems Component Feedback Frequency of Yes Answer ChatGPT Teacher Task Does the agent give a correct answer? 40% 85% Solving process Does the agent provide elements for understanding the problem? e.g., verbal, schematic, tabular, and so on. 90% 10% Does the agent model the problem? 90% 5% Does the agent provide calculations to resolve the model? 90% 5% Does the agent interpret output(s)? 90% 90% Does the agent evaluate the solution? 90% 90% Does the agent communicate the whole solution? 80% 5% Selfregulation Does the agent show any sort of self-management? a) Awareness of own errors No Yes b) Timing of feedback No Yes c) Level of detail No Yes d) Accuracy No Yes e) Tone No Yes Self Does the agent encourage engagement/ commitment through answers? 80% 60% Does the agent promote selfefficacy? (recommendations) 90% 90% In the 'Solution Process' component, we observe that there are some aspects in which ChatGPT shows better results than a human. This is because, being an automated process, it can generate longer responses tailored to each situation, including verbal elements to understand the problem, model the problem, display the procedure's calculations, and most of the time, communicate a final solution. On the other hand, human feedback was shorter (on average, three lines) and focused on determining whether the result was correct or incorrect. In the latter case, it briefly pointed out where in the procedure the student's first error occurred but did not provide an explanation of what the correct solution and procedure should be. It is important to note that the evaluators independently analyzed the 'task' component within the 'solution process' component. For instance, 'Does the agent provide calculations to resolve the model?' is assigned 'yes' when the agent tries to include such calculations in its feedback, regardless of whether they are correct or not. In the 'Self-regulation' component, evaluators decided that it was challenging to assess these aspects individually in each of the samples and that a global conclusion had to be drawn for the complete set of results. The conclusion was that although ChatGPT can regulate aspects such as tone, the level of detail in the response, etc., this is done as part of the prompt generation. However, this is externally imposed regulation by a human and not self-regulation. In the case of the teachers, there was no indication of a response that was out of context in terms of tone, level of detail, etc. According to the meta-evaluators of the experiment, all the responses provided by the humans would be the responses a teacher would typically give in a classroom. Finally, in the 'Self' component, we can observe that ChatGPT always considered the result of emotion interpretation to craft feedback and included elements to encourage engagement and promote self-efficacy. In this regard, it is notably contrasting that the teachers' responses did not exhibit elements indicating that they considered the emotional state of the student, and the feedback was focused on problem-solving. In the same phase of the experiment, as noted when the difficulty of problems increased, frustration is the most common emotion as shown in Fig. 3 . Fig. 3 shows emotions exhibited by participants and provides frequencies of the experienced emotions by the students, during the solution of set of five Linear Algebra practice problems, from number one to five, as their complexity increase from less complex to more complex. The suggested emotions include boredom, anxiety, anger, indifference, frustration, and others such as happiness or surprise. In Fig. 3 , the frequency of these emotions experienced in each problem of increasing complexity is illustrated. As observed, anxiety decreased as the complexity of the problem increased. This suggests that, as students progressed in solving the problem, they were more focused on the task at hand. The emotion of boredom remains constant throughout the problemsolving process, diminishing only in the most complex problem. The same pattern is observed for anger. Indifference increases from problem one to problem three and then decreases from problem three to problem five. In the case of frustration, it consistently increases with each new problem and experiences a significant spike in the final one. As observed, frustration appears to be the emotion that could have had the most pronounced negative impact on the group, theoretically suggesting that their performance did not improve. Fig. 4 shows that four students did not answer any problem, and nineteen answered three problems. Fig. 4 illustrates the distribution of students who answered a certain number of problems. The cumulative frequencies within the group of thirty-five students are as follows: four students did not solve any problem, two students answered one problem, four students answered two problems, nineteen students answered three problems, three students answered four problems, and three students successfully completed all five problems.",
+      "discussion": "ChatGPT is an appropriate tool to provide more effective formative feedback due to the inclusion of four main aspects: tasks, problem solving, self-management, and self. Interpretation of Fig. 3 and Fig. 4 suggests that there is a need for reinforcement and improvement in students' performance concerning knowledge, attitude, and dominant emotions [11][13] . This interpretation is attributed to a low proficiency in Linear Algebra, lack of comprehension of the problems, and a prominent level of distraction hindering performance improvement. Based on these findings, the recommended approach for the instructor is to prioritize feedback, incorporating both quantitative and qualitative criteria of formative assessment. Implementing strategies like Polya's problem-solving method can aid in enhancing student understanding and regaining their self-confidence. As seen, in mathematical problems, when ChatGPT is employed independently, its performance is low. Something similar happens to the instructor. However, through the employment of the framework that includes both agents, feedback could improve learning outcomes. Additionally, the support of LLM for the students benefit their motivation to continue their math studies and reinforce math learning [26] . Nowadays, the use of these technologies is particularly important, such as LLM and the adequate use of prompts generators. Moreover, when the teachers function as a guide to construct them, recommendations are strong [44][45] . The transformative impact of LLM on mathematics learning presents key challenges that are central to the scope of this research, as follows: To effectively integrate tools like ChatGPT into educational settings, it is imperative to establish explicit guidelines encompassing teaching and learning assessment strategies. Specifically, within the realm of evaluation, ChatGPT tools should play a role in fostering critical thinking and logical reasoning, particularly in STEM careers, where disruptive technologies, such as those facilitated by AI, contribute to innovative and creative environments. Considering this, prompt engineering becomes essential for shaping the approach to queries directed at ChatGPT. Well-crafted prompts should provide resources, such as relevant books available on the web, and adhere to a clear structure akin to the one proposed by the authors of this paper. This approach ensures that the generated answers are not only accurate but also engaging. The teacher's role is pivotal in this phase, serving as a verifier to confirm the correctness of the responses, as verified by the three teachers during the experiment. For students struggling in mathematics, experiencing emotions like frustration and indifference that negatively impact their performance, ChatGPT can serve as a valuable tool. Leveraging a more humanlike interaction through conversational agents, it has the potential to promote motivation and reinforce positive emotions. Undoubtedly, the use of AI technologies with LLM represents a tool for educative support, as shown with the proposed feedback framework to improve formative assessment. As final recommendations at the level of tasks, the instructor could propose a math word problem and assign it to the student. After the student solves it, the teacher reviews and provides regular feedback. The student asks ChatGPT to become an immersive choose-your-own task. The purpose is to reinforce the prior knowledge of the student. For self-regulation, and from obtained feedback, students reflect and communicate about the mathematical task. Students ask ChatGPT to generate structured activities to correct his/her performance, and to encourage them to think about their learning process and math progress. Therefore, the use of ChatGPT to generate feedback is tailored to each student's needs and goals. Another conclusion is that the teacher should encourage students to self-assess, reflect, and monitor their math work. The teacher asks ChatGPT to generate self-assessment tools, such as rubrics or the entire process for solving a math word problem that helps students evaluate their own work. Finally, at the personal level, from provided feedback, the teacher asks ChatGPT to generate follow-up activities that encourage students to apply the feedback they have received. For self-regulation, students engage in reflective practices based on feedback received. They utilize ChatGPT to request structured activities aimed at correcting their performance and fostering thoughtful consideration of their learning process and mathematical progress. Consequently, the use of ChatGPT for feedback generation is tailored to each student's individual needs and goals. Alternatively, teachers can empower students to self-assess, reflect, and monitor their mathematical work. In this scenario, the teacher prompts ChatGPT to generate self-assessment tools, based on Polya's problem-solving strategy, such as rubrics or comprehensive guides for solving math word problems, facilitating students in evaluating their own work. On a personal level, leveraging the feedback provided, the teacher can instruct ChatGPT to generate follow-up activities. These activities are designed to encourage students to apply the received feedback, promoting a more firsthand and practical application of their learning experience, and reducing negative emotions that hinder academic performance. This personalized approach contributes to a more comprehensive assessment tailored to individual learning needs, supported by AI technologies.",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.9781/ijimai.2024.02.004",
+      "key_idea": "We present the results of the analysis conducted on the feedback from ChatGPT and the teachers in Table II . As observed, we transformed the model components of Hattie and Gan [32] (Task, Solving Process, Self-regulation, and Self) into a sequence of yes-no response questions, wh",
+      "extraction_date": "2026-11-11",
+      "extraction_version": 3,
+      "sections_available": [
+        "methods",
+        "results",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-11"
   },
   {
     "title": "The influence of AI text generators on critical thinking skills in UK business schools",
@@ -38235,11 +38267,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-10-27T00:25:30+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-11T01:29:25+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-10T00:25:30+00:00"
+      "next_at": "2026-11-25T01:29:25+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -40966,7 +40998,15 @@
       "last_at": "2026-11-11",
       "next_at": "2026-12-11",
       "attempts": 1
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-11T01:29:26+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-25T01:29:26+00:00"
+    },
+    "open_access_url": "https://arxiv.org/abs/2611.02721"
   },
   {
     "title": "Measuring Perceived Fairness Of The Machine Learning Development Process: Conceptual Framework and Empirical Validation",
@@ -41003,19 +41043,24 @@
     "metadata_observed_at": "2026-11-10T20:53:35.603243+00:00",
     "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Using a sociotechnical lens, this study examines how fairness perceptions evolve during ML development, shifting attention from outcomes to processes to support human-centered evaluation. This research introduces and validates the TAR framework, which operationalizes fairness perceptions across three dimensions: transparency, accountability, and representativeness.",
-      "methods": "Grounded in theory, three validated survey scales measure these perceptions systematically.",
-      "findings": "",
-      "interpretation": "",
-      "limitations": "",
-      "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Fairness in Machine Learning (ML) development is a critical but subjective concern, shaped by biases in data, practices, and assumptions. Although algorithmic fairness has gained attention, empirical insights into how ML practitioners and domain experts perceive fairness across development remain limited.",
+      "methods": "The survey instruments and model speciications outlined above are designed to evaluate the perceived fairness among ML practitioners and SMEs within the ML development lifecycle. These instruments incorporate measurable indicators that help assess the underlying constructs in accordance with the TAR framework. All questionnaires utilize a Likert scale for responses, ranging from 1 to 5, where 1 represents strong disagreement and 5 signiies strong agreement. Data were collected using the online Qualtrics survey platform. Participants for this study were recruited using a random selection approach across two channels, author advertisements and the Proliic crowdsourcing platform. The authors contacted eligible organizations within these segments and received the survey via targeted emails, digital lyers, and social media advertisements, resulting in approximately 122 participants. Inclusion required a publicly veriiable AI/ML portfolio. Additionally, 200 participants were recruited from Proliic. The Proliic platform has received consistent endorsement within the research and ML communities as a trusted, reliable crowdsourcing platform that has proven to deliver high-quality participant responses [34, 104, 130] . All participants recruited through Proliic adhered to Proliic's payment protocols after completion of the study. The survey received approval from the Institutional Review Board (IRB), and eligibility was limited to participants aged 19 and older only. The survey instrum",
+      "findings": "The results are drawn from four distinct tests, each evaluating diferent variables between two groups, namely perceived fairness as a construct and transparency, accountability, and representativeness as factors. Focus groups are qualitative discussions among individuals with similar characteristics, used to generate data and assess in-depth understanding of social issues [61, 62, 96] . This IRB-approved study employed virtual focus groups to explore ML practitioners' perceptions of fairness. The recruitment through LinkedIn and email yielded three US companies (each > 1000 employees). In total, nine participants (3 female, 6 male), comprising data scientists and software developers, participated in three company-speciic, synchronous 75-minute sessions using Zoom, and MIRO ( https://miro.com/ ) was used as a brainstorming tool. Regarding expertise, 75% possessed 3ś5 years of professional experience and college-level ML training, while 25% were experts with > 5 years experience. During these sessions, participants recorded their perceptions and understanding on digital sticky notes, then discussed and formatted them into structured notes. Further, the authors of this study, analyzed the structured notes using inductive thematic analysis, supplemented by Latent Dirichlet Allocation (LDA) to surface underlying topic structures. The indings indicate that participants' contributions were informed by their experiential and practice-based expertise. The analysis identiied six themes deining perceived fairness: bias mitigation, data, model design, model validity, business rules, and user interaction. Practitioners' discussion on \"fairness\": The study concludes that perceived fairness encompasses the entire ML process, including privacy, ethics, intent, business constraints, explainability, and usability. Notably, one developer described fairness as subjective, necessitating evaluation of the full ML pipeline. Table 11 details these themes, attributes, sub-themes, and supporting transcript evidence. This appendix section includes the details of virtual focus groups, which served as only one part of our multi-stage research process. Speciically, they were used in an exploratory capacity to inform early conceptual development. A.0.1 Thematic analysis. The focus group data collected from the participants' brainstorming is qualitative in nature. Thus, the data are further analyzed utilizing thematic analysis. Thematic analysis is widely used to analyze qualitative data, identify patterns, and help researchers formulate rich, detailed, and transparent meanings [13] . Braun et al. [13] explain that thematic analysis uses familiarization, code formulation, generation of themes, themes review, deining and naming themes, and report formation. In this focus group, thematic analysis is used to identify emerging themes and to formulate and assess the perceived fairness of ML developers. A.0.2 Topic Modeling. Topic modeling is a statistical modeling approach for disco",
+      "interpretation": "In conclusion, the convergent validity assessment conducted for all three proposed scales provides signiicant validation for assessing perceived fairness within the TAR framework. The high coeicient values and composite reliability scores indicate strong internal consistency and convergent validity across all constructs, airming their suitability for use by both practitioners and SMEs. While the overall scale exhibited moderate reliability, the indings suggest adequate performance in capturing the complexities of fairness perceptions among various stakeholder groups. Furthermore, the factor loading analysis highlights the efectiveness of the selected items in representing the latent constructs, with minor discrepancies pointing to potential areas for future reinement. Overall, these results reinforce the efectiveness of the TAR framework in addressing concerns related to fairness and suggest a path for continued research and improvement in measurement tools within this important area. This study aims to explore the concept of fairness in ML systems, with a focus on the development process from a sociotechnical perspective. Addressing the research gap identiied in the related works section 2 and the research proposal section 1.3, two key research questions are examined: the factors that inluence perceptions of fairness and the variations in these perceptions. This study evaluates the perceived fairness of the ML development cycle as experienced by ML practitioners and SMEs, focusing on human-centered evaluation. The research introduces the TAR framework for assessing perceived fairness, emphasizing both procedural and distributive fairness as highlighted in existing literature. The three scales developed integrate the beliefs of diverse stakeholders and are validated bot",
+      "limitations": "The study results should be interpreted within the context of the sample and research design. Data were collected from a combination of Proliic participants and the authors' professional networks, resulting in a inal sample (N = 197) that, while suicient for scale validation, remains modest and exhibits some imbalance between practitioners (n = 123) and SMEs (n = 74). Although Proliic provides access to a globally diverse participant pool, it does not constitute a fully representative sample of any speciic population. Consequently, the indings should be interpreted with appropriate caution when generalizing across domains or populations. Additionally, the exclusion of student participants and restriction to adult respondents may limit the applicability of indings to educational or early-career contexts. A potential limitation of this study is that participants evaluated perceived fairness based on their most recent ML project, resulting in variability across project types and contexts.",
+      "sample": "122",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
-      "reported_findings": false
+      "reported_findings": true
     },
     "oa_checked": "2026-11-10",
     "oa_pass_version": 3,
@@ -41039,7 +41084,36 @@
         "codepoint": "U+DF14",
         "source_pdf": "https://content.openalex.org/works/W7225426045.pdf"
       }
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-11T01:29:26+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.1145/3861018",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "The survey instruments and model speciications outlined above are designed to evaluate the perceived fairness among ML practitioners and SMEs within the ML development lifecycle. These instruments incorporate measurable indicators that help assess the underlying constructs in accordance with the TAR framework. All questionnaires utilize a Likert scale for responses, ranging from 1 to 5, where 1 represents strong disagreement and 5 signiies strong agreement. Data were collected using the online Qualtrics survey platform. Participants for this study were recruited using a random selection approach across two channels, author advertisements and the Proliic crowdsourcing platform. The authors contacted eligible organizations within these segments and received the survey via targeted emails, digital lyers, and social media advertisements, resulting in approximately 122 participants. Inclusion required a publicly veriiable AI/ML portfolio. Additionally, 200 participants were recruited from Proliic. The Proliic platform has received consistent endorsement within the research and ML communities as a trusted, reliable crowdsourcing platform that has proven to deliver high-quality participant responses [34, 104, 130] . All participants recruited through Proliic adhered to Proliic's payment protocols after completion of the study. The survey received approval from the Institutional Review Board (IRB), and eligibility was limited to participants aged 19 and older only. The survey instrument utilized conditional branching logic tailored to respondent classiications. Participants reviewed operational deinitions of both ML practitioners and ML SMEs and then self-identiied into one of these categories. Individuals responsible for designing, developing, training, deploying, maintaining, or managing ML models were classiied as practitioners. Individuals who contributed domain expertise, operational knowledge, business context, data interpretation, labeling guidance, validation input, or evaluation criteria, but were not primarily responsible for model construction, were classiied as SMEs. Upon initiation, all participants reviewed a concise, standardized deinition of the two primary categories to establish conceptual baseline alignment. Subsequently, a uniform demographic module captured baseline data across all respondent cohorts regarding gender, educational attainment, and professional experience. The survey low then diverged ML practitioners were routed to a specialized module to identify their speciic functional role within the development lifecycle. To mitigate forced-choice bias, this item included an open-ended text ield, enabling respondents to manually input roles omitted from the predeined taxonomy. Further, participants were asked to respond with respect to their most recent ML project, ensuring that responses were grounded in concrete and recent experiences. While this introduces variability across project types, such diversity is consistent with best practices in construct validation, which emphasize capturing constructs across a range of real-world contexts. The survey instruments and model speciications outlined above are designed to evaluate the perceived fairness among ML practitioners and users within the ML development lifecycle. These instruments incorporate measurable indicators that help assess the underlying constructs in accordance with the TAR framework. All questionnaires utilize a Likert scale for responses, ranging from 1 to 5, where 1 represents strong disagreement, and 5 signiies strong agreement.",
+      "results": "The results are drawn from four distinct tests, each evaluating diferent variables between two groups, namely perceived fairness as a construct and transparency, accountability, and representativeness as factors. Focus groups are qualitative discussions among individuals with similar characteristics, used to generate data and assess in-depth understanding of social issues [61, 62, 96] . This IRB-approved study employed virtual focus groups to explore ML practitioners' perceptions of fairness. The recruitment through LinkedIn and email yielded three US companies (each > 1000 employees). In total, nine participants (3 female, 6 male), comprising data scientists and software developers, participated in three company-speciic, synchronous 75-minute sessions using Zoom, and MIRO ( https://miro.com/ ) was used as a brainstorming tool. Regarding expertise, 75% possessed 3ś5 years of professional experience and college-level ML training, while 25% were experts with > 5 years experience. During these sessions, participants recorded their perceptions and understanding on digital sticky notes, then discussed and formatted them into structured notes. Further, the authors of this study, analyzed the structured notes using inductive thematic analysis, supplemented by Latent Dirichlet Allocation (LDA) to surface underlying topic structures. The indings indicate that participants' contributions were informed by their experiential and practice-based expertise. The analysis identiied six themes deining perceived fairness: bias mitigation, data, model design, model validity, business rules, and user interaction. Practitioners' discussion on \"fairness\": The study concludes that perceived fairness encompasses the entire ML process, including privacy, ethics, intent, business constraints, explainability, and usability. Notably, one developer described fairness as subjective, necessitating evaluation of the full ML pipeline. Table 11 details these themes, attributes, sub-themes, and supporting transcript evidence. This appendix section includes the details of virtual focus groups, which served as only one part of our multi-stage research process. Speciically, they were used in an exploratory capacity to inform early conceptual development. A.0.1 Thematic analysis. The focus group data collected from the participants' brainstorming is qualitative in nature. Thus, the data are further analyzed utilizing thematic analysis. Thematic analysis is widely used to analyze qualitative data, identify patterns, and help researchers formulate rich, detailed, and transparent meanings [13] . Braun et al. [13] explain that thematic analysis uses familiarization, code formulation, generation of themes, themes review, deining and naming themes, and report formation. In this focus group, thematic analysis is used to identify emerging themes and to formulate and assess the perceived fairness of ML developers. A.0.2 Topic Modeling. Topic modeling is a statistical modeling approach for discovering abstract łtopicsž in a collection of documents, like newspapers and digital corpora [76] . Latent Dirichlet Allocation (LDA) approach is used for conducting the topic modeling on focus group data. LDA is a popular topic modeling technique for Please answer all questions to the best of your knowledge. All questions are voluntary. After you have answered all questions, \"Notify\" the host, and you will be taken back to the agenda. When you are back at the agenda, go to Brainstorming Question 1 and you can start discussing and entering ideas.",
+      "discussion": "In conclusion, the convergent validity assessment conducted for all three proposed scales provides signiicant validation for assessing perceived fairness within the TAR framework. The high coeicient values and composite reliability scores indicate strong internal consistency and convergent validity across all constructs, airming their suitability for use by both practitioners and SMEs. While the overall scale exhibited moderate reliability, the indings suggest adequate performance in capturing the complexities of fairness perceptions among various stakeholder groups. Furthermore, the factor loading analysis highlights the efectiveness of the selected items in representing the latent constructs, with minor discrepancies pointing to potential areas for future reinement. Overall, these results reinforce the efectiveness of the TAR framework in addressing concerns related to fairness and suggest a path for continued research and improvement in measurement tools within this important area. This study aims to explore the concept of fairness in ML systems, with a focus on the development process from a sociotechnical perspective. Addressing the research gap identiied in the related works section 2 and the research proposal section 1.3, two key research questions are examined: the factors that inluence perceptions of fairness and the variations in these perceptions. This study evaluates the perceived fairness of the ML development cycle as experienced by ML practitioners and SMEs, focusing on human-centered evaluation. The research introduces the TAR framework for assessing perceived fairness, emphasizing both procedural and distributive fairness as highlighted in existing literature. The three scales developed integrate the beliefs of diverse stakeholders and are validated both theoretically and empirically. Additionally, these scales facilitate the investigation of diferences in perceptions of fairness among various stakeholders. This section outlines the implications of the proposed scales for research, practice, and broader societal impact within the context of machine learning evaluation. The empirically validated scales introduce new opportunities for ine-grained comparative analyses of fairness perceptions across models, metrics, and deployment contexts. For practitioners, the proposed scales provide a structured framework for assessing, diagnosing, and improving perceived fairness in algorithmic systems. In a social context, the scales help reine normative benchmarks of fairness and support more transparent, equitable interactions between SMEs and ML-driven systems. By enabling more precise, cross-group measurement, these tools advance fairness research and contribute to a more rigorous and inclusive discourse in the evaluation of ML systems. This study presents the irst empirical investigation into fairness perceptions among machine learning (ML) practitioners and SMEs within the development process, adopting a socio-technical lens grounded in transparency, accountability, and representativeness. It ofers a human-centered, empirically validated contribution to the discourse on fairness in ML by introducing the TAR framework and associated survey instruments for assessing perceived fairness across the ML lifecycle. The framework's multidimensional design enables organizations to identify gaps between design intentions and lived experiences, monitor fairness perceptions, and inform design and policy decisions. By bridging technical evaluations with social context, this work advances the development of AI systems that are trustworthy and socially acceptable. Findings reveal statistically signiicant diferences in fairness perceptions between practitioner and SME respondents. Because respondents evaluated diferent ML projects operating within diverse organizational and application contexts, these diferences should be interpreted as relecting a combination of stakeholder perspectives and project-speciic characteristics rather than stakeholder role alone. These results support the utility of process-based fairness measurement and demonstrate the value of the TAR framework as a validated instrument for assessing perceived fairness across ML development contexts. The validated instruments, supported by reliability and factor analysis, operationalize fairness as a multidimensional construct and provide a scalable method for real-world ML contexts. This research reframes fairness as a negotiated, context-dependent concept, encouraging participatory ML-design and interdisciplinary collaboration to close practitioner-user gaps and foster inclusive, accountable ML systems. Future work may extend the TAR framework to domainspeciic applications and explore integration into participatory ML-design processes. It also opens avenues for multidisciplinary collaboration between ML researchers, HCI scholars, social scientists, and policymakers to co-produce both methodologically robust and ethically grounded frameworks. Summarizing all participant's ideas and requesting their agreement for closing the agenda. extracting topics from a document collection [10] . Further details of LDA-based topic modeling can be found in [10] . An inductive approach is used to derive the themes by coding qualitative data into clusters of similar entities and conceptual categories. The theme derivation is done by integrating thematic analysis and LDA-based topic modeling approach. The themes helped to formulate the theoretical explanation and deinition of ML developer's perceived fairness in machine learning. Table 10 demonstrates the agenda and instructions provided to the participants. Table 11 presents an overview of the derived themes, along with their associated attributes that elucidate the sub-themes identiied from the focus group data. The supportive evidence from focus groups in Table 11 presents transcripts from focus group discussions. These themes are bias mitigation, data, model design, model validity, business rules, and users interaction, which describe the attributes of the practitioner's perceived fairness.",
+      "limitations": "The study results should be interpreted within the context of the sample and research design. Data were collected from a combination of Proliic participants and the authors' professional networks, resulting in a inal sample (N = 197) that, while suicient for scale validation, remains modest and exhibits some imbalance between practitioners (n = 123) and SMEs (n = 74). Although Proliic provides access to a globally diverse participant pool, it does not constitute a fully representative sample of any speciic population. Consequently, the indings should be interpreted with appropriate caution when generalizing across domains or populations. Additionally, the exclusion of student participants and restriction to adult respondents may limit the applicability of indings to educational or early-career contexts. A potential limitation of this study is that participants evaluated perceived fairness based on their most recent ML project, resulting in variability across project types and contexts. However, this variability is intentional and methodologically appropriate, given that the objective of this research is construct development rather than causal inference. Established scale development guidelines emphasize the importance of capturing constructs across heterogeneous real-world settings to ensure generalizability and external validity [31, 79] . In this study, perceived fairness is explicitly conceptualized as a context-dependent, sociotechnical construct that is expected to vary across domains, stakeholder roles, and system characteristics. To support this approach, the study collected practitioners' metadata on ML project characteristics (e.g., model type, data modality, and application domain), summarized in Table 5 , and sampled across diverse industry contexts. This design enables the TAR framework to capture generalizable perceptual patterns rather than being tied to any single project or domain. At the same time, it is important to acknowledge that some observed diferences may relect both stakeholder perspectives and project-speciic characteristics. Accordingly, indings should be interpreted as patterns of perceived fairness across heterogeneous settings rather than controlled comparisons.",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.1145/3861018",
+      "key_idea": "The results are drawn from four distinct tests, each evaluating diferent variables between two groups, namely perceived fairness as a construct and transparency, accountability, and representativeness as factors. Focus groups are qualitative discussions among individuals with sim",
+      "extraction_date": "2026-11-11",
+      "extraction_version": 3,
+      "sections_available": [
+        "methods",
+        "discussion",
+        "results",
+        "limitations"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-11"
   },
   {
     "title": "Artificial Intelligence in Education: Addressing Teacher Perceptions To Support Effective Implementation",
@@ -44948,6 +45022,24 @@
       "last_at": "2026-11-11",
       "next_at": "2026-12-02",
       "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-11T01:29:24+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-25T01:29:24+00:00"
+    },
+    "open_access_url": "https://doi.org/10.46328/ijtes.8155",
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-11",
+      "next_at": "2026-12-11",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -45015,6 +45107,24 @@
       "last_at": "2026-11-11",
       "next_at": "2026-12-02",
       "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-11T01:29:24+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-25T01:29:24+00:00"
+    },
+    "open_access_url": "https://doi.org/10.36713/epra32006",
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-11",
+      "next_at": "2026-12-11",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -45058,17 +45168,21 @@
     "metadata_observed_at": "2026-11-10T20:53:35.603243+00:00",
     "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Abstract Traditional bioinformatic pipelines, which focus on predefined statistical analyses, are increasingly inadequate for handling high‐dimensional, heterogeneous, and context‐rich multi‐omics, spatial, and clinical datasets. Artificial intelligence (AI) is extending modern bioinformatics from predefined analytical pipelines toward learned biological representations,…",
-      "methods": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Abstract Traditional bioinformatic pipelines, which focus on predefined statistical analyses, are increasingly inadequate for handling high‐dimensional, heterogeneous, and context‐rich multi‐omics, spatial, and clinical datasets. Artificial intelligence (AI) is extending modern bioinformatics from predefined analytical pipelines toward learned biological representations, intervention‐oriented modeling, and…",
+      "methods": "Genome foundation models move genomics away from task-specific predictors and toward reusable representations of DNA sequence. DNABERT showed that maskedtoken pretraining can learn nucleotide embeddings, while Nucleotide Transformer scaled pretraining across human and multispecies genomes and transferred to regulatory and variant-related tasks [39, 40] . Recent benchmarking of DNA foundation models is important because it asks whether these embeddings improve real genomic and genetic tasks, rather than merely fitting pretraining objectives [45] . A related direction is genome design, where AI attempts to write functional regulatory elements under constraints. DeepSTARR and enhancer-design studies show that learned regulatory syntax can be inverted to generate promoters or enhancers with programmable activity, and guide-design models support more predictable editing [59] [60] [61] [62] [63] . Yet genome design is still narrower than the phrase suggests. Most validated successes involve enhancers, promoters, guide RNAs, or local repair contexts, not whole-genome engineering. Robust design will require closed-loop cycles that link sequence proposal, high-throughput assays, mechanistic interpretation, and safety constraints. The most important downstream effect of AI structure prediction is the emergence of molecular design as a native bioinformatics task. Instead of asking only what shape a natural protein adopts, current models ask which sequence, backbone, or interface should ",
       "findings": "",
-      "interpretation": "",
-      "limitations": "",
+      "interpretation": "Taken together, AI should not be regarded as a straightforward upgrade to conventional bioinformatics tools, nor should model-centered discovery be framed as a wholly unprecedented concept. Its significance resides in a shift of emphasis: away from manually predefined analytical steps toward learned representations that increasingly contribute to prediction, intervention design, and workflow orchestration. The contribution of this review is therefore not a claim of priority for that paradigm, but a cross-domain, failure-aware evaluation lens that applies the same six questions to otherwise heterogeneous model classes: what biological representation is learned, what incremental task value is gained, where the model fails under distribution shift, what causal support exists, what resources are required, and what validation or governance is needed before deployment. Classical analytical pipelines remain indispensable, as quality-control procedures, transparent statistical frameworks, standardized workflows, and experimental validation supply the critical constraints that render learned models trustworthy. Accordingly, the most illuminating question is not whether AI \"replaces\" existing pipelines, but which components of biological reasoning can be delegated to computational models without compromising validity, interpretability, or accountability. The merit of AI-driven bioinformatics thus hinges less on raw model scale than on the surrounding scientific ecosystem. This ecosystem encompasses diverse, well-documented datasets, leakage-robust evaluation protocols, explicitly stated causal assumptions, uncertainty quantification together with abstention mechanisms, reproducible execution, privacy safeguards, sustainable computing resources, secure deployment, and iterative ex",
+      "limitations": "The limitations of AI-driven bioinformatics can be grouped into two partially overlapping categories. Technical hurdles encompass data quality, distribution shift, model interpretability, causal identifiability, data leakage, reproducibility, privacy-preserving computation, and computational resource efficiency. Social challenges emerge upon real-world deployment of these models within institutional settings, including compatibility with clinical workflows, regulatory compliance, health-economic valuation, equitable access, accountability, and dual-use governance. This categorical distinction is meaningful because improved model architectures or expanded training datasets can resolve only a subset of these constraints; addressing the remaining barriers demands prospective empirical studies, standardized frameworks, targeted policy interventions, and community-driven norms (Figure 5 ).",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
     },
@@ -45087,7 +45201,35 @@
       "last_at": "2026-11-11",
       "next_at": "2026-12-11",
       "attempts": 1
-    }
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-11T01:29:24+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.1002/imo2.70156",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "Genome foundation models move genomics away from task-specific predictors and toward reusable representations of DNA sequence. DNABERT showed that maskedtoken pretraining can learn nucleotide embeddings, while Nucleotide Transformer scaled pretraining across human and multispecies genomes and transferred to regulatory and variant-related tasks [39, 40] . Recent benchmarking of DNA foundation models is important because it asks whether these embeddings improve real genomic and genetic tasks, rather than merely fitting pretraining objectives [45] . A related direction is genome design, where AI attempts to write functional regulatory elements under constraints. DeepSTARR and enhancer-design studies show that learned regulatory syntax can be inverted to generate promoters or enhancers with programmable activity, and guide-design models support more predictable editing [59] [60] [61] [62] [63] . Yet genome design is still narrower than the phrase suggests. Most validated successes involve enhancers, promoters, guide RNAs, or local repair contexts, not whole-genome engineering. Robust design will require closed-loop cycles that link sequence proposal, high-throughput assays, mechanistic interpretation, and safety constraints. The most important downstream effect of AI structure prediction is the emergence of molecular design as a native bioinformatics task. Instead of asking only what shape a natural protein adopts, current models ask which sequence, backbone, or interface should exist to satisfy a desired constraint. Network hallucination showed that information captured by structure predictors can be inverted to generate new folds [90] . Binder-design frameworks, ProteinMPNN, and RFdiffusion connect prediction with therapeutic target modulation, inverse folding, and constrained backbone generation [91] [92] [93] . AlphaFold3 and RoseTTAFold All-Atom broaden this logic to complexes involving proteins, nucleic acids, small molecules, ions, and modified residues [25, 94] . The conceptual flow is straightforward: from prediction to design and then to experiment. A model generates candidate structures, experiments test expression, stability, binding, and activity, and failures shape the next design cycle. Structural bioinformatics is therefore moving from retrospective interpretation toward programmable molecular design. This shift also changes what counts as a useful bioinformatics output. A static structural model is valuable, but design requires ranking candidates across several constraints: foldability, interface geometry, specificity, stability, expression, immunogenicity, manufacturability, and assay feasibility. Many of these properties are not fully captured by current structural objectives. The next phase of protein AI will need tighter integration among structure prediction, language-model fitness scoring, molecular dynamics, experimental deep mutational scanning, and high-throughput functional assays (Figure 3 ). The goal is not merely to generate plausible molecules, but to produce designs whose predicted mechanisms can be validated by wet-lab testing.",
+      "results": "",
+      "discussion": "Taken together, AI should not be regarded as a straightforward upgrade to conventional bioinformatics tools, nor should model-centered discovery be framed as a wholly unprecedented concept. Its significance resides in a shift of emphasis: away from manually predefined analytical steps toward learned representations that increasingly contribute to prediction, intervention design, and workflow orchestration. The contribution of this review is therefore not a claim of priority for that paradigm, but a cross-domain, failure-aware evaluation lens that applies the same six questions to otherwise heterogeneous model classes: what biological representation is learned, what incremental task value is gained, where the model fails under distribution shift, what causal support exists, what resources are required, and what validation or governance is needed before deployment. Classical analytical pipelines remain indispensable, as quality-control procedures, transparent statistical frameworks, standardized workflows, and experimental validation supply the critical constraints that render learned models trustworthy. Accordingly, the most illuminating question is not whether AI \"replaces\" existing pipelines, but which components of biological reasoning can be delegated to computational models without compromising validity, interpretability, or accountability. The merit of AI-driven bioinformatics thus hinges less on raw model scale than on the surrounding scientific ecosystem. This ecosystem encompasses diverse, well-documented datasets, leakage-robust evaluation protocols, explicitly stated causal assumptions, uncertainty quantification together with abstention mechanisms, reproducible execution, privacy safeguards, sustainable computing resources, secure deployment, and iterative experimental feedback. Near-term practical impact will most likely emerge from auditable, scientist-supervised systems that streamline execution and verification of established analytical workflows. As the quality of interventional datasets improves, causal models and multimodal foundation models can broaden the hypothesis-generating space. By contrast, digital twins and fully autonomous discovery systems ought to be treated as conditional long-term objectives rather than inevitable endpoints. Progress within this field is achieved only when learned representations yield biological claims that hold up under independent biological, experimental, and clinical validation. Provincial Natural Science Foundation of China (Grant No. 2026JJ60616), the China Postdoctoral Science Foundation under Grant Number 2026M792495, and the Postdoctoral Fellowship Program of CPSF under Grant Number GZC20261186. We thank all participants and investigators involved in the review production. All figures in this manuscript were created using Adobe Illustrator and BioRender.com, and we sincerely appreciate the convenient graphical resources provided by these platforms for figure visualization.",
+      "limitations": "The limitations of AI-driven bioinformatics can be grouped into two partially overlapping categories. Technical hurdles encompass data quality, distribution shift, model interpretability, causal identifiability, data leakage, reproducibility, privacy-preserving computation, and computational resource efficiency. Social challenges emerge upon real-world deployment of these models within institutional settings, including compatibility with clinical workflows, regulatory compliance, health-economic valuation, equitable access, accountability, and dual-use governance. This categorical distinction is meaningful because improved model architectures or expanded training datasets can resolve only a subset of these constraints; addressing the remaining barriers demands prospective empirical studies, standardized frameworks, targeted policy interventions, and community-driven norms (Figure 5 ).",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.1002/imo2.70156",
+      "key_idea": "Taken together, AI should not be regarded as a straightforward upgrade to conventional bioinformatics tools, nor should model-centered discovery be framed as a wholly unprecedented concept. Its significance resides in a shift of emphasis: away from manually predefined analytical ",
+      "extraction_date": "2026-11-11",
+      "extraction_version": 3,
+      "sections_available": [
+        "methods",
+        "limitations",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-11"
   },
   {
     "title": "GENERATION GHOST: MODEL STRUKTURAL COGNITIVE OFFLOADING BERBASIS ARTIFICIAL INTELLIGENCE TERHADAP ILLUSION OF COMPETENCE MELALUI CRITICAL THINKING PADA PELAJAR SMA DI MAKASSAR",
