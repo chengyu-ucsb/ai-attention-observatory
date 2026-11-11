@@ -1,0 +1,73 @@
+const HASH = /^[0-9a-f]{64}$/;
+const METADATA_FIELDS = new Set(["doi", "url", "title", "authors", "kind", "published", "venue",
+  "lane", "relation", "source_group", "source_version", "research_type", "publication_date_provenance"]);
+const CLAIM_FIELDS = new Set(["research_question", "study_design", "reported_results",
+  "authors_interpretation", "critical_context", "limitations", "open_question", "thesis",
+  "reasoning", "examples", "tension", "implications", "qualification"]);
+
+function object(value: unknown): asserts value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("invalid_request");
+}
+function exact(value: Record<string, unknown>, keys: string[]) {
+  if (Object.keys(value).sort().join(",") !== keys.sort().join(",")) throw new Error("invalid_request");
+}
+function bounded(value: unknown, limit: number): asserts value is string {
+  if (typeof value !== "string" || !value.length || value.length > limit) throw new Error("invalid_request");
+}
+function hash(value: unknown) {
+  if (typeof value !== "string" || !HASH.test(value)) throw new Error("invalid_request");
+}
+export function canonical(value: unknown): string {
+  if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
+  if (value && typeof value === "object") return "{" + Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0)
+    .map(([key, item]) => JSON.stringify(key) + ":" + canonical(item)).join(",") + "}";
+  return JSON.stringify(value);
+}
+export async function digest(value: unknown) {
+  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(canonical(value)));
+  return Array.from(new Uint8Array(bytes), (x) => x.toString(16).padStart(2, "0")).join("");
+}
+export async function validateRequest(value: unknown): Promise<Record<string, any>> {
+  object(value);
+  if (value.op === "status" || value.op === "probe") {
+    exact(value, ["op"]); return value;
+  }
+  if (value.op === "put_source") {
+    exact(value, ["op", "source_id", "kind", "canonical_url", "fingerprint", "metadata", "published_on"]);
+    bounded(value.source_id, 2048); bounded(value.canonical_url, 4096); hash(value.fingerprint);
+    object(value.metadata);
+    if (!Object.keys(value.metadata).every((k) => METADATA_FIELDS.has(k)) ||
+        JSON.stringify(value.metadata).length > 24000 ||
+        !["scholarly", "nonacademic"].includes(String(value.kind)) || value.metadata.kind !== value.kind ||
+        !String(value.canonical_url).startsWith("https://") || await digest(value.metadata) !== value.fingerprint) {
+      throw new Error("invalid_source");
+    }
+    const doi = String(value.metadata.doi || "").trim();
+    if (value.source_id !== (doi.toLowerCase() || value.metadata.url) ||
+        value.canonical_url !== (doi ? "https://doi.org/" + doi : value.metadata.url)) throw new Error("invalid_source");
+    if (value.published_on !== null && (typeof value.published_on !== "string" ||
+        !/^\d{4}-\d{2}-\d{2}$/.test(value.published_on))) throw new Error("invalid_source");
+    return value;
+  }
+  if (value.op === "get_checkpoint") {
+    exact(value, ["op", "key"]); hash(value.key); return value;
+  }
+  if (value.op === "save_checkpoint") {
+    exact(value, ["op", "key", "source_id", "source_hash", "reader_version", "segment_id", "result"]);
+    hash(value.key); hash(value.source_hash); bounded(value.source_id, 2048);
+    hash(value.reader_version); bounded(value.segment_id, 32);
+    if (!/^C\d{4,}$/.test(String(value.segment_id))) throw new Error("invalid_checkpoint");
+    object(value.result); exact(value.result, ["claims", "checked"]);
+    if (value.result.checked !== true || !Array.isArray(value.result.claims) || value.result.claims.length > 6) {
+      throw new Error("invalid_checkpoint");
+    }
+    for (const claim of value.result.claims) {
+      object(claim); exact(claim, ["field", "text", "source_span", "anchor_sha256"]);
+      bounded(claim.text, 2000); hash(claim.anchor_sha256);
+      if (!CLAIM_FIELDS.has(String(claim.field)) ||
+          !new RegExp("^" + value.segment_id + ":S\\d{3,}$").test(String(claim.source_span))) throw new Error("invalid_checkpoint");
+    }
+    return value;
+  }
+  throw new Error("operation_not_allowed");
+}

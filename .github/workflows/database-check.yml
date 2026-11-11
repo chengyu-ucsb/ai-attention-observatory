@@ -1,0 +1,55 @@
+name: Verify private research database
+on:
+  pull_request:
+    branches: [main]
+    paths: ['supabase/**', 'scripts/observatory_remote_store.py', 'scripts/reading_progress.py', 'tests/test_remote_store.py', '.github/workflows/database-check.yml']
+  push:
+    branches: [main]
+    paths: ['supabase/**', 'scripts/observatory_remote_store.py', 'scripts/reading_progress.py', 'tests/test_remote_store.py', '.github/workflows/database-check.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: private-database-check-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      # Official Node 24 releases verified November 11, 2026.
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Verify token boundaries, retries and request redaction offline
+        run: python -m unittest discover -s tests -p test_remote_store.py -v
+      - name: Verify signed identities and allowed operations offline
+        env:
+          DENO_NO_UPDATE_CHECK: '1'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/observatory-deno" --no-audit --no-fund --ignore-scripts deno@2.9.6
+          npm ci --prefix supabase/functions/observatory-store --no-audit --no-fund --ignore-scripts
+          "$RUNNER_TEMP/observatory-deno/node_modules/@deno/linux-x64-glibc/deno" test --node-modules-dir=manual --cached-only --config supabase/functions/observatory-store/deno.json supabase/functions/observatory-store/auth_test.ts
+          "$RUNNER_TEMP/observatory-deno/node_modules/@deno/linux-x64-glibc/deno" check --node-modules-dir=manual --cached-only --config supabase/functions/observatory-store/deno.json supabase/functions/observatory-store/index.ts
+  live:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Save a real connectivity receipt in the private database
+        env:
+          OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
+        run: python scripts/observatory_remote_store.py probe
