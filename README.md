@@ -317,6 +317,15 @@ More detailed assistant-maintenance requirements are in [AGENTS.md](AGENTS.md).
 
 ## Run and contribute
 
+### Database transition
+
+[Database setup and implementation status](docs/database-setup.md) describes the
+Supabase project, private schema, resumable section checkpoints and remaining
+worker cutover. GitHub remains the authority for code and published artifacts.
+The operational database is not active until the project and backend secret are
+configured and verified. The new reader export serves a small edition manifest,
+a cached search index and individual article payloads on demand.
+
 ### Website-owned weekly publication and RSS delivery
 
 The repository is the canonical source: weekly discovery → source-backed

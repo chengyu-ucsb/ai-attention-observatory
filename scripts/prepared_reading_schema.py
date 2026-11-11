@@ -318,10 +318,19 @@ def validate_saved_record(record, now=None):
             require("reading_coverage" in record and "complete_reading_attempt" in record)
         if "complete_reading_attempt" in record:
             attempt = record["complete_reading_attempt"]
-            shape(attempt, {"status", "last_at", "next_at", "provider_diagnostics"}, {"stage"})
+            shape(attempt, {"status", "last_at", "next_at", "provider_diagnostics"}, {"stage","retry_after","format_failures"})
             require(type(attempt["status"]) is str and re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,100}", attempt["status"]))
             last, next_at = day(attempt["last_at"]), day(attempt["next_at"])
             require(last <= now.date() and next_at > last)
+            if 'format_failures' in attempt:
+                integer(attempt['format_failures'],maximum=1000,minimum=1)
+                require(attempt.get('stage')=='synthesis' and attempt['status'] in {
+                    'model_json_invalid','model_schema_invalid','model_output_truncated',
+                    'verifier_indices_invalid','verifier_schema_invalid',
+                    'verifier_output_truncated','verifier_output_incomplete'})
+            if 'retry_after' in attempt:
+                retry=saved_moment(attempt['retry_after'])
+                require(1<=attempt.get('format_failures',0)<=2 and last<=retry.date()<=next_at)
             validate_diagnostics(attempt["provider_diagnostics"])
             if attempt["status"] in {"summarized", "partial_summary"}:
                 require(analyses and "stage" not in attempt)
