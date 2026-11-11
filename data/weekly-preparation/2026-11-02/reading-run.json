@@ -2,8 +2,9 @@
   "schema_version": 1,
   "kind": "preparation_reading_run",
   "phase": "closed",
-  "started_at": "2026-11-10T23:19:22.383672+00:00",
-  "finished_at": "2026-11-10T23:19:50.124267+00:00",
+  "reading_policy_version": 2,
+  "started_at": "2026-11-11T01:25:21.976226+00:00",
+  "finished_at": "2026-11-11T01:27:33.239816+00:00",
   "publication_window": {
     "from": "2026-11-02",
     "to": "2026-11-08",
@@ -11,24 +12,24 @@
   },
   "bindings": {
     "packet.json": "bf55b98966b80031f1fc8368bf5792a5b9c40bca0c0b4f9df49a95f4bdf35792",
-    "acquisition.json": "680a266e6786b0c3a4b962a4adcd6e10968e2b3c4e28dfd56550a2579281f978",
-    "readings.json": "5585c4a1455abc0b2fd565c5936d300f98febfc6c0f65b33d5dca3173018e1cc"
+    "acquisition.json": "fb42303bb50660a89f531ba83f86861f2f23dcf62c1cbc3c142c65fa0836c54e",
+    "readings.json": "caf5014cc4fc3ccbcb3602e02f0f9d31d5eb1658be9e1ed2b659294d41d7142d"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-10T23:19:22.990862+00:00",
+      "checked_at": "2026-11-11T01:25:22.340280+00:00",
       "selected_records": 58,
       "attempted_records": 12,
       "attempted_stages": 12,
-      "completed_records": 8,
-      "pending_records": 50,
+      "completed_records": 9,
+      "pending_records": 49,
       "deferred_retry_records": 0,
       "statuses": {
         "access_blocked": 2,
-        "full_document_retrieved_not_reviewed": 4,
+        "full_document_retrieved_not_reviewed": 5,
         "partial_full_text_not_reviewed": 2,
-        "pending": 27,
-        "pending_routes": 23
+        "pending": 20,
+        "pending_routes": 29
       },
       "excluded": {},
       "duplicate_records": 0,
@@ -44,15 +45,29 @@
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 0,
-      "documents_retrieved": 0,
+      "attempted": 2,
+      "documents_retrieved": 2,
       "partial_inputs": 0,
       "summaries_completed": 0,
-      "failed": 0,
-      "failure_reasons": {},
-      "failure_stages": {},
+      "failed": 2,
+      "failure_reasons": {
+        "verifier_indices_invalid": 1,
+        "copied_source_passage": 1
+      },
+      "failure_stages": {
+        "synthesis": 2
+      },
       "source_text_saved": false,
-      "skipped_no_model": false
+      "skipped_no_model": false,
+      "selection": {
+        "considered": 7,
+        "eligible": 3,
+        "deferred_by_limit": 1,
+        "skipped": {
+          "no_explicit_human_topic": 3,
+          "retry_cooldown": 1
+        }
+      }
     },
     "revalidate": {
       "attempted": 0,

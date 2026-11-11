@@ -6,9 +6,9 @@
     "to": "2026-11-08",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-10T23:19:48.130054+00:00",
+  "observation_at": "2026-11-11T01:27:32.064328+00:00",
   "packet_sha256": "bf55b98966b80031f1fc8368bf5792a5b9c40bca0c0b4f9df49a95f4bdf35792",
-  "acquisition_state_sha256": "5b7db8bb21c75bc457341db77bf0bc7cd517c8a95b53fc5cd24c006295863cb5",
+  "acquisition_state_sha256": "5fa185949823b273741661b47d23a6c0442f72c1bb03288924db163496fe67e5",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -2021,7 +2021,8 @@
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-10T02:26:39.286894+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00"
-      }
+      },
+      "acquisition_receipt_sha256": "528b47c7bbe0fab8a0dd0b54471f8e437aca9457ca87afa97c4b8749ec5f9c7f"
     },
     "8145e6b893991ebae31bead7bfa2f6e25071b3fd17fde91adbb8a51a9803db8a": {
       "input_fingerprint": "e68b192b4dc466148085cf085fdb675e78ff8732d70149d765421bd6163497fd",
@@ -2060,7 +2061,30 @@
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-10T20:53:35.603243+00:00",
-        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00"
+        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
+        "complete_reading_attempt": {
+          "status": "verifier_indices_invalid",
+          "stage": "synthesis",
+          "last_at": "2026-11-11",
+          "next_at": "2026-11-13",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://arxiv.org/pdf/2611.04783v1",
+              "status": "full_document_retrieved",
+              "final_url": "https://arxiv.org/pdf/2611.04783v1",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://arxiv.org/pdf/2611.04783v1"
+            }
+          ]
+        }
       },
       "acquisition_receipt_sha256": "de36ab6dd77bf66c074ce35d229aeaf3b1670e636c2d1a8da55a62f0a065b92a"
     },
@@ -2105,7 +2129,30 @@
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-10T20:53:35.603243+00:00",
-        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00"
+        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
+        "complete_reading_attempt": {
+          "status": "copied_source_passage",
+          "stage": "synthesis",
+          "last_at": "2026-11-11",
+          "next_at": "2026-11-13",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://arxiv.org/pdf/2611.06830v1",
+              "status": "full_document_retrieved",
+              "final_url": "https://arxiv.org/pdf/2611.06830v1",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://arxiv.org/pdf/2611.06830v1"
+            }
+          ]
+        }
       },
       "acquisition_receipt_sha256": "223f84d06454d33a37618c5dee54e67a59dc5e1135dcb8f9550d334c77789f22"
     },
@@ -3589,5 +3636,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "34830e3c751d5d088fb4a115e4bd1ccebd78f4710edd3de15793ea76b592538d"
+  "metadata_sha256": "02fb4cd4806268ee02f42335b354908238c1cf03e93cd15bf90c185bf3c4af7e"
 }
