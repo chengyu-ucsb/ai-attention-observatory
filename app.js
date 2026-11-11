@@ -1239,8 +1239,8 @@ function showPaper(x){
 let libraryPromise=null;
 const articlePromises=new Map();
 function matchesSearch(x,q){
- const text=[x.title,x.venue,x.search_terms,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
- return String(q).toLowerCase().split(/\s+/).filter(Boolean).every(term=>text.includes(term));
+ const text=[x.title,x.venue,x.search_text,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
+ return text.includes(String(q).toLowerCase());
 }
 async function jsonPayload(path,immutable=false){
  const response=await fetch(path,{cache:immutable?"force-cache":"no-cache"});

@@ -50,12 +50,11 @@ def card(record, article_url):
     longform = digest.get('longform') or {}
     if longform.get('source_depth'):
         result['reading']['digest']['longform'] = {'source_depth': longform['source_depth']}
-    # Searchable words preserve recall without shipping full source passages.
-    import re
+    # Preserve phrase-search order using only already screened public fields.
     search_values = [record.get('abstract_text', ''), record.get('preview', ''),
                      reading.get('findings', ''), reading.get('methods', '')]
     search_values += [v for v in digest.values() if isinstance(v, str)]
-    result['search_terms'] = ' '.join(sorted(set(re.findall(r'[\w-]+', ' '.join(search_values).lower()))))
+    result['search_text'] = ' '.join(' '.join(search_values).split()).lower()
     result['article_payload'] = article_url
     return result
 

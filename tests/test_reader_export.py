@@ -31,7 +31,7 @@ class ReaderExportTests(unittest.TestCase):
             self.assertNotIn('PRIVATE_OPERATION_MARKER', json.dumps(index))
             self.assertEqual(json.loads((root / index[0]['article_payload']).read_text()), row)
             self.assertTrue(index[0]['has_finding'])
-            self.assertIn('observed', index[0]['search_terms'])
+            self.assertIn('observed result', index[0]['search_text'])
             self.assertLess(report['index_bytes'], len(json.dumps(row)))
             reader.build(root)
             self.assertEqual(json.loads((data / 'reader-manifest.json').read_text()), manifest)

@@ -38,8 +38,8 @@ function environment(fetch){
  assert.equal(requests[1].options.cache,'force-cache');
  assert(!app.includes('Date.now()'),'Do not defeat versioned caching');
  assert(!app.includes('data/runs.json'),'Operational logs are not reader data');
- assert.equal(vm.runInContext('matchesSearch({search_terms:"critical learning study thinking"},"critical thinking")',context),true);
- assert.equal(vm.runInContext('matchesSearch({search_terms:"critical learning study thinking"},"critical unrelated")',context),false);
+ assert.equal(vm.runInContext('matchesSearch({search_text:"a study of critical thinking and learning"},"critical thinking")',context),true);
+ assert.equal(vm.runInContext('matchesSearch({search_text:"critical learning study thinking"},"critical thinking")',context),false);
  // The source cards must continue to use edition snapshots after a new index.
  vm.runInContext('renderEditionCards()',context);
  const cards=elements.get('#feature-grid').children;
