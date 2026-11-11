@@ -7,6 +7,7 @@ Do not infer missing study methods or results.
 import datetime, html, json, os, pathlib, re, time
 import urllib.parse, urllib.request, urllib.error
 from xml.etree import ElementTree as ET
+from abstract_metadata import abstract_record, openalex_abstract, merge_abstract
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -41,22 +42,13 @@ def api_json(url,headers=None):
                 raise
     return {}
 def uninvert(inv):
-    if not isinstance(inv,dict):return ""
-    word_at={}
-    for word,indices in inv.items():
-        for pos in indices:
-            if isinstance(pos,int) and pos < 20000:word_at[pos]=word
-    return textclean(" ".join(word for _,word in sorted(word_at.items())))
+    return openalex_abstract(inv)["abstract_text"]
 def enrich_record(record,abstract,provider):
-    abstract=textclean(abstract)
-    if len(abstract)<90:return False
-    before=record.get("abstract_text") or ""
-    if len(abstract)<=len(before):return False
-    # Keep one medium-size abstract, not a full publisher PDF.
-    record["abstract_text"]=abstract[:3800]
-    record["abstract_source"]=provider
+    return enrich_abstract(record,abstract_record(textclean(abstract),provider))
+def enrich_abstract(record,fields):
+    if len(fields["abstract_text"])<90:return False
+    if not merge_abstract(record,fields):return False
     record["abstract_updated"]=TODAY
-    record["preview"]=abstract[:420]+("…" if len(abstract)>420 else "")
     return True
 def run():
     file=DATA/"library.json"
@@ -80,7 +72,7 @@ def run():
             for r in group:
                 w=mapped.get(r["doi"].lower())
                 if not w:continue
-                if enrich_record(r,uninvert(w.get("abstract_inverted_index")),"OpenAlex abstract index"):
+                if enrich_abstract(r,openalex_abstract(w.get("abstract_inverted_index"))):
                     updated+=1;provider_stats["OpenAlex"]+=1
         except Exception as e:print("OpenAlex abstract batch:",str(e)[:170])
         time.sleep(.25)

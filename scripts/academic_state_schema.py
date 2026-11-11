@@ -13,6 +13,7 @@ import math
 import re
 
 from collection_window import crossref_publication, publication_date
+from abstract_metadata import COMPLETENESS, MAX_ABSTRACT_CHARS, openalex_abstract
 
 SCHEMA = 1
 SAFE_PARAMS = {"search", "filter", "query.bibliographic", "query.title", "query.container-title", "sort", "order"}
@@ -120,8 +121,12 @@ def project_publication_event(value):
 
 
 def validate_row(provider, row):
+    obj(row)
+    if "abstract_completeness" in row:
+        text(row["abstract_completeness"])
+        if row["abstract_completeness"] not in COMPLETENESS: invalid()
     if provider == "Crossref":
-        obj(row, {"DOI", "type", "title", "container-title", "abstract", "author"} | PUBLICATION_FIELDS)
+        obj(row, {"DOI", "type", "title", "container-title", "abstract", "abstract_completeness", "author"} | PUBLICATION_FIELDS)
         for name in ("DOI", "type"): 
             if name in row: text(row[name], nullable=True, maximum=2048)
         if row.get("DOI") and not DOI.fullmatch(row["DOI"]): invalid()
@@ -129,7 +134,7 @@ def validate_row(provider, row):
             if name not in row or row[name] is None: continue
             if isinstance(row[name], str): text(row[name], maximum=4096)
             else: strings(row[name], maximum=32)
-        if "abstract" in row: text(row["abstract"], maximum=6000)
+        if "abstract" in row: text(row["abstract"], maximum=MAX_ABSTRACT_CHARS)
         if "author" in row:
             sequence(row["author"], maximum=8)
             for author in row["author"]:
@@ -137,7 +142,7 @@ def validate_row(provider, row):
                 for name in author.values(): text(name, nullable=True, maximum=1024)
         for name in PUBLICATION_FIELDS & row.keys(): publication_event(row[name])
     elif provider == "OpenAlex":
-        obj(row, {"id", "doi", "title", "publication_date", "is_retracted", "primary_location", "authorships", "abstract_inverted_index"})
+        obj(row, {"id", "doi", "title", "publication_date", "is_retracted", "primary_location", "authorships", "abstract_inverted_index", "abstract_completeness"})
         for name in ("id", "doi", "title", "publication_date"):
             if name in row: text(row[name], nullable=True, maximum=4096)
         if row.get("doi") and not DOI.fullmatch(row["doi"]): invalid()
@@ -156,17 +161,27 @@ def validate_row(provider, row):
         if "abstract_inverted_index" in row:
             inverted = row["abstract_inverted_index"]
             obj(inverted)
+            modern = "abstract_completeness" in row
+            limit = MAX_ABSTRACT_CHARS if modern else 801
             count = 0
             for word, positions in inverted.items():
-                text(word, maximum=4096)
-                sequence(positions, maximum=801)
+                text(word, maximum=MAX_ABSTRACT_CHARS if modern else 4096)
+                sequence(positions, maximum=limit)
                 count += len(positions)
                 for position in positions: integer(position)
-            if count > 801: invalid()
-            # Only the prefix consumed by update.abstract may be checkpointed.
+            if count > limit: invalid()
             ordered = sorted((p, word) for word, positions in inverted.items() for p in positions)
-            if sum(len(word) + 1 for _, word in ordered[:-1]) >= 801: invalid()
+            if modern:
+                if sum(len(word) + 1 for _, word in ordered) > MAX_ABSTRACT_CHARS + 1: invalid()
+                if inverted and openalex_abstract(inverted)["abstract_completeness"] != "provider_text_preserved": invalid()
+            # Legacy rows retain their exact validation contract and digest.
+            elif sum(len(word) + 1 for _, word in ordered[:-1]) >= 801: invalid()
     else: invalid()
+    if "abstract_completeness" in row:
+        value = row.get("abstract" if provider == "Crossref" else "abstract_inverted_index")
+        status = row["abstract_completeness"]
+        if status in {"provider_text_preserved", "truncated"} and not value: invalid()
+        if status in {"unavailable", "invalid_provider_index"} and value: invalid()
 
 
 def provenance(value):

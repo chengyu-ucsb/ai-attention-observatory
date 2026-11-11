@@ -14,13 +14,13 @@ import re
 from urllib.parse import quote, urlencode
 from source_quality import normal, topic_class, venue_class
 from academic_state import DiscoveryState, cursor_search
+from abstract_metadata import crossref_abstract
 from search_plan import discovery_window
 from collection_window import crossref_publication, date_in_window, previous_week, reconcile_publication_evidence
 
 ROOT=Path(__file__).resolve().parents[1]
 MANIFEST=ROOT/"data/priority-research.json"
 TYPES={"journal-article","proceedings-article","posted-content"}
-HTML=re.compile(r"<[^>]+>")
 
 
 def load_manifest(path=None):
@@ -51,13 +51,12 @@ def crossref_article(work, *, lane, scope, query, today, expected_venue=None, ed
     published,date_provenance=crossref_publication(work)
     if not title or (not published and not allow_unresolved) or published>today.isoformat():return None
     if expected_venue and normal(venue)!=normal(expected_venue):return None
-    abstract=HTML.sub(" ",str(work.get("abstract") or ""))
-    abstract=" ".join(abstract.split())[:6000]
+    abstract_fields=crossref_abstract(work.get("abstract"),completeness=work.get("abstract_completeness"))
+    abstract=abstract_fields["abstract_text"]
     candidate={
         "title":title,"authors":[" ".join(filter(None,[a.get("given"),a.get("family")])) for a in work.get("author",[])[:8]],
         "published":published,"publication_date_provenance":date_provenance,"venue":venue,"doi":doi,"url":"https://doi.org/"+doi,
-        "preview":abstract[:420] if abstract else "Abstract unavailable; bibliographic metadata only.",
-        "abstract_text":abstract,"abstract_source":"Crossref publisher-supplied abstract" if abstract else "",
+        **abstract_fields,
         "kind":"scholarly","lane":lane,
         "relation":"AI-related literature" if re.search(r"\bAI\b|ChatGPT|generative|language model|artificial intelligence",title+" "+abstract,re.I) else "Adjacent digital-attention evidence",
         "evidence":"Registry metadata screened; original paper not yet independently assessed",

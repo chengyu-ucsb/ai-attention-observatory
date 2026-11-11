@@ -28,6 +28,7 @@ from urllib.parse import urlencode
 
 from academic_state_schema import (SCHEMA, SAFE_PARAMS, PROVIDERS, digest, fingerprint,
                                    validate_state, validate_row, project_publication_event, strict_json_loads, MAX_DATE_RETRIES)
+from abstract_metadata import crossref_abstract, openalex_abstract
 RETRYABLE = {429, 500, 502, 503, 504}
 
 
@@ -255,7 +256,9 @@ def _project(provider, work):
             if field in out:out[field]=project_publication_event(out[field])
         if work.get("abstract"):
             if not isinstance(work["abstract"],str):raise ValueError("Malformed Crossref abstract")
-            out["abstract"] = work["abstract"][:6000]
+            abstract = crossref_abstract(work["abstract"])
+            out["abstract"] = abstract["abstract_text"]
+            out["abstract_completeness"] = abstract["abstract_completeness"]
         if work.get("author"):
             if not isinstance(work["author"], list) or any(not isinstance(a, dict) for a in work["author"]):
                 raise ValueError("Malformed Crossref authors")
@@ -275,18 +278,15 @@ def _project(provider, work):
         raise ValueError("Malformed OpenAlex authors")
     out["authorships"] = [{"author": {"display_name": (a.get("author") or {}).get("display_name", "")}} for a in authors[:8]]
     inverted = work.get("abstract_inverted_index")
-    if inverted:
-        if not isinstance(inverted, dict) or any(not isinstance(word, str) or not isinstance(positions, list) or any(type(p) is not int or p < 0 for p in positions) for word, positions in inverted.items()):
-            raise ValueError("Malformed OpenAlex abstract index")
-        # update.abstract reads its first 800 characters. Preserve complete
-        # words spanning that prefix, keeping exactly the same input meaning.
-        retained, length = {}, 0
-        for position, word in sorted((p, word) for word, positions in inverted.items() for p in positions):
+    if inverted is not None:
+        abstract = openalex_abstract(inverted)
+        # Save a bounded normalized index and its coverage together. A clipped
+        # final token is explicitly partial, never a complete-provider receipt.
+        retained = {}
+        for position, word in enumerate(abstract["abstract_text"].split()):
             retained.setdefault(word, []).append(position)
-            length += len(word) + 1
-            if length >= 801:
-                break
         out["abstract_inverted_index"] = retained
+        out["abstract_completeness"] = abstract["abstract_completeness"]
     validate_row(provider,out)
     return out
 
@@ -404,7 +404,14 @@ def cursor_search(request, provider, params, *, state=None, max_pages=5, page_si
         audit["access_blocked"] = bool(p.get("blocked"))
         if p.get("last_http_status") == 429:
             audit["quota_exhausted"] = True
-    return copy.deepcopy(list(q["rows"].values())), audit, errors
+    rows = copy.deepcopy(list(q["rows"].values()))
+    for row in rows:
+        field = "abstract" if provider == "Crossref" else "abstract_inverted_index"
+        if field in row and "abstract_completeness" not in row:
+            # Existing checkpoints may contain the old 801/6,000-character
+            # projection. Do not refetch, mutate digests, or assume completeness.
+            row["abstract_completeness"] = "unknown"
+    return rows, audit, errors
 
 
 def prefetch_searches(request, jobs, *, state, max_pages=1):
