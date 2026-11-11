@@ -109,9 +109,42 @@ def clean(source):
   if new==s:break
   s=new
  return s
-def sentence_list(text):
+def sentence_list(text,min_length=35):
  s=clean(text)
- return [p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",s) if len(p.strip())>=35]
+ return [p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",s) if len(p.strip())>=min_length]
+
+SOURCE_HEADING=re.compile(
+ r"<h[1-6]\b[^>]*>(?s:.*?)</h[1-6]\s*>|"
+ r"^[ \t]*\#{1,6}[ \t]+[^\n]+$|"
+ r"^[ \t]*\d+(?:\.\d+)+\.?[ \t]+[^\n]*?(?:[.!?](?=[ \t]|$)|(?=\n|$))|"
+ r"^[ \t]*(?:pilot (?:study|testing)|(?:main|primary|final) (?:study|survey|sample)|"
+ r"(?:instrument|questionnaire|scale) validation)[ \t]*[.:]?[ \t]*$",re.I|re.M)
+HYPOTHESIS_STATEMENT=re.compile(
+ r"^(?:(?:Furthermore|Moreover|Additionally|However|In contrast)[,:]?\s+)?"
+ r"(?:(?:H\s*\d+[a-z]?|\(H\s*\d+[a-z]?\))\s*[:.)–—-]?\s*|"
+ r"(?:the |our |this )?hypothes(?:is|es)\b)",re.I)
+
+def source_parts(source):
+ """Yield prose and explicit headings without flattening their boundaries."""
+ source=source or ""
+ start=0
+ for heading in SOURCE_HEADING.finditer(source):
+  yield source[start:heading.start()],False
+  yield heading.group(),True
+  start=heading.end()
+ yield source[start:],False
+
+def result_sentences(source):
+ """Keep headings out of findings without joining prose across a heading.
+
+ Explicit HTML/Markdown/numbered subheadings are structural boundaries, not
+ evidence. A blank boundary also stops result bundles from crossing sections.
+ Short prose is retained here because even a short caveat breaks adjacency.
+ """
+ parts=[]
+ for block,is_heading in source_parts(source):
+  parts.extend([""] if is_heading else sentence_list(block,min_length=0))
+ return parts
 # Research findings are different from checks on the measurement instruments.
 # Fail closed when neither the extracted Results nor the source abstract
 # contains a clearly stated substantive result.
@@ -136,14 +169,16 @@ RESULT_CLAIM = re.compile(
  r"\b(?:results? (?:show(?:ed)?|suggest(?:ed)?|indicat(?:ed|e)?|reveal(?:ed)?|found)|"
  r"findings? (?:show|suggest|indicat|reveal)|"
  r"(?:we|the authors) (?:found|find|observed)|"
- r"(?:was|were|is|are) (?:positively |negatively |significantly )?associated|"
+ r"(?:was|were|is|are) (?:not )?(?:(?:positively|negatively|statistically|significantly) ){0,3}(?:associated|correlated)|"
  r"(?:positively|negatively) (?:associated|correlated)|"
  r"(?:analysis|analyses) (?:identified|revealed|showed)|"
  r"(?:was|were) (?:higher|lower)|"
+ r"(?:did|do|does) not (?:differ|predict|increase|decrease)|"
+ r"(?:there (?:was|were)|(?:analysis|analyses|results?) (?:found|showed|revealed)) no (?:statistically )?significant|"
  r"(?:participants|students|respondents|workers|patients) (?:in [^.]{0,100} )?reported (?:significantly )?(?:higher|lower)|"
  r"(?<![-–—])(?:predicted|increased|decreased|moderated|mediated))\b",re.I)
 UNTESTED = re.compile(
- r"\b(?:hypothesi[sz]|we (?:propose|expect|aim|seek|explore|test)|"
+ r"\b(?:hypothesi[sz](?:e[ds]?|ing)|we (?:propose|expect|aim|seek|explore|test)|"
  r"the present study (?:examines|investigates|aims)|"
  r"may (?:be|lead|affect)|future research|should be studied|"
  r"previous research (?:suggests|shows)|prior studies|recent work|"
@@ -152,6 +187,7 @@ UNTESTED = re.compile(
  r"(?:examine[ds]?|investigate[ds]?|explore[ds]?|test(?:ed|s)?) whether|"
  r"(?:aim|aimed|aims|seek|seeks|sought) to|research questions?|"
  r"(?:previous|prior|earlier) (?:research|studies|work)|"
+ r"according to (?:hypothes(?:is|es)|H\s*\d)|"
  r"concluding subsection|same pattern|"
  r"(?:to|we) (?:examine|investigate|explore|test)|"
  r"(?:study|paper) (?:employed|examined|investigated|explored)|"
@@ -170,8 +206,8 @@ def reported_result(source,title="",maxlen=300):
  words={x for x in re.findall(r"[a-z]{4,}",(title or "").lower())
         if x not in STOPWORDS}
  candidates=[]
- for position,s in enumerate(sentence_list(source or "")):
-  if len(s)<45 or len(s)>maxlen or s.endswith(("…", "...")) or not re.search(r'[.!?]["”’\)\]]*$',s) or DIAGNOSTIC.search(s) or UNTESTED.search(s):continue
+ for position,s in enumerate(result_sentences(source or "")):
+  if len(s)<45 or len(s)>maxlen or s.endswith(("…", "...")) or not re.search(r'[.!?]["”’\)\]]*$',s) or DIAGNOSTIC.search(s) or UNTESTED.search(s) or HYPOTHESIS_STATEMENT.search(s):continue
   if not FINDING_VERBS.search(s):continue
   # Context words alone ("associated", "effects") are insufficient if the
   # sentence is merely introducing the research question.
@@ -203,8 +239,7 @@ def condensed(text,role,maxlen=295):
  if role=="finding":
   return reported_result(text,maxlen=maxlen)
  if role=="approach":
-  p=[x for x in items if re.search("survey|interview|experiment|design|sample|participants|review|thematic|analysis|qualitative|quantitative",x,re.I)]
-  if p:items=p
+  return source_snippet(text,role,limit=maxlen)
  elif role=="limitations":
   p=[x for x in items if re.search("limit|cannot|caution|self.report|cross.sectional|generaliz|sample|bias|underrepresent",x,re.I)]
   if p:items=p
@@ -268,12 +303,51 @@ def concept_tags(record):
  ]
  tags=[label for label,pattern in clusters if re.search(pattern,text)]
  return tags[:3]
+
+SAMPLE_COUNT=re.compile(
+ r"\bn\s*=\s*\d[\d,]*|\b\d[\d,]*\s+"
+ r"(?:(?:valid|university|college|school|undergraduate|graduate|adult)\s+){0,3}"
+ r"(?:participants|students|respondents|responses|teachers|workers|adults|questionnaires)\b",re.I)
+ACTUAL_SAMPLE=re.compile(
+ r"\b(?:participated|completed|responded|recruited|surveyed|included|"
+ r"analy[sz]ed|collected|retained|were randomly assigned)\b",re.I)
+PRELIMINARY_METHOD=re.compile(
+ r"\b(?:pilot(?:ed|ing|[- ]test(?:ed|ing)?)?|"
+ r"preliminary (?:study|sample|survey|experiment|test)|"
+ r"(?:instrument|questionnaire|scale|measurement) (?:development|validation|refinement|testing|pre[- ]?test(?:ed|ing|s)?)|"
+ r"(?:instrument|questionnaire|scale|items?) (?:was|were) (?:developed|validated|refined|pre[- ]?tested)|"
+ r"pre[- ]?test(?:ed|ing|s)? (?:the |a |our )?(?:instrument|questionnaire|scale|items?)|"
+ r"validat(?:ed|ing) (?:the |a |our )?(?:instrument|questionnaire|scale)|"
+ r"content valid(?:ity|ation)|cognitive interviews?)\b",re.I)
+MAIN_STUDY=re.compile(
+ r"\b(?:main|primary|final|full.scale|definitive) "
+ r"(?:study|survey|sample|experiment|data collection|analysis|analyses|dataset)\b",re.I)
+
+def approach_sentences(text):
+ """Exclude preliminary samples, including subsequent sentences about them.
+
+ A pilot or instrument-validation sample is not the study's participant count.
+ After such a passage, require an explicit return to the main study instead of
+ silently treating an unqualified follow-on sample as a different population.
+ Short cues and headings change context before candidate-length filtering.
+ A baseline pre-test is not itself evidence of an instrument-development pilot.
+ """
+ preliminary=False
+ for block,is_heading in source_parts(text):
+  for line in sentence_list(block,min_length=0):
+   if PRELIMINARY_METHOD.search(line):
+    preliminary=True
+    continue
+   if MAIN_STUDY.search(line):preliminary=False
+   if is_heading or len(line)<35 or preliminary or DIAGNOSTIC.search(line):continue
+   yield line
+
 def method_specificity(line):
  """Prefer the actual design/sample to preliminary administrative procedures."""
  patterns=[
-  (8,r"\bn\s*=\s*\d+|\b\d+\s+(?:(?:valid|university|college|school|undergraduate|graduate)\s+)?(?:participants|students|respondents|responses|teachers|workers|adults)\b"),
+  (8,SAMPLE_COUNT.pattern),
   (5,r"\b(?:randomly assigned|randomi[sz]ed|cross.sectional|longitudinal|systematic review|meta.analysis|mixed.methods)\b"),
-  (3,r"\b(?:survey|interview|experiment|sample|participants|recruited|were compared|thematic analysis)\b"),
+  (3,r"\b(?:survey|interview|experiment|sample|participants|participated|recruited|were compared|thematic analysis)\b"),
   (1,r"\b(?:regression|data were collected)\b")]
  return sum(weight for weight,pattern in patterns if re.search(pattern,line,re.I))
 
@@ -289,10 +363,10 @@ def source_snippet(text, role, limit=600):
  if not text:return ""
  candidates=sentence_list(text)
  if role=="approach":
-  candidates=sorted(candidates,key=method_specificity,reverse=True)
+  candidates=sorted(approach_sentences(text),key=method_specificity,reverse=True)
  for line in candidates:
   if line.endswith(("…", "...")) or len(line)>limit or not re.search(r'[.!?]["”’\)\]]*$',line):continue
-  if role=="approach" and (not (METHOD.search(line) or re.search(r"\b(?:interviews|surveys|experiments|randomly assigned|randomi[sz]ed (?:controlled|trial|experiment|study|comparison))\b",line,re.I)) or re.search(r"\b(?:future research|prior studies|previous research|one study|another study|(?:studies|research)[^.]{0,100}(?:needed|required)|should be|could be)\b",line,re.I)):continue
+  if role=="approach" and (not (METHOD.search(line) or (SAMPLE_COUNT.search(line) and ACTUAL_SAMPLE.search(line)) or re.search(r"\b(?:interviews|surveys|experiments|randomly assigned|randomi[sz]ed (?:controlled|trial|experiment|study|comparison))\b",line,re.I)) or re.search(r"\b(?:future research|prior studies|previous research|one study|another study|(?:studies|research)[^.]{0,100}(?:needed|required)|should be|could be|planned|target sample|aimed to recruit)\b",line,re.I)):continue
   if role=="limitations" and (not LIMITATION_CONTENT.search(line) or not (LIMIT.search(line) or re.search(
       r"\b(?:(?:cannot|could not) (?:establish|infer|determine|conclude|disentangle|rule out|exclude|generaliz\w*)|limited to|self.report\w*|cross.sectional|generalizability|generalisation|generalization|selection bias|convenience sampl\w*|absence of|limits? the|not representatively)\b",line,re.I))):continue
   phrase=readable_excerpt(line,role,limit)
@@ -311,12 +385,12 @@ def reported_result_bundle(source, title="", limit=600):
  primary=reported_result(source,title,maxlen=limit)
  if not primary:return ""
  # Do not filter short sentences: an intervening caveat breaks adjacency.
- parts=[p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",clean(source)) if p.strip()]
+ parts=result_sentences(source)
  if primary not in parts:return ""
  start=parts.index(primary)
  selected=[readable_excerpt(primary,"finding",limit)]
  for line in parts[start+1:start+3]:
-  if (UNTESTED.search(line) or DIAGNOSTIC.search(line) or line.endswith(("…","..."))
+  if (UNTESTED.search(line) or DIAGNOSTIC.search(line) or HYPOTHESIS_STATEMENT.search(line) or line.endswith(("…","..."))
       or not re.search(r'[.!?]["”’\)\]]*$',line)):break
   if re.search(r"\b(?:it is possible|perhaps|might|may|could|would|"
       r"we (?:believe|argue|suggest)|the authors (?:believe|argue|suggest)|"

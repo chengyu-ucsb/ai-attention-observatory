@@ -40,6 +40,20 @@ def first_two(parts,limit=420):
     if len(t)>limit:return t[:limit].rsplit(" ",1)[0]+"…"
     return t
 
+def projection_coverage(analysis, note):
+    """Describe display-card omissions without copying more source text."""
+    mapping={"findings":"results","methods":"methods",
+             "interpretation":"discussion","limitations":"limitations"}
+    fields={}
+    for output,source in mapping.items():
+        original=clean(analysis.get(source))
+        projected=note.get(output,"")
+        fields[output]={"source_field":source,"available":bool(original),
+            "source_characters":len(original),"display_characters":len(projected),
+            "omitted_characters":max(0,len(original)-len(projected)),
+            "complete_retained_section":bool(original) and original==projected}
+    return {"scope":"display_excerpts_not_complete_model_evidence","fields":fields}
+
 def make_note(r):
     original=note_for(r)
     if original is not None:return original
@@ -100,7 +114,7 @@ def make_note(r):
     if sample and not METHOD.search(approach):sample=""  # Require an actual methodological context.
     if conceptual:sample=""
     has_finding=bool(results)
-    return {
+    note={
         "level":"full_text" if licensed else "abstract" if len(src)>=90 else "curated",
         "provenance":provider,
         "overview":introduction,
@@ -118,6 +132,8 @@ def make_note(r):
         "research_type":"conceptual_framework" if conceptual else r.get("research_type") or "unclassified",
         "reported_findings":has_finding
     }
+    if licensed:note["projection_coverage"]=projection_coverage(full,note)
+    return note
 
 def main():
     records=prepare(json.loads(LIB.read_text()))
