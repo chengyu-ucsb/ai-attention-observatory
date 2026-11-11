@@ -59,6 +59,29 @@ definitions, with hover text as a supplement. Keyboard and touch users do not
 need hover. Citations take priority if a glossary term overlaps a source name.
 Avoid jargon simply because a definition can be added.
 
+## November 11 repair diagnostics
+
+The [November 10 generation run](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42922735584)
+reached the local model but withheld the draft after three failed theme attempts.
+The responses omitted a source, used fifteen-word anchors, or paraphrased an
+anchor. Several inline citation labels also did not appear in the prose; those
+errors were hidden behind the first anchor failure. No editorial critique or
+publication followed.
+
+Theme generation now separates visible author/title links from internal source
+quotes. Suggested labels are checked for substring collisions. Repair feedback
+reports independently detectable anchor and citation problems together, then
+reruns the original publication gates. It never inserts citations, trims quotes,
+or substitutes an arbitrary evidence phrase. Synthetic regressions reproduce the
+observed failure sequence without committing article extracts or rejected prose.
+
+The source packet also contained incomplete section extracts: two sources lacked
+a findings field. A `full_text` extraction label is not a completed independent
+reading. Prompts now explicitly forbid converting an aim, title or interpretation
+into a measured improvement when findings are unavailable. This guidance and the
+repair tests are not a factual-consistency result. The separate-context critique,
+all evidence gates and fail-closed publication behavior remain required.
+
 ## Correct an already published edition
 
 A current discovery shelf can legitimately differ from a frozen published one.
