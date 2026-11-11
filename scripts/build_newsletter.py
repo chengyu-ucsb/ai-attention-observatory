@@ -8,6 +8,8 @@ from datetime import date, datetime, time, timezone
 from email.utils import format_datetime
 from original_readings import safe_url as safe_original_url
 from build_issue import citation_url, validate_issue_citations, validate_section_citations
+from build_reader import encoded
+from hashlib import sha256
 import html
 import json
 import re
@@ -88,8 +90,9 @@ def source_shelf(issue, disclosure=True):
     return ('<details class="source-shelf"><summary>Sources &amp; reading details · '+str(len(rows))+'</summary>'+content+'</details>') if disclosure else '<h2>Sources &amp; reading details</h2>'+content
 
 def top_html(issue):
+    snapshot = ('<meta name="observatory-edition-sha256" content="'+sha256(encoded(issue)).hexdigest()+'">') if issue.get('status')=='published' else ''
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<meta name="theme-color" content="#E00122"><title>'+esc(brief_title(issue['subject']))+'</title><style>'+STYLE+'</style></head><body>'
+            '<meta name="theme-color" content="#E00122">'+snapshot+'<title>'+esc(brief_title(issue['subject']))+'</title><style>'+STYLE+'</style></head><body>'
             '<header><div class="shell nav"><a class="brand" href="'+BASE+'">AI &amp; ATTENTION</a><a href="'+BASE+'issues/">The Weekly Brief</a></div></header><main class="shell">')
 
 def section_label(label):

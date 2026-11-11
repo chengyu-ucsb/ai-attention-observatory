@@ -6,6 +6,17 @@ on:
       - 'scripts/full_document_access.py'
       - 'scripts/comprehensive_readings.py'
       - 'scripts/article_access_trials.py'
+      - 'scripts/build_reader.py'
+      - 'scripts/verify_publication.py'
+      - 'scripts/observatory_store.py'
+      - 'scripts/reading_progress.py'
+      - 'supabase/**'
+      - 'tests/test_reader_export.py'
+      - 'tests/test_reading_progress.py'
+      - 'tests/test_reading_retries.py'
+      - 'tests/test_publication_verification.py'
+      - 'tests/validate_reader_loading.cjs'
+      - 'tests/validate_database.cjs'
       - 'tests/test_complete_source_reading.py'
       - '.github/workflows/complete-source-tests.yml'
   push:
@@ -14,6 +25,17 @@ on:
       - 'scripts/full_document_access.py'
       - 'scripts/comprehensive_readings.py'
       - 'scripts/article_access_trials.py'
+      - 'scripts/build_reader.py'
+      - 'scripts/verify_publication.py'
+      - 'scripts/observatory_store.py'
+      - 'scripts/reading_progress.py'
+      - 'supabase/**'
+      - 'tests/test_reader_export.py'
+      - 'tests/test_reading_progress.py'
+      - 'tests/test_reading_retries.py'
+      - 'tests/test_publication_verification.py'
+      - 'tests/validate_reader_loading.cjs'
+      - 'tests/validate_database.cjs'
       - 'tests/test_complete_source_reading.py'
       - '.github/workflows/complete-source-tests.yml'
   workflow_dispatch:
@@ -45,6 +67,11 @@ jobs:
           python -m unittest discover -s tests -v
           node tests/validate_article_ui.cjs
           node tests/validate_weekly_issue.cjs
+          node tests/validate_reader_loading.cjs
+      - name: Check private database schema and job recovery
+        run: |
+          npm install --prefix "$RUNNER_TEMP/observatory-db-test" --no-audit --no-fund --ignore-scripts @electric-sql/pglite@0.5.16
+          PGLITE_MODULE="$RUNNER_TEMP/observatory-db-test/node_modules/@electric-sql/pglite" node tests/validate_database.cjs
       # Historical live probes are opt-in diagnostics, not offline CI checks.
       - name: Test real access routes without retaining article text
         if: github.event_name == 'workflow_dispatch'

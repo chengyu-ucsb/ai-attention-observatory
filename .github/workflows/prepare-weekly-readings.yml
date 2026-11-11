@@ -70,6 +70,7 @@ jobs:
           python -m pip install --disable-pip-version-check --only-binary=llama-cpp-python \
             --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu \
             'llama-cpp-python>=0.3.0,<0.4' 'pypdf>=6.0,<7.0'
+          python -m pip install --disable-pip-version-check -r requirements-database.txt
       - name: Download the existing official open reading model
         if: steps.plan.outputs.ready == 'true'
         run: |
@@ -82,6 +83,7 @@ jobs:
         if: steps.plan.outputs.ready == 'true'
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
+          OBSERVATORY_DATABASE_URL: ${{ secrets.OBSERVATORY_DATABASE_URL }}
         run: python scripts/preparation_pipeline.py readings --phase preparing --expected-week "${{ steps.scope.outputs.week }}"
       - name: Validate final local outputs
         id: validation

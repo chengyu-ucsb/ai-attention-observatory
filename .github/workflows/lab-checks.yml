@@ -10,6 +10,7 @@ on:
       - 'scripts/article_art_queue.py'
       - 'scripts/art_similarity.py'
       - 'scripts/build_public.py'
+      - 'scripts/build_reader.py'
       - 'data/article-art-overrides.json'
       - 'data/article-art-state.json'
       - 'assets/editorial-covers/**'
@@ -32,6 +33,7 @@ on:
       - 'scripts/article_art_queue.py'
       - 'scripts/art_similarity.py'
       - 'scripts/build_public.py'
+      - 'scripts/build_reader.py'
       - 'data/article-art-overrides.json'
       - 'data/article-art-state.json'
       - 'assets/editorial-covers/**'
@@ -68,7 +70,9 @@ jobs:
         with:
           python-version: '3.12'
       - name: Build article illustrations
-        run: python scripts/build_public.py
+        run: |
+          python scripts/build_public.py
+          python scripts/build_reader.py
       - name: Validate Lab behavior without a browser
         run: |
           node --check lab-play.js

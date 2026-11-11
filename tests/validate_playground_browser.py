@@ -360,11 +360,14 @@ def check_site_integration(page, url):
     page.locator("#lab").wait_for(state="visible")
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert "Resumed" in page.locator("#switch-note").inner_text()
+    published_title = page.locator("#weekly-title").inner_text()
     # A failed research-data request must not prevent the independent Lab loading.
     page.route("**/data/public-library.json*", lambda route: route.abort())
+    page.route("**/data/reader/indexes/*", lambda route: route.abort())
     page.reload(wait_until="networkidle")
     page.locator("#lab").wait_for(state="visible")
-    assert page.locator("#issue-label").inner_text() == "INDEX OFFLINE"
+    expect(page.locator("#issue-label")).to_have_text("RESEARCH INDEX TEMPORARILY UNAVAILABLE")
+    expect(page.locator("#weekly-title")).to_have_text(published_title)
     expect(page.get_by_role("list", name="Four product design precedents").get_by_role("listitem")).to_have_count(4)
     expect(page.get_by_role("link", name="Android Digital Wellbeing guide")).to_be_visible()
     page.locator("#switch-start").click()

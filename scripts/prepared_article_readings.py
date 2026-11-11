@@ -180,7 +180,7 @@ def observe_document_mismatch(record, document, state, now):
         observe_retrieval(state, [receipt_change_note(record, row, document, queue)], now)
 
 
-def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=None, data_dir=None):
+def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=None, data_dir=None, checkpoint_factory=None):
     now = queue.utc_now(now)
     bundle = reconcile(packet, state, previous, now=now)
     candidates = []
@@ -203,7 +203,8 @@ def review(packet, state, previous=None, *, model, now=None, limit=2, retriever=
             observe_document_mismatch(record, document, state, now)
             raise ValueError("prepared_acquisition_receipt_mismatch")
         return document, diagnostics
-    stats = readings.process(candidates, model, limit=limit, retriever=receipt_checked_retriever, run_date=now.date())
+    stats = readings.process(candidates, model, limit=limit, retriever=receipt_checked_retriever,
+                             run_date=now.date(), run_at=now, checkpoint_factory=checkpoint_factory)
     bundle["review_run"] = stats
     bundle["acquisition_state_sha256"] = state["state_sha256"]
     return validate_bundle(sealed(bundle), bundle["publication_window"], now=now)
@@ -374,8 +375,10 @@ def main():
         from llama_cpp import Llama
         model = Llama(model_path=str(model_path), n_ctx=6144, chat_format="chatml",
                       n_threads=min(os.cpu_count() or 2, 4), verbose=False)
-        result = review(packet, state, bundle, model=model, now=now, limit=min(args.limit, 2),
-                        retriever=tracked_retriever, data_dir=data)
+        from reading_progress import cloud_progress
+        with cloud_progress(model_path) as checkpoint_factory:
+            result = review(packet, state, bundle, model=model, now=now, limit=min(args.limit, 2),
+                            retriever=tracked_retriever, data_dir=data, checkpoint_factory=checkpoint_factory)
         result["acquisition_state_sha256"] = state["state_sha256"]
         sealed(result)
         save(bundle_path, result); print(json.dumps(result["review_run"])); return

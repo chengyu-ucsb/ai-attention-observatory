@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
-const S={records:[],companions:[],pending:[],week:{},issue:{},runs:[],backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
+const S={records:[],companions:[],pending:[],week:{},issue:{},manifest:null,libraryLoaded:false,backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#E00122"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","direction-mark","#A8001A"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#646464"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#9A9193"]];
 const depths=[["full_text","Full-text material","#E00122"],["abstract","Abstract-based","#666666"],["curated","Curated synopsis","#C6C0C1"]];
 function uiIcon(name,cls=""){
@@ -165,7 +165,7 @@ function readingBasisName(x){
  return depthName(x);
 }
 function ideaInfo(x){return {text:readingHeadline(x),label:readingKind(x)}}
-function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=r.digest?.finding?26:0;v+=r.methods?10:0;v+=r.limitations?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
+function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=(r.digest?.finding||x.has_finding)?26:0;v+=(r.methods||x.has_methods)?10:0;v+=(r.limitations||x.has_limitations)?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 function libraryHash(theme){return "#library?theme="+encodeURIComponent(theme)+"&scope=all"}
 function goto(page,k){
  const value=page==="paper"?"#paper/"+encodeURIComponent(k):page==="library"&&k?libraryHash(k):"#"+page;
@@ -183,7 +183,7 @@ function route(event){
  }
  $$(".view").forEach(v=>v.hidden=v.id!==page);
  $$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});
- if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}showPaper(record(key))}
+ if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}void openPaper(key,event?.type==="hashchange")}
  if(page==="library")showLibrary();if(page==="atlas")showAtlas();
  window.scrollTo({top:0,behavior:"instant"});
  if(event?.type==="hashchange"){
@@ -360,7 +360,7 @@ function evidenceTags(sources){
 }
 function renderIssue(){
  const issue=S.issue||{},published=issue.status==="published";
- const edition=issue.edition_date||S.week.run?.date||"";
+ const edition=issue.edition_date||"";
  const sourceCount=Number(issue.source_count)||0;
  renderIssueLandscape(issue);
  renderIssueGlossary(issue);
@@ -401,6 +401,7 @@ function renderIssue(){
  $("#issue-coverage").textContent=issue.publication_window?sourceList.length+" sources originally published "+date(issue.publication_window.from)+"–"+date(issue.publication_window.to)+" (UTC). No older context sources are included.":sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries())shelf.append(issueSourceShelfItem(src,i));
+ renderEditionCards();
 }
 function issueSourceShelfItem(src,index){
  const item=make("div","issue-shelf-item"),resolved=record(src.id),candidate=resolved&&depth(resolved)!=="citation_only"?resolved:null;
@@ -431,16 +432,25 @@ function issueSourceShelfItem(src,index){
  return add(item,make("span","issue-shelf-number",String(index+1).padStart(2,"0")),content);
 }
 
-function home(){
- const run=S.week.run||{},all=(S.week.items||[]).map(x=>record(id(x))||S.records.find(r=>r.title===x.title)||x);
- const top=all.filter(x=>x.kind==="scholarly"&&depth(x)!=="citation_only"&&x.reading?.digest?.finding).sort((a,b)=>rank(b)-rank(a)).filter(x=>x.relation!=="Adjacent digital-attention evidence"||!all.some(y=>y.relation!=="Adjacent digital-attention evidence"&&y.reading?.digest?.finding)).slice(0,3);
- const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??all.length)+" in latest collection · "+S.records.length+" in library"+(run.publication_window?" · Published "+date(run.publication_window.from)+"–"+date(run.publication_window.to)+" UTC":"");
+function renderEditionCards(){
  const root=$("#feature-grid");root.replaceChildren();
- if(!top.length)root.append(make("div","empty-state","The latest index contains no source-rich highlights yet. Browse the research library."));
- top.forEach((x,i)=>{const c=make("article","feature-card"+(i===0?" primary":"")),head=make("div","feature-top"),foot=make("div","feature-foot");
- add(head,make("span","feature-number",String(i+1).padStart(2,"0")),uiIcon(["focus","switch","design"][i%3],"feature-icon"));
- add(foot,make("span","source-pill",readingBasisName(x)),btn("Read the evidence",()=>goto("paper",id(x)),"feature-go"));
- add(c,head,editorialMedia(x,"feature"),make("p","feature-idea-label",ideaInfo(x).label),make("h3","feature-idea",shortIdea(x,96)),originalSummary(x)?make("p","source-meta",cut(x.reading.digest?.explain,220)):null,shortIdea(x)!==readableSourceTitle(x)?make("p","feature-source-title",readableSourceTitle(x)):null,make("p","source-meta",(x.venue||"")+" · "+date(x.published)),featureCoverage(x),foot);root.append(c)});
+ // All text and source versions come from the same frozen edition as the hero.
+ for(const [i,src] of (S.issue.sources||[]).slice(0,3).entries()){
+  const c=make("article","feature-card"+(i===0?" primary":""));
+  add(c,make("span","feature-number",String(i+1).padStart(2,"0")),
+      editorialMedia({editorial_art:record(src.id)?.editorial_art},"feature"),
+      make("p","feature-idea-label",src.kind==="scholarly"?"Research":"Commentary"),
+      make("h3","feature-idea",readableSourceTitle(src)),
+      make("p","source-meta",[src.venue,date(src.published)].filter(Boolean).join(" · ")),
+      make("p","source-meta",src.review_label||(src.reading_level==="abstract"?"Based on the abstract":"Source material recorded in this edition")),
+      btn("Read this edition’s source notes",()=>goto("issue"),"feature-go"));
+  root.append(c);
+ }
+}
+function home(){
+ const run=S.week.run||{};
+ const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??0)+" in latest collection · "+S.records.length+" in library"+(run.publication_window?" · Published "+date(run.publication_window.from)+"–"+date(run.publication_window.to)+" UTC":"");
+ renderEditionCards();
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
  topicBars("#topic-bars");donut();
@@ -503,7 +513,7 @@ function renderBacklog(){
 }
 function showLibrary(){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value,scope=$("#scope-filter").value,order=$("#library-sort")?.value||"added";
- const xs=S.records.filter(x=>(!q||[x.title,x.venue,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase().includes(q))&&(!t||x.lane===t)&&(!k||x.kind===k)&&(
+ const xs=S.records.filter(x=>matchesSearch(x,q)&&(!t||x.lane===t)&&(!k||x.kind===k)&&(
    scope==="all"||(scope==="core"&&x.source_group==="AI-specific")||
    (scope==="adjacent"&&x.source_group==="Adjacent digital-attention evidence")||
    (scope==="historical"&&/^(Earlier|Historical)/.test(x.source_group||""))
@@ -539,7 +549,7 @@ function showLibrary(){
 }
 function showAtlas(){
  const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
- for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-text material",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
+ for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-text material",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding||x.has_finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
  topicBars("#atlas-topic-bars");
  const years={};for(let y=2023;y<=new Date().getFullYear();y++)years[String(y)]=0;
  S.records.forEach(x=>{const y=(x.published||"").slice(0,4);if(x.source_group==="AI-specific"&&Object.prototype.hasOwnProperty.call(years,y))years[y]++});
@@ -1226,19 +1236,80 @@ function showPaper(x){
  main.append(layout);
  root.append(main);
 }
-async function init(){
- // The Experimental Lab initializes independently in lab-play.js.
+let libraryPromise=null;
+const articlePromises=new Map();
+function matchesSearch(x,q){
+ const text=[x.title,x.venue,x.search_text,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
+ return text.includes(String(q).toLowerCase());
+}
+async function jsonPayload(path,immutable=false){
+ const response=await fetch(path,{cache:immutable?"force-cache":"no-cache"});
+ if(!response.ok)throw new Error("Could not load published content (HTTP "+response.status+")");
+ return response.json();
+}
+function readerPath(path){
+ if(typeof path!=="string"||!/^data\/reader\/(?:indexes|articles)\/[a-f0-9]{64}\.json$/.test(path))throw new Error("Invalid reader asset");
+ return path;
+}
+async function ensureLibrary(){
+ if(S.libraryLoaded)return;
+ if(libraryPromise)return libraryPromise;
+ libraryPromise=(async()=>{
+  const rows=S.manifest?await jsonPayload(readerPath(S.manifest.index_url),true):await jsonPayload("data/public-library.json");
+  if(!Array.isArray(rows))throw new Error("Unexpected library format");
+  const available=rows.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
+  S.companions=available.filter(x=>Boolean(x.companion_to));
+  S.records=available.filter(x=>!x.companion_to);S.libraryLoaded=true;
+  home();renderIssue();renderBacklog();renderPerspectives();showLibrary();
+ })().catch(error=>{libraryPromise=null;throw error});
+ return libraryPromise;
+}
+async function openPaper(key,focusHeading=false){
+ const hash=location.hash,root=$("#paper-content");
+ root.replaceChildren(make("p","empty-state","Loading the reading…"));
  try{
-  const rs=await Promise.all(["data/public-library.json","data/public-weekly.json","data/runs.json","data/fulltext-backfill-state.json","data/public-featured-issue.json","data/public-pending-sources.json"].map(p=>fetch(p+"?v="+Date.now(),{cache:"no-store"})));
-  if(!rs[0].ok)throw new Error("Library download failed (HTTP "+rs[0].status+")");
-  S.records=await rs[0].json();if(!Array.isArray(S.records))throw new Error("Unexpected library format");S.records=S.records.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");S.companions=S.records.filter(x=>Boolean(x.companion_to));S.records=S.records.filter(x=>!x.companion_to);
-  S.week=rs[1].ok?await rs[1].json():{run:{mode:"unavailable"},items:[]};
-  S.runs=rs[2].ok?await rs[2].json():[];
-  S.backlog=rs[3].ok?await rs[3].json():{};
-  S.issue=rs[4].ok?await rs[4].json():{};
-  S.pending=rs[5].ok?await rs[5].json():[];
-  home();renderIssue();renderBacklog();showLibrary();renderPerspectives();route();
- }catch(e){$("#issue-label").textContent="INDEX OFFLINE";$("#issue-meta").textContent="Research data could not load";$("#feature-grid").replaceChildren(make("div","empty-state","Could not load the research archive: "+e.message));route()}
+  await ensureLibrary();let found=record(key);
+  if(!found){
+   if(!S.pending.length)S.pending=await jsonPayload("data/public-pending-sources.json");
+   found=record(key);
+  }
+  if(found?.article_payload){
+   const asset=readerPath(found.article_payload);
+   if(!articlePromises.has(asset))articlePromises.set(asset,jsonPayload(asset,true).catch(error=>{articlePromises.delete(asset);throw error}));
+   const full=await articlePromises.get(asset);
+   if(id(full)!==id(found))throw new Error("Reading identity mismatch");
+   found=full;
+  }
+  if(location.hash===hash){
+   showPaper(found);
+   const heading=focusHeading&&$("#paper h1");
+   if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+  }
+ }catch(error){
+  if(location.hash===hash)root.replaceChildren(make("p","empty-state","This reading could not load. The published brief remains available."),btn("Try again",()=>openPaper(key)));
+ }
+}
+async function init(){
+ // The published edition never waits for the archive or operational history.
+ try{
+  try{
+   const manifest=await jsonPayload("data/reader-manifest.json");
+   if(manifest.schema_version!==1||manifest.edition_id!==(manifest.issue?.edition_date||null))throw new Error("Invalid publication manifest");
+   S.manifest=manifest;S.issue=manifest.issue;S.week={run:manifest.collection};S.backlog=manifest.backlog||{};
+  }catch{
+   S.issue=await jsonPayload("data/public-featured-issue.json");
+  }
+  renderIssue();route();
+ }catch{
+  $("#weekly-deck").textContent="Read the published edition in the archive.";
+  $("#weekly-scope").replaceChildren(link("Open the edition archive","issues/"));
+  route();
+ }
+ // Optional data is isolated: a failed index cannot erase a valid edition.
+ try{await ensureLibrary();route()}catch{
+  $("#issue-label").textContent="RESEARCH INDEX TEMPORARILY UNAVAILABLE";
+  $("#issue-meta").textContent="The published weekly brief is still available.";
+ }
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
 ["search","scope-filter","topic-filter","depth-filter","type-filter"].forEach(s=>$("#"+s).addEventListener(s==="search"?"input":"change",showLibrary));

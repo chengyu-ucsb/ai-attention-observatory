@@ -460,6 +460,9 @@ def check_typed_readings(page, url, width, out):
         else:
             route.continue_()
     page.route('**/data/*.json*', fulfill)
+    # These controlled full-record fixtures also exercise the legacy fallback.
+    # Ordinary browsing above exercises the production versioned reader export.
+    page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
     page.goto(url + '#library', wait_until='networkidle')
     expect(page.locator('.library-story')).to_have_count(2)
     card = page.locator('.library-story').filter(has_text=commentary['reading']['digest']['idea'])
@@ -593,6 +596,7 @@ def check_registered_readings(page, url, width, out, payloads):
         else:
             route.continue_()
     page.route('**/data/*.json*', fulfill)
+    page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
     for row in originals:
         reading = row['reading']
         commentary = reading.get('research_type') == 'attributed_commentary'
@@ -725,10 +729,11 @@ def check_reader_headings(page, url, width):
     expect(page.locator('#library')).to_be_visible()
     for label in page.locator('.card-type').all_text_contents():
         assert '/' not in label and 'RESULT' not in label
-    sample = page.evaluate("""() => {
+    sample = page.evaluate("""async () => {
       const x = S.records.find(x => x.doi === '10.3389/fpsyg.2026.1971672');
+      const full = x.article_payload ? await jsonPayload(readerPath(x.article_payload), true) : x;
       goto('paper', id(x));
-      return {title:readableSourceTitle(x), finding:x.reading.digest.finding};
+      return {title:readableSourceTitle(x), finding:full.reading.digest.finding};
     }""")
     expect(page.locator('.rv-headline')).to_have_text(sample['title'])
     assert page.locator('.rv-headline').evaluate('(el) => document.activeElement === el'), 'Navigation must focus the complete heading'
@@ -759,6 +764,7 @@ if __name__ == '__main__':
     # Exercise the actual publication projection, not a stale committed payload.
     subprocess.run([sys.executable, str(ROOT / "scripts/build_public.py")], cwd=ROOT, check=True)
     subprocess.run([sys.executable, str(ROOT / "scripts/build_newsletter.py")], cwd=ROOT, check=True)
+    subprocess.run([sys.executable, str(ROOT / "scripts/build_reader.py")], cwd=ROOT, check=True)
     registered = registered_reading_payloads()
     with server() as url, sync_playwright() as p:
         browser = getattr(p, args.browser).launch(**({"executable_path":args.executable_path} if args.executable_path else {}))

@@ -14,6 +14,8 @@ on:
       - 'data/**'
       - 'feed.xml'
       - 'scripts/build_public.py'
+      - 'scripts/build_reader.py'
+      - 'scripts/verify_publication.py'
       - 'scripts/pipeline_status.py'
       - 'scripts/source_audit.py'
       - 'scripts/export_zotero_backlog.py'
@@ -70,6 +72,7 @@ jobs:
           python scripts/build_newsletter.py
           python scripts/pipeline_status.py
           python scripts/feed.py
+          python scripts/build_reader.py
       - name: Retain artwork retry state
         # Data-writing workflows also commit this state. Publish-only runs keep
         # a recoverable record without granting write access or creating loops.
@@ -85,6 +88,7 @@ jobs:
           node --check lab-play.js
           node tests/validate_playground.cjs
           node tests/validate_article_ui.cjs
+          node tests/validate_reader_loading.cjs
           node tests/validate_weekly_issue.cjs
           python -m compileall -q scripts tests
           python -m unittest discover -s tests -v
@@ -123,7 +127,8 @@ jobs:
           cp -R issues/. _site/issues/
           mkdir -p _site/data
           cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json data/public-pending-sources.json _site/data/
-          if [ -s data/runs.json ]; then cp data/runs.json _site/data/; fi
+          cp data/reader-manifest.json _site/data/
+          cp -R data/reader _site/data/
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           cp data/pipeline-status.json data/issue-feed.json _site/data/
           touch _site/.nojekyll
@@ -134,3 +139,5 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@v5
 
+      - name: Verify live edition and RSS against the deployed artifact
+        run: python scripts/verify_publication.py --manifest _site/data/reader-manifest.json

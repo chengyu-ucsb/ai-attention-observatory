@@ -5,7 +5,7 @@ Matching evidence and a second model pass are safeguards, not independent review
 Oversized or unfinished documents are deferred, never silently shortened.
 """
 from __future__ import annotations
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 from hashlib import sha256
 import json
 import os
@@ -312,14 +312,17 @@ def read_chunk(model,chunk,kind,title,deadline=None):
     return claims
 
 
-def synthesize(document,model,kind,title,max_chunks=80,deadline=None):
+def synthesize(document,model,kind,title,max_chunks=80,deadline=None,checkpoint=None):
     chunks=chunk_document(document)
     if not coverage_is_complete(document,chunks): raise ValueError('coverage_gap')
     if len(chunks)>max_chunks: raise ValueError('deferred_document_exceeds_chunk_budget')
     notes=[]; processed=[]; empty=[]
     for chunk in chunks:
         check_deadline(deadline)
-        claims=read_chunk(model,chunk,kind,title,deadline=deadline)
+        claims=checkpoint.load(document,chunk,kind,title) if checkpoint else None
+        if claims is None:
+            claims=read_chunk(model,chunk,kind,title,deadline=deadline)
+            if checkpoint: checkpoint.save(document,chunk,kind,title,claims)
         processed.append(chunk['id'])
         if not claims: empty.append(chunk['id'])
         for claim in claims:
@@ -357,7 +360,7 @@ def indexed_sections(record):
         'upstream_truncation_possible':True,'semantic_completeness':'not_verified'})
 
 
-def due(record,today):
+def due(record,today,now=None):
     if record.get('source_review') or (record.get('analysis') or {}).get('original_paraphrases_only'):
         return False
     deep=record.get('deep_analysis') or {}
@@ -366,7 +369,10 @@ def due(record,today):
             and coverage.get('evidence_status')=='full_document_retrieved'):
         return False
     # A complete pass over partial input must remain eligible for fuller access.
-    return (record.get('complete_reading_attempt') or {}).get('next_at','')<=today
+    attempt=record.get('complete_reading_attempt') or {}
+    if now is not None and attempt.get('retry_after'):
+        return datetime.fromisoformat(attempt['retry_after'])<=now
+    return attempt.get('next_at','')<=today
 
 
 def reading_queue_key(record):
@@ -384,7 +390,7 @@ def reading_queue_key(record):
     Fair opportunities do not guarantee accepted summaries or faster throughput.
     """
     attempt=record.get('complete_reading_attempt') or {}
-    ready_at=attempt.get('next_at') or attempt.get('last_at') or record.get('first_seen') or ''
+    ready_at=attempt.get('retry_after') or attempt.get('next_at') or attempt.get('last_at') or record.get('first_seen') or ''
     identity=tuple(str(record.get(key) or '') for key in ('doi','url','title','kind'))
     return (ready_at,*identity)
 
@@ -413,7 +419,7 @@ def source_coverage_basis(document):
     return 'All supplied source text retrieved; document format is not verified.'
 
 
-def process(records,model,limit=2,retriever=None,run_date=None):
+def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,checkpoint_factory=None):
     stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
            'failed':0,'failure_reasons':{},'failure_stages':{},
            'source_text_saved':False,'skipped_no_model':model is None}
@@ -423,6 +429,7 @@ def process(records,model,limit=2,retriever=None,run_date=None):
         retriever=retrieve_for_reading
     run_date=run_date or date.today()
     today=run_date.isoformat()
+    observed_at=run_at or datetime.combine(run_date,datetime.min.time(),tzinfo=timezone.utc)
     candidates=[]
     selection={'considered':len(records), 'eligible':0, 'deferred_by_limit':0, 'skipped':{}}
     for record in records:
@@ -431,7 +438,7 @@ def process(records,model,limit=2,retriever=None,run_date=None):
             reason = 'unsupported_kind'
         elif record.get('source_review') or (record.get('analysis') or {}).get('original_paraphrases_only'):
             reason = 'already_editorially_reviewed'
-        elif not due(record,today):
+        elif not due(record,today,observed_at):
             coverage=(record.get('deep_analysis') or {}).get('coverage') or {}
             reason = ('complete_machine_reading' if coverage.get('evidence_status')=='full_document_retrieved'
                       and coverage.get('all_retrieved_text_processed')
@@ -462,8 +469,9 @@ def process(records,model,limit=2,retriever=None,run_date=None):
             if document.coverage.get('evidence_status')!='full_document_retrieved':
                 stats['partial_inputs']+=1
             stage='synthesis'
+            options={'checkpoint':checkpoint_factory(record)} if checkpoint_factory else {}
             result=synthesize(document,model,record['kind'],record.get('title',''),
-                              deadline=time.monotonic()+1200)
+                              deadline=time.monotonic()+1200,**options)
             complete=document.coverage.get('evidence_status')=='full_document_retrieved'
             depth=('full_text' if complete else 'partial_full_text') if record['kind']=='scholarly' else ('source_html' if complete else 'partial_source_html')
             result.update(version=3,kind=record['kind'],source_depth=depth,
@@ -487,9 +495,21 @@ def process(records,model,limit=2,retriever=None,run_date=None):
             stats['failed']+=1
             stats['failure_reasons'][reason]=stats['failure_reasons'].get(reason,0)+1
             stats['failure_stages'][stage]=stats['failure_stages'].get(stage,0)+1
+            old_attempt=record.get('complete_reading_attempt') or {}
             record['complete_reading_attempt']={'status':reason,'stage':stage,'last_at':today,
                 'next_at':(run_date+timedelta(days=2)).isoformat(),
                 'provider_diagnostics':diagnostics}
+            # Output-format failures can receive two bounded same-day retries.
+            # Negative evidence verdicts, copied passages and access restrictions
+            # retain their existing holds; no rejected claim is salvaged here.
+            format_errors={'model_json_invalid','model_schema_invalid','model_output_truncated',
+                           'verifier_indices_invalid','verifier_schema_invalid',
+                           'verifier_output_truncated','verifier_output_incomplete'}
+            if stage=='synthesis' and reason in format_errors:
+                count=(old_attempt.get('format_failures',0) if old_attempt.get('last_at')==today else 0)+1
+                record['complete_reading_attempt']['format_failures']=count
+                if count<=2:
+                    record['complete_reading_attempt']['retry_after']=(observed_at+timedelta(minutes=15*count)).isoformat()
     return stats
 
 
@@ -501,7 +521,8 @@ def main():
     model=Llama(model_path=str(path),n_ctx=6144,chat_format='chatml',
                 n_threads=min(os.cpu_count() or 2,4),verbose=False)
     records=json.loads(LIB.read_text(encoding='utf-8'))
-    stats=process(records,model,limit=max(1,min(2,int(os.getenv('DEEP_READING_LIMIT','2')))))
+    stats=process(records,model,limit=max(1,min(2,int(os.getenv('DEEP_READING_LIMIT','2')))),
+                  run_at=datetime.now(timezone.utc))
     LIB.write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(stats))
 
