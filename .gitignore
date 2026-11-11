@@ -23,3 +23,7 @@ assets/article-art/
 # Immutable reader projections are built from reviewed public data.
 data/reader/
 data/reader-manifest.json
+
+# Local dependency caches and Supabase CLI state are never deployable content.
+node_modules
+supabase/.temp/

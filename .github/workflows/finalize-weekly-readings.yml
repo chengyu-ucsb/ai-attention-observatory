@@ -45,6 +45,7 @@ jobs:
     if: github.event_name != 'pull_request' && (github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main'))
     permissions:
       contents: write
+      id-token: write
     runs-on: ubuntu-24.04
     # 8m acquisition + 2 x 20m review, bounded revalidation, setup and validation.
     # This cap is not a measured full-corpus review throughput estimate.
@@ -88,6 +89,7 @@ jobs:
         if: steps.plan.outputs.ready == 'true' && steps.existing.outputs.ready != 'true'
         env:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
+          OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
           OBSERVATORY_DATABASE_URL: ${{ secrets.OBSERVATORY_DATABASE_URL }}
         run: python scripts/preparation_pipeline.py readings --phase closed --expected-week "${{ steps.scope.outputs.week }}"
       - name: Rebuild gated canonical projections and record exact final inputs

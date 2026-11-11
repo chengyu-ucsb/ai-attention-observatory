@@ -5,7 +5,9 @@ const {PGlite}=require(process.env.PGLITE_MODULE||'@electric-sql/pglite');
 (async()=>{
  const db=new PGlite();
  await db.exec('create role anon; create role authenticated;');
- await db.exec(fs.readFileSync('supabase/migrations/202611110001_observatory.sql','utf8'));
+ for(const file of fs.readdirSync('supabase/migrations').filter(f=>f.endsWith('.sql')).sort()){
+  await db.exec(fs.readFileSync('supabase/migrations/'+file,'utf8'));
+ }
  await assert.rejects(db.query("select * from observatory.claim_jobs(null)"),/Invalid claim/);
  const hash='a'.repeat(64),input=JSON.stringify({source_id:'example'});
  await db.query("insert into observatory.jobs(dedupe_key,kind,input,lane,priority) values ('low','retrieve',$1,'current',1),('high','review',$1,'current',20),('history','retrieve',$1,'backfill',999)",[input]);

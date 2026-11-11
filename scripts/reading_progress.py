@@ -13,8 +13,8 @@ from pathlib import Path
 
 @contextmanager
 def cloud_progress(model_path):
-    """Opt-in via a backend secret; disconnected deployments retain old behavior."""
-    if not os.getenv('OBSERVATORY_DATABASE_URL'):
+    """Use the private OIDC bridge, or an explicitly configured backend DSN."""
+    if not (os.getenv('OBSERVATORY_STORE_URL') or os.getenv('OBSERVATORY_DATABASE_URL')):
         yield None
         return
     from observatory_store import connection,Store
@@ -25,14 +25,20 @@ def cloud_progress(model_path):
     revision=fingerprint({'model_sha256':model_hash,**{
         name:sha256((scripts/name).read_bytes()).hexdigest() for name in
         ('comprehensive_readings.py','full_document_access.py','prepared_reading_schema.py','reading_progress.py')}})
+    def factory_for(store):
+        def factory(record):
+            ident,_=store.put_source(record)
+            return ReadingProgress(store,ident,revision)
+        return factory
+    if os.getenv('OBSERVATORY_STORE_URL'):
+        from observatory_remote_store import RemoteStore
+        yield factory_for(RemoteStore())
+        return
     with connection() as conn:
         # Each successful section survives an interrupted article/run.
         conn.autocommit=True
         store=Store(conn)
-        def factory(record):
-            ident,_=store.put_source(record)
-            return ReadingProgress(store,ident,revision)
-        yield factory
+        yield factory_for(store)
 
 
 class ReadingProgress:

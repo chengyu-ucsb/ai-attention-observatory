@@ -2,23 +2,17 @@
 
 ## Where the database belongs
 
-Create a hosted **Supabase** project named `ai-attention-observatory` at
-<https://supabase.com/dashboard>. A US East region is a reasonable default for
-this project. Connect that project through the Supabase integration in ChatGPT
-so its schema and access can be inspected without sharing passwords in chat.
+The connected project is [ai-attention-observatory](https://supabase.com/dashboard/project/jrndagmzayiwpmyjtczx),
+project ref `jrndagmzayiwpmyjtczx`, in US East. The private `observatory`
+schema is installed. On November 11, 2026, its metadata import contained 688
+source identities and four already-published edition snapshots. These are
+indexed records, not a claim that 688 full articles have been reviewed.
 
 GitHub remains the cloud authority for code, versioned publication artifacts and
 the deployed site. Supabase becomes the authority for live operational state:
 source identities, reading progress, jobs, frozen editions and publication
 receipts. The website consumes screened static exports and remains readable
 when the operational database is unavailable.
-
-Free is suitable for setup and a pilot. Supabase currently pauses Free projects
-after a week of inactivity; a paid plan avoids that pause. Pro starts at $25 per
-month for the included project compute, with usage and additional compute billed
-separately. This does not include a model provider or an external worker.
-See [pricing](https://supabase.com/pricing) and
-[Free project pausing](https://supabase.com/docs/guides/platform/free-project-pausing).
 
 ## Implemented in this change
 
@@ -28,46 +22,69 @@ See [pricing](https://supabase.com/pricing) and
 | Edition display | Featured source cards use the featured edition's frozen source list | Pages deployment |
 | Deployment receipt | Fetches the live manifest, permanent edition and RSS; rejects stale or mismatched deployment | Every Pages deployment |
 | Retry policy | Two bounded same-day retries for output-format errors; no promotion of unsupported claims | Existing reading runs |
-| Private database | Ten tables, row-level access controls, immutable evidence and editions, leased jobs and publication hashes | Apply migration after project connection |
-| Reading checkpoints | Reuses successfully checked sections only when source, parser, model and chunk hashes match | Add verified backend database secret |
+| Private database | Ten tables, row-level access controls, immutable evidence and editions, leased jobs and publication hashes | Installed and tested in the connected project |
+| Reading checkpoints | Reuses successfully checked sections only when source, parser, model and chunk hashes match | Scheduled readers use the private GitHub OIDC bridge |
 | Queue adapter | Deduplicated inserts; current/backfill lanes; leases and stale-worker fencing; typed failure delays | Ready for worker integration |
 
-The SQL and adapter are tested, but an unconnected project is **not a migrated
-production pipeline**. The current reading model, two-document run limit,
+Database activation is **not a complete worker-queue migration**. The current
+reading model, two-document run limit,
 shared GitHub writer lock and scheduling remain in service during this stage.
 End-to-end Monday delivery and improved review throughput remain unverified.
 
-## Activate safely after connecting the project
+## Private worker connection
 
-1. Apply `supabase/migrations/202611110001_observatory.sql` once through the
-   project's migration tooling. Keep `observatory` out of Supabase's exposed
-   API schemas. Its tables are private operational data, not a browser API.
-2. Verify that anonymous and authenticated browser roles cannot read these
-   tables or execute their functions. The migration creates a `NOLOGIN`
-   `observatory_worker` group. Provision a separate backend login belonging to
-   that group, without owner, superuser or bypass-RLS privileges.
-3. Save that backend's connection string in the repository's **Actions secret**
-   `OBSERVATORY_DATABASE_URL`. Do not use the owner connection or put the value
-   in JavaScript, commits, logs, issues or chat. Use a supported direct or pooler
-   connection with TLS; the adapter requires TLS and disables prepared statements
-   for pooler compatibility. See
-   [connection options](https://supabase.com/docs/guides/database/connecting-to-postgres).
-4. In a trusted worker environment, install `requirements-database.txt` and run
-   `python scripts/observatory_store.py status`, then `import`. Import copies only
-   allowlisted source metadata and already published edition snapshots. It does
-   not copy source bodies or certify previous deployment. Verify counts and
-   edition hashes against the checked-out repository before cutover.
-5. Exercise one real prepared-reading job with the backend connection. Interrupt
-   it after a completed section, then resume it and verify reuse. A changed
-   source, model or parsing policy must cause a fresh read. No partial checkpoint
-   qualifies an article as fully read or independently reviewed.
+No database password or Supabase service key is stored in the website or required
+in GitHub Actions. `observatory-store` is a deployed Supabase Edge Function that
+verifies short-lived GitHub OIDC tokens against GitHub's signed public keys.
+It requires the exact repository and immutable owner/repository IDs, the `main`
+branch, the expected audience and one of three approved workflow paths:
 
-The existing preparation and final-reading workflows already accept this
-optional secret. With no secret, they keep their existing storage behavior.
-Once configured, completed sections persist immediately; a database error fails
-the affected reading instead of pretending progress was saved. Store calls used
-by future workers must commit a lease before doing external work (or use an
-autocommit connection). A lease does not make external side effects exactly-once.
+- `.github/workflows/prepare-weekly-readings.yml`
+- `.github/workflows/finalize-weekly-readings.yml`
+- `.github/workflows/database-check.yml`
+
+Pull-request tokens, other branches, unrelated workflows, wrong audiences,
+expired tokens and invalid signatures fail authentication. The platform's
+Supabase-JWT gateway check is disabled because this endpoint accepts GitHub JWTs;
+the function performs signature and claim verification before any database query.
+No browser CORS policy or browser database credentials are enabled.
+
+The function uses Supabase's built-in server connection and executes every
+transaction as the restricted `observatory_worker` role. The three applied
+migrations are:
+
+1. `20261111112523_observatory.sql`: private schema and recovery primitives.
+2. `20261111113233_observatory_foreign_key_indexes.sql`: covering indexes.
+3. `20261111113632_observatory_edge_worker_role.sql`: permit the server connection
+   to drop into the worker role; Supabase initially granted membership with
+   `SET FALSE`. This grants no browser access or additional worker privileges.
+
+The Python bridge exposes only allowlisted metadata writes, checkpoint reads and
+writes, status and a connectivity probe. It cannot execute arbitrary SQL. It
+rejects unexpected fields and raw passage fields, bounds requests and retries,
+never follows credential-bearing redirects, and never prints tokens or database
+errors. Checkpoints contain checked paraphrases and hashes of supporting spans;
+exact source passages are reconstructed and validated against the current text.
+A partial checkpoint never qualifies a whole paper as reviewed.
+
+`Verify private research database` tests token rejection and payload validation on
+pull requests. Its main-branch job uses a real GitHub token, checks the effective
+database role, exercises checkpoint write/read/rollback, then persists a labeled
+connectivity receipt in `observatory.jobs`. That receipt explicitly says weekly
+publication was not verified. Check the actual run and stored receipt before
+claiming that the GitHub connection works; a deployed function alone is not proof.
+
+The existing direct PostgreSQL adapter remains available for separately
+provisioned backend workers through `OBSERVATORY_DATABASE_URL`. The scheduled
+readers prefer `OBSERVATORY_STORE_URL`, the public endpoint URL, and need no such
+secret. A configured bridge failure stops the affected reading rather than
+pretending progress was saved. Future queue handlers must commit leases before
+external work. A lease does not make external side effects exactly-once.
+
+The metadata import copied only allowlisted bibliographic fields and the four
+validated published edition snapshots. It copied no source bodies. Snapshot
+hashes were read back from Supabase and matched the repository's canonical
+encoding. Import does not establish that a new weekly edition has been published.
 
 No source-storage bucket or user-response table is activated by this migration.
 The optional retrieval object key requires a documented retention basis; raw
@@ -82,7 +99,7 @@ and reading throughout the previous week should reduce Monday's remaining work.
 Eligibility continues to use the previous completed Monday–Sunday **UTC** week
 and the source's original publication date. Indexing dates cannot admit old work.
 
-After the database is connected:
+With the database connected, the remaining cutover work is:
 
 1. Move source retrieval, review and synthesis handlers onto the leased queue;
    enforce per-provider limits and store observed outcomes. Protect current-week
@@ -121,6 +138,21 @@ Supabase project, including its network and account configuration.
 
 The `Publish observatory website` run must finish its live verification step.
 Check the reported edition date and publication window separately from job
-success. To disable cloud reading checkpoints, remove the backend Actions
-secret; existing git-based reading receipts remain usable. Keep database
+success. To disable cloud reading checkpoints, remove `OBSERVATORY_STORE_URL`
+from both reading workflows and any optional `OBSERVATORY_DATABASE_URL` secret; existing git-based reading receipts remain usable. Keep database
 snapshots and published archives intact when rolling back code.
+
+## Function deployment
+
+Runtime dependencies are pinned in `deno.json`; the same exact versions and npm
+integrity hashes are recorded in `package.json` and `package-lock.json` for CI.
+Deploy `index.ts`, `auth.ts`, `validation.ts` and `deno.json`, using `deno.json` as
+the import map. Do not upload the CI-only npm package files or `node_modules`:
+including a package manifest makes the Edge bundler expect a local dependency
+tree. Never add credentials to the function source or deployment bundle.
+
+The connected-project tests verified private role access, checkpoint round-trip,
+expired-lease recovery, stale-token rejection and semantic holds inside a rolled
+back transaction. Test source rows were confirmed absent afterward. Security
+Advisor returned no findings after these migrations. The offline suite also
+verifies immutable editions and exact publication hash binding.
