@@ -183,7 +183,7 @@ function route(event){
  }
  $$(".view").forEach(v=>v.hidden=v.id!==page);
  $$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});
- if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}void openPaper(key)}
+ if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}void openPaper(key,event?.type==="hashchange")}
  if(page==="library")showLibrary();if(page==="atlas")showAtlas();
  window.scrollTo({top:0,behavior:"instant"});
  if(event?.type==="hashchange"){
@@ -1260,11 +1260,11 @@ async function ensureLibrary(){
   const available=rows.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
   S.companions=available.filter(x=>Boolean(x.companion_to));
   S.records=available.filter(x=>!x.companion_to);S.libraryLoaded=true;
-  home();renderIssue();renderBacklog();renderPerspectives();
+  home();renderIssue();renderBacklog();renderPerspectives();showLibrary();
  })().catch(error=>{libraryPromise=null;throw error});
  return libraryPromise;
 }
-async function openPaper(key){
+async function openPaper(key,focusHeading=false){
  const hash=location.hash,root=$("#paper-content");
  root.replaceChildren(make("p","empty-state","Loading the reading…"));
  try{
@@ -1280,7 +1280,11 @@ async function openPaper(key){
    if(id(full)!==id(found))throw new Error("Reading identity mismatch");
    found=full;
   }
-  if(location.hash===hash)showPaper(found);
+  if(location.hash===hash){
+   showPaper(found);
+   const heading=focusHeading&&$("#paper h1");
+   if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
+  }
  }catch(error){
   if(location.hash===hash)root.replaceChildren(make("p","empty-state","This reading could not load. The published brief remains available."),btn("Try again",()=>openPaper(key)));
  }

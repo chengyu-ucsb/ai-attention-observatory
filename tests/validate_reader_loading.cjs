@@ -14,7 +14,7 @@ function environment(fetch){
    document:{createElement:()=>new Element(),querySelector:key=>{
     if(!elements.has(key))elements.set(key,new Element());return elements.get(key)
    }}});
- vm.runInContext(code+'\nthis.state=S;this.events=[];renderIssue=()=>events.push("edition");route=()=>events.push("route");home=()=>{};renderBacklog=()=>{};renderPerspectives=()=>{};',context);
+ vm.runInContext(code+'\nthis.state=S;this.events=[];renderIssue=()=>events.push("edition");route=()=>events.push("route");home=()=>{};renderBacklog=()=>{};renderPerspectives=()=>{};showLibrary=()=>{};',context);
  return {context,elements};
 }
 (async()=>{
