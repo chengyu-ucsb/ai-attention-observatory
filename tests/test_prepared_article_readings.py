@@ -71,6 +71,18 @@ class PreparedReadingTests(unittest.TestCase):
         fetch.assert_not_called()
         self.assertEqual(state["records"], self.state["records"])
 
+    def test_continuation_matches_actual_reader_when_documents_are_missing(self):
+        from preparation_pipeline import pending_readings
+        pending = prepared.acquire(self.packet, now=FRIDAY, limit=0, known_sources_only=True)
+        for state, expected in ((pending, 0), (self.state, 1)):
+            with self.subTest(acquired=bool(expected)):
+                bundle = prepared.reconcile(self.packet, state, now=FRIDAY)
+                selection = pending_readings(self.packet, state, bundle, FRIDAY)
+                self.assertEqual(selection['eligible'], expected)
+                result = self.reviewed(state=state, previous=bundle)
+                self.assertEqual(selection, result['review_run']['selection'])
+                self.assertEqual(result['review_run']['attempted'], expected)
+
     def test_machine_reading_is_private_and_never_an_approval(self):
         bundle = self.reviewed()
         self.assertEqual(bundle["review_run"]["summaries_completed"], 1)
