@@ -45,7 +45,7 @@ jobs:
       - name: Require final reading of the current late-index packet
         id: final_reading
         if: github.event_name != 'pull_request'
-        run: python scripts/preparation_pipeline.py edition-check
+        run: python scripts/preparation_pipeline.py edition-check --reconcile-legacy-library
       - name: Check whether this week already has an edition
         id: edition
         if: github.event_name != 'pull_request' && steps.final_reading.outputs.ready == 'true'

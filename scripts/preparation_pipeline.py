@@ -7,6 +7,7 @@ its analysis. Publication keeps the established abstract-backed evidence gates.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 import datetime as dt
 import hashlib
 import json
@@ -129,11 +130,106 @@ def reading_plan(root=ROOT, now=None, phase="closed"):
     return dict(result, ready=True, status="ready_with_explicit_coverage_gaps")
 
 
-def bindings(root, folder, *, canonical=False):
-    names = {name: folder / name for name in ("packet.json", "acquisition.json", "readings.json")}
+# Version 1 bound the complete historical library. Version 2 binds every field
+# of the target week's canonical candidates and their identity dependencies.
+# It deliberately does not reinterpret or migrate an existing execution receipt.
+CANONICAL_BINDING_VERSION = 2
+CANONICAL_POLICY_INPUTS = ("editorial-corrections.json", "editorial-source-readings.json",
+    "original-readings.json", "source-lineage.json", "venue-standards.json", "fulltext-source-hints.json")
+
+
+def scoped_library_inputs(root, packet, weekly, library):
+    """Conservative publication-week dependency set, not a public-quality filter.
+
+    Include dated candidates even when withdrawn, unapproved or unverified;
+    filtering on current eligibility would hide the very changes we must hold.
+    Packet/weekly identity matches also retain records with corrected dates.
+    All fields (including source URLs, versions, licenses and cooldowns) remain
+    bound. Policy/approval registries are exact inputs, never cached projections.
+    """
+    import collect_weekly_sources as queue
+    from collection_window import date_in_window
+    from source_lineage import canonical_url, prepare as apply_lineage
+    from editorial_corrections import apply as apply_corrections
+    window = packet["target_publication_window"]
+    if type(library) is not list or any(type(record) is not dict for record in library):
+        raise ValueError("invalid_canonical_library")
+    keys = [queue.record_key(record) for record in library]
+    if len(keys) != len(set(keys)):
+        raise ValueError("duplicate_library_publication_identity")
+
+    def identities(record):
+        # Match the DOI and URL identity conventions used by acquisition and
+        # public lineage, including aliases which could otherwise shadow a row.
+        values = {"key:" + queue.record_key(record)}
+        for field in ("doi", "companion_to"):
+            doi = queue.access.doi(record.get(field))
+            if doi:
+                values.add("doi:" + doi)
+        for field in ("url", "id"):
+            value = record.get(field)
+            if value:
+                values.add(field + ":" + str(value))
+        url = canonical_url(record.get("url"))
+        if url:
+            values.add("canonical_url:" + url)
+        return values
+
+    policy = {}
+    configs = {}
+    for name in CANONICAL_POLICY_INPUTS:
+        path = Path(root) / "data" / name
+        value = read(path) if path.exists() else None
+        if path.exists() and type(value) is not dict:
+            raise ValueError("invalid_canonical_policy_input:" + name)
+        configs[name] = value
+        policy[name] = digest(value)
+    # Use the real pure local correction/lineage functions for selection only.
+    # Keep the raw full records in the digest. A historical raw URL/date may be
+    # corrected into this week, and must not escape the dependency closure.
+    projected = apply_lineage(apply_corrections(deepcopy(library),
+        configs["editorial-corrections.json"] or {}), configs["source-lineage.json"] or {})
+    wanted = set()
+    for record in packet["items"] + weekly["items"]:
+        wanted.update(identities(record))
+    selected = set()
+    aliases = [identities(record) | identities(projected[index])
+               for index, record in enumerate(library)]
+    for index, record in enumerate(library):
+        if (any(date_in_window(row.get("published"), window["from"], window["to"])
+                for row in (record, projected[index]))
+                or not (record.get("doi") or record.get("url") or record.get("id"))):
+            selected.add(index)
+            wanted.update(aliases[index])
+    for record in projected[len(library):]:
+        if date_in_window(record.get("published"), window["from"], window["to"]):
+            wanted.update(identities(record))
+    # A relationship can point at another library record; retain the complete
+    # connected identity set rather than assuming every row is independent.
+    while True:
+        added = {index for index, values in enumerate(aliases)
+                 if index not in selected and values & wanted}
+        if not added:
+            break
+        selected.update(added)
+        for index in added:
+            wanted.update(aliases[index])
+    return {"binding_policy_version": CANONICAL_BINDING_VERSION,
+            "publication_window": window,
+            "records": [record for index, record in enumerate(library) if index in selected],
+            "policy_inputs": policy}
+
+
+def bindings(root, folder, *, canonical=False, binding_policy_version=CANONICAL_BINDING_VERSION):
+    values = {name: read(folder / name) for name in ("packet.json", "acquisition.json", "readings.json")}
     if canonical:
-        names.update({name: Path(root) / "data" / name for name in ("library.json", "weekly.json")})
-    return {name: digest(read(path)) for name, path in names.items()}
+        values.update({name: read(Path(root) / "data" / name) for name in ("library.json", "weekly.json")})
+        if binding_policy_version == CANONICAL_BINDING_VERSION:
+            values["library.json"] = scoped_library_inputs(root, values["packet.json"],
+                values["weekly.json"], values["library.json"])
+        elif binding_policy_version != 1:
+            raise ValueError("invalid_canonical_binding_policy_version")
+    return {name: digest(value) for name, value in values.items()}
 
 
 class ReadingInputsChanged(ValueError):
@@ -275,7 +371,10 @@ def validate_reading_receipt(value, kind, now):
     if not run:
         names |= {"library.json", "weekly.json"}
     try:
-        queue.shape(value, required, {'reading_policy_version'} if run else set())
+        queue.shape(value, required, {'reading_policy_version'} if run else {'binding_policy_version'})
+        if 'binding_policy_version' in value:
+            queue.require(type(value['binding_policy_version']) is int
+                          and 1 <= value['binding_policy_version'] <= CANONICAL_BINDING_VERSION)
         if 'reading_policy_version' in value:
             queue.require(type(value['reading_policy_version']) is int
                           and 1 <= value['reading_policy_version'] <= READING_POLICY_VERSION)
@@ -410,14 +509,16 @@ def finalize(root=ROOT, now=None, expected_week=None):
     previous_path = folder / "final-reading.json"
     if previous_path.exists():
         previous = validate_reading_receipt(read(previous_path), "weekly_final_reading", now)
-        # Builders run between reading and finalization. Once that execution
-        # has been finalized, a later canonical writer cannot rebind it without
-        # the normal bounded reading sequence producing a new execution receipt.
-        if previous["reading_run_sha256"] == digest(run) and previous["bindings"] != current:
-            raise ValueError("current_final_reading_run_required")
+        # Never upgrade/rebind the same completed execution, including a legacy
+        # receipt. Only a real new bounded reading run may create a new receipt.
+        if previous["reading_run_sha256"] == digest(run):
+            if not edition_ready(root, now)["ready"]:
+                raise ValueError("current_final_reading_run_required")
+            return previous
     coverage = final_coverage(packet, state, bundle, read(Path(root) / "data/library.json"), run)
     review = run["stages"]["review"]
     receipt = {"schema_version": 1, "kind": "weekly_final_reading", "completed_at": now.isoformat(),
+        "binding_policy_version": CANONICAL_BINDING_VERSION,
         "publication_window": packet["target_publication_window"], "bindings": current,
         "reading_run_sha256": digest(run), "approved": False, "source_text_saved": False,
         "status": "completed_with_review_failures" if review["failed"] else "bounded_stage_completed",
@@ -427,12 +528,13 @@ def finalize(root=ROOT, now=None, expected_week=None):
     return receipt
 
 
-def edition_ready(root=ROOT, now=None):
-    """Read-only gate: stale valid inputs need real work, never a reused receipt.
+def edition_ready(root=ROOT, now=None, *, reconcile_legacy=False):
+    """Read-only gate: changed reading inputs need real work, never reblessing.
 
     The finalizer uses ready=false to enter its existing bounded reading stages;
-    the edition uses it to skip publication. Only the typed cross-snapshot
-    mismatch is recoverable here. Schema, checksum, date and namespace errors
+    the edition uses it to skip publication. Explicit legacy reconciliation
+    can prove only a narrow canonical no-op from exact local Git evidence.
+    Schema, checksum, date and namespace errors
     still fail closed rather than starting work on corrupt evidence.
     """
     now = utc(now)
@@ -460,19 +562,30 @@ def edition_ready(root=ROOT, now=None):
         return dict(result, status="reading_inputs_changed", next_action="readings", changed_inputs=changed)
     if state is None or bundle is None:
         return dict(result, status="awaiting_reading_inputs", next_action="readings")
-    current = bindings(root, folder, canonical=True)
+    current = bindings(root, folder, canonical=True,
+                       binding_policy_version=receipt.get("binding_policy_version", 1))
     if run.get('reading_policy_version', 1) != READING_POLICY_VERSION:
         return dict(result, status='final_reading_policy_changed', next_action='readings')
-    if (receipt["publication_window"] != packet["target_publication_window"]
-            or receipt["bindings"] != current or not current_reading_run(run, packet, current, now)
-            or receipt["reading_run_sha256"] != digest(run)
-            or not utc(run["finished_at"]) <= utc(receipt["completed_at"]) <= now):
+    other_inputs_current = (receipt["publication_window"] == packet["target_publication_window"]
+            and current_reading_run(run, packet, current, now)
+            and receipt["reading_run_sha256"] == digest(run)
+            and utc(run["finished_at"]) <= utc(receipt["completed_at"]) <= now)
+    changed_inputs = [key for key in current if receipt["bindings"][key] != current[key]]
+    reconciliation = None
+    if (reconcile_legacy and other_inputs_current and changed_inputs == ["library.json"]
+            and receipt.get("binding_policy_version", 1) == 1):
+        from reading_receipt_reconciliation import reconcile_legacy_library
+        reconciliation = reconcile_legacy_library(root, folder, receipt, run, packet,
+            read(Path(root) / "data/weekly.json"), read(Path(root) / "data/library.json"), now)
+    if not other_inputs_current or (changed_inputs and not reconciliation):
         return dict(result, status="final_reading_inputs_changed", next_action="readings",
-                    changed_inputs=[key for key in current if receipt["bindings"][key] != current[key]])
+                    changed_inputs=changed_inputs)
     expected_status = "completed_with_review_failures" if run["stages"]["review"]["failed"] else "bounded_stage_completed"
     if (receipt["status"] != expected_status or receipt["coverage"] !=
             final_coverage(packet, state, bundle, read(Path(root) / "data/library.json"), run)):
         raise ValueError("invalid_weekly_final_reading_coverage_receipt")
+    if reconciliation:
+        result["reconciliation"] = reconciliation
     return dict(result, ready=True, status=receipt["status"], coverage=receipt["coverage"])
 
 
@@ -594,6 +707,8 @@ def lead_time():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "readings", "finalize", "edition-check", "checkpoint", "checkpoint-commit", "scope", "lead-time"))
+    parser.add_argument("--reconcile-legacy-library", action="store_true",
+        help="Opt-in read-only proof against exact local Git history; edition-check only")
     parser.add_argument("--phase", choices=("preparing", "closed"), default="closed")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--destination", type=Path)
@@ -604,6 +719,8 @@ def main():
     parser.add_argument("--max-feed-requests", type=int, default=24)
     parser.add_argument("--time-budget", type=int, default=240)
     args = parser.parse_args()
+    if args.reconcile_legacy_library and args.action != "edition-check":
+        parser.error("--reconcile-legacy-library is only supported for edition-check")
     if args.action in {"prepare", "closeout"}:
         operation = run_preparation if args.action == "prepare" else run_closeout
         result = operation(args.root, expected_week=args.expected_week, max_requests=args.max_requests,
@@ -612,7 +729,7 @@ def main():
     elif args.action == "reading-plan": result = reading_plan(args.root, phase=args.phase)
     elif args.action == "readings": result = run_readings(args.root, phase=args.phase, expected_week=args.expected_week)
     elif args.action == "finalize": result = finalize(args.root, expected_week=args.expected_week)
-    elif args.action == "edition-check": result = edition_ready(args.root)
+    elif args.action == "edition-check": result = edition_ready(args.root, reconcile_legacy=args.reconcile_legacy_library)
     elif args.action == "lead-time": result = lead_time()
     elif args.action == "scope": result = {"week": target_window(utc(), args.phase)["from"], "phase": args.phase}
     elif args.action == "checkpoint-commit":
