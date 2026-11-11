@@ -45,9 +45,9 @@ publication.
 The writer and automated critic currently use the same local model in separate
 contexts. This is an additional check, not independent expertise. Deterministic
 regression tests verify orchestration, citation safety and failure behavior;
-they do **not** demonstrate reliable editorial judgment. A real unattended
-model-generated edition has not yet been evaluated with this new path. Inspect
-the next run and its actual prose before claiming improved automatic quality.
+they do **not** demonstrate reliable editorial judgment. A successful unattended
+model-generated edition has not yet been established with this new path. Inspect
+actual generation results and prose before claiming improved automatic quality.
 Do not use a passing review receipt as proof that an underlying study is valid.
 
 ## Citations and terms
@@ -58,6 +58,43 @@ Optional `glossary: [{term, definition}]` entries create native links and visibl
 definitions, with hover text as a supplement. Keyboard and touch users do not
 need hover. Citations take priority if a glossary term overlaps a source name.
 Avoid jargon simply because a definition can be added.
+
+## November 11 repair diagnostics
+
+The [November 10 generation run](https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/42922735584)
+reached the local model but withheld the draft after three failed theme attempts.
+The responses omitted a source, used fifteen-word anchors, or paraphrased an
+anchor. Several inline citation labels also did not appear in the prose; those
+errors were hidden behind the first anchor failure. No editorial critique or
+publication followed.
+
+Theme generation now separates visible author/title links from internal source
+quotes. Suggested labels are checked for substring collisions. Repair feedback
+reports independently detectable anchor and citation problems together, then
+reruns the original publication gates. It never inserts citations, trims quotes,
+or substitutes an arbitrary evidence phrase. Synthetic regressions reproduce the
+observed failure sequence without committing article extracts or rejected prose.
+
+The source packet also contained incomplete section extracts: two sources lacked
+a findings field. A `full_text` extraction label is not a completed independent
+reading. Prompts now explicitly forbid converting an aim, title or interpretation
+into a measured improvement when findings are unavailable. This guidance and the
+repair tests are not a factual-consistency result. The separate-context critique,
+all evidence gates and fail-closed publication behavior remain required.
+
+A bounded local replay used the failed run's exact supplied source packet and
+fixed theme plan with the same Qwen weights and runtime version. All three
+theme attempts still failed anchor or citation checks. The replay never reached
+editorial critique and published nothing. Clearer prompting and complete repair
+feedback alone therefore did not solve this case. This was a test of supplied
+section extracts, not full-article verification or a production run.
+
+A separate private structured-selection experiment required source-local anchor
+IDs and explicit source identities, then mapped those selections back to the
+unchanged validators. Its first response contained invalid JSON and still made
+unsupported outcome and scale claims. It was rejected before further stages.
+That experiment is not included in production. Exact source-span selection does
+not by itself establish that the surrounding prose is accurate.
 
 ## Correct an already published edition
 

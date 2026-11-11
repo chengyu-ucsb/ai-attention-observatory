@@ -111,6 +111,98 @@ class CompositionTests(unittest.TestCase):
             self.assertFalse(composer.compose(root,fake,today=date(2026,10,26)))
             fake.create_chat_completion.assert_not_called()
 
+    def test_real_failure_shape_reports_anchors_and_hidden_inline_errors_together(self):
+        # Synthetic content reproduces the Nov 10 three-attempt failure shape;
+        # no source extracts or generated article text are stored in this test.
+        draft, packet = self.fixture()
+        plan = {'themes': [dict(short='A theme', title='Assistance and learning', keys=keys)
+                           for keys in (['S1', 'S2'], ['S2', 'S3'], ['S3', 'S4'])]}
+        long_quote = ' '.join(composer.normalize(packet[0]['evidence']).split()[:15])
+        first = copy.deepcopy(draft['signals'][0])
+        first['evidence'] = [{'key': 'S1', 'quote': long_quote}]
+        first['citations'] = [{'key': 'S1', 'text': 'an absent source name'}]
+        second = copy.deepcopy(first)
+        second['evidence'].append({'key': 'S2', 'quote': long_quote})
+        second['citations'].append({'key': 'S2', 'text': 'another absent source name'})
+        third = copy.deepcopy(second)
+        third['evidence'][0]['quote'] = 'did not establish lasting independent learning'
+        third['evidence'][1]['quote'] = 'a paraphrased unsupported anchor not in this source'
+        third['citations'][1]['text'] = 'Source 2'
+        replies = [plan, first, second, third]
+        model = Mock()
+        model.create_chat_completion.side_effect = [
+            {'choices': [{'message': {'content': json.dumps(value)}}]} for value in replies]
+        audit = {}
+        before = copy.deepcopy(replies)
+        with self.assertRaisesRegex(ValueError, 'theme 1'):
+            composer.draft_in_stages(model, packet, audit)
+        failures = [entry['validation_error'] for entry in audit['stages'][1:]]
+        for expected in ('Evidence array must cover', '15 normalized words',
+                         'S1 inline link: Citation text must occur exactly once'):
+            self.assertIn(expected, failures[0])
+        for key in ('S1', 'S2'):
+            self.assertIn(f'{key} evidence quote has 15', failures[1])
+            self.assertIn(f'{key} inline link: Citation text must occur exactly once', failures[1])
+        self.assertIn('Evidence anchor does not match source: S2', failures[2])
+        self.assertIn('S1 inline link: Citation text must occur exactly once', failures[2])
+        self.assertNotIn('candidate', audit)
+        self.assertEqual(replies, before)  # No silent trimming or inserted links.
+        instruction = model.create_chat_completion.call_args_list[1].kwargs['messages'][1]['content']
+        self.assertIn('The two arrays have DIFFERENT purposes', instruction)
+        self.assertIn('If findings are\nabsent', instruction)
+
+    def test_generated_section_keeps_anchor_and_inline_gates(self):
+        draft, packet = self.fixture()
+        original = draft['signals'][0]
+        for count in (4, 13):
+            section = copy.deepcopy(original)
+            section['evidence'][0]['quote'] = ' '.join(
+                composer.normalize(packet[0]['evidence']).split()[:count])
+            with self.subTest(count=count), self.assertRaisesRegex(ValueError, '5–12'):
+                composer.validate_generated_section(section, packet[:2])
+        for change in ('wrong_source', 'unknown_source', 'missing_link', 'duplicate_link'):
+            section = copy.deepcopy(original)
+            sources = copy.deepcopy(packet[:2])
+            if change == 'wrong_source':
+                sources[1]['evidence'] = 'Only a different population discussed these separate questions.'
+                section['evidence'][0]['quote'] = sources[1]['evidence']
+            elif change == 'unknown_source':
+                section['evidence'][0]['key'] = 'S99'
+            elif change == 'missing_link':
+                section['citations'].pop()
+            else:
+                section['text'] += ' Source 1 is mentioned again.'
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                composer.validate_generated_section(section, sources)
+        composer.validate_generated_section(copy.deepcopy(original), packet[:2])
+        malformed = copy.deepcopy(original)
+        malformed['evidence'][0]['key'] = ['S1']
+        malformed['citations'][0]['key'] = {'source': 'S1'}
+        with self.assertRaisesRegex(ValueError, 'unknown source'):
+            composer.validate_generated_section(malformed, packet[:2])
+
+    def test_citation_label_contract_uses_identity_never_claim_text(self):
+        _, packet = self.fixture()
+        packet[0]['authors'] = ['Avery Researcher']
+        packet[1]['authors'] = ['Robin Author', 'Lee Colleague']
+        contract = composer.section_citation_contract(packet)
+        self.assertEqual([c['text'] for c in contract],
+                         ['Avery Researcher', 'Robin Author and colleagues', 'Source 3', 'Source 4'])
+        packet[2]['authors'] = ['Avery Researcher']
+        self.assertEqual(composer.section_citation_contract(packet)[0]['text'], '“Source 1”')
+        self.assertEqual(composer.section_citation_contract(packet)[2]['text'], '“Source 3”')
+
+    def test_solo_and_shared_author_labels_do_not_create_overlapping_links(self):
+        draft, packet = self.fixture()
+        packet[0].update(authors=['Avery Researcher'], title='Practice')
+        packet[1].update(authors=['Avery Researcher', 'Another Author'], title='Practice now')
+        contract = composer.section_citation_contract(packet[:2])
+        self.assertEqual([c['text'] for c in contract], ['“Practice”', '“Practice now”'])
+        section = copy.deepcopy(draft['signals'][0])
+        section['text'] = '“Practice” and “Practice now” address this question. ' + section['text']
+        section['citations'] = contract
+        composer.validate_generated_section(section, packet[:2])
+
     def test_stale_discovery_fails_instead_of_silently_skipping_the_week(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

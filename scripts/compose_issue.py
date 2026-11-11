@@ -477,7 +477,8 @@ def validate_section(section, sources, minimum_words=60, common_disclosure=None)
     lookup = {p['key']: p for p in sources}
     anchors = section.get('evidence', [])
     if not lookup or {a.get('key') for a in anchors} != set(lookup):
-        raise ValueError('Cite all supplied source keys: '+', '.join(lookup))
+        raise ValueError('Evidence array must cover all supplied source keys: '+', '.join(lookup)
+                         + '. Inline citation links are checked separately')
     for anchor in anchors:
         phrase = normalize(anchor.get('quote', ''))
         if not 5 <= len(phrase.split()) <= 12:
@@ -500,6 +501,92 @@ def repair_feedback(error, repeated=False):
             'Do not merely append qualifications, and do not output placeholders.'
             + (' The same invalid candidate was returned again. Make a substantive correction '
                'instead of repeating it.' if repeated else ''))
+
+
+def section_citation_contract(sources):
+    """Suggest source names, never claim excerpts, for visible link spans."""
+    labels = []
+    for source in sources:
+        authors = source.get('authors')
+        names = [name.strip() for name in authors
+                 if isinstance(name, str) and name.strip()] if isinstance(authors, list) else []
+        labels.append(names[0] + (' and colleagues' if len(names) > 1 else '')
+                      if names else source['title'])
+    # Exact span matching also counts an author's name inside "and colleagues".
+    # Quoted titles distinguish prefix titles such as "Practice" / "Practice now".
+    while True:
+        collisions = {i for i, label in enumerate(labels)
+                      if any(i != j and (label in other or other in label)
+                             for j, other in enumerate(labels))}
+        if not collisions:
+            break
+        revised = [f'“{source["title"]}”' if i in collisions else labels[i]
+                   for i, source in enumerate(sources)]
+        if revised == labels:
+            raise ValueError('Source identities cannot produce distinct inline citation labels')
+        labels = revised
+    return [{'key': source['key'], 'text': label}
+            for source, label in zip(sources, labels)]
+
+
+def validate_generated_section(section, sources, common_disclosure=None):
+    """Expose independent repair errors without replacing publication gates.
+
+    Exact anchors and inline links are different contracts. A bad anchor must
+    not hide a missing link until the next model attempt. These diagnostics do
+    not insert evidence, shorten quotes, or establish that a claim is supported.
+    """
+    errors = []
+    try:
+        validate_section(section, sources, minimum_words=80,
+                         common_disclosure=common_disclosure)
+    except (ValueError, KeyError, TypeError, AttributeError) as exc:
+        errors.append(str(exc))
+    lookup = {source['key']: source for source in sources}
+    anchors = section.get('evidence', [])
+    if isinstance(anchors, list):
+        for anchor in anchors:
+            if not isinstance(anchor, dict):
+                errors.append('Each evidence anchor must be an object')
+                continue
+            key = anchor.get('key')
+            source = lookup.get(key) if isinstance(key, str) else None
+            if source is None:
+                errors.append('Evidence anchor refers to an unknown source: ' + str(key))
+                continue
+            phrase = normalize(anchor.get('quote', ''))
+            count = len(phrase.split())
+            if not 5 <= count <= 12:
+                errors.append(f'{key} evidence quote has {count} normalized words; '
+                              'choose an exact supporting phrase of 5–12 words')
+            if not phrase or phrase not in normalize(source['evidence']):
+                errors.append('Evidence anchor does not match source: ' + str(key))
+    else:
+        errors.append('Evidence must be an array of source anchors')
+    # The full existing gate still checks coverage, identities and overlap.
+    candidate = dict(section)
+    try:
+        resolve_inline_citations(candidate, sources)
+    except (ValueError, KeyError, TypeError, AttributeError) as exc:
+        errors.append(str(exc))
+    entries = section.get('citations', [])
+    if isinstance(entries, list):
+        for entry in entries:
+            if not isinstance(entry, dict):
+                errors.append('Inline citations must be objects')
+                continue
+            key = entry.get('key')
+            source = (lookup.get(key) if isinstance(key, str) else None) or next(
+                (s for s in sources if s['title'] == entry.get('source')), None)
+            if source is not None:
+                try:
+                    resolve_inline_citations({'text': section.get('text', ''),
+                                              'citations': [entry]}, [source])
+                except (ValueError, KeyError, TypeError, AttributeError) as exc:
+                    errors.append(f"{source['key']} inline link: {exc}")
+    if errors:
+        raise ValueError('; '.join(dict.fromkeys(errors)))
+    section['citations'] = candidate['citations']
 
 
 def draft_in_stages(model, packet, audit):
@@ -584,8 +671,7 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
 
         def check_section(section):
             candidate = {**theme, **section}
-            validate_section(candidate, pair, minimum_words=80, common_disclosure=disclosure)
-            resolve_inline_citations(candidate, pair)
+            validate_generated_section(candidate, pair, common_disclosure=disclosure)
             section['citations'] = candidate['citations']
 
         section=generate('theme '+str(index+1), '''Write ONE useful section of 130–210 words, using only the supplied sources.
@@ -599,6 +685,10 @@ everyday actions; define an unavoidable technical term in place. Use two short p
 where useful, separated by \n\n. Do not force every comparison into a common mechanism. Keep each source's limitations
 attached to that source. Do not claim an attention study tested AI unless it did.
 Discussion is author interpretation, not measured results. Use the word "abstract" to explicitly label abstract-only evidence.
+Source fields can be incomplete even when extraction depth is full_text. If findings are
+absent, describe the available methods or attribute an interpretation to its authors;
+do not present an interpretation, study aim or title as a measured improvement. Missing
+limitations means limitations are unavailable here, not that the study has none.
 Identify nonacademic material as an "essay" or "commentary", never a study or experiment. Attribute its proposals to the author.
 Distinguish assisted performance, independent learning and sustained attention. No broad
 causal or long-term claims. Preprint status and AI-review limits are disclosed once in the
@@ -609,12 +699,19 @@ Paraphrase all public prose, including limitations, in original language: do not
 consecutive words from any source. Put exact source phrases only in evidence quotes.
 No numeric claims needed; any number must appear in the cited source evidence.
 Return an object with "text" containing your COMPLETE original prose, "citations", and "evidence".
-"citations" is an array with at least one entry for each source: {"key":"S1",
-"text":"exact source-identifying phrase that occurs ONCE in your prose"}. Those phrases
-become clickable source links. Put the link where the claim is introduced, not on a vague
-word like "study" or "here". Do not use Markdown, HTML or source-key placeholders in prose.
-"evidence" contains one object for each supplied source. Each evidence object needs "key" (the actual source key) and "quote" (an exact 5–12 word excerpt from THAT source, never from your paragraph or the other source). Do not output placeholders.
-Theme: '''+theme['title']+'\nSources:\n'+json.dumps(pair,ensure_ascii=False),check_section,1100)
+The two arrays have DIFFERENT purposes:
+1. "citations": source names copied from YOUR text. Use each supplied citation label
+literally ONCE in your prose, near the claim it introduces, and return that same label
+as its citation "text". A citation label is an author or title, never an evidence sentence.
+Do not use Markdown, HTML, vague words like "study", or source-key placeholders in prose.
+2. "evidence": one object for EVERY supplied source, with its "key" and "quote".
+Copy each quote exactly from THAT source's evidence, not from your prose or another source.
+Select a short supporting phrase of 5–12 normalized words. Count words after splitting
+punctuation and hyphens; aim for 6–8 words. Do not paraphrase or output placeholders.
+Before returning, check every source has BOTH an inline citation and an evidence anchor.
+Theme: '''+theme['title']+'\nCitation labels to use in prose and citations:\n'
+            +json.dumps(section_citation_contract(pair),ensure_ascii=False)
+            +'\nSources:\n'+json.dumps(pair,ensure_ascii=False),check_section,1100)
         signals.append({**theme,**section})
 
     def check_frame(frame):
