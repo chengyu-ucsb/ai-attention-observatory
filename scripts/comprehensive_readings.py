@@ -14,7 +14,7 @@ import re
 import time
 from full_document_access import Document, diagnostic_url, retrieve
 from enrich_deep_readings import FIELDS, has_copied_sequence
-from source_quality import screen as screen_source
+from source_quality import screen as screen_source, private_reading_eligibility
 
 ROOT=Path(__file__).resolve().parents[1]
 LIB=ROOT/'data/library.json'
@@ -423,8 +423,31 @@ def process(records,model,limit=2,retriever=None,run_date=None):
         retriever=retrieve_for_reading
     run_date=run_date or date.today()
     today=run_date.isoformat()
-    candidates=[r for r in records if r.get('kind') in FIELDS and due(r,today)
-                and (r['kind']!='scholarly' or screen_source(r)['decision']=='include')]
+    candidates=[]
+    selection={'considered':len(records), 'eligible':0, 'deferred_by_limit':0, 'skipped':{}}
+    for record in records:
+        reason = None
+        if record.get('kind') not in FIELDS:
+            reason = 'unsupported_kind'
+        elif record.get('source_review') or (record.get('analysis') or {}).get('original_paraphrases_only'):
+            reason = 'already_editorially_reviewed'
+        elif not due(record,today):
+            coverage=(record.get('deep_analysis') or {}).get('coverage') or {}
+            reason = ('complete_machine_reading' if coverage.get('evidence_status')=='full_document_retrieved'
+                      and coverage.get('all_retrieved_text_processed')
+                      and (record.get('deep_analysis') or {}).get('version',0)>=3 else 'retry_cooldown')
+        else:
+            disposition=private_reading_eligibility(record,
+                screen_source(record) if record['kind']=='scholarly' else None)
+            if disposition.startswith('skip_'):
+                reason=disposition[5:]
+        if reason:
+            selection['skipped'][reason]=selection['skipped'].get(reason,0)+1
+        else:
+            candidates.append(record)
+    selection['eligible']=len(candidates)
+    selection['deferred_by_limit']=max(0,len(candidates)-max(0,limit))
+    stats['selection']=selection
     candidates.sort(key=reading_queue_key)
     for record in candidates[:max(0,limit)]:
         stats['attempted']+=1

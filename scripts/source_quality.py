@@ -77,3 +77,36 @@ def screen(record,rules=None):
     if venue=="unverified":
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"publication_venue_unverified"}
     return {"decision":"include","venue_level":venue,"topic":topic,"reason":"field_venue_and_explicit_relevance"}
+
+
+# Private intake is not article approval. Keep this separate from screen(): a
+# machine reading may investigate a relevant preprint before editorial review.
+PRIVATE_HUMAN_FOCUS = re.compile(
+    r"\b(?:(?:human|student|learner|epistemic) agency|"
+    r"cognitive (?:atrophy|autonomy|dependency)|"
+    r"(?:human|student|learner) (?:attention|metacognit\w*|critical thinking))\b", re.I)
+PRIVATE_TITLE_FOCUS = re.compile(
+    r"\b(?:attention|attentional|distraction|critical thinking|metacognit\w*|"
+    r"self[- ]regulat\w*|cognitive (?:offload\w*|effort|engagement|autonomy)|"
+    r"learning (?:engagement|strategies|strategy))\b", re.I)
+HUMAN_CONTEXT = re.compile(r"\b(?:humans?|students?|learners?|participants?|users?|people)\b", re.I)
+
+
+def private_reading_eligibility(record, public_screen=None):
+    """Conservative metadata intake; never mutate or return public approval."""
+    public_screen = public_screen if public_screen is not None else screen(record)
+    if record.get('kind') != 'scholarly':
+        return 'nonacademic_intake'
+    if public_screen.get('decision') == 'include':
+        return 'public_screen_included'
+    venue = venue_class(record.get('venue'))
+    if venue == 'unverified':
+        return 'skip_unverified_venue'
+    if topic_class(record) == 'off_topic':
+        return 'skip_off_topic'
+    text = str(record.get('title') or '') + ' ' + str(record.get('abstract_text') or '')
+    if (AI.search(text) and (PRIVATE_HUMAN_FOCUS.search(text)
+            or (HUMAN_CONTEXT.search(str(record.get('title') or ''))
+                and PRIVATE_TITLE_FOCUS.search(str(record.get('title') or ''))))):
+        return 'human_ai_topic_for_private_review'
+    return 'skip_no_explicit_human_topic'

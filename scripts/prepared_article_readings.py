@@ -57,6 +57,9 @@ def validate_bundle(value, window, now=None):
             or value.get("source_text_saved") is not False or not isinstance(value.get("records"), dict)
             or value.get("metadata_sha256") != queue.digest({k: v for k, v in value.items() if k != "metadata_sha256"})):
         raise ValueError("invalid_prepared_readings")
+    if 'review_run' in value:
+        from preparation_pipeline import validate_stage_report
+        validate_stage_report('review', value['review_run'])
     queue.timestamp(value["observation_at"])
     if queue.utc_now(value["observation_at"]) > now:
         raise ValueError("invalid_prepared_readings")

@@ -45,7 +45,8 @@ class PipelineTests(unittest.TestCase):
         prep.atomic_save(self.folder / 'acquisition.json', self.state)
         prep.atomic_save(self.folder / 'readings.json', self.bundle)
         self.reports = {'acquire': self.state['run'],
-            'review': {'attempted': 2, 'summaries_completed': 1, 'failed': 1, 'skipped_no_model': False},
+            'review': {'attempted': 2, 'summaries_completed': 1, 'failed': 1, 'skipped_no_model': False,
+                       'selection': {'considered': 2, 'eligible': 2, 'deferred_by_limit': 0, 'skipped': {}}},
             'revalidate': {'attempted': 0, 'source_text_saved': False, 'approved': False},
             'apply': {'machine_checked_readings_applied': 0, 'approved': False}}
 
@@ -137,6 +138,8 @@ class PipelineTests(unittest.TestCase):
         self.receipt(); pipeline.finalize(self.root, NOW)
         receipt = pipeline.read(self.folder / 'reading-run.json')
         receipt['stages']['review']['failed'] += 1; receipt['stages']['review']['attempted'] += 1
+        receipt['stages']['review']['selection']['considered'] += 1
+        receipt['stages']['review']['selection']['eligible'] += 1
         prep.atomic_save(self.folder / 'reading-run.json', receipt)
         self.assertFalse(pipeline.edition_ready(self.root, NOW)['ready'])
         self.assertFalse(pipeline.edition_ready(self.root, NOW + dt.timedelta(days=7))['ready'])
@@ -254,6 +257,8 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result['next_action'], 'readings')
         run_path.write_bytes(saved)
         run = pipeline.read(run_path); run['stages']['review']['failed'] += 1; run['stages']['review']['attempted'] += 1
+        run['stages']['review']['selection']['considered'] += 1
+        run['stages']['review']['selection']['eligible'] += 1
         prep.atomic_save(run_path, run)
         self.assertEqual(pipeline.edition_ready(self.root, NOW)['status'], 'final_reading_inputs_changed')
         (self.folder / 'final-reading.json').unlink()
