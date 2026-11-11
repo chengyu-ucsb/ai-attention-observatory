@@ -1,6 +1,7 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
 import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
 from academic_state import DiscoveryState, ProviderDeferred, cursor_search
+from abstract_metadata import openalex_abstract, merge_abstract
 from search_plan import plan,source_class,discovery_window
 from arxiv_publication import ArxivPublicationVerifier, identifier_for as arxiv_identifier, fetch_atom
 from priority_research import discover as discover_priority, crossref_article, crossref_search, doi_id, load_manifest as priority_manifest
@@ -51,8 +52,7 @@ def request(url):
  req=urllib.request.Request(url,headers={"User-Agent":"AttentionAIObservatory/1.1 academic metadata research (contact via repository README)","Accept":"application/json"})
  with urllib.request.urlopen(req,timeout=25) as r:return json.load(r)
 def abstract(inv):
- if not isinstance(inv,dict):return ""
- return " ".join(word for _,word in sorted((p,word) for word,ps in inv.items() for p in ps if isinstance(p,int)))[:800]
+ return openalex_abstract(inv)["abstract_text"]
 def openalex_search(params, *, max_pages=5, page_size=100, state=None):
  return cursor_search(request,"OpenAlex",params,state=state,max_pages=max_pages,page_size=page_size)
 
@@ -97,7 +97,7 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
   audit.update(theme=lane,scope=scope);stats["provider_windows"].append(audit)
   errors.extend(provider_errors);stats["openalex"]+=len(works);stats["queries_attempted"]+=int(audit.get("requests_this_run",0)>0)
   for w in works:
-   title=w.get("title") or "";ab=abstract(w.get("abstract_inverted_index"));doi=doi_id(w.get("doi"))
+   title=w.get("title") or "";abstract_fields=openalex_abstract(w.get("abstract_inverted_index"),completeness=w.get("abstract_completeness"));ab=abstract_fields["abstract_text"];doi=doi_id(w.get("doi"))
    if not title or not KEYWORDS.search(title+" "+ab) or w.get("is_retracted"):continue
    pub=publication_date(w.get("publication_date"))
    if not date_in_window(pub,start,end):stats["publication_date_rejected"]+=1;continue
@@ -106,8 +106,7 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
    found.append({"title":title,"authors":authors,"published":pub.isoformat(),"venue":venue,"doi":doi,
      "publication_date_provenance":{"source":"OpenAlex","field":"publication_date","value":pub.isoformat(),"status":"day_known","original_day_verified":False},
      "url":"https://doi.org/"+doi if doi else w.get("id",""),
-     "preview":ab[:420]+("…" if len(ab)>420 else "") if ab else "Abstract unavailable; bibliographic metadata only.",
-     "abstract_text":ab[:3800],"abstract_source":"OpenAlex abstract index" if ab else "","kind":"scholarly","lane":lane,
+     **abstract_fields,"kind":"scholarly","lane":lane,
      "relation":"AI-related literature" if re.search(r"\bAI\b|artificial intelligence|generative",title+" "+ab,re.I) else "Adjacent digital-attention evidence",
      "evidence":"Metadata screened (unverified)","source":"OpenAlex","curated":False,"first_seen":today.isoformat(),
      "discovery_scope":scope,"discovery_query":q,"historical_backfill":mode=="backfill"})
@@ -334,9 +333,7 @@ def main():
     current["historical_backfill"]=False
     current["discovery_scope"]=x.get("discovery_scope", "previous_publication_week")
    current["source_group"]=source_class(current)
-   if len(x.get("abstract_text",""))>len(current.get("abstract_text","")):
-    current["abstract_text"]=x["abstract_text"];current["abstract_source"]=x.get("abstract_source","");current["preview"]=x["preview"]
-   elif not current.get("preview") or current["preview"].startswith("Abstract unavailable"):
+   if not merge_abstract(current,x) and (not current.get("preview") or current["preview"].startswith("Abstract unavailable")):
     if not x.get("preview","").startswith("Abstract unavailable"):current["preview"]=x["preview"]
    continue
   x["source_group"]=source_class(x)

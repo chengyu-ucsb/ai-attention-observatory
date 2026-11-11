@@ -22,6 +22,7 @@ import time
 
 from academic_state import DiscoveryState, ProviderDeferred, prefetch_searches
 from academic_state_schema import strict_json_loads
+from abstract_metadata import COMPLETENESS, MAX_ABSTRACT_CHARS
 from collection_window import (previous_week, publication_date, weekly_eligible,
                                reconcile_publication_evidence, window_metadata)
 import discover_editorial as editorial
@@ -152,9 +153,7 @@ def adopt_closed_packet(packet, library, now=None):
                   weekly_eligible(current, dt.date.min, dt.date.max)):
             current["published"] = row.get("published", "")
             current["publication_date_provenance"] = deepcopy(evidence)
-        if len(row.get("abstract_text", "")) > len(current.get("abstract_text", "")):
-            for field in ("abstract_text", "abstract_source", "preview"):
-                current[field] = row.get(field, "")
+        update.merge_abstract(current, row)
         if row.get("metadata_observed_at"):
             current["metadata_observed_at"] = row["metadata_observed_at"]
     preserve_unchanged_check_times(records, previous_records)
@@ -210,7 +209,7 @@ def adopt_closeout_checkpoint(path, now=None, *, closeout_pass="initial"):
 METADATA_FIELDS = {"title", "authors", "published", "venue", "doi", "url", "preview", "kind", "lane",
     "relation", "evidence", "source", "format", "source_type", "source_type_basis",
     "publication_date_provenance", "discovery_provenance", "first_seen", "content_access",
-    "abstract_text", "abstract_source", "discovery_scope", "discovery_query", "historical_backfill",
+    "abstract_text", "abstract_source", "abstract_completeness", "discovery_scope", "discovery_query", "historical_backfill",
     "source_group", "metadata_observed_at", "preparation_first_seen_at", "acquisition_status"}
 
 
@@ -352,7 +351,8 @@ DISCOVERY_SCHEMA.update(feed_url=meta_url, checked_at=meta_check_time,
 
 def validate_metadata_record(row):
     fields = {key: meta_text for key in METADATA_FIELDS}
-    fields.update(title=lambda x: meta_text(x, 4096), abstract_text=lambda x: meta_text(x, 6000),
+    fields.update(title=lambda x: meta_text(x, 4096), abstract_text=lambda x: meta_text(x, MAX_ABSTRACT_CHARS),
+        abstract_completeness=meta_enum(*COMPLETENESS),
         preview=lambda x: meta_text(x, 1000), authors=meta_list(lambda x: meta_text(x, 1024), 50),
         published=meta_day, first_seen=meta_day, url=meta_url,
         historical_backfill=meta_bool, publication_date_provenance=meta_provenance,
@@ -575,9 +575,7 @@ def merge_candidates(records, candidates, corrections, now, state):
             prior = records[key]
             if row.get("publication_date_provenance"):
                 update.apply_publication_evidence(prior, row.get("published", ""), row["publication_date_provenance"])
-            if len(row.get("abstract_text", "")) > len(prior.get("abstract_text", "")):
-                for field in ("abstract_text", "abstract_source", "preview"):
-                    prior[field] = row.get(field, "")
+            update.merge_abstract(prior, row)
         if key in observations:
             records[key]["metadata_observed_at"] = observations[key]
         records[key].setdefault("preparation_first_seen_at", now.isoformat())

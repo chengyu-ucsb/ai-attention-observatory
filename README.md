@@ -98,6 +98,15 @@ requires a separately issued API key; it is **not connected** in this iteration.
 
 ## How the research pipeline works
 
+Recurring scholarly discovery and metadata enrichment keep up to 6,000 characters
+of each provider-supplied abstract, separate from the 420-character card preview.
+`abstract_completeness` records
+whether the supplied text was preserved, truncated, unavailable, or rejected as
+an invalid index. Legacy cached text has unknown completeness. Preserved provider
+text does not establish that the provider supplied the entire abstract, or that
+the full paper was retrieved or reviewed. Cursor replay and weekly preparation
+retain this distinction without restarting completed searches.
+
 1. **Weekly discovery** (`.github/workflows/refresh.yml`) collects source records from academic and nonacademic publishers.
 2. **Full-text catch-up** (`.github/workflows/backfill-fulltext.yml`) makes smaller, repeated attempts to retrieve legitimately reusable machine-readable articles. Rate limits pause work, and retry status is retained between runs.
 3. **Reading preparation** separates reported results from author interpretations, retains provenance, and generates short, source-grounded notes. Machine condensation is *not* an independently verified critical review.
