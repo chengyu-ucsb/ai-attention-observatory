@@ -12,17 +12,25 @@ import re
 from observatory_store import fingerprint
 from observatory_remote_store import RemoteStore
 from preparation_pipeline import (ROOT, read, folder_for, target_window,
-                                  validate_reading_receipt)
+                                  validate_reading_receipt, scoped_library_inputs)
 
 
 def input_hash(root, phase, now):
     folder = folder_for(root, now, phase)
     inputs = {name: read(folder/name) if (folder/name).exists() else None
               for name in ('packet.json', 'acquisition.json', 'readings.json')}
+    if phase == 'closed':
+        # A backlog acquisition can change this week's evidence without changing
+        # its preparation packet. Such a change needs a fresh final reading pass.
+        weekly = read(Path(root)/'data/weekly.json')
+        inputs['weekly.json'] = weekly
+        inputs['library.json'] = scoped_library_inputs(root, inputs['packet.json'], weekly,
+                                                       read(Path(root)/'data/library.json'))
     # A fixed input set can be retried after a code or model-policy correction.
     from hashlib import sha256
     policy = {name: sha256((Path(root)/'scripts'/name).read_bytes()).hexdigest() for name in
-              ('prepared_article_readings.py', 'comprehensive_readings.py', 'reading_progress.py', 'worker_run.py')}
+              ('prepared_article_readings.py', 'comprehensive_readings.py', 'reading_progress.py',
+               'preparation_pipeline.py', 'worker_run.py')}
     return fingerprint({'phase': phase, 'inputs': inputs, 'policy': policy})
 
 
