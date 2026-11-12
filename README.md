@@ -28,7 +28,7 @@ availability and evidence checks.
 
 **Direct feed:** https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml
 
-RSS follows published weekly briefions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
+RSS follows published weekly editions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
 
 ## Private Zotero access
 
@@ -342,20 +342,29 @@ conversation. Optional source nominations can still be added in
 `data/brief-leads.json` with a title, DOI (or canonical arXiv URL), lane,
 discovery-week date and human-readable origin. Do not add private chat URLs.
 
-`Publish weekly briefion` runs after successful full-text acquisition, with
-Monday/Tuesday recovery checks. It checks for an existing edition before
+`Publish weekly edition` runs after final source-reading passes, with
+scheduled recovery checks. It checks for an existing edition before
 downloading a model or generating anything. For a new week,
-`scripts/compose_issue.py` runs Qwen2.5-7B-Instruct locally on the GitHub runner,
-with no hosted inference service or paid API key. It synthesizes eligible
-readings into three cross-source themes, a tension and a research question.
-The complete weekly source shelf remains attached to the published issue.
+`scripts/compose_issue.py` runs Qwen2.5-7B-Instruct locally on the standard
+GitHub runner. Private Supabase checkpoints retain each checked theme and review.
+An attempt is reserved before inference; each stage gets one initial attempt and
+one correction across restarts. Unchanged held inputs skip model installation
+and download. A final source-fidelity review remains mandatory.
+
+Composition runs Monday at 8:17 a.m., 11:40 a.m. and 4:17 p.m. Eastern.
+After 11:30 a.m., it may publish a compact edition with one to three checked
+themes from at least two sources. Pending readings continue independently;
+source-date, citation, currentness and accuracy gates still apply. With no
+acceptable draft, the last published issue remains visible. Artwork and
+intervention development are separate from the newsletter deadline.
 
 Automatic checks require real source identifiers, matching evidence anchors,
-multiple sources per theme, original prose, supported numeric claims and
+explicit source attribution, original prose, supported numeric claims and
 substantive content. They do not guarantee factual accuracy or replace an
 independent review. Automatic editions are labeled accordingly. Invalid output
 fails the run, retains evidence and draft in a recovery artifact, and leaves
-the previous edition visible; the next recovery run can retry. Completed
+the previous edition visible. Recovery reuses saved stages within their original
+attempt budgets; unchanged held inputs wait for changed evidence or policy. Completed
 editions are idempotent. Manual corrections in `data/issue-editorial.json`
 remain supported. The generation audit records the model and source-packet hash.
 

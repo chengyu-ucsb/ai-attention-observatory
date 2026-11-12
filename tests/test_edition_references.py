@@ -121,7 +121,7 @@ class ReferenceSelectionTests(unittest.TestCase):
         model = Mock()
         model.create_chat_completion.side_effect = [
             {'choices': [{'message': {'content': json.dumps(value)}}]} for value in [plan, *sections, frame]]
-        result = composer.draft_in_stages(model, self.packet, {})
+        result = composer.draft_in_stages(model, self.packet, {}, review_sections=False)
         self.assertEqual(model.create_chat_completion.call_count, 5)
         schema = model.create_chat_completion.call_args_list[1].kwargs['response_format']['schema']
         self.assertEqual(set(schema['properties']['evidence']['required']), {'S1', 'S2'})

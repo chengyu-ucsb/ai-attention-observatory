@@ -35,13 +35,22 @@ const {PGlite}=require(process.env.PGLITE_MODULE||'@electric-sql/pglite');
  for(const role of ['anon','authenticated']){
   await db.exec('set role '+role);
   await assert.rejects(db.query('select * from observatory.jobs'),/permission denied/);
+  await assert.rejects(db.query('select * from observatory.editorial_checkpoints'),/permission denied/);
   await db.exec('reset role');
  }
  await db.exec('set role observatory_worker');
  assert((await db.query('select count(*) as n from observatory.jobs')).rows[0].n>0);
+ await db.query("insert into observatory.editorial_checkpoints(cache_key,revision,value) values ($1,1,$2)",
+  [hash,JSON.stringify({kind:'stage',stage:'theme 1',attempts:[{attempt:1,status:'started'}],result:null})]);
+ assert.equal((await db.query('select revision from observatory.editorial_checkpoints where cache_key=$1',[hash])).rows[0].revision,1);
+ assert.equal((await db.query('update observatory.editorial_checkpoints set revision=revision+1 where cache_key=$1 and revision=0 returning revision',[hash])).rows.length,0);
+ assert.equal((await db.query('update observatory.editorial_checkpoints set revision=revision+1 where cache_key=$1 and revision=1 returning revision',[hash])).rows[0].revision,2);
+ await assert.rejects(db.query('update observatory.editorial_checkpoints set revision=0 where cache_key=$1',[hash]),/check constraint/);
  await db.exec('reset role');
  const tables=(await db.query("select count(*) as n from pg_tables where schemaname='observatory' and rowsecurity")).rows[0].n;
- assert.equal(Number(tables),10);
+ assert.equal(Number(tables),11);
+ const unprotected=(await db.query("select count(*) as n from pg_tables where schemaname='observatory' and not rowsecurity")).rows[0].n;
+ assert.equal(Number(unprotected),0);
  await db.close();
  console.log('Database verified: current-week isolation, leases, stale-worker fencing, bounded retries, semantic holds, immutable editions and private access.');
 })().catch(error=>{console.error(error.message);process.exitCode=1});

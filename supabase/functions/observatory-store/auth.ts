@@ -5,6 +5,7 @@ export const ISSUER = "https://token.actions.githubusercontent.com";
 const REPOSITORY = "chengyu-ucsb/ai-attention-observatory";
 const WORKFLOWS = new Set([
   "prepare-weekly-readings.yml", "finalize-weekly-readings.yml", "database-check.yml",
+  "weekly-edition.yml",
 ].map((file) => `${REPOSITORY}/.github/workflows/${file}@refs/heads/main`));
 const SUBJECTS = new Set([
   `repo:${REPOSITORY}:ref:refs/heads/main`,
@@ -13,6 +14,10 @@ const SUBJECTS = new Set([
 const KEYS = createRemoteJWKSet(new URL(`${ISSUER}/.well-known/jwks`), {
   timeoutDuration: 5000, cooldownDuration: 30000,
 });
+
+export function canManageEditorial(identity: Record<string, unknown>) {
+  return identity.workflow_ref === `${REPOSITORY}/.github/workflows/weekly-edition.yml@refs/heads/main`;
+}
 
 export function canManageRun(identity: Record<string, unknown>, phase: string) {
   const file = phase === "preparing" ? "prepare-weekly-readings.yml" : phase === "closed" ? "finalize-weekly-readings.yml" : "";

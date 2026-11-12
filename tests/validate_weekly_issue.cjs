@@ -33,12 +33,12 @@ if(featured.status==="published"){
  assert(fs.existsSync(path.join(root,"data/approved-issues",featured.edition_date+".json")),"Featured editorial is not archived");
 }
 if(issue.status==="published"){
- assert(issue.signals.length>=3&&issue.signals.length<=4,"A small number of cross-source signals is required");
+ assert(issue.signals.length>=(issue.edition_format==="compact"?1:3)&&issue.signals.length<=4,"A small number of cross-source signals is required");
  for(const sig of issue.signals){
-  assert(sig.source_ids.length>=2,"Each cross-source signal needs multiple sources");
+  assert(sig.source_ids.length>=1,"Each signal needs a checked source");
   for(const id of sig.source_ids)assert(issue.sources.some(s=>s.id===id),"Unresolved source citation "+id);
  }
- assert(issue.tension.source_ids.length>=2,"Tension must compare multiple sources");
+ assert(issue.tension.source_ids.length>=1,"Tension must cite a checked source");
  assert(newsletter.includes(issue.headline.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;"))||newsletter.includes(issue.headline),"Newsletter headline not in HTML");
  assert(!newsletter.includes("unsubscribe here"),"Don't fabricate unsubscribe support");
  assert(newsletter.includes(issue.editorial_note.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#x27;")),"Editorial production and evidence limits must be visible");

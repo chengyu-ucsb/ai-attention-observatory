@@ -185,7 +185,7 @@ def build(edition_date=None, use_published_sources=False):
    # A new collection rule/shelf must not rewrite an already published edition.
    draft=None
  if draft:
-  if len(items)<3:raise ValueError("Issue must have at least three source-backed items")
+  if len(items)<(2 if draft.get("edition_format")=="compact" else 3):raise ValueError("Issue has too few source-backed items for its format")
   cards=[]
   for sig in draft["signals"]:
    cited=[find(name,items) for name in sig["sources"]]
@@ -193,7 +193,7 @@ def build(edition_date=None, use_published_sources=False):
   tension=draft["tension"].copy()
   tension["source_ids"]=[source_id(find(name,items)) for name in tension["sources"]]
   schema.update({k:draft[k] for k in ("number","subject","headline","deck","letter","experiment","closer","editorial_note")})
-  for key in ("citation_schema_version","glossary"):
+  for key in ("citation_schema_version","glossary","edition_format"):
    if key in draft:schema[key]=draft[key]
   schema["signals"]=cards
   schema["tension"]=tension

@@ -51,7 +51,10 @@ class CoverageWorkflowTests(unittest.TestCase):
     def test_all_shared_writers_preserve_pending_work(self):
         for name in ('refresh.yml','backfill-fulltext.yml','deepen-readings.yml','weekly-edition.yml','resume-weekly-discovery.yml'):
             text=(ROOT/'.github/workflows'/name).read_text()
-            self.assertIn('observatory-index',text)
+            self.assertIn('observatory-edition' if name=='weekly-edition.yml' else 'observatory-index',text)
+            if name=='weekly-edition.yml':
+                self.assertIn('git diff --quiet "$publication_base" origin/main',text)
+                self.assertIn('compose_issue.py --verify-release',text)
             self.assertIn('  queue: max',text)
             self.assertIn('  cancel-in-progress: false',text)
 

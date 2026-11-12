@@ -24,7 +24,8 @@ publication.
 - Prompts ask who did what, what was measured, what was found and why a reader
   should care. Source names and understandable descriptions precede jargon.
 - Each theme may use one to three sources. A single-source account is preferable
-  to a manufactured cross-paper claim. An issue uses at least three sources;
+  to a manufactured cross-paper claim. A full issue uses at least three sources;
+  a compact edition after Monday 11:30 a.m. Eastern uses at least two;
   not every source must appear in the final research question.
 - Common preprint/review limits appear once in the source note. Material design
   limits stay with the relevant claim; removing repeated boilerplate does not
@@ -38,9 +39,11 @@ publication.
 - A separate-context AI critique checks fidelity, identifiable sources, concrete
   detail, useful comparisons and plain language against the supplied notes. It
   must cite specific draft passages and matching source evidence, not merely
-  say "pass." Rejections cause a rewrite and a fresh critique, up to a bounded
-  limit; unresolved or malformed reviews withhold publication. The audit keeps
-  the actual candidate, model, draft hash, review and revisions.
+  say "pass." Each theme gets its own review and at most one correction, with
+  attempts and accepted work saved privately across runner restarts. A final
+  critique checks the assembled edition; it can request one framing correction
+  without rewriting accepted themes. Unresolved or malformed reviews withhold
+  publication. The audit keeps the candidate, model, draft hash and reviews.
 
 The writer and automated critic currently use the same local model in separate
 contexts. This is an additional check, not independent expertise. Deterministic

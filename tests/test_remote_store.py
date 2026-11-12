@@ -66,6 +66,17 @@ class RemoteStoreTests(unittest.TestCase):
             store.save_checkpoint('a'*64, 'source', 'b'*64, 'c'*64, 'C0001', {'claims': [], 'checked': True})
         self.assertEqual(len(requests), 4)
 
+    def test_editorial_compare_and_swap_receipts_must_confirm_exact_revision(self):
+        store = RemoteStore(STORE_URL)
+        for receipt in ({'saved':False,'revision':1}, {'saved':True,'revision':2}, {}, {'saved':True,'revision':True}):
+            with patch.object(store,'_call',return_value=receipt), self.assertRaises(RuntimeError):
+                store.save_editorial('a'*64,0,{'kind':'stage'})
+        with patch.object(store,'_call',return_value={'saved':True,'revision':1}):
+            self.assertEqual(store.save_editorial('a'*64,0,{'kind':'stage'}),1)
+        for receipt in ({'revision':False,'value':None}, {'revision':1}, {'revision':-1,'value':None}):
+            with patch.object(store,'_call',return_value=receipt), self.assertRaises(RuntimeError):
+                store.get_editorial('a'*64)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -551,6 +551,20 @@ class PipelineTests(unittest.TestCase):
         with patch('comprehensive_readings.reading_candidates',return_value=([{'id':'pending'}],{'eligible':1})):
             self.assertFalse(pipeline.edition_ready(self.root,NOW)['ready'])
 
+    def test_cutoff_releases_only_current_checked_subset_and_does_not_stop_readers(self):
+        self.receipt(); pipeline.finalize(self.root,NOW)
+        late = NOW.replace(hour=17)
+        with patch('comprehensive_readings.reading_candidates',return_value=([{'id':'pending'}],{'eligible':1})):
+            self.assertFalse(pipeline.edition_ready(self.root,NOW,allow_partial=True)['ready'])
+            result = pipeline.edition_ready(self.root,late,allow_partial=True)
+            self.assertTrue(result['ready'])
+            self.assertEqual(result['status'],'checked_subset_at_cutoff')
+            self.assertEqual(result['pending_readings'],1)
+            self.assertFalse(pipeline.worker_plan(self.root,late)['ready'])
+            # A missing final receipt remains a blocker even after the cutoff.
+            (self.folder/'final-reading.json').unlink()
+            self.assertFalse(pipeline.edition_ready(self.root,late,allow_partial=True)['ready'])
+
 
 class WorkflowContractTests(unittest.TestCase):
     def test_all_shared_writers_are_serialized(self):

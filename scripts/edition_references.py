@@ -174,3 +174,42 @@ def resolve_review_references(review, draft, packet, criteria):
             'supported': checks[source['key']]['supported'],
         } for source in sources]
     return result
+
+
+def frame_response_schema(sources):
+    prose = {'type':'string', 'pattern':'^[^0-9]*$'}
+    keys = [p['key'] for p in sources]
+    return strict_object({
+        'headline': prose, 'deck': prose, 'letter': prose,
+        'tension': strict_object({'title':prose, 'text':{'type':'string'},
+            'citations':{'type':'array', 'minItems':1, 'maxItems':len(keys),
+                'items':strict_object({'key':{'type':'string','enum':keys},
+                                       'text':{'type':'string','enum':keys}})}}),
+        'closer':prose,
+        'glossary':{'type':'array', 'maxItems':5,
+                    'items':strict_object({'term':prose,'definition':prose})},
+    })
+
+
+def resolve_frame_references(frame, sources):
+    """Expand explicitly cited keys only; never infer attribution from prose."""
+    from copy import deepcopy
+    result = deepcopy(frame)
+    tension = result.get('tension', {})
+    labels = source_labels(sources)
+    text = tension.get('text', '')
+    selected = {}
+    for citation in tension.get('citations', []):
+        phrase, key = citation.get('text'), citation.get('key')
+        if re.fullmatch(r'S\d+', str(phrase)):
+            if phrase != key or key not in labels or key in selected:
+                raise ValueError('Invalid explicit frame source key')
+            if len(re.findall(r'\b' + re.escape(key) + r'\b', text)) != 1:
+                raise ValueError('Frame source key must occur exactly once')
+            selected[key] = labels[key]
+            citation['text'] = labels[key]
+    unknown = set(re.findall(r'\bS\d+\b', text)) - selected.keys()
+    if unknown:
+        raise ValueError('Unknown or uncited frame source key')
+    tension['text'] = re.sub(r'\bS\d+\b', lambda m: selected[m.group()], text)
+    return result

@@ -29,6 +29,30 @@ export async function digest(value: unknown) {
 }
 export async function validateRequest(value: unknown): Promise<Record<string, any>> {
   object(value);
+  if (value.op === "get_editorial") {
+    exact(value, ["op", "key"]); hash(value.key); return value;
+  }
+  if (value.op === "save_editorial") {
+    exact(value, ["op", "key", "revision", "value"]); hash(value.key); object(value.value);
+    if (!Number.isSafeInteger(value.revision) || Number(value.revision) < 0 ||
+        new TextEncoder().encode(JSON.stringify(value.value)).length > 58000 ||
+        !["stage", "edition"].includes(String(value.value.kind))) throw new Error("invalid_editorial_checkpoint");
+    if (value.value.kind === "stage") {
+      bounded(value.value.stage, 80);
+      const attempts = value.value.attempts;
+      if (!Array.isArray(attempts) || attempts.length > 2) throw new Error("invalid_editorial_budget");
+      for (const [index, attempt] of attempts.entries()) {
+        object(attempt);
+        if (attempt.attempt !== index + 1 || !["started", "checked", "rejected"].includes(String(attempt.status))) {
+          throw new Error("invalid_editorial_budget");
+        }
+      }
+    } else if (!Number.isInteger(value.value.runs) || Number(value.value.runs) < 1 ||
+               Number(value.value.runs) > 3 || !["pending", "working", "held", "checked"].includes(String(value.value.status))) {
+      throw new Error("invalid_editorial_budget");
+    }
+    return value;
+  }
   if (value.op === "begin_run") {
     exact(value, ["op", "phase", "week", "inputs_hash"]); hash(value.inputs_hash);
     if (!["preparing", "closed"].includes(String(value.phase)) ||
