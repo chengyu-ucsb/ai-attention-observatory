@@ -55,6 +55,26 @@ class ReferenceSelectionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unsupported numeric'):
             composer.validate_section(resolved, sources)
 
+    def test_required_source_paragraphs_render_unambiguous_named_citations(self):
+        sources = self.packet[:2]
+        prose = self.draft['signals'][0]['text'].split('address this question. ', 1)[1]
+        raw = {'source_notes': {'S1': prose, 'S2': prose},
+               'comparison': ' '.join(prose.split()[:35]),
+               'evidence': {source['key']: next(iter(refs.source_options(source))) for source in sources}}
+        resolved = refs.resolve_section_references(raw, sources)
+        self.assertNotIn('source_notes', resolved)
+        self.assertEqual(resolved['text'].count('Source 1'), 1)
+        self.assertEqual(resolved['text'].count('Source 2'), 1)
+        composer.validate_section(resolved, sources)
+        composer.resolve_inline_citations(resolved, sources)
+        for change in ('missing', 'empty', 'mixed'):
+            bad = copy.deepcopy(raw)
+            if change == 'missing': bad['source_notes'].pop('S2')
+            if change == 'empty': bad['source_notes']['S2'] = ''
+            if change == 'mixed': bad['citations'] = {'S1': 'Invented link'}
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                refs.resolve_section_references(bad, sources)
+
     def test_missing_cross_source_or_fabricated_choices_are_never_repaired(self):
         section, sources = self.selected_section()
         for mutation in ('missing', 'foreign', 'invented', 'missing_citation'):
@@ -76,6 +96,11 @@ class ReferenceSelectionTests(unittest.TestCase):
         sections = [self.selected_section(i)[0] for i in range(3)]
         plan = {'themes': [{'short': section['short'], 'title': section['title'],
                             'keys': list(section['evidence'])} for section in sections]}
+        for section in sections:
+            prose = section['text'].split('address this question. ', 1)[1]
+            section['source_notes'] = {key: ' '.join(prose.split()[:42]) for key in section['evidence']}
+            section['comparison'] = ' '.join(prose.split()[42:80])
+            section.pop('text'); section.pop('citations')
         frame = {key: value for key, value in copy.deepcopy(self.draft).items() if key != 'signals'}
         frame['tension'].pop('evidence')
         model = Mock()
@@ -86,6 +111,7 @@ class ReferenceSelectionTests(unittest.TestCase):
         schema = model.create_chat_completion.call_args_list[1].kwargs['response_format']['schema']
         self.assertEqual(set(schema['properties']['evidence']['required']), {'S1', 'S2'})
         self.assertNotIn('S2-A01', schema['properties']['evidence']['properties']['S1']['enum'])
+        self.assertEqual(set(schema['properties']['source_notes']['required']), {'S1', 'S2'})
         self.assertTrue(all(anchor['quote'] for section in result['signals'] for anchor in section['evidence']))
 
     def test_review_resolves_real_passages_but_cannot_override_an_unsupported_judgment(self):

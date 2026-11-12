@@ -41,11 +41,23 @@ def with_evidence_options(sources):
 
 def section_response_schema(sources):
     return strict_object({
-        'text': {'type': 'string'},
-        'citations': strict_object({source['key']: {'type': 'string'} for source in sources}),
+        'source_notes': strict_object({source['key']: {'type': 'string'} for source in sources}),
+        'comparison': {'type': 'string'},
         'evidence': strict_object({source['key']: {'type': 'string', 'enum': list(source_options(source))}
                                    for source in sources}),
     })
+
+
+def source_labels(sources):
+    labels = {}
+    for source in sources:
+        authors = source.get('authors') or []
+        labels[source['key']] = (authors[0] + (' and colleagues' if len(authors) > 1 else '')
+                                 if authors and isinstance(authors[0], str) else source['title'])
+    for source in sources:
+        if list(labels.values()).count(labels[source['key']]) > 1:
+            labels[source['key']] = source['title']
+    return labels
 
 
 def exact_keys(value, keys, label):
@@ -66,6 +78,24 @@ def resolve_section_references(section, sources):
     """
     result = dict(section)
     keys = [source['key'] for source in sources]
+    notes = result.get('source_notes')
+    if notes is not None:
+        if not isinstance(notes, dict) or 'text' in result or 'citations' in result:
+            raise ValueError('Supply source_notes and comparison, without a separate text or citations field')
+        exact_keys(notes, keys, 'Source notes')
+        if any(not isinstance(note, str) or len(note.split()) < 30 for note in notes.values()):
+            raise ValueError('Each supplied source needs its own substantive paragraph of at least 30 words')
+        comparison = result.get('comparison')
+        if not isinstance(comparison, str) or len(comparison.split()) < 25:
+            raise ValueError('Explain the connection or open question in at least 25 words')
+        labels = source_labels(sources)
+        # The model explicitly assigns each paragraph to a required source key.
+        # Render that assignment as a named link; never infer a missing citation
+        # from the prose or invent a missing source's contribution.
+        result['text'] = '\n\n'.join(labels[key] + ': ' + notes[key].strip() for key in keys)
+        result['text'] += '\n\n' + comparison.strip()
+        result['citations'] = [{'key': key, 'text': labels[key]} for key in keys]
+        result.pop('source_notes'); result.pop('comparison')
     citations = result.get('citations')
     if isinstance(citations, dict):
         exact_keys(citations, keys, 'Citations')
