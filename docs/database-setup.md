@@ -212,3 +212,27 @@ To explicitly start a bounded final reading on a trusted main-branch code push,
 include `[run-readings]` in the commit message and change the finalizer workflow
 or `scripts/worker_run.py`. Ordinary code pushes do not use that direct recovery
 route. Existing trusted upstream-workflow triggers remain supported.
+
+
+### Editorial progress
+
+`observatory.editorial_checkpoints` is private and accessible only through the
+main-branch publication workflow's short-lived GitHub identity. Checkpoints
+bind source content, prompts, model and validator policy. Compare-and-swap
+revisions prevent concurrent attempts from overwriting progress; identical
+HTTP retries are idempotent. Stage attempts are saved before inference and
+limited to two, including interruptions and source-fidelity corrections.
+
+Each theme receives a separate-context source review. A rejected theme can be
+corrected once without rewriting accepted themes. At the Monday 11:30 a.m.
+Eastern cutoff, a compact edition may use the accepted subset. Its framing is
+written only from retained themes and still receives a final review. The
+finalizer continues processing deferred sources. Unchanged held editions do
+not download a model on subsequent scheduled checks. No paid inference or
+provider upgrade is configured.
+
+A publisher runs independently of research acquisition and verifies that its
+source and policy snapshot is unchanged before pushing. A race retains private
+checkpoints for the next run instead of silently attaching old prose to new
+source evidence. GitHub schedules are best effort; the noon target is not a
+guaranteed service deadline.

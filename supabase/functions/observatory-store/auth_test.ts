@@ -1,5 +1,5 @@
 import { generateKeyPair, SignJWT } from "jose";
-import { AUDIENCE, ISSUER, canManageRun, verifyGithubToken } from "./auth.ts";
+import { AUDIENCE, ISSUER, canManageRun, canManageEditorial, verifyGithubToken } from "./auth.ts";
 import { digest, validateRequest } from "./validation.ts";
 
 function assert(value: unknown) { if (!value) throw new Error("assertion_failed"); }
@@ -70,4 +70,22 @@ Deno.test("reading leases require the correct workflow and never assert publicat
   await rejects(() => validateRequest({ ...payload, result: { ...payload.result, weekly_publication_verified: true } }));
   await rejects(() => validateRequest({ ...payload, result: { ...payload.result, completed: 1 } }));
   await rejects(() => validateRequest({ ...payload, result: { ...payload.result, attempted: -1 } }));
+});
+
+Deno.test("editorial checkpoints are bounded and restricted to the main publisher", async () => {
+  assert(!canManageEditorial(normal));
+  const publisher = { ...normal, workflow_ref: normal.workflow_ref.replace("database-check", "weekly-edition") };
+  assert(canManageEditorial(publisher));
+  await verifyGithubToken(await token(publisher), pair.publicKey);
+  const body = { op:"save_editorial", key:"a".repeat(64), revision:0,
+    value:{kind:"stage", stage:"theme 1", attempts:[{attempt:1,status:"started"}],result:null} };
+  await validateRequest(body);
+  for (const change of [{revision:-1}, {revision:1.5}, {key:"no"},
+    {value:{...body.value, attempts:[{attempt:3,status:"started"}]}},
+    {value:{...body.value, attempts:Array(3).fill({attempt:1,status:"started"})}},
+    {value:{...body.value, result:"x".repeat(58000)}},
+    {value:{kind:"edition",status:"checked",runs:4}}]) {
+    await rejects(() => validateRequest({...body,...change}));
+  }
+  await validateRequest({op:"get_editorial",key:body.key});
 });

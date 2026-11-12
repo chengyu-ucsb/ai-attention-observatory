@@ -528,7 +528,7 @@ def finalize(root=ROOT, now=None, expected_week=None):
     return receipt
 
 
-def edition_ready(root=ROOT, now=None, *, reconcile_legacy=False):
+def edition_ready(root=ROOT, now=None, *, reconcile_legacy=False, allow_partial=False):
     """Read-only gate: changed reading inputs need real work, never reblessing.
 
     The finalizer uses ready=false to enter its existing bounded reading stages;
@@ -588,6 +588,10 @@ def edition_ready(root=ROOT, now=None, *, reconcile_legacy=False):
         result["reconciliation"] = reconciliation
     selection = pending_readings(packet, state, bundle, now)
     if selection['eligible']:
+        from edition_schedule import publication_cutoff
+        if allow_partial and publication_cutoff(now):
+            return dict(result, ready=True, status='checked_subset_at_cutoff',
+                        coverage=receipt['coverage'], pending_readings=selection['eligible'])
         return dict(result, ready=False, status='more_readings_due', next_action='readings', selection=selection)
     return dict(result, ready=True, status=receipt["status"], coverage=receipt["coverage"])
 
@@ -746,7 +750,7 @@ def main():
     elif args.action == "reading-plan": result = reading_plan(args.root, phase=args.phase)
     elif args.action == "readings": result = run_readings(args.root, phase=args.phase, expected_week=args.expected_week)
     elif args.action == "finalize": result = finalize(args.root, expected_week=args.expected_week)
-    elif args.action == "edition-check": result = edition_ready(args.root, reconcile_legacy=args.reconcile_legacy_library)
+    elif args.action == "edition-check": result = edition_ready(args.root, reconcile_legacy=args.reconcile_legacy_library, allow_partial=True)
     elif args.action == "worker-plan": result = worker_plan(args.root)
     elif args.action == "lead-time": result = lead_time()
     elif args.action == "scope": result = {"week": target_window(utc(), args.phase)["from"], "phase": args.phase}

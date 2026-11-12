@@ -76,31 +76,26 @@ class EditorialQualityGateTests(unittest.TestCase):
             with self.subTest(corrupt=corrupt),self.assertRaises(ValueError):
                 composer.validate_editorial_review(bad,draft,packet)
 
-    def test_rejection_rewrites_then_gets_a_fresh_separate_context_review(self):
+    def test_rejected_final_review_never_rewrites_approved_themes(self):
         draft,packet=self.fixture()
-        model=self.mock_responses(self.receipt(draft,packet,False),draft,self.receipt(draft,packet))
+        model=self.mock_responses(self.receipt(draft,packet,False))
+        progress = composer.Progress(composer.MemoryStore(), composer.MODEL)
         audit={}
-        result=composer.review_and_revise(model,draft,packet,audit)
-        self.assertEqual(result['headline'],draft['headline'])
-        self.assertEqual([x['decision'] for x in audit['editorial_reviews']],['revise','pass'])
-        self.assertTrue(all(len(c.kwargs['messages'])==2 for c in model.create_chat_completion.call_args_list))
-        self.assertNotIn('ISSUES:',model.create_chat_completion.call_args_list[-1].kwargs['messages'][1]['content'])
-
-    def test_repeated_quality_failure_withholds_instead_of_publishing(self):
-        draft,packet=self.fixture()
-        rejection=self.receipt(draft,packet,False)
-        model=self.mock_responses(rejection,draft,rejection,draft,rejection)
-        audit={}
-        with self.assertRaisesRegex(ValueError,'still requires changes'):
-            composer.review_and_revise(model,draft,packet,audit)
-        self.assertEqual(len(audit['editorial_reviews']),3)
+        for _ in range(2):
+            with self.assertRaisesRegex(ValueError,'still requires changes'):
+                composer.review_and_revise(model,draft,packet,audit,progress)
+        self.assertEqual(model.create_chat_completion.call_count,1)
         self.assertTrue(all(x['decision']=='revise' for x in audit['editorial_reviews']))
+        self.assertTrue(all(len(c.kwargs['messages'])==2 for c in model.create_chat_completion.call_args_list))
 
-    def test_malformed_review_cannot_license_publication(self):
+    def test_malformed_review_cannot_license_publication_or_reset_on_restart(self):
         draft,packet=self.fixture()
-        model=self.mock_responses({}, {}, {})
-        with self.assertRaisesRegex(ValueError,'valid assessment'):
-            composer.review_and_revise(model,draft,packet,{})
+        model=self.mock_responses({}, {})
+        store = composer.MemoryStore()
+        for _ in range(2):
+            with self.assertRaisesRegex(ValueError,'correction budget exhausted'):
+                composer.review_and_revise(model,draft,packet,{},composer.Progress(store,composer.MODEL))
+        self.assertEqual(model.create_chat_completion.call_count,2)
 
     def test_evidence_budgets_end_at_sentences_not_half_a_qualification(self):
         original='The study measured an immediate outcome. This does not establish lasting learning.'

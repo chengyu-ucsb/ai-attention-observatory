@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { canManageRun, verifyGithubToken } from "./auth.ts";
+import { canManageRun, canManageEditorial, verifyGithubToken } from "./auth.ts";
 import { canonical, digest, validateRequest } from "./validation.ts";
 
 // This is a private backend bridge, never a browser/client API. The platform's
@@ -41,6 +41,24 @@ Deno.serve(async (req) => {
       await sql`set local statement_timeout = '15s'`;
       const owner = `github:${identity.run_id}:${identity.run_attempt}`;
       const runUrl = `https://github.com/chengyu-ucsb/ai-attention-observatory/actions/runs/${identity.run_id}`;
+      if (input.op === "get_editorial" || input.op === "save_editorial") {
+        if (!canManageEditorial(identity)) throw new Error("workflow_scope_mismatch");
+        if (input.op === "get_editorial") {
+          const [row] = await sql`select revision,value from observatory.editorial_checkpoints where cache_key=${input.key}`;
+          return row ?? { revision: 0, value: null };
+        }
+        // Serialize one key, including the first INSERT; unrelated stages remain independent.
+        await sql`select pg_advisory_xact_lock(hashtextextended(${input.key},0))`;
+        const [current] = await sql`select revision,value from observatory.editorial_checkpoints where cache_key=${input.key} for update`;
+        const revision = current?.revision ?? 0;
+        if (revision === input.revision + 1 && canonical(current.value) === canonical(input.value)) return { saved: true, revision };
+        if (revision !== input.revision) return { saved: false, revision };
+        const [saved] = await sql`insert into observatory.editorial_checkpoints(cache_key,revision,value)
+          values (${input.key},${revision+1},${sql.json(input.value)})
+          on conflict (cache_key) do update set revision=excluded.revision,value=excluded.value,updated_at=now()
+          returning revision`;
+        return { saved: true, revision: saved.revision };
+      }
       if (input.op === "begin_run") {
         if (!canManageRun(identity, input.phase)) throw new Error("workflow_scope_mismatch");
         const start = new Date(); start.setUTCHours(0, 0, 0, 0);

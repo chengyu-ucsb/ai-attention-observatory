@@ -74,7 +74,7 @@ class CompositionTests(unittest.TestCase):
         replies=[plan,bad]+draft['signals']+[frame]
         model=Mock()
         model.create_chat_completion.side_effect=[{'choices':[{'message':{'content':json.dumps(x)}}]} for x in replies]
-        result=composer.draft_in_stages(model,packet,{})
+        result=composer.draft_in_stages(model,packet,{},review_sections=False)
         self.assertEqual(len(result['signals']),3)
         first=model.create_chat_completion.call_args_list[1].kwargs['messages'][1]['content']
         self.assertIn('Source 1',first)
@@ -103,7 +103,7 @@ class CompositionTests(unittest.TestCase):
             fake.create_chat_completion.return_value={'choices':[{'message':{'content':'{}'}}]}
             with self.assertRaises(ValueError): composer.compose(root,fake,today=date(2026,10,26))
             self.assertEqual(path.read_text(encoding='utf-8'),original)
-            self.assertEqual(fake.create_chat_completion.call_count,3)
+            self.assertEqual(fake.create_chat_completion.call_count,2)
             audit=json.loads((data/'edition-audits/2026-10-26.json').read_text(encoding='utf-8'))
             self.assertEqual(audit['status'],'failed_validation')
             path.write_text(json.dumps({'2026-10-26':{'headline':'Already published'}}),encoding='utf-8')
@@ -354,15 +354,15 @@ class CompositionTests(unittest.TestCase):
         bad_frame['headline'] = 'AI improves independent learning in classrooms'
         bad_anchor = copy.deepcopy(draft['signals'][1])
         bad_anchor['evidence'][0]['quote'] = ' '.join(composer.normalize(packet[1]['evidence']).split()[:13])
-        replies = [bad_plan, plan, bad_copy, bad_number, draft['signals'][0],
+        replies = [bad_plan, plan, bad_copy, draft['signals'][0],
                    bad_anchor] + draft['signals'][1:] + [bad_frame, frame]
         model = Mock()
         model.create_chat_completion.side_effect = [{'choices':[{'message':{'content':json.dumps(x)}}]} for x in replies]
         audit = {}
-        result = composer.draft_in_stages(model, packet, audit)
+        result = composer.draft_in_stages(model, packet, audit, review_sections=False)
         self.assertEqual(result['headline'], draft['headline'])
         errors = [s.get('validation_error', '') for s in audit['stages']]
-        for expected in ('neutral preprint heading', 'copies a long source passage', 'Unsupported numeric claim',
+        for expected in ('neutral preprint heading', 'copies a long source passage',
                          '5–12 normalized words'):
             self.assertTrue(any(expected in error for error in errors), expected)
         self.assertTrue(any(s['stage'] == 'editorial frame' and s.get('validation_error') for s in audit['stages']))
@@ -377,9 +377,10 @@ class CompositionTests(unittest.TestCase):
         model = Mock()
         model.create_chat_completion.return_value = {'choices':[{'message':{'content':json.dumps(invalid)}}]}
         audit = {}
-        with self.assertRaises(ValueError): composer.draft_in_stages(model, packet, audit)
-        self.assertEqual([s['repeated_candidate'] for s in audit['stages']], [False, True, True])
-        self.assertIn('Make a substantive correction', model.create_chat_completion.call_args_list[2].kwargs['messages'][-1]['content'])
+        with self.assertRaises(ValueError): composer.draft_in_stages(model, packet, audit, review_sections=False)
+        self.assertEqual(model.create_chat_completion.call_count, 2)
+        self.assertTrue(all(s['status'] == 'rejected' for s in audit['stages']))
+        self.assertIn('Remove unsupported claims', model.create_chat_completion.call_args_list[1].kwargs['messages'][-1]['content'])
         self.assertNotIn('candidate', audit)  # No final draft was fabricated.
 
     def test_prompt_does_not_order_false_review_status_or_preserve_flawed_prose(self):

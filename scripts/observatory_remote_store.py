@@ -114,6 +114,18 @@ class RemoteStore:
     def status(self):
         return self._call('status')
 
+    def get_editorial(self, key):
+        result = self._call('get_editorial', key=key)
+        if type(result.get('revision')) is not int or result['revision'] < 0 or 'value' not in result:
+            raise RuntimeError('editorial_checkpoint_receipt_invalid')
+        return result
+
+    def save_editorial(self, key, revision, value):
+        saved = self._call('save_editorial', key=key, revision=revision, value=value)
+        if saved.get('saved') is not True or type(saved.get('revision')) is not int or saved.get('revision') != revision + 1:
+            raise RuntimeError('editorial_checkpoint_conflict')
+        return saved['revision']
+
     def probe(self):
         return self._call('probe')
 
