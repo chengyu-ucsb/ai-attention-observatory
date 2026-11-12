@@ -18,7 +18,7 @@ from original_readings import public_record
 from collection_window import previous_week, weekly_eligible, window_metadata
 from edition_references import (with_evidence_options, section_response_schema,
     resolve_section_references, draft_passages, review_response_schema,
-    resolve_review_references)
+    resolve_review_references, frame_response_schema)
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'Qwen3-4B-Instruct-2507-Q4_K_M'
@@ -690,7 +690,8 @@ The glossary is optional: use zero to five terms a general reader may not know. 
 ordinary language in the prose; do not add jargon just to define it. No digits. Comparisons:\n'''+json.dumps(
         [{'title':s['title'],'text':s['text'],
           'citations':[{'key':c['key'],'text':c['text'].removesuffix(':')} for c in s['citations']]}
-         for s in signals],ensure_ascii=False),check_frame,1200)
+         for s in signals],ensure_ascii=False),check_frame,1200,
+        response_schema=frame_response_schema(packet))
     # The framing adds no evidence: keep the anchors from the comparisons it connects.
     frame['tension']['evidence']=[a for s in signals for a in s['evidence']
         if a['key'] in {c.get('key') for c in frame['tension'].get('citations', [])}]

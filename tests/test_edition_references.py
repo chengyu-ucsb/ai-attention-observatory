@@ -1,6 +1,7 @@
 """Reference selection prevents transcription failures, not factual mistakes."""
 import copy
 import json
+import re
 from pathlib import Path
 import sys
 import unittest
@@ -90,6 +91,32 @@ class ReferenceSelectionTests(unittest.TestCase):
         composer.validate_section(resolved, sources)
         composer.resolve_inline_citations(resolved, sources)
 
+    def test_internal_references_are_named_and_unknown_sources_are_rejected(self):
+        sources = copy.deepcopy(self.packet[:2])
+        sources[0]['authors'] = ['Jing Zhan']
+        sources[1]['authors'] = ['Michael Adarkwah']
+        prose = self.draft['signals'][0]['text'].split('address this question. ', 1)[1]
+        raw = {'source_notes': {'S1': prose, 'S2': prose},
+               'comparison': 'S1 and S2 ask related questions. ' + ' '.join(prose.split()[:35]),
+               'evidence': {source['key']: next(iter(refs.source_options(source))) for source in sources}}
+        resolved = refs.resolve_section_references(raw, sources)
+        self.assertIn('Jing Zhan and Michael Adarkwah ask related questions.', resolved['text'])
+        self.assertNotRegex(resolved['text'], r'\bS\d+\b')
+        composer.validate_section(resolved, sources)
+        composer.resolve_inline_citations(resolved, sources)
+        raw['comparison'] += ' S99 adds another finding.'
+        with self.assertRaisesRegex(ValueError, 'Unknown source reference'):
+            refs.resolve_section_references(raw, sources)
+
+    def test_frame_schema_keeps_numbers_in_evidence_bearing_sections(self):
+        schema = refs.frame_response_schema(self.packet)
+        for field in ('headline', 'deck', 'letter', 'closer'):
+            pattern = schema['properties'][field]['pattern']
+            self.assertIsNotNone(re.fullmatch(pattern, 'Learning outcomes remain uncertain.'))
+            self.assertIsNone(re.fullmatch(pattern, 'The mean was 4.58.'))
+        citation = schema['properties']['tension']['properties']['citations']['items']
+        self.assertEqual(citation['properties']['key']['enum'], ['S1', 'S2', 'S3', 'S4'])
+
     def test_missing_cross_source_or_fabricated_choices_are_never_repaired(self):
         section, sources = self.selected_section()
         for mutation in ('missing', 'foreign', 'invented', 'missing_citation'):
@@ -127,6 +154,8 @@ class ReferenceSelectionTests(unittest.TestCase):
         self.assertEqual(set(schema['properties']['evidence']['required']), {'S1', 'S2'})
         self.assertNotIn('S2-A01', schema['properties']['evidence']['properties']['S1']['enum'])
         self.assertEqual(set(schema['properties']['source_notes']['required']), {'S1', 'S2'})
+        self.assertIn('pattern', model.create_chat_completion.call_args_list[-1].kwargs[
+            'response_format']['schema']['properties']['letter'])
         self.assertTrue(all(anchor['quote'] for section in result['signals'] for anchor in section['evidence']))
 
     def test_review_resolves_real_passages_but_cannot_override_an_unsupported_judgment(self):

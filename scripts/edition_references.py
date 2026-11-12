@@ -60,6 +60,34 @@ def source_labels(sources):
     return labels
 
 
+def expand_source_keys(text, labels):
+    """Render explicit known references; never infer a new source association."""
+    def replace(match):
+        key = match.group()
+        if key not in labels:
+            raise ValueError('Unknown source reference in prose: ' + key)
+        return labels[key]
+    return re.sub(r'\bS\d+\b', replace, text)
+
+
+def frame_response_schema(sources):
+    prose = {'type': 'string', 'pattern': '^[^0-9]*$'}
+    return strict_object({
+        **{field: prose for field in ('headline', 'deck', 'letter')},
+        'tension': strict_object({
+            'title': prose, 'text': prose,
+            'citations': {'type': 'array', 'minItems': 1, 'items': strict_object({
+                'key': {'type': 'string', 'enum': [source['key'] for source in sources]},
+                'text': {'type': 'string'},
+            })},
+        }),
+        'closer': prose,
+        'glossary': {'type': 'array', 'maxItems': 5, 'items': strict_object({
+            'term': prose, 'definition': prose,
+        })},
+    })
+
+
 def exact_keys(value, keys, label):
     if set(value) != set(keys):
         raise ValueError(label + ' must cover exactly the supplied sources or criteria')
@@ -92,8 +120,8 @@ def resolve_section_references(section, sources):
         # The model explicitly assigns each paragraph to a required source key.
         # Render that assignment as a named link; never infer a missing citation
         # from the prose or invent a missing source's contribution.
-        result['text'] = '\n\n'.join(labels[key] + ': ' + notes[key].strip() for key in keys)
-        result['text'] += '\n\n' + comparison.strip()
+        result['text'] = '\n\n'.join(labels[key] + ': ' + expand_source_keys(notes[key].strip(), labels) for key in keys)
+        result['text'] += '\n\n' + expand_source_keys(comparison.strip(), labels)
         # Link the source label including its delimiter. An author's name may
         # also occur naturally in the paragraph; that is not a second link.
         result['citations'] = [{'key': key, 'text': labels[key] + ':'} for key in keys]
