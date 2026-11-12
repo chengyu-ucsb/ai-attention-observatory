@@ -683,7 +683,7 @@ Return {"headline":"at least five words", "deck":"30â€“45 words", "letter":"90â€
 The glossary is optional: use zero to five terms a general reader may not know. Prefer
 ordinary language in the prose; do not add jargon just to define it. No digits. Comparisons:\n'''+json.dumps(
         [{'title':s['title'],'text':s['text'],
-          'citations':[{key:c[key] for key in ('key','text')} for c in s['citations']]}
+          'citations':[{'key':c['key'],'text':c['text'].removesuffix(':')} for c in s['citations']]}
          for s in signals],ensure_ascii=False),check_frame,1200)
     # The framing adds no evidence: keep the anchors from the comparisons it connects.
     frame['tension']['evidence']=[a for s in signals for a in s['evidence']
