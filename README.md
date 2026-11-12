@@ -28,7 +28,7 @@ availability and evidence checks.
 
 **Direct feed:** https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml
 
-RSS follows published weekly briefions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
+RSS follows published weekly editions, including the complete editorial text and source links. It does **not** publish every incoming bibliographic record. The website composes new editions automatically from eligible readings; failed validation leaves the latest published issue available. The email-style newsletter is a public reading preview: **email delivery, subscriber storage, and mailing-list signup are not connected**.
 
 ## Private Zotero access
 
@@ -342,10 +342,10 @@ conversation. Optional source nominations can still be added in
 `data/brief-leads.json` with a title, DOI (or canonical arXiv URL), lane,
 discovery-week date and human-readable origin. Do not add private chat URLs.
 
-`Publish weekly briefion` runs after successful full-text acquisition, with
+`Publish weekly edition` runs after successful full-text acquisition, with
 Monday/Tuesday recovery checks. It checks for an existing edition before
 downloading a model or generating anything. For a new week,
-`scripts/compose_issue.py` runs Qwen2.5-7B-Instruct locally on the GitHub runner,
+`scripts/compose_issue.py` runs Qwen3-4B-Instruct-2507 locally on the GitHub runner,
 with no hosted inference service or paid API key. It synthesizes eligible
 readings into three cross-source themes, a tension and a research question.
 The complete weekly source shelf remains attached to the published issue.
