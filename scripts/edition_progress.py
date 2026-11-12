@@ -76,7 +76,7 @@ class Progress:
         for previous in state['attempts']:
             if previous.get('candidate'):
                 messages.extend([{'role': 'assistant', 'content': previous['candidate']},
-                                 {'role': 'user', 'content': 'Correct this error only: ' + previous.get('error', 'Interrupted assessment. Recheck the supplied evidence.')}])
+                                 {'role': 'user', 'content': 'Correct this error only: ' + previous.get('error', 'The prior draft passed structural checks; apply the source-fidelity correction below.')}])
         if correction:
             messages.append({'role': 'user', 'content': 'Correct these source-fidelity issues: ' + correction})
             state['result'] = None

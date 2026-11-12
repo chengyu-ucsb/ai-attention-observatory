@@ -171,6 +171,23 @@ class EditionRecoveryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Unsupported numeric claim'):
             composer.validate(draft,packet)
 
+    def test_elapsed_budget_keeps_unattempted_work_resumable(self):
+        _,packet,_,_ = self.fixture()
+        weekly = {'run':{'date':'2026-11-12','publication_window':composer.window_metadata('2026-11-12')},'items':[]}
+        store = MemoryStore()
+        def exhausted(model,packet,audit,**kwargs):
+            audit['budget_deferred'] = True
+            raise HeldStage('Insufficient checked material for an edition')
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'data').mkdir();(root/'data/issue-editorial.json').write_text('{}')
+            with patch.object(composer,'pending',return_value=weekly), patch.object(composer,'evidence',return_value=packet), patch.object(composer,'draft_in_stages',side_effect=exhausted):
+                with self.assertRaises(ValueError):
+                    composer.compose(root,Mock(),today=dt.date(2026,11,12),store=store)
+                self.assertTrue(composer.readiness(root,today=dt.date(2026,11,12),store=store)['needed'])
+        row=store.get_editorial(composer.edition_key(weekly,packet,True))['value']
+        self.assertEqual(row['status'],'pending')
+        self.assertEqual(row['runs'],1)
+
     def test_monday_cutoff_tracks_eastern_time_and_dst(self):
         for month,day,hour in [(11,9,16),(6,8,15)]:
             self.assertFalse(publication_cutoff(dt.datetime(2026,month,day,hour,29,tzinfo=dt.timezone.utc)))

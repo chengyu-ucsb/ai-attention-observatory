@@ -628,6 +628,8 @@ Theme: '''+theme['title']+'\nSources:\n'+json.dumps(with_evidence_options(pair),
                     response_schema=section_response_schema(pair), correction='; '.join(review['issues']))
             signals.append(candidate)
         except HeldStage as exc:
+            if 'time_budget' in str(exc):
+                audit['budget_deferred'] = True
             held.append({'stage':stage, 'reason':str(exc)})
             # Continue other independent themes; never discard those already checked.
     audit['deferred_sections'] = held
@@ -759,7 +761,7 @@ def compose(root=ROOT, model=None, today=None, *, store=None, now=None):
         draft = draft_in_stages(model, packet, audit, progress=progress, compact=compact)
     except Exception as exc:
         errors.append(str(exc))
-        resumable = not isinstance(exc, (ValueError, KeyError, TypeError)) or 'time_budget' in str(exc)
+        resumable = not isinstance(exc, (ValueError, KeyError, TypeError)) or 'time_budget' in str(exc) or audit.get('budget_deferred', False)
         state.update(status='pending' if resumable and state['runs'] < 3 else 'held',
                      reason=str(exc)[:1500])
         store.save_editorial(key, revision, state)

@@ -175,13 +175,14 @@ continues to use the prior completed Monday–Sunday UTC window.
 | Monday collection/closeout | 12:07, 2:07, 6:07 and 10:07 a.m. |
 | Monday final reading passes | 3:27, 6:27, 9:27 and 11:27 a.m.; 3:27 p.m. |
 | Later reading recovery | Tuesday–Sunday at 9:27 a.m. |
-| Monday composition attempts | 10:17 a.m., 12:17 p.m. and 4:17 p.m., plus successful finalizer completion |
+| Monday composition attempts | 8:17 a.m., 11:40 a.m. and 4:17 p.m., plus successful finalizer completion |
 | Later composition recovery | Tuesday–Sunday at 12:17 p.m. |
 | Publication-status rebuild | Monday at 12:47 and 5:47 p.m.; other days at 12:47 p.m. |
 | Missing-discovery check | Daily at 3:41 and 8:41 a.m.; only a genuinely absent launch is eligible |
 
 Noon is a target, not a guaranteed delivery time. GitHub scheduling and the
-shared writer queue can delay starts. Evidence gates can also hold a draft.
+runner availability can delay starts. The edition has a separate queue from
+research, and evidence gates can still hold a draft.
 `pipeline-status.json` records the timezone-aware target, source window and an
 explicit notice when the current edition has not been published. The existing
 Monday 1 p.m. chat delivery checks the website independently and reports a delay
