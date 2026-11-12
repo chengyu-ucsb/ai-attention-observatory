@@ -6,9 +6,9 @@
     "to": "2026-11-08",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-12T11:10:59.776426+00:00",
-  "packet_sha256": "304e936d454b44049166ca2487af7bd72f6ca4d63e726171ad8880340686b35f",
-  "acquisition_state_sha256": "d59dd0a66ae57d84f8765d8e1b8aced0390db9c42f4f776e4e5b3a2505593241",
+  "observation_at": "2026-11-12T21:37:27.978820+00:00",
+  "packet_sha256": "fa604b920fa8a740f7e168cf0bc23ca3b816232fb94d9f1b04d06f86b129d18d",
+  "acquisition_state_sha256": "f5f2a62681472ccd57ba97b33d49b9df0adf589b4ed4cd30e5fffcf3fe5d56c9",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -83,7 +83,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -158,7 +158,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -230,7 +230,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -296,7 +296,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -425,8 +425,74 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
+      }
+    },
+    "663780101daa37f72ad0354606726549a9212afd9a2527655b97d26e3d797e4b": {
+      "input_fingerprint": "ab5d132c7f1a5287dbd71384c7dfeb4dd80ff8537d25267f854f164ae2451ef1",
+      "record": {
+        "title": "Evaluating the AI-predictive potential of the PIC database for pediatric ICU mortality",
+        "authors": [
+          "Maria A. Bravo",
+          "Judy Ximena Ramos Garzon",
+          "Carlos A. Fajardo"
+        ],
+        "published": "2026-11-02",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-02"
+        },
+        "venue": "Pediatric Research",
+        "doi": "10.1038/s41390-026-05451-0",
+        "url": "https://doi.org/10.1038/s41390-026-05451-0",
+        "abstract_text": "Abstract Background Reliable Artificial Intelligence (AI) tools in healthcare depend on both data quality and model design. However, the predictive integrity of datasets is rarely assessed. Publicly available resources for critically ill children remain scarce. The Pediatric Intensive Care (PIC) database remains, to the best of current knowledge, the only open-access resource focused on pediatric critical care research. Methods This study evaluates the predictive potential of the PIC database. After applying strict cohort selection and data preprocessing, mortality risk was analyzed using statistical analysis through univariate Odds Ratio (OR) to measure associations, and machine learning (ML) models interpreted through SHAP values to assess feature importance and model behavior. Results ML experiments showed moderate but limited predictive performance for mortality. CatBoost performed best, with an AUC of 0.8521 (0.8414–0.8627) on the hold-out test set, but low sensitivity (42%) limited its ability to identify non-survivors. These findings suggest dataset-related constraints that reduce clinical reliability. Most relevant variables were minimum lactate, maximum lactate, mean respiratory rate, maximum hematocrit, and minimum urea. Conclusion Analysis showed that PIC lacks essential physiological data, highlighting the limits of current pediatric databases and the need for richer multicenter datasets to enable more robust, clinically applicable AI models. Impact Provides the first comprehensive evaluation of the PIC database, assessing its suitability for machine learning-based predictive modeling. Identifies key clinical variables and data gaps that influence the reliability of AI–based mortality prediction and model performance. Underscores the need for richer, multicenter pediatric ICU databases for research that incorporate essential physiological and neurological indicators. Demonstrates the value of combining statistical association and AI interpretability methods to assess the predictive integrity of clinical datasets.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Abstract Background Reliable Artificial Intelligence (AI) tools in healthcare depend on both data quality and model design. However, the predictive integrity of datasets is rarely assessed. Publicly available resources for critically ill children remain scarce. The Pediatric Intensive Care (PIC) database remains, to the best of current knowledge, the only open-access resource focused on pediatric critical care resear…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI assistant interruptions distraction multitasking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "869eb1cb3bc740b2c0d516105efa59c6f83c439c7cc7abbfba42268201b261d2": {
@@ -495,7 +561,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T09:59:22.959131+00:00",
         "abstract_completeness": "unknown"
       }
@@ -559,7 +625,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -691,7 +757,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "AI information overload algorithmic mediation",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -762,7 +828,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "adaptive notifications attention digital wellbeing",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -827,7 +893,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -893,7 +959,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -957,7 +1023,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T09:59:22.959131+00:00"
       }
     },
@@ -1027,7 +1093,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "generative AI sustained attention task switching",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -1097,7 +1163,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -1161,7 +1227,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "AI assistant interruptions distraction multitasking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -1230,7 +1296,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T09:59:22.959131+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -1296,7 +1362,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -1362,7 +1428,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -1434,7 +1500,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -1509,7 +1575,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -1574,7 +1640,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       }
@@ -1653,7 +1719,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -1720,7 +1786,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -1784,8 +1850,75 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
+      }
+    },
+    "d688d7e803ef8c8d5572935eb6977f1a07b8da25bd903beacbe27ab087d22272": {
+      "input_fingerprint": "110350473954ae5f02f0d642b4b4888179f32ade870cb9f285aaa5ca8cf9f5d6",
+      "record": {
+        "title": "The association between interpersonal alienation and problematic use of conversational AI among adolescents: A mediated network analysis of perceived anthropomorphism and AI attachment",
+        "authors": [
+          "Di Jiang",
+          "Qinqiu Gao",
+          "Qi Liu",
+          "Haifeng Li"
+        ],
+        "published": "2026-11-02",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-print",
+          "value": "2026-11-02"
+        },
+        "venue": "Journal of Behavioral Addictions",
+        "doi": "10.1556/2006.2026.00160",
+        "url": "https://doi.org/10.1556/2006.2026.00160",
+        "abstract_text": "Abstract Background and aims With the rapid development of conversational artificial intelligence (CAI), problematic use of conversational AI (PUCAI) among adolescents has attracted increasing attention. However, the underlying psychological factors associated with PUCAI remain unclear. Guided by the Interaction of Person-Affect-Cognition-Execution (I-PACE) model, this study explored the associations between interpersonal alienation, perceived anthropomorphism, AI attachment, and PUCAI. Methods Data were collected from 1,124 Chinese high school students (516 males, 608 females; M age = 16.59). Serial mediation analysis and network analysis were conducted. Results Interpersonal alienation was positively associated with PUCAI. It also had indirect associations through both parallel and serial mediation involving perceived anthropomorphism and AI attachment. Network analysis further revealed that perceived anthropomorphism exhibited the highest bridge expected influence, and emotional trust showed the highest centrality. Conclusion These findings suggest that adolescent PUCAI is associated not only with general psychological risk factors but also with social-cognitive perceptions and emotional bonding experiences during human–AI interactions. This study provides a novel perspective for understanding problematic use behaviors in emerging human–AI interaction contexts and offers implications for future risk assessment and research on healthy AI use.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Abstract Background and aims With the rapid development of conversational artificial intelligence (CAI), problematic use of conversational AI (PUCAI) among adolescents has attracted increasing attention. However, the underlying psychological factors associated with PUCAI remain unclear. Guided by the Interaction of Person-Affect-Cognition-Execution (I-PACE) model, this study explored the associations between interper…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI assistant interruptions distraction multitasking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "b55a86354b2160ad9e0bbd36ff360b413f636d3758b1df65bc5d495642e88db0": {
@@ -1849,7 +1982,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -1905,7 +2038,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -1959,7 +2092,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -2093,7 +2226,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "generative AI sustained attention task switching",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
       }
     },
@@ -2170,8 +2303,79 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "AI assistant interruptions distraction multitasking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
+      }
+    },
+    "8a77cf16c523a5f81a598a384ed2d476b9f4b62cea0493fd73bf34745fd31a5b": {
+      "input_fingerprint": "0e4d59dbc79fe3cef4d077332f5e641d9356003a47eea68a2cbf0528b1f40dd9",
+      "record": {
+        "title": "Investigating Patient Trust and Intention to Act in AI-Supported Clinical Decisions: Cross-Sectional Survey",
+        "authors": [
+          "Sippo Rossi",
+          "Afra Shamnath",
+          "Meghan Reading Turchioe",
+          "Laurie Lovett Novak",
+          "Megan E Salwei",
+          "Isabella Buitron",
+          "Xuhai Xu",
+          "Natalie Benda"
+        ],
+        "published": "2026-11-02",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-02"
+        },
+        "venue": "Journal of Medical Internet Research",
+        "doi": "10.2196/100388",
+        "url": "https://doi.org/10.2196/100388",
+        "abstract_text": "Abstract Background In health systems, AI is increasingly being implemented as a form of clinical decision support (CDS). Research on patient perspectives, however, lags behind clinician-focused studies. Before the introduction of AI-based tools, clinicians often used and continue to use rule-based guidelines and risk calculators (RCs) to inform decision-making. Prior research has shown that RCs for CDS have mixed effects on patient adherence to treatment recommendations, whereas for AI-based tools, the effect is still not clear. Objective This study aims to assess differences in patients’ behavioral intentions, trust, and preferences for clinical recommendations provided by doctors alone, doctors supported by RCs, and doctors supported by AI-based risk predictions. We also evaluate how sociodemographic characteristics affect these perceptions. Methods We surveyed 1185 US-based adults. Participants rated their likelihood of taking recommended clinical actions (behavioral intentions) across 6 clinical scenarios, where they were randomized to a different recommendation source (doctor, doctor + RC, and doctor + AI). Participants also rated their trust in the recommendation, indicated their preferred source for recommendations, and provided qualitative feedback. Results Behavioral intentions differed by recommendation source such that the doctor + RC condition had greater odds of behavioral intention than the doctor + AI condition. Behavioral intentions were also affected by the clinical condition. Participants had greater odds of trusting doctors alone over doctor + RC, and both doctors alone and doctor + RC had greater trust than doctor + AI. However, a plurality of participants ultimately preferred a doctor using an RC for making recommendations. Several sociodemographic differences were detected, namely, participants with higher subjective numeracy and literacy had higher odds of taking clinical action and higher trust across decision-support sources. We detected qualitative themes in the following categories: decision quality and reliability; trust and perceptions; patient-centeredness and autonomy; fairness, transparency, and ethics. Across categories, participants reported skepticism toward all decision sources and potential misunderstanding of AI’s ability to personalize risk predictions. Some participants also stated that they had no additional concerns or were uncertain regarding their feelings. Conclusions These findings reveal novel, nuanced patient preferences shaped by task and context, offering guidance for aligning AI-supported care with patient values. Patients were not aligned on the recommendation source across intentions, trust, and preferences. Taken together, our results indicate that patients prefer doctors working with easy-to-understand, explainable support but are still learning to trust these tools. Our findings also highlight the continued importance of the clinical context and its interaction with computer-assisted decision support. Future work should evaluate how we can transparently convey to patients the use of AI in clinical decision-making, embedded within the given clinical context. This may present an opportunity to bolster, rather than erode, patient trust.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Abstract Background In health systems, AI is increasingly being implemented as a form of clinical decision support (CDS). Research on patient perspectives, however, lags behind clinician-focused studies. Before the introduction of AI-based tools, clinicians often used and continue to use rule-based guidelines and risk calculators (RCs) to inform decision-making. Prior research has shown that RCs for CDS have mixed ef…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI assistant interruptions distraction multitasking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "1fad7e3c1720462b70d9459b25e9b7fc309dae09268385f5ba6562de8c0d5489": {
@@ -2239,9 +2443,74 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
+      }
+    },
+    "6bb639cc47638f0b41acad670cba610739c3825c73e1b02f02b55860487312bf": {
+      "input_fingerprint": "243e6ad19245a6d5679d880e9344367711e99c1d90c79cd6bdc0db1e78227669",
+      "record": {
+        "title": "How do PhD Students Use Generative AI? Reflections on Practice and Ethics",
+        "authors": [
+          "Josh Grignon",
+          "Olivia Caruso"
+        ],
+        "published": "2026-11-02",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-02"
+        },
+        "venue": "Journal of Teaching and Learning",
+        "doi": "10.22329/jtl.v20i4.11289",
+        "url": "https://doi.org/10.22329/jtl.v20i4.11289",
+        "abstract_text": "Generative AI (GenAI) has rapidly moved from novelty to ubiquity, reshaping how doctoral students approach learning, research, and career preparation. Yet while universities and the public often frame debates around undergraduate use, comparatively little attention has been given to PhD students despite their dual role as learners and future scholars. In this paper, we reflect on our experiences as PhD students using GenAI across coursework, qualifying exams, thesis research, teaching, and the job market. Drawing on these experiences, we highlight both the opportunities GenAI provides—for efficiency, conceptual clarity, and skill development—and the ethical challenges it raises, including concerns about academic integrity, cognitive outsourcing, disclosure, and employability beyond academia. Our reflections emphasize that GenAI use is not uniform: it varies with disciplinary context, institutional policies, and students’ levels of development. We argue that GenAI is no longer peripheral to doctoral education but central to its practice, and the challenge ahead is how it can be integrated responsibly to support learning, uphold integrity, and prepare graduates for an evolving academic and professional landscape.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Generative AI (GenAI) has rapidly moved from novelty to ubiquity, reshaping how doctoral students approach learning, research, and career preparation. Yet while universities and the public often frame debates around undergraduate use, comparatively little attention has been given to PhD students despite their dual role as learners and future scholars. In this paper, we reflect on our experiences as PhD students using…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI assistant interruptions distraction multitasking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "383aa779ae6063e5dbb9e9e5e650e07267a5a0c0d3f23b669c53e514b7c31431": {
@@ -2306,7 +2575,76 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
+        "abstract_completeness": "provider_text_preserved"
+      }
+    },
+    "533b391ddbd036751d74406e1d2b3a6ba3e47faac1ec21210ace082a5edb4e9a": {
+      "input_fingerprint": "302f28330e77ae445b9dd1893487d806bbd06f5311ba289c60bd6f5ec38a7d6c",
+      "record": {
+        "title": "Designing a Human–AI Collaborative Blended Learning Framework for EFL Speaking Development",
+        "authors": [
+          "Mehrinigor Bahodirovna Akhmedova",
+          "Karimjonova Shahlo Ravshanjonovna",
+          "Solijonov Muhammadjon Zokirjon o'g'li",
+          "Aziza Akhmedova Komilovna",
+          "Po’latova Irodakhon Ilxomjon Qizi",
+          "Jurayeva Nargiza Jamolidinovna"
+        ],
+        "published": "2026-11-02",
+        "venue": "JURNAL ARBITRER",
+        "doi": "10.25077/ar.13.3.374-389.2026",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-02"
+        },
+        "url": "https://doi.org/10.25077/ar.13.3.374-389.2026",
+        "preview": "While artificial intelligence (AI) technologies such as conversational chatbots and speech recognition systems are increasingly adopted in language education, existing research focuses predominantly on isolated tools rather than integrated instructional models. This study proposes and evaluates a Human–AI Collaborative Blended Learning Framework for the development of English as a Foreign Language (EFL) speaking skil…",
+        "abstract_text": "While artificial intelligence (AI) technologies such as conversational chatbots and speech recognition systems are increasingly adopted in language education, existing research focuses predominantly on isolated tools rather than integrated instructional models. This study proposes and evaluates a Human–AI Collaborative Blended Learning Framework for the development of English as a Foreign Language (EFL) speaking skills. Using a two-phase research design, the study first synthesizes contemporary literature to establish a 7-layer conceptual framework that connects stakeholder participation, learner profiling, a Human–AI collaboration engine, blended activities, adaptive speaking services, teacher facilitation, and continuous learning analytics. Second, the framework was evaluated through an expert validation survey involving 52 specialists in language education, applied linguistics, and educational technology (40.4% PhDs, 57.7% Master’s). Quantitative findings revealed strong endorsement for actionable teacher support dashboards (80.8% agreement), visual pronunciation feedback (78.8%), and private AI speaking practice for anxiety reduction (75.0%; M = 2.98/4.00). However, experts expressed reservations regarding automated prompts for language elaboration (53.8% agreement), fixed 14-meeting schedules (57.7%), and automated grading weights (57.7%). Qualitative analysis highlighted that acceptance remains conditional upon accent fairness, data privacy, and active teacher oversight. Implications: Theoretically, the study advances AI-assisted language learning by establishing a human-centered collaborative model that prioritizes teacher-AI shared regulation over technological substitution. Pedagogically and practically, the findings imply that institutions and EdTech developers should deploy AI primarily for scalable, low-stakes rehearsal and actionable lesson planning, while preserving teacher authority over social communication, pragmatic competence, and high-stakes assessment.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "kind": "scholarly",
+        "lane": "Interventions",
+        "relation": "AI-related literature",
+        "evidence": "Metadata screened (unverified)",
+        "source": "OpenAlex",
+        "first_seen": "2026-11-09",
+        "discovery_scope": "closeout",
+        "discovery_query": "generative AI self regulation learning intervention",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -2365,7 +2703,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -2431,7 +2769,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "AI assistant interruptions distraction multitasking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -2494,7 +2832,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "unknown"
       }
@@ -2559,7 +2897,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI interface attention design human agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "provider_text_preserved"
       },
@@ -2627,7 +2965,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       }
@@ -2692,7 +3030,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T21:27:38.003106+00:00"
       }
     },
@@ -2756,7 +3094,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       }
@@ -2957,7 +3295,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -3022,7 +3360,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       }
@@ -3088,7 +3426,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "AI attention management intervention focus assistant",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "provider_text_preserved"
       },
@@ -3158,7 +3496,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -3224,7 +3562,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
       }
     },
@@ -3289,8 +3627,75 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
+      }
+    },
+    "1804d6a0378e223c8d032d6d87313bd0ecae4166ef11337ce1e8e8ebb13dfc49": {
+      "input_fingerprint": "f303194b361ec9083f16e8fa6c5ef089a972103cabb92350355de666c6f868df",
+      "record": {
+        "title": "Cognitive-Professional Resource Configurations for AI-Mediated Teaching: Perceived Teacher-Education Support and Intelligent Professional Action",
+        "authors": [
+          "Jiacheng Wang",
+          "Xu Liu",
+          "Jiaoyang Du",
+          "Huan Song"
+        ],
+        "published": "2026-11-05",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                5
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                5
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                5
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-05"
+        },
+        "venue": "Journal of Intelligence",
+        "doi": "10.3390/jintelligence14110288",
+        "url": "https://doi.org/10.3390/jintelligence14110288",
+        "abstract_text": "AI-mediated teaching requires teachers to evaluate uncertain information, respond to changing conditions, and integrate AI with pedagogical judgment. This study examined four cognitive-professional resource domains relevant to intelligent professional action: digital literacy, digital resilience, AI-mediated epistemic agency (AMEA), and AI-TPACK. Variable-centered and person-centered analyses drew on a cross-sectional survey of 942 YouShi Plan preservice teachers at one Chinese university. Perceived structured teacher-education support was positively associated with all four resources. Self-reported teaching innovation competence was positively associated with jointly higher digital literacy and digital resilience, with the response surface primarily reflecting their combined level. Four resource profiles mainly differed in overall level and showed graded differences in perceived teaching innovation competence. Higher perceived support was also associated with membership in higher-resource profiles. Together, these findings connect perceived teacher-education support, cognitive-professional resource configurations, and self-reported teaching innovation competence, positioning the latter as a domain-specific perceived capability relevant to intelligent professional action in AI-mediated teaching.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "AI-mediated teaching requires teachers to evaluate uncertain information, respond to changing conditions, and integrate AI with pedagogical judgment. This study examined four cognitive-professional resource domains relevant to intelligent professional action: digital literacy, digital resilience, AI-mediated epistemic agency (AMEA), and AI-TPACK. Variable-centered and person-centered analyses drew on a cross-sectiona…",
+        "kind": "scholarly",
+        "lane": "AI & cognition",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "ChatGPT metacognition memory cognitive effort",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "b4a66125f975c4ae367740aee2c428af715fca6061b89d99b93409b21fd09e2c": {
@@ -3353,9 +3758,74 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "unknown"
+      }
+    },
+    "0209c7b240fb29c36a708d56c2c99f22d2a9ce8897e49833aca2d64672bcb6fa": {
+      "input_fingerprint": "d065ca1614580d4a4aff70249fcc59538c7fd72eea663ed5ee7ee18ae4837e3c",
+      "record": {
+        "title": "Roles of Artificial Intelligence in Urban Digital Twins and Governance",
+        "authors": [
+          "Jenna-Riia Oldenburg",
+          "Juho-Pekka Virtanen"
+        ],
+        "published": "2026-11-03",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                3
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                3
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                3
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-03"
+        },
+        "venue": "Smart Cities",
+        "doi": "10.3390/smartcities9110187",
+        "url": "https://doi.org/10.3390/smartcities9110187",
+        "abstract_text": "Artificial intelligence is becoming an increasingly used component in municipal operations, with applications spanning administrative automation, decision support, citizen interfaces, and predictive analytics across domains such as mobility, health and social services, and environmental management. While the literature documents benefits in operational efficiency and decision quality, most concrete evidence focuses primarily on internal efficiency. Urban digital twins have become commonplace in most European cities and smart cities globally. However, the role of AI within urban digital twins remains comparatively underexplored. This article addresses these gaps through a qualitative analysis of AI in Helsinki’s Experimentation Accelerator platform experiments and by comparing them against a DT framework based on the literature. Through this, we analyze how AI is piloted in municipal applications and how the identified use cases of AI align with the components of urban digital twins, identifying potential roles for AI in the urban digital twin as well as directions for future development.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Artificial intelligence is becoming an increasingly used component in municipal operations, with applications spanning administrative automation, decision support, citizen interfaces, and predictive analytics across domains such as mobility, health and social services, and environmental management. While the literature documents benefits in operational efficiency and decision quality, most concrete evidence focuses p…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "digital distraction notification fatigue attention",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "71b506bff0a0745aa0ee7dbc1f00b300860f4c8a31b6592f89bf0e56f0d2aea3": {
@@ -3418,9 +3888,77 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "unknown"
+      }
+    },
+    "2ad5b4e7841dbb1a1a78bccc7388a3004d5e457a61a89fafd0f27cc2eaa5a2b7": {
+      "input_fingerprint": "cbde90bef5fceedd6a475e1b1ad843f25687327758d27d5392bc95991df302b1",
+      "record": {
+        "title": "Overcoming Dengue Underreporting: A Machine Learning Framework for Automated Dengue Notification Based on Electronic Medical Records",
+        "authors": [
+          "Warodom Sornsurin",
+          "Worasait Suwannik",
+          "Panithee Thammawijaya",
+          "Till D. Frank",
+          "Lily Ingsrisawang"
+        ],
+        "published": "2026-11-03",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                3
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                3
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                3
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-03"
+        },
+        "venue": "Tropical Medicine and Infectious Disease",
+        "doi": "10.3390/tropicalmed11110315",
+        "url": "https://doi.org/10.3390/tropicalmed11110315",
+        "abstract_text": "Hospital notification of dengue cases is frequently delayed, contributing to underreporting. At Thai provincial hospitals the bottleneck is administrative, not diagnostic: delayed discharge coding and clerical steps mean notifications are submitted late or omitted. Existing machine learning (ML) studies require clinician-annotated features absent in passive electronic medical records (EMRs). We propose a dual-pathway EMR framework for ML-based pre-population of surveillance reports. We analyzed 1031 dengue-suspected encounters (508 notifiable) from Surin Hospital, Thailand (2019–2022). Pathway A combines EMR data with manually documented clinical features; Pathway B uses only passive EMR data. Using an 80/20 stratified split, we tested 7 ML methods across 11 feature sets (77 combinations) with SHAP-guided feature elimination and 10-fold cross-validation. On the primary split, Pathway A (CatBoost) achieved an F1 score of 96.62%, 95.10% sensitivity, and 98.10% specificity (10-seed mean F1 95.7% ± 1.4%). Pathway B (LightGBM) achieved an F1 score of 84.42%, 94.12% sensitivity, 75.24% specificity, and a projected negative predictive value of 99.1% at 10% prevalence; 10-seed performance was lower (F1 78.5% ± 4.3%; sensitivity 89.1%). An exploratory LSTM-16 stacking model (F1 83.99%; precision 79.49%) performed best in precision and specificity among Pathway B. Test F1 SD across 10 seeds was ≤5.0% in 75 of 77 combinations. Within this cohort, passive EMR modeling achieved 91–94% sensitivity on the primary split (85–89% across seeds) without additional data collection, supporting the feasibility of ML-based notification in resource-constrained hospitals. Whether this reduces dengue underreporting must be established in prospective, multi-center studies.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Hospital notification of dengue cases is frequently delayed, contributing to underreporting. At Thai provincial hospitals the bottleneck is administrative, not diagnostic: delayed discharge coding and clerical steps mean notifications are submitted late or omitted. Existing machine learning (ML) studies require clinician-annotated features absent in passive electronic medical records (EMRs). We propose a dual-pathway…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "Adjacent digital-attention evidence",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "digital distraction notification fatigue attention",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "8f6e2ccddb1281f3fe1abfed36c128b0c29e7411cc6d428240df69b6cd17213f": {
@@ -3484,9 +4022,78 @@
         "discovery_scope": "closeout",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
+      }
+    },
+    "8a78a963c243a41ad46c40323c8966d15637f8800e9fa0fc26220caaab124477": {
+      "input_fingerprint": "47186ceebf9eaf57ed5b92578a85fe536c26e42966380b8fc2889c0570f01c7a",
+      "record": {
+        "title": "Enhancing Students' Critical Evaluation of AI Versus Human-Generated Literature Reviews: Deliberative Pedagogy",
+        "authors": [
+          "Wan-chin Kuo",
+          "Kristen E. Pecanac",
+          "Che-Hao Tung",
+          "Pajarita Charles",
+          "Hung-Hui Chen",
+          "Diane R. Lauver"
+        ],
+        "published": "2026-11-02",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                2
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-02"
+        },
+        "venue": "Journal of Nursing Education",
+        "doi": "10.3928/01484834-20261009-02",
+        "url": "https://doi.org/10.3928/01484834-20261009-02",
+        "abstract_text": "Background: AI misuse in literature reviews has emerged as an issue for educators. The goal of this teaching innovation was to foster learners' critical thinking about AI use in literature reviews. Method: A four-step deliberative pedagogical process was applied: (a) announcing literature review battles between AI and humans, (b) presenting review results generated by both sides, (c) using a poll to ask learners to choose their preferred review results for policy decision-making, and (d) debriefing on the speed and accuracy of both reviews. Results: Sixty-one learners responded to the poll: 51% ( n = 31) chose human-generated reviews, 36% ( n = 22) chose AI-generated reviews, while 13% ( n = 8) expressed their surprise at AI's performance. Debriefing showed that AI spent only 0.5 hours completing the review, but with low search accuracy, whereas humans achieved high accuracy but took more than 6 months. Conclusion: Deliberative pedagogy encourages learners to recalibrate their AI knowledge and reconsider the importance of human decision-making in literature reviews.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Background: AI misuse in literature reviews has emerged as an issue for educators. The goal of this teaching innovation was to foster learners' critical thinking about AI use in literature reviews. Method: A four-step deliberative pedagogical process was applied: (a) announcing literature review battles between AI and humans, (b) presenting review results generated by both sides, (c) using a poll to ask learners to c…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI assistant interruptions distraction multitasking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "6ef51a2a161087fcafd378cfdfc9d27699543f9005561140cb47d0115350a1e5": {
@@ -3554,7 +4161,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
       }
     },
@@ -3638,7 +4245,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown",
         "complete_reading_attempt": {
@@ -3707,7 +4314,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown",
         "complete_reading_attempt": {
@@ -3822,7 +4429,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       },
@@ -3975,7 +4582,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -4043,7 +4650,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "generative AI sustained attention task switching",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
       }
     },
@@ -4171,7 +4778,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -4300,7 +4907,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -4374,7 +4981,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
       }
     },
@@ -4438,9 +5045,77 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "AI assistant interruptions distraction multitasking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "provider_text_preserved"
+      }
+    },
+    "4678d988b4f393fe50a5182f3e2c0323e3a30b25d7d3eb7fb1ca575d367b5b5a": {
+      "input_fingerprint": "faae2cf3904b3d995c1cd1d1e0b921c494e84356839352f2dfc11ddb51945465",
+      "record": {
+        "title": "THE AI LEARNING PARADOX: REVEALING HOW UNIVERSITY STUDENTS NAVIGATE LEARNING CONVENIENCE, COGNITIVE EFFORT, DIGITAL CONTENT INFLUENCE, ACADEMIC CONFIDENCE, AND EDUCATIONAL ENGAGEMENT",
+        "authors": [
+          "Dr. Habib Ahmed Khan",
+          "Dr. Muhammad Zakir",
+          "Sadia Gondal",
+          "Dr. Muhammad Usman Zia",
+          "Javed Ahmed"
+        ],
+        "published": "2026-11-05",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                5
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                5
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                5
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-05"
+        },
+        "venue": "JOURNAL OF SOCIAL SCIENCES DEVELOPMENT",
+        "doi": "10.59075/jssd.v5i9.443",
+        "url": "https://doi.org/10.59075/jssd.v5i9.443",
+        "abstract_text": "Artificial Intelligence (AI) has introduced a significant paradox in higher education by simultaneously enhancing learning accessibility, personalization, and academic confidence while creating concerns regarding reduced cognitive effort and technological dependency. This study explores how university students navigate AI-supported learning experiences by examining five key dimensions: learning convenience, cognitive effort, digital content influence, academic confidence, and educational engagement. Adopting a qualitative research design, the study investigates the lived experiences of 18 Pakistani university students through semi-structured interviews. Data were analyzed using reflexive thematic analysis to identify patterns within students’ perceptions and practices of AI use. The findings reveal six major themes: AI as an educational accelerator, convenience versus intellectual struggle, confidence versus competence, transformation of digital learning consumption, risks of AI dependency, and purposeful AI-supported learning. The study demonstrates that AI can enhance educational engagement when used as a cognitive partner but may weaken independent learning when relied upon excessively. The findings highlight the importance of AI literacy, responsible technology integration, and pedagogical strategies that preserve students’ cognitive autonomy while maximizing the benefits of AI in higher education.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Artificial Intelligence (AI) has introduced a significant paradox in higher education by simultaneously enhancing learning accessibility, personalization, and academic confidence while creating concerns regarding reduced cognitive effort and technological dependency. This study explores how university students navigate AI-supported learning experiences by examining five key dimensions: learning convenience, cognitive…",
+        "kind": "scholarly",
+        "lane": "AI & cognition",
+        "relation": "AI-related literature",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-12",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "ChatGPT metacognition memory cognitive effort",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
+        "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00"
       }
     },
     "ab7d4f3fff463f3896eb1b1623738f02596462147b909e1050271edd5b312a56": {
@@ -4503,7 +5178,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -4567,7 +5242,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-11T09:34:21.097797+00:00"
       }
     },
@@ -4630,7 +5305,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       }
@@ -4695,7 +5370,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -4760,7 +5435,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI interface attention design human agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -4825,7 +5500,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "ChatGPT metacognition memory cognitive effort",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
         "abstract_completeness": "unknown"
       }
@@ -4891,7 +5566,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -5028,7 +5703,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -5105,7 +5780,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-10T20:53:35.603243+00:00",
         "abstract_completeness": "unknown"
       }
@@ -5170,7 +5845,7 @@
         "discovery_scope": "closeout_late_index",
         "discovery_query": "artificial intelligence attention economy cognitive autonomy",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00"
       }
     },
@@ -5235,7 +5910,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -5302,7 +5977,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
+        "metadata_observed_at": "2026-11-12T21:29:44.511993+00:00",
         "preparation_first_seen_at": "2026-11-09T17:19:37.345541+00:00",
         "abstract_completeness": "unknown"
       }
@@ -5568,5 +6243,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "9286a26c0d0d20a3cae97bdee84806d0ec2531379ba6c3012faa33bd42cf628e"
+  "metadata_sha256": "b2c5c17f8b5ded0faeea15e1ab1f0928c1f3d8c895becd057297f7eb040e4d28"
 }
