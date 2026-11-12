@@ -170,9 +170,9 @@ def editorial_review(model, draft, packet, audit, progress, stage='final review'
         'Choose IDs from DRAFT PASSAGES and the matching source evidence_options. Check meaning, '
         'not just matching words. For revise, issues must name the location and concrete correction. '
         'For pass, issues MUST be the empty array []. Criteria: ' + ', '.join(REVIEW_CRITERIA)
-        + '\nDRAFT:\n' + json.dumps(draft, ensure_ascii=False)
-        + '\nDRAFT PASSAGES:\n' + json.dumps(draft_passages(draft), ensure_ascii=False)
-        + '\nSOURCES:\n' + json.dumps(with_evidence_options(sources), ensure_ascii=False))
+        + '\nDRAFT:\n' + json.dumps(draft, ensure_ascii=False, sort_keys=True)
+        + '\nDRAFT PASSAGES:\n' + json.dumps(draft_passages(draft), ensure_ascii=False, sort_keys=True)
+        + '\nSOURCES:\n' + json.dumps(with_evidence_options(sources), ensure_ascii=False, sort_keys=True))
 
     def check(value):
         resolved = resolve_review_references(value, draft, sources, REVIEW_CRITERIA)
@@ -382,7 +382,7 @@ Avoid numeric claims in the headline, deck, letter and closer. Return only JSON:
 Return exactly three signals. Every signal and tension must cite its actual source keys, with exact evidence phrases supporting
 that section and explicit citations naming authors or a recognizable title. Use at least three
 distinct sources overall. A focused single-source theme is better than a forced comparison. Evidence phrases are internal audit data, not public quotations.
-Use 500–850 words overall. Source packet:\n''' + json.dumps(packet, ensure_ascii=False)
+Use 500–850 words overall. Source packet:\n''' + json.dumps(packet, ensure_ascii=False, sort_keys=True)
 
 
 def section_text(section):
@@ -547,7 +547,7 @@ Read the limitations as well as the finding preview. Keep unlike source types di
 Adjacent attention research does not establish effects of AI. Commentary proposes arguments,
 not experimental findings. All sources must be originally published in the previous completed UTC week; do not add older context sources.
 Return {"themes":[{"short":"brief label","title":"specific comparison","keys":["S1","S2"]}, ...]}.
-Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=False),check_plan,600)
+Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=False, sort_keys=True),check_plan,600)
 
     signals=[]
     held=[]
@@ -609,7 +609,7 @@ Use the actual supplied keys. No separate text or citations field; no Markdown o
 passage from THAT source's evidence_options, for example {"S1":"S1-A02","S2":"S2-A04"}.
 Select the passage that supports the claim you make; read it in context. Do not transcribe
 quotes, invent IDs or select a passage from another source. No placeholders.
-Theme: '''+theme['title']+'\nSources:\n'+json.dumps(with_evidence_options(pair),ensure_ascii=False)
+Theme: '''+theme['title']+'\nSources:\n'+json.dumps(with_evidence_options(pair),ensure_ascii=False, sort_keys=True)
         stage = 'theme ' + str(index+1)
         try:
             section = generate(stage, instruction, check_section,
@@ -680,7 +680,7 @@ The glossary is optional: use zero to five terms a general reader may not know. 
 ordinary language in the prose; do not add jargon just to define it. No digits. Comparisons:\n'''+json.dumps(
         [{'title':s['title'],'text':s['text'],
           'citations':[{'key':c['key'],'text':c['text'].removesuffix(':')} for c in s['citations']]}
-         for s in signals],ensure_ascii=False)
+         for s in signals],ensure_ascii=False, sort_keys=True)
     def assemble(frame):
         frame = deepcopy(frame)
         frame.update(signals=signals, citation_schema_version=1, source_note=disclosure,
@@ -704,7 +704,7 @@ ordinary language in the prose; do not add jargon just to define it. No digits. 
         # opening/tension. If the final review still objects, do not publish.
         frame = generate('editorial frame', frame_instruction, check_frame, 1200, schema,
                          correction='; '.join(review['issues']))
-    audit['candidate'] = json.dumps(result, ensure_ascii=False)
+    audit['candidate'] = json.dumps(result, ensure_ascii=False, sort_keys=True)
     return result
 
 

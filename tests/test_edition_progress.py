@@ -26,6 +26,12 @@ def check(value):
         raise ValueError('unsupported claim')
 
 
+class JsonOrderStore(MemoryStore):
+    """JSONB may reorder object keys; cache identity must ignore that order."""
+    def get_editorial(self, key):
+        return json.loads(json.dumps(super().get_editorial(key), sort_keys=True))
+
+
 class ProgressTests(unittest.TestCase):
     def test_restart_reuses_checked_result_but_revalidates_it(self):
         store = MemoryStore(); model = responses({'answer':'supported'})
@@ -131,7 +137,7 @@ class EditionRecoveryTests(unittest.TestCase):
                         'claim':passage,'supported':True} for k in sorted(keys)], 'issues':[]}
             return {'choices':[{'message':{'content':json.dumps(value)}}]}
         model.create_chat_completion.side_effect = answer
-        store = MemoryStore()
+        store = JsonOrderStore()
         first = composer.draft_in_stages(model,packet,{},progress=Progress(store,composer.MODEL))
         self.assertEqual(len(review_calls),4)
         self.assertEqual([len(x['signals']) for x in review_calls],[1,1,1,3])
