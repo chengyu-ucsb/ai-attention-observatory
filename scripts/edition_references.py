@@ -1,0 +1,144 @@
+"""Bound local-model references to supplied text before applying editorial gates.
+
+Choosing a real passage prevents transcription errors; it does not establish
+that the passage supports a claim. The normal fidelity review still applies.
+"""
+from __future__ import annotations
+
+import re
+
+
+def strict_object(properties):
+    return {'type': 'object', 'properties': properties,
+            'required': list(properties), 'additionalProperties': False}
+
+
+def source_options(source, limit=20):
+    """Offer short exact spans spread across findings, design and limitations."""
+    if limit < 2:
+        raise ValueError('At least two evidence options must be allowed')
+    candidates, seen = [], set()
+    for sentence in re.split(r'\n+|(?<=[.!?])\s+', source['evidence']):
+        words = list(re.finditer(r'\w+', sentence))
+        for start in range(0, len(words) - 4, 8):
+            end = min(start + 10, len(words))
+            quote = sentence[words[start].start():words[end - 1].end()]
+            normalized = ' '.join(re.findall(r'\w+', quote.casefold()))
+            if 5 <= len(normalized.split()) <= 12 and normalized not in seen:
+                seen.add(normalized)
+                candidates.append(quote)
+    if not candidates:
+        raise ValueError('Source has no usable evidence passages: ' + source['key'])
+    if len(candidates) > limit:
+        candidates = [candidates[round(i * (len(candidates) - 1) / (limit - 1))]
+                      for i in range(limit)]
+    return {f"{source['key']}-A{i:02d}": quote for i, quote in enumerate(candidates, 1)}
+
+
+def with_evidence_options(sources):
+    return [{**source, 'evidence_options': source_options(source)} for source in sources]
+
+
+def section_response_schema(sources):
+    return strict_object({
+        'text': {'type': 'string'},
+        'citations': strict_object({source['key']: {'type': 'string'} for source in sources}),
+        'evidence': strict_object({source['key']: {'type': 'string', 'enum': list(source_options(source))}
+                                   for source in sources}),
+    })
+
+
+def exact_keys(value, keys, label):
+    if set(value) != set(keys):
+        raise ValueError(label + ' must cover exactly the supplied sources or criteria')
+
+
+def select(options, choice, label):
+    if not isinstance(choice, str) or choice not in options:
+        raise ValueError('Unknown ' + label + ': ' + str(choice))
+    return options[choice]
+
+
+def resolve_section_references(section, sources):
+    """Resolve only explicit choices; never add a missing source or anchor.
+
+    Existing array-shaped drafts remain subject to the original validators.
+    """
+    result = dict(section)
+    keys = [source['key'] for source in sources]
+    citations = result.get('citations')
+    if isinstance(citations, dict):
+        exact_keys(citations, keys, 'Citations')
+        if any(not isinstance(text, str) for text in citations.values()):
+            raise ValueError('Citation phrases must be strings')
+        result['citations'] = [{'key': key, 'text': citations[key]} for key in keys]
+    anchors = result.get('evidence')
+    if isinstance(anchors, dict):
+        exact_keys(anchors, keys, 'Evidence')
+        result['evidence'] = [
+            {'key': source['key'], 'quote': select(source_options(source), anchors[source['key']],
+                                                  'evidence option for ' + source['key'])}
+            for source in sources]
+    return result
+
+
+def draft_passages(draft):
+    sections = draft.get('signals', []) + [draft.get('tension', {})]
+    fields = [draft.get(key, '') for key in ('headline', 'deck', 'letter', 'closer')]
+    fields += [section.get(key, '') for section in sections for key in ('title', 'text')]
+    passages = list(dict.fromkeys(
+        sentence.strip() for field in fields
+        for sentence in re.split(r'\n+|(?<=[.!?])\s+', field)
+        if len(sentence.strip()) >= 12))
+    return {f'D{i:03d}': passage for i, passage in enumerate(passages, 1)}
+
+
+def cited_sources(draft, packet):
+    keys = {anchor['key'] for section in draft['signals'] + [draft['tension']]
+            for anchor in section['evidence']}
+    sources = [source for source in packet if source['key'] in keys]
+    if {source['key'] for source in sources} != keys:
+        raise ValueError('Draft cites unknown sources')
+    return sources
+
+
+def review_response_schema(draft, packet, criteria):
+    passages = list(draft_passages(draft))
+    return strict_object({
+        'decision': {'type': 'string', 'enum': ['pass', 'revise']},
+        'checks': strict_object({criterion: strict_object({
+            'pass': {'type': 'boolean'}, 'reason': {'type': 'string'},
+            'example_id': {'type': 'string', 'enum': passages},
+        }) for criterion in criteria}),
+        'source_checks': strict_object({source['key']: strict_object({
+            'anchor_id': {'type': 'string', 'enum': list(source_options(source))},
+            'claim_id': {'type': 'string', 'enum': passages},
+            'supported': {'type': 'boolean'},
+        }) for source in cited_sources(draft, packet)}),
+        'issues': {'type': 'array', 'items': {'type': 'string'}},
+    })
+
+
+def resolve_review_references(review, draft, packet, criteria):
+    result = dict(review)
+    passages = draft_passages(draft)
+    checks = result.get('checks')
+    if isinstance(checks, dict):
+        exact_keys(checks, criteria, 'Review checks')
+        result['checks'] = [{
+            'criterion': criterion, 'pass': checks[criterion]['pass'],
+            'reason': checks[criterion]['reason'],
+            'example': select(passages, checks[criterion]['example_id'], 'draft passage'),
+        } for criterion in criteria]
+    checks = result.get('source_checks')
+    if isinstance(checks, dict):
+        sources = cited_sources(draft, packet)
+        exact_keys(checks, [source['key'] for source in sources], 'Source checks')
+        result['source_checks'] = [{
+            'key': source['key'],
+            'quote': select(source_options(source), checks[source['key']]['anchor_id'],
+                            'evidence option for ' + source['key']),
+            'claim': select(passages, checks[source['key']]['claim_id'], 'draft claim'),
+            'supported': checks[source['key']]['supported'],
+        } for source in sources]
+    return result

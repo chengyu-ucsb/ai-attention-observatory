@@ -8,6 +8,13 @@ An open research and design project about **AI, attention, cognitive effort, and
 
 Developed by [Chengyu Fang](https://chengyufang.org/). This is an evolving research resource, not a definitive evidence review or a validated attention intervention.
 
+**Cost policy:** The site is intended to operate without additional charges.
+It uses GitHub Pages, standard public-repository runners and local open models;
+there is no paid language-model API fallback. Database, provider and storage
+usage must stay within free allowances. Quotas pause work instead of purchasing
+capacity. Monday publication is a target, subject to source access, free-runner
+availability and evidence checks.
+
 ## Explore
 
 | Section | What's there |

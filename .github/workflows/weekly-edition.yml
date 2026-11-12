@@ -8,14 +8,17 @@ on:
     branches: [main]
     paths:
       - 'scripts/compose_issue.py'
+      - 'scripts/edition_references.py'
       - 'data/original-readings.json'
       - '.github/workflows/weekly-edition.yml'
   pull_request:
     branches: [main]
     paths:
       - 'scripts/compose_issue.py'
+      - 'scripts/edition_references.py'
       - 'data/original-readings.json'
       - 'tests/test_compose_issue.py'
+      - 'tests/test_edition_references.py'
       - '.github/workflows/weekly-edition.yml'
   # Recovery if an upstream run fails before dispatching its successor.
   schedule:
@@ -108,8 +111,15 @@ jobs:
         uses: actions/upload-artifact@v7.0.2
         with:
           name: weekly-edition-recovery-${{ github.run_id }}
+          # Keep the actual draft and its evidence packet, not another 95 MB
+          # copy of the source database on every failure. Main retains inputs.
           path: |
-            data/
+            data/edition-audits/
+            data/issue-editorial.json
+            data/public-issue.json
+            data/public-featured-issue.json
+            data/issue-feed.json
+            data/approved-issues/
             issue-feed.xml
             newsletter.html
             issues/

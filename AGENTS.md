@@ -10,6 +10,18 @@ Before creating, copying, or editing GitHub Actions workflows:
 
 This policy is stored in the repository so future assistants working on it can see and follow it. It does not override GitHub's documentation or substitute for checking current versions.
 
+## Free operation
+
+- The owner requires this website to incur no additional costs. Keep GitHub
+  Pages, standard public-repository GitHub Actions runners, local open-model
+  inference, and the existing database within free service limits.
+- Do not add paid inference APIs, larger billed runners, paid provider plans,
+  automatic upgrades, or billable storage as a repair or fallback.
+- Respect provider quotas and bounded retries. If a free limit is reached,
+  retain the checkpoint and report the delay rather than purchasing capacity.
+- Verify actual account limits before enabling anything that could incur a
+  charge. A public repository does not imply unlimited free artifact storage.
+
 ## Commentary extraction integrity (October 2026)
 
 - RSS descriptions are discovery metadata (`source_preview`), not curated

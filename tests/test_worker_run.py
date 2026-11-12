@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import json
 import re
+import shutil
 from pathlib import Path
 import sys
 import tempfile
@@ -14,6 +15,26 @@ NOW=datetime(2026,11,11,14,tzinfo=timezone.utc)
 
 
 class WorkerRunTests(unittest.TestCase):
+    def test_new_target_week_evidence_reopens_the_worker_without_unrelated_backfill(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp); folder = root/'data/weekly-preparation/2026-11-02'
+            folder.mkdir(parents=True); (root/'scripts').mkdir()
+            for name in ('prepared_article_readings.py', 'comprehensive_readings.py',
+                         'reading_progress.py', 'preparation_pipeline.py', 'worker_run.py'):
+                shutil.copyfile(Path(worker.__file__).parent/name, root/'scripts'/name)
+            packet = {'target_publication_window': {'from':'2026-11-02','to':'2026-11-08','timezone':'UTC'}, 'items':[]}
+            (folder/'packet.json').write_text(json.dumps(packet))
+            # A first pass must also work before acquisition/readings files exist.
+            (root/'data/weekly.json').write_text(json.dumps({'items':[]}))
+            library = [{'url':'https://example.org/current','published':'2026-11-05','title':'Current'},
+                       {'url':'https://example.org/old','published':'2025-01-01','title':'Old'}]
+            def save(): (root/'data/library.json').write_text(json.dumps(library))
+            save(); before = worker.input_hash(root, 'closed', NOW)
+            library[1]['full_text'] = 'Historical backfill'; save()
+            self.assertEqual(worker.input_hash(root, 'closed', NOW), before)
+            library[0]['full_text'] = 'New target-week results'; save()
+            self.assertNotEqual(worker.input_hash(root, 'closed', NOW), before)
+
     def test_workflow_cron_fields_fit_github_ranges(self):
         bounds = ((0,59),(0,23),(1,31),(1,12),(0,6))
         workflows = Path(__file__).resolve().parents[1]/'.github/workflows'
