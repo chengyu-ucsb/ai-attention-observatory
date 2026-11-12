@@ -596,18 +596,36 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
 
         def check_section(section):
             resolved = resolve_section_references(section, pair)
+            if 'source_notes' in section:
+                for source in pair:
+                    note = section['source_notes'][source['key']]
+                    validate_original_prose(note, [source])
+                    if not set(re.findall(r'\b\d+(?:\.\d+)?\b', note)) <= set(
+                            re.findall(r'\b\d+(?:\.\d+)?\b', source['evidence'])):
+                        raise ValueError('Unsupported numeric claim in paragraph for ' + source['key'])
             candidate = {**theme, **resolved}
             validate_section(candidate, pair, minimum_words=80, common_disclosure=disclosure)
             resolve_inline_citations(candidate, pair)
             section['citations'] = candidate['citations']
             section['evidence'] = candidate['evidence']
+            section['text'] = candidate['text']
+            section.pop('source_notes', None)
+            section.pop('comparison', None)
 
-        section=generate('theme '+str(index+1), '''Write ONE useful section of 130–210 words, using only the supplied sources.
-For a single source, explain its concrete contribution and why it matters; do not invent a comparison.
-Write for a curious reader outside academia. Name each source by its authors or a
-recognizable short title at first mention; never start with 'the survey', 'the classroom
-account', 'S1', or 'the first source'. Say who participated, what they actually did, what
-was measured and what was found. Explain why that result matters for the reader's question.
+        section=generate('theme '+str(index+1), '''Write ONE useful theme of roughly 130–210 words, using only the supplied sources.
+Return one source_notes paragraph for EVERY supplied source key, then a separate comparison.
+Each source_notes paragraph must have 40–65 words describing that source's own contribution
+and a concrete limitation. Do not skip any source. These paragraphs will receive named
+author links automatically from your explicit source-key assignments, so do not repeat
+author names or publication titles in your prose. Do not put source keys in the prose.
+Write for a curious reader outside academia. Say who participated, what they actually did,
+what was measured and what was found, only when supplied. A pilot sample is not the main sample.
+If the supplied passages contain only methods or discussion, attribute the authors'
+interpretation explicitly; do not present a mechanism or a reported benefit as independently
+established. Do not invent missing measurements, results, sample sizes or design details.
+The comparison must have 35–60 words explaining the useful connection or open question
+across those source paragraphs without introducing new facts. For a single source,
+explain why it matters and what remains unresolved; do not invent a comparison.
 Give a concrete example from the evidence when available. Translate specialist labels into
 everyday actions; define an unavoidable technical term in place. Use two short paragraphs
 where useful, separated by \n\n. Do not force every comparison into a common mechanism. Keep each source's limitations
@@ -622,11 +640,9 @@ reports show skill enhancement. Do not call unverified review verified absence o
 Paraphrase all public prose, including limitations, in original language: do not copy sixteen
 consecutive words from any source. Put exact source phrases only in evidence quotes.
 No numeric claims needed; any number must appear in the cited source evidence.
-Return an object with "text" containing your COMPLETE original prose, "citations", and "evidence".
-"citations" is an object keyed by EVERY supplied source key: {"S1":
-"exact source-identifying phrase that occurs ONCE in your prose"}. Those phrases
-become clickable source links. Put the link where the claim is introduced, not on a vague
-word like "study" or "here". Do not use Markdown, HTML or source-key placeholders in prose.
+Return {"source_notes":{"S1":"first source paragraph","S2":"second source paragraph"},
+"comparison":"the connection or open question","evidence":{"S1":"S1-A02","S2":"S2-A04"}}.
+Use the actual supplied keys. No separate text or citations field; no Markdown or HTML.
 "evidence" is an object keyed by EVERY supplied source key, with the ID of a supporting
 passage from THAT source's evidence_options, for example {"S1":"S1-A02","S2":"S2-A04"}.
 Select the passage that supports the claim you make; read it in context. Do not transcribe
@@ -650,6 +666,8 @@ Use ONLY the claims in these paragraphs; introduce no new factual claims or stat
 Keep concrete evidence limitations without repeating the common preprint/AI-review source note.
 The tension should propose a specific next comparison or decision; do not just say more research
 is needed or that the sources differ. Cite named sources where you use their observations.
+Use the exact short citation phrases supplied with the comparisons, once each in the
+tension text; do not substitute publication titles or invent a different linking phrase.
 Label abstract-only sources and commentary when present.
 Do not equate engagement, learning and sustained attention, or imply enhanced skills in a headline.
 Paraphrase all public prose, including caveats; never copy sixteen consecutive source words.
@@ -664,7 +682,9 @@ Return {"headline":"at least five words", "deck":"30–45 words", "letter":"90�
 "glossary":[{"term":"an actually used technical term","definition":"plain-language explanation"}]}.
 The glossary is optional: use zero to five terms a general reader may not know. Prefer
 ordinary language in the prose; do not add jargon just to define it. No digits. Comparisons:\n'''+json.dumps(
-        [{'title':s['title'],'text':s['text'],'citations':s['citations']} for s in signals],ensure_ascii=False),check_frame,1200)
+        [{'title':s['title'],'text':s['text'],
+          'citations':[{key:c[key] for key in ('key','text')} for c in s['citations']]}
+         for s in signals],ensure_ascii=False),check_frame,1200)
     # The framing adds no evidence: keep the anchors from the comparisons it connects.
     frame['tension']['evidence']=[a for s in signals for a in s['evidence']
         if a['key'] in {c.get('key') for c in frame['tension'].get('citations', [])}]
