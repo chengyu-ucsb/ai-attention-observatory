@@ -94,7 +94,9 @@ def resolve_section_references(section, sources):
         # from the prose or invent a missing source's contribution.
         result['text'] = '\n\n'.join(labels[key] + ': ' + notes[key].strip() for key in keys)
         result['text'] += '\n\n' + comparison.strip()
-        result['citations'] = [{'key': key, 'text': labels[key]} for key in keys]
+        # Link the source label including its delimiter. An author's name may
+        # also occur naturally in the paragraph; that is not a second link.
+        result['citations'] = [{'key': key, 'text': labels[key] + ':'} for key in keys]
         result.pop('source_notes'); result.pop('comparison')
     citations = result.get('citations')
     if isinstance(citations, dict):

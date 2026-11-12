@@ -21,7 +21,7 @@ from edition_references import (with_evidence_options, section_response_schema,
     resolve_review_references)
 
 ROOT = Path(__file__).resolve().parents[1]
-MODEL = 'Qwen2.5-7B-Instruct-Q4_K_M'
+MODEL = 'Qwen3-4B-Instruct-2507-Q4_K_M'
 
 # Recognize only explicit qualifications. Unverified review is not evidence that
 # review never occurred, and a qualification cannot excuse a separate overclaim.
@@ -159,6 +159,8 @@ def review_and_revise(model, draft, packet, audit):
             'empty comparisons, unexplained jargon, or a paragraph whose point is only that sources differ. '
             'Check glossary definitions for accuracy, clarity and usefulness; prefer ordinary language first. '
             'Check every source-specific statement, including sample, outcome, direction and limits. '
+            'The sources below are selected notes: a detail absent from these notes is not '
+            'evidence that the original article omitted it. Reject invented limitations. '
             'Findings should precede concrete limits. Repeated preprint boilerplate is unnecessary because '
             'the source note discloses that once. Editorial proposals must be labeled as proposals. '
             'Do not demand causal proof for a clearly qualified observational claim. '
@@ -166,7 +168,8 @@ def review_and_revise(model, draft, packet, audit):
             '"reason":"specific justification of at least eight words","example_id":"D001"}},'
             '"source_checks":{"S1":{"anchor_id":"S1-A01",'
             '"claim_id":"D001","supported":true}},'
-            '"issues":["specific correction with location, or none when passed"]}. '
+            '"issues":[]}. If passing, issues must be the empty array []; if revising, list '
+            'specific corrections with locations. Never use the string "none" as an issue. '
             'Assess each criterion exactly once: ' + ', '.join(REVIEW_CRITERIA) + '. '
             'Check every cited source. A matching quotation alone does not prove the claim: compare meaning.\n'
             'Choose example_id and claim_id from DRAFT PASSAGES and anchor_id from that source\'s '
@@ -620,6 +623,9 @@ author links automatically from your explicit source-key assignments, so do not 
 author names or publication titles in your prose. Do not put source keys in the prose.
 Write for a curious reader outside academia. Say who participated, what they actually did,
 what was measured and what was found, only when supplied. A pilot sample is not the main sample.
+These are selected source notes. Do not claim that an article lacks a method, tool description
+or result merely because it is absent from these notes. Describe that as a gap in the supplied
+notes, or use a documented design limitation. Do not invent limitations to fill the paragraph.
 If the supplied passages contain only methods or discussion, attribute the authors'
 interpretation explicitly; do not present a mechanism or a reported benefit as independently
 established. Do not invent missing measurements, results, sample sizes or design details.
@@ -683,7 +689,7 @@ Return {"headline":"at least five words", "deck":"30â€“45 words", "letter":"90â€
 The glossary is optional: use zero to five terms a general reader may not know. Prefer
 ordinary language in the prose; do not add jargon just to define it. No digits. Comparisons:\n'''+json.dumps(
         [{'title':s['title'],'text':s['text'],
-          'citations':[{key:c[key] for key in ('key','text')} for c in s['citations']]}
+          'citations':[{'key':c['key'],'text':c['text'].removesuffix(':')} for c in s['citations']]}
          for s in signals],ensure_ascii=False),check_frame,1200)
     # The framing adds no evidence: keep the anchors from the comparisons it connects.
     frame['tension']['evidence']=[a for s in signals for a in s['evidence']

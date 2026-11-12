@@ -345,7 +345,7 @@ discovery-week date and human-readable origin. Do not add private chat URLs.
 `Publish weekly briefion` runs after successful full-text acquisition, with
 Monday/Tuesday recovery checks. It checks for an existing edition before
 downloading a model or generating anything. For a new week,
-`scripts/compose_issue.py` runs Qwen2.5-7B-Instruct locally on the GitHub runner,
+`scripts/compose_issue.py` runs Qwen3-4B-Instruct-2507 locally on the GitHub runner,
 with no hosted inference service or paid API key. It synthesizes eligible
 readings into three cross-source themes, a tension and a research question.
 The complete weekly source shelf remains attached to the published issue.

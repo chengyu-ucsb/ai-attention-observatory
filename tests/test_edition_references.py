@@ -75,6 +75,21 @@ class ReferenceSelectionTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 refs.resolve_section_references(bad, sources)
 
+    def test_repeated_author_mentions_do_not_duplicate_the_rendered_source_link(self):
+        sources = copy.deepcopy(self.packet[:2])
+        sources[0]['authors'] = ['Jing Zhan']
+        sources[1]['authors'] = ['Michael Agyemang Adarkwah', 'Esinam Afi Kayi']
+        prose = self.draft['signals'][0]['text'].split('address this question. ', 1)[1]
+        raw = {'source_notes': {'S1': "Jing Zhan's account considers this question. " + prose,
+                                'S2': "Michael Agyemang Adarkwah's account considers this question. " + prose},
+               'comparison': ' '.join(prose.split()[:35]),
+               'evidence': {source['key']: next(iter(refs.source_options(source))) for source in sources}}
+        resolved = refs.resolve_section_references(raw, sources)
+        self.assertEqual(resolved['text'].count('Jing Zhan'), 2)
+        self.assertEqual(resolved['text'].count('Jing Zhan:'), 1)
+        composer.validate_section(resolved, sources)
+        composer.resolve_inline_citations(resolved, sources)
+
     def test_missing_cross_source_or_fabricated_choices_are_never_repaired(self):
         section, sources = self.selected_section()
         for mutation in ('missing', 'foreign', 'invented', 'missing_citation'):
