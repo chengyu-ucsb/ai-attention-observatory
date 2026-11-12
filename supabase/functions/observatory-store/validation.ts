@@ -37,11 +37,11 @@ export async function validateRequest(value: unknown): Promise<Record<string, an
     if (!Number.isSafeInteger(value.revision) || Number(value.revision) < 0 ||
         new TextEncoder().encode(JSON.stringify(value.value)).length > 58000 ||
         !["stage", "edition"].includes(String(value.value.kind))) throw new Error("invalid_editorial_checkpoint");
-    if (value.value.kind === "stage" && (!Array.isArray(value.value.attempts) ||
-        value.value.attempts.length > 2 || typeof value.value.stage !== "string")) throw new Error("invalid_editorial_budget");
     if (value.value.kind === "stage") {
       bounded(value.value.stage, 80);
-      for (const [index, attempt] of value.value.attempts.entries()) {
+      const attempts = value.value.attempts;
+      if (!Array.isArray(attempts) || attempts.length > 2) throw new Error("invalid_editorial_budget");
+      for (const [index, attempt] of attempts.entries()) {
         object(attempt);
         if (attempt.attempt !== index + 1 || !["started", "checked", "rejected"].includes(String(attempt.status))) {
           throw new Error("invalid_editorial_budget");
