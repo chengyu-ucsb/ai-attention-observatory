@@ -178586,6 +178586,32 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:48+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-26T11:08:49+00:00"
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "no_oa_pdf_reported",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -179835,6 +179861,33 @@
         "limitations": "",
         "sample": "",
         "notice": "No accessible abstract or licensed text has been indexed for this record."
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:48+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-26T11:08:48+00:00"
+      },
+      "open_access_url": "https://doi.org/10.2139/ssrn.6663559",
+      "repository_recovery": {
+        "version": 1,
+        "status": "no_oa_pdf_reported",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -180173,6 +180226,34 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:48+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-26T11:08:48+00:00"
+      },
+      "open_access_url": "https://doi.org/10.1177/10519815261491692",
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked",
+          "s2_candidate"
+        ]
       }
     },
     {
@@ -180237,20 +180318,61 @@
       "metadata_observed_at": "2026-11-12T09:56:50.354598+00:00",
       "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00",
       "reading": {
-        "level": "abstract",
-        "provenance": "Crossref publisher-supplied abstract",
-        "overview": "To solve these problems, this paper proposes an Optimization-Guided Feature Refinement and Adaptive Attention RoBERTa (OGFAA-RoBERTa).",
-        "methods": "Experimental evaluation was performed on Sentiment140 and SemEval-2014 datasets.",
-        "findings": "The results show that the optimization-guided feature refinement and the adaptive attention can significantly improve the performance of sentiment classification, model stability and cross-domain generalization over the existing state-of-the-art methods.",
-        "interpretation": "",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "Sentiment analysis has become a fundamental task in natural language processing to extract public opinions from social media and online review platforms at a large scale. Recent machine learning, deep learning and transformer-based approaches have been significantly improved for sentiment classification.",
+        "methods": "This work presents Optimization-Guided Feature Refinement and Adaptive Attention Robustly Optimized Bidirectional Encoder Representations from Transformers approach (OGFAA-RoBERTa) which has been designed for improving semantic representation using optimization-guided feature refinement. The work consists of five stages, i.e., dataset preparation, preprocessing, optimization-based deep feature extraction, adaptive attentionenabled RoBERTa classifier and performance evaluation as presented in Figure 1 . Initially, textual reviews are preprocessed for removing irrelevant information. The cleaned sentences are converted into contextual embeddings using deep semantic representation learning. A novel optimization approach is presented which assigns adaptive importance weights for contextual features, thereby suppressing redundant information while preserving discriminative semantic patterns. Finally, an improved RoBERTa classifier having optimization-guided attention classifies sentiments.",
+        "findings": "The OGFAA-RoBERTa was implemented using Python programming language within Anaconda distribution. The implementation was executed on high-performance workstation having Intel Core i9 processor, NVIDIA GeForce RTX 5070 Ti GPU and 32 GB of DDR5 RAM. The GPU accelerated transformer-based training providing parallel execution of matrix operations, attention computations and gradient updates, reducing overall time. During training, the optimization-guided feature refinement approach and adaptive attention module were jointly optimized using end-to-end backpropagation, providing simultaneous learning of contextual semantic 1142 representations and feature importance weights. Mini-batch learning was used for improving computational performance, while GPU provided rapid convergence of transformer network. For experiment evaluation, the Sentiment140 dataset was considered which was split into 70:30 training-testing ratio, as discussed in preprocessing section. For evaluating generalization capability of OGFAA-RoBERTa, considered SemEval-2014 dataset. For Sentiment140, the OGFAA-RoBERTa was evaluated using accuracy, precision, recall and f-score as [12] , [15] , [16] , [17] have used similar metrics. Further, for SemEval-2014 evaluation, the OGFAA-RoBERTa was evaluated using accuracy and macro-f-score as [13] , [14] , [18] , [19] have used the following metrics. This section first discusses the performance of OGFAA-RoBERTa achieved when using Sentiment140, followed by discussion of results achieved using SemEval-2014 dataset. Finally, providing comparative study. Sentiment140 Performance Evaluation Figure 2 shows the performance of OGFAA-RoBERTa on Sentiment140 dataset. The OGFAA-RoBERTa achieved 92.34% accuracy, 92.18% precision, 92.09% recall and 92.13% F1-score, indicating its better ability to effectively classify neutral, positive and negative sentiments from large-scale Twitter data. This is due to the performance of the optimization-guided feature refinement mechanism with Eq. ( 5 ) that refines the contextual feature matrix by optimization coefficient vector S. This operation removes the redundant semantic dimensions while retaining the highly discriminative contextual information for sentiment prediction. Additionally, the composite optimization objective in Eq. ( 6 ) jointly optimizes three objectives, namely, classification loss, feature redundancy, and sparsity, and allows the network to preserve only informative semantic representations during the learning process. The redundancy minimization function of Eq. ( 7 ) reduces the inter-feature correlation, and thus eliminates the duplicated contextual information which often degrades the classification accuracy. The other contribution is the adaptive attention mechanism introduced in Eq. ( 13 ), which embeds optimization coefficients into the conventional self-attention computation. The proposed attention mechanism learns contextual relationships equally, but assigns higher attention weights to se",
+        "interpretation": "The increasing demand for precise opinion mining from large-scale social media and review datasets has prompted the creation of a number of sentiment classification algorithms. In this work, we present OGFAA-RoBERTa for sentiment classification. Although recent ML, DL and transformer-based methods have made great progress in sentiment analysis, their performance is often limited by high-dimensional feature representations, redundant contextual information, and lack of model stability during training. These constraints limit the ability of existing models to effectively learn discriminative semantic representations and generalize over heterogeneous datasets. These challenges motivated this research to address dimensionality problem through an optimization-based feature selection strategy and improve model learning through a novel deep feature extraction mechanism. For this purpose, OGFAA-RoBERTa combined optimization-guided feature refinement with an adaptive attention-enabled RoBERTa classifier. The optimization strategy was able to extract the relevant contextual features by suppressing redundant semantic information. The adaptive attention mechanism highlighted the sentiment-bearing contextual dependencies to improve representation learning. The OGFAA-RoBERTa was validated on the Sentiment140 dataset and further evaluated on SemEval-2014 to test its cross-domain generalization ability. Experimental results show that OGFAA-RoBERTa achieved an accuracy of 1145 92.34% on Sentiment140 dataset. Likewise, OGFAA-RoBERTa achieved accuracy of 88.76%, 92.43% and 85.74% on Laptop14, Restaurant14 and Twitter subsets of SemEval-2014, respectively. The results demonstrate that the optimization-guided feature refinement and adaptive attention mechanism significantly improve the sema",
         "limitations": "",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "results",
+          "discussion"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
         "reported_findings": true
-      }
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:49+00:00",
+        "pipeline_version": 3,
+        "status": "full_text",
+        "next_at": null
+      },
+      "open_access_url": "https://doi.org/10.1922/comdem.v3i6s.18890",
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "This work presents Optimization-Guided Feature Refinement and Adaptive Attention Robustly Optimized Bidirectional Encoder Representations from Transformers approach (OGFAA-RoBERTa) which has been designed for improving semantic representation using optimization-guided feature refinement. The work consists of five stages, i.e., dataset preparation, preprocessing, optimization-based deep feature extraction, adaptive attentionenabled RoBERTa classifier and performance evaluation as presented in Figure 1 . Initially, textual reviews are preprocessed for removing irrelevant information. The cleaned sentences are converted into contextual embeddings using deep semantic representation learning. A novel optimization approach is presented which assigns adaptive importance weights for contextual features, thereby suppressing redundant information while preserving discriminative semantic patterns. Finally, an improved RoBERTa classifier having optimization-guided attention classifies sentiments.",
+        "results": "The OGFAA-RoBERTa was implemented using Python programming language within Anaconda distribution. The implementation was executed on high-performance workstation having Intel Core i9 processor, NVIDIA GeForce RTX 5070 Ti GPU and 32 GB of DDR5 RAM. The GPU accelerated transformer-based training providing parallel execution of matrix operations, attention computations and gradient updates, reducing overall time. During training, the optimization-guided feature refinement approach and adaptive attention module were jointly optimized using end-to-end backpropagation, providing simultaneous learning of contextual semantic 1142 representations and feature importance weights. Mini-batch learning was used for improving computational performance, while GPU provided rapid convergence of transformer network. For experiment evaluation, the Sentiment140 dataset was considered which was split into 70:30 training-testing ratio, as discussed in preprocessing section. For evaluating generalization capability of OGFAA-RoBERTa, considered SemEval-2014 dataset. For Sentiment140, the OGFAA-RoBERTa was evaluated using accuracy, precision, recall and f-score as [12] , [15] , [16] , [17] have used similar metrics. Further, for SemEval-2014 evaluation, the OGFAA-RoBERTa was evaluated using accuracy and macro-f-score as [13] , [14] , [18] , [19] have used the following metrics. This section first discusses the performance of OGFAA-RoBERTa achieved when using Sentiment140, followed by discussion of results achieved using SemEval-2014 dataset. Finally, providing comparative study. Sentiment140 Performance Evaluation Figure 2 shows the performance of OGFAA-RoBERTa on Sentiment140 dataset. The OGFAA-RoBERTa achieved 92.34% accuracy, 92.18% precision, 92.09% recall and 92.13% F1-score, indicating its better ability to effectively classify neutral, positive and negative sentiments from large-scale Twitter data. This is due to the performance of the optimization-guided feature refinement mechanism with Eq. ( 5 ) that refines the contextual feature matrix by optimization coefficient vector S. This operation removes the redundant semantic dimensions while retaining the highly discriminative contextual information for sentiment prediction. Additionally, the composite optimization objective in Eq. ( 6 ) jointly optimizes three objectives, namely, classification loss, feature redundancy, and sparsity, and allows the network to preserve only informative semantic representations during the learning process. The redundancy minimization function of Eq. ( 7 ) reduces the inter-feature correlation, and thus eliminates the duplicated contextual information which often degrades the classification accuracy. The other contribution is the adaptive attention mechanism introduced in Eq. ( 13 ), which embeds optimization coefficients into the conventional self-attention computation. The proposed attention mechanism learns contextual relationships equally, but assigns higher attention weights to sentiment-bearing tokens, and suppresses less informative contextual dependencies, unlike the standard RoBERTa attention. Eq. ( 14 ) provides more informative attention output for classification. Finally, the cross-entropy optimization in Eq. ( 19 ) and parameter update strategy in Eq. ( 20 ) guarantee the model is trained efficiently and converges. Hence, the joint effect of optimization-guided feature refinement and adaptive attention enables OGFAA-RoBERTa to achieve robust and consistent performance on sentiment classification on the Sentiment140 dataset.",
+        "discussion": "The increasing demand for precise opinion mining from large-scale social media and review datasets has prompted the creation of a number of sentiment classification algorithms. In this work, we present OGFAA-RoBERTa for sentiment classification. Although recent ML, DL and transformer-based methods have made great progress in sentiment analysis, their performance is often limited by high-dimensional feature representations, redundant contextual information, and lack of model stability during training. These constraints limit the ability of existing models to effectively learn discriminative semantic representations and generalize over heterogeneous datasets. These challenges motivated this research to address dimensionality problem through an optimization-based feature selection strategy and improve model learning through a novel deep feature extraction mechanism. For this purpose, OGFAA-RoBERTa combined optimization-guided feature refinement with an adaptive attention-enabled RoBERTa classifier. The optimization strategy was able to extract the relevant contextual features by suppressing redundant semantic information. The adaptive attention mechanism highlighted the sentiment-bearing contextual dependencies to improve representation learning. The OGFAA-RoBERTa was validated on the Sentiment140 dataset and further evaluated on SemEval-2014 to test its cross-domain generalization ability. Experimental results show that OGFAA-RoBERTa achieved an accuracy of 1145 92.34% on Sentiment140 dataset. Likewise, OGFAA-RoBERTa achieved accuracy of 88.76%, 92.43% and 85.74% on Laptop14, Restaurant14 and Twitter subsets of SemEval-2014, respectively. The results demonstrate that the optimization-guided feature refinement and adaptive attention mechanism significantly improve the semantic representation learning, reduce the feature redundancy, and improve the classification robustness compared with existing approaches. In future work, we will extend OGFAA-RoBERTa by adding an advanced attention mechanism to effectively address the gradient vanishing problem through better long-range dependency learning, thus allowing OGFAA-RoBERTa to keep critical contextual information over longer text sequences and further improve computational efficiency. In addition, an improved DL algorithm will be developed to improve complex pattern recognition in sentiment data, enabling OGFAA-RoBERTa to better capture subtle semantic relationships and further improve the overall accuracy, robustness and generalization ability of sentiment classification in a variety of real-world applications.",
+        "limitations": "",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.1922/comdem.v3i6s.18890",
+        "key_idea": "The OGFAA-RoBERTa was implemented using Python programming language within Anaconda distribution. The implementation was executed on high-performance workstation having Intel Core i9 processor, NVIDIA GeForce RTX 5070 Ti GPU and 32 GB of DDR5 RAM. The GPU accelerated transformer-",
+        "extraction_date": "2026-11-12",
+        "extraction_version": 3,
+        "sections_available": [
+          "methods",
+          "results",
+          "discussion"
+        ]
+      },
+      "oa_grobid_checked": "2026-11-12"
     },
     {
       "title": "The longitudinal relationships among AI-assisted music classroom engagement, flow experience, and musical emotional intelligence: a parallel-process latent growth modeling study",
@@ -180452,6 +180574,32 @@
         "limitations": "",
         "sample": "",
         "notice": "No accessible abstract or licensed text has been indexed for this record."
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:50+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-26T11:08:50+00:00"
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "no_oa_pdf_reported",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -180532,6 +180680,48 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:48+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_machine_text",
+        "next_at": "2026-11-19T11:08:48+00:00"
+      },
+      "open_access_url": "https://doi.org/10.3390/app162110970",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-03",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "pdf_host_unapproved",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked",
+          "s2_candidate"
+        ]
+      },
+      "publisher_html_attempt": {
+        "version": 2,
+        "status": "publisher_access_denied",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-27",
+        "attempts": 1
       }
     },
     {
@@ -180829,6 +181019,33 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:50+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-26T11:08:50+00:00"
+      },
+      "open_access_url": "https://doi.org/10.7126/cumudj.2049044",
+      "repository_recovery": {
+        "version": 1,
+        "status": "no_oa_pdf_reported",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -180906,6 +181123,48 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:48+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_machine_text",
+        "next_at": "2026-11-19T11:08:48+00:00"
+      },
+      "open_access_url": "https://doi.org/10.3390/jintelligence14110286",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-03",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "pdf_host_unapproved",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked",
+          "s2_candidate"
+        ]
+      },
+      "publisher_html_attempt": {
+        "version": 2,
+        "status": "publisher_access_denied",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-27",
+        "attempts": 1
       }
     },
     {
@@ -181340,6 +181599,32 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": true
+      },
+      "oa_checked": "2026-11-12",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-10",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-12T11:08:50+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-11-26T11:08:50+00:00"
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "no_oa_pdf_reported",
+        "last_at": "2026-11-12",
+        "next_at": "2026-12-12",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
