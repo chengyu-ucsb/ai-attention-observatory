@@ -10,6 +10,10 @@ on:
   schedule:
     - cron: '17 6,18 * * *'
       timezone: America/New_York
+    # Two bounded recovery opportunities after each collection. These do not
+    # repeat metadata discovery or acquire new sources, and skip idle queues.
+    - cron: '17 8,10,20,22 * * *'
+      timezone: America/New_York
   workflow_dispatch:
 permissions:
   contents: read
@@ -24,7 +28,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      # Official Node 24 releases verified November 9, 2026.
+      # Official Node 24 releases verified November 13, 2026.
       - uses: actions/checkout@v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -49,6 +53,7 @@ jobs:
     # This cap is not a measured full-corpus review throughput estimate.
     timeout-minutes: 80
     env:
+      RETRY_ONLY: ${{ github.event_name == 'schedule' && github.event.schedule == '17 8,10,20,22 * * *' }}
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
     steps:
@@ -63,10 +68,16 @@ jobs:
         id: scope
         run: python scripts/preparation_pipeline.py scope --phase preparing
       - name: Capture bounded current-week metadata without publishing
+        if: env.RETRY_ONLY != 'true'
         run: python scripts/preparation_pipeline.py prepare --expected-week "${{ steps.scope.outputs.week }}" --max-requests 48 --max-feed-requests 24 --time-budget 240
       - name: Check actual UTC packet and calendar phase
         id: plan
-        run: python scripts/preparation_pipeline.py reading-plan --phase preparing
+        run: |
+          if [ "$RETRY_ONLY" = true ]; then
+            python scripts/preparation_pipeline.py rolling-retry-plan --expected-week "${{ steps.scope.outputs.week }}"
+          else
+            python scripts/preparation_pipeline.py reading-plan --phase preparing
+          fi
       - name: Lease this reading pass in the private database
         id: worker
         if: steps.plan.outputs.ready == 'true'
@@ -92,7 +103,10 @@ jobs:
           LOCAL_READING_MODEL: /tmp/attention-model.gguf
           OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
           OBSERVATORY_DATABASE_URL: ${{ secrets.OBSERVATORY_DATABASE_URL }}
-        run: python scripts/preparation_pipeline.py readings --phase preparing --expected-week "${{ steps.scope.outputs.week }}"
+        run: |
+          args=()
+          if [ "$RETRY_ONLY" = true ]; then args+=(--retry-only); fi
+          python scripts/preparation_pipeline.py readings --phase preparing --expected-week "${{ steps.scope.outputs.week }}" "${args[@]}"
       - name: Validate final local outputs
         id: validation
         if: steps.readings.outcome == 'success'
@@ -103,7 +117,7 @@ jobs:
           node tests/validate_weekly_window.cjs
       - name: Protect validated metadata even if later stages failed
         id: checkpoint
-        if: always() && steps.scope.outputs.week != ''
+        if: always() && steps.scope.outputs.week != '' && (env.RETRY_ONLY != 'true' || steps.worker.outputs.claimed == 'true')
         run: |
           python scripts/preparation_pipeline.py checkpoint --phase preparing --week "${{ steps.scope.outputs.week }}" --destination "$RUNNER_TEMP/validated-preparation"
       - name: Save checkpoints without repeating external work on a push race

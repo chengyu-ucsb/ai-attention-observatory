@@ -130,6 +130,27 @@ def reading_plan(root=ROOT, now=None, phase="closed"):
     return dict(result, ready=True, status="ready_with_explicit_coverage_gaps")
 
 
+def rolling_retry_plan(root=ROOT, now=None, expected_week=None):
+    """Read-only admission for recovery slots; never discover or acquire sources.
+
+    Retry eligibility is the reader's actual policy, not the existence of a
+    timestamp. Missing, stale or closed packets do not create model work.
+    """
+    now = utc(now)
+    check_scope(expected_week, now, "preparing")
+    plan = reading_plan(root, now, "preparing")
+    if not plan["ready"]:
+        return plan
+    folder = folder_for(root, now, "preparing")
+    if any(not (folder / name).exists() for name in ("acquisition.json", "readings.json")):
+        return dict(plan, ready=False, status="awaiting_acquired_readings")
+    packet, state, bundle = validate_reading_inputs(folder, now)
+    selection = pending_readings(packet, state, bundle, now)
+    return dict(plan, ready=bool(selection["eligible"]),
+                status="rolling_readings_due" if selection["eligible"] else "no_rolling_readings_due",
+                selection=selection)
+
+
 # Version 1 bound the complete historical library. Version 2 binds every field
 # of the target week's canonical candidates and their identity dependencies.
 # It deliberately does not reinterpret or migrate an existing execution receipt.
@@ -418,16 +439,21 @@ def current_reading_run(run, packet, current_bindings, now):
             and utc(packet["observation_at"]) <= utc(run["started_at"]) <= utc(run["finished_at"]) <= now)
 
 
-def run_readings(root=ROOT, now=None, phase="closed", runner=None, expected_week=None):
+def run_readings(root=ROOT, now=None, phase="closed", runner=None, expected_week=None, retry_only=False):
     """Execute real CLI stages; a zero exit with a skipped-model report is held."""
     now = utc(now)
     check_scope(expected_week, now, phase)
-    plan = reading_plan(root, now, phase)
+    if retry_only and phase != "preparing":
+        raise ValueError("retry_only_requires_preparing_phase")
+    plan = (rolling_retry_plan(root, now, expected_week) if retry_only
+            else reading_plan(root, now, phase))
     if not plan["ready"]:
         raise ValueError(plan["status"])
     folder = folder_for(root, now, phase)
     runner = runner or subprocess.run
-    stages = [("acquire", 12), ("review", 2)]
+    # Zero acquisition budget retains the real validated stage receipt without
+    # making provider requests. Review still rechecks its saved source identity.
+    stages = [("acquire", 0 if retry_only else 12), ("review", 2)]
     if phase == "closed":
         stages += [("revalidate", 12), ("apply", 2)]
     reports = {}
@@ -727,9 +753,10 @@ def lead_time():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "readings", "finalize", "edition-check", "worker-plan", "checkpoint", "checkpoint-commit", "scope", "lead-time"))
+    parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "rolling-retry-plan", "readings", "finalize", "edition-check", "worker-plan", "checkpoint", "checkpoint-commit", "scope", "lead-time"))
     parser.add_argument("--reconcile-legacy-library", action="store_true",
         help="Opt-in read-only proof against exact local Git history; edition-check only")
+    parser.add_argument("--retry-only", action="store_true", help="Resume acquired rolling readings without discovery or acquisition")
     parser.add_argument("--phase", choices=("preparing", "closed"), default="closed")
     parser.add_argument("--root", type=Path, default=ROOT)
     parser.add_argument("--destination", type=Path)
@@ -740,6 +767,8 @@ def main():
     parser.add_argument("--max-feed-requests", type=int, default=24)
     parser.add_argument("--time-budget", type=int, default=240)
     args = parser.parse_args()
+    if args.retry_only and (args.action != "readings" or args.phase != "preparing"):
+        parser.error("--retry-only requires readings --phase preparing")
     if args.reconcile_legacy_library and args.action != "edition-check":
         parser.error("--reconcile-legacy-library is only supported for edition-check")
     if args.action in {"prepare", "closeout"}:
@@ -748,7 +777,8 @@ def main():
                            max_feed_requests=args.max_feed_requests, max_pages=1, time_budget=args.time_budget)
     elif args.action == "closeout-plan": result = closeout_plan(args.root)
     elif args.action == "reading-plan": result = reading_plan(args.root, phase=args.phase)
-    elif args.action == "readings": result = run_readings(args.root, phase=args.phase, expected_week=args.expected_week)
+    elif args.action == "rolling-retry-plan": result = rolling_retry_plan(args.root, expected_week=args.expected_week)
+    elif args.action == "readings": result = run_readings(args.root, phase=args.phase, expected_week=args.expected_week, retry_only=args.retry_only)
     elif args.action == "finalize": result = finalize(args.root, expected_week=args.expected_week)
     elif args.action == "edition-check": result = edition_ready(args.root, reconcile_legacy=args.reconcile_legacy_library, allow_partial=True)
     elif args.action == "worker-plan": result = worker_plan(args.root)

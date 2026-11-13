@@ -21,6 +21,12 @@ LIB=ROOT/'data/library.json'
 NUMBERS=re.compile(r'(?<!\w)[+-]?\d+(?:[.,]\d+)*(?:%|\b)')
 
 
+class VerifierPartitionError(ValueError):
+    def __init__(self, diagnostic):
+        super().__init__('verifier_indices_invalid')
+        self.diagnostic = diagnostic
+
+
 class ModelFormatError(ValueError):
     """A retryable response-format failure, never an evidence rejection."""
 
@@ -82,7 +88,13 @@ def validate_verdict(answer,claim_count):
     if (len(set(supported))!=len(supported) or len(set(rejected))!=len(rejected)
             or set(supported)&set(rejected)
             or set(supported)|set(rejected)!=set(range(claim_count))):
-        raise ValueError('verifier_indices_invalid')
+        raise VerifierPartitionError({
+            'claim_count':claim_count,
+            'duplicate_supported':len(set(supported))!=len(supported),
+            'duplicate_rejected':len(set(rejected))!=len(rejected),
+            'overlap_count':len(set(supported)&set(rejected)),
+            'missing_count':len(set(range(claim_count))-(set(supported)|set(rejected))),
+            'out_of_range_count':len((set(supported)|set(rejected))-set(range(claim_count)))})
     if rejected: raise ValueError('claim_verification_failed')
 
 
@@ -360,6 +372,21 @@ def indexed_sections(record):
         'upstream_truncation_possible':True,'semantic_completeness':'not_verified'})
 
 
+# Changes to reader code invalidate failed-input budgets, not evidence gates.
+def reading_retry_fingerprint(record):
+    fields=('doi','url','title','kind','venue','abstract_text','analysis',
+            'open_access_url','open_access_version','open_access_license')
+    return sha256(json.dumps({'reader':sha256(Path(__file__).read_bytes()).hexdigest(),
+        'input':{key:record.get(key) for key in fields}},sort_keys=True,
+        ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+
+
+def format_retry_exhausted(record):
+    attempt=record.get('complete_reading_attempt') or {}
+    return (attempt.get('format_failures',0)>=3
+            and attempt.get('format_input_sha256')==reading_retry_fingerprint(record))
+
+
 def due(record,today,now=None):
     if record.get('source_review') or (record.get('analysis') or {}).get('original_paraphrases_only'):
         return False
@@ -370,6 +397,7 @@ def due(record,today,now=None):
         return False
     # A complete pass over partial input must remain eligible for fuller access.
     attempt=record.get('complete_reading_attempt') or {}
+    if format_retry_exhausted(record): return False
     if now is not None and attempt.get('retry_after'):
         return datetime.fromisoformat(attempt['retry_after'])<=now
     return attempt.get('next_at','')<=today
@@ -433,7 +461,7 @@ def reading_candidates(records, today, observed_at, limit=2):
             coverage=(record.get('deep_analysis') or {}).get('coverage') or {}
             reason = ('complete_machine_reading' if coverage.get('evidence_status')=='full_document_retrieved'
                       and coverage.get('all_retrieved_text_processed')
-                      and (record.get('deep_analysis') or {}).get('version',0)>=3 else 'retry_cooldown')
+                      and (record.get('deep_analysis') or {}).get('version',0)>=3 else 'format_retry_exhausted' if format_retry_exhausted(record) else 'retry_cooldown')
         else:
             disposition=private_reading_eligibility(record,
                 screen_source(record) if record['kind']=='scholarly' else None)
@@ -504,14 +532,22 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
             record['complete_reading_attempt']={'status':reason,'stage':stage,'last_at':today,
                 'next_at':(run_date+timedelta(days=2)).isoformat(),
                 'provider_diagnostics':diagnostics}
-            # Output-format failures can receive two bounded same-day retries.
+            input_hash=reading_retry_fingerprint(record)
+            # Transient access errors must not erase prior format failures.
+            if old_attempt.get('format_input_sha256')==input_hash:
+                record['complete_reading_attempt']['format_input_sha256']=input_hash
+                record['complete_reading_attempt']['format_failures']=old_attempt['format_failures']
+            if isinstance(exc,VerifierPartitionError):
+                record['complete_reading_attempt']['verifier_diagnostic']=exc.diagnostic
+            # At most two format retries for unchanged inputs, across dates.
             # Negative evidence verdicts, copied passages and access restrictions
             # retain their existing holds; no rejected claim is salvaged here.
             format_errors={'model_json_invalid','model_schema_invalid','model_output_truncated',
                            'verifier_indices_invalid','verifier_schema_invalid',
                            'verifier_output_truncated','verifier_output_incomplete'}
             if stage=='synthesis' and reason in format_errors:
-                count=(old_attempt.get('format_failures',0) if old_attempt.get('last_at')==today else 0)+1
+                count=(old_attempt.get('format_failures',0) if old_attempt.get('format_input_sha256')==input_hash else 0)+1
+                record['complete_reading_attempt']['format_input_sha256']=input_hash
                 record['complete_reading_attempt']['format_failures']=count
                 if count<=2:
                     record['complete_reading_attempt']['retry_after']=(observed_at+timedelta(minutes=15*count)).isoformat()
