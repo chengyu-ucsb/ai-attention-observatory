@@ -10,6 +10,7 @@ from urllib.parse import urlsplit
 from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for, identifier
 from checked_reading_types import record_context, RECORD_FIELDS
 from collection_window import window_metadata,previous_week,weekly_eligible
+from edition_schedule import canonical_edition_date
 ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
 def source_id(x):return x.get("id") or (x.get("doi") or "").lower() or x.get("url") or x.get("title")
 def find(needle,items):
@@ -58,6 +59,10 @@ def validate_section_citations(section,sources,required=False):
  return resolved
 
 def validate_issue_citations(issue):
+ if issue.get('edition_format')=='coverage':
+  from publish_deadline import validate_coverage
+  validate_coverage(issue)
+  return issue
  version=issue.get("citation_schema_version")
  if version is not None and (type(version) is not int or version!=1):raise ValueError("Unsupported citation schema version")
  for section in issue.get("signals",[])+[issue.get("tension",{})]:
@@ -141,6 +146,7 @@ def build(edition_date=None, use_published_sources=False):
   if use_published_sources and packet.get("status")!="published":raise ValueError("Correction requires an existing published edition")
   weekly={"run":{"date":edition_date,"publication_window":packet.get("publication_window") or window_metadata(edition_date)},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
  issue_date=(weekly.get("run") or {}).get("date") or ""
+ if issue_date and not edition_date:issue_date=canonical_edition_date(DATA.parent,issue_date)
  drafts=json.loads((DATA/"issue-editorial.json").read_text())
  items=weekly.get("items") or []
  if not edition_date:
@@ -181,7 +187,7 @@ def build(edition_date=None, use_published_sources=False):
  existing_archive=DATA/"approved-issues"/(issue_date+".json")
  if not edition_date and schema.get("publication_window") and existing_archive.exists():
   archived=json.loads(existing_archive.read_text(encoding="utf-8"))
-  if archived.get("status")=="published":
+  if archived.get("status")=="published" and archived.get('edition_format')!='coverage':
    # A new collection rule/shelf must not rewrite an already published edition.
    draft=None
  if draft:

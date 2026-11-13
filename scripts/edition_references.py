@@ -6,7 +6,22 @@ that the passage supports a claim. The normal fidelity review still applies.
 from __future__ import annotations
 
 import re
+import unicodedata
 
+# llama.cpp translates patterns directly to grammar character classes. A
+# negated digit class alone also admits JSON quotes and backslashes, allowing
+# the model to swallow object delimiters and emit malformed multi-object JSON.
+QUALITATIVE_PROSE = {'type': 'string', 'pattern': r'^[^0-9"\\\x00-\x1f]*$'}
+
+
+def prose_words(minimum, maximum):
+    word = r'[^0-9"\\\x00-\x1f ]+'
+    return {'type': 'string', 'pattern': '^' + word + '( ' + word + '){' + str(minimum-1) + ',' + str(maximum-1) + '}$'}
+
+
+def normalize_digits(text):
+    """Canonicalize decimal typography before value checks, never change values."""
+    return ''.join(str(unicodedata.decimal(c)) if c.isdecimal() else c for c in text)
 
 def strict_object(properties):
     return {'type': 'object', 'properties': properties,
@@ -40,12 +55,27 @@ def with_evidence_options(sources):
 
 
 def section_response_schema(sources):
+    # Formatting and attribution are software responsibilities. Keep numbers
+    # out of this short qualitative synthesis instead of making the model
+    # spend a correction attempt on an unneeded author/year citation.
+    prose = QUALITATIVE_PROSE
     return strict_object({
-        'source_notes': strict_object({source['key']: {'type': 'string'} for source in sources}),
-        'comparison': {'type': 'string'},
+        'short': prose,
+        'title': prose,
+        'source_notes': strict_object({source['key']: prose_words(40, 90) for source in sources}),
+        'comparison': prose_words(35, 70),
         'evidence': strict_object({source['key']: {'type': 'string', 'enum': list(source_options(source))}
                                    for source in sources}),
     })
+
+
+def depth_label(source):
+    """Labels describe the actual packet, never inferred study quality."""
+    if source.get('kind') == 'nonacademic':
+        return 'Commentary. '
+    if source.get('level') == 'abstract':
+        return 'Abstract-based account. '
+    return ''
 
 
 def source_labels(sources):
@@ -92,8 +122,9 @@ def resolve_section_references(section, sources):
         # The model explicitly assigns each paragraph to a required source key.
         # Render that assignment as a named link; never infer a missing citation
         # from the prose or invent a missing source's contribution.
-        result['text'] = '\n\n'.join(labels[key] + ': ' + notes[key].strip() for key in keys)
-        result['text'] += '\n\n' + comparison.strip()
+        result['text'] = '\n\n'.join(labels[source['key']] + ': ' + depth_label(source)
+                                    + normalize_digits(notes[source['key']].strip()) for source in sources)
+        result['text'] += '\n\n' + normalize_digits(comparison.strip())
         # Link the explicit paragraph label, including its delimiter. Repeated
         # author names elsewhere in the prose are not duplicate citation links.
         result['citations'] = [{'key': key, 'text': labels[key] + ':'} for key in keys]
@@ -134,18 +165,45 @@ def cited_sources(draft, packet):
     return sources
 
 
+def source_claims(draft, source):
+    """Bind the critic to every paragraph attributed to a source.
+
+    The critic must not select a harmless heading instead of the claim that
+    needs checking. Legacy drafts without paragraph labels use the whole
+    cited section, which is deliberately conservative.
+    """
+    claims = []
+    for section in draft['signals'] + [draft['tension']]:
+        if source['key'] not in {a['key'] for a in section['evidence']}:
+            continue
+        text = section.get('text', '')
+        phrases = [c['text'] for c in section.get('citations', [])
+                   if c.get('key') == source['key'] or c.get('source') == source['title']]
+        paragraphs = [p for p in text.split('\n\n') if any(c in p for c in phrases)]
+        claims.extend(paragraphs or [text])
+    return '\n\n'.join(dict.fromkeys(claims))
+
+
+def reason_schema(minimum=8):
+    # Bound words in the decoder as well as checking after decoding. Unlike
+    # an unrestricted negated class, this cannot swallow JSON delimiters.
+    word = r'[^"\\\x00-\x1f ]+'
+    return {'type': 'string', 'pattern': '^' + word + '( ' + word + '){' + str(minimum-1) + ',}$'}
+
+
 def review_response_schema(draft, packet, criteria):
     passages = list(draft_passages(draft))
     return strict_object({
+        'review_protocol': {'type': 'integer', 'enum': [2]},
         'decision': {'type': 'string', 'enum': ['pass', 'revise']},
         'checks': strict_object({criterion: strict_object({
-            'pass': {'type': 'boolean'}, 'reason': {'type': 'string'},
+            'pass': {'type': 'boolean'}, 'reason': reason_schema(),
             'example_id': {'type': 'string', 'enum': passages},
         }) for criterion in criteria}),
         'source_checks': strict_object({source['key']: strict_object({
             'anchor_id': {'type': 'string', 'enum': list(source_options(source))},
-            'claim_id': {'type': 'string', 'enum': passages},
             'supported': {'type': 'boolean'},
+            'reason': reason_schema(12),
         }) for source in cited_sources(draft, packet)}),
         'issues': {'type': 'array', 'items': {'type': 'string'}},
     })
@@ -170,22 +228,22 @@ def resolve_review_references(review, draft, packet, criteria):
             'key': source['key'],
             'quote': select(source_options(source), checks[source['key']]['anchor_id'],
                             'evidence option for ' + source['key']),
-            'claim': select(passages, checks[source['key']]['claim_id'], 'draft claim'),
+            'claim': (source_claims(draft, source) if result.get('review_protocol') == 2 else
+                      select(passages, checks[source['key']]['claim_id'], 'draft claim')),
             'supported': checks[source['key']]['supported'],
+            **({'reason': checks[source['key']]['reason']} if result.get('review_protocol') == 2 else {}),
         } for source in sources]
     return result
 
 
 def frame_response_schema(sources):
-    prose = {'type':'string', 'pattern':'^[^0-9]*$'}
-    keys = [p['key'] for p in sources]
+    prose = QUALITATIVE_PROSE
     return strict_object({
-        'headline': prose, 'deck': prose, 'letter': prose,
-        'tension': strict_object({'title':prose, 'text':{'type':'string'},
-            'citations':{'type':'array', 'minItems':1, 'maxItems':len(keys),
-                'items':strict_object({'key':{'type':'string','enum':keys},
-                                       'text':{'type':'string','enum':keys}})}}),
-        'closer':prose,
+        'headline': prose_words(5, 15), 'deck': prose_words(20, 45), 'letter': prose_words(75, 120),
+        'tension': strict_object({'title':prose,
+            'source_notes': strict_object({s['key']: prose_words(20, 35) for s in sources}),
+            'question': prose_words(35, 60)}),
+        'closer':prose_words(10, 35),
         'glossary':{'type':'array', 'maxItems':5,
                     'items':strict_object({'term':prose,'definition':prose})},
     })
@@ -197,6 +255,22 @@ def resolve_frame_references(frame, sources):
     result = deepcopy(frame)
     tension = result.get('tension', {})
     labels = source_labels(sources)
+    if 'source_notes' in tension:
+        notes = tension.pop('source_notes')
+        question = tension.pop('question')
+        exact_keys(notes, list(labels), 'Frame source notes')
+        if 'text' in tension or 'citations' in tension:
+            raise ValueError('Do not mix assigned frame notes with free-form citations')
+        if any(not isinstance(note, str) or len(note.split()) < 15 for note in notes.values()):
+            raise ValueError('Frame source notes need substantive, source-specific context')
+        if not isinstance(question, str) or len(question.split()) < 25:
+            raise ValueError('Frame needs a substantive unresolved question')
+        if re.search(r'\bS\d+\b', question+' '.join(notes.values())):
+            raise ValueError('Use source keys only as field names, never in the public frame prose')
+        tension['text'] = '\n\n'.join(labels[s['key']] + ': ' + depth_label(s) + normalize_digits(notes[s['key']]) for s in sources)
+        tension['text'] += '\n\n' + normalize_digits(question)
+        tension['citations'] = [{'key':key, 'text':label+':'} for key,label in labels.items()]
+        return result
     text = tension.get('text', '')
     selected = {}
     for citation in tension.get('citations', []):

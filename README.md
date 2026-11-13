@@ -354,16 +354,30 @@ and download. A final source-fidelity review remains mandatory.
 Composition runs Monday at 8:17 a.m., 11:40 a.m. and 4:17 p.m. Eastern.
 After 11:30 a.m., it may publish a compact edition with one to three checked
 themes from at least two sources. Pending readings continue independently;
-source-date, citation, currentness and accuracy gates still apply. With no
-acceptable draft, the last published issue remains visible. Artwork and
-intervention development are separate from the newsletter deadline.
+source-date, citation, currentness and accuracy gates still apply. A separate
+`Meet weekly publication deadline` job runs Monday at 12:05 p.m. Eastern, with
+1:05 p.m. recovery and a daily catch-up. It does not depend on inference, the
+database, or successful acquisition. If no analysis is ready, it publishes a
+clearly labelled coverage update with the eligible reading shelf, even when
+that shelf is empty. Its fixed template cannot contain rejected prose or new
+research claims. A later checked analysis replaces it at the same permanent
+URL. Artwork and intervention development remain outside this deadline.
+The deadline job checks for an existing release before doing work and dispatches
+Pages only after saving a changed release; routine no-op checks add no artifacts.
 
 Automatic checks require real source identifiers, matching evidence anchors,
 explicit source attribution, original prose, supported numeric claims and
 substantive content. They do not guarantee factual accuracy or replace an
 independent review. Automatic editions are labeled accordingly. Invalid output
-fails the run, retains evidence and draft in a recovery artifact, and leaves
-the previous edition visible. Recovery reuses saved stages within their original
+fails the synthesis run and retains evidence and draft in a recovery artifact.
+Source-depth labels and citation links are rendered by code. Constrained JSON
+strings exclude quotes and control characters, so a qualitative prose rule
+cannot consume JSON delimiters. The critic must assess every paragraph assigned
+to each source, with source-specific reasoning; it cannot select a harmless
+heading in place of the source's claims. Regression guards reject causal
+wording in cross-sectional surveys, confusion about reverse-coded physical
+strain, and presenting Discussion as measured Results. These gates still do
+not establish the truth of every claim. Recovery reuses saved stages within their original
 attempt budgets; unchanged held inputs wait for changed evidence or policy. Completed
 editions are idempotent. Manual corrections in `data/issue-editorial.json`
 remain supported. The generation audit records the model and source-packet hash.
@@ -419,10 +433,13 @@ python -m unittest discover -s tests -v
 ```
 
 Commit manual editorial corrections and the generated issue/archive together.
-The regular Pages workflow publishes the latest completed edition. Until an
-automatic draft passes its checks or a manual edition is supplied, the previous
-published issue stays featured. Earlier failed weeks remain in the editorial
-queue for recovery; they are not silently filled with invented copy.
+The regular Pages workflow publishes the latest completed edition or explicit
+coverage update. `pipeline-status.json` distinguishes `publication_current`
+from `synthesis_current`; a coverage notice never counts as a completed research
+synthesis. Earlier failed weeks remain available for recovery. The weekly
+deadline cannot guarantee GitHub uptime or exact cron start times, but a stalled
+model no longer blocks the release job. No paid inference or additional service
+plan is used.
 
 The [rolling preparation lane](docs/rolling-weekly-preparation.md) stages the
 actual current publication week daily at **01:29 UTC**, including bounded
