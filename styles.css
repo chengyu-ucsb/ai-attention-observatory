@@ -1217,7 +1217,10 @@ summary,.theme-browser button,.nav-toggle {
   .main-nav a {font-size:var(--type-small);padding-block:10px}
 }
 @media(max-width:600px) {
-  .header-inner {flex-wrap:nowrap}
+  .header-inner {flex-wrap:wrap}
+  .identity {min-width:0;flex:1}
+  .identity-text {min-width:0}
+  .nav-toggle {flex-shrink:0}
   .main-nav {gap:8px 18px}
   #home .weekly-signal-strip>a,#home .weekly-signal-strip>a:not(:last-child) {grid-template-columns:90px minmax(0,1fr)}
 }
