@@ -41,10 +41,19 @@ class WeeklyFeedTests(unittest.TestCase):
   page=build_newsletter.render_issue(issue)
   markup=page.split('<script>')[0]
   panels=re.findall(r'<section[^>]*id="([^"]+)"[^>]*data-edition-panel[^>]*>',markup)
-  options=re.findall(r'<option value="([^"]+)">',markup)
+  navigation=markup.split('<nav id="edition-section"',1)[1].split('</nav>',1)[0]
+  options=re.findall(r'data-edition-target="([^"]+)"',navigation)
   self.assertEqual(set(panels),set(options))
   self.assertEqual(len(panels),len(options))
   self.assertGreaterEqual(len(panels),4)
+  self.assertNotIn('<select',markup)
+  self.assertIn('class="edition-layout"',markup)
+  self.assertIn('class="edition-reading"',markup)
+  for key in options:
+   button=navigation.split('data-edition-target="'+key+'"',1)[1].split('</button>',1)[0]
+   self.assertIn('aria-controls="'+key+'"',button)
+   self.assertIn('aria-pressed="false"',button)
+   self.assertIn('class="chapter-label"',button)
   # Hidden panels are a browser enhancement: all content survives script failure.
   for tag in re.findall(r'<section[^>]*data-edition-panel[^>]*>',markup):
    self.assertNotIn('hidden',tag)
@@ -69,6 +78,21 @@ class WeeklyFeedTests(unittest.TestCase):
    self.assertIn(str(count)+' source'+('' if count==1 else 's'),card)
   self.assertIn('Edition reading map',page)
   self.assertNotIn('effect size',page)
+
+ def test_chapter_navigation_lists_every_choice_and_keeps_real_source_counts(self):
+  issue=self.latest_published_issue()
+  navigation=build_newsletter.reader_controls(issue)
+  self.assertIn('aria-label="Edition chapters"',navigation)
+  self.assertIn('data-active-section=""',navigation)
+  self.assertNotIn('<select',navigation)
+  self.assertNotIn('overflow-x',navigation)
+  for i,section in enumerate(issue['signals'],1):
+   button=navigation.split('data-edition-target="signal-'+str(i)+'"',1)[1].split('</button>',1)[0]
+   self.assertIn(html.escape(section.get('short') or section['title'],quote=True),button)
+   count=len(section['source_ids'])
+   self.assertIn(str(count)+' source'+('' if count==1 else 's'),button)
+  self.assertIn('data-edition-target="edition-question"',navigation)
+  self.assertIn('Question &amp; experiment',navigation)
 
  def test_methods_and_dates_are_secondary_layers_without_losing_their_text(self):
   issue=self.latest_published_issue()

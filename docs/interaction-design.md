@@ -12,7 +12,7 @@ article reader, permanent editions, and Experimental Lab. The
 | Level | What belongs here | Presentation |
 | --- | --- | --- |
 | Understand | The main idea, a few takeaways, a meaningful visual, and the limitation needed to interpret the claim | Visible at the start of the selected section |
-| Explore | A related theme, method, example, comparison, or activity | A section selector, theme card, or bounded two-sided card |
+| Explore | A related theme, method, example, comparison, or activity | Visible chapter navigation, a theme card, or a bounded two-sided card |
 | Inspect | Full context, source locators, publication history, and how the summary was made | A clearly named dialog or dedicated reading view |
 
 Do not make the reader open a control to discover every substantive statement.
@@ -24,17 +24,32 @@ record.
 
 | Pattern | Use it for | Contract |
 | --- | --- | --- |
-| Section selector | Major destinations within a long page | A labeled native select switches the visible section. A short button row can offer the same choices. Both controls stay synchronized. |
-| Theme deck | The weekly edition's connected ideas | Show concise source-backed theme cards and one selected analysis at a time. Offer a full reading mode. Do not invent extra themes to fill a layout. |
+| Chapter navigation | Major destinations within a long reading | Keep every choice visible as a labeled button. A numbered vertical rail sits beside the desktop article or edition; a compact two-column grid replaces the rail on phones. Each destination has one control. |
+| Horizontal choices | Short groups of related views | Use a visible row of buttons for themes and the homepage, Atlas, and Lab sections. Allow wrapping on smaller screens; do not hide these choices in a select menu. |
+| Theme deck | The weekly edition's connected ideas | Show concise source-backed theme cards and one selected analysis at a time, with visible horizontal theme choices. Offer a full reading mode. Do not invent extra themes to fill a layout. |
 | Two-sided card | One bounded question and its takeaway, or one concept and its explanation | An explicit button changes sides. The inactive side is unavailable to keyboard and assistive technology. Do not put an entire article or its only citation on a hidden reverse side. |
 | Dialog card | Source details, full context, a figure, or methodology | Open on an explicit action, keep a visible close control, support Escape, and restore focus when closed. The background remains inert while modal. |
 | Pagination | Long result collections | The research library starts with 12 results per page. Preserve the total matching count, provide previous/next controls and a page indicator, and reset the page when filters change. |
 | Inline disclosure | A short, genuinely secondary detail | Use sparingly, especially inside an already layered view. Do not use an accordion as the default structure for every section. |
 
-Native selects are navigation controls, not another way to hide every paragraph.
-Changing a major section should replace the active reading area rather than
-merely jump several screen lengths down an otherwise unchanged page. Keep the
-page title and navigation available so the reader knows where they are.
+Reserve native selects for genuine filters and input settings, such as source
+type, date order, catalog collection, or a simulation's delivery rule. Primary
+reading navigation must reveal the available destinations without another
+click. Do not duplicate the same destinations in both a select and a button row.
+
+Changing a chapter replaces the active reading area rather than merely jumping
+several screen lengths down an otherwise unchanged page. Keep the page title,
+navigation labels, and current selection available so the reader knows where
+they are. The active chapter needs a clear visual marker and an exposed pressed
+state; color alone is not sufficient.
+
+For a long reading, give the desktop rail and content separate columns with a
+clear gap. A sticky rail must remain below the site header and must not obscure
+the text. On phones, place the chapter grid before the content, keep all labels
+visible, and preserve at least 44px targets. Give headings, controls, cards, and
+paragraphs breathing room instead of compressing them to fit more on one screen.
+Do not reduce body type or create a horizontally scrolling navigation strip to
+make the layout shorter.
 
 One control should have one job. A card's main link opens its reading; a separate
 control opens its explanation or changes its side. Avoid nested buttons, whole
@@ -134,6 +149,10 @@ time as performance or allow a stale callback to change a different activity.
 - Use semantic headings, labeled form controls, native buttons, and native
   dialogs. Use a tab pattern only if its arrow-key and focus behavior are fully
   implemented; a group of ordinary labeled buttons is otherwise preferable.
+- Chapter buttons stay visible at every supported width and expose the active
+  choice with `aria-pressed`. Preserve a visible keyboard focus indicator and a
+  sensible reading order from navigation to the selected content. A numbered
+  rail or grid must retain meaningful labels, not depend on numbers alone.
 - Only the active section or card face belongs in the reading and tab order.
   Hidden panels must not expose focusable descendants.
 - Opening a dialog moves focus into it. Escape and the visible close button
@@ -170,7 +189,8 @@ while allowing the new presentation patterns.
 
 | Behavior to guard | Observable assertion |
 | --- | --- |
-| Short page sections | Exactly one major section is active by default; selector and buttons show the same selection; changing it reveals the requested content. |
+| Short page sections | Exactly one major section is active by default; the visible chapter buttons expose that selection; choosing another reveals the requested content. |
+| Discoverable navigation | Each chapter has one visible control; desktop reading rails become a complete mobile grid; no primary chapter choices are hidden in a select. |
 | Complete research text | Every original paragraph, citation target, numeric result, and substantive limitation remains reachable without altered wording. |
 | Reversible layers | Dialog opens, closes by button and Escape, restores focus, and leaves no duplicate IDs or stale background controls. |
 | Two-sided cards | The same button can reveal and return; only the active face is exposed; reduced motion removes the turn. |

@@ -77,6 +77,18 @@ def return_to_lab_catalog(page):
     expect(page.locator("#lab-collection-filter")).to_be_focused()
 
 
+def choose_lab_section(page, value):
+    nav = page.locator("#lab-section")
+    target = nav.locator(f'button[data-section="{value}"]')
+    expect(target).to_be_visible()
+    target.focus()
+    expect(target).to_be_focused()
+    page.keyboard.press("Enter")
+    expect(nav).to_have_attribute("data-active-section", value)
+    expect(target).to_have_attribute("aria-pressed", "true")
+    expect(nav.locator('button[data-section][aria-pressed="true"]')).to_have_count(1)
+
+
 def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -457,9 +469,9 @@ def check_site_integration(page, url):
     page.locator("#lab-collection-filter").select_option("classic")
     open_lab_activity(page, "switch")
     page.locator("#switch-start").click()
-    page.locator("#lab-section").select_option("design")
+    choose_lab_section(page, "design")
     expect(page.locator("#play-switch")).not_to_be_visible()
-    page.locator("#lab-section").select_option("experiments")
+    choose_lab_section(page, "experiments")
     expect(page.locator("#play-switch")).to_be_visible()
     expect(page.locator("#switch-note")).to_contain_text("Resumed")
     page.locator('[data-route="library"]').first.click()
@@ -502,7 +514,7 @@ def check_site_integration(page, url):
     page.locator("#lab").wait_for(state="visible")
     expect(page.locator("#issue-label")).to_have_text("RESEARCH INDEX TEMPORARILY UNAVAILABLE")
     expect(page.locator("#weekly-title")).to_have_text(published_title)
-    page.locator("#lab-section").select_option("design")
+    choose_lab_section(page, "design")
     expect(page.get_by_role("list", name="Four product design precedents").get_by_role("listitem")).to_have_count(4)
     expect(page.get_by_role("link", name="Android Digital Wellbeing guide")).to_be_visible()
     precedent = page.locator(".precedent-details").first
@@ -513,7 +525,7 @@ def check_site_integration(page, url):
     page.keyboard.press("Escape")
     expect(page.get_by_role("dialog")).not_to_be_visible()
     expect(trigger).to_be_focused()
-    page.locator("#lab-section").select_option("experiments")
+    choose_lab_section(page, "experiments")
     expect(page.locator(".play-precedents")).not_to_be_visible()
     page.locator("#lab-collection-filter").select_option("classic")
     open_lab_activity(page, "switch")

@@ -101,7 +101,7 @@ footer{background:#E00122;color:#fff;padding:36px 0}footer a{color:#fff}footer p
 # reading section at a time and moves secondary material into native dialogs.
 STYLE += '''
 [hidden]{display:none!important}
-button,select{font:600 var(--type-small)/1.4 var(--font-interface);color:inherit}
+button{font:600 var(--type-small)/1.4 var(--font-interface);color:inherit}
 button{cursor:pointer;min-height:44px;border:1px solid #bfb7b7;background:#fffefa;padding:10px 16px;border-radius:4px}
 button:hover{border-color:#b6001c;color:#b6001c}
 .edition-intro{max-width:var(--measure-reading)}.edition-intro .preview-copy{display:none}
@@ -114,19 +114,27 @@ button:hover{border-color:#b6001c;color:#b6001c}
 .overview a{display:flex;flex-direction:column;gap:6px;height:100%;min-height:108px;padding:15px;background:#fffefa;border:1px solid #cfc5c2;border-top:3px solid #b6001c;border-radius:5px;text-decoration:none;color:#333}
 .overview a:hover,.overview a[aria-current="true"]{border-color:#b6001c;background:#fff}.map-index{font:600 var(--type-caption)/1.2 var(--font-interface);color:#b6001c}
 .map-label{font:600 1.05rem/1.35 var(--font-interface)}.map-count{font:400 var(--type-caption)/1.4 var(--font-reading);color:#646064;margin-top:auto}
-.edition-controls{display:flex;align-items:end;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid #d7d1d2}
-.edition-select{display:grid;gap:6px;min-width:0;max-width:70%;font:600 var(--type-caption)/1.4 var(--font-interface)}
-.edition-select select{width:100%;min-height:44px;max-width:100%;padding:8px 30px 8px 12px;background:#fffefa;border:1px solid #bfb7b7;border-radius:4px;text-overflow:ellipsis}
-.edition-controls button[aria-pressed="true"]{background:#333;color:#fff;border-color:#333}
+.shell{max-width:1200px}.deck{max-width:var(--measure-reading)}
+.edition-layout.is-enhanced{display:grid;grid-template-columns:210px minmax(0,1fr);gap:52px;align-items:start;margin-top:34px}
+.edition-reading{min-width:0}.edition-reading>.signal:first-child{padding-top:0;border-top:0}
+.edition-controls{position:sticky;top:24px;align-self:start;min-width:0;padding:0 0 24px}
+.edition-controls>.stamp{margin-bottom:14px}.edition-chapters{display:grid;gap:6px}
+.edition-chapter{width:100%;display:grid;grid-template-columns:24px minmax(0,1fr);gap:8px;align-items:start;text-align:left;padding:13px 10px 13px 12px;background:transparent;border:1px solid transparent;border-left:3px solid #d7d1d2;border-radius:0;color:#333}
+.edition-chapter:hover{background:#f5f1ee;border-left-color:#b6001c}.edition-chapter[aria-pressed="true"]{background:#f5f1ee;border-left-color:#E00122;color:#a8001a}
+.chapter-number{font:600 var(--type-caption)/1.6 var(--font-interface);color:#767071}.edition-chapter[aria-pressed="true"] .chapter-number{color:#a8001a}
+.chapter-copy{display:grid;gap:5px;min-width:0}.chapter-label{font:600 1rem/1.4 var(--font-interface);overflow-wrap:break-word}.chapter-detail{font:400 var(--type-caption)/1.45 var(--font-reading);color:#646064}
+#edition-read-all{margin-top:18px;width:100%;text-align:left;background:transparent;border-color:#d7d1d2;font-size:1rem}
+#edition-read-all[aria-pressed="true"]{background:#333;color:#fff;border-color:#333}
 .edition-panel:focus{outline:none}.edition-panel{scroll-margin-top:24px}.edition-panel .signal:first-child{border-top:0}
 .edition-utilities{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;padding-top:20px;border-top:1px solid #d7d1d2}
 .edition-utilities>details{flex-basis:100%}.layer-open{background:transparent;font-weight:500}.layer-open::after{content:' +';color:#b6001c}.card:last-child .layer-open{color:#fff;border-color:#fff}.card:last-child .layer-open::after{color:#fff}
 .edition-dialog{position:fixed;inset:0;width:min(760px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid #bfb7b7;border-top:4px solid #E00122;border-radius:10px;color:#333;background:#fffefa;overflow:auto;box-shadow:0 22px 90px #0004;overscroll-behavior:contain}
 .edition-dialog::backdrop{background:#17121299}.dialog-header{position:sticky;top:0;display:flex;align-items:start;justify-content:space-between;gap:20px;padding:20px 26px 12px;background:#fffefa;border-bottom:1px solid #ded6d1;z-index:1}
 .dialog-header h2{font-size:var(--type-card);margin:6px 0 0}.dialog-header button{flex:none}.dialog-body{padding:24px 26px}.dialog-body>ol{padding-left:22px}.dialog-body .source-shelf{border:0;padding:0}.dialog-body .scope{font-size:var(--type-small)}
-@media(max-width:600px){.reader-map{padding:16px;margin-top:22px}.overview{gap:8px}.overview a{min-height:0;display:grid;grid-template-columns:25px minmax(0,1fr) auto;gap:8px;align-items:center;padding:12px;border-top-width:1px;border-left:3px solid #b6001c}.map-label{font-size:1rem}.map-count{margin:0;font-size:.8125rem;white-space:nowrap}.edition-controls{align-items:stretch;flex-direction:column;gap:10px}.edition-select{max-width:100%}.edition-controls button{align-self:start}.edition-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px)}.dialog-header{padding:16px}.dialog-body{padding:20px}.edition-utilities .layer-open{flex:1 1 auto}}
+@media(max-width:999px){.edition-layout.is-enhanced{grid-template-columns:minmax(0,1fr);gap:24px;margin-top:28px}.edition-controls{position:static;padding:0 0 24px;border-bottom:1px solid #d7d1d2}.edition-chapters{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px}.edition-chapter{height:100%;border-color:#ded6d1;border-left-color:#d7d1d2;border-radius:3px;background:#fffefa}.edition-chapter[aria-pressed="true"]{border-left-color:#E00122}#edition-read-all{width:auto;max-width:100%;margin-top:14px}.edition-controls>.stamp{margin-bottom:12px}}
+@media(max-width:600px){.reader-map{padding:16px;margin-top:22px}.overview{grid-template-columns:1fr;gap:8px}.overview a{min-height:0;display:grid;grid-template-columns:25px minmax(0,1fr) auto;gap:8px;align-items:center;padding:12px;border-top-width:1px;border-left:3px solid #b6001c}.map-label{font-size:1rem}.map-count{margin:0;font-size:.8125rem;white-space:nowrap}.edition-chapters{grid-template-columns:repeat(2,minmax(0,1fr))}.chapter-detail{display:none}.edition-chapter{grid-template-columns:20px minmax(0,1fr);gap:5px;padding:12px 8px}.edition-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px)}.dialog-header{padding:16px}.dialog-body{padding:20px}.edition-utilities .layer-open{flex:1 1 auto}}
 @media(prefers-reduced-motion:no-preference){.edition-dialog[open]{animation:card-arrive .16s ease-out}@keyframes card-arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}}
-@media print{[data-edition-panel][hidden],.edition-dialog{display:block!important}.edition-controls,.layer-open,.dialog-header button{display:none!important}.edition-dialog{position:static;max-height:none;width:auto;border:0;box-shadow:none}.dialog-header{position:static}.dialog-body{padding:0}.overview{break-inside:avoid}}
+@media print{[data-edition-panel][hidden],.edition-dialog{display:block!important}.edition-layout.is-enhanced{display:block}.edition-controls,.layer-open,.dialog-header button{display:none!important}.edition-dialog{position:static;max-height:none;width:auto;border:0;box-shadow:none}.dialog-header{position:static}.dialog-body{padding:0}.overview{break-inside:avoid}}
 '''
 
 READER_SCRIPT = '''
@@ -134,26 +142,25 @@ READER_SCRIPT = '''
 (() => {
   'use strict';
   const panels=Array.from(document.querySelectorAll('[data-edition-panel]'));
-  const controls=document.querySelector('.edition-controls'),select=document.getElementById('edition-section'),all=document.getElementById('edition-read-all');
-  let showingAll=false;
+  const controls=document.querySelector('.edition-controls'),navigation=document.getElementById('edition-section'),all=document.getElementById('edition-read-all'),layout=document.querySelector('.edition-layout');
+  let showingAll=false,activeId=panels.length?panels[0].id:'';
   function show(id,focus=false){
     const target=document.getElementById(id);if(!target||!panels.includes(target))return;
     showingAll=false;panels.forEach(panel=>panel.hidden=panel!==target);
-    select.value=id;all.setAttribute('aria-pressed','false');all.textContent='Show all sections';
-    document.querySelectorAll('[data-edition-target]').forEach(link=>link.setAttribute('aria-current',String(link.dataset.editionTarget===id)));
+    activeId=id;navigation.dataset.activeSection=id;all.setAttribute('aria-pressed','false');all.textContent='Show all sections';
+    document.querySelectorAll('[data-edition-target]').forEach(control=>{const active=control.dataset.editionTarget===id;control.setAttribute(control.tagName==='BUTTON'?'aria-pressed':'aria-current',String(active));});
     if(focus){target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}
   }
-  function showAll(){showingAll=true;panels.forEach(panel=>panel.hidden=false);all.setAttribute('aria-pressed','true');all.textContent='One section at a time';document.querySelectorAll('[data-edition-target]').forEach(link=>link.removeAttribute('aria-current'));}
+  function showAll(){showingAll=true;panels.forEach(panel=>panel.hidden=false);all.setAttribute('aria-pressed','true');all.textContent='One section at a time';document.querySelectorAll('[data-edition-target]').forEach(control=>{if(control.tagName==='BUTTON')control.setAttribute('aria-pressed','false');else control.removeAttribute('aria-current');});}
   function revealHash(){
     let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
     const target=document.getElementById(id),panel=target&&target.closest('[data-edition-panel]');
     if(panel&&!showingAll)show(panel.id);
     if(target){requestAnimationFrame(()=>{target.scrollIntoView({block:'start'});if(target.hasAttribute('tabindex'))target.focus({preventScroll:true});});}
   }
-  if(panels.length&&controls&&select&&all){
-    controls.hidden=false;show(panels[0].id);
-    select.addEventListener('change',()=>show(select.value));
-    all.addEventListener('click',()=>showingAll?show(select.value):showAll());
+  if(panels.length&&controls&&navigation&&all){
+    controls.hidden=false;if(layout)layout.classList.add('is-enhanced');show(panels[0].id);
+    all.addEventListener('click',()=>showingAll?show(activeId):showAll());
     document.querySelectorAll('[data-edition-target]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();show(link.dataset.editionTarget,true);history.replaceState(null,'','#'+link.dataset.editionTarget);}));
     window.addEventListener('hashchange',revealHash);revealHash();
   }
@@ -322,13 +329,18 @@ def overview(issue):
             +'<p class="map-note">A guide to this edition. Choose a theme to explore.</p></nav>')
 
 def reader_controls(issue):
-    options=[('signal-'+str(i),s.get('short') or s['title']) for i,s in enumerate(issue.get('signals',[]),1)]
-    options += [('edition-supplement-'+str(i),section['title']) for i,section in enumerate(issue.get('supplements',[]),1)]
-    options += [('edition-question','The question & something to try')]
-    if issue.get('glossary'):options.append(('edition-glossary','Useful terms'))
-    return ('<div class="edition-controls" hidden><label class="edition-select" for="edition-section">Explore this edition<select id="edition-section">'
-            +''.join('<option value="'+esc(key)+'">'+esc(label)+'</option>' for key,label in options)
-            +'</select></label><button type="button" id="edition-read-all" aria-pressed="false">Show all sections</button></div>')
+    options=[('signal-'+str(i),s.get('short') or s['title'],
+              str(len(s.get('source_ids',[])))+' source'+('' if len(s.get('source_ids',[]))==1 else 's'))
+             for i,s in enumerate(issue.get('signals',[]),1)]
+    options += [('edition-supplement-'+str(i),section['title'],'Additional analysis') for i,section in enumerate(issue.get('supplements',[]),1)]
+    options += [('edition-question','Question & experiment','Reflect, then try')]
+    if issue.get('glossary'):options.append(('edition-glossary','Useful terms',str(len(issue['glossary']))+' definitions'))
+    return ('<aside class="edition-controls" hidden>'+section_label('In this edition')
+            +'<nav id="edition-section" class="edition-chapters" aria-label="Edition chapters" data-active-section="">'
+            +''.join('<button type="button" class="edition-chapter" data-edition-target="'+esc(key)+'" aria-controls="'+esc(key)+'" aria-pressed="false">'
+                      +'<span class="chapter-number" aria-hidden="true">'+str(i).zfill(2)+'</span><span class="chapter-copy"><span class="chapter-label">'+esc(label)+'</span><span class="chapter-detail">'+esc(detail)+'</span></span></button>'
+                      for i,(key,label,detail) in enumerate(options,1))
+            +'</nav><button type="button" id="edition-read-all" aria-pressed="false">Show all sections</button></aside>')
 
 def source_layer(issue,ids,key):
     return ('<details class="source-links" data-edition-layer="'+esc(key)+'"><summary>Sources behind this theme · '+str(len(ids))+'</summary>'
@@ -374,7 +386,7 @@ def bottom(issue):
     methods='<details data-edition-layer="methods"><summary>How this was made</summary>'+render_text(issue.get('editorial_note',''),issue)
     if publication_scope(issue):methods+='<p class="scope">'+esc(publication_scope(issue))+'</p>'
     methods+='</details>'
-    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue,panel=True)+'<div class="edition-utilities">'+methods+source_shelf(issue,include_note=False)+publication_history(issue)+'</div></main><footer><div class="shell">'
+    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue,panel=True)+'<div class="edition-utilities">'+methods+source_shelf(issue,include_note=False)+publication_history(issue)+'</div></div></div></main><footer><div class="shell">'
             '<p><strong>THE ATTENTION BRIEF</strong></p><p>A weekly look at what AI changes about thinking, focus, and human agency.</p>'
             '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
             '</div></footer>'+READER_SCRIPT+'</body></html>')
@@ -383,7 +395,8 @@ def render_issue(issue, asset_prefix=""):
     if issue.get('status')!='published':
         return top_html({'subject':'The Attention Brief · Ideas about AI and attention'},asset_prefix)+'<h1>A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></main></body></html>'
     validate_issue_citations(issue)
-    return top_html(issue,asset_prefix)+opening(issue)+overview(issue)+reader_controls(issue)+signal_cards(issue)+supplement_cards(issue)+question_and_try(issue)+bottom(issue)
+    return (top_html(issue,asset_prefix)+opening(issue)+overview(issue)+'<div class="edition-layout">'
+            +reader_controls(issue)+'<div class="edition-reading">'+signal_cards(issue)+supplement_cards(issue)+question_and_try(issue)+bottom(issue))
 
 def render_index(issues):
     links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+edition_label(i))+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]
