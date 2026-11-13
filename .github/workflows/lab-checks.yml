@@ -7,6 +7,7 @@ on:
       - 'app.js'
       - 'styles.css'
       - 'assets/typography.css'
+      - 'assets/article-layers.css'
       - 'assets/fonts/**'
       - 'subscribe.html'
       - 'scripts/build_newsletter.py'
@@ -35,6 +36,7 @@ on:
       - 'app.js'
       - 'styles.css'
       - 'assets/typography.css'
+      - 'assets/article-layers.css'
       - 'assets/fonts/**'
       - 'subscribe.html'
       - 'scripts/build_newsletter.py'
@@ -87,6 +89,7 @@ jobs:
         run: |
           node --check lab-play.js
           node tests/validate_playground.cjs
+          node tests/validate_lab_catalog.cjs
       - name: Install browser test dependencies
         run: |
           python -m pip install 'playwright==1.64.1'

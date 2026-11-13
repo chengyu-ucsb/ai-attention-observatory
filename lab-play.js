@@ -13,12 +13,15 @@
     $$("[data-play-tab]").forEach(b=>{let on=b.dataset.playTab===name;b.classList.toggle("is-active",on);b.setAttribute("aria-selected",String(on));b.tabIndex=on?0:-1});
     ["switch","recovery","assist"].forEach(k=>$("#play-"+k).hidden=k!==name);
     syncVisibility();
+    if(document.defaultView)document.dispatchEvent(new CustomEvent("observatory:lab-classic",{detail:name}));
   }
+  document.addEventListener("observatory:lab-activate",event=>{if(["switch","recovery","assist"].includes(event.detail))activate(event.detail)});
+  document.addEventListener("observatory:lab-visibility",()=>syncVisibility());
   $$("[data-play-tab]").forEach(b=>{
     b.addEventListener("click",()=>activate(b.dataset.playTab));
     b.addEventListener("keydown",e=>{if(!["ArrowRight","ArrowLeft","Home","End"].includes(e.key))return;e.preventDefault();e.stopPropagation();const all=$$("[data-play-tab]");let i=all.indexOf(b);let next=all[e.key==="Home"?0:e.key==="End"?all.length-1:(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length];next.focus();activate(next.dataset.playTab)});
   });
-  const visible=name=>!document.hidden&&!$("#lab").hidden&&!$("#play-"+name).hidden;
+  const visible=name=>!document.hidden&&!$("#lab").hidden&&!$("#lab-activities")?.hidden&&!$("#play-"+name).hidden;
   function syncVisibility(){
     const g=practice.switch;
     if(g.active&&!g.locked){
@@ -37,6 +40,7 @@
   // seen before an interruption is not a fresh reaction-time observation.
   document.addEventListener("visibilitychange",syncVisibility);
   new MutationObserver(syncVisibility).observe($("#lab"),{attributes:true,attributeFilter:["hidden"]});
+  if($("#lab-activities"))new MutationObserver(syncVisibility).observe($("#lab-activities"),{attributes:true,attributeFilter:["hidden"]});
   // 1 / Switch Lab: repeat a single rule, then alternate parity and magnitude.
   const choices=[1,2,3,4,6,7,8,9];
   const challengeLength=20;
@@ -411,3 +415,195 @@
 
 
 
+/* Versioned Lab collection: new activities and preserved classics share one catalog. */
+(() => {
+  "use strict";
+  const CATALOG = [
+    {id:"evidence-detective",title:"Evidence Detective",status:"new",version:"1.0.0",released:"2026-11-13",duration:"3 minutes",topic:"Reading AI claims",evidenceBasis:"Fictional teaching scenarios",description:"Turn over the evidence. Decide how far a claim can go.",glyph:"◈"},
+    {id:"notification-studio",title:"Notification Studio",status:"new",version:"1.0.0",released:"2026-11-13",duration:"2 minutes",topic:"Designing interruptions",evidenceBasis:"Explicit arithmetic simulation",description:"Remix a stream of messages. See the trade-off between alerts and waiting.",glyph:"▥"},
+    {id:"switch",title:"Switch Lab",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"2 minutes",topic:"Task switching",evidenceBasis:"Exploratory task demonstration",description:"Try a stable rule, then a changing rule. Timed and untimed play.",glyph:"⇄"},
+    {id:"recovery",title:"Return Point",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"3 minutes",topic:"Returning to a task",evidenceBasis:"Fictional task comparison",description:"Leave a task and find your way back, with or without a checkpoint.",glyph:"↩"},
+    {id:"assist",title:"Assistance Dial",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-09",duration:"3 minutes",topic:"Choosing AI help",evidenceBasis:"Scripted reasoning scenarios",description:"Choose reflection, a hint, or an answer. Keep the judgment yours.",glyph:"◐"}
+  ];
+  const CASES = [
+    {title:"The confident headline",claim:"An AI coach improves concentration at work.",cards:[
+      {label:"Who took part?",detail:"Volunteers who already used the coach answered a one-time survey."},
+      {label:"What was measured?",detail:"They rated how focused they felt. No attention task or work output was measured."},
+      {label:"What was compared?",detail:"There was no comparison group and no measurement before using the coach."}
+    ],verdict:"overreach",explanation:"The survey describes users’ impressions. It cannot establish that the coach caused better concentration.",takeaway:"A confident verb such as “improves” needs a design that can support a causal claim."},
+    {title:"The narrow result",claim:"In this task, the reminder group missed fewer planned check-ins.",cards:[
+      {label:"Who took part?",detail:"Volunteers were randomly assigned to receive reminders or no reminders during one simulated work session."},
+      {label:"What was measured?",detail:"Researchers counted missed check-ins during that session. They did not test learning or long-term work habits."},
+      {label:"What was found?",detail:"The reminder group missed fewer check-ins than the comparison group in the recorded session."}
+    ],verdict:"supported",explanation:"The wording matches the comparison and the outcome measured. It stays within this simulated task.",takeaway:"A useful conclusion can be narrow. A task result is not a claim about every workplace."},
+    {title:"The missing outcome",claim:"The assistant reduced people’s stress.",cards:[
+      {label:"Who took part?",detail:"A small design team tried a fictional assistant prototype and discussed its interface."},
+      {label:"What was measured?",detail:"The notes describe whether controls were easy to find. Stress was not measured or discussed."},
+      {label:"What was found?",detail:"Participants suggested clearer labels and fewer steps. There is no evidence about stress in this dossier."}
+    ],verdict:"unanswered",explanation:"This dossier does not answer the stress question. Interface feedback cannot establish a change in an unmeasured outcome.",takeaway:"An unanswered question is a reason to seek evidence, not proof that an effect is absent."}
+  ];
+  const MESSAGES = [
+    {at:2,kind:"team",text:"Project update"},{at:4,kind:"social",text:"Group chat"},{at:6,kind:"team",text:"Document comment"},
+    {at:8,kind:"urgent",text:"Time-sensitive request"},{at:11,kind:"social",text:"Photo shared"},{at:13,kind:"team",text:"Meeting question"},
+    {at:16,kind:"team",text:"Review request"},{at:18,kind:"social",text:"Event invitation"},{at:21,kind:"urgent",text:"Decision needed"},
+    {at:23,kind:"team",text:"Status check"},{at:26,kind:"social",text:"New reply"},{at:28,kind:"team",text:"File ready"}
+  ];
+  function notificationPlan(mode="batch",urgent=true){
+    if(!["immediate","batch","end"].includes(mode))throw Error("Unknown delivery mode");
+    const deliveries=MESSAGES.map(message=>({...message,delivered:mode==="immediate"||(urgent&&message.kind==="urgent")?message.at:mode==="end"?30:Math.ceil(message.at/10)*10}));
+    const moments=[...new Set(deliveries.map(message=>message.delivered))].sort((a,b)=>a-b);
+    const gaps=[0,...moments,30].slice(1).map((at,index)=>at-[0,...moments,30][index]);
+    return {deliveries,moments,alerts:moments.length,meanWait:deliveries.reduce((sum,message)=>sum+message.delivered-message.at,0)/deliveries.length,longestGap:Math.max(...gaps),urgentWait:Math.max(...deliveries.filter(message=>message.kind==="urgent").map(message=>message.delivered-message.at))};
+  }
+  // The export lets the offline test verify the actual catalog and arithmetic.
+  if(typeof module==="object"&&module.exports)module.exports={CATALOG,CASES,MESSAGES,notificationPlan};
+  const catalog=document.querySelector("#lab-catalog"),workbench=document.querySelector("#lab-workbench");
+  // Classic-only fixtures can run without the collection enhancement.
+  if(!catalog||!workbench||!catalog.ownerDocument)return;
+  const view=document.defaultView,q=selector=>document.querySelector(selector);
+  const node=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el};
+  const add=(el,...children)=>{children.forEach(child=>el.append(child));return el};
+  const control=(text,fn,cls="play-secondary")=>{const el=node("button",cls,text);el.type="button";el.addEventListener("click",fn);return el};
+  const state={active:null,filter:"new",caseIndex:0,answers:Array(CASES.length).fill(null),flipped:Array(CASES.length).fill(null).map(()=>[false,false,false]),mode:"batch",urgent:true};
+  const classicTabs=q(".play-tabs"),sessionControls=q(".play-session-controls");
+  const panels=["switch","recovery","assist"].map(id=>q("#play-"+id));
+  const filter=node("select","lab-collection-select");filter.id="lab-collection-filter";
+  [["new","New experiments"],["all","All experiments"],["classic","Classic collection"]].forEach(([value,text])=>{const option=node("option","",text);option.value=value;filter.append(option)});
+  const label=node("label","","Browse the collection");label.htmlFor=filter.id;
+  const count=node("p","lab-catalog-count");count.setAttribute("role","status");
+  const grid=node("div","lab-catalog-grid");
+  add(catalog,add(node("div","lab-catalog-toolbar"),add(node("div"),label,filter),count),grid);
+  filter.addEventListener("change",()=>{state.filter=filter.value;drawCatalog()});
+  function drawCatalog(){
+    grid.replaceChildren();
+    const shown=CATALOG.filter(entry=>state.filter==="all"||entry.status===state.filter);
+    count.textContent=shown.length+" experiments · 2 new + 3 classics available";
+    shown.forEach(entry=>{
+      const card=node("article","lab-catalog-card"),symbol=node("span","lab-catalog-symbol",entry.glyph);symbol.setAttribute("aria-hidden","true");
+      const title=node("h3","",entry.title),open=control("Open experiment →",()=>navigate(entry.id),"play-primary");open.dataset.labOpen=entry.id;open.setAttribute("aria-label","Open "+entry.title);
+      add(card,add(node("div","lab-catalog-meta"),node("span","",entry.status==="new"?"NEW · NOVEMBER":"CLASSIC"),node("span","",entry.duration)),symbol,title,node("p","",entry.description),node("p","lab-catalog-topic",entry.topic),open);
+      grid.append(card);
+    });
+  }
+  function hideClassics(){
+    if(classicTabs)classicTabs.hidden=true;
+    panels.forEach(panel=>{if(panel)panel.hidden=true});
+    if(sessionControls)sessionControls.hidden=true;
+    document.dispatchEvent(new CustomEvent("observatory:lab-visibility"));
+  }
+  function navigate(id){
+    const hash=id?"#lab?experiment="+encodeURIComponent(id):"#lab";
+    if(view.location.hash!==hash)view.location.hash=hash;
+    select(id,true);
+  }
+  function routeSelection(){
+    const openHelp=q(".lab-help-dialog");if(openHelp)openHelp.close();
+    const [page,search=""]=view.location.hash.replace(/^#/,"").split("?");
+    if(page!=="lab")return;
+    const id=new URLSearchParams(search).get("experiment");
+    select(CATALOG.some(entry=>entry.id===id)?id:null,false);
+  }
+  function select(id,focus){
+    if(id===state.active&&id!==null)return;
+    state.active=id;hideClassics();workbench.replaceChildren();
+    catalog.hidden=Boolean(id);workbench.hidden=!id;
+    if(!id){if(focus)filter.focus();return}
+    const entry=CATALOG.find(item=>item.id===id);
+    const back=control("← Experiment collection",()=>navigate(null));back.id="lab-back-to-catalog";
+    const title=node("h2","lab-workbench-title",entry.title);title.id="lab-workbench-title";title.tabIndex=-1;
+    const version=node("p","lab-workbench-meta",entry.topic+" · "+entry.duration+" · v"+entry.version);
+    add(workbench,add(node("div","lab-workbench-header"),back,add(node("div"),title,version)));
+    if(entry.status==="classic"){
+      if(classicTabs)classicTabs.hidden=false;
+      if(sessionControls)sessionControls.hidden=false;
+      document.dispatchEvent(new CustomEvent("observatory:lab-activate",{detail:id}));
+    } else if(id==="evidence-detective")drawDetective();else drawStudio();
+    if(focus)title.focus();
+  }
+  function helpDialog(title,texts,opener){
+    const dialog=node("dialog","lab-help-dialog"),heading=node("h2","",title);heading.id="lab-help-title";dialog.setAttribute("aria-labelledby",heading.id);
+    const close=control("Close",()=>dialog.close());
+    add(dialog,heading,...texts.map(text=>node("p","",text)),close);document.body.append(dialog);
+    dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()});
+    dialog.addEventListener("close",()=>{dialog.remove();if(opener.isConnected)opener.focus()});
+    dialog.showModal();close.focus();
+  }
+  function drawDetective(){
+    const stage=node("div","lab-detective"),toolbar=node("div","lab-activity-toolbar"),picker=node("select","lab-collection-select");picker.id="lab-case-picker";
+    const pickerLabel=node("label","","Choose a dossier");pickerLabel.htmlFor=picker.id;
+    CASES.forEach((item,index)=>{const option=node("option","",(index+1)+" · "+item.title);option.value=String(index);picker.append(option)});picker.value=String(state.caseIndex);
+    picker.addEventListener("change",()=>{state.caseIndex=Number(picker.value);drawCase()});
+    const reset=control("Start over",()=>{state.answers.fill(null);state.flipped=CASES.map(()=>[false,false,false]);state.caseIndex=0;picker.value="0";drawCase();reset.focus()});reset.id="lab-detective-reset";
+    add(toolbar,add(node("div"),pickerLabel,picker),reset);stage.append(toolbar);
+    const content=node("div");content.id="lab-detective-case";stage.append(content);workbench.append(stage);
+    function drawCase(){
+      content.replaceChildren();const example=CASES[state.caseIndex];
+      const progress=node("div","lab-case-progress");progress.setAttribute("aria-label",state.answers.filter(Boolean).length+" of "+CASES.length+" dossiers checked");
+      CASES.forEach((item,index)=>{const dot=node("span",state.answers[index]?"is-done":"",String(index+1));dot.setAttribute("aria-hidden","true");progress.append(dot)});
+      const claim=node("blockquote","lab-claim",example.claim);claim.id="lab-detective-claim";
+      add(content,node("p","lab-fiction-label","Fictional evidence dossier · no real study is described"),progress,node("p","eyebrow","THE CLAIM"),claim,node("p","","Turn over each card, then decide whether this wording fits the evidence."));
+      const cards=node("div","lab-evidence-cards");
+      example.cards.forEach((card,index)=>{
+        const flip=control("",()=>{state.flipped[state.caseIndex][index]=!state.flipped[state.caseIndex][index];face()},"lab-evidence-card");flip.dataset.evidenceCard=String(index);
+        function face(){const turned=state.flipped[state.caseIndex][index];flip.classList.toggle("is-flipped",turned);flip.setAttribute("aria-pressed",String(turned));flip.setAttribute("aria-label",card.label+(turned?" Evidence shown. Flip back.":" Reveal evidence."));flip.replaceChildren(node("span","lab-card-number","0"+(index+1)),node("strong","",card.label),node("span","lab-card-copy",turned?card.detail:"Tap to inspect"),node("span","lab-card-action",turned?"↶ Turn back":"↻ Reveal evidence"))}
+        face();cards.append(flip);
+      });content.append(cards);
+      const choices=node("div","lab-verdicts");choices.setAttribute("role","group");choices.setAttribute("aria-label","Your verdict");
+      [["supported","Fits the evidence"],["overreach","Claims too much"],["unanswered","Question not studied"]].forEach(([value,text])=>{const answer=control(text,()=>{state.answers[state.caseIndex]=value;drawCase();q("#lab-detective-feedback").focus()},"lab-verdict");answer.dataset.labVerdict=value;answer.setAttribute("aria-pressed",String(state.answers[state.caseIndex]===value));choices.append(answer)});
+      add(content,node("h3","","Your verdict"),choices);
+      if(state.answers[state.caseIndex]){
+        const feedback=node("div","lab-detective-feedback");feedback.id="lab-detective-feedback";feedback.tabIndex=-1;feedback.setAttribute("role","status");
+        add(feedback,node("strong","",state.answers[state.caseIndex]===example.verdict?"You matched the claim to the evidence.":"Reconsider the scope of the claim."),node("p","",example.explanation),node("p","lab-takeaway",example.takeaway));
+        const next=control(state.caseIndex<CASES.length-1?"Next dossier →":"Return to first dossier",()=>{state.caseIndex=(state.caseIndex+1)%CASES.length;picker.value=String(state.caseIndex);drawCase();q("#lab-detective-claim").tabIndex=-1;q("#lab-detective-claim").focus()},"play-primary");next.id="lab-detective-next";feedback.append(next);content.append(feedback);
+      }
+    }
+    drawCase();
+    const help=control("How to use this experiment",()=>helpDialog("Read the claim against the evidence",["All three dossiers are fictional. The feedback follows the evidence supplied on the cards.","The goal is to practice matching a claim to its participants, design, and measured outcome. This is not a test of your ability or a score of the website’s research."],help));stage.append(help);
+  }
+  function drawStudio(){
+    const stage=node("div","lab-studio"),controls=node("div","lab-studio-controls"),mode=node("select","lab-collection-select");mode.id="lab-notification-policy";
+    [["immediate","As they arrive"],["batch","Every 10 minutes"],["end","At the end"]].forEach(([value,text])=>{const option=node("option","",text);option.value=value;mode.append(option)});mode.value=state.mode;
+    const label=node("label","","Deliver non-urgent messages");label.htmlFor=mode.id;
+    const urgent=node("input");urgent.type="checkbox";urgent.id="lab-urgent-bypass";urgent.checked=state.urgent;
+    const urgentLabel=node("label","lab-checkbox-label");add(urgentLabel,urgent,node("span","","Let urgent messages through immediately"));
+    const reset=control("Reset simulation",()=>{state.mode="batch";state.urgent=true;mode.value=state.mode;urgent.checked=true;render();reset.focus()});reset.id="lab-notification-reset";
+    add(controls,add(node("div"),label,mode),urgentLabel,reset);
+    const output=node("div","lab-studio-output");output.id="lab-notification-output";
+    add(stage,node("p","lab-fiction-label","Simulated 30-minute session · 12 invented messages"),node("p","","Change the delivery rule. The messages stay the same; the timing changes."),controls,output);workbench.append(stage);
+    mode.addEventListener("change",()=>{state.mode=mode.value;render()});urgent.addEventListener("change",()=>{state.urgent=urgent.checked;render()});
+    function render(){
+      const plan=notificationPlan(state.mode,state.urgent);output.replaceChildren();
+      const metrics=node("dl","lab-simulation-metrics");
+      [["Alert moments",String(plan.alerts)],["Average wait",plan.meanWait.toFixed(1)+" min"],["Longest gap",plan.longestGap+" min"]].forEach(([name,value])=>add(metrics,add(node("div"),node("dt","",name),node("dd","",value))));output.append(metrics);
+      const status=node("p","lab-simulation-summary",plan.alerts+" alert moment"+(plan.alerts===1?"":"s")+". Urgent messages wait up to "+plan.urgentWait+" minutes.");status.setAttribute("role","status");status.id="lab-notification-summary";output.append(status);
+      const timeline=node("div","lab-timeline");timeline.setAttribute("aria-label","Delivery timeline, from minute 0 to minute 30");
+      for(let minute=0;minute<=30;minute++){
+        const messages=plan.deliveries.filter(message=>message.delivered===minute);
+        const tick=node("div","lab-timeline-tick"+(messages.length?" has-alert":""));
+        const mark=node("span","lab-timeline-mark");mark.setAttribute("aria-hidden","true");tick.append(mark);
+        if(messages.length){const dot=node("span","lab-timeline-dot");dot.style.height=(10+messages.length*6)+"px";dot.setAttribute("aria-label","Minute "+minute+": "+messages.length+" messages");tick.append(dot)}
+        if(minute%10===0)tick.append(node("span","lab-timeline-time",String(minute)));
+        timeline.append(tick);
+      }
+      add(output,node("h3","","When alerts arrive"),timeline,node("p","lab-timeline-key","Red bars mark delivery times. Taller bars contain more messages. The labels show minutes from the start."));
+      const inspect=node("select","lab-collection-select");inspect.id="lab-delivery-picker";
+      plan.moments.forEach(minute=>{const amount=plan.deliveries.filter(message=>message.delivered===minute).length;const option=node("option","","Minute "+minute+" · "+amount+" message"+(amount===1?"":"s"));option.value=String(minute);inspect.append(option)});inspect.value=String(plan.moments[0]);
+      const inspectLabel=node("label","","Inspect a delivery");inspectLabel.htmlFor=inspect.id;
+      const inspectButton=control("Open delivery card",()=>{const minute=Number(inspect.value);helpDialog("Minute "+minute,plan.deliveries.filter(message=>message.delivered===minute).map(message=>message.text+" · arrived at "+message.at+" min · waited "+(message.delivered-message.at)+" min"),inspectButton)});inspectButton.id="lab-inspect-delivery";
+      add(output,add(node("div","lab-delivery-inspector"),add(node("div"),inspectLabel,inspect),inspectButton));
+      const tradeoff=node("ul","lab-tradeoffs");
+      [plan.alerts<12?"Batching creates fewer delivery moments in this simulation.":"Immediate delivery creates one alert for each message.",plan.meanWait>0?"Fewer delivery moments come with waiting time.":"Every message arrives without a scheduled wait.","A quiet gap is time without a simulated alert, not a measure of attention or productivity."].forEach(text=>tradeoff.append(node("li","",text)));output.append(tradeoff);
+    }
+    render();
+    const help=control("How the simulation works",()=>helpDialog("A transparent timing model",["The same 12 invented messages arrive at minutes 2, 4, 6, 8, 11, 13, 16, 18, 21, 23, 26, and 28. Two are marked urgent.","Immediate delivery uses arrival time. Batches round delivery up to minute 10, 20, or 30. End-only delivery uses minute 30. The urgent exception overrides those rules.","Messages delivered at the same minute count as one alert moment. Average wait is delivery time minus arrival time, averaged across the 12 messages. Longest gap includes the start and end of the session.","These are model outputs, not study results or predictions about your concentration."],help));stage.append(help);
+  }
+  q("#play-reset").addEventListener("click",()=>{state.answers.fill(null);state.flipped=CASES.map(()=>[false,false,false]);state.caseIndex=0;state.mode="batch";state.urgent=true;const active=state.active;if(active&& !["switch","recovery","assist"].includes(active)){state.active=null;select(active,false)}});
+  document.addEventListener("observatory:lab-classic",event=>{
+    if(!["switch","recovery","assist"].includes(state.active))return;
+    state.active=event.detail;const entry=CATALOG.find(item=>item.id===event.detail);
+    const title=q("#lab-workbench-title");if(title)title.textContent=entry.title;const meta=q(".lab-workbench-meta");if(meta)meta.textContent=entry.topic+" · "+entry.duration+" · v"+entry.version;
+    if(view.location.hash.startsWith("#lab"))view.history.replaceState(null,"","#lab?experiment="+entry.id);
+  });
+  view.addEventListener("hashchange",routeSelection);view.addEventListener("popstate",routeSelection);
+  drawCatalog();hideClassics();routeSelection();
+})();

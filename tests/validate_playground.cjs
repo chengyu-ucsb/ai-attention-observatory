@@ -278,7 +278,19 @@ by("play-reset").click();assert.equal(by("recovery-history").children.length,0);
 assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 5");
 assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").value,"timed");
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
-assert(html.includes('datetime="2026-11-09"'));
+// The Lab's section menu can hide the whole activities region without changing
+// its selected tab. Hidden input is ignored and time away is not a response.
+by("tab-switch").click();by("switch-start").click();
+by("lab-activities").hidden=true;environment.time+=60000;
+const hiddenSectionTrial=by("switch-progress").textContent;
+answerSwitch();assert.equal(by("switch-progress").textContent,hiddenSectionTrial);
+by("lab-activities").hidden=false;
+for(let index=0;index<20;index++){answerSwitch();flush()}
+assert(descendants(by("switch-results")).some(node=>node.textContent==="1 interrupted response(s) excluded from timing."));
+assert.deepEqual(descendants(by("switch-results")).filter(node=>node.tagName==="STRONG").map(node=>node.textContent),["135 ms","135 ms"]);
+by("play-reset").click();
+assert(html.includes('datetime="2026-11-13"'));
+assert(html.includes('id="lab-catalog"')&&html.includes('id="lab-workbench"'),"Versioned collection hosts must remain in the page");
 assert(html.includes('Official guides · Checked <time datetime="2026-11-06">6 Nov 2026</time>'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
 console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 5 scenarios at all 3 assistance levels with source/limit disclosures.");

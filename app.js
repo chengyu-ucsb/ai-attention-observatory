@@ -12,6 +12,73 @@ function make(t,c,s){if(s==="direction-mark")return uiIcon("external",c);const e
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
+let layerState=null;
+function restoreLayer(){if(layerState){const {node,parent,next,hidden,overflow,trigger:origin}=layerState;node.hidden=hidden;parent.insertBefore(node,next?.parentNode===parent?next:null);document.body.style.overflow=overflow;layerState=null;if(origin?.isConnected)origin.focus({preventScroll:true});}}
+function closeLayer(){const dialog=$("#reading-layer");if(dialog?.open){dialog.close();restoreLayer();}}
+function openLayer(title,content,trigger){
+ closeLayer();
+ let dialog=$("#reading-layer");
+ if(!dialog){
+  dialog=make("dialog","reading-layer");dialog.id="reading-layer";dialog.setAttribute("aria-labelledby","reading-layer-title");
+  const header=make("header","reading-layer-head"),heading=make("h2");heading.id="reading-layer-title";
+  const close=btn("Close",closeLayer,"layer-close");close.setAttribute("aria-label","Close reading card");
+  const body=make("div","reading-layer-body");body.id="reading-layer-body";
+  add(header,heading,close);add(dialog,header,body);document.body.append(dialog);
+  dialog.addEventListener("close",()=>{if(!dialog.open)restoreLayer();});
+  dialog.addEventListener("click",event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeLayer();}});
+ }
+ layerState={node:content,parent:content.parentNode,next:content.nextSibling,hidden:content.hidden,overflow:document.body.style.overflow,trigger:trigger||document.activeElement};document.body.style.overflow="hidden";
+ $("#reading-layer-title").textContent=title;content.hidden=false;$("#reading-layer-body").replaceChildren(content);dialog.showModal();dialog.querySelector(".layer-close").focus();
+}
+function layerButton(label,title,content,cls=""){
+ const wrap=make("div","layer-control"+(cls?" "+cls:"")),button=btn(label,()=>openLayer(title,content,button),"layer-trigger");
+ button.setAttribute("aria-haspopup","dialog");content.hidden=true;add(wrap,button,content);return wrap;
+}
+function layerDisclosure(node,title){
+ if(!node||node.dataset.layered)return;
+ const summary=node.querySelector(":scope > summary");if(!summary)return;
+ const body=make("div","layer-content");for(const child of Array.from(node.childNodes))if(child!==summary)body.append(child);
+ const replacement=layerButton(title||summary.textContent.trim(),title||summary.textContent.trim(),body,node.className);
+ if(node.id)replacement.id=node.id;replacement.hidden=node.hidden;replacement.dataset.layered="true";node.replaceWith(replacement);return replacement;
+}
+function sectionMenu(host,groups,id,label="Explore this page"){
+ const nav=make("nav","section-menu");nav.setAttribute("aria-label",label);
+ const field=make("label","section-menu-label",label),select=make("select");select.id=id;
+ const tabs=make("div","section-shortcuts"),status=make("span","sr-only");status.setAttribute("role","status");
+ for(const group of groups){const option=make("option","",group.label);option.value=group.key;select.append(option);
+  const b=btn(group.label,()=>choose(group.key),"section-shortcut");b.dataset.section=group.key;tabs.append(b);}
+ field.append(select);add(nav,field,tabs,status);host.prepend(nav);
+ function choose(key){
+  const found=groups.find(g=>g.key===key)||groups[0];select.value=found.key;
+  for(const group of groups)for(const node of group.nodes)if(node)node.hidden=group.key!==found.key;
+  for(const button of tabs.children)button.setAttribute("aria-pressed",String(button.dataset.section===found.key));
+  status.textContent=found.label;nav.dispatchEvent(new CustomEvent("sectionchange",{detail:found.key}));
+ }
+ select.addEventListener("change",()=>choose(select.value));choose(groups[0].key);return {choose,nav,select};
+}
+let homeMenu,issueMenu,issueThemeMenu,labPageMenu;
+function setupPageLayers(){
+ const homeHost=make("div","shell home-section-controls");$("#home .field-guide").before(homeHost);
+ homeMenu=sectionMenu(homeHost,[
+  {key:"overview",label:"Start exploring",nodes:[$("#home .field-guide"),$("#home .lab-teaser")]},
+  {key:"ideas",label:"Ideas & tools",nodes:[$("#beyond-journals")]},
+  {key:"landscape",label:"Research landscape",nodes:[$("#home .glance-section"),$("#home .issue-strip")]},
+  {key:"recent",label:"Recently added",nodes:[$("#home .arrivals-section")]},
+  {key:"follow",label:"Follow the brief",nodes:[$("#home .follow-section")]}
+ ],"home-section");
+ layerDisclosure($(".home-source-drawer"),"Sources behind this issue");
+ layerDisclosure($(".collection-details"),"About the collection");
+ layerDisclosure($(".library-refine"),"Filter the collection");
+ layerDisclosure($(".play-update"),"What's new in the Lab");
+ for(const node of $$(".precedent-details"))layerDisclosure(node,"Design notes");
+ const labNote=$(".play-note"),noteBody=make("div");while(labNote.firstChild)noteBody.append(labNote.firstChild);labNote.append(layerButton("About these experiments","About these experiments",noteBody));
+ labPageMenu=sectionMenu($("#lab-page-navigation"),[{key:"experiments",label:"Experiments",nodes:[$("#lab-activities")]},{key:"design",label:"Design examples",nodes:[$(".play-precedents")]}],"lab-section","Explore the Lab");
+ const perspectiveHost=make("div","perspective-section-controls"),intro=$$("#perspectives .perspectives-intro");$(".perspectives-quick-links").after(perspectiveHost);
+ const perspectives=sectionMenu(perspectiveHost,[{key:"essays",label:"Reporting & essays",nodes:[intro[0],$("#perspectives-essays")]},{key:"products",label:"Tools & design",nodes:[intro[1],$("#perspectives-products")]}],"perspectives-section");
+ $("#perspectives-essays-link").onclick=()=>perspectives.choose("essays");
+ const atlasHost=make("div");$(".atlas-stat-row").after(atlasHost);
+ sectionMenu(atlasHost,[{key:"themes",label:"Research themes",nodes:[$(".atlas-topic")]},{key:"years",label:"Publication years",nodes:[$(".atlas-years")]},{key:"material",label:"Source material",nodes:[$(".atlas-coverage"),$(".atlas-matrix")]}],"atlas-section");
+}
 function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.slice(0,10)+"T12:00:00Z");return isNaN(d.getTime())?"Undated":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
 function id(x){return String(x.doi||x.url||x.title)}
 function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.pending.find(x=>id(x)===k);return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
@@ -28,13 +95,13 @@ function checkedReadingContext(reading,cls="source-meta"){
  return box;
 }
 function readingDetails(reading){
- const details=make("details","card-reading-details");
- add(details,make("summary","","Reading details"),checkedReadingContext(reading));
- if(reading.source_version)details.append(make("p","source-meta","Source version identifier: "+reading.source_version));
+ const content=make("div","card-reading-context");
+ content.append(checkedReadingContext(reading));
+ if(reading.source_version)content.append(make("p","source-meta","Source version identifier: "+reading.source_version));
  const basis=reading.digest?.basis;
- if(basis&&!String(reading.notice||"").includes(basis))details.append(make("p","source-meta",basis));
- if(!/not human review|not independently reviewed/i.test(String(reading.notice||"")+String(basis||"")))details.append(make("p","source-meta","AI source-check; not human review or independent replication."));
- return details;
+ if(basis&&!String(reading.notice||"").includes(basis))content.append(make("p","source-meta",basis));
+ if(!/not human review|not independently reviewed/i.test(String(reading.notice||"")+String(basis||"")))content.append(make("p","source-meta","AI source-check; not human review or independent replication."));
+ return layerButton("Reading details","Reading details",content,"card-reading-details");
 }
 function depthName(x){if(originalSummary(x))return "Original summary";if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":x.analysis?.original_paraphrases_only?"Reviewed full article":"Full-text sections","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
@@ -172,6 +239,7 @@ function goto(page,k){
  if(location.hash===value)route({type:"hashchange"});else location.hash=value;
 }
 function route(event){
+ if(event?.type==="hashchange")closeLayer();
  const raw=location.hash.slice(1)||"home";
  let page=raw.startsWith("paper/")?"paper":raw.split("?")[0];
  if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";
@@ -185,6 +253,7 @@ function route(event){
  $$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});
  if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}void openPaper(key,event?.type==="hashchange")}
  if(page==="library")showLibrary();if(page==="atlas")showAtlas();
+ if(page==="lab"&&raw.includes("experiment="))labPageMenu?.choose("experiments");
  window.scrollTo({top:0,behavior:"instant"});
  if(event?.type==="hashchange"){
   closeNavigation();
@@ -195,7 +264,7 @@ function route(event){
 function focusIssueTerm(raw){
  const term=new URLSearchParams(raw.split("?")[1]||"").get("term");
  const target=term?.startsWith("issue-term-")?document.getElementById(term):null;
- if(target){target.focus({preventScroll:true});target.scrollIntoView({block:"center"})}
+ if(target){issueMenu?.choose("about");target.focus({preventScroll:true});target.scrollIntoView({block:"center"})}
 }
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
 function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>goto("library",t[0]),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
@@ -288,7 +357,37 @@ function compactIssueReading(section,label="Read the full analysis",issue=S.issu
  if(end===text.length)return full;
  const box=make("div","compact-reading issue-compact-reading"),preview=issueProse(text,section,issue,0,end);
  preview.classList.add("compact-lead");
- return add(box,preview,add(make("details","reading-expansion"),make("summary","",label),full));
+ return add(box,preview,layerButton(label,section.title||label,full,"reading-expansion"));
+}
+function setupIssueLayers(issue){
+ const host=$("#issue-navigation");if(!host)return;
+ const deck=$("#issue-takeaways");deck.replaceChildren();
+ for(const [i,signal] of (issue.signals||[]).entries()){
+  const card=make("article","takeaway-card"),front=make("div","takeaway-face"),back=make("div","takeaway-face takeaway-back");back.hidden=true;
+  add(front,make("span","eyebrow","0"+(i+1)+" / "+signal.short),uiIcon(["focus","switch","network"][i%3],"takeaway-symbol"),make("h3","",signal.title));
+  const bullets=make("ul","takeaway-statements");bullets.append(make("li","",textSentences(signal.text)[0]||signal.text));
+  add(back,make("span","eyebrow","KEY STATEMENT"),bullets);
+  const turn=btn("Turn card",()=>{const flipped=back.hidden;front.hidden=flipped;back.hidden=!flipped;card.classList.toggle("is-flipped",flipped);turn.setAttribute("aria-pressed",String(flipped));turn.textContent=flipped?"Back to theme":"Turn card";},"flip-toggle");turn.setAttribute("aria-pressed","false");
+  const read=btn("Explore the evidence",()=>{issueMenu.choose("themes");issueThemeMenu.choose(String(i));issueThemeMenu.nav.scrollIntoView({block:"start"});issueThemeMenu.select.focus({preventScroll:true});},"quiet-link");
+  add(card,front,back,add(make("div","takeaway-actions"),turn,read));deck.append(card);
+ }
+ const intro=layerDisclosure($(".issue-letter"),"The big picture")||$(".issue-letter");
+ layerDisclosure($(".issue-closing .issue-editorial-details"),"How this was made");
+ layerDisclosure($("#issue-history"),"Publication history");
+ const shelf=$(".issue-reading-shelf > details");if(shelf){const summary=shelf.querySelector("summary");summary?.remove();shelf.replaceWith(...shelf.childNodes);}
+ let map=$("#issue-map");if(!map){map=make("div","issue-concept-map");map.id="issue-map";$("#issue-takeaways").before(map);}
+ map.replaceChildren(make("span","map-center","One edition · "+(issue.signals||[]).length+" connected themes"),make("span","map-caption","A reading map"));
+ host.replaceChildren();
+ issueMenu=sectionMenu(host,[
+  {key:"overview",label:"At a glance",nodes:[$("#issue-overview"),intro]},
+  {key:"themes",label:"Explore the themes",nodes:[$(".issue-signals-section"),...(issue.supplements?.length?[$("#issue-supplements")]:[])]},
+  {key:"question",label:"Question & experiment",nodes:[$("#issue-extras")]},
+  {key:"sources",label:"Sources",nodes:[$(".issue-reading-shelf")]},
+  {key:"about",label:"Notes & glossary",nodes:[$(".issue-closing"),...((issue.glossary||[]).length?[$("#issue-glossary")]:[]),$(".issue-follow")]}
+ ],"issue-section","Choose a reading layer");
+ let themeHost=$("#issue-theme-navigation");if(!themeHost){themeHost=make("div");themeHost.id="issue-theme-navigation";$("#issue-signals").before(themeHost);}themeHost.replaceChildren();
+ const panels=Array.from($("#issue-signals").children);
+ if(panels.length)issueThemeMenu=sectionMenu(themeHost,panels.map((node,i)=>({key:String(i),label:issue.signals[i].short,nodes:[node]})),"issue-theme","Choose a theme");
 }
 function renderIssueGlossary(issue){
  let glossary=$("#issue-glossary");
@@ -419,6 +518,7 @@ function renderIssue(){
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries())shelf.append(issueSourceShelfItem(src,i));
  renderEditionCards();
+ setupIssueLayers(issue);
 }
 function issueSourceShelfItem(src,index){
  const item=make("div","issue-shelf-item"),resolved=record(src.id),candidate=resolved&&depth(resolved)!=="citation_only"?resolved:null;
@@ -438,13 +538,13 @@ function issueSourceShelfItem(src,index){
   if(publicationUrl&&publicationUrl!==sourceUrl)
    links.append(add(make("p"),link(related?"Related journal publication (not the checked source)":"Publication record",publicationUrl,"issue-source-publication-link")));
   if(links.children.length)content.append(links);
-  const review=make("details","issue-source-review"),scope=make("div","issue-source-review-body");
+  const scope=make("div","issue-source-review-body");
   scope.append(checkedReadingContext(src,"issue-source-review-label"));
   if(src.source_version)scope.append(make("p","","Source version identifier: "+src.source_version));
   if(src.source_doi)scope.append(make("p","","Checked source DOI: "+src.source_doi));
   if(related)scope.append(make("p","","Related journal DOI (not checked here): "+src.related_journal_doi));
-  if(scope.children.length)content.append(add(review,make("summary","","Source details & reading basis"),scope));
-  const evidence=originalEvidence(src);if(evidence)content.append(evidence);
+  if(scope.children.length)content.append(layerButton("Source details & reading basis","Source details & reading basis",scope,"issue-source-review"));
+  const evidence=originalEvidence(src);if(evidence)content.append(layerButton("Inspect source passages","Source passages",evidence,"issue-source-evidence"));
  }
  return add(item,make("span","issue-shelf-number",String(index+1).padStart(2,"0")),content);
 }
@@ -528,6 +628,7 @@ function renderBacklog(){
  const detail=make("p","",pending+" papers ready for another extraction attempt. "+pause);
  add(root,top,rail,detail);
 }
+const libraryPage={signature:"",number:0};
 function showLibrary(){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value,scope=$("#scope-filter").value,order=$("#library-sort")?.value||"added";
  const xs=S.records.filter(x=>matchesSearch(x,q)&&(!t||x.lane===t)&&(!k||x.kind===k)&&(
@@ -544,8 +645,13 @@ function showLibrary(){
  }
 
  const box=$("#library-results");box.replaceChildren();
+ const pager=$("#library-pagination"),size=pager?Number($("#library-page-size").value)||12:Math.max(1,xs.length),signature=[q,t,d,k,scope,order,size].join("|");
+ if(libraryPage.signature!==signature){libraryPage.signature=signature;libraryPage.number=0;}
+ const pages=Math.max(1,Math.ceil(xs.length/size));libraryPage.number=Math.min(libraryPage.number,pages-1);
+ if(pager){pager.hidden=!xs.length;$("#library-page-status").textContent="Page "+(libraryPage.number+1)+" of "+pages+" · "+(xs.length?libraryPage.number*size+1:0)+"–"+Math.min(xs.length,(libraryPage.number+1)*size)+" of "+xs.length;
+  $("#library-previous").disabled=libraryPage.number===0;$("#library-next").disabled=libraryPage.number>=pages-1;}
  if(!xs.length){box.append(make("div","empty-state","No source-backed items match those filters. Try a broader search."));return}
- for(const x of xs){
+ for(const x of xs.slice(libraryPage.number*size,(libraryPage.number+1)*size)){
   const c=make("article","library-card library-story"),body=make("div","library-story-body"),h=make("h3"),foot=make("div","card-foot");
   const image=editorialMedia(x,"card");
   if(image){
@@ -846,7 +952,7 @@ function originalEvidence(reading){
  const fields=originalCommentary(reading)?[["thesis","Attributed central argument"],["reasoning","How the argument develops"],
   ["examples","Examples and distinctions"],["tension","The central tension"],["qualification","Qualifications"]]:[["idea","Main idea"],["explain","Explanation"],["approach","Study approach"],
   ["finding","Reported finding"],["interpretation","Interpretation"],["limitation","Limitations"]];
- const details=make("details","rv-drawer rv-evidence"),body=make("div","rv-drawer-body");
+ const details=make("section","rv-drawer rv-evidence"),body=make("div","rv-drawer-body");
  for(const [key,label] of fields){
   const locators=reading.evidence?.[key];
   if(!Array.isArray(locators))continue;
@@ -861,7 +967,7 @@ function originalEvidence(reading){
   if(list.children.length)body.append(add(make("section","rv-excerpt"),make("h3","",label),list));
  }
  if(!body.children.length)return null;
- add(details,make("summary","","Inspect source locators for this summary"),
+ add(details,make("h3","","Source locators for this summary"),
   make("p","rv-source-version","Locators refer to: "+checkedSourceLabel(reading)),body);
  return details;
 }
@@ -917,8 +1023,7 @@ function readingQualifications(content){
  const hasCausalLimit=substantive.some(sentence=>/\b(?:cannot|can not|does not|do not|not establish|no|without|unverified|uncertain|limited|lack)\b[^.!?]*\bcausal(?:ity)?\b|\bcausal(?:ity)?\b[^.!?]*\b(?:cannot|not|unverified|uncertain|limited|lack)\b/i.test(sentence));
  if(sentences.includes(mixedNotice)&&!hasCausalLimit)substantive.push("Reported results do not establish strong causal evidence.");
  if(substantive.length)box.append(readingBullets(substantive.join(" ")));
- const full=make("details","rv-full-qualifications");
- add(full,make("summary","","Full qualifications"),readingProse(content));
+ const full=layerButton("Full qualifications","Full qualifications",readingProse(content),"rv-full-qualifications");
  box.append(full);return box;
 }
 function readingProse(content,className=""){
@@ -947,8 +1052,8 @@ function sourceFields(x){
 function sourceReader(x){
  const fields=sourceFields(x),available=fields.filter(([,content])=>content),r=x.reading||{},a=x.analysis||{},original=originalSummary(x);
  if(!available.length)return null;
- const drawer=make("details","rv-drawer rv-source-excerpts");
- drawer.append(make("summary","",original?
+ const drawer=make("section","rv-drawer rv-source-excerpts");
+ drawer.append(make("h3","",original?
   a.original_paraphrases_only?"Inspect prior indexed notes and abstract":"Inspect machine-indexed excerpts and abstract":
   "Inspect source text and abstract"));
  const panel=make("div","rv-reader-panel"),intro=make("div","rv-indexed-provenance");
@@ -964,22 +1069,26 @@ function sourceReader(x){
  const contents=make("nav","rv-reader-contents");contents.setAttribute("aria-label","Source sections");
  const drawerBody=make("div","rv-drawer-body"),sections=[];
  for(const [label,content,basis] of available){
-  const section=make("details","rv-excerpt rv-source-section");
+  const section=make("section","rv-excerpt rv-source-section");
+  section.id="article-source-passage-"+(sections.length+1);
   const count=String(content).trim().split(/\s+/).length;
-  add(section,add(make("summary","rv-source-section-title"),make("span","",label),make("small","",count+" words")),
+  add(section,add(make("h4","rv-source-section-title"),make("span","",label),make("small","",count+" words")),
    make("p","rv-section-basis",basis),readingProse(content));
-  const jump=btn(label,()=>{section.open=true;section.querySelector?.("summary")?.focus();section.scrollIntoView?.({block:"start"});},"rv-reader-jump");
+  section.hidden=sections.length>0;
+  const jump=btn(label,()=>{sections.forEach(s=>s.hidden=s!==section);Array.from(contents.children).forEach(b=>b.setAttribute("aria-pressed",String(b===jump)));},"rv-reader-jump");
+  jump.setAttribute("aria-pressed",String(sections.length===0));
+  jump.setAttribute("aria-controls",section.id);
   contents.append(jump);sections.push(section);drawerBody.append(section);
  }
  const controls=make("div","rv-reader-controls");
- add(controls,btn("Expand all sections",()=>sections.forEach(s=>s.open=true),"rv-reader-control"),
-  btn("Collapse all sections",()=>sections.forEach(s=>s.open=false),"rv-reader-control"));
+ add(controls,btn("Read all source sections",()=>{sections.forEach(s=>s.hidden=false);Array.from(contents.children).forEach(b=>b.setAttribute("aria-pressed","false"));},"rv-reader-control"),
+  btn("One section at a time",()=>{sections.forEach((s,i)=>s.hidden=i!==0);Array.from(contents.children).forEach((b,i)=>b.setAttribute("aria-pressed",String(i===0)));},"rv-reader-control"));
  add(panel,contents,controls,drawerBody);drawer.append(panel);return drawer;
 }
 function evidenceCoverage(x){
  const r=x.reading||{},d=r.digest||{},fields=sourceFields(x);
- const section=make("details","rv-coverage");
- add(section,make("summary","","Available source material"),
+ const section=make("section","rv-coverage");
+ add(section,make("h3","","Available source material"),
   make("p","rv-coverage-note",depth(x)==="abstract"?"This reading uses the abstract, not the full paper.":"Indexed sections can be incomplete. Availability does not rate study quality."));
  const table=make("table","rv-coverage-table"),body=make("tbody","");
  [["Methods",fields[0]?.[1],d.approach],["Results",fields[1]?.[1],d.finding],["Discussion",fields[2]?.[1],d.interpretation],["Limitations",fields[3]?.[1],d.limitation]].forEach(([label,content,summary])=>{
@@ -990,6 +1099,43 @@ function evidenceCoverage(x){
  table.append(body);section.append(table);
  section.append(make("p","rv-coverage-note","“Not indexed” describes the material available here, not a flaw in the study or proof that the paper omitted it."));
  return section;
+}
+
+function articleSections(main,layout,body,side,analysis,evidence){
+ const overview=make("section","rv-panel rv-panel-overview");
+ overview.id="article-overview";overview.setAttribute("aria-label","Reading overview");
+ for(const child of Array.from(body.children))overview.append(child);
+ analysis.className+=" rv-panel";analysis.id="article-analysis";analysis.setAttribute("aria-label","Analysis");
+ evidence.className+=" rv-panel";evidence.id="article-evidence";evidence.setAttribute("aria-label","Evidence");
+ side.className+=" rv-panel";side.id="article-source";side.setAttribute("aria-label","Source and related readings");
+ body.append(overview,analysis,evidence);
+ const groups=[{value:"overview",label:"Overview",node:overview},
+  ...(analysis.children.length?[{value:"analysis",label:"Analysis",node:analysis}]:[]),
+  ...(evidence.children.length?[{value:"evidence",label:"Evidence",node:evidence}]:[]),
+  {value:"source",label:"Source",node:side}];
+ const controls=make("nav","rv-section-controls");controls.setAttribute("aria-label","Choose reading section");
+ const label=make("label","rv-section-select-label","Reading view"),select=make("select","rv-section-select");
+ select.id="article-section";label.setAttribute("for",select.id);
+ select.setAttribute("aria-controls",groups.map(group=>group.node.id).join(" "));
+ for(const group of groups){const option=make("option","",group.label);option.value=group.value;select.append(option);}
+ const allOption=make("option","","Read all");allOption.value="all";select.append(allOption);
+ const buttons=make("div","rv-section-tabs"),readAll=btn("Read all",()=>choose("all"),"rv-read-all");
+ function choose(value){
+  if(value!=="all"&&!groups.some(group=>group.value===value))value="overview";
+  for(const group of groups)group.node.hidden=value!=="all"&&group.value!==value;
+  analysis.hidden=!analysis.children.length||value!=="all"&&value!=="analysis";
+  evidence.hidden=!evidence.children.length||value!=="all"&&value!=="evidence";
+  body.hidden=value==="source";
+  select.value=value;main.setAttribute("data-reading-view",value);
+  Array.from(buttons.children).forEach(button=>button.setAttribute("aria-pressed",String(button.getAttribute("data-reading-view")===value)));
+  readAll.setAttribute("aria-pressed",String(value==="all"));
+ }
+ for(const group of groups){
+  const button=btn(group.label,()=>choose(group.value),"rv-section-tab");
+  button.setAttribute("data-reading-view",group.value);button.setAttribute("aria-controls",group.node.id);buttons.append(button);
+ }
+ select.onchange=()=>choose(select.value);
+ add(controls,label,select,buttons,readAll);main.append(controls,layout);choose("overview");
 }
 
 function showPaper(x){
@@ -1029,17 +1175,18 @@ function showPaper(x){
  add(head,metadata,title);
  const introCopy=make("div","rv-intro-copy");
  if(readingTitles[id(x)]&&d.idea)introCopy.append(make("p","rv-summary-idea",d.idea));
- if(intro){const overview=make("details","rv-overview");add(overview,make("summary","","Read the full overview"),readingProse(d.explain));introCopy.append(overview);}
+ if(intro)introCopy.append(layerButton("Read the overview","Overview",readingProse(d.explain),"rv-overview"));
  const sourceRow=make("div","rv-source-row");
  add(sourceRow,make("span","",[x.venue,date(x.published)].filter(Boolean).join(" · ")),make("span","",original?checkedSourceLabel(r):readingBasisName(x)));
  introCopy.append(sourceRow);
- if(original&&r.temporal_notice){const dates=make("details","rv-source-dates");add(dates,make("summary","","Source dates"),make("p","rv-reading-notice",r.temporal_notice));introCopy.append(dates);}
+ if(original&&r.temporal_notice)introCopy.append(layerButton("Source dates","Source dates",make("p","rv-reading-notice",r.temporal_notice),"rv-source-dates"));
+ introCopy.append(make("p","rv-ai-notice","AI-generated summary. AI can make mistakes."));
  // Editorial art is separate from the source-grounded figures below.
  if(editorialArt(x)){const lede=make("div","rv-lede-layout");add(lede,introCopy,editorialMedia(x,"reading"));head.append(lede);}else head.append(introCopy);
 
  main.append(back,head);
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
- const body=make("section","rv-content");
+ const body=make("section","rv-content"),analysis=make("section","rv-analysis"),evidencePanel=make("section","rv-evidence-panel");
  // Older indexed graphics can describe a different source version. Keep the
  // checked original prose primary instead of reusing those unreviewed visuals.
  const art=original?null:conceptArtwork(x);
@@ -1054,24 +1201,24 @@ function showPaper(x){
   if(hasFinding||conceptual){
    const claim=make("div","rv-claim");
    add(claim,make("span","rv-mini-label",conceptual?"Proposed framework":"Main finding"),
-      make("p","",d.finding||d.idea));
+      readingBullets(d.finding||d.idea));
    body.append(claim);
   }
  }else if(editorial&&hasFinding&&!autoGraphic){
   const claim=make("div","rv-claim");
-  add(claim,make("span","rv-mini-label","Main finding"),make("p","",d.finding));
+  add(claim,make("span","rv-mini-label","Main finding"),readingBullets(d.finding));
   body.append(claim);
  }else if(scholarly&&hasFinding&&!autoGraphic&&!commentary){
-  body.append(add(make("div","rv-claim"),make("span","rv-mini-label","What the study reports"),readingProse(d.finding)));
+  body.append(add(make("div","rv-claim"),make("span","rv-mini-label","What the study reports"),readingBullets(d.finding)));
  }else if(commentary||!scholarly){
   const deep=d.longform||{},hasDepth=Boolean(deep.reasoning||deep.examples||deep.tension||deep.implications);
   const reading=make("div","rv-longform");
   function lens(label,value){
    if(!value)return;
    const collapsed=!label.includes("central argument")&&!label.includes("Qualifications");
-   const part=make(collapsed?"details":"section","rv-longform-part");
-   add(part,make(collapsed?"summary":"h3","",label),readingProse(value));
-   reading.append(part);
+   const part=make("section","rv-longform-part");
+   add(part,make("h3","",label),label.includes("central argument")?readingBullets(value):readingProse(value));
+   (collapsed?analysis:reading).append(part);
   }
   // Publisher metadata alone cannot justify invented counterarguments or a
   // faux methods section. Only display fields supported by source analysis.
@@ -1082,7 +1229,7 @@ function showPaper(x){
   lens("What this could mean for attention design",deep.implications);
   lens("A question to investigate",deep.open_question);
   lens("Qualifications and unresolved issues",deep.qualification);
-  if(deep.basis)reading.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
+  if(deep.basis)evidencePanel.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
   body.append(reading);
  }else if(conceptual){
   const framework=x.framework_notes||{};
@@ -1100,7 +1247,7 @@ function showPaper(x){
       make("p","",cutAt>0?phase.slice(cutAt+1).trim():phase));
     stages.append(section);
    }
-   body.append(stages);
+   analysis.append(stages);
   }
  }else if(!hasFinding){
   const claim=make("div","rv-source-gap");
@@ -1124,17 +1271,17 @@ function showPaper(x){
  }
  if(!commentary&&(scholarly||original)&&!autoGraphic)body.append(context);
  if(!commentary&&(original||(scholarly&&editorial))&&d.interpretation){
-  const relevance=make("details","rv-take");
+  const relevance=make("section","rv-take");
   add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
-    make("summary","rv-section-title",original?"Interpretation and implications":"Why this matters"),
+    make("h2","rv-section-title",original?"Interpretation and implications":"Why this matters"),
     readingProse(d.interpretation));
-  body.append(relevance);
+  analysis.append(relevance);
  }
  if(scholarly&&!original&&d.longform){
   const deep=d.longform;
-  const extended=make("details","rv-research-longform");
+  const extended=make("section","rv-research-longform");
   add(extended,make("span","rv-section-overline","02 / CLOSER READING"),
-     make("summary","rv-section-title","A deeper look at the study"));
+     make("h2","rv-section-title","A deeper look at the study"));
   const items=[
     ["The research question",deep.research_question],
     ["Design and evidence",deep.study_design],
@@ -1154,15 +1301,15 @@ function showPaper(x){
   if(deep.basis)parts.append(make("p","rv-longform-basis",
    "Reading basis: "+deep.basis+" · Machine-generated, not independently reviewed"));
   extended.append(parts);
-  body.append(extended);
+  analysis.append(extended);
  }
  // Keep the extracted text and metadata in one clearly optional evidence drawer.
  if(original){
   const evidence=originalEvidence(r);
-  if(evidence)body.append(evidence);
+  if(evidence)evidencePanel.append(evidence);
  }
  const reader=sourceReader(x);
- if(reader)body.append(reader);
+ if(reader)evidencePanel.append(reader);
  story.append(body);
  const cite=make("section","rv-source");
  add(cite,make("span","rv-section-overline","SOURCE"),
@@ -1189,7 +1336,7 @@ function showPaper(x){
   if(x.source_review?.source_url&&/^https:\/\//.test(x.source_review.source_url))
    cite.append(link("Read verified full-text republication",x.source_review.source_url,"rv-secondary-link"));
  }
- const provenance=make("details","rv-provenance"),provenanceBody=make("div","rv-provenance-body");
+ const provenanceBody=make("div","rv-provenance-body");
  provenanceBody.append(make("p","",r.provenance||"Publisher/source index"));
  if(original){
   provenanceBody.append(status);
@@ -1202,12 +1349,12 @@ function showPaper(x){
   if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)
    provenanceBody.append(make("p","","Related journal DOI (not checked here): "+r.related_journal_doi));
  }else provenanceBody.append(make("p","",x.doi?"DOI: "+x.doi:"No DOI recorded"));
- add(provenance,make("summary","","Source details & reading basis"),provenanceBody);
+ const provenance=layerButton("Source details & reading basis","Source details & reading basis",provenanceBody,"rv-provenance");
  cite.append(provenance);side.append(cite);
  if(scholarly&&!original)side.append(evidenceCoverage(x));
  if(!original&&x.analysis?.figures?.length){
-  const figureSection=make("details","rv-figures");
-  figureSection.append(make("summary","","Original paper figures ("+x.analysis.figures.length+")"));
+  const figureSection=make("section","rv-figures");
+  figureSection.append(make("h3","","Original paper figures ("+x.analysis.figures.length+")"));
   const figureBody=make("div","rv-figures-content");
   for(const fig of x.analysis.figures.slice(0,3)){
    const caption=make("div","rv-source-figure");
@@ -1250,7 +1397,7 @@ function showPaper(x){
   side.append(next);
  }
  add(layout,story,side);
- main.append(layout);
+ articleSections(main,layout,body,side,analysis,evidencePanel);
  root.append(main);
 }
 let libraryPromise=null;
@@ -1335,6 +1482,8 @@ $("#perspectives-library-link").addEventListener("click",e=>{e.preventDefault();
 $("#perspectives-essays-link").addEventListener("click",e=>{e.preventDefault();$("#perspectives-essays").scrollIntoView({behavior:"smooth",block:"start"})});
 $$("[data-library-theme]").forEach(button=>button.addEventListener("click",()=>{$("#topic-filter").value=button.dataset.libraryTheme;showLibrary()}));
 $("#library-sort").addEventListener("change",showLibrary);
+$("#library-page-size")?.addEventListener("change",showLibrary);
+for(const [selector,step] of [["#library-previous",-1],["#library-next",1]])$(selector)?.addEventListener("click",()=>{libraryPage.number=Math.max(0,libraryPage.number+step);showLibrary();$(".library-results-heading").scrollIntoView({block:"start"});$("#library-page-status").tabIndex=-1;$("#library-page-status").focus({preventScroll:true});});
 $("#library-reset").addEventListener("click",()=>{
  $("#search").value="";$("#scope-filter").value="all";$("#topic-filter").value="";$("#type-filter").value="";$("#depth-filter").value="readable";showLibrary();
 });
@@ -1346,6 +1495,7 @@ navigation.classList.add("is-collapsible");menuToggle.hidden=false;
 menuToggle.addEventListener("click",()=>{const open=menuToggle.getAttribute("aria-expanded")!=="true";menuToggle.setAttribute("aria-expanded",String(open));navigation.classList.toggle("is-open",open)});
 navigation.addEventListener("keydown",event=>{if(event.key==="Escape"&&menuToggle.getAttribute("aria-expanded")==="true"){closeNavigation();menuToggle.focus()}});
 window.addEventListener("hashchange",route);
+setupPageLayers();
 init();
 
 
