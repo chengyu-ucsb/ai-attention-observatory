@@ -46,11 +46,12 @@ assert.equal(q("lab-workbench").hidden,true,"Catalog must not preload a long act
 assert.equal(q("lab-classic-tabs").hidden,true);assert.equal(q("lab-session-controls").hidden,true);
 assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,2,"New is the initial collection");
 select("lab-collection-filter","all");assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,5);
-findData("labOpen","switch").click();assert.equal(view.location.hash,"#lab?experiment=switch");assert.equal(q("play-switch").hidden,false);assert.equal(q("play-recovery").hidden,true);assert.equal(classicActivations,1);
-route(view.location.hash);doc.activeElement=doc.body;assert.equal(frames.length,1);frames.shift()();assert.equal(doc.activeElement,q("lab-workbench-title"),"Destination focus must survive outer-router hash navigation");
+findData("labOpen","switch").click();assert.equal(view.location.hash,"#lab?experiment=switch");assert(q("lab-workbench").hidden,"New controls cannot appear before hash navigation settles");assert.equal(classicActivations,0);
+doc.activeElement=doc.body;route(view.location.hash);assert.equal(q("play-switch").hidden,false);assert.equal(q("play-recovery").hidden,true);assert.equal(classicActivations,1);assert.equal(frames.length,0);assert.equal(doc.activeElement,q("lab-workbench-title"),"Destination focus is established during the completed hash route");
 assert.equal(q("lab-catalog").hidden,true);assert.equal(q("lab-classic-tabs").hidden,false);
-q("lab-back-to-catalog").click();assert.equal(q("play-switch").hidden,true);assert.equal(q("lab-catalog").hidden,false);assert.equal(doc.activeElement,q("lab-collection-filter"));
-route("#lab");doc.activeElement=doc.body;assert.equal(frames.length,1);frames.shift()();assert.equal(doc.activeElement,q("lab-collection-filter"),"Returning to the collection must restore its filter after navigation");
+q("lab-back-to-catalog").click();assert.equal(q("lab-catalog").hidden,true,"Collection controls also wait for their route");
+doc.activeElement=doc.body;route("#lab");assert.equal(q("play-switch").hidden,true);assert.equal(q("lab-catalog").hidden,false);assert.equal(frames.length,0);assert.equal(doc.activeElement,q("lab-collection-filter"),"Returning to the collection restores its filter during navigation");
+assert.equal((view.listeners.popstate||[]).length,0,"Hash navigation must not publish controls early through a duplicate popstate handler");
 route("#lab?experiment=evidence-detective");assert.equal(q("lab-workbench-title").textContent,"Evidence Detective");assert.equal(q("lab-classic-tabs").hidden,true);
 for(let index=0;index<CASES.length;index++){
  select("lab-case-picker",String(index));
@@ -83,6 +84,7 @@ select("lab-notification-policy","end");q("lab-urgent-bypass").checked=false;q("
 assert(q("lab-notification-summary").textContent.includes("1 alert moment."));assert(q("lab-notification-summary").textContent.includes("22 minutes"));
 q("lab-inspect-delivery").click();const modal=doc.querySelector(".lab-help-dialog");assert(modal.open);assert(modal.textContent.includes("Minute 30"));assert(modal.textContent.includes("Time-sensitive request"));
 assert.equal(layerNotices,1,"Opening the activity dialog must pause any covered timing");
+const modalFocus=doc.activeElement;route(view.location.hash);assert.equal(doc.querySelector(".lab-help-dialog"),modal,"A repeated route cannot close a newly opened dialog in the same workspace");assert.equal(doc.activeElement,modalFocus,"Settled navigation cannot steal focus from a delivery dialog");assert.equal(frames.length,0);
 flatten(modal).find(node=>node.tagName==="BUTTON").click();assert.equal(doc.querySelector(".lab-help-dialog"),null);assert.equal(doc.activeElement,q("lab-inspect-delivery"));
 assert.equal(layerNotices,2,"Closing the activity dialog must notify timing controllers");
 q("lab-inspect-delivery").click();route("#home");assert.equal(doc.querySelector(".lab-help-dialog"),null,"Navigation cannot leave a Lab dialog over another page");route("#lab?experiment=notification-studio");

@@ -495,25 +495,21 @@
   }
   function navigate(id){
     const hash=id?"#lab?experiment="+encodeURIComponent(id):"#lab";
-    pendingNavigationFocus=view.location.hash!==hash?id:undefined;
-    if(view.location.hash!==hash)view.location.hash=hash;
-    select(id,true);
+    if(view.location.hash===hash){pendingNavigationFocus=undefined;select(id,true);return}
+    // Expose the new controls only after the hash router has finished. A
+    // synchronous preview here would let a visitor act before navigation settles.
+    pendingNavigationFocus=id;
+    view.location.hash=hash;
   }
   function routeSelection(){
-    const openHelp=q(".lab-help-dialog");if(openHelp)openHelp.close();
     const [page,search=""]=view.location.hash.replace(/^#/,"").split("?");
-    if(page!=="lab"){pendingNavigationFocus=undefined;return}
+    if(page!=="lab"){const openHelp=q(".lab-help-dialog");if(openHelp)openHelp.close();pendingNavigationFocus=undefined;return}
     const id=new URLSearchParams(search).get("experiment");
     const selected=CATALOG.some(entry=>entry.id===id)?id:null;
     const needsFocus=pendingNavigationFocus!==undefined&&pendingNavigationFocus===selected;
     pendingNavigationFocus=undefined;
+    if(selected!==state.active){const openHelp=q(".lab-help-dialog");if(openHelp)openHelp.close()}
     select(selected,needsFocus);
-    if(needsFocus){
-      // Hash navigation and the outer page router can move focus after the
-      // click handler. Restore the user's destination after both have settled.
-      const focusDestination=()=>{if(state.active===selected&&view.location.hash.split("?")[0]==="#lab")(selected?q("#lab-workbench-title"):filter)?.focus()};
-      if(typeof view.requestAnimationFrame==="function")view.requestAnimationFrame(focusDestination);else focusDestination();
-    }
   }
   function select(id,focus){
     if(id===state.active&&id!==null){if(focus)q("#lab-workbench-title")?.focus();return}
@@ -616,6 +612,8 @@
     const title=q("#lab-workbench-title");if(title)title.textContent=entry.title;const meta=q(".lab-workbench-meta");if(meta)meta.textContent=entry.topic+" · "+entry.duration+" · v"+entry.version;
     if(view.location.hash.startsWith("#lab"))view.history.replaceState(null,"","#lab?experiment="+entry.id);
   });
-  view.addEventListener("hashchange",routeSelection);view.addEventListener("popstate",routeSelection);
+  // Hash changes cover catalog links and browser Back/Forward. Processing both
+  // popstate and hashchange would expose controls before the outer hash router.
+  view.addEventListener("hashchange",routeSelection);
   drawCatalog();hideClassics();routeSelection();
 })();

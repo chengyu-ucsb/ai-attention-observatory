@@ -54,6 +54,29 @@ def server():
         srv.server_close()
 
 
+def open_lab_activity(page, activity, keyboard=False):
+    """Wait for the routed workbench before interacting with its controls."""
+    trigger = page.locator(f'[data-lab-open="{activity}"]')
+    if keyboard:
+        trigger.focus()
+        expect(trigger).to_be_focused()
+        page.keyboard.press("Enter")
+    else:
+        trigger.click()
+    expect(page).to_have_url(re.compile(r'#lab\?experiment=' + re.escape(activity) + r'$'))
+    expect(page.locator("#lab-workbench-title")).to_be_focused()
+    expect(page.locator("#lab-catalog")).not_to_be_visible()
+    expect(page.locator("#lab-back-to-catalog")).to_be_visible()
+
+
+def return_to_lab_catalog(page):
+    page.locator("#lab-back-to-catalog").click()
+    expect(page).to_have_url(re.compile(r'#lab$'))
+    expect(page.locator("#lab-catalog")).to_be_visible()
+    expect(page.locator("#lab-workbench")).not_to_be_visible()
+    expect(page.locator("#lab-collection-filter")).to_be_focused()
+
+
 def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
@@ -72,9 +95,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     # The compact landing keeps all classic activities accessible by category.
     page.locator("#lab-collection-filter").select_option("classic")
     expect(page.locator("[data-lab-open]")).to_have_count(3)
-    page.locator('[data-lab-open="switch"]').focus()
-    page.keyboard.press("Enter")
-    expect(page.locator("#lab-back-to-catalog")).to_be_visible()
+    open_lab_activity(page, "switch", keyboard=True)
     for name in ("Switch Lab", "Return Point", "Assistance Dial"):
         expect(page.get_by_role("tab", name=name, exact=True)).to_be_visible()
     assert page.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches")
@@ -356,13 +377,10 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     # New activities live in the same versioned catalog; classics remain reachable.
-    page.locator("#lab-back-to-catalog").click()
-    expect(page.locator("#lab-catalog")).to_be_visible()
+    return_to_lab_catalog(page)
     expect(page.locator("#play-assist")).not_to_be_visible()
     page.locator("#lab-collection-filter").select_option("new")
-    page.locator('[data-lab-open="evidence-detective"]').focus()
-    page.keyboard.press("Enter")
-    expect(page.locator("#lab-workbench-title")).to_be_focused()
+    open_lab_activity(page, "evidence-detective", keyboard=True)
     expect(page.locator(".lab-fiction-label")).to_contain_text("Fictional evidence dossier")
     expect(page.locator("#play-switch")).not_to_be_visible()
     for index, verdict in enumerate(("overreach", "supported", "unanswered")):
@@ -398,12 +416,14 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     expect(page.locator("#lab-case-picker")).to_have_value("0")
     expect(page.locator("#lab-detective-feedback")).to_have_count(0)
     expect(page.locator("[data-evidence-card][aria-pressed=true]")).to_have_count(0)
-    page.locator("#lab-back-to-catalog").click()
-    page.locator('[data-lab-open="notification-studio"]').click()
+    return_to_lab_catalog(page)
+    open_lab_activity(page, "notification-studio")
     expect(page.locator("#lab-notification-summary")).to_have_text("5 alert moments. Urgent messages wait up to 0 minutes.")
     page.locator("#lab-delivery-picker").select_option("8")
     inspect = page.locator("#lab-inspect-delivery")
-    inspect.focus(); page.keyboard.press("Enter")
+    inspect.focus()
+    expect(inspect).to_be_focused()
+    page.keyboard.press("Enter")
     expect(page.get_by_role("dialog")).to_contain_text("Minute 8")
     expect(page.get_by_role("dialog")).to_contain_text("Time-sensitive request")
     page.keyboard.press("Escape")
@@ -421,7 +441,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     expect(page.locator("#lab-notification-policy")).to_have_value("batch")
     expect(page.locator("#lab-urgent-bypass")).to_be_checked()
     expect(page.locator("#lab-notification-summary")).to_have_text("5 alert moments. Urgent messages wait up to 0 minutes.")
-    page.locator("#lab-back-to-catalog").click()
+    return_to_lab_catalog(page)
     page.locator("#lab-collection-filter").select_option("all")
     expect(page.locator("[data-lab-open]")).to_have_count(5)
     assert not errors, errors
@@ -435,7 +455,7 @@ def check_site_integration(page, url):
     page.goto(real_url, wait_until="networkidle")
     page.locator("#lab").wait_for(state="visible")
     page.locator("#lab-collection-filter").select_option("classic")
-    page.locator('[data-lab-open="switch"]').click()
+    open_lab_activity(page, "switch")
     page.locator("#switch-start").click()
     page.locator("#lab-section").select_option("design")
     expect(page.locator("#play-switch")).not_to_be_visible()
@@ -448,7 +468,7 @@ def check_site_integration(page, url):
     page.locator("#lab").wait_for(state="visible")
     expect(page.locator("#lab-catalog")).to_be_visible()
     page.locator("#lab-collection-filter").select_option("classic")
-    page.locator('[data-lab-open="switch"]').click()
+    open_lab_activity(page, "switch")
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert "Resumed" in page.locator("#switch-note").inner_text()
     # A modal hides the task just as surely as changing routes. Isolate this
@@ -496,7 +516,7 @@ def check_site_integration(page, url):
     page.locator("#lab-section").select_option("experiments")
     expect(page.locator(".play-precedents")).not_to_be_visible()
     page.locator("#lab-collection-filter").select_option("classic")
-    page.locator('[data-lab-open="switch"]').click()
+    open_lab_activity(page, "switch")
     page.locator("#switch-start").click()
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert not errors, errors
