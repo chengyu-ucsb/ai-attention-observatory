@@ -288,6 +288,7 @@ def pending(root=ROOT, today=None):
     if actual > now:
         raise ValueError(f'Weekly discovery date {date} is in the future relative to {now}.')
     window = window_metadata(date)
+    weekly['run']['edition_date'] = canonical_edition_date(root, date)
     supplied = weekly['run'].get('publication_window') or window
     if any(supplied.get(key) != window[key] for key in ('from', 'to', 'timezone')):
         raise ValueError('Publication window does not match previous completed UTC week')
@@ -311,7 +312,9 @@ def pending(root=ROOT, today=None):
         if issue.get('status') == 'published' and same_window(issue.get('edition_date') or path.stem, issue):
             if issue.get('edition_format') != 'coverage':
                 return None
-            weekly['run']['edition_date'] = issue['edition_date']
+            # A coverage upgrade retains its Monday identity and issue number.
+            if issue.get('number'):
+                weekly['run']['edition_number'] = issue['number']
     current_items = []
     for item in weekly.get('items', []):
         current = public_record(item, require_current=True)
@@ -771,7 +774,8 @@ def compose(root=ROOT, model=None, today=None, *, store=None, now=None):
     if weekly is None:
         print('Current edition already exists; no inference or rewrite.')
         return False
-    date = weekly['run'].get('edition_date') or weekly['run']['date']
+    date = canonical_edition_date(root, weekly['run']['date'],
+                                  publication_window=weekly['run'].get('publication_window'))
     packet = evidence(weekly['items'])
     compact = publication_cutoff(now or today)
     if len(packet) < (2 if compact else 3):
@@ -812,7 +816,7 @@ def compose(root=ROOT, model=None, today=None, *, store=None, now=None):
     store.save_editorial(key, revision, state)
     data = root / 'data'
     drafts = json.loads((data / 'issue-editorial.json').read_text(encoding='utf-8'))
-    number = f'{len(drafts)+1:02d}'
+    number = weekly['run'].get('edition_number') or f'{len(drafts)+1:02d}'
     draft.update(number=number, subject=f'The Attention Edit #{number} — '+draft['headline'],
         experiment={'title':'Keep one decision visible', 'text':'Before using AI on a task, write down one judgment you want to make yourself. Afterwards, note what evidence changed that judgment.',
                     'caution':'A reflection prompt, not a tested intervention.'},
@@ -851,7 +855,8 @@ def readiness(root=ROOT, today=None, *, store=None, now=None):
     minimum = 2 if compact else 3
     result = {'needed': count >= minimum,
             'status': 'ready' if count >= minimum else 'awaiting_substantive_sources',
-            'edition_date': weekly['run']['date'], 'eligible_sources': count,
+            'edition_date': canonical_edition_date(root, weekly['run']['date'],
+                publication_window=weekly['run'].get('publication_window')), 'eligible_sources': count,
             'minimum_sources': minimum, 'compact_allowed':compact, 'needs_model':count >= minimum,
             'publication_window': weekly['run']['publication_window']}
     if store is not None and result['needed']:

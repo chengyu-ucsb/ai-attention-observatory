@@ -367,8 +367,8 @@ function renderIssue(){
  $("#weekly-kicker").textContent=published?"THE WEEKLY BRIEF / ISSUE "+String(issue.number).padStart(2,"0"):"THE ATTENTION BRIEF";
  $("#weekly-title").textContent=published?issue.headline:"Good questions about AI and attention.";
  $("#weekly-deck").textContent=published?issue.deck:"Browse research and ideas about thinking, distraction, and how we work with AI.";
- $("#weekly-scope").textContent=published?"An issue of The Attention Brief · "+date(edition):"Browse the research library for the latest findings.";
- $("#issue-edition").textContent=published?"THE ATTENTION BRIEF / ISSUE "+issue.number+" / "+date(edition):"THE ATTENTION BRIEF";
+ $("#weekly-scope").textContent=published?"Week of Monday, "+date(edition):"Browse the research library for the latest findings.";
+ $("#issue-edition").textContent=published?"THE ATTENTION BRIEF / ISSUE "+issue.number+" / WEEK OF MONDAY, "+date(edition):"THE ATTENTION BRIEF";
  $("#issue-headline").textContent=published?issue.headline:"Ideas for thinking clearly.";
  $("#issue-deck").textContent=published?issue.deck:"Explore research, commentary, and experiments about AI and attention.";
  $("#issue-letter-text").replaceChildren(issueProse(published?issue.letter:"Start with a question, follow the evidence, and explore the research library.",{},issue));
@@ -385,6 +385,23 @@ function renderIssue(){
        issueRefs(sig.source_ids));
    main.append(panel);
  });
+ const supplements=$("#issue-supplements");supplements.replaceChildren();supplements.hidden=!published||!(issue.supplements||[]).length;
+ for(const section of published?issue.supplements||[]:[]){
+   const panel=make("article","issue-signal");
+   add(panel,make("h2","",section.title),compactIssueReading(section,"Read the additional analysis",issue),issueRefs(section.source_ids));
+   supplements.append(panel);
+ }
+ const history=$("#issue-history"),historyBody=$("#issue-history-body");historyBody.replaceChildren();
+ const first=issue.first_published_date||String(issue.published_at||"").slice(0,10);
+ history.hidden=!published||(!first&&!(issue.edition_history||[]).length);
+ if(first)historyBody.append(make("p","","First published "+date(first)+". The Monday label identifies this edition; it does not change its release date."));
+ if(issue.updated_at)historyBody.append(make("p","","Updated "+date(issue.updated_at)+"."));
+ for(const entry of issue.edition_history||[]){
+   if(!/^history\/20\d\d-\d\d-\d\d\.html$/.test(entry.url||""))continue;
+   const row=make("p");row.append(link("Original version · "+date(entry.original_date),"issues/"+entry.url));
+   if(entry.note)row.append(document.createTextNode(" — "+entry.note));
+   historyBody.append(row);
+ }
  $("#issue-extras").hidden=!published;
  $(".issue-closing").hidden=!published;
  $("#issue-tension-title").textContent=published?issue.tension.title:"";
@@ -398,7 +415,7 @@ function renderIssue(){
  if(published&&issue.editorial_note)qualification.replaceChildren(...issueProse(issue.editorial_note,{},issue).firstElementChild.childNodes);
  $("#issue-qualification").hidden=!published||!issue.editorial_note;
  const sourceList=issue.sources||[],earlier=sourceList.filter(source=>source.editorial_role==="previously_indexed_context").length,collection=sourceList.filter(source=>source.editorial_role==="collection_week").length;
- $("#issue-coverage").textContent=issue.publication_window?sourceList.length+" sources originally published "+date(issue.publication_window.from)+"–"+date(issue.publication_window.to)+" (UTC). No older context sources are included.":sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
+ $("#issue-coverage").textContent=issue.scope_kind==="legacy_collection"?sourceList.length+" sources in a historical collection, including earlier sources; not a strict previous-week digest.":issue.publication_window?sourceList.length+" sources originally published "+date(issue.publication_window.from)+"–"+date(issue.publication_window.to)+" (UTC). No older context sources are included.":sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries())shelf.append(issueSourceShelfItem(src,i));
  renderEditionCards();

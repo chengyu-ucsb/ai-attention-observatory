@@ -17,14 +17,17 @@ from compose_issue import validate_design_claims, pending, validate_editorial_re
 
 
 class DeadlineTests(unittest.TestCase):
-    now = dt.datetime(2026, 11, 9, 17, tzinfo=dt.timezone.utc)
+    now = dt.datetime(2026, 11, 9, 17, 5, tzinfo=dt.timezone.utc)
 
     def root(self, tmp):
         root = Path(tmp); (root/'data').mkdir()
         return root
 
     def frozen_week(self):
-        issue=json.loads((deadline.ROOT/'data/approved-issues/2026-11-13.json').read_text())
+        folder=deadline.ROOT/'data/approved-issues'
+        path=folder/'2026-11-09.json'
+        if not path.exists():path=folder/'2026-11-13.json'
+        issue=json.loads(path.read_text())
         return {'run':{'date':'2026-11-13','publication_window':issue['publication_window']},
                 'items':[{**s,'reading':{'level':s['reading_level']}} for s in issue['sources']]}
 
@@ -114,7 +117,7 @@ class DeadlineTests(unittest.TestCase):
             weekly=self.frozen_week()
             current_date=weekly['run']['date']
             coverage_date=(dt.date.fromisoformat(current_date)-dt.timedelta(days=dt.date.fromisoformat(current_date).weekday())).isoformat()
-            coverage=deadline.coverage_issue(coverage_date,'05',[])
+            coverage=deadline.coverage_issue(coverage_date,'05',[],published_at=self.now.isoformat())
             (folder/(coverage_date+'.json')).write_text(json.dumps(coverage))
             for name in ('public-weekly.json','editorial-weekly.json'):
                 (data/name).write_text(json.dumps(weekly))
@@ -122,12 +125,18 @@ class DeadlineTests(unittest.TestCase):
             with patch('compose_issue.public_record',side_effect=lambda x,**kwargs:x):
                 self.assertEqual(pending(root,today=dt.date.fromisoformat(current_date))['run']['edition_date'],coverage_date)
             drafts=json.loads((deadline.ROOT/'data/issue-editorial.json').read_text())
-            draft=copy.deepcopy(drafts['2026-11-13'])
+            draft=copy.deepcopy(drafts.get(coverage_date) or drafts['2026-11-13'])
             (data/'issue-editorial.json').write_text(json.dumps({coverage_date:draft}))
+            with patch.object(build_issue,'DATA',data),patch.object(build_issue,'public_record',side_effect=lambda x,**kwargs:x),patch.object(build_issue,'edition_release_open',return_value=False):
+                held=build_issue.build()
+            self.assertEqual(held['status'],'awaiting_publication')
+            self.assertNotIn('signals',held)
+            self.assertEqual(json.loads((folder/(coverage_date+'.json')).read_text()),coverage)
             with patch.object(build_issue,'DATA',data),patch.object(build_issue,'public_record',side_effect=lambda x,**kwargs:x):
                 result=build_issue.build()
             self.assertEqual(result['edition_date'],coverage_date)
             self.assertEqual(result['edition_format'],'full')
+            self.assertEqual(result['published_at'],coverage['published_at'])
             with patch.object(build_newsletter,'DATA',data),patch.object(build_newsletter,'ROOT',root):
                 build_newsletter.build()
             self.assertEqual(canonical_edition_date(root,current_date),coverage_date)

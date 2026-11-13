@@ -36,8 +36,28 @@ def safe_url(value):
 def published_on(edition_date):
     return datetime.combine(date.fromisoformat(edition_date),time(hour=12),tzinfo=timezone.utc)
 
+def publication_timestamp(issue):
+    """Feed clocks record release time; Monday is an edition identity, not a claim of timely release."""
+    value=issue.get('feed_published_at') or issue.get('published_at')
+    if not value:return published_on(issue['edition_date'])
+    stamp=datetime.fromisoformat(value.replace('Z','+00:00'))
+    if stamp.tzinfo is None:raise ValueError('Publication timestamp must include a timezone')
+    return stamp.astimezone(timezone.utc)
+
+def feed_identity(issue):
+    value=issue.get('feed_id') or BASE+'issues/'+issue['edition_date']+'.html'
+    if not re.fullmatch(re.escape(BASE)+r'issues/20\d\d-\d\d-\d\d\.html',value):
+        raise ValueError('Invalid permanent edition feed identity')
+    return value
+
+def edition_label(issue):
+    day=date.fromisoformat(issue['edition_date'])
+    # Frozen pre-consolidation versions retain their real historical label.
+    prefix='Week of ' if day.weekday()==0 else 'Original edition · '
+    return prefix+day.strftime('%A, %B ')+str(day.day)+day.strftime(', %Y')
+
 def rss_date(value):
-    return format_datetime(value,usegmt=True)
+    return format_datetime(value.astimezone(timezone.utc),usegmt=True)
 
 STYLE = '''
 /* Layout is local; font families and the reading scale come from typography.css. */
@@ -124,14 +144,17 @@ def source_shelf(issue, disclosure=True):
 def top_html(issue, asset_prefix=""):
     """Load the shared type system relative to this page, including archives."""
     snapshot = ('<meta name="observatory-edition-sha256" content="'+sha256(encoded(issue)).hexdigest()+'">') if issue.get('status')=='published' else ''
+    canonical=('<link rel="canonical" href="'+BASE+'issues/'+esc(issue['edition_date'])+'.html">') if issue.get('status')=='published' else ''
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<meta name="theme-color" content="#E00122">'+snapshot+'<title>'+esc(brief_title(issue['subject']))+'</title><link rel="stylesheet" href="'+esc(asset_prefix)+'assets/typography.css"><style>'+STYLE+'</style></head><body>'
+            '<meta name="theme-color" content="#E00122">'+snapshot+canonical+'<title>'+esc(brief_title(issue['subject']))+'</title><link rel="stylesheet" href="'+esc(asset_prefix)+'assets/typography.css"><style>'+STYLE+'</style></head><body>'
             '<header><div class="shell nav"><a class="brand" href="'+BASE+'">AI &amp; ATTENTION</a><a href="'+BASE+'issues/">The Weekly Brief</a></div></header><main class="shell">')
 
 def section_label(label):
     return '<p class="stamp">'+esc(label)+'</p>'
 
 def publication_scope(issue):
+    if issue.get('scope_kind')=='legacy_collection':
+        return 'Historical collection, including earlier sources; not a strict previous-week digest.'
     window=issue.get('publication_window') or {}
     return ('Sources originally published '+str(window.get('from'))+' through '+str(window.get('to'))+
             ' (UTC). Older background sources are not included.') if window else ''
@@ -205,7 +228,7 @@ def long_copy(text,label='Read the full analysis',issue=None,section=None):
     return render_text(text,issue,section,end=end,css='long-copy preview-copy')+'<details><summary>'+esc(label)+'</summary>'+full+'</details>'
 
 def opening(issue):
-    return (section_label('Issue '+str(issue.get('number','—'))+' · '+issue['edition_date'])
+    return (section_label('Issue '+str(issue.get('number','—'))+' · '+edition_label(issue))
             +'<h1>'+esc(issue['headline'])+'</h1><p class="deck">'+esc(issue.get('deck',''))+'</p>'
             +long_copy(issue.get('letter',''),'Read the opening argument',issue)
             +('<p class="scope">'+esc(publication_scope(issue))+'</p>' if publication_scope(issue) else ''))
@@ -216,13 +239,41 @@ def overview(issue):
 def signal_cards(issue):
     return ''.join('<section class="signal" id="signal-'+str(i)+'">'+section_label('Signal '+str(i).zfill(2))+'<h2>'+esc(s['title'])+'</h2>'+long_copy(s['text'],issue=issue,section=s)+'<p class="source-links">'+source_links(issue,s.get('source_ids',[]))+'</p></section>' for i,s in enumerate(issue.get('signals',[]),1))
 
+def supplement_cards(issue):
+    return ''.join('<section class="signal supplementary-analysis"><h2>'+esc(section['title'])+'</h2>'
+        +long_copy(section['text'],'Read the additional analysis',issue,section)
+        +'<p class="source-links">'+source_links(issue,section.get('source_ids',[]))+'</p></section>'
+        for section in issue.get('supplements',[]))
+
+def publication_history(issue):
+    first=issue.get('first_published_date') or str(issue.get('published_at') or '')[:10]
+    updated=str(issue.get('updated_at') or '')[:10]
+    entries=issue.get('edition_history',[])
+    if not first and not entries:return ''
+    parts=['<details class="publication-history"><summary>Publication history</summary>']
+    if first:
+        date.fromisoformat(first)
+        parts.append('<p>First published '+esc(first)+'. The Monday label identifies the edition; it does not change when this version was released.</p>')
+    if updated:
+        date.fromisoformat(updated)
+        parts.append('<p>Updated '+esc(updated)+'.</p>')
+    if entries:
+        parts.append('<ul>')
+        for entry in entries:
+            path=entry.get('url','')
+            if not re.fullmatch(r'history/20\d\d-\d\d-\d\d\.html',path):raise ValueError('Invalid edition history path')
+            parts.append('<li><a href="'+BASE+'issues/'+esc(path)+'">Original version · '+esc(entry['original_date'])+'</a>'
+                         +(' — '+esc(entry['note']) if entry.get('note') else '')+'</li>')
+        parts.append('</ul>')
+    return ''.join(parts)+'</details>'
+
 def question_and_try(issue):
     t=issue['tension'];p=issue['experiment']
     return ('<div class="pair"><section class="card">'+section_label('The productive tension')+'<h3>'+esc(t['title'])+'</h3>'+long_copy(t['text'],'Explore the tension',issue,t)+'<p class="source-links">'+source_links(issue,t.get('source_ids',[]))+'</p></section>'
             '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+long_copy(p['text'],'See the activity',issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p></section></div>')
 
 def bottom(issue):
-    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue)+source_shelf(issue)+'</main><footer><div class="shell">'
+    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue)+source_shelf(issue)+publication_history(issue)+'</main><footer><div class="shell">'
             '<p><strong>THE ATTENTION BRIEF</strong></p><p>A weekly look at what AI changes about thinking, focus, and human agency.</p>'
             '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
             '<p>Read online or follow via RSS. Email subscriptions are not active.</p></div></footer></body></html>')
@@ -231,19 +282,20 @@ def render_issue(issue, asset_prefix=""):
     if issue.get('status')!='published':
         return top_html({'subject':'The Attention Brief · Ideas about AI and attention'},asset_prefix)+'<h1>A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></main></body></html>'
     validate_issue_citations(issue)
-    return top_html(issue,asset_prefix)+opening(issue)+overview(issue)+signal_cards(issue)+question_and_try(issue)+bottom(issue)
+    return top_html(issue,asset_prefix)+opening(issue)+overview(issue)+signal_cards(issue)+supplement_cards(issue)+question_and_try(issue)+bottom(issue)
 
 def render_index(issues):
-    links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+i['edition_date'])+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]
+    links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+edition_label(i))+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]
     return top_html({'subject':'The Attention Brief · Archive'},'../')+'<h1>The Attention Brief.</h1><p>Past issues, ready to revisit.</p>'+(''.join(links) if links else '<p>No approved issues yet.</p>')+'</main></body></html>'
 
 def rss_content(issue):
     """The same published copy, with sources, for downstream RSS/chat delivery."""
     validate_issue_citations(issue)
-    parts=['<h1>'+esc(issue['headline'])+'</h1>']
+    parts=['<p>'+esc(edition_label(issue))+'</p>'] if issue.get('edition_date') else []
+    parts.append('<h1>'+esc(issue['headline'])+'</h1>')
     if publication_scope(issue):parts.append('<p>'+esc(publication_scope(issue))+'</p>')
     parts += [render_text(issue.get(k,''),issue) for k in ('deck','letter')]
-    for section in issue.get('signals',[]) + [issue.get('tension',{})]:
+    for section in issue.get('signals',[]) + issue.get('supplements',[]) + [issue.get('tension',{})]:
         parts += ['<h2>'+esc(section.get('title',''))+'</h2>',
                   render_text(section.get('text',''),issue,section),
                   '<p>'+source_links(issue, section.get('source_ids',[]))+'</p>']
@@ -269,7 +321,7 @@ def build_rss(issues):
         "href":FEED,"rel":"self","type":"application/rss+xml"
     })
     if issues:
-        latest=published_on(issues[0]["edition_date"])
+        latest=max(publication_timestamp(issue) for issue in issues)
         ET.SubElement(channel,"lastBuildDate").text=rss_date(latest)
         ET.SubElement(channel,"pubDate").text=rss_date(latest)
     for issue in issues[:50]:
@@ -277,8 +329,8 @@ def build_rss(issues):
         item=ET.SubElement(channel,"item")
         ET.SubElement(item,"title").text=brief_title(issue["subject"])
         ET.SubElement(item,"link").text=permalink
-        ET.SubElement(item,"guid",{"isPermaLink":"true"}).text=permalink
-        ET.SubElement(item,"pubDate").text=rss_date(published_on(issue["edition_date"]))
+        ET.SubElement(item,"guid",{"isPermaLink":"true"}).text=feed_identity(issue)
+        ET.SubElement(item,"pubDate").text=rss_date(publication_timestamp(issue))
         summary=issue.get("deck","")+" "+issue.get("closer","")
         ET.SubElement(item,"description").text=summary.strip()
         ET.SubElement(item,"{"+CONTENT+"}encoded").text=rss_content(issue)
@@ -295,12 +347,51 @@ def json_feed(issues):
     return {'version':'https://jsonfeed.org/version/1.1',
             'title':'The Attention Brief | AI & Attention Observatory',
             'home_page_url':BASE+'issues/', 'feed_url':BASE+'data/issue-feed.json',
-            'items':[{'id':BASE+'issues/'+i['edition_date']+'.html',
+            'items':[{'id':feed_identity(i),
                       'url':BASE+'issues/'+i['edition_date']+'.html',
-                      'title':brief_title(i['subject']), 'date_published':published_on(i['edition_date']).isoformat(),
+                      'title':brief_title(i['subject']), 'date_published':publication_timestamp(i).isoformat(),
                       'summary':i.get('deck',''), 'content_html':rss_content(i),
                       '_observatory':i} for i in issues[:50] if i.get('status')=='published']}
 
+
+
+def render_alias(original_date,canonical_date):
+    date.fromisoformat(original_date);date.fromisoformat(canonical_date)
+    destination=canonical_date+'.html'
+    return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<meta http-equiv="refresh" content="0; url='+destination+'"><link rel="canonical" href="'+BASE+'issues/'+destination+'">'
+            '<meta name="robots" content="noindex"><title>This edition has a permanent Monday home</title>'
+            '<link rel="stylesheet" href="../assets/typography.css"></head><body>'
+            '<p>This edition is now part of the <a href="'+destination+'">'+canonical_date+' Monday edition</a>.</p>'
+            '<p><a href="history/'+original_date+'.html">Read the original published version</a>.</p></body></html>')
+
+def build_history_pages(folder,issues):
+    path=DATA/'edition-lineage.json'
+    if not path.exists():return
+    lineage=json.loads(path.read_text())
+    canonical={issue['edition_date'] for issue in issues}
+    revisions=DATA/'edition-revisions'
+    history=folder/'history';history.mkdir(exist_ok=True)
+    for original,entry in lineage.get('revisions',{}).items():
+        date.fromisoformat(original)
+        target=entry['canonical_date']
+        if target not in canonical:raise ValueError('History points to an absent canonical edition')
+        snapshot=(revisions/(original+'.json')).read_bytes()
+        if sha256(snapshot).hexdigest()!=entry.get('sha256'):
+            raise ValueError('Original edition snapshot hash mismatch: '+original)
+        source=json.loads(snapshot)
+        page=render_issue(source,asset_prefix='../../')
+        notice=('<aside class="scope"><strong>Original published version · '+esc(original)+'</strong><p>'+esc(entry.get('note',''))+'</p>'
+                '<p><a href="../'+esc(target)+'.html">Read the consolidated '+esc(target)+' Monday edition</a>.</p></aside>')
+        page=page.replace('<link rel="canonical" href="'+BASE+'issues/'+source['edition_date']+'.html">',
+                          '<link rel="canonical" href="'+BASE+'issues/'+target+'.html">',1)
+        page=page.replace('</head>','<meta name="robots" content="noindex"></head>',1)
+        page=page.replace('<main class="shell">','<main class="shell">'+notice,1)
+        (history/(original+'.html')).write_text(page,encoding='utf-8')
+    for original,target in lineage.get('aliases',{}).items():
+        if target not in canonical or original in canonical:raise ValueError('Invalid edition alias')
+        if original not in lineage.get('revisions',{}):raise ValueError('Alias has no preserved original version')
+        (folder/(original+'.html')).write_text(render_alias(original,target),encoding='utf-8')
 
 def build():
     current=json.loads((DATA/"public-issue.json").read_text())
@@ -308,7 +399,8 @@ def build():
     approved.mkdir(parents=True,exist_ok=True)
     if current.get("status")=="published":
         validate_issue_citations(current)
-        date.fromisoformat(current["edition_date"])
+        if date.fromisoformat(current["edition_date"]).weekday()!=0:
+            raise ValueError("New editions must use their canonical Monday; consolidate legacy dates before building")
         (approved/(current["edition_date"]+".json")).write_text(
             json.dumps(current,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
         )
@@ -316,7 +408,9 @@ def build():
     for file in sorted(approved.glob("????-??-??.json"),reverse=True):
         issue=json.loads(file.read_text(encoding="utf-8"))
         if issue.get("status")=="published":
-            date.fromisoformat(issue["edition_date"])
+            if date.fromisoformat(issue["edition_date"]).weekday()!=0:
+                raise ValueError("Archive contains an unconsolidated edition date")
+            if file.stem!=issue["edition_date"]:raise ValueError("Edition path and identity disagree")
             issues.append(issue)
     newest=issues[0] if issues else current
     (ROOT/"newsletter.html").write_text(render_issue(newest),encoding="utf-8")
@@ -325,6 +419,7 @@ def build():
     for issue in issues:
         (folder/(issue["edition_date"]+".html")).write_text(render_issue(issue,asset_prefix="../"),encoding="utf-8")
     (folder/"index.html").write_text(render_index(issues),encoding="utf-8")
+    build_history_pages(folder,issues)
     count=build_rss(issues)
     (DATA/'issue-feed.json').write_text(json.dumps(json_feed(issues),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps({"newsletter_preview":"latest approved" if count else "in review",

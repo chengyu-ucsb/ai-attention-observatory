@@ -14,7 +14,7 @@ from pathlib import Path
 
 from build_issue import source_id, citation_url, checked_source_metadata
 from collection_window import previous_week, weekly_eligible, window_metadata
-from edition_schedule import publication_cutoff
+from edition_schedule import canonical_edition_date, release_cutoff
 from original_readings import public_record
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,7 +67,7 @@ def eligible_shelf(root, date):
     return items
 
 
-def coverage_issue(date, number, items):
+def coverage_issue(date, number, items, *, published_at=None):
     sources = [{
         'id': source_id(x), 'title': x['title'], 'url': x.get('url', ''),
         'kind': x.get('kind', ''), 'venue': x.get('venue', ''),
@@ -76,15 +76,22 @@ def coverage_issue(date, number, items):
         'reading_level': x['reading']['level'],
         'editorial_role': 'collection_week', **checked_source_metadata(x),
     } for x in items]
-    return coverage_from_sources(date, number, sources)
+    return coverage_from_sources(date, number, sources, published_at=published_at)
 
 
-def coverage_from_sources(date, number, sources):
+def coverage_from_sources(date, number, sources, *, published_at=None):
     """All public wording is fixed; no rejected prose can reach this path."""
+    date = canonical_edition_date(None, date)
     count = len(sources)
+    timestamp = {}
+    if published_at is not None:
+        actual = dt.datetime.fromisoformat(published_at.replace('Z', '+00:00'))
+        if actual.tzinfo is None:
+            raise ValueError('First publication timestamp must include a timezone')
+        timestamp['published_at'] = actual.astimezone(dt.timezone.utc).isoformat()
     headline = 'This week’s reading list and evidence check'
     return {
-        'edition_date': date, 'number': number, 'status': 'published',
+        'edition_date': date, 'number': number, 'status': 'published', **timestamp,
         'edition_format': 'coverage', 'coverage_template_version': 1,
         'publication_window': window_metadata(date),
         'source_count': count, 'sources': sources,
@@ -129,7 +136,8 @@ def coverage_from_sources(date, number, sources):
 def validate_coverage(issue):
     if issue.get('edition_format') != 'coverage':
         return
-    expected = coverage_from_sources(issue['edition_date'], issue['number'], issue['sources'])
+    expected = coverage_from_sources(issue['edition_date'], issue['number'], issue['sources'],
+                                     published_at=issue.get('published_at'))
     if issue != expected:
         raise ValueError('Coverage updates must contain only the fixed, transparent coverage template')
     seen = set()
@@ -144,8 +152,8 @@ def validate_coverage(issue):
 
 def publish(root=ROOT, now=None, *, dry_run=False):
     now = now or dt.datetime.now(dt.timezone.utc)
-    date = now.astimezone(dt.timezone.utc).date().isoformat()
-    if not publication_cutoff(now):
+    date = canonical_edition_date(root, now)
+    if not release_cutoff(now):
         return {'status': 'before_cutoff', 'changed': False}
     existing = published_in_window(root, window_metadata(date))
     if existing:
@@ -163,7 +171,8 @@ def publish(root=ROOT, now=None, *, dry_run=False):
     folder = root / 'data/approved-issues'
     folder.mkdir(parents=True, exist_ok=True)
     number = f'{len(list(folder.glob("????-??-??.json")))+1:02d}'
-    issue = coverage_issue(date, number, eligible_shelf(root, date))
+    issue = coverage_issue(date, number, eligible_shelf(root, date),
+                           published_at=now.astimezone(dt.timezone.utc).isoformat())
     validate_coverage(issue)
     (folder / (date + '.json')).write_text(json.dumps(issue, ensure_ascii=False, indent=2) + '\n')
     return {'status': 'coverage_published', 'changed': True, 'edition_date': date,
