@@ -59,7 +59,10 @@ def build(root=ROOT):
             for x in current.get('sources', [])
         ),
         'featured_issue_date': featured.get('edition_date'),
-        'editorial_status': current['status'],
+        'editorial_status': ('published' if featured.get('status') == 'published'
+                             and window_metadata(featured['edition_date']) == window_metadata(date)
+                             else current['status']),
+        'source_shelf_status': current['status'],
         'pending_editorial_dates': pending,
         'canonical_source': 'Website repository: discovery → readings → weekly edition → RSS',
         'delivery_feed': 'https://chengyu-ucsb.github.io/ai-attention-observatory/issue-feed.xml',
