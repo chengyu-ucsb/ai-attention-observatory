@@ -557,7 +557,7 @@
       const cards=node("div","lab-evidence-cards");
       example.cards.forEach((card,index)=>{
         const flip=control("",()=>{state.flipped[state.caseIndex][index]=!state.flipped[state.caseIndex][index];face()},"lab-evidence-card");flip.dataset.evidenceCard=String(index);
-        function face(){const turned=state.flipped[state.caseIndex][index];flip.classList.toggle("is-flipped",turned);flip.setAttribute("aria-pressed",String(turned));flip.setAttribute("aria-label",card.label+(turned?" Evidence shown. Flip back.":" Reveal evidence."));flip.replaceChildren(node("span","lab-card-number","0"+(index+1)),node("strong","",card.label),node("span","lab-card-copy",turned?card.detail:"Tap to inspect"),node("span","lab-card-action",turned?"↶ Turn back":"↻ Reveal evidence"))}
+        function face(){const turned=state.flipped[state.caseIndex][index];flip.classList.toggle("is-flipped",turned);flip.setAttribute("aria-pressed",String(turned));flip.setAttribute("aria-label",card.label+(turned?" "+card.detail+" Flip back.":" Reveal evidence."));flip.replaceChildren(node("span","lab-card-number","0"+(index+1)),node("strong","",card.label),node("span","lab-card-copy",turned?card.detail:"Tap to inspect"),node("span","lab-card-action",turned?"↶ Turn back":"↻ Reveal evidence"))}
         face();cards.append(flip);
       });content.append(cards);
       const choices=node("div","lab-verdicts");choices.setAttribute("role","group");choices.setAttribute("aria-label","Your verdict");

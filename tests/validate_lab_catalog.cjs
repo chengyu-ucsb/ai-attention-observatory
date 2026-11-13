@@ -54,7 +54,15 @@ route("#lab");doc.activeElement=doc.body;assert.equal(frames.length,1);frames.sh
 route("#lab?experiment=evidence-detective");assert.equal(q("lab-workbench-title").textContent,"Evidence Detective");assert.equal(q("lab-classic-tabs").hidden,true);
 for(let index=0;index<CASES.length;index++){
  select("lab-case-picker",String(index));
- const card=findData("evidenceCard","0");assert.equal(card.getAttribute("aria-pressed"),"false");card.click();assert.equal(card.getAttribute("aria-pressed"),"true");assert(card.textContent.includes(CASES[index].cards[0].detail));card.click();assert.equal(card.getAttribute("aria-pressed"),"false");
+ for(let cardIndex=0;cardIndex<CASES[index].cards.length;cardIndex++){
+  const card=findData("evidenceCard",String(cardIndex)),evidence=CASES[index].cards[cardIndex];
+  assert.equal(card.getAttribute("aria-pressed"),"false");
+  assert(!card.getAttribute("aria-label").includes(evidence.detail),"Unturned cards must not expose hidden evidence");
+  card.click();assert.equal(card.getAttribute("aria-pressed"),"true");assert(card.textContent.includes(evidence.detail));
+  assert(card.getAttribute("aria-label").includes(evidence.detail),"Revealed evidence must be available in the button's accessible name");
+  card.click();assert.equal(card.getAttribute("aria-pressed"),"false");
+  assert(!card.getAttribute("aria-label").includes(evidence.detail),"Turning back must restore the front's accessible name");
+ }
  findData("labVerdict",CASES[index].verdict).click();assert(q("lab-detective-feedback").textContent.includes(CASES[index].explanation));assert.equal(doc.activeElement,q("lab-detective-feedback"));
  assert(q("lab-detective-feedback").textContent.includes("You matched the claim to the evidence"));
  const wrong=["supported","overreach","unanswered"].find(value=>value!==CASES[index].verdict);findData("labVerdict",wrong).click();assert(q("lab-detective-feedback").textContent.includes("Reconsider"));
