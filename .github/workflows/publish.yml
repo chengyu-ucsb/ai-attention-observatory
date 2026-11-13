@@ -40,7 +40,7 @@ on:
       - 'tests/validate_article_ui.cjs'
       - '.github/workflows/publish.yml'
   workflow_run:
-    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
+    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Meet weekly publication deadline", "Deepen source readings"]
     types: [completed]
     branches: [main]
   # Refresh the honest publication-status payload even when an edition is held.
@@ -66,7 +66,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           ref: main
       - name: Build safe public reading library and RSS
@@ -138,12 +138,12 @@ jobs:
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           cp data/pipeline-status.json data/issue-feed.json _site/data/
           touch _site/.nojekyll
-      - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v5
+      - uses: actions/configure-pages@v6.0.0
+      - uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
       - id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v5.0.1
 
       - name: Verify live edition and RSS against the deployed artifact
         run: python scripts/verify_publication.py --manifest _site/data/reader-manifest.json

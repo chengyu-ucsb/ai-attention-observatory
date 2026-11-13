@@ -28,11 +28,11 @@ assert(!site.includes('THE ATTENTION BRIEF · IN PREPARATION'),"Editorial workfl
 const featured=JSON.parse(text("data/public-featured-issue.json"));
 assert(featured.status==="published"||featured.status==="none","Only completed editorials may appear as featured issues");
 if(featured.status==="published"){
- assert(featured.headline&&featured.sources.length>0,"Featured issue must have a published headline and citations");
- assert(featured.edition_date<=issue.edition_date,"Featured issue cannot be dated after the weekly indexing run");
+ assert(featured.headline&&(featured.sources.length>0||featured.edition_format==="coverage"),"Featured analysis must have citations; a labelled outage update may have no sources");
+ assert(featured.edition_date<=issue.edition_date||featured.edition_format==="coverage","Only an explicit coverage update can precede recovery of source discovery");
  assert(fs.existsSync(path.join(root,"data/approved-issues",featured.edition_date+".json")),"Featured editorial is not archived");
 }
-if(issue.status==="published"){
+if(issue.status==="published"&&issue.edition_format!=="coverage"){
  assert(issue.signals.length>=(issue.edition_format==="compact"?1:3)&&issue.signals.length<=4,"A small number of cross-source signals is required");
  for(const sig of issue.signals){
   assert(sig.source_ids.length>=1,"Each signal needs a checked source");

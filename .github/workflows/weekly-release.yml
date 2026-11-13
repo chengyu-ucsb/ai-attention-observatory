@@ -1,0 +1,64 @@
+name: Meet weekly publication deadline
+on:
+  schedule:
+    - cron: '5 12,13 * * 1'
+      timezone: America/New_York
+    - cron: '5 12 * * 0,2-6'
+      timezone: America/New_York
+  workflow_run:
+    workflows: ["Publish weekly edition"]
+    types: [completed]
+    branches: [main]
+  push:
+    branches: [main]
+    paths: ['scripts/publish_deadline.py', '.github/workflows/weekly-release.yml']
+  pull_request:
+    paths: ['scripts/publish_deadline.py', 'tests/test_publication_deadline.py', '.github/workflows/weekly-release.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+# Independent of inference and source acquisition; it must run even when a
+# model job hangs or its database is unavailable. It never executes PR code
+# through workflow_run and never reads or publishes failed draft artifacts.
+concurrency:
+  group: ${{ github.event_name == 'pull_request' && format('deadline-check-{0}', github.ref) || 'observatory-deadline' }}
+  queue: max
+  cancel-in-progress: false
+jobs:
+  release:
+    if: github.event_name != 'workflow_run' || (github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || 'main' }}
+          fetch-depth: 0
+      - name: Validate publication boundaries
+        run: python -m unittest discover -s tests -v
+      - name: Release checked content or a transparent coverage update
+        if: github.event_name != 'pull_request'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3; do
+            # This fresh runner owns only reproducible generated files. After
+            # a push race, regenerate against main instead of merging stale
+            # source shelves or overwriting a newly published full edition.
+            git fetch origin main
+            git reset --hard origin/main
+            python scripts/build_public.py
+            python scripts/build_issue.py
+            python scripts/build_newsletter.py
+            python scripts/publish_deadline.py
+            python scripts/build_issue.py
+            python scripts/build_newsletter.py
+            python scripts/pipeline_status.py
+            node tests/validate_weekly_issue.cjs
+            git add data/ issue-feed.xml newsletter.html issues/
+            if git diff --cached --quiet; then exit 0; fi
+            git commit -m "Publish weekly release and coverage status"
+            if git push origin HEAD:main; then exit 0; fi
+          done
+          echo "::error::Weekly release could not be saved after three concurrent-write attempts."
+          exit 1

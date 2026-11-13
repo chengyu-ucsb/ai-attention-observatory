@@ -19,9 +19,9 @@ from original_readings import public_record
 from collection_window import previous_week, weekly_eligible, window_metadata
 from edition_references import (with_evidence_options, section_response_schema,
     resolve_section_references, draft_passages, review_response_schema,
-    resolve_review_references, frame_response_schema, resolve_frame_references)
+    resolve_review_references, frame_response_schema, resolve_frame_references, source_claims)
 from edition_progress import Progress, MemoryStore, HeldStage, policy_signature
-from edition_schedule import publication_cutoff
+from edition_schedule import publication_cutoff, canonical_edition_date
 from observatory_store import fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -133,8 +133,19 @@ def validate_editorial_review(review, draft, packet):
         phrase = normalize(check.get('quote', ''))
         if not 5 <= len(phrase.split()) <= 12 or phrase not in normalize(lookup[check['key']]['evidence']):
             raise ValueError('Editorial review evidence does not match its source')
-        if len(check.get('claim', '')) < 12 or check['claim'] not in prose:
+        expected = source_claims(draft, lookup[check['key']])
+        if len(check.get('claim', '')) < 12 or (
+                check['claim'] != expected if review.get('review_protocol') == 2 else check['claim'] not in prose):
             raise ValueError('Editorial review must name the draft claim checked against each source')
+        if review.get('review_protocol') == 2:
+            reason = check.get('reason', '')
+            # A generic "all claims are supported" receipt is not a source
+            # assessment. Require concrete source vocabulary in the reasoning.
+            stop = set('the a an and or to of in is are was were be been this that these those source study paper claims supported evidence draft provided all each their with for from not does do it its by as on at we our they have has'.split())
+            detail = set(normalize(reason).split()) - stop
+            available = set(normalize(lookup[check['key']]['evidence']).split()) - stop
+            if len(reason.split()) < 12 or len(detail & available) < 2:
+                raise ValueError('Source review must explain the actual design, outcome or qualification for ' + check['key'])
         if type(check.get('supported')) is not bool:
             raise ValueError('Editorial source check needs an explicit supported judgment')
     issues = review.get('issues', [])
@@ -166,12 +177,20 @@ def editorial_review(model, draft, packet, audit, progress, stage='final review'
         'limits are disclosed once in the source note. A focused single-source theme may explain '
         'why a finding matters without claiming cross-source agreement. Review glossary accuracy. '
         'Return decision pass or revise, each required criterion with pass, reason of at least '
-        'eight words and example_id, and EVERY cited source with anchor_id, claim_id, supported. '
+        'eight words and example_id, and EVERY cited source with anchor_id, supported and reason. '
+        'Use review_protocol 2. Each source judgment covers ALL its ASSIGNED CLAIMS, including '
+        'every limitation, not just the selected anchor. Its reason must use at least twelve '
+        'words and explain a specific population, measurement, direction or qualification '
+        'from that source. Never use blanket reasons such as all claims are supported. '
+        'A high reverse-coded physical-strain score does not establish improved physical health. '
+        'A significant total association and a nonsignificant residual direct association are different. '
+        'In cross-sectional surveys, influenced, caused and had an impact overstate an association. '
         'Choose IDs from DRAFT PASSAGES and the matching source evidence_options. Check meaning, '
         'not just matching words. For revise, issues must name the location and concrete correction. '
         'For pass, issues MUST be the empty array []. Criteria: ' + ', '.join(REVIEW_CRITERIA)
         + '\nDRAFT:\n' + json.dumps(draft, ensure_ascii=False, sort_keys=True)
         + '\nDRAFT PASSAGES:\n' + json.dumps(draft_passages(draft), ensure_ascii=False, sort_keys=True)
+        + '\nASSIGNED CLAIMS:\n' + json.dumps({s['key']: source_claims(draft, s) for s in sources}, ensure_ascii=False, sort_keys=True)
         + '\nSOURCES:\n' + json.dumps(with_evidence_options(sources), ensure_ascii=False, sort_keys=True))
 
     def check(value):
@@ -285,12 +304,14 @@ def pending(root=ROOT, today=None):
         return (all(declared.get(key) == expected_window[key] for key in ('from', 'to', 'timezone'))
                 and all(declared.get(key) == window[key] for key in ('from', 'to', 'timezone')))
 
-    if any(same_window(issue_date, issue) for issue_date, issue in drafts.items()):
+    if any(same_window(issue_date, issue) and issue.get('edition_format') != 'coverage' for issue_date, issue in drafts.items()):
         return None
     for path in (data / 'approved-issues').glob('????-??-??.json'):
         issue = json.loads(path.read_text(encoding='utf-8'))
         if issue.get('status') == 'published' and same_window(issue.get('edition_date') or path.stem, issue):
-            return None
+            if issue.get('edition_format') != 'coverage':
+                return None
+            weekly['run']['edition_date'] = issue['edition_date']
     current_items = []
     for item in weekly.get('items', []):
         current = public_record(item, require_current=True)
@@ -488,6 +509,35 @@ def validate_section(section, sources, minimum_words=60, common_disclosure=None)
     validate_original_prose(section_text(section), sources)
 
 
+def validate_design_claims(text, source):
+    """Fail closed on observed causal and scale-direction mistakes.
+
+    These are narrow regression guards, not substitutes for source review.
+    An appended caveat cannot neutralize an earlier unsupported assertion.
+    """
+    evidence_text = source['evidence'].casefold()
+    for sentence in re.split(r'(?<=[.!?])\s+', text.casefold()):
+        if ('interpretation:' in evidence_text and not re.search(r'(?m)^findings?:\s*\S', evidence_text)
+                and re.search(r'\b(?:found|demonstrated|showed|established)\b', sentence)
+                and not re.search(r'\b(?:author|discussion|interpretation)\b', sentence)):
+            raise ValueError('No Results passage is supplied for ' + source['key'] +
+                             '; attribute the authors\' interpretation instead of announcing a finding')
+        absence = re.search(r'\b(?:did not|failed to|does not) (?:address|measure|control|assess|examine|include)\b', sentence)
+        if absence and not re.search(r'\b(?:excerpt|passages?|available evidence)\b', sentence):
+            if not re.search(r'\b(?:did not|does not|not measured|not assessed|not controlled)\b', evidence_text):
+                raise ValueError('Do not infer an absent study measurement from missing excerpts: ' + source['key'])
+        qualified = re.sub(r'\b(?:do(?:es)? not|did not|cannot|can not|could not)\s+'
+                           r'(?:show|establish|demonstrate|prove|determine)\b[^.!?]*', '', sentence)
+        if re.search(r'cross[- ]sectional|single point in time', evidence_text) and re.search(
+                r'\b(?:caused|influenced|drove|led to|resulted in)\b|\bhad (?:a |an )?(?:positive |negative )?(?:impact|effect)\b', qualified):
+            raise ValueError('Cross-sectional evidence supports associations, not causal effects: ' + source['key'])
+        if 'reverse coding' in evidence_text and re.search(
+                r'(?:improv\w*|gain\w*|benefit\w*).{0,35}(?:physical health|physical well[- ]being)|'
+                r'(?:physical health|physical well[- ]being).{0,35}(?:improv\w*|gain\w*|benefit\w*)', qualified):
+            if not re.search(r'\b(?:not|cannot|doesn.t|no evidence)\b', qualified):
+                raise ValueError('A reverse-coded strain scale does not establish physical health improvement: ' + source['key'])
+
+
 def repair_feedback(error, repeated=False):
     return ('Rewrite the complete JSON to correct this validation error: '+str(error)+'. '
             'Recheck the source evidence, title, prose and evidence anchors. Keep only valid '
@@ -557,9 +607,12 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
         def check_section(section):
             resolved = resolve_section_references(section, pair)
             if 'source_notes' in section:
+                if len(pair) > 1 and re.search(r'\bboth (?:groups|populations|studies)|\ball (?:groups|populations|studies)\b', section.get('comparison', ''), re.I):
+                    raise ValueError('Keep populations and findings separate; do not turn the comparison into a shared-group finding')
                 for source in pair:
                     note = section['source_notes'][source['key']]
                     validate_original_prose(note, [source])
+                    validate_design_claims(note, source)
                     if not set(re.findall(r'\b\d+(?:\.\d+)?\b', note)) <= set(
                             re.findall(r'\b\d+(?:\.\d+)?\b', source['evidence'])):
                         raise ValueError('Unsupported numeric claim in paragraph for ' + source['key'])
@@ -572,44 +625,30 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
             section.pop('source_notes', None)
             section.pop('comparison', None)
 
-        instruction='''Write ONE useful theme of roughly 130–210 words, using only the supplied sources.
-Return one source_notes paragraph for EVERY supplied source key, then a separate comparison.
-Each source_notes paragraph must have 40–65 words describing that source's own contribution
-and a concrete limitation. Do not skip any source. These paragraphs will receive named
-author links automatically from your explicit source-key assignments, so do not repeat
-author names or publication titles in your prose. Do not put source keys in the prose.
-Write for a curious reader outside academia. Say who participated, what they actually did,
-what was measured and what was found, only when supplied. A pilot sample is not the main sample.
-If the supplied passages contain only methods or discussion, attribute the authors'
-interpretation explicitly; do not present a mechanism or a reported benefit as independently
-established. Do not invent missing measurements, results, sample sizes or design details.
-The comparison must have 35–60 words explaining the useful connection or open question
-across those source paragraphs without introducing new facts. For a single source,
-explain why it matters and what remains unresolved; do not invent a comparison.
-Give a concrete example from the evidence when available. Translate specialist labels into
-everyday actions; define an unavoidable technical term in place. Use two short paragraphs
-where useful, separated by \n\n. Do not force every comparison into a common mechanism. Keep each source's limitations
-attached to that source. Do not claim an attention study tested AI unless it did.
-Discussion is author interpretation, not measured results. Use the word "abstract" to explicitly label abstract-only evidence.
-Identify nonacademic material as an "essay" or "commentary", never a study or experiment. Attribute its proposals to the author.
-Distinguish assisted performance, independent learning and sustained attention. No broad
-causal or long-term claims. Preprint status and AI-review limits are disclosed once in the
-edition source note; do not repeat stock disclaimers here. Still explain the limitation that
-changes how a reader should interpret this particular result. Do not claim that engagement
-reports show skill enhancement. Do not call unverified review verified absence of review.
-Paraphrase all public prose, including limitations, in original language: do not copy sixteen
-consecutive words from any source. Put exact source phrases only in evidence quotes.
-Avoid numbers unless essential; any number must appear in that specific source's evidence.
-Do not invent a limitation from missing excerpt details. When a detail is unavailable here,
-say it is unavailable in the supplied evidence, not absent from the study itself.
-Return {"source_notes":{"S1":"first source paragraph","S2":"second source paragraph"},
-"comparison":"the connection or open question","evidence":{"S1":"S1-A02","S2":"S2-A04"}}.
-Use the actual supplied keys. No separate text or citations field; no Markdown or HTML.
-"evidence" is an object keyed by EVERY supplied source key, with the ID of a supporting
-passage from THAT source's evidence_options, for example {"S1":"S1-A02","S2":"S2-A04"}.
-Select the passage that supports the claim you make; read it in context. Do not transcribe
-quotes, invent IDs or select a passage from another source. No placeholders.
-Theme: '''+theme['title']+'\nSources:\n'+json.dumps(with_evidence_options(pair),ensure_ascii=False, sort_keys=True)
+        instruction='''Write one theme for general readers, using only these source passages.
+Return short (two to five words), title (five to twelve words), source_notes,
+comparison, and evidence. You may improve the planned heading; use an observation
+or an open question, never a claim of established learning gains.
+For EACH source, write one original paragraph of forty to sixty-five words:
+what was examined, the specific observation or author interpretation, and its
+supported boundary. No author names, source keys, years, statistics or digits.
+Software adds source links and abstract/commentary labels. Do not repeat them.
+Use ordinary terms: expected usefulness, expected ease, willingness to use,
+reported learning, persistence, and self-reported wellbeing. Avoid acronyms.
+For a cross-sectional survey use associated with, never influenced, caused,
+led to, or had an impact. A caveat at the end does not repair a causal claim.
+Reported low physical strain is not improved physical health. Distinguish total
+associations from residual direct associations. Do not invent absent controls,
+measurements or design details from omissions in the excerpts. If no limitation
+is supplied, say the available passages leave that question unresolved.
+Methods explain the design; Discussion gives the authors' interpretation.
+Do not turn either into measured Results. Keep every source's claims separate.
+The comparison is thirty-five to fifty words: a useful question or distinction
+arising from these paragraphs, with no extra factual claims or assumed consensus.
+Paraphrase the observations AND caveats. Never copy sixteen consecutive words.
+The evidence object chooses one supporting evidence_options ID for each source.
+Do not transcribe quotes. Return only the requested JSON fields.
+Planned theme: '''+theme['title']+'\nSources:\n'+json.dumps(with_evidence_options(pair),ensure_ascii=False, sort_keys=True)
         stage = 'theme ' + str(index+1)
         try:
             section = generate(stage, instruction, check_section,
@@ -722,7 +761,7 @@ class LazyModel:
         if self.model is None:
             from llama_cpp import Llama
             self.model = Llama(model_path=os.environ['LOCAL_ISSUE_MODEL'], n_ctx=24576,
-                               n_threads=4, n_batch=512, verbose=False, seed=42)
+                               n_threads=4, n_batch=512, verbose=False, seed=42, chat_format='chatml')
         return self.model.create_chat_completion(**kwargs)
 
 
@@ -731,7 +770,7 @@ def compose(root=ROOT, model=None, today=None, *, store=None, now=None):
     if weekly is None:
         print('Current edition already exists; no inference or rewrite.')
         return False
-    date = weekly['run']['date']
+    date = weekly['run'].get('edition_date') or weekly['run']['date']
     packet = evidence(weekly['items'])
     compact = publication_cutoff(now or today)
     if len(packet) < (2 if compact else 3):
@@ -846,7 +885,7 @@ def check(root=ROOT, today=None, *, store=None):
 def verify_release(root=ROOT, today=None):
     """Reject stale work at the final write boundary, including week rollover."""
     weekly = json.loads((root / 'data/editorial-weekly.json').read_text())
-    date = weekly['run']['date']
+    date = canonical_edition_date(root, weekly['run']['date'])
     now = today or dt.datetime.now(dt.timezone.utc).date()
     if window_metadata(date) != window_metadata(now.isoformat()):
         raise ValueError('Publication window changed during composition')

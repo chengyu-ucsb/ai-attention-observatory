@@ -2,6 +2,7 @@
 import datetime as dt
 import json
 from pathlib import Path
+from collection_window import window_metadata
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -29,7 +30,7 @@ def build(root=ROOT):
     read = lambda name: json.loads((data / name).read_text(encoding='utf-8'))
     weekly, current, featured = (read(n) for n in ('public-weekly.json', 'public-issue.json', 'public-featured-issue.json'))
     date = weekly['run']['date']
-    if current['edition_date'] != date:
+    if window_metadata(current['edition_date']) != window_metadata(date):
         raise ValueError('Current editorial shelf and discovery week do not match; rebuild the current issue')
     # Archive the exact eligible shelf before the next discovery replaces it.
     folder = data / 'editorial-queue'
@@ -37,11 +38,15 @@ def build(root=ROOT):
     (folder / (date + '.json')).write_text(json.dumps(current, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     pending = []
     approved = data / 'approved-issues'
+    published_windows = {window_metadata(json.loads(p.read_text()).get('edition_date') or p.stem)['from']
+                         for p in approved.glob('????-??-??.json')
+                         if json.loads(p.read_text()).get('status') == 'published'}
     for file in sorted(folder.glob('*.json')):
         packet = json.loads(file.read_text(encoding='utf-8'))
         approved_path = approved / file.name
         is_approved = approved_path.exists() and json.loads(approved_path.read_text(encoding='utf-8')).get('status') == 'published'
-        if packet.get('status') != 'published' and not is_approved:
+        if (packet.get('status') != 'published' and not is_approved
+                and window_metadata(packet['edition_date'])['from'] not in published_windows):
             pending.append(packet['edition_date'])
     status = {
         'discovery_date': date,
@@ -66,6 +71,10 @@ def build(root=ROOT):
     if editorial.get('status'):
         status['editorial_discovery_status']=editorial['status']
     status.update(weekly_freshness(date, featured.get('edition_date')))
+    status['edition_format'] = featured.get('edition_format', 'full')
+    status['synthesis_current'] = status['publication_current'] and featured.get('edition_format') != 'coverage'
+    if status['publication_current'] and not status['synthesis_current']:
+        status['pipeline_health'] = 'coverage_only'
     from worker_schedule import publication_target
     status['publication_target'] = publication_target()
     if not status['publication_current']:
@@ -74,6 +83,8 @@ def build(root=ROOT):
             if status['publication_target']['deadline_elapsed'] else
             'This week’s edition is being prepared for Monday. '
         ) + ('The latest published edition is ' + featured.get('edition_date', 'unavailable') + '.')
+    elif not status['synthesis_current']:
+        status['reader_notice'] = 'This week’s coverage update is available. The research synthesis is still under review.'
     else:
         status['reader_notice'] = ''
     if status['pipeline_health'] != 'current':
