@@ -79,6 +79,67 @@ def close_reading_card(page, dialog, trigger):
     expect(trigger).to_be_focused()
 
 
+def section_buttons(page, identifier):
+    attribute = {'article-section': 'data-reading-view',
+                 'edition-section': 'data-edition-target'}.get(identifier, 'data-section')
+    return page.locator('#' + identifier), attribute
+
+
+def choose_section(page, identifier, value, keyboard=False):
+    nav, attribute = section_buttons(page, identifier)
+    target = nav.locator(f'button[{attribute}="{value}"]')
+    expect(target).to_be_visible()
+    if keyboard:
+        target.focus()
+        expect(target).to_be_focused()
+        page.keyboard.press('Enter')
+    else:
+        target.click()
+    expect(nav).to_have_attribute('data-active-section', value)
+    expect(target).to_have_attribute('aria-pressed', 'true')
+    expect(nav.locator(f'button[{attribute}][aria-pressed="true"]')).to_have_count(1)
+
+
+def check_section_navigation(page, identifier, values=None):
+    """Every chapter remains directly visible and usable without a dropdown."""
+    nav, attribute = section_buttons(page, identifier)
+    expect(nav).to_be_visible()
+    assert nav.evaluate('(el) => el.tagName') == 'NAV'
+    expect(nav.locator('select')).to_have_count(0)
+    buttons = nav.locator(f'button[{attribute}]')
+    assert buttons.count() > 0, identifier
+    if values is not None:
+        assert buttons.evaluate_all('(els, key) => els.map(el => el.getAttribute(key))', attribute) == values
+    for button in buttons.all():
+        expect(button).to_be_visible()
+        geometry = button.evaluate('''el => {
+            const rect = el.getBoundingClientRect();
+            return {x: rect.x, right: rect.right, width: rect.width, height: rect.height,
+                    clientWidth: el.clientWidth, scrollWidth: el.scrollWidth,
+                    clientHeight: el.clientHeight, scrollHeight: el.scrollHeight,
+                    viewport: innerWidth};
+        }''')
+        assert geometry['width'] >= 44 and geometry['height'] >= 44, (identifier, geometry)
+        assert geometry['x'] >= -1 and geometry['right'] <= geometry['viewport'] + 1, (identifier, geometry)
+        assert geometry['scrollWidth'] <= geometry['clientWidth'] + 1, (identifier, geometry)
+        assert geometry['scrollHeight'] <= geometry['clientHeight'] + 1, (identifier, geometry)
+    assert nav.evaluate('(el) => el.scrollWidth <= el.clientWidth + 1'), identifier
+
+
+def check_chapter_layout(page, navigation, content, desktop_from):
+    """At desktop width, chapters form a vertical rail beside the reading."""
+    rail, reading = page.locator(navigation), page.locator(content)
+    expect(rail).to_be_visible()
+    expect(reading).to_be_visible()
+    rail_box, reading_box = rail.bounding_box(), reading.bounding_box()
+    if page.viewport_size['width'] >= desktop_from:
+        assert rail_box['x'] + rail_box['width'] <= reading_box['x'] + 1, (rail_box, reading_box)
+        buttons = rail.locator('button[data-section], button[data-reading-view], button[data-edition-target]')
+        boxes = [button.bounding_box() for button in buttons.all()]
+        for previous, current in zip(boxes, boxes[1:]):
+            assert previous['y'] + previous['height'] <= current['y'] + 1, (previous, current)
+
+
 def check_nested_cards(page):
     """Synthetic UI-only fixture: nested cards must restore parent nodes/focus."""
     page.evaluate("""() => {
@@ -146,7 +207,7 @@ def check(page, url, width, out):
             out.mkdir(parents=True, exist_ok=True)
             page.screenshot(path=str(out / f'observatory-{width}-{name}.png'), full_page=False)
         # Compact, public-page review frames remain inspectable alongside the PNG artifacts.
-        if args.browser == 'chromium' and ((width in (1280, 390) and name in ('home', 'issue', 'reading-head', 'library')) or name.startswith('overflow')):
+        if args.browser == 'chromium' and ((width in (1280, 390) and name in ('home', 'issue', 'reading-head', 'library', 'reading-navigation', 'issue-navigation')) or name.startswith('overflow')):
             frame = page.screenshot(type='jpeg', quality=55, full_page=False)
             print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
     def overflow():
@@ -180,19 +241,20 @@ def check(page, url, width, out):
         ('.weekly-scope', 'Open Sans', 13),
         ('.identity-text small', 'Jost', 13),
     ])
-    expect(page.locator('#home-section')).to_have_value('overview')
+    expect(page.locator('#home-section')).to_have_attribute('data-active-section', 'overview')
+    check_section_navigation(page, 'home-section', ['overview', 'ideas', 'landscape', 'recent', 'follow'])
     expect(page.locator('#home .field-guide')).to_be_visible()
     expect(page.locator('#beyond-journals')).not_to_be_visible()
     expect(page.locator('#home .glance-section')).not_to_be_visible()
     overflow(); screenshot('home')
     if out:
         for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.field-guide','themes')]:
-            page.locator('#home-section').select_option('ideas' if section == '.editorial-section' else 'overview')
+            choose_section(page, 'home-section', 'ideas' if section == '.editorial-section' else 'overview')
             page.locator('#home '+section).screenshot(path=str(out / f'observatory-{width}-{name}.png'), style='.site-header { visibility: hidden !important; }')
             if args.browser == 'chromium' and ((width == 1280 and name == 'perspectives-preview') or (width == 390 and name == 'themes')):
                 frame = page.locator('#home '+section).screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
                 print(f'DESIGN_REVIEW_IMAGE:{width}:{name}:' + base64.b64encode(frame).decode('ascii'), flush=True)
-    page.locator('#home-section').select_option('ideas')
+    choose_section(page, 'home-section', 'ideas', keyboard=True)
     expect(page.locator('#beyond-journals')).to_be_visible()
     expect(page.locator('#home .field-guide')).not_to_be_visible()
     # Fixed-size artwork must never cover adjacent editorial headlines.
@@ -201,7 +263,7 @@ def check(page, url, width, out):
         if artwork.count():
             art_box, title_box = artwork.bounding_box(), card.locator('h3').bounding_box()
             assert art_box['x'] + art_box['width'] <= title_box['x'] - 8, 'Editorial thumbnail overlaps its headline'
-    page.locator('#home-section').select_option('overview')
+    choose_section(page, 'home-section', 'overview')
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
     assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url
@@ -275,10 +337,14 @@ def check(page, url, width, out):
     assert page.locator('.rv-head .story-image').evaluate('(e) => e.complete && e.naturalWidth > 0'), 'Editorial art failed to load'
     assert page.locator('.rv-head .story-visual-reading').evaluate('(e) => e.lastElementChild.getBoundingClientRect().bottom <= e.getBoundingClientRect().bottom + 1'), 'Illustration caption was cropped'
     expect(page.locator('.rv-head .story-visual-caption')).to_have_text('Editorial illustration')
-    expect(page.locator('#article-section')).to_have_value('overview')
+    expect(page.locator('#article-section')).to_have_attribute('data-active-section', 'overview')
+    check_section_navigation(page, 'article-section')
+    check_chapter_layout(page, '#article-section', '.rv-reading-workspace > .rv-layout', 1000)
+    page.locator('.rv-reading-workspace').evaluate("el => el.scrollIntoView({block:'start',behavior:'instant'})")
+    screenshot('reading-navigation')
     expect(page.locator('#article-overview')).to_be_visible()
     expect(page.locator('#article-source')).not_to_be_visible()
-    page.locator('#article-section').select_option('source')
+    choose_section(page, 'article-section', 'source', keyboard=True)
     expect(page.locator('#article-source')).to_be_visible()
     expect(page.locator('#article-overview')).not_to_be_visible()
     provenance = page.locator('.rv-provenance')
@@ -287,7 +353,13 @@ def check(page, url, width, out):
     expect(dialog.locator('.rv-status')).to_be_visible()
     close_reading_card(page, dialog, trigger)
     expect(provenance.locator('.rv-status')).not_to_be_visible()
-    page.locator('#article-section').select_option('overview')
+    page.locator('.rv-read-all').click()
+    expect(page.locator('#article-section')).to_have_attribute('data-active-section', 'all')
+    expect(page.locator('.rv-read-all')).to_have_attribute('aria-pressed', 'true')
+    for panel_id in page.locator('#article-section [data-reading-view]').evaluate_all('(els) => els.map(el => el.getAttribute("aria-controls"))'):
+        expect(page.locator('#' + panel_id)).to_be_visible()
+    choose_section(page, 'article-section', 'overview')
+    expect(page.locator('.rv-read-all')).to_have_attribute('aria-pressed', 'false')
     for card in page.locator('.rv-context:visible').all():
         assert card.evaluate("el => parseFloat(getComputedStyle(el).paddingLeft) >= 16 && parseFloat(getComputedStyle(el).paddingRight) >= 16"), 'Reading context card lost its text inset'
     overflow(); screenshot('reading')
@@ -301,12 +373,12 @@ def check(page, url, width, out):
     expect(page.locator('.rv-content')).not_to_contain_text('Method details are not clear enough')
     coverage = page.locator('.rv-coverage')
     expect(coverage.locator('.rv-coverage-table')).not_to_be_visible()
-    page.locator('#article-section').select_option('source')
+    choose_section(page, 'article-section', 'source')
     expect(coverage.locator('.rv-coverage-table')).to_be_visible()
     expect(page.locator('.rv-content')).to_contain_text('n = 47')
     expect(page.locator('.automatic-evidence')).to_contain_text('Source: abstract')
     overflow(); screenshot('source-reading')
-    page.locator('#article-section').select_option('evidence')
+    choose_section(page, 'article-section', 'evidence')
     reader = page.locator('.rv-source-excerpts')
     expect(reader.locator('.rv-reader-contents')).to_be_visible()
     reader.get_by_role('button', name='Abstract', exact=True).click()
@@ -319,18 +391,22 @@ def check(page, url, width, out):
     expect(reader.locator('.rv-source-section:visible')).to_have_count(reader.locator('.rv-source-section').count())
     reader.get_by_role('button', name='One section at a time', exact=True).click()
     expect(reader.locator('.rv-source-section:visible')).to_have_count(1)
-    page.locator('#article-section').select_option('overview')
+    choose_section(page, 'article-section', 'overview')
     expect(reader).not_to_be_visible()
-    page.locator('#article-section').select_option('evidence')
+    choose_section(page, 'article-section', 'evidence')
     expect(reader.locator('.rv-reader-contents')).to_be_visible()
     overflow()
     # Every main destination remains available, with no page-level horizontal scroll.
-    for route in ['issue', 'perspectives', 'atlas', 'about', 'home']:
+    for route in ['issue', 'perspectives', 'atlas', 'lab', 'about', 'home']:
         navigate(route)
         expect(page.locator(f'#{route}')).to_be_visible()
         overflow(); screenshot(route)
         if route == 'issue':
-            expect(page.locator('#issue-section')).to_have_value('overview')
+            expect(page.locator('#issue-section')).to_have_attribute('data-active-section', 'overview')
+            check_section_navigation(page, 'issue-section', ['overview', 'themes', 'question', 'sources', 'about'])
+            check_chapter_layout(page, '#issue-navigation', '.issue-content', 1000)
+            page.locator('.issue-layout').evaluate("el => el.scrollIntoView({block:'start',behavior:'instant'})")
+            screenshot('issue-navigation')
             cards = page.locator('#issue-takeaways .takeaway-card')
             assert cards.count() > 0
             turn = cards.first.locator('.flip-toggle')
@@ -342,16 +418,41 @@ def check(page, url, width, out):
             expect(turn).to_have_attribute('aria-pressed', 'false')
             expect(cards.first.locator('.takeaway-back')).not_to_be_visible()
             cards.first.get_by_role('button', name='Explore the evidence').click()
-            expect(page.locator('#issue-section')).to_have_value('themes')
-            expect(page.locator('#issue-theme')).to_have_value('0')
+            expect(page.locator('#issue-section')).to_have_attribute('data-active-section', 'themes')
+            expect(page.locator('#issue-theme')).to_have_attribute('data-active-section', '0')
+            check_section_navigation(page, 'issue-theme')
             expect(page.locator('#issue-signals .issue-signal:visible')).to_have_count(1)
-            page.locator('#issue-section').select_option('sources')
+            choose_section(page, 'issue-section', 'sources')
             source_shelf = page.locator('.issue-reading-shelf')
             assert page.locator('.issue-shelf-item').count() > 0
             expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
             shelf_count = page.locator('.issue-shelf-item').count()
             expect(page.locator('#issue-coverage')).to_contain_text(re.compile(r'^' + str(shelf_count) + r' sources (?:originally published|in this edition)'))
             screenshot('issue-sources')
+        elif route == 'perspectives':
+            check_section_navigation(page, 'perspectives-section', ['essays', 'products'])
+            choose_section(page, 'perspectives-section', 'products', keyboard=True)
+            expect(page.locator('#perspectives-products')).to_be_visible()
+            expect(page.locator('#perspectives-essays')).not_to_be_visible()
+            choose_section(page, 'perspectives-section', 'essays')
+        elif route == 'atlas':
+            check_section_navigation(page, 'atlas-section', ['themes', 'years', 'material'])
+            choose_section(page, 'atlas-section', 'years', keyboard=True)
+            expect(page.locator('.atlas-years')).to_be_visible()
+            expect(page.locator('.atlas-topic')).not_to_be_visible()
+            choose_section(page, 'atlas-section', 'material')
+            expect(page.locator('.atlas-coverage')).to_be_visible()
+            expect(page.locator('.atlas-matrix')).to_be_visible()
+            choose_section(page, 'atlas-section', 'themes')
+        elif route == 'lab':
+            check_section_navigation(page, 'lab-section', ['experiments', 'design'])
+            choose_section(page, 'lab-section', 'design', keyboard=True)
+            expect(page.locator('.play-precedents')).to_be_visible()
+            expect(page.locator('#lab-activities')).not_to_be_visible()
+            choose_section(page, 'lab-section', 'experiments')
+            expect(page.locator('#lab-catalog')).to_be_visible()
+            expect(page.locator('.play-precedents')).not_to_be_visible()
+        overflow()
     # Visual routes have ordinary destinations and no tracking/persistence.
     navigate('atlas')
     expect(page.locator('#atlas')).to_be_visible()
@@ -405,7 +506,7 @@ def check_weekly_citations(page, url, width, out):
     page.goto(url + '#issue', wait_until='networkidle')
     expect(page.locator('#issue')).to_be_visible()
     expect(page.locator('#issue-headline')).to_have_text(issue['headline'])
-    expect(page.locator('#issue-section')).to_have_value('overview')
+    expect(page.locator('#issue-section')).to_have_attribute('data-active-section', 'overview')
     sources = {source['id']: source for source in issue['sources']}
 
     def verify_citations(scope, section, css):
@@ -423,9 +524,9 @@ def check_weekly_citations(page, url, width, out):
                 expect(anchor).to_have_attribute('title', re.compile(re.escape(source['title'])))
                 if citation.get('locator'):
                     expect(anchor).to_have_attribute('title', re.compile(re.escape(citation['locator'])))
-    page.locator('#issue-section').select_option('themes')
+    choose_section(page, 'issue-section', 'themes', keyboard=True)
     for index, section in enumerate(issue['signals']):
-        page.locator('#issue-theme').select_option(str(index))
+        choose_section(page, 'issue-theme', str(index))
         panel = page.locator('#issue-signals .issue-signal').nth(index)
         expect(panel).to_be_visible()
         verify_citations(panel, section, 'a.issue-inline-citation')
@@ -434,14 +535,14 @@ def check_weekly_citations(page, url, width, out):
         expect(dialog.locator('a.issue-inline-citation').first).to_be_visible()
         close_reading_card(page, dialog, trigger)
         verify_citations(panel, section, 'a.issue-inline-citation')
-    page.locator('#issue-section').select_option('question')
+    choose_section(page, 'issue-section', 'question')
     verify_citations(page.locator('#issue-tension-text'), issue['tension'], 'a.issue-inline-citation')
     dialog, trigger = open_reading_card(page, page.locator('#issue-tension-text .reading-expansion'))
     verify_citations(dialog, issue['tension'], 'a.issue-inline-citation')
     close_reading_card(page, dialog, trigger)
     # Native links also work from an open card, across touch and keyboard input.
-    page.locator('#issue-section').select_option('themes')
-    page.locator('#issue-theme').select_option('2')
+    choose_section(page, 'issue-section', 'themes')
+    choose_section(page, 'issue-theme', '2')
     dialog, trigger = open_reading_card(page, page.locator('#issue-signals .issue-signal').nth(2).locator('.reading-expansion'))
     term = dialog.locator('a.issue-glossary-term:visible').first
     target_id = parse_qs(urlsplit(term.get_attribute('href')[1:]).query)['term'][0]
@@ -554,10 +655,16 @@ def check_standalone_brief(page, url, width, out):
             panels = page.locator('[data-edition-panel]')
             assert panels.count() >= len(latest['signals'])
             expect(page.locator('[data-edition-panel]:visible')).to_have_count(1)
-            expect(page.locator('#edition-section')).to_have_value('signal-1')
+            expect(page.locator('#edition-section')).to_have_attribute('data-active-section', 'signal-1')
+            check_section_navigation(page, 'edition-section')
+            check_chapter_layout(page, '.edition-controls', '.edition-reading', 1000)
+            if args.browser == 'chromium' and width in (1280, 390):
+                page.locator('.edition-layout').evaluate("el => el.scrollIntoView({block:'start',behavior:'instant'})")
+                frame = page.screenshot(type='jpeg', quality=55, full_page=False)
+                print(f'DESIGN_REVIEW_IMAGE:{width}:newsletter-navigation:' + base64.b64encode(frame).decode('ascii'), flush=True)
             # Keyboard section selection changes the reading panel, not the page height.
             if len(latest['signals']) > 1:
-                page.locator('#edition-section').select_option('signal-2')
+                choose_section(page, 'edition-section', 'signal-2', keyboard=True)
                 expect(page.locator('#signal-2')).to_be_visible()
                 expect(page.locator('#signal-1')).not_to_be_visible()
             opening = page.locator('[data-open-layer="opening"]')
@@ -697,13 +804,13 @@ def check_typed_readings(page, url, width, out):
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', commentary['reading']['source_url'])
     evidence = paper.locator('.rv-evidence')
     expect(evidence).not_to_be_visible()
-    page.locator('#article-section').select_option('evidence')
+    choose_section(page, 'article-section', 'evidence')
     expect(evidence.locator('.rv-source-locator')).to_have_count(5)
     expect(evidence.locator('.rv-source-locator').first).to_be_visible()
     expect(evidence).to_contain_text('extracted block 1')
-    page.locator('#article-section').select_option('overview')
+    choose_section(page, 'article-section', 'overview')
     expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
-    page.locator('#article-section').select_option('evidence')
+    choose_section(page, 'article-section', 'evidence')
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed reading overflow at {width}px'
     if out:
         out.mkdir(parents=True, exist_ok=True)
@@ -715,13 +822,13 @@ def check_typed_readings(page, url, width, out):
     expect(paper).to_contain_text('not verified peer-reviewed evidence')
     expect(paper).to_contain_text('How it was studied')
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', preprint['reading']['source_url'])
-    page.locator('#article-section').select_option('evidence')
+    choose_section(page, 'article-section', 'evidence')
     expect(paper.locator('.rv-evidence')).to_contain_text('page 2')
     expect(paper.locator('.rv-evidence')).not_to_contain_text('extracted block')
     page.goto(url + '#issue', wait_until='networkidle')
     issue_view = page.locator('#issue')
     expect(issue_view).to_be_visible()
-    issue_view.locator('#issue-section').select_option('sources')
+    choose_section(page, 'issue-section', 'sources')
     source_shelf = issue_view.locator('.issue-reading-shelf')
     expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
     shelf = issue_view.locator('.issue-shelf-item').first
@@ -844,7 +951,7 @@ def check_registered_readings(page, url, width, out, payloads):
         expect(paper.locator('.automatic-evidence, .rv-artwork, .rv-original-figure')).to_have_count(0)
         evidence = paper.locator('.rv-evidence')
         expect(evidence).to_have_count(1)
-        page.locator('#article-section').select_option('evidence')
+        choose_section(page, 'article-section', 'evidence')
         locators = [locator for values in reading['evidence'].values() for locator in values]
         expect(evidence.locator('.rv-source-locator')).to_have_count(len(locators))
         for locator in locators:
@@ -855,9 +962,9 @@ def check_registered_readings(page, url, width, out, payloads):
                 label = 'extracted block ' if commentary and reading['source_format'] == 'html' else 'paragraph '
                 expect(evidence).to_contain_text(label + str(locator['paragraph']))
         expect(evidence.locator('.rv-source-locator').first).to_be_visible()
-        page.locator('#article-section').select_option('overview')
+        choose_section(page, 'article-section', 'overview')
         expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
-        page.locator('#article-section').select_option('evidence')
+        choose_section(page, 'article-section', 'evidence')
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Registered reading overflow: {identifier} at {width}px'
         if out:
             out.mkdir(parents=True, exist_ok=True)

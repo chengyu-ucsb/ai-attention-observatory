@@ -80,37 +80,45 @@ function layerDisclosure(node,title){
  if(node.id)replacement.id=node.id;replacement.hidden=node.hidden;replacement.dataset.layered="true";node.replaceWith(replacement);return replacement;
 }
 function sectionMenu(host,groups,id,label="Explore this page"){
- const nav=make("nav","section-menu");nav.setAttribute("aria-label",label);
- const field=make("label","section-menu-label",label),select=make("select");select.id=id;
- const tabs=make("div","section-shortcuts"),status=make("span","sr-only");status.setAttribute("role","status");
- for(const group of groups){const option=make("option","",group.label);option.value=group.key;select.append(option);
-  const b=btn(group.label,()=>choose(group.key),"section-shortcut");b.dataset.section=group.key;tabs.append(b);}
- field.append(select);add(nav,field,tabs,status);host.prepend(nav);
- function choose(key){
-  const found=groups.find(g=>g.key===key)||groups[0];select.value=found.key;
+ const nav=make("nav","section-menu");nav.id=id;nav.setAttribute("aria-label",label);
+ const heading=make("div","section-nav-heading"),position=make("span","section-position"),tabs=make("div","section-shortcuts"),status=make("span","sr-only");
+ status.setAttribute("role","status");position.setAttribute("aria-hidden","true");
+ add(heading,make("p","section-nav-label",label),position);
+ for(const [index,group] of groups.entries()){
+  const b=btn("",()=>choose(group.key,true),"section-shortcut"),number=make("span","section-step",String(index+1).padStart(2,"0")),copy=make("span","section-option-copy");
+  number.setAttribute("aria-hidden","true");b.dataset.section=group.key;
+  copy.append(make("span","section-option-title",group.label));if(group.note)copy.append(make("small","section-option-note",group.note));
+  const targets=[];for(const [i,node] of group.nodes.entries())if(node){if(!node.id)node.id=id+"-panel-"+index+"-"+i;node.classList.add("section-panel");targets.push(node.id);}
+  b.setAttribute("aria-controls",targets.join(" "));add(b,number,copy);tabs.append(b);
+ }
+ add(nav,heading,tabs,status);host.prepend(nav);
+ function choose(key,fromControl=false){
+  const found=groups.find(g=>g.key===key)||groups[0];nav.dataset.activeSection=found.key;
   for(const group of groups)for(const node of group.nodes)if(node)node.hidden=group.key!==found.key;
   for(const button of tabs.children)button.setAttribute("aria-pressed",String(button.dataset.section===found.key));
-  status.textContent=found.label;nav.dispatchEvent(new CustomEvent("sectionchange",{detail:found.key}));
+  const index=groups.indexOf(found)+1;position.textContent=String(index).padStart(2,"0")+" / "+String(groups.length).padStart(2,"0");
+  status.textContent=found.label+", section "+index+" of "+groups.length;nav.dispatchEvent(new CustomEvent("sectionchange",{detail:found.key}));
+  const first=found.nodes.find(Boolean);if(fromControl&&first&&first.getBoundingClientRect().top<100)first.scrollIntoView({block:"start",behavior:"instant"});
  }
- select.addEventListener("change",()=>choose(select.value));choose(groups[0].key);return {choose,nav,select};
+ choose(groups[0].key);return {choose,nav,focusActive:()=>Array.from(tabs.children).find(b=>b.dataset.section===nav.dataset.activeSection)?.focus({preventScroll:true})};
 }
 let homeMenu,issueMenu,issueThemeMenu,labPageMenu;
 function setupPageLayers(){
  const homeHost=make("div","shell home-section-controls");$("#home .field-guide").before(homeHost);
  homeMenu=sectionMenu(homeHost,[
-  {key:"overview",label:"Start exploring",nodes:[$("#home .field-guide"),$("#home .lab-teaser")]},
-  {key:"ideas",label:"Ideas & tools",nodes:[$("#beyond-journals")]},
-  {key:"landscape",label:"Research landscape",nodes:[$("#home .glance-section"),$("#home .issue-strip")]},
-  {key:"recent",label:"Recently added",nodes:[$("#home .arrivals-section")]},
-  {key:"follow",label:"Follow the brief",nodes:[$("#home .follow-section")]}
- ],"home-section");
+  {key:"overview",label:"Start exploring",note:"Find your way in",nodes:[$("#home .field-guide"),$("#home .lab-teaser")]},
+  {key:"ideas",label:"Ideas & tools",note:"Perspectives in practice",nodes:[$("#beyond-journals")]},
+  {key:"landscape",label:"Research landscape",note:"See the collection",nodes:[$("#home .glance-section"),$("#home .issue-strip")]},
+  {key:"recent",label:"Recently added",note:"New reading material",nodes:[$("#home .arrivals-section")]},
+  {key:"follow",label:"Follow the brief",note:"Keep up each week",nodes:[$("#home .follow-section")]}
+ ],"home-section","Explore the Observatory");
  layerDisclosure($(".home-source-drawer"),"Sources behind this issue");
  layerDisclosure($(".collection-details"),"About the collection");
  layerDisclosure($(".library-refine"),"Filter the collection");
  layerDisclosure($(".play-update"),"What's new in the Lab");
  for(const node of $$(".precedent-details"))layerDisclosure(node,"Design notes");
  const labNote=$(".play-note"),noteBody=make("div");while(labNote.firstChild)noteBody.append(labNote.firstChild);labNote.append(layerButton("About these experiments","About these experiments",noteBody));
- labPageMenu=sectionMenu($("#lab-page-navigation"),[{key:"experiments",label:"Experiments",nodes:[$("#lab-activities")]},{key:"design",label:"Design examples",nodes:[$(".play-precedents")]}],"lab-section","Explore the Lab");
+ labPageMenu=sectionMenu($("#lab-page-navigation"),[{key:"experiments",label:"Experiments",note:"Play, compare, reflect",nodes:[$("#lab-activities")]},{key:"design",label:"Design examples",note:"Ideas behind the tools",nodes:[$(".play-precedents")]}],"lab-section","Explore the Lab");
  const perspectiveHost=make("div","perspective-section-controls"),intro=$$("#perspectives .perspectives-intro");$(".perspectives-quick-links").after(perspectiveHost);
  const perspectives=sectionMenu(perspectiveHost,[{key:"essays",label:"Reporting & essays",nodes:[intro[0],$("#perspectives-essays")]},{key:"products",label:"Tools & design",nodes:[intro[1],$("#perspectives-products")]}],"perspectives-section");
  $("#perspectives-essays-link").onclick=()=>perspectives.choose("essays");
@@ -406,7 +414,7 @@ function setupIssueLayers(issue){
   const bullets=make("ul","takeaway-statements");bullets.append(make("li","",textSentences(signal.text)[0]||signal.text));
   add(back,make("span","eyebrow","KEY STATEMENT"),bullets);
   const turn=btn("Turn card",()=>{const flipped=back.hidden;front.hidden=flipped;back.hidden=!flipped;card.classList.toggle("is-flipped",flipped);turn.setAttribute("aria-pressed",String(flipped));turn.textContent=flipped?"Back to theme":"Turn card";},"flip-toggle");turn.setAttribute("aria-pressed","false");
-  const read=btn("Explore the evidence",()=>{issueMenu.choose("themes");issueThemeMenu.choose(String(i));issueThemeMenu.nav.scrollIntoView({block:"start"});issueThemeMenu.select.focus({preventScroll:true});},"quiet-link");
+  const read=btn("Explore the evidence",()=>{issueMenu.choose("themes");issueThemeMenu.choose(String(i));issueThemeMenu.nav.scrollIntoView({block:"start"});issueThemeMenu.focusActive();},"quiet-link");
   add(card,front,back,add(make("div","takeaway-actions"),turn,read));deck.append(card);
  }
  const intro=layerDisclosure($(".issue-letter"),"The big picture")||$(".issue-letter");
@@ -417,12 +425,12 @@ function setupIssueLayers(issue){
  map.replaceChildren(make("span","map-center","One edition · "+(issue.signals||[]).length+" connected themes"),make("span","map-caption","A reading map"));
  host.replaceChildren();
  issueMenu=sectionMenu(host,[
-  {key:"overview",label:"At a glance",nodes:[$("#issue-overview"),intro]},
-  {key:"themes",label:"Explore the themes",nodes:[$(".issue-signals-section"),...(issue.supplements?.length?[$("#issue-supplements")]:[])]},
-  {key:"question",label:"Question & experiment",nodes:[$("#issue-extras")]},
-  {key:"sources",label:"Sources",nodes:[$(".issue-reading-shelf")]},
-  {key:"about",label:"Notes & glossary",nodes:[$(".issue-closing"),...((issue.glossary||[]).length?[$("#issue-glossary")]:[]),$(".issue-follow")]}
- ],"issue-section","Choose a reading layer");
+  {key:"overview",label:"At a glance",note:"The week's main ideas",nodes:[$("#issue-overview"),intro]},
+  {key:"themes",label:"Explore the themes",note:"Connections and evidence",nodes:[$(".issue-signals-section"),...(issue.supplements?.length?[$("#issue-supplements")]:[])]},
+  {key:"question",label:"Question & experiment",note:"Something to think through",nodes:[$("#issue-extras")]},
+  {key:"sources",label:"Sources",note:"The complete reading list",nodes:[$(".issue-reading-shelf")]},
+  {key:"about",label:"Notes & glossary",note:"Terms and context",nodes:[$(".issue-closing"),...((issue.glossary||[]).length?[$("#issue-glossary")]:[]),$(".issue-follow")]}
+ ],"issue-section","In this edition");
  let themeHost=$("#issue-theme-navigation");if(!themeHost){themeHost=make("div");themeHost.id="issue-theme-navigation";$("#issue-signals").before(themeHost);}themeHost.replaceChildren();
  const panels=Array.from($("#issue-signals").children);
  if(panels.length)issueThemeMenu=sectionMenu(themeHost,panels.map((node,i)=>({key:String(i),label:issue.signals[i].short,nodes:[node]})),"issue-theme","Choose a theme");
@@ -1147,33 +1155,36 @@ function articleSections(main,layout,body,side,analysis,evidence){
  evidence.className+=" rv-panel";evidence.id="article-evidence";evidence.setAttribute("aria-label","Evidence");
  side.className+=" rv-panel";side.id="article-source";side.setAttribute("aria-label","Source and related readings");
  body.append(overview,analysis,evidence);
- const groups=[{value:"overview",label:"Overview",node:overview},
-  ...(analysis.children.length?[{value:"analysis",label:"Analysis",node:analysis}]:[]),
-  ...(evidence.children.length?[{value:"evidence",label:"Evidence",node:evidence}]:[]),
-  {value:"source",label:"Source",node:side}];
- const controls=make("nav","rv-section-controls");controls.setAttribute("aria-label","Choose reading section");
- const label=make("label","rv-section-select-label","Reading view"),select=make("select","rv-section-select");
- select.id="article-section";label.setAttribute("for",select.id);
- select.setAttribute("aria-controls",groups.map(group=>group.node.id).join(" "));
- for(const group of groups){const option=make("option","",group.label);option.value=group.value;select.append(option);}
- const allOption=make("option","","Read all");allOption.value="all";select.append(allOption);
- const buttons=make("div","rv-section-tabs"),readAll=btn("Read all",()=>choose("all"),"rv-read-all");
- function choose(value){
+ const groups=[{value:"overview",label:"Overview",description:"The idea and its limits",node:overview},
+  ...(analysis.children.length?[{value:"analysis",label:"Analysis",description:"Context and interpretation",node:analysis}]:[]),
+  ...(evidence.children.length?[{value:"evidence",label:"Evidence",description:"Passages and source notes",node:evidence}]:[]),
+  {value:"source",label:"Source",description:"Publication and related reads",node:side}];
+ const workspace=make("div","rv-reading-workspace"),controls=make("nav","rv-section-controls");
+ controls.id="article-section";controls.setAttribute("aria-label","In this reading");
+ const heading=make("p","rv-section-heading","In this reading"),position=make("p","rv-section-position");
+ position.setAttribute("role","status");position.setAttribute("aria-live","polite");position.setAttribute("aria-atomic","true");
+ const buttons=make("div","rv-section-tabs"),readAll=btn("Read all",()=>choose("all",true),"rv-read-all");
+ function choose(value,fromControl=false){
   if(value!=="all"&&!groups.some(group=>group.value===value))value="overview";
   for(const group of groups)group.node.hidden=value!=="all"&&group.value!==value;
   analysis.hidden=!analysis.children.length||value!=="all"&&value!=="analysis";
   evidence.hidden=!evidence.children.length||value!=="all"&&value!=="evidence";
   body.hidden=value==="source";
-  select.value=value;main.setAttribute("data-reading-view",value);
+  controls.dataset.activeSection=value;main.setAttribute("data-reading-view",value);
+  const index=groups.findIndex(group=>group.value===value);
+  position.textContent=value==="all"?"All "+groups.length+" sections":String(index+1).padStart(2,"0")+" / "+String(groups.length).padStart(2,"0")+" · "+groups[index].label;
   Array.from(buttons.children).forEach(button=>button.setAttribute("aria-pressed",String(button.getAttribute("data-reading-view")===value)));
   readAll.setAttribute("aria-pressed",String(value==="all"));
+  if(fromControl&&typeof layout.getBoundingClientRect==="function"&&layout.getBoundingClientRect().top<110)layout.scrollIntoView({block:"start",behavior:"instant"});
  }
- for(const group of groups){
-  const button=btn(group.label,()=>choose(group.value),"rv-section-tab");
+ for(const [index,group] of groups.entries()){
+  const button=btn("",()=>choose(group.value,true),"rv-section-tab"),number=make("span","rv-section-number",String(index+1).padStart(2,"0"));
+  number.setAttribute("aria-hidden","true");
+  const label=make("span","rv-section-label",group.label),description=make("span","rv-section-description",group.description);
+  add(button,number,add(make("span","rv-section-copy"),label,description));
   button.setAttribute("data-reading-view",group.value);button.setAttribute("aria-controls",group.node.id);buttons.append(button);
  }
- select.onchange=()=>choose(select.value);
- add(controls,label,select,buttons,readAll);main.append(controls,layout);choose("overview");
+ add(controls,heading,position,buttons,readAll);add(workspace,controls,layout);main.append(workspace);choose("overview");
 }
 
 function showPaper(x){
