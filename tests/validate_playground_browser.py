@@ -376,11 +376,11 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
             expect(card).to_be_focused()
         if index == 0:
             page.locator('[data-lab-verdict="supported"]').click()
-            expect(page.locator("#lab-detective-feedback")).to_contain_text("Reconsider the scope")
+            expect(page.locator("#lab-detective-feedback > strong")).to_have_text("Reconsider the scope of the claim.")
         page.locator(f'[data-lab-verdict="{verdict}"]').focus()
         page.keyboard.press("Enter")
         expect(page.locator("#lab-detective-feedback")).to_be_focused()
-        expect(page.locator("#lab-detective-feedback")).to_contain_text("That wording fits your verdict")
+        expect(page.locator("#lab-detective-feedback > strong")).to_have_text("You matched the claim to the evidence.")
         assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
         if index < 2:
             page.locator("#lab-detective-next").click()

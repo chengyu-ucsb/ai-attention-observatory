@@ -557,7 +557,9 @@ def check_standalone_brief(page, url, width, out):
             page.keyboard.press('Enter')
             dialog = page.get_by_role('dialog')
             expect(dialog).to_be_visible()
-            expect(dialog.locator('.dialog-body')).to_contain_text(latest['letter'])
+            opening_paragraphs = dialog.locator('.dialog-body .long-copy:visible').all_text_contents()
+            assert opening_paragraphs, 'Opening argument must remain readable'
+            assert re.sub(r'\s+', ' ', ' '.join(opening_paragraphs)).strip() == re.sub(r'\s+', ' ', latest['letter']).strip(), 'Opening argument changed'
             assert dialog.evaluate('(el) => el.contains(document.activeElement)'), 'Modal must receive focus'
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Newsletter card overflow at {width}px'
             if out:
@@ -569,7 +571,9 @@ def check_standalone_brief(page, url, width, out):
             expect(page.locator('#edition-read-all')).to_have_attribute('aria-pressed', 'true')
             expect(page.locator('[data-edition-panel]:visible')).to_have_count(panels.count())
             for index, signal in enumerate(latest['signals'], 1):
-                expect(page.locator('#signal-' + str(index))).to_contain_text(signal['text'])
+                paragraphs = page.locator('#signal-' + str(index) + ' > .long-copy:visible').all_text_contents()
+                assert paragraphs, 'Full theme text must remain readable'
+                assert re.sub(r'\s+', ' ', ' '.join(paragraphs)).strip() == re.sub(r'\s+', ' ', signal['text']).strip(), 'Theme prose changed: ' + str(index)
             page.locator('#edition-read-all').click()
             expect(page.locator('[data-edition-panel]:visible')).to_have_count(1)
     assert not errors, errors
@@ -675,7 +679,9 @@ def check_typed_readings(page, url, width, out):
     expect(dialog.locator('.rv-reading-notice')).to_be_visible()
     close_reading_card(page, dialog, trigger)
     for key in ('thesis', 'reasoning', 'examples', 'tension', 'qualification'):
-        expect(paper).to_contain_text(commentary['reading']['digest']['longform'][key])
+        actual = ' '.join(paper.locator('p, li').all_text_contents())
+        expected = commentary['reading']['digest']['longform'][key]
+        assert re.sub(r'\s+', ' ', expected).strip() in re.sub(r'\s+', ' ', actual).strip(), 'Commentary prose changed: ' + key
     for forbidden in ('How it was studied', 'Study approach', 'Reported finding', 'Main finding', 'Stale visual sentinel'):
         expect(paper).not_to_contain_text(forbidden)
     expect(paper.locator('.automatic-evidence, .rv-original-figure, .rv-context-grid')).to_have_count(0)
