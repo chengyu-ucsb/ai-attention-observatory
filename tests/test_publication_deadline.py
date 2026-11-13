@@ -9,8 +9,10 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import publish_deadline as deadline
+import build_issue
+import build_newsletter
 from edition_schedule import canonical_edition_date
-from edition_references import QUALITATIVE_PROSE, section_response_schema, resolve_section_references, source_claims
+from edition_references import QUALITATIVE_PROSE, section_response_schema, resolve_section_references, source_claims, normalize_digits, resolve_frame_references
 from compose_issue import validate_design_claims, pending, validate_editorial_review, REVIEW_CRITERIA
 
 
@@ -20,6 +22,11 @@ class DeadlineTests(unittest.TestCase):
     def root(self, tmp):
         root = Path(tmp); (root/'data').mkdir()
         return root
+
+    def frozen_week(self):
+        issue=json.loads((deadline.ROOT/'data/approved-issues/2026-11-13.json').read_text())
+        return {'run':{'date':'2026-11-13','publication_window':issue['publication_window']},
+                'items':[{**s,'reading':{'level':s['reading_level']}} for s in issue['sources']]}
 
     def test_before_deadline_never_freezes_a_coverage_update(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -63,7 +70,7 @@ class DeadlineTests(unittest.TestCase):
                 deadline.validate_coverage(bad)
 
     def test_source_shelf_rechecks_dates_depth_duplicates_and_revocations(self):
-        actual=json.loads((deadline.ROOT/'data/editorial-weekly.json').read_text())
+        actual=self.frozen_week()
         # A small realistic fixture, preserving its actual verified date evidence.
         item=actual['items'][0]
         date=actual['run']['date']
@@ -91,6 +98,35 @@ class DeadlineTests(unittest.TestCase):
             self.assertNotIn(blocked,workflow)
         self.assertIn('Meet weekly publication deadline',(deadline.ROOT/'.github/workflows/publish.yml').read_text())
 
+    def test_coverage_upgrades_through_real_builders_at_the_same_permalink(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=self.root(tmp);data=root/'data';folder=data/'approved-issues';folder.mkdir()
+            # Use the recovered edition as a full publication integration fixture.
+            weekly=self.frozen_week()
+            current_date=weekly['run']['date']
+            coverage_date=(dt.date.fromisoformat(current_date)-dt.timedelta(days=dt.date.fromisoformat(current_date).weekday())).isoformat()
+            coverage=deadline.coverage_issue(coverage_date,'05',[])
+            (folder/(coverage_date+'.json')).write_text(json.dumps(coverage))
+            for name in ('public-weekly.json','editorial-weekly.json'):
+                (data/name).write_text(json.dumps(weekly))
+            (data/'issue-editorial.json').write_text('{}')
+            with patch('compose_issue.public_record',side_effect=lambda x,**kwargs:x):
+                self.assertEqual(pending(root,today=dt.date.fromisoformat(current_date))['run']['edition_date'],coverage_date)
+            drafts=json.loads((deadline.ROOT/'data/issue-editorial.json').read_text())
+            draft=copy.deepcopy(drafts['2026-11-13'])
+            (data/'issue-editorial.json').write_text(json.dumps({coverage_date:draft}))
+            with patch.object(build_issue,'DATA',data),patch.object(build_issue,'public_record',side_effect=lambda x,**kwargs:x):
+                result=build_issue.build()
+            self.assertEqual(result['edition_date'],coverage_date)
+            self.assertEqual(result['edition_format'],'full')
+            with patch.object(build_newsletter,'DATA',data),patch.object(build_newsletter,'ROOT',root):
+                build_newsletter.build()
+            self.assertEqual(canonical_edition_date(root,current_date),coverage_date)
+            feed=json.loads((data/'issue-feed.json').read_text())
+            self.assertEqual(len(feed['items']),1)
+            self.assertTrue(feed['items'][0]['id'].endswith('/'+coverage_date+'.html'))
+            self.assertEqual(feed['items'][0]['_observatory']['edition_format'],'full')
+
 
 class ObservedFailureTests(unittest.TestCase):
     def test_string_grammar_cannot_consume_json_delimiters(self):
@@ -99,6 +135,20 @@ class ObservedFailureTests(unittest.TestCase):
         self.assertTrue(re.fullmatch(pattern,'A plain qualitative sentence.'))
         for bad in ['A year 2026.', 'Ends here"},"injected":"yes', 'A\\path','Two\nlines']:
             self.assertIsNone(re.fullmatch(pattern,bad))
+
+    def test_full_width_digits_keep_their_value_before_numeric_validation(self):
+        self.assertEqual(normalize_digits('９４２ participants and ３５０ learners'), '942 participants and 350 learners')
+
+    def test_frame_attribution_and_abstract_label_are_rendered_from_assignments(self):
+        source={'key':'S3','title':'Teacher education','authors':['Wang'],'level':'abstract'}
+        note='Teachers described their resources and support in a survey, leaving the direction of the relationship unresolved in this account.'
+        question='Which classroom comparison could distinguish a change in willingness to use a tool from a change in what learners can explain independently, while keeping the different outcomes separate?'
+        frame={'tension':{'title':'An unresolved question','source_notes':{'S3':note},'question':question}}
+        resolved=resolve_frame_references(frame,[source])['tension']
+        self.assertEqual(resolved['citations'],[{'key':'S3','text':'Wang:'}])
+        self.assertEqual(resolved['text'].count('Wang:'),1)
+        self.assertIn('Abstract-based account.',resolved['text'])
+        self.assertIn(question,resolved['text'])
 
     def test_survey_caveat_does_not_erase_causal_claim(self):
         s={'key':'S4','evidence':'A cross-sectional survey measured intention to use GenAI.'}

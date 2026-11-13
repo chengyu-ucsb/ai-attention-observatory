@@ -6,6 +6,7 @@ that the passage supports a claim. The normal fidelity review still applies.
 from __future__ import annotations
 
 import re
+import unicodedata
 
 # llama.cpp translates patterns directly to grammar character classes. A
 # negated digit class alone also admits JSON quotes and backslashes, allowing
@@ -16,6 +17,11 @@ QUALITATIVE_PROSE = {'type': 'string', 'pattern': r'^[^0-9"\\\x00-\x1f]*$'}
 def prose_words(minimum, maximum):
     word = r'[^0-9"\\\x00-\x1f ]+'
     return {'type': 'string', 'pattern': '^' + word + '( ' + word + '){' + str(minimum-1) + ',' + str(maximum-1) + '}$'}
+
+
+def normalize_digits(text):
+    """Canonicalize decimal typography before value checks, never change values."""
+    return ''.join(str(unicodedata.decimal(c)) if c.isdecimal() else c for c in text)
 
 def strict_object(properties):
     return {'type': 'object', 'properties': properties,
@@ -117,8 +123,8 @@ def resolve_section_references(section, sources):
         # Render that assignment as a named link; never infer a missing citation
         # from the prose or invent a missing source's contribution.
         result['text'] = '\n\n'.join(labels[source['key']] + ': ' + depth_label(source)
-                                    + notes[source['key']].strip() for source in sources)
-        result['text'] += '\n\n' + comparison.strip()
+                                    + normalize_digits(notes[source['key']].strip()) for source in sources)
+        result['text'] += '\n\n' + normalize_digits(comparison.strip())
         # Link the explicit paragraph label, including its delimiter. Repeated
         # author names elsewhere in the prose are not duplicate citation links.
         result['citations'] = [{'key': key, 'text': labels[key] + ':'} for key in keys]
@@ -232,14 +238,12 @@ def resolve_review_references(review, draft, packet, criteria):
 
 def frame_response_schema(sources):
     prose = QUALITATIVE_PROSE
-    keys = [p['key'] for p in sources]
     return strict_object({
-        'headline': prose, 'deck': prose, 'letter': prose,
-        'tension': strict_object({'title':prose, 'text':{'type':'string'},
-            'citations':{'type':'array', 'minItems':1, 'maxItems':len(keys),
-                'items':strict_object({'key':{'type':'string','enum':keys},
-                                       'text':{'type':'string','enum':keys}})}}),
-        'closer':prose,
+        'headline': prose_words(5, 15), 'deck': prose_words(20, 45), 'letter': prose_words(75, 120),
+        'tension': strict_object({'title':prose,
+            'source_notes': strict_object({s['key']: prose_words(20, 35) for s in sources}),
+            'question': prose_words(35, 60)}),
+        'closer':prose_words(10, 35),
         'glossary':{'type':'array', 'maxItems':5,
                     'items':strict_object({'term':prose,'definition':prose})},
     })
@@ -251,6 +255,22 @@ def resolve_frame_references(frame, sources):
     result = deepcopy(frame)
     tension = result.get('tension', {})
     labels = source_labels(sources)
+    if 'source_notes' in tension:
+        notes = tension.pop('source_notes')
+        question = tension.pop('question')
+        exact_keys(notes, list(labels), 'Frame source notes')
+        if 'text' in tension or 'citations' in tension:
+            raise ValueError('Do not mix assigned frame notes with free-form citations')
+        if any(not isinstance(note, str) or len(note.split()) < 15 for note in notes.values()):
+            raise ValueError('Frame source notes need substantive, source-specific context')
+        if not isinstance(question, str) or len(question.split()) < 25:
+            raise ValueError('Frame needs a substantive unresolved question')
+        if re.search(r'\bS\d+\b', question+' '.join(notes.values())):
+            raise ValueError('Use source keys only as field names, never in the public frame prose')
+        tension['text'] = '\n\n'.join(labels[s['key']] + ': ' + depth_label(s) + normalize_digits(notes[s['key']]) for s in sources)
+        tension['text'] += '\n\n' + normalize_digits(question)
+        tension['citations'] = [{'key':key, 'text':label+':'} for key,label in labels.items()]
+        return result
     text = tension.get('text', '')
     selected = {}
     for citation in tension.get('citations', []):

@@ -20,10 +20,10 @@ def canonical_edition_date(root, date):
     """Upgrade a coverage notice at its existing permanent URL."""
     from collection_window import window_metadata
     window = window_metadata(date)
-    for path in sorted((root / 'data/approved-issues').glob('????-??-??.json')):
+    for path in sorted((root / 'data/approved-issues').glob('????-??-??.json'), reverse=True):
         issue = json.loads(path.read_text())
-        if (issue.get('status') == 'published' and issue.get('edition_format') == 'coverage'
+        if (issue.get('status') == 'published'
                 and window_metadata(issue['edition_date']) == window
-                and issue.get('publication_window') == window):
+                and (issue.get('publication_window') or window) == window):
             return issue['edition_date']
     return date

@@ -19,7 +19,7 @@ from original_readings import public_record
 from collection_window import previous_week, weekly_eligible, window_metadata
 from edition_references import (with_evidence_options, section_response_schema,
     resolve_section_references, draft_passages, review_response_schema,
-    resolve_review_references, frame_response_schema, resolve_frame_references, source_claims)
+    resolve_review_references, frame_response_schema, resolve_frame_references, source_claims, normalize_digits)
 from edition_progress import Progress, MemoryStore, HeldStage, policy_signature
 from edition_schedule import publication_cutoff, canonical_edition_date
 from observatory_store import fingerprint
@@ -610,7 +610,7 @@ Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=Fal
                 if len(pair) > 1 and re.search(r'\bboth (?:groups|populations|studies)|\ball (?:groups|populations|studies)\b', section.get('comparison', ''), re.I):
                     raise ValueError('Keep populations and findings separate; do not turn the comparison into a shared-group finding')
                 for source in pair:
-                    note = section['source_notes'][source['key']]
+                    note = normalize_digits(section['source_notes'][source['key']])
                     validate_original_prose(note, [source])
                     validate_design_claims(note, source)
                     if not set(re.findall(r'\b\d+(?:\.\d+)?\b', note)) <= set(
@@ -700,9 +700,10 @@ Use ONLY the claims in these paragraphs; introduce no new factual claims or stat
 Keep concrete evidence limitations without repeating the common preprint/AI-review source note.
 The tension should propose a specific next comparison or decision; do not just say more research
 is needed or that the sources differ. Cite named sources where you use their observations.
-In the tension, use each cited source key (such as S1) exactly once as the citation phrase.
-Software expands those explicit keys to source names. No keys in other prose fields.
-Label abstract-only sources and commentary when present.
+In the tension, supply source_notes for every source key, twenty to thirty-five words
+per source summarizing its already-checked contribution. Then supply a question of
+thirty-five to sixty words proposing the unresolved comparison. Software adds named
+links and depth labels. No source keys, author names or publication titles in prose.
 Do not equate engagement, learning and sustained attention, or imply enhanced skills in a headline.
 Paraphrase all public prose, including caveats; never copy sixteen consecutive source words.
 The themes may mix studies and essays; do not call the whole collection studies.
@@ -711,8 +712,8 @@ Keep each limitation attached to its own study, rather than claiming all sources
 The tension must be an explicitly unresolved research/design question, not an extra finding.
 Use plain, specific prose, not "delve", "multifaceted", "nuanced" or generic benefits/risks language.
 Return {"headline":"at least five words", "deck":"30–45 words", "letter":"90–120 words",
-"tension":{"title":"an unresolved question", "text":"80–130 words",
-"citations":[{"key":"S1","text":"S1"}, ...]},
+"tension":{"title":"an unresolved question", "source_notes":{"S1":"checked contribution", ...},
+"question":"the proposed comparison; no new factual claims"},
 "closer":"one specific research question",
 "glossary":[{"term":"an actually used technical term","definition":"plain-language explanation"}]}.
 The glossary is optional: use zero to five terms a general reader may not know. Prefer
