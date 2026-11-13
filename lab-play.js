@@ -495,7 +495,7 @@
   }
   function navigate(id){
     const hash=id?"#lab?experiment="+encodeURIComponent(id):"#lab";
-    if(view.location.hash===hash){pendingNavigationFocus=undefined;select(id,true);return}
+    if(view.location.hash===hash){if(pendingNavigationFocus===undefined)select(id,true);return}
     // Expose the new controls only after the hash router has finished. A
     // synchronous preview here would let a visitor act before navigation settles.
     pendingNavigationFocus=id;

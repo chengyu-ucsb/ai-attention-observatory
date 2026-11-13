@@ -47,6 +47,7 @@ assert.equal(q("lab-classic-tabs").hidden,true);assert.equal(q("lab-session-cont
 assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,2,"New is the initial collection");
 select("lab-collection-filter","all");assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,5);
 findData("labOpen","switch").click();assert.equal(view.location.hash,"#lab?experiment=switch");assert(q("lab-workbench").hidden,"New controls cannot appear before hash navigation settles");assert.equal(classicActivations,0);
+findData("labOpen","switch").click();assert(q("lab-workbench").hidden,"A repeated click cannot bypass pending route readiness");assert.equal(classicActivations,0);
 doc.activeElement=doc.body;route(view.location.hash);assert.equal(q("play-switch").hidden,false);assert.equal(q("play-recovery").hidden,true);assert.equal(classicActivations,1);assert.equal(frames.length,0);assert.equal(doc.activeElement,q("lab-workbench-title"),"Destination focus is established during the completed hash route");
 assert.equal(q("lab-catalog").hidden,true);assert.equal(q("lab-classic-tabs").hidden,false);
 q("lab-back-to-catalog").click();assert.equal(q("lab-catalog").hidden,true,"Collection controls also wait for their route");
