@@ -479,7 +479,7 @@
   function drawCatalog(){
     grid.replaceChildren();
     const shown=CATALOG.filter(entry=>state.filter==="all"||entry.status===state.filter);
-    count.textContent=shown.length+" experiments · 2 new + 3 classics available";
+    count.textContent=shown.length+" experiments · "+CATALOG.filter(entry=>entry.status==="new").length+" new + "+CATALOG.filter(entry=>entry.status==="classic").length+" classics available";
     shown.forEach(entry=>{
       const card=node("article","lab-catalog-card"),symbol=node("span","lab-catalog-symbol",entry.glyph);symbol.setAttribute("aria-hidden","true");
       const title=node("h3","",entry.title),open=control("Open experiment →",()=>navigate(entry.id),"play-primary");open.dataset.labOpen=entry.id;open.setAttribute("aria-label","Open "+entry.title);

@@ -45,6 +45,9 @@ for(const entry of CATALOG){assert(entry.version&&entry.released&&entry.evidence
 assert.equal(q("lab-workbench").hidden,true,"Catalog must not preload a long activity");
 assert.equal(q("lab-classic-tabs").hidden,true);assert.equal(q("lab-session-controls").hidden,true);
 assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,2,"New is the initial collection");
+CATALOG.push({...CATALOG[0],id:"future-experiment",title:"Future experiment"});select("lab-collection-filter","new");
+assert.equal(doc.querySelector(".lab-catalog-count").textContent,"3 experiments · 3 new + 3 classics available","Collection counts must grow with the registry");
+CATALOG.pop();
 select("lab-collection-filter","all");assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,5);
 findData("labOpen","switch").click();assert.equal(view.location.hash,"#lab?experiment=switch");assert(q("lab-workbench").hidden,"New controls cannot appear before hash navigation settles");assert.equal(classicActivations,0);
 findData("labOpen","switch").click();assert(q("lab-workbench").hidden,"A repeated click cannot bypass pending route readiness");assert.equal(classicActivations,0);
