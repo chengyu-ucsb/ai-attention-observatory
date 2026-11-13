@@ -7,6 +7,7 @@ This path uses no model, database connection, or external retrieval.
 """
 from __future__ import annotations
 import datetime as dt
+import argparse
 import json
 import os
 from pathlib import Path
@@ -141,7 +142,7 @@ def validate_coverage(issue):
             raise ValueError('Coverage source is outside the verified publication window')
 
 
-def publish(root=ROOT, now=None):
+def publish(root=ROOT, now=None, *, dry_run=False):
     now = now or dt.datetime.now(dt.timezone.utc)
     date = now.astimezone(dt.timezone.utc).date().isoformat()
     if not publication_cutoff(now):
@@ -157,6 +158,8 @@ def publish(root=ROOT, now=None):
         current = json.loads(current_path.read_text())
         if current.get('status') == 'published' and same_window(current, window_metadata(date)):
             return {'status': 'checked_edition_ready', 'changed': False}
+    if dry_run:
+        return {'status': 'coverage_due', 'changed': False}
     folder = root / 'data/approved-issues'
     folder.mkdir(parents=True, exist_ok=True)
     number = f'{len(list(folder.glob("????-??-??.json")))+1:02d}'
@@ -168,7 +171,13 @@ def publish(root=ROOT, now=None):
 
 
 if __name__ == '__main__':
-    result = publish()
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--check', action='store_true')
+    args=parser.parse_args()
+    result = publish(dry_run=args.check)
+    if args.check and os.getenv('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+            out.write('needed='+str(result['status'] in ('coverage_due','checked_edition_ready')).lower()+'\n')
     print(json.dumps(result))
     if os.getenv('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:

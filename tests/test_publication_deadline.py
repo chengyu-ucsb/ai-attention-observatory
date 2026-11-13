@@ -34,6 +34,14 @@ class DeadlineTests(unittest.TestCase):
             self.assertEqual(deadline.publish(root, self.now.replace(hour=16, minute=29))['status'], 'before_cutoff')
             self.assertFalse((root/'data/approved-issues').exists())
 
+    def test_preflight_is_read_only_and_skips_an_already_published_week(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=self.root(tmp)
+            self.assertEqual(deadline.publish(root,self.now,dry_run=True)['status'],'coverage_due')
+            self.assertFalse((root/'data/approved-issues').exists())
+            deadline.publish(root,self.now)
+            self.assertEqual(deadline.publish(root,self.now,dry_run=True)['status'],'edition_exists')
+
     def test_missing_sources_or_database_cannot_block_an_honest_notice(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=self.root(tmp)
@@ -96,7 +104,8 @@ class DeadlineTests(unittest.TestCase):
         self.assertIn('python scripts/publish_deadline.py',workflow)
         for blocked in ('needs_model', 'final_reading.outputs.ready', 'pip install', 'SUPABASE', 'LOCAL_ISSUE_MODEL'):
             self.assertNotIn(blocked,workflow)
-        self.assertIn('Meet weekly publication deadline',(deadline.ROOT/'.github/workflows/publish.yml').read_text())
+        self.assertIn('steps.release.outputs.changed',workflow)
+        self.assertIn('actions/workflows/publish.yml/dispatches',workflow)
 
     def test_coverage_upgrades_through_real_builders_at_the_same_permalink(self):
         with tempfile.TemporaryDirectory() as tmp:

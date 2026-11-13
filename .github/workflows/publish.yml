@@ -40,7 +40,7 @@ on:
       - 'tests/validate_article_ui.cjs'
       - '.github/workflows/publish.yml'
   workflow_run:
-    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Meet weekly publication deadline", "Deepen source readings"]
+    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
     types: [completed]
     branches: [main]
   # Refresh the honest publication-status payload even when an edition is held.
@@ -142,6 +142,7 @@ jobs:
       - uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
+          retention-days: 1
       - id: deployment
         uses: actions/deploy-pages@v5.0.1
 

@@ -362,6 +362,8 @@ clearly labelled coverage update with the eligible reading shelf, even when
 that shelf is empty. Its fixed template cannot contain rejected prose or new
 research claims. A later checked analysis replaces it at the same permanent
 URL. Artwork and intervention development remain outside this deadline.
+The deadline job checks for an existing release before doing work and dispatches
+Pages only after saving a changed release; routine no-op checks add no artifacts.
 
 Automatic checks require real source identifiers, matching evidence anchors,
 explicit source attribution, original prose, supported numeric claims and
