@@ -6,9 +6,9 @@
     "to": "2026-11-08",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-13T09:54:03.343556+00:00",
+  "observation_at": "2026-11-13T09:58:37.344735+00:00",
   "packet_sha256": "4cb333fc21587cfac3fc9b9463cd0221265a02a10d4ea2d10b3c9730ba9ed230",
-  "acquisition_state_sha256": "0fd8dd87f07ddc2a399eee641ab3912b1503c1ea7cd7fb28f23cfd23f01e4695",
+  "acquisition_state_sha256": "0d91c676a3d45a6265ee862a052aaa85af3b8ed9d211ab2512beeee8a74321ce",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -3806,8 +3806,32 @@
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-13T09:42:45.335836+00:00",
         "preparation_first_seen_at": "2026-11-10T02:26:39.286894+00:00",
-        "abstract_completeness": "unknown"
-      }
+        "abstract_completeness": "unknown",
+        "complete_reading_attempt": {
+          "status": "copied_source_passage",
+          "stage": "synthesis",
+          "last_at": "2026-11-13",
+          "next_at": "2026-11-15",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.2017882/pdf",
+              "status": "full_document_retrieved",
+              "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.2017882/pdf",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.2017882/pdf"
+            }
+          ]
+        }
+      },
+      "acquisition_receipt_sha256": "518e64709144c994a8d0390e47a24b15e4212c0a24a822601513b25100fbf354"
     },
     "6e1cbe633040e9e4ba5b4feecaa297bef454fddc6b74f29f4673d217ebf55eb1": {
       "input_fingerprint": "4a36577791f4471b8450937d76650eea47be75faa43c463d18a0f46ad4b52cd4",
@@ -4904,8 +4928,8 @@
         "complete_reading_attempt": {
           "status": "copied_source_passage",
           "stage": "synthesis",
-          "last_at": "2026-11-11",
-          "next_at": "2026-11-13",
+          "last_at": "2026-11-13",
+          "next_at": "2026-11-15",
           "provider_diagnostics": [
             {
               "stage": "article",
@@ -6889,5 +6913,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "097ae4427d691187006f8af826d501e0e2740f8846cdf4cff93c39641c4a2c3a"
+  "metadata_sha256": "64ee0146984ef2d8699e09d32350d7e35c28ad56233831ae10a4c4dfd7ef090a"
 }
