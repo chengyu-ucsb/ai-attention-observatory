@@ -17,11 +17,12 @@
   }
   document.addEventListener("observatory:lab-activate",event=>{if(["switch","recovery","assist"].includes(event.detail))activate(event.detail)});
   document.addEventListener("observatory:lab-visibility",()=>syncVisibility());
+  document.addEventListener("observatory-layer-change",()=>syncVisibility());
   $$("[data-play-tab]").forEach(b=>{
     b.addEventListener("click",()=>activate(b.dataset.playTab));
     b.addEventListener("keydown",e=>{if(!["ArrowRight","ArrowLeft","Home","End"].includes(e.key))return;e.preventDefault();e.stopPropagation();const all=$$("[data-play-tab]");let i=all.indexOf(b);let next=all[e.key==="Home"?0:e.key==="End"?all.length-1:(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length];next.focus();activate(next.dataset.playTab)});
   });
-  const visible=name=>!document.hidden&&!$("#lab").hidden&&!$("#lab-activities")?.hidden&&!$("#play-"+name).hidden;
+  const visible=name=>!document.hidden&&!document.querySelector("dialog[open]")&&!$("#lab").hidden&&!$("#lab-activities")?.hidden&&!$("#play-"+name).hidden;
   function syncVisibility(){
     const g=practice.switch;
     if(g.active&&!g.locked){
@@ -465,6 +466,7 @@
   const add=(el,...children)=>{children.forEach(child=>el.append(child));return el};
   const control=(text,fn,cls="play-secondary")=>{const el=node("button",cls,text);el.type="button";el.addEventListener("click",fn);return el};
   const state={active:null,filter:"new",caseIndex:0,answers:Array(CASES.length).fill(null),flipped:Array(CASES.length).fill(null).map(()=>[false,false,false]),mode:"batch",urgent:true};
+  let pendingNavigationFocus;
   const classicTabs=q(".play-tabs"),sessionControls=q(".play-session-controls");
   const panels=["switch","recovery","assist"].map(id=>q("#play-"+id));
   const filter=node("select","lab-collection-select");filter.id="lab-collection-filter";
@@ -493,18 +495,28 @@
   }
   function navigate(id){
     const hash=id?"#lab?experiment="+encodeURIComponent(id):"#lab";
+    pendingNavigationFocus=view.location.hash!==hash?id:undefined;
     if(view.location.hash!==hash)view.location.hash=hash;
     select(id,true);
   }
   function routeSelection(){
     const openHelp=q(".lab-help-dialog");if(openHelp)openHelp.close();
     const [page,search=""]=view.location.hash.replace(/^#/,"").split("?");
-    if(page!=="lab")return;
+    if(page!=="lab"){pendingNavigationFocus=undefined;return}
     const id=new URLSearchParams(search).get("experiment");
-    select(CATALOG.some(entry=>entry.id===id)?id:null,false);
+    const selected=CATALOG.some(entry=>entry.id===id)?id:null;
+    const needsFocus=pendingNavigationFocus!==undefined&&pendingNavigationFocus===selected;
+    pendingNavigationFocus=undefined;
+    select(selected,needsFocus);
+    if(needsFocus){
+      // Hash navigation and the outer page router can move focus after the
+      // click handler. Restore the user's destination after both have settled.
+      const focusDestination=()=>{if(state.active===selected&&view.location.hash.split("?")[0]==="#lab")(selected?q("#lab-workbench-title"):filter)?.focus()};
+      if(typeof view.requestAnimationFrame==="function")view.requestAnimationFrame(focusDestination);else focusDestination();
+    }
   }
   function select(id,focus){
-    if(id===state.active&&id!==null)return;
+    if(id===state.active&&id!==null){if(focus)q("#lab-workbench-title")?.focus();return}
     state.active=id;hideClassics();workbench.replaceChildren();
     catalog.hidden=Boolean(id);workbench.hidden=!id;
     if(!id){if(focus)filter.focus();return}
@@ -525,8 +537,8 @@
     const close=control("Close",()=>dialog.close());
     add(dialog,heading,...texts.map(text=>node("p","",text)),close);document.body.append(dialog);
     dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()});
-    dialog.addEventListener("close",()=>{dialog.remove();if(opener.isConnected)opener.focus()});
-    dialog.showModal();close.focus();
+    dialog.addEventListener("close",()=>{dialog.remove();document.dispatchEvent(new CustomEvent("observatory-layer-change"));if(opener.isConnected)opener.focus()});
+    dialog.showModal();document.dispatchEvent(new CustomEvent("observatory-layer-change"));close.focus();
   }
   function drawDetective(){
     const stage=node("div","lab-detective"),toolbar=node("div","lab-activity-toolbar"),picker=node("select","lab-collection-select");picker.id="lab-case-picker";

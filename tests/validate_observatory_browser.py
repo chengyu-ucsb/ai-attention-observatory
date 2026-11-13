@@ -78,6 +78,52 @@ def close_reading_card(page, dialog, trigger):
     expect(trigger).to_be_focused()
 
 
+def check_nested_cards(page):
+    """Synthetic UI-only fixture: nested cards must restore parent nodes/focus."""
+    page.evaluate("""() => {
+      const fixture = document.createElement('section'); fixture.id='nested-card-fixture';
+      fixture.setAttribute('aria-label','Synthetic interface fixture');
+      const outer = document.createElement('div'); outer.id='fixture-parent-content';
+      const label = document.createElement('p'); label.textContent='Parent interface context';
+      const inner = document.createElement('div'); inner.id='fixture-child-content';
+      const text = document.createElement('p'); text.textContent='Nested interface context';
+      const leave = document.createElement('a'); leave.href='#home'; leave.textContent='Leave fixture';
+      inner.append(text,leave);
+      outer.append(label,layerButton('Open child fixture','Child fixture',inner));
+      fixture.append(layerButton('Open parent fixture','Parent fixture',outer));
+      document.body.append(fixture);
+    }""")
+    fixture = page.locator('#nested-card-fixture')
+    parent_trigger = fixture.get_by_role('button', name='Open parent fixture', exact=True)
+    parent_trigger.focus(); page.keyboard.press('Enter')
+    parent = page.locator('#fixture-parent-content')
+    expect(parent).to_be_visible()
+    child_trigger = parent.get_by_role('button', name='Open child fixture', exact=True)
+    child_trigger.focus(); page.keyboard.press('Enter')
+    child = page.locator('#fixture-child-content')
+    expect(child).to_be_visible()
+    page.keyboard.press('Escape')
+    expect(child).not_to_be_visible()
+    expect(parent).to_be_visible()
+    expect(child_trigger).to_be_focused()
+    page.keyboard.press('Escape')
+    expect(page.locator('dialog[open]')).to_have_count(0)
+    expect(parent_trigger).to_be_focused()
+    expect(fixture.locator('#fixture-parent-content')).to_have_count(1)
+    expect(fixture.locator('#fixture-child-content')).to_have_count(1)
+    # Navigation from the child closes the whole stack and returns both live
+    # nodes to their original owners, rather than leaving an orphan overlay.
+    parent_trigger.click()
+    child_trigger.click()
+    child.get_by_role('link', name='Leave fixture', exact=True).click()
+    expect(page.locator('#home')).to_be_visible()
+    expect(page.locator('dialog[open]')).to_have_count(0)
+    expect(fixture.locator('#fixture-parent-content')).to_have_count(1)
+    expect(fixture.locator('#fixture-child-content')).to_have_count(1)
+    assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
+    fixture.evaluate('(el) => el.remove()')
+
+
 def check(page, url, width, out):
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
@@ -309,6 +355,7 @@ def check(page, url, width, out):
     expect(page.locator('#type-filter')).to_have_value('nonacademic')
     expect(page.locator('#scope-filter')).to_have_value('all')
     assert page.locator('.library-story').count() > 0
+    check_nested_cards(page)
     assert not errors, errors
 
 

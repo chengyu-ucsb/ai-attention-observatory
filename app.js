@@ -12,11 +12,43 @@ function make(t,c,s){if(s==="direction-mark")return uiIcon("external",c);const e
 function add(p,...els){for(const e of els)if(e)p.append(e);return p}
 function btn(s,fn,c){const e=make("button",c,s);e.type="button";e.onclick=fn;return e}
 function link(s,u,c){const e=make("a",c,s);e.href=u;if(u.startsWith("https://")){e.target="_blank";e.rel="noopener noreferrer"}return e}
-let layerState=null;
-function restoreLayer(){if(layerState){const {node,parent,next,hidden,overflow,trigger:origin}=layerState;node.hidden=hidden;parent.insertBefore(node,next?.parentNode===parent?next:null);document.body.style.overflow=overflow;layerState=null;if(origin?.isConnected)origin.focus({preventScroll:true});}}
-function closeLayer(){const dialog=$("#reading-layer");if(dialog?.open){dialog.close();restoreLayer();}}
+const layerStack=[];
+let layerOverflow="";
+function notifyLayerChange(){document.dispatchEvent(new CustomEvent("observatory-layer-change",{detail:{open:layerStack.length>0,depth:layerStack.length}}));}
+function restoreLayer(){
+ const state=layerStack.pop();if(!state)return null;
+ const {node,parent,next,hidden}=state;node.hidden=hidden;
+ parent.insertBefore(node,next?.parentNode===parent?next:null);return state;
+}
+function presentLayer(){
+ const state=layerStack[layerStack.length-1];if(!state)return;
+ $("#reading-layer-title").textContent=state.title;state.node.hidden=false;
+ $("#reading-layer-body").replaceChildren(state.node);
+}
+function closeLayer(){
+ const state=restoreLayer();if(!state)return;
+ const dialog=$("#reading-layer");
+ if(layerStack.length){
+  presentLayer();if(!dialog.open)dialog.showModal();
+  if(state.trigger?.isConnected)state.trigger.focus({preventScroll:true});
+  else dialog.querySelector(".layer-close").focus();
+ }else{
+  if(dialog?.open)dialog.close();
+  document.body.style.overflow=layerOverflow;layerOverflow="";
+  if(state.trigger?.isConnected)state.trigger.focus({preventScroll:true});
+ }
+ notifyLayerChange();
+}
+function closeAllLayers(restoreFocus=true){
+ if(!layerStack.length)return;
+ const origin=layerStack[0].trigger;
+ while(layerStack.length)restoreLayer();
+ const dialog=$("#reading-layer");if(dialog?.open)dialog.close();
+ document.body.style.overflow=layerOverflow;layerOverflow="";
+ if(restoreFocus&&origin?.isConnected)origin.focus({preventScroll:true});
+ notifyLayerChange();
+}
 function openLayer(title,content,trigger){
- closeLayer();
  let dialog=$("#reading-layer");
  if(!dialog){
   dialog=make("dialog","reading-layer");dialog.id="reading-layer";dialog.setAttribute("aria-labelledby","reading-layer-title");
@@ -24,11 +56,17 @@ function openLayer(title,content,trigger){
   const close=btn("Close",closeLayer,"layer-close");close.setAttribute("aria-label","Close reading card");
   const body=make("div","reading-layer-body");body.id="reading-layer-body";
   add(header,heading,close);add(dialog,header,body);document.body.append(dialog);
-  dialog.addEventListener("close",()=>{if(!dialog.open)restoreLayer();});
+  // Escape steps back through nested cards; only the outer close dismisses
+  // the native modal. A queued close event must not tear down a reopened card.
+  dialog.addEventListener("cancel",event=>{event.preventDefault();closeLayer();});
+  dialog.addEventListener("close",()=>{if(!dialog.open)closeAllLayers();});
   dialog.addEventListener("click",event=>{if(event.target===dialog){const r=dialog.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)closeLayer();}});
  }
- layerState={node:content,parent:content.parentNode,next:content.nextSibling,hidden:content.hidden,overflow:document.body.style.overflow,trigger:trigger||document.activeElement};document.body.style.overflow="hidden";
- $("#reading-layer-title").textContent=title;content.hidden=false;$("#reading-layer-body").replaceChildren(content);dialog.showModal();dialog.querySelector(".layer-close").focus();
+ const existing=layerStack.findIndex(state=>state.node===content);
+ if(existing>=0){while(layerStack.length>existing+1)closeLayer();dialog.querySelector(".layer-close").focus();return;}
+ if(!layerStack.length){layerOverflow=document.body.style.overflow;document.body.style.overflow="hidden";}
+ layerStack.push({title,node:content,parent:content.parentNode,next:content.nextSibling,hidden:content.hidden,trigger:trigger||document.activeElement});
+ presentLayer();if(!dialog.open)dialog.showModal();dialog.querySelector(".layer-close").focus();notifyLayerChange();
 }
 function layerButton(label,title,content,cls=""){
  const wrap=make("div","layer-control"+(cls?" "+cls:"")),button=btn(label,()=>openLayer(title,content,button),"layer-trigger");
@@ -239,7 +277,7 @@ function goto(page,k){
  if(location.hash===value)route({type:"hashchange"});else location.hash=value;
 }
 function route(event){
- if(event?.type==="hashchange")closeLayer();
+ if(event?.type==="hashchange")closeAllLayers(false);
  const raw=location.hash.slice(1)||"home";
  let page=raw.startsWith("paper/")?"paper":raw.split("?")[0];
  if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";

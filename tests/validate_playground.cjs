@@ -55,7 +55,7 @@ for(const match of html.matchAll(/<([a-z][a-z0-9]*)\b([^>]*)>/gi)){
 function descendants(e){const out=[];for(const c of e.children){out.push(c,...descendants(c))}return out}
 const doc={
  hidden:false,activeElement:{tagName:"BODY"},listeners:{},
- querySelector(s){if(s.startsWith("#"))return ids[s.slice(1)]||null;return this.querySelectorAll(s)[0]||null},
+ querySelector(s){if(s.startsWith("#"))return ids[s.slice(1)]||null;if(s==="dialog[open]")return all.find(node=>node.tagName==="DIALOG"&&node.open)||null;return this.querySelectorAll(s)[0]||null},
  querySelectorAll(s){
   if(s.startsWith("[data-")){const k=s.match(/^\[data-([a-z-]+)\]$/)?.[1];if(!k)throw Error("Unknown query "+s);const name=k.replace(/-([a-z])/g,(_,c)=>c.toUpperCase());return all.filter(x=>x.dataset[name]!==undefined)}
   if(s===".switch-dot")return all.filter(x=>x.classes.has("switch-dot"));
@@ -285,6 +285,20 @@ by("lab-activities").hidden=true;environment.time+=60000;
 const hiddenSectionTrial=by("switch-progress").textContent;
 answerSwitch();assert.equal(by("switch-progress").textContent,hiddenSectionTrial);
 by("lab-activities").hidden=false;
+for(let index=0;index<20;index++){answerSwitch();flush()}
+assert(descendants(by("switch-results")).some(node=>node.textContent==="1 interrupted response(s) excluded from timing."));
+assert.deepEqual(descendants(by("switch-results")).filter(node=>node.tagName==="STRONG").map(node=>node.textContent),["135 ms","135 ms"]);
+by("play-reset").click();
+// A shared or activity-owned dialog covers the trial even though its panel is
+// still displayed. Reading the modal must never inflate response-time medians.
+by("switch-start").click();
+const blockingDialog=new FakeElement("dialog");blockingDialog.open=true;
+for(const notify of doc.listeners["observatory-layer-change"]||[])notify();
+environment.time+=60000;
+const modalTrial=by("switch-progress").textContent;
+answerSwitch();assert.equal(by("switch-progress").textContent,modalTrial);
+blockingDialog.open=false;
+for(const notify of doc.listeners["observatory-layer-change"]||[])notify();
 for(let index=0;index<20;index++){answerSwitch();flush()}
 assert(descendants(by("switch-results")).some(node=>node.textContent==="1 interrupted response(s) excluded from timing."));
 assert.deepEqual(descendants(by("switch-results")).filter(node=>node.tagName==="STRONG").map(node=>node.textContent),["135 ms","135 ms"]);

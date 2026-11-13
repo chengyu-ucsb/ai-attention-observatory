@@ -451,6 +451,29 @@ def check_site_integration(page, url):
     page.locator('[data-lab-open="switch"]').click()
     assert page.locator("#switch-progress").inner_text() == "1 / 20"
     assert "Resumed" in page.locator("#switch-note").inner_text()
+    # A modal hides the task just as surely as changing routes. Isolate this
+    # interruption from the route/panel checks above with a fresh timed trial.
+    page.locator("#play-reset").click()
+    page.locator("#switch-timing").select_option("timed")
+    page.locator("#switch-start").click()
+    note_trigger = page.locator(".play-note .layer-trigger")
+    note_trigger.focus(); page.keyboard.press("Enter")
+    expect(page.get_by_role("dialog")).to_be_visible()
+    page.keyboard.press("ArrowLeft")
+    expect(page.locator("#switch-progress")).to_have_text("1 / 20")
+    page.keyboard.press("Escape")
+    expect(page.get_by_role("dialog")).not_to_be_visible()
+    expect(note_trigger).to_be_focused()
+    expect(page.locator("#switch-note")).to_contain_text("Resumed")
+    for trial in range(1, 21):
+        page.wait_for_function("n => document.querySelector('#switch-progress').textContent === n + ' / 20' && document.querySelector('#switch-left').getAttribute('aria-disabled') === 'false'", arg=trial)
+        cue = page.locator("#switch-cue").inner_text()
+        number = int(page.locator("#switch-number").inner_text())
+        left = number % 2 == 1 if cue.startswith("ODD") else number < 5
+        page.locator("#switch-left").focus()
+        page.keyboard.press("ArrowLeft" if left else "ArrowRight")
+    page.wait_for_function("document.querySelector('#switch-phase').textContent === 'COMPLETE'")
+    expect(page.locator("#switch-results")).to_contain_text("1 interrupted response(s) excluded")
     published_title = page.locator("#weekly-title").inner_text()
     # A failed research-data request must not prevent the independent Lab loading.
     page.route("**/data/public-library.json*", lambda route: route.abort())

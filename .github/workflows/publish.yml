@@ -94,6 +94,8 @@ jobs:
           node --check app.js
           node --check lab-play.js
           node tests/validate_playground.cjs
+          node tests/validate_lab_catalog.cjs
+          node tests/validate_layers.cjs
           node tests/validate_article_ui.cjs
           node tests/validate_reader_loading.cjs
           node tests/validate_weekly_issue.cjs
