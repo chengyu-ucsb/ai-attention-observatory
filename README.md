@@ -501,3 +501,10 @@ The published resource updates through GitHub Actions. API keys belong in reposi
 
 Questions, possible sources, and collaboration ideas are welcome through [GitHub Issues](https://github.com/chengyu-ucsb/ai-attention-observatory/issues) or [Chengyu's website](https://chengyufang.org/).
 
+
+### Typography
+
+The [typography guide](docs/typography.md) defines the Observatory's font roles,
+reading scale, responsive checks, and rules for new components. Font loading and
+shared tokens live in `assets/typography.css`; use these across the main site,
+Lab, generated editions, archive, subscription page, and browser RSS view.

@@ -40,9 +40,41 @@ def rss_date(value):
     return format_datetime(value,usegmt=True)
 
 STYLE = '''
-.glossary dt{scroll-margin-top:24px}.glossary dt:focus{outline:3px solid #E00122;outline-offset:4px}
-
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}body{margin:0;background:#fffefa;color:#333;font:16px/1.75 "Open Sans",Arial,sans-serif}a{color:#b6001c;text-underline-offset:4px}a:hover{text-decoration-thickness:2px}a:focus-visible,summary:focus-visible{outline:3px solid #E00122;outline-offset:5px}.shell{max-width:920px;margin:auto;padding:0 40px}header{border-top:7px solid #E00122;border-bottom:1px solid #d7d1d2;padding:22px 0;background:#fff}.nav{display:flex;justify-content:space-between;gap:24px;align-items:center;font-size:13px}.brand{font:700 18px/1.1 Jost,Arial,sans-serif;letter-spacing:.025em;text-decoration:none;color:#333}.stamp{font:600 12px/1.6 Jost,Arial,sans-serif;text-transform:uppercase;letter-spacing:.12em;color:#a8001a}main{padding-top:48px!important;padding-bottom:64px!important}h1,h2,h3{font-family:"Gentium Book Plus",Georgia,serif;font-weight:400;line-height:1.1;letter-spacing:-.025em;margin:0 0 18px}h1{font-size:clamp(38px,5.8vw,62px);max-width:800px}h2{font-size:34px}h3{font-size:28px}p{margin:0 0 18px}.deck{font-size:19px;line-height:1.65;max-width:720px}.scope{font-size:12px;color:#646064}.overview{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;padding:0;list-style:none;margin:36px 0}.overview li{border-top:3px solid #E00122;padding:18px 0;font:400 23px/1.18 "Gentium Book Plus",Georgia,serif}.signal{padding:34px 0;border-top:1px solid #d7d1d2}.source-links{font-size:13px;margin-top:20px}.source-link{overflow-wrap:anywhere}.pair{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin:28px 0}.card{padding:28px;background:#f1eeed;border:1px solid #d7d1d2;border-radius:0}.card:last-child{background:#E00122;color:#fff;border-color:#E00122}.card:last-child a,.card:last-child summary,.card:last-child .stamp{color:#fff}.card:last-child a:focus-visible,.card:last-child summary:focus-visible,footer a:focus-visible{outline-color:#fff}details{margin:18px 0}summary{cursor:pointer;font:600 13px/1.7 "Open Sans",Arial,sans-serif;color:#333;min-height:44px;padding:10px 0}details[open]>summary{margin-bottom:12px}.long-copy{max-width:72ch}.caution{font-size:13px}.takeaway{border-left:4px solid #E00122;padding:8px 0 8px 24px;font:400 27px/1.35 "Gentium Book Plus",Georgia,serif}.source-shelf{border-top:1px solid #d7d1d2;padding-top:22px;font-size:14px}.source-shelf li{margin:24px 0;overflow-wrap:anywhere}.source-shelf p{margin:6px 0}.source-meta{color:#646064;font-size:13px}footer{background:#E00122;color:#fff;padding:36px 0}footer a{color:#fff}footer p{font-size:13px}.archive-card{display:block;background:#fff;border:0;border-top:2px solid #E00122;padding:28px 0;margin:20px 0;text-decoration:none;color:#333}.archive-card:hover h2{color:#b6001c}@media(max-width:600px){.shell{padding:0 20px}.nav{align-items:flex-start;gap:14px;font-size:12px}.brand{font-size:15px}main{padding-top:32px!important}.overview{grid-template-columns:1fr;gap:0;margin:28px 0}.overview li{padding:16px 0;border-top-width:1px;font-size:23px}.pair{grid-template-columns:1fr}.card{padding:24px}h2{font-size:29px}.deck{font-size:17px}.takeaway{font-size:24px;padding-left:20px}}@media print{details>*{display:block!important}}
+/* Layout is local; font families and the reading scale come from typography.css. */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#fffefa;color:#333;font:400 var(--type-body)/var(--leading-reading) var(--font-reading)}
+a{color:#b6001c;text-underline-offset:4px}a:hover{text-decoration-thickness:2px}
+a:focus-visible,summary:focus-visible{outline:3px solid #E00122;outline-offset:5px}
+.shell{max-width:920px;margin:auto;padding:0 40px}
+header{border-top:7px solid #E00122;border-bottom:1px solid #d7d1d2;padding:22px 0;background:#fff}
+.nav{display:flex;justify-content:space-between;gap:24px;align-items:center;font:600 var(--type-small)/1.5 var(--font-interface)}
+.brand{font:700 1.125rem/1.2 var(--font-interface);letter-spacing:.025em;text-decoration:none;color:#333}
+.stamp{font:600 var(--type-caption)/1.5 var(--font-interface);text-transform:uppercase;letter-spacing:.08em;color:#a8001a}
+main{padding-top:48px!important;padding-bottom:64px!important}
+h1,h2,h3{font-family:var(--font-editorial);font-weight:700;line-height:var(--leading-heading);letter-spacing:-.015em;margin:0 0 18px;text-wrap:balance;overflow-wrap:break-word}
+h1{font-size:var(--type-title);max-width:800px}h2{font-size:var(--type-section)}h3{font-size:var(--type-card)}
+p{margin:0 0 18px}.deck{font-size:var(--type-lead);line-height:1.65;max-width:var(--measure-reading)}
+.scope{font-size:var(--type-caption);color:#646064}
+.overview{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding:0;list-style:none;margin:36px 0}
+.overview li{border-top:3px solid #E00122;padding:18px 0;font:400 var(--type-card)/1.3 var(--font-editorial)}
+.signal{padding:34px 0;border-top:1px solid #d7d1d2}
+.source-links{font-size:var(--type-small);margin-top:20px}.source-link{overflow-wrap:anywhere}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin:28px 0}
+.card{padding:28px;background:#f1eeed;border:1px solid #d7d1d2;border-radius:0;min-width:0}
+.card:last-child{background:#E00122;color:#fff;border-color:#E00122}
+.card:last-child a,.card:last-child summary,.card:last-child .stamp{color:#fff}
+.card:last-child a:focus-visible,.card:last-child summary:focus-visible,footer a:focus-visible{outline-color:#fff}
+details{margin:18px 0}summary{cursor:pointer;font:600 var(--type-small)/1.6 var(--font-interface);color:#333;min-height:44px;padding:10px 0}
+details[open]>summary{margin-bottom:12px}.long-copy{max-width:var(--measure-reading)}.caution{font-size:var(--type-small)}
+.takeaway{border-left:4px solid #E00122;padding:8px 0 8px 24px;font:400 var(--type-card)/1.4 var(--font-editorial);max-width:50ch}
+.source-shelf{border-top:1px solid #d7d1d2;padding-top:22px;font-size:var(--type-small)}
+.source-shelf li{margin:24px 0;overflow-wrap:anywhere}.source-shelf p{margin:6px 0}.source-meta{color:#646064;font-size:var(--type-caption)}
+.glossary{max-width:var(--measure-reading)}.glossary dt{scroll-margin-top:24px}.glossary dt:focus{outline:3px solid #E00122;outline-offset:4px}.glossary dd{margin:6px 0 20px}
+footer{background:#E00122;color:#fff;padding:36px 0}footer a{color:#fff}footer p{font-size:var(--type-small)}
+.archive-card{display:block;background:#fff;border:0;border-top:2px solid #E00122;padding:28px 0;margin:20px 0;text-decoration:none;color:#333}.archive-card:hover h2{color:#b6001c}
+@media(max-width:600px){.shell{padding:0 20px}.nav{align-items:flex-start;gap:14px;flex-wrap:wrap}.brand{font-size:1rem}main{padding-top:32px!important}.overview{grid-template-columns:1fr;gap:0;margin:28px 0}.overview li{padding:16px 0;border-top-width:1px}.pair{grid-template-columns:1fr}.card{padding:24px}.takeaway{padding-left:20px}}
+@media print{details>*{display:block!important}}
 '''
 
 def brief_title(value):
@@ -89,10 +121,11 @@ def source_shelf(issue, disclosure=True):
     content=note+'<ol>'+''.join(rows)+'</ol>'
     return ('<details class="source-shelf"><summary>Sources &amp; reading details · '+str(len(rows))+'</summary>'+content+'</details>') if disclosure else '<h2>Sources &amp; reading details</h2>'+content
 
-def top_html(issue):
+def top_html(issue, asset_prefix=""):
+    """Load the shared type system relative to this page, including archives."""
     snapshot = ('<meta name="observatory-edition-sha256" content="'+sha256(encoded(issue)).hexdigest()+'">') if issue.get('status')=='published' else ''
     return ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-            '<meta name="theme-color" content="#E00122">'+snapshot+'<title>'+esc(brief_title(issue['subject']))+'</title><style>'+STYLE+'</style></head><body>'
+            '<meta name="theme-color" content="#E00122">'+snapshot+'<title>'+esc(brief_title(issue['subject']))+'</title><link rel="stylesheet" href="'+esc(asset_prefix)+'assets/typography.css"><style>'+STYLE+'</style></head><body>'
             '<header><div class="shell nav"><a class="brand" href="'+BASE+'">AI &amp; ATTENTION</a><a href="'+BASE+'issues/">The Weekly Brief</a></div></header><main class="shell">')
 
 def section_label(label):
@@ -194,15 +227,15 @@ def bottom(issue):
             '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
             '<p>Read online or follow via RSS. Email subscriptions are not active.</p></div></footer></body></html>')
 
-def render_issue(issue):
+def render_issue(issue, asset_prefix=""):
     if issue.get('status')!='published':
-        return top_html({'subject':'The Attention Brief · Ideas about AI and attention'})+'<h1>A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></main></body></html>'
+        return top_html({'subject':'The Attention Brief · Ideas about AI and attention'},asset_prefix)+'<h1>A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></main></body></html>'
     validate_issue_citations(issue)
-    return top_html(issue)+opening(issue)+overview(issue)+signal_cards(issue)+question_and_try(issue)+bottom(issue)
+    return top_html(issue,asset_prefix)+opening(issue)+overview(issue)+signal_cards(issue)+question_and_try(issue)+bottom(issue)
 
 def render_index(issues):
     links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+i['edition_date'])+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]
-    return top_html({'subject':'The Attention Brief · Archive'})+'<h1>The Attention Brief.</h1><p>Past issues, ready to revisit.</p>'+(''.join(links) if links else '<p>No approved issues yet.</p>')+'</main></body></html>'
+    return top_html({'subject':'The Attention Brief · Archive'},'../')+'<h1>The Attention Brief.</h1><p>Past issues, ready to revisit.</p>'+(''.join(links) if links else '<p>No approved issues yet.</p>')+'</main></body></html>'
 
 def rss_content(issue):
     """The same published copy, with sources, for downstream RSS/chat delivery."""
@@ -290,7 +323,7 @@ def build():
     folder=ROOT/"issues"
     folder.mkdir(parents=True,exist_ok=True)
     for issue in issues:
-        (folder/(issue["edition_date"]+".html")).write_text(render_issue(issue),encoding="utf-8")
+        (folder/(issue["edition_date"]+".html")).write_text(render_issue(issue,asset_prefix="../"),encoding="utf-8")
     (folder/"index.html").write_text(render_index(issues),encoding="utf-8")
     count=build_rss(issues)
     (DATA/'issue-feed.json').write_text(json.dumps(json_feed(issues),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

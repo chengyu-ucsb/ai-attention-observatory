@@ -31,6 +31,35 @@ def server():
         srv.shutdown()
         srv.server_close()
 
+
+def check_typography(page, samples):
+    """Test real downloaded font faces, rather than accepting fallback family names."""
+    import json
+    manifest = json.loads((ROOT / 'assets/fonts/manifest.json').read_text())
+    checks = [{'family': item['family'], 'style': item['style'],
+               'weight': item['weight'].split()[0]} for item in manifest]
+    loaded = page.evaluate("""async (checks) => {
+      const results = await Promise.all(checks.map(async item => {
+        const query = `${item.style} ${item.weight} 16px "${item.family}"`;
+        const faces = await document.fonts.load(query, 'Attention evidence 0123');
+        return {query, loaded: faces.length > 0 && faces.every(face => face.status === 'loaded')};
+      }));
+      await document.fonts.ready;
+      return results;
+    }""", checks)
+    assert all(item['loaded'] for item in loaded), loaded
+    remote_fonts = page.evaluate(r"""() => performance.getEntriesByType('resource')
+      .filter(item => /fonts\.(googleapis|gstatic)\.com/.test(item.name)).map(item => item.name)""")
+    assert not remote_fonts, f'Typography must be self-hosted: {remote_fonts}'
+    assert page.locator('body').evaluate('(e) => parseFloat(getComputedStyle(e).fontSize)') >= 16
+    for selector, family, minimum in samples:
+        node = page.locator(selector).first
+        expect(node).to_be_visible()
+        rendered = node.evaluate("""e => ({family: getComputedStyle(e).fontFamily,
+          size: parseFloat(getComputedStyle(e).fontSize)})""")
+        assert family in rendered['family'], (selector, rendered)
+        assert rendered['size'] >= minimum, (selector, rendered)
+
 def check(page, url, width, out):
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
@@ -76,6 +105,12 @@ def check(page, url, width, out):
     expect(page.locator('.observation-art title')).to_have_text('The attention lens')
     assert page.locator('body').evaluate("(e) => getComputedStyle(e).getPropertyValue('--red').trim().toLowerCase()") == '#e00122'
     assert page.locator('.weekly-cover-art').evaluate('(e) => getComputedStyle(e).position') == 'static'
+    check_typography(page, [
+        ('#weekly-title', 'Gentium Book Plus', 32),
+        ('.weekly-cover-copy>p:not(.eyebrow):not(.weekly-scope)', 'Open Sans', 16),
+        ('.weekly-scope', 'Open Sans', 13),
+        ('.identity-text small', 'Jost', 13),
+    ])
     overflow(); screenshot('home')
     if out:
         for section, name in [('.home-edition','edition'),('.editorial-section','perspectives-preview'),('.field-guide','themes')]:
@@ -288,6 +323,7 @@ def check_weekly_citations(page, url, width, out):
 
     archive_url = url + 'issues/' + issue['edition_date'] + '.html'
     page.goto(archive_url, wait_until='networkidle')
+    check_typography(page, [('h1', 'Gentium Book Plus', 32), ('.scope', 'Open Sans', 13)])
     expect(page.locator('h1')).to_have_text(issue['headline'])
     for summary in page.locator('main details > summary').all():
         summary.focus()
@@ -358,6 +394,10 @@ def check_standalone_brief(page, url, width, out):
             expect(page.locator('header a[href="./#issue"]')).to_be_visible()
             expect(page.locator('#feed-url')).to_have_value(base + 'issue-feed.xml')
             expect(page.locator('.actions a[href="newsletter.html"]')).to_be_visible()
+        samples = [('h1', 'Gentium Book Plus', 32)]
+        samples += ([('.scope', 'Open Sans', 13)] if name == 'newsletter' else
+                    [('#feed-url', 'Open Sans', 16), ('.feed-row button', 'Jost', 16)])
+        check_typography(page, samples)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'{name} overflow at {width}px'
         if out:
             out.mkdir(parents=True, exist_ok=True)

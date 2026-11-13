@@ -126,6 +126,8 @@ jobs:
           cp index.html subscribe.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
           mkdir -p _site/assets
           cp assets/reading-*.svg assets/feed.xsl _site/assets/
+          cp assets/typography.css _site/assets/
+          cp -R assets/fonts _site/assets/
           cp -R assets/article-art assets/editorial-covers _site/assets/
           mkdir -p _site/exports
           cp exports/zotero-fulltext-backlog.ris _site/exports/
