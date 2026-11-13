@@ -33,13 +33,14 @@ def verify(expected,base=BASE,reader=fetch):
         raise ValueError('permanent_edition_mismatch')
     if '<meta name="observatory-edition-sha256" content="'+live['edition_sha256']+'">' not in html:
         raise ValueError('permanent_edition_hash_mismatch')
+    feed_id=live['issue'].get('feed_id') or permanent
     feed=ET.fromstring(reader(urljoin(base,'issue-feed.xml')))
-    if not any(item.findtext('link')==permanent and item.findtext('guid')==permanent
+    if not any(item.findtext('link')==permanent and item.findtext('guid')==feed_id
                for item in feed.findall('./channel/item')):
         raise ValueError('published_feed_entry_missing')
     structured=json.loads(reader(urljoin(base,'data/issue-feed.json')))
-    item=next((item for item in structured.get('items',[]) if item.get('id')==permanent),None)
-    if not item or sha256(encoded(item.get('_observatory',{}))).hexdigest()!=live['edition_sha256']:
+    item=next((item for item in structured.get('items',[]) if item.get('id')==feed_id),None)
+    if not item or item.get('url')!=permanent or sha256(encoded(item.get('_observatory',{}))).hexdigest()!=live['edition_sha256']:
         raise ValueError('published_feed_content_mismatch')
     return {'status':'live_verified','edition_id':edition,'permanent_url':permanent,
             'edition_sha256':live['edition_sha256'],

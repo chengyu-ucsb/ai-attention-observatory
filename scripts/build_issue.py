@@ -10,7 +10,7 @@ from urllib.parse import urlsplit
 from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for, identifier
 from checked_reading_types import record_context, RECORD_FIELDS
 from collection_window import window_metadata,previous_week,weekly_eligible
-from edition_schedule import canonical_edition_date
+from edition_schedule import canonical_edition_date, edition_release_open
 ROOT=pathlib.Path(__file__).resolve().parents[1];DATA=ROOT/"data"
 def source_id(x):return x.get("id") or (x.get("doi") or "").lower() or x.get("url") or x.get("title")
 def find(needle,items):
@@ -68,6 +68,8 @@ def validate_issue_citations(issue):
  for section in issue.get("signals",[])+[issue.get("tension",{})]:
   citations=validate_section_citations(section,issue.get("sources",[]),required=version==1)
   if "citations" in section or version==1:section["citations"]=citations
+ for section in issue.get('supplements', []):
+  section['citations']=validate_section_citations(section,issue.get('sources',[]),required=True)
  glossary=issue.get("glossary",[])
  if not isinstance(glossary,list):raise ValueError("Glossary must be a list")
  seen=set()
@@ -146,7 +148,7 @@ def build(edition_date=None, use_published_sources=False):
   if use_published_sources and packet.get("status")!="published":raise ValueError("Correction requires an existing published edition")
   weekly={"run":{"date":edition_date,"publication_window":packet.get("publication_window") or window_metadata(edition_date)},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
  issue_date=(weekly.get("run") or {}).get("date") or ""
- if issue_date and not edition_date:issue_date=canonical_edition_date(DATA.parent,issue_date)
+ if issue_date:issue_date=canonical_edition_date(DATA.parent,issue_date)
  drafts=json.loads((DATA/"issue-editorial.json").read_text())
  items=weekly.get("items") or []
  if not edition_date:
@@ -190,6 +192,9 @@ def build(edition_date=None, use_published_sources=False):
   if archived.get("status")=="published" and archived.get('edition_format')!='coverage':
    # A new collection rule/shelf must not rewrite an already published edition.
    draft=None
+ if draft and not edition_release_open(issue_date):
+  draft=None
+  schema['note']='The checked draft is held until its Monday publication window opens in America/New_York.'
  if draft:
   if len(items)<(2 if draft.get("edition_format")=="compact" else 3):raise ValueError("Issue has too few source-backed items for its format")
   cards=[]
@@ -199,13 +204,22 @@ def build(edition_date=None, use_published_sources=False):
   tension=draft["tension"].copy()
   tension["source_ids"]=[source_id(find(name,items)) for name in tension["sources"]]
   schema.update({k:draft[k] for k in ("number","subject","headline","deck","letter","experiment","closer","editorial_note")})
-  for key in ("citation_schema_version","glossary","edition_format"):
+  for key in ("citation_schema_version","glossary","edition_format","supplements"):
    if key in draft:schema[key]=draft[key]
   schema["signals"]=cards
   schema["tension"]=tension
   schema["status"]="published"
   schema["note"]="Published edition; see editorial_note for evidence and synthesis qualifications."
- if schema["status"]=="published":validate_issue_citations(schema)
+ if schema["status"]=="published":
+  # Edition identity is Monday; publication and revision clocks are separate.
+  stamp=datetime.datetime.now(datetime.timezone.utc).isoformat()
+  previous=json.loads(existing_archive.read_text()) if existing_archive.exists() else {}
+  for key in ('feed_id','feed_published_at','first_published_date','edition_history','scope_kind'):
+   if key in previous:schema[key]=previous[key]
+  schema['published_at']=previous.get('published_at') or stamp
+  schema.setdefault('first_published_date',schema['published_at'][:10])
+  schema['updated_at']=stamp
+  validate_issue_citations(schema)
  (DATA/"public-issue.json").write_text(json.dumps(schema,ensure_ascii=False,indent=2)+"\n")
  # Readers see the latest completed issue while the next week's editorial
  # work stays private. Keep the newest unreviewed source shelf in public-issue

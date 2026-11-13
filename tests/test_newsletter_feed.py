@@ -72,7 +72,7 @@ class WeeklyFeedTests(unittest.TestCase):
    item=channel.find('item')
    self.assertEqual(item.findtext('title'),feed['items'][0]['title'])
    self.assertEqual(item.findtext('guid'),feed['items'][0]['id'])
-   self.assertEqual(item.findtext('pubDate'),build_newsletter.rss_date(build_newsletter.published_on(issue['edition_date'])))
+   self.assertEqual(item.findtext('pubDate'),build_newsletter.rss_date(build_newsletter.publication_timestamp(issue)))
   self.assertEqual(issue,frozen)
 
  def test_long_copy_shows_a_complete_sentence_and_preserves_full_analysis(self):
@@ -118,7 +118,10 @@ class WeeklyFeedTests(unittest.TestCase):
   for item in items:
    link=item.findtext("link")
    self.assertTrue(link.startswith("https://"))
-   self.assertEqual(item.findtext("guid"),link)
+   key=link.rsplit('/',1)[-1].removesuffix('.html')
+   archived=json.loads((ROOT/'data/approved-issues'/f'{key}.json').read_text())
+   self.assertEqual(item.findtext("guid"),build_newsletter.feed_identity(archived))
+   self.assertEqual(item.findtext("pubDate"),build_newsletter.rss_date(build_newsletter.publication_timestamp(archived)))
    self.assertEqual(item.find("guid").attrib["isPermaLink"],"true")
    self.assertIn("/issues/",link)
    self.assertTrue(item.findtext("description"))
@@ -164,5 +167,62 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertTrue((ROOT/"issues"/"index.html").stat().st_size>1000)
   archive=list((ROOT/"issues").glob("20??-??-??.html"))
   self.assertTrue(archive)
+
+
+ def test_monday_identity_does_not_rewrite_release_clock_or_feed_id(self):
+  issue=copy.deepcopy(self.latest_published_issue())
+  issue.update(edition_date='2026-11-09', first_published_date='2026-11-13',
+               feed_id=build_newsletter.BASE+'issues/2026-11-13.html',
+               feed_published_at='2026-11-13T12:00:00+00:00')
+  frozen=copy.deepcopy(issue)
+  page=build_newsletter.render_issue(issue)
+  self.assertIn('Week of Monday, November 9, 2026',page)
+  self.assertIn('First published 2026-11-13',page)
+  self.assertIn('rel="canonical" href="'+build_newsletter.BASE+'issues/2026-11-09.html"',page)
+  item=build_newsletter.json_feed([issue])['items'][0]
+  self.assertEqual(item['id'],issue['feed_id'])
+  self.assertTrue(item['url'].endswith('/2026-11-09.html'))
+  self.assertEqual(item['date_published'],'2026-11-13T12:00:00+00:00')
+  with tempfile.TemporaryDirectory() as directory,patch.object(build_newsletter,'ROOT',Path(directory)):
+   build_rss([issue]);rss=ET.parse(Path(directory)/'issue-feed.xml').find('./channel/item')
+   self.assertEqual(rss.findtext('guid'),item['id'])
+   self.assertEqual(rss.findtext('link'),item['url'])
+   self.assertEqual(parsedate_to_datetime(rss.findtext('pubDate')).isoformat(),item['date_published'])
+  self.assertEqual(issue,frozen)
+
+ def test_merged_supplement_survives_html_and_feed_with_source_links(self):
+  issue=copy.deepcopy(self.latest_published_issue());source=issue['sources'][0]
+  issue['supplements']=[{'title':'A retained question','text':'This earlier perspective raises a question.',
+                         'source_ids':[source['id']],
+                         'citations':[{'text':'earlier perspective','source_id':source['id']}]}]
+  for page in (build_newsletter.render_issue(issue),build_newsletter.rss_content(issue)):
+   self.assertIn('A retained question',page)
+   self.assertIn('This',VisibleText(page).text())
+   self.assertIn('earlier perspective raises a question.',VisibleText(page).text())
+   self.assertIn('class="inline-citation"',page)
+
+ def test_legacy_links_redirect_and_original_versions_remain_readable(self):
+  original=copy.deepcopy(self.latest_published_issue());original['edition_date']='2026-11-13'
+  canonical=copy.deepcopy(original);canonical['edition_date']='2026-11-09'
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);data=root/'data';data.mkdir();revisions=data/'edition-revisions';revisions.mkdir()
+   folder=root/'issues';folder.mkdir()
+   snapshot=json.dumps(original).encode()
+   (revisions/'2026-11-13.json').write_bytes(snapshot)
+   lineage={'aliases':{'2026-11-13':'2026-11-09'},'revisions':{'2026-11-13':{'canonical_date':'2026-11-09','sha256':build_newsletter.sha256(snapshot).hexdigest(),'note':'Consolidated Monday edition.'}}}
+   (data/'edition-lineage.json').write_text(json.dumps(lineage))
+   with patch.object(build_newsletter,'DATA',data):build_newsletter.build_history_pages(folder,[canonical])
+   alias=(folder/'2026-11-13.html').read_text();history=(folder/'history/2026-11-13.html').read_text()
+   self.assertIn('0; url=2026-11-09.html',alias)
+   self.assertIn('history/2026-11-13.html',alias)
+   self.assertIn('Original published version · 2026-11-13',history)
+   self.assertIn('href="../../assets/typography.css"',history)
+   self.assertIn('name="robots" content="noindex"',history)
+   self.assertIn('rel="canonical" href="'+build_newsletter.BASE+'issues/2026-11-09.html"',history)
+   self.assertEqual(json.loads((revisions/'2026-11-13.json').read_text()),original)
+   # Even whitespace changes must not silently replace the frozen original.
+   (revisions/'2026-11-13.json').write_bytes(snapshot+b'\n')
+   with patch.object(build_newsletter,'DATA',data),self.assertRaisesRegex(ValueError,'snapshot hash mismatch'):
+    build_newsletter.build_history_pages(folder,[canonical])
 
 if __name__=="__main__":unittest.main()

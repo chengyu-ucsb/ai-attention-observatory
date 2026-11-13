@@ -132,3 +132,14 @@ This policy is stored in the repository so future assistants working on it can s
 - Edit newsletter typography in `scripts/build_newsletter.py` and regenerate its HTML.
   Preserve frozen issue content and feed identity. Verify new font assets and stylesheets
   are included in the Pages package, including nested archive paths.
+
+## Monday edition identity
+
+- Follow [the edition calendar](docs/editions.md). Derive a normal weekly edition's
+  Monday from its completed UTC source-publication window, never its retry day.
+- Preserve the canonical Monday date, URL, and feed identity during revisions or
+  coverage-to-full upgrades. Record actual publication and update times separately.
+- Keep the launch collections explicitly historical; do not relabel older sources
+  as newly published. Preserve immutable originals and the consolidation lineage.
+- Verify source preservation, one active edition per Monday, retired links, and
+  live RSS/JSON output when changing archive or publication behavior.

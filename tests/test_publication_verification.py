@@ -18,7 +18,7 @@ class PublicationVerificationTests(unittest.TestCase):
         self.pages={BASE+'data/reader-manifest.json':encoded(self.manifest),
                     url:('<meta name="observatory-edition-sha256" content="'+self.manifest['edition_sha256']+'"><h1>What changed?</h1>').encode(),
                     BASE+'issue-feed.xml':('<rss><channel><item><link>'+url+'</link><guid>'+url+'</guid></item></channel></rss>').encode(),
-                    BASE+'data/issue-feed.json':encoded({'items':[{'id':url,'_observatory':issue}]})}
+                    BASE+'data/issue-feed.json':encoded({'items':[{'id':url,'url':url,'_observatory':issue}]})}
 
     def test_only_matching_live_manifest_permalink_and_feed_are_success(self):
         result=verify(self.manifest,reader=self.pages.__getitem__)
@@ -36,6 +36,20 @@ class PublicationVerificationTests(unittest.TestCase):
         stale=json.loads(self.pages[BASE+'data/issue-feed.json'])
         stale['items'][0]['_observatory']['headline']='Previous copy'
         self.pages[BASE+'data/issue-feed.json']=encoded(stale)
+        with self.assertRaisesRegex(ValueError,'feed_content_mismatch'):verify(self.manifest,reader=self.pages.__getitem__)
+
+    def test_retained_legacy_feed_identity_requires_canonical_monday_link(self):
+        canonical=BASE+'issues/2026-11-09.html';legacy=BASE+'issues/2026-11-13.html'
+        issue=self.manifest['issue'];issue['feed_id']=legacy
+        self.manifest['edition_sha256']=sha256(encoded(issue)).hexdigest()
+        self.pages[BASE+'data/reader-manifest.json']=encoded(self.manifest)
+        self.pages[canonical]=('<meta name="observatory-edition-sha256" content="'+self.manifest['edition_sha256']+'"><h1>What changed?</h1>').encode()
+        self.pages[BASE+'issue-feed.xml']=('<rss><channel><item><link>'+canonical+'</link><guid>'+legacy+'</guid></item></channel></rss>').encode()
+        feed={'items':[{'id':legacy,'url':canonical,'_observatory':issue}]}
+        self.pages[BASE+'data/issue-feed.json']=encoded(feed)
+        self.assertEqual(verify(self.manifest,reader=self.pages.__getitem__)['status'],'live_verified')
+        feed['items'][0]['url']=legacy
+        self.pages[BASE+'data/issue-feed.json']=encoded(feed)
         with self.assertRaisesRegex(ValueError,'feed_content_mismatch'):verify(self.manifest,reader=self.pages.__getitem__)
 
 

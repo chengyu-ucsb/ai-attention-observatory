@@ -508,3 +508,10 @@ The [typography guide](docs/typography.md) defines the Observatory's font roles,
 reading scale, responsive checks, and rules for new components. Font loading and
 shared tokens live in `assets/typography.css`; use these across the main site,
 Lab, generated editions, archive, subscription page, and browser RSS view.
+
+### Monday editions
+
+The [edition calendar](docs/editions.md) defines one fixed Monday identity per
+source week, stable links and feed IDs, and the distinction between an edition
+label and its actual release time. Delays and later revisions update the same
+edition. Original launch versions remain in revision history.

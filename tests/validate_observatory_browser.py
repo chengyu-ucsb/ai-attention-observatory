@@ -271,7 +271,7 @@ def check_weekly_citations(page, url, width, out):
     current = json.loads((ROOT / 'data/public-featured-issue.json').read_text())
     archived = json.loads((ROOT / 'data/approved-issues' / (current['edition_date'] + '.json')).read_text())
     assert current == archived, 'Featured edition must remain its exact published snapshot'
-    fixture_path = ROOT / 'data/approved-issues/2026-11-07.json'
+    fixture_path = ROOT / 'data/edition-revisions/2026-11-07.json'
     issue = json.loads(fixture_path.read_text())
     assert issue['status'] == 'published' and issue['edition_date'] == '2026-11-07'
     assert issue.get('citation_schema_version') == 1 and issue.get('glossary'), 'Archived citation fixture lacks definitions'
@@ -343,7 +343,7 @@ def check_weekly_citations(page, url, width, out):
     expect(definition).to_be_focused()
     expect(page.locator('#issue')).to_be_visible()
 
-    archive_url = url + 'issues/' + issue['edition_date'] + '.html'
+    archive_url = url + 'issues/history/' + issue['edition_date'] + '.html'
     page.goto(archive_url, wait_until='networkidle')
     check_typography(page, [('h1', 'Gentium Book Plus', 32), ('.scope', 'Open Sans', 13)])
     expect(page.locator('h1')).to_have_text(issue['headline'])
