@@ -38137,6 +38137,53 @@
       "pipeline_version": 3,
       "status": "full_text",
       "next_at": null
+    },
+    "complete_reading_attempt": {
+      "status": "copied_source_passage",
+      "stage": "synthesis",
+      "last_at": "2026-11-13",
+      "next_at": "2026-11-15",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "candidates_retained": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "status": "candidates",
+          "candidates": 3,
+          "candidates_retained": 3,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher deposit",
+          "url": "https://link.springer.com/content/pdf/10.1007/s00146-025-02400-z.pdf",
+          "retryable": false,
+          "status": "document_identity_unverified"
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAlex XML and OA locations",
+          "status": "candidates",
+          "candidates": 5,
+          "candidates_retained": 5,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://arxiv.org/pdf/2405.06478",
+          "status": "full_document_retrieved",
+          "final_url": "https://arxiv.org/pdf/2405.06478",
+          "retryable": false
+        }
+      ]
     }
   },
   {
@@ -61947,6 +61994,22 @@
       "last_at": "2026-10-22",
       "reason": "ValueError",
       "next_at": "2026-11-05"
+    },
+    "complete_reading_attempt": {
+      "status": "copied_source_passage",
+      "stage": "synthesis",
+      "last_at": "2026-11-13",
+      "next_at": "2026-11-15",
+      "provider_diagnostics": [
+        {
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.techpolicy.press/the-battle-for-cognitive-liberty-in-the-age-of-corporate-ai/",
+          "status": "partial_full_text",
+          "final_url": "https://www.techpolicy.press/the-battle-for-cognitive-liberty-in-the-age-of-corporate-ai/",
+          "retryable": false
+        }
+      ]
     }
   }
 ]
