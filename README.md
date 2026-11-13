@@ -515,3 +515,11 @@ The [edition calendar](docs/editions.md) defines one fixed Monday identity per
 source week, stable links and feed IDs, and the distinction between an edition
 label and its actual release time. Delays and later revisions update the same
 edition. Original launch versions remain in revision history.
+
+### Interaction and the Lab
+
+The [interaction guide](docs/interaction-design.md) defines visual takeaways,
+section navigation, card/dialog behavior, concise notices, and accessibility
+checks. It also defines a versioned Lab catalog that makes room for new
+experiments while keeping earlier activities available. The
+[Lab backlog](docs/lab-backlog.md) tracks substantive updates and future work.

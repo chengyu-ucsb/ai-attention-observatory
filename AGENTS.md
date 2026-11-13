@@ -143,3 +143,14 @@ This policy is stored in the repository so future assistants working on it can s
   as newly published. Preserve immutable originals and the consolidation lineage.
 - Verify source preservation, one active edition per Monday, retired links, and
   live RSS/JSON output when changing archive or publication behavior.
+
+## Interaction and Lab design
+
+- Follow [the interaction guide](docs/interaction-design.md). Reuse section
+  selectors, theme decks, bounded two-sided cards, and accessible dialogs;
+  do not turn every reading into an accordion or a long stacked page.
+- Keep one short AI notice while preserving claim-specific evidence limits and
+  complete source context. Visuals must not invent data or causal relationships.
+- Extend the Lab through its versioned catalog and retain earlier activities.
+  Verify keyboard/touch, reset, hidden-activity timing, responsive layout, source
+  fidelity, and the actual deployment when changing these patterns.

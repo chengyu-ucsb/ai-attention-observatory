@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="assets/typography.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="lab-play.css">
+  <link rel="stylesheet" href="assets/article-layers.css">
   <link rel="alternate" type="application/rss+xml" title="The Attention Brief weekly synthesis" href="issue-feed.xml">
   <script src="app.js" defer></script>
   <script src="lab-play.js" defer></script>
@@ -115,7 +116,7 @@
         </div>
       </section>
 
-      <section class="shell lab-teaser"><div class="lab-teaser-inner play-teaser-inner"><div class="play-teaser-copy"><p class="eyebrow">EXPLORE / THE EXPERIMENTAL LAB</p><h2>Can you feel the difference?</h2><p>Switch rules. Recover from a distraction. Decide how much AI help you want. Three short experiences—not another wall of text.</p><div class="play-teaser-steps"><span>01 · SWITCH</span><span>02 · RECOVER</span><span>03 · DECIDE</span></div><a href="#lab" class="button button-red">Try the playground</a></div><div class="play-teaser-demo" aria-hidden="true"><span class="play-teaser-counter">QUICK PREVIEW / 01</span><span class="play-teaser-rule">ODD OR EVEN?</span><strong>7</strong><div class="play-teaser-keys"><span>← ODD</span><span>EVEN →</span></div></div></div></section>
+      <section class="shell lab-teaser"><div class="lab-teaser-inner play-teaser-inner"><div class="play-teaser-copy"><p class="eyebrow">EXPLORE / THE EXPERIMENTAL LAB</p><h2>Can you feel the difference?</h2><p>Challenge a claim, remix notifications, or return to a classic attention experiment.</p><div class="play-teaser-steps"><span>INSPECT</span><span>REMIX</span><span>EXPLORE</span></div><a href="#lab" class="button button-red">Try the playground</a></div><div class="play-teaser-demo" aria-hidden="true"><span class="play-teaser-counter">QUICK PREVIEW / 01</span><span class="play-teaser-rule">ODD OR EVEN?</span><strong>7</strong><div class="play-teaser-keys"><span>← ODD</span><span>EVEN →</span></div></div></div></section>
       <section class="shell arrivals-section">
         <div class="section-heading"><div><p class="eyebrow">05 / FROM THE INDEX</p><h2>Recently added<span class="red-period">.</span></h2></div><a class="quiet-link" href="#library">Search the full library</a></div>
         <div class="table-scroll"><table class="arrival-table"><thead><tr><th>Added to index</th><th>Research / article</th><th>Theme</th><th>Coverage</th><th class="align-right">Read</th></tr></thead><tbody id="arrivals-body"></tbody></table></div>
@@ -132,6 +133,8 @@
     <section id="issue" class="view" hidden>
       <div class="issue-hero"><div class="shell issue-hero-wrap"><p class="eyebrow light" id="issue-edition">THE ATTENTION BRIEF</p><h1 id="issue-headline">A weekly idea worth thinking about.</h1><p id="issue-deck"></p><div class="issue-hero-actions"><a class="button button-light" href="newsletter.html">Reader view</a><a class="hero-secondary" href="subscribe.html">Follow via RSS</a><a class="hero-secondary" href="issues/">Past editions</a></div></div></div>
       <div class="shell issue-layout">
+        <div id="issue-navigation"></div>
+        <section id="issue-overview" aria-label="This edition at a glance"><div class="section-heading"><div><p class="eyebrow">AT A GLANCE</p><h2>Three ways into the question.</h2></div></div><div id="issue-takeaways" class="takeaway-deck"></div><p class="ai-notice">AI-generated summary. AI can make mistakes.</p></section>
         <details class="issue-letter"><summary>The big picture <span>Read the editorial introduction</span></summary><div id="issue-letter-text"></div></details>
         <section class="issue-signals-section"><div class="section-heading"><div><p class="eyebrow">THE WEEK IN THREE IDEAS</p><h2>The connections worth making<span class="red-period">.</span></h2></div></div><div id="issue-signals" class="issue-signals"></div></section>
         <section id="issue-supplements" hidden></section>
@@ -197,6 +200,7 @@
         </div>
         <div class="library-results-heading"><div><p id="library-context" class="eyebrow">AI-SPECIFIC RESEARCH</p><div class="library-count" id="library-count" role="status" aria-live="polite" aria-atomic="true"></div></div><div class="library-order"><label for="library-sort">Order by<select id="library-sort"><option value="added">Recently added</option><option value="published">Publication date</option></select></label><button type="button" id="library-reset">Show all sources <span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button></div></div>
         <div id="library-results" class="library-results"></div>
+        <nav id="library-pagination" class="library-pagination" aria-label="Research result pages"><button type="button" id="library-previous">Previous</button><span id="library-page-status" role="status" aria-live="polite"></span><button type="button" id="library-next">Next</button><label>Per page<select id="library-page-size"><option value="12">12</option><option value="24">24</option><option value="48">48</option></select></label></nav>
       </div>
     </section>
 
@@ -222,8 +226,8 @@
         <div class="shell play-head-layout">
           <div><p class="eyebrow">THE ATTENTION PLAYGROUND · EXPERIMENTAL</p>
             <h1>Less reading.<br><em>More trying.</em></h1>
-            <p>Three playable sketches for investigating what attention-supporting technology might feel like. No account. No tracking. No performance judgments.</p>
-            <div class="play-status"><span class="play-status-dot"></span> All activities run locally in your browser · early design explorations</div>
+            <p>Challenge a claim. Reshape your notifications. Explore the ways we switch, recover, and work with AI.</p>
+            <div class="play-status"><span class="play-status-dot"></span> Interactive demonstrations, not cognitive tests.</div>
           </div>
           <svg viewBox="0 0 380 300" class="play-art" role="img" aria-label="Abstract red and cream illustration of focus, task switching, and branching attention">
             <rect x="25" y="25" width="330" height="250" rx="34" fill="#f9e7e4"/>
@@ -238,13 +242,17 @@
       </div>
       <div class="shell play-wrap">
         <details class="play-update">
-          <summary><span>November lab update</span><span>Updated <time datetime="2026-11-09">9 Nov 2026</time> · What changed?</span></summary>
-          <p>Assistance Dial adds a fifth scenario: whose experience did a study actually test? A question picker lets you jump straight to it. Its expandable source note connects the fictional example to the published 7 November issue and distinguishes expert role-play from evidence about students. Paired Return Point comparisons, untimed play, practice, reset and source-linked design precedents remain available.</p>
-          <p>We review the improvement plan alongside new weekly issues and develop the tools continuously. This date records an actual content and behavior update, not an automatic refresh. <a href="https://github.com/chengyu-ucsb/ai-attention-observatory/blob/main/docs/lab-backlog.md">See the improvement plan</a></p>
+          <summary><span>November lab update</span><span>Updated <time datetime="2026-11-13">13 Nov 2026</time> · What changed?</span></summary>
+          <p>Two new experiments: inspect claims in Evidence Detective, and remix message timing in Notification Studio. A filterable collection keeps Switch Lab, Return Point, and Assistance Dial available as classics. Each activity now has a permanent link and version.</p>
+          <p><a href="https://github.com/chengyu-ucsb/ai-attention-observatory/blob/main/docs/lab-backlog.md">See the improvement plan</a></p>
         </details>
-        <div class="play-intro-row"><div><p class="eyebrow">CHOOSE AN EXPERIMENT</p><h2>Pick something to play.</h2></div><p>About 1–3 minutes each · exploratory demos, not scientific tests</p></div>
+        <div id="lab-page-navigation"></div>
+        <div id="lab-activities">
+        <div class="play-intro-row"><div><p class="eyebrow">CHOOSE AN EXPERIMENT</p><h2>Pick something to play.</h2></div><p>New experiences and returning favorites.</p></div>
+        <section id="lab-catalog" aria-label="Experiment collection"></section>
+        <section id="lab-workbench" hidden aria-label="Selected experiment"></section>
         <div class="play-session-controls">
-          <div><button type="button" id="play-reset" class="play-secondary" aria-describedby="play-reset-description">Stop and reset Lab</button><p id="play-reset-description">Stops every activity and clears this visit’s results. Your selected modes stay unchanged. Nothing is saved or sent.</p></div>
+          <div><button type="button" id="play-reset" class="play-secondary" aria-describedby="play-reset-description">Stop and reset Lab</button><p id="play-reset-description">Stops activities and clears this visit’s results. Nothing is saved or sent.</p></div>
           <p id="play-session-status" role="status" aria-live="polite" aria-atomic="true"></p>
         </div>
         <div class="play-tabs" role="tablist" aria-label="Attention activities">
@@ -342,6 +350,7 @@
         </div>
         <div class="play-note">
           <span class="ui-icon play-note-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-experiment"></use></svg></span><div><strong>Prototype, not a diagnostic tool.</strong> The demonstrations are simplified, include practice and order effects, and cannot measure your real-world ability to concentrate. No scores or typed content are transmitted or saved. Nothing in this lab establishes an intervention's effectiveness.</div>
+        </div>
         </div>
         <section class="play-precedents">
           <div class="section-heading"><div><p class="eyebrow">OUTSIDE THE LAB / DESIGN PRECEDENTS</p><h2>How products approach focus<span class="red-period">.</span></h2><p class="section-deck">Compare design mechanisms, without mistaking product claims for outcome evidence.</p></div></div>

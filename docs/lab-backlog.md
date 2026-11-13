@@ -26,9 +26,38 @@ validated cognitive assessments or evidence that an intervention works.
   passed checks and are ready to publish. Record blocked work honestly.
 
 This document is the maintained backlog and acceptance checklist, not a scheduler.
-The weekly edition itself runs after successful full-text backlog processing, with
-Monday/Tuesday 14:40 UTC recovery schedules. Review its completed output rather
-than assuming a scheduled run published an issue.
+Weekly publication follows the [fixed Monday edition calendar](editions.md), with
+a separate coverage deadline. Lab development stays independent of retrieval and
+publication so an experiment change cannot delay the newsletter. Verify completed
+workflow output rather than assuming that a scheduled run published an issue.
+
+## Collection architecture
+
+The Lab has one catalog and one active workspace. `CATALOG` in `lab-play.js`
+records each activity's stable `id`, title, status, version, release date, duration,
+topic, and evidence basis. The initial **New experiments** view contains the two
+November additions; **All experiments** and **Classic collection** keep the three
+older activities discoverable. No activity opens until a visitor chooses it.
+
+- Permanent entry links use `#lab?experiment=<id>`. Returning to `#lab` restores the
+  collection. Browser back/forward and invalid IDs have explicit behavior.
+- `#lab-catalog` hosts collection cards and the filter. `#lab-workbench` hosts the
+  chosen activity's header and new activities. Existing classic panels retain
+  their IDs, modes, session state, and keyboard navigation.
+- Choosing another activity hides the classic panels and notifies their timing
+  controller. Hidden intervals cannot silently enter a response-time result.
+- Each activity owns its reset behavior. The existing visit-wide stop/reset also
+  clears the new activity states. Results stay in memory; there is no account,
+  analytics, backend, browser storage, or automatic export.
+- Release a new version when behavior or teaching materials change. Keep stable
+  IDs when the same activity improves. Preserve a replaced activity under a
+  separate versioned ID if the change removes an experience people may revisit.
+- Add new activities through the registry and a renderer. Provide keyboard
+  controls, a concise evidence basis, reset/replay, narrow-screen behavior,
+  reduced-motion support, a permanent entry link, and meaningful regression tests.
+- A real study's numbers need a checked source and faithful mapping. Fictional
+  scenarios and model outputs must remain labeled as such. A simulation is not
+  an estimate of intervention effectiveness.
 
 ## Next work, in priority order
 
@@ -284,16 +313,44 @@ determine publication status, not this date.
   pass. Hosted engine checks and final Pages publication must be verified on the
   exact PR revision; this record alone is not a deployment claim.
 
+### 13 November 2026 · A growing experiment collection
+
+Implementation prepared for this release; the completed PR checks and Pages
+publication establish the deployed revision.
+
+- Added **Evidence Detective**: three fictional dossiers, reversible evidence
+  cards, a case picker, three distinct verdicts, targeted feedback, progression,
+  and reset. The activity makes a claim's participants, design, and measured
+  outcome inspectable before a visitor judges its scope. It reports no ability
+  score and does not present fictional cases as real research.
+- Added **Notification Studio**: a fixed stream of twelve invented messages over
+  thirty simulated minutes. Visitors choose immediate, ten-minute batches, or
+  end-only delivery, with an urgent-message exception. A live timeline and three
+  arithmetic summaries show alert moments, average wait, and longest gap. Each
+  delivery has an inspectable card. Full calculation rules remain available.
+- Added a versioned registry and a compact collection landing page. New and
+  classic filters preserve Switch Lab, Return Point, and Assistance Dial. One
+  chosen activity occupies the workspace; direct links and browser history keep
+  exploration navigable.
+- Used evidence-card turns, a live model, and native dialog cards rather than
+  stacking more accordion sections. Motion respects the visitor's preference;
+  dialogs restore focus and have keyboard dismissal. Controls remain usable
+  when the timeline is narrow.
+- Added an offline catalog suite for registry integrity, landing and deep links,
+  classic preservation, all dossier verdicts, resets/focus, all delivery modes,
+  arithmetic invariants, modal restoration, and invalid-route fallback. Existing
+  classic activity regressions remain in place.
+
 ## Checks for every release
 
 1. `node --check lab-play.js`
-2. `node tests/validate_playground.cjs`
+2. `node tests/validate_playground.cjs` and `node tests/validate_lab_catalog.cjs`
 3. With Playwright and the chosen browser installed:
    `python tests/validate_playground_browser.py --executable-path /usr/bin/chromium`
    (omit the flag when using Playwright's bundled Chromium). Also run with
    `--browser firefox` and `--browser webkit` after installing those engines.
 4. Run the repository's existing application and Python tests in a full checkout.
-5. Inspect desktop/phone screenshots and complete all three activities manually.
+5. Inspect desktop/phone screenshots and complete each new or changed activity, plus the preserved classic flows.
 6. Review the diff, then create a draft PR. Do not claim tests passed if the
    environment could not run them. Verify the real Pages build and public Lab
    after publication; inspect logs for warnings as well as errors.

@@ -9,7 +9,9 @@ class Element{
 }
 const elements=new Map();
 const doc={createTextNode:text=>Object.assign(new Element("#text"),{textContent:text}),createElement:tag=>new Element(tag),createElementNS:(_ns,tag)=>new Element(tag),querySelector:q=>{
- if(q==='#issue-source-landscape')return null;
+ // This unit fixture renders date labels only. Real section-menu navigation
+ // is exercised by validate_observatory_browser.py with the actual HTML.
+ if(q==='#issue-source-landscape'||q==='#issue-navigation')return null;
  if(!elements.has(q))elements.set(q,new Element('div'));
  return elements.get(q);
 }};

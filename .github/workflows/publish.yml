@@ -94,6 +94,8 @@ jobs:
           node --check app.js
           node --check lab-play.js
           node tests/validate_playground.cjs
+          node tests/validate_lab_catalog.cjs
+          node tests/validate_layers.cjs
           node tests/validate_article_ui.cjs
           node tests/validate_reader_loading.cjs
           node tests/validate_weekly_issue.cjs
@@ -128,6 +130,7 @@ jobs:
           mkdir -p _site/assets
           cp assets/reading-*.svg assets/feed.xsl _site/assets/
           cp assets/typography.css _site/assets/
+          cp assets/article-layers.css _site/assets/
           cp -R assets/fonts _site/assets/
           cp -R assets/article-art assets/editorial-covers _site/assets/
           mkdir -p _site/exports

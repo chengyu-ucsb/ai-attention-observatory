@@ -65,7 +65,7 @@ STYLE = '''
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:#fffefa;color:#333;font:400 var(--type-body)/var(--leading-reading) var(--font-reading)}
 a{color:#b6001c;text-underline-offset:4px}a:hover{text-decoration-thickness:2px}
-a:focus-visible,summary:focus-visible{outline:3px solid #E00122;outline-offset:5px}
+a:focus-visible,summary:focus-visible,button:focus-visible,select:focus-visible{outline:3px solid #E00122;outline-offset:5px}
 .shell{max-width:920px;margin:auto;padding:0 40px}
 header{border-top:7px solid #E00122;border-bottom:1px solid #d7d1d2;padding:22px 0;background:#fff}
 .nav{display:flex;justify-content:space-between;gap:24px;align-items:center;font:600 var(--type-small)/1.5 var(--font-interface)}
@@ -97,6 +97,86 @@ footer{background:#E00122;color:#fff;padding:36px 0}footer a{color:#fff}footer p
 @media print{details>*{display:block!important}}
 '''
 
+# The full edition remains readable without JavaScript. Enhancement adds one
+# reading section at a time and moves secondary material into native dialogs.
+STYLE += '''
+[hidden]{display:none!important}
+button,select{font:600 var(--type-small)/1.4 var(--font-interface);color:inherit}
+button{cursor:pointer;min-height:44px;border:1px solid #bfb7b7;background:#fffefa;padding:10px 16px;border-radius:4px}
+button:hover{border-color:#b6001c;color:#b6001c}
+.edition-intro{max-width:var(--measure-reading)}.edition-intro .preview-copy{display:none}
+.edition-intro details{margin:4px 0 12px}.edition-intro .layer-open{margin:0 0 12px}
+.ai-note{font-size:var(--type-caption);color:#646064;margin:12px 0 22px}
+.reader-map{padding:22px;background:#f5f1ee;border:1px solid #ded6d1;margin:26px 0 20px;border-radius:8px}
+.reader-map .stamp{margin:0 0 14px}.map-hub{display:flex;align-items:center;gap:10px;font:600 var(--type-small)/1.4 var(--font-interface);margin:0 0 16px}
+.map-hub svg{width:34px;height:34px;flex:none;color:#b6001c}.map-note{font-size:var(--type-caption);margin:0;color:#646064}
+.overview{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 12px}.overview li{padding:0;border:0;position:relative}
+.overview a{display:flex;flex-direction:column;gap:6px;height:100%;min-height:108px;padding:15px;background:#fffefa;border:1px solid #cfc5c2;border-top:3px solid #b6001c;border-radius:5px;text-decoration:none;color:#333}
+.overview a:hover,.overview a[aria-current="true"]{border-color:#b6001c;background:#fff}.map-index{font:600 var(--type-caption)/1.2 var(--font-interface);color:#b6001c}
+.map-label{font:600 1.05rem/1.35 var(--font-interface)}.map-count{font:400 var(--type-caption)/1.4 var(--font-reading);color:#646064;margin-top:auto}
+.edition-controls{display:flex;align-items:end;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid #d7d1d2}
+.edition-select{display:grid;gap:6px;min-width:0;max-width:70%;font:600 var(--type-caption)/1.4 var(--font-interface)}
+.edition-select select{width:100%;min-height:44px;max-width:100%;padding:8px 30px 8px 12px;background:#fffefa;border:1px solid #bfb7b7;border-radius:4px;text-overflow:ellipsis}
+.edition-controls button[aria-pressed="true"]{background:#333;color:#fff;border-color:#333}
+.edition-panel:focus{outline:none}.edition-panel{scroll-margin-top:24px}.edition-panel .signal:first-child{border-top:0}
+.edition-utilities{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px;padding-top:20px;border-top:1px solid #d7d1d2}
+.edition-utilities>details{flex-basis:100%}.layer-open{background:transparent;font-weight:500}.layer-open::after{content:' +';color:#b6001c}.card:last-child .layer-open{color:#fff;border-color:#fff}.card:last-child .layer-open::after{color:#fff}
+.edition-dialog{position:fixed;inset:0;width:min(760px,calc(100% - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid #bfb7b7;border-top:4px solid #E00122;border-radius:10px;color:#333;background:#fffefa;overflow:auto;box-shadow:0 22px 90px #0004;overscroll-behavior:contain}
+.edition-dialog::backdrop{background:#17121299}.dialog-header{position:sticky;top:0;display:flex;align-items:start;justify-content:space-between;gap:20px;padding:20px 26px 12px;background:#fffefa;border-bottom:1px solid #ded6d1;z-index:1}
+.dialog-header h2{font-size:var(--type-card);margin:6px 0 0}.dialog-header button{flex:none}.dialog-body{padding:24px 26px}.dialog-body>ol{padding-left:22px}.dialog-body .source-shelf{border:0;padding:0}.dialog-body .scope{font-size:var(--type-small)}
+@media(max-width:600px){.reader-map{padding:16px;margin-top:22px}.overview{gap:8px}.overview a{min-height:0;display:grid;grid-template-columns:25px minmax(0,1fr) auto;gap:8px;align-items:center;padding:12px;border-top-width:1px;border-left:3px solid #b6001c}.map-label{font-size:1rem}.map-count{margin:0;font-size:.8125rem;white-space:nowrap}.edition-controls{align-items:stretch;flex-direction:column;gap:10px}.edition-select{max-width:100%}.edition-controls button{align-self:start}.edition-dialog{width:calc(100% - 20px);max-height:calc(100dvh - 20px)}.dialog-header{padding:16px}.dialog-body{padding:20px}.edition-utilities .layer-open{flex:1 1 auto}}
+@media(prefers-reduced-motion:no-preference){.edition-dialog[open]{animation:card-arrive .16s ease-out}@keyframes card-arrive{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}}
+@media print{[data-edition-panel][hidden],.edition-dialog{display:block!important}.edition-controls,.layer-open,.dialog-header button{display:none!important}.edition-dialog{position:static;max-height:none;width:auto;border:0;box-shadow:none}.dialog-header{position:static}.dialog-body{padding:0}.overview{break-inside:avoid}}
+'''
+
+READER_SCRIPT = '''
+<script>
+(() => {
+  'use strict';
+  const panels=Array.from(document.querySelectorAll('[data-edition-panel]'));
+  const controls=document.querySelector('.edition-controls'),select=document.getElementById('edition-section'),all=document.getElementById('edition-read-all');
+  let showingAll=false;
+  function show(id,focus=false){
+    const target=document.getElementById(id);if(!target||!panels.includes(target))return;
+    showingAll=false;panels.forEach(panel=>panel.hidden=panel!==target);
+    select.value=id;all.setAttribute('aria-pressed','false');all.textContent='Show all sections';
+    document.querySelectorAll('[data-edition-target]').forEach(link=>link.setAttribute('aria-current',String(link.dataset.editionTarget===id)));
+    if(focus){target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}
+  }
+  function showAll(){showingAll=true;panels.forEach(panel=>panel.hidden=false);all.setAttribute('aria-pressed','true');all.textContent='One section at a time';document.querySelectorAll('[data-edition-target]').forEach(link=>link.removeAttribute('aria-current'));}
+  function revealHash(){
+    let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
+    const target=document.getElementById(id),panel=target&&target.closest('[data-edition-panel]');
+    if(panel&&!showingAll)show(panel.id);
+    if(target){requestAnimationFrame(()=>{target.scrollIntoView({block:'start'});if(target.hasAttribute('tabindex'))target.focus({preventScroll:true});});}
+  }
+  if(panels.length&&controls&&select&&all){
+    controls.hidden=false;show(panels[0].id);
+    select.addEventListener('change',()=>show(select.value));
+    all.addEventListener('click',()=>showingAll?show(select.value):showAll());
+    document.querySelectorAll('[data-edition-target]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();show(link.dataset.editionTarget,true);history.replaceState(null,'','#'+link.dataset.editionTarget);}));
+    window.addEventListener('hashchange',revealHash);revealHash();
+  }
+  if(typeof HTMLDialogElement==='undefined'||!HTMLDialogElement.prototype.showModal)return;
+  document.querySelectorAll('details[data-edition-layer]').forEach((details,index)=>{
+    const summary=details.querySelector('summary'),label=summary.textContent.trim();
+    const button=document.createElement('button');button.type='button';button.className='layer-open';button.textContent=label;
+    const dialog=document.createElement('dialog');dialog.className='edition-dialog';dialog.id='edition-layer-'+index;
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-controls',dialog.id);button.dataset.openLayer=details.dataset.editionLayer;
+    const header=document.createElement('div');header.className='dialog-header';const title=document.createElement('h2');title.id=dialog.id+'-title';title.textContent=label;dialog.setAttribute('aria-labelledby',title.id);
+    const close=document.createElement('button');close.type='button';close.textContent='Close';close.setAttribute('aria-label','Close '+label);header.append(title,close);
+    const body=document.createElement('div');body.className='dialog-body';Array.from(details.childNodes).forEach(node=>{if(node!==summary)body.append(node);});dialog.append(header,body);
+    details.replaceWith(button);document.body.append(dialog);let previousOverflow='';
+    button.addEventListener('click',()=>{previousOverflow=document.body.style.overflow;dialog.showModal();dialog.scrollTop=0;document.body.style.overflow='hidden';close.focus();});
+    close.addEventListener('click',()=>dialog.close());
+    dialog.addEventListener('close',()=>{document.body.style.overflow=previousOverflow;button.focus({preventScroll:true});});
+    dialog.addEventListener('click',event=>{const r=dialog.getBoundingClientRect();if(event.target===dialog&&(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom))dialog.close();});
+    dialog.querySelectorAll('a.glossary-term').forEach(link=>link.addEventListener('click',()=>dialog.close()));
+  });
+})();
+</script>
+'''
+
 def brief_title(value):
     """Present the new masthead without rewriting frozen issue snapshots."""
     return str(value or '').replace('Attention Edit','Attention Brief').replace('Weekly Edit','Weekly Brief')
@@ -117,7 +197,7 @@ def source_links(issue,ids):
         out.append('<a class="source-link" href="'+esc(url)+'" title="'+esc(source.get('title') or 'Original source')+'">'+esc((source.get('title') or 'Original source')+version)+'</a>')
     return ' · '.join(out)
 
-def source_shelf(issue, disclosure=True):
+def source_shelf(issue, disclosure=True, include_note=True):
     """One provenance shelf, complete in RSS and expandable on the web."""
     rows=[]
     for source in issue.get('sources',[]):
@@ -135,11 +215,11 @@ def source_shelf(issue, disclosure=True):
                 row+='<p>'+esc(notice)+'</p>'
                 notices.append(notice)
         rows.append(row+'</li>')
-    note=render_text(issue.get('editorial_note',''),issue)
-    if any(s.get('original_summary') for s in issue.get('sources',[])):
+    note=render_text(issue.get('editorial_note',''),issue) if include_note else ''
+    if include_note and any(s.get('original_summary') for s in issue.get('sources',[])):
         note+='<p>AI source-check, not human review or independent replication. Version-specific scope and limitations are listed with each source.</p>'
     content=note+'<ol>'+''.join(rows)+'</ol>'
-    return ('<details class="source-shelf"><summary>Sources &amp; reading details · '+str(len(rows))+'</summary>'+content+'</details>') if disclosure else '<h2>Sources &amp; reading details</h2>'+content
+    return ('<details class="source-shelf" data-edition-layer="sources"><summary>Sources · '+str(len(rows))+'</summary>'+content+'</details>') if disclosure else '<h2>Sources &amp; reading details</h2>'+content
 
 def top_html(issue, asset_prefix=""):
     """Load the shared type system relative to this page, including archives."""
@@ -204,14 +284,15 @@ def render_text(text,issue=None,section=None,end=None,css='long-copy'):
         start=stop+(separator.end() if separator else 0)
     return ''.join(paragraphs)
 
-def glossary_html(issue):
+def glossary_html(issue, panel=False):
     entries=issue.get('glossary',[])
     if not entries:return ''
-    return '<section class="glossary" aria-label="Plain-language glossary"><h2>A few useful terms</h2><dl>'+''.join(
+    attributes=' id="edition-glossary" data-edition-panel tabindex="-1"' if panel else ''
+    return '<section class="glossary'+(' edition-panel' if panel else '')+'"'+attributes+' aria-label="Plain-language glossary"><h2>A few useful terms</h2><dl>'+''.join(
         '<dt id="'+glossary_id(i,e)+'" tabindex="-1"><strong>'+esc(e['term'])+'</strong></dt><dd>'+esc(e['definition'])+'</dd>'
         for i,e in enumerate(entries,1))+'</dl></section>'
 
-def long_copy(text,label='Read the full analysis',issue=None,section=None):
+def long_copy(text,label='Read the full analysis',issue=None,section=None,layer=None):
     text=str(text or '')
     full=render_text(text,issue,section)
     if len(text)<260:return full
@@ -225,32 +306,49 @@ def long_copy(text,label='Read the full analysis',issue=None,section=None):
     for start,stop,*_ in text_spans(text,issue,section):
         if start<end<stop:end=stop
     if end==len(text):return full
-    return render_text(text,issue,section,end=end,css='long-copy preview-copy')+'<details><summary>'+esc(label)+'</summary>'+full+'</details>'
+    attributes=(' data-edition-layer="'+esc(layer)+'"') if layer else ''
+    return render_text(text,issue,section,end=end,css='long-copy preview-copy')+'<details'+attributes+'><summary>'+esc(label)+'</summary>'+full+'</details>'
 
 def opening(issue):
     return (section_label('Issue '+str(issue.get('number','—'))+' · '+edition_label(issue))
             +'<h1>'+esc(issue['headline'])+'</h1><p class="deck">'+esc(issue.get('deck',''))+'</p>'
-            +long_copy(issue.get('letter',''),'Read the opening argument',issue)
-            +('<p class="scope">'+esc(publication_scope(issue))+'</p>' if publication_scope(issue) else ''))
+            +'<div class="edition-intro">'+long_copy(issue.get('letter',''),'The opening argument',issue,layer='opening')+'</div>'
+            +'<p class="scope ai-note">AI-assisted summary. AI can make mistakes.</p>')
 
 def overview(issue):
-    return '<ul class="overview">'+''.join('<li><a href="#signal-'+str(i)+'">'+esc(s.get('short',s.get('title','')))+'</a></li>' for i,s in enumerate(issue.get('signals',[]),1))+'</ul>'
+    return ('<nav class="reader-map" aria-label="Edition reading map">'+section_label('At a glance')
+            +'<p class="map-hub"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="10" r="5"/><path d="M20 15v8M7 30v-7h26v7"/><circle cx="7" cy="33" r="3"/><circle cx="20" cy="33" r="3"/><circle cx="33" cy="33" r="3"/><path d="M20 23v7"/></svg>One argument, several lenses</p>'
+            +'<ul class="overview">'+''.join('<li><a href="#signal-'+str(i)+'" data-edition-target="signal-'+str(i)+'"><span class="map-index">'+str(i).zfill(2)+'</span><span class="map-label">'+esc(s.get('short',s.get('title','')))+'</span><span class="map-count">'+str(len(s.get('source_ids',[])))+' source'+('' if len(s.get('source_ids',[]))==1 else 's')+'</span></a></li>' for i,s in enumerate(issue.get('signals',[]),1))+'</ul>'
+            +'<p class="map-note">A guide to this edition. Choose a theme to explore.</p></nav>')
+
+def reader_controls(issue):
+    options=[('signal-'+str(i),s.get('short') or s['title']) for i,s in enumerate(issue.get('signals',[]),1)]
+    options += [('edition-supplement-'+str(i),section['title']) for i,section in enumerate(issue.get('supplements',[]),1)]
+    options += [('edition-question','The question & something to try')]
+    if issue.get('glossary'):options.append(('edition-glossary','Useful terms'))
+    return ('<div class="edition-controls" hidden><label class="edition-select" for="edition-section">Explore this edition<select id="edition-section">'
+            +''.join('<option value="'+esc(key)+'">'+esc(label)+'</option>' for key,label in options)
+            +'</select></label><button type="button" id="edition-read-all" aria-pressed="false">Show all sections</button></div>')
+
+def source_layer(issue,ids,key):
+    return ('<details class="source-links" data-edition-layer="'+esc(key)+'"><summary>Sources behind this theme · '+str(len(ids))+'</summary>'
+            +'<p>'+source_links(issue,ids)+'</p></details>')
 
 def signal_cards(issue):
-    return ''.join('<section class="signal" id="signal-'+str(i)+'">'+section_label('Signal '+str(i).zfill(2))+'<h2>'+esc(s['title'])+'</h2>'+long_copy(s['text'],issue=issue,section=s)+'<p class="source-links">'+source_links(issue,s.get('source_ids',[]))+'</p></section>' for i,s in enumerate(issue.get('signals',[]),1))
+    return ''.join('<section class="signal edition-panel" id="signal-'+str(i)+'" data-edition-panel tabindex="-1">'+section_label('Theme '+str(i).zfill(2))+'<h2>'+esc(s['title'])+'</h2>'+render_text(s['text'],issue,s)+source_layer(issue,s.get('source_ids',[]),'signal-'+str(i)+'-sources')+'</section>' for i,s in enumerate(issue.get('signals',[]),1))
 
 def supplement_cards(issue):
-    return ''.join('<section class="signal supplementary-analysis"><h2>'+esc(section['title'])+'</h2>'
-        +long_copy(section['text'],'Read the additional analysis',issue,section)
-        +'<p class="source-links">'+source_links(issue,section.get('source_ids',[]))+'</p></section>'
-        for section in issue.get('supplements',[]))
+    return ''.join('<section class="signal supplementary-analysis edition-panel" id="edition-supplement-'+str(i)+'" data-edition-panel tabindex="-1"><h2>'+esc(section['title'])+'</h2>'
+        +render_text(section['text'],issue,section)
+        +source_layer(issue,section.get('source_ids',[]),'supplement-'+str(i)+'-sources')+'</section>'
+        for i,section in enumerate(issue.get('supplements',[]),1))
 
 def publication_history(issue):
     first=issue.get('first_published_date') or str(issue.get('published_at') or '')[:10]
     updated=str(issue.get('updated_at') or '')[:10]
     entries=issue.get('edition_history',[])
     if not first and not entries:return ''
-    parts=['<details class="publication-history"><summary>Publication history</summary>']
+    parts=['<details class="publication-history" data-edition-layer="history"><summary>Publication history</summary>']
     if first:
         date.fromisoformat(first)
         parts.append('<p>First published '+esc(first)+'. The Monday label identifies the edition; it does not change when this version was released.</p>')
@@ -269,20 +367,23 @@ def publication_history(issue):
 
 def question_and_try(issue):
     t=issue['tension'];p=issue['experiment']
-    return ('<div class="pair"><section class="card">'+section_label('The productive tension')+'<h3>'+esc(t['title'])+'</h3>'+long_copy(t['text'],'Explore the tension',issue,t)+'<p class="source-links">'+source_links(issue,t.get('source_ids',[]))+'</p></section>'
-            '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+long_copy(p['text'],'See the activity',issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p></section></div>')
+    return ('<section id="edition-question" class="edition-panel" data-edition-panel tabindex="-1" aria-label="The question and something to try"><div class="pair"><section class="card">'+section_label('The productive tension')+'<h3>'+esc(t['title'])+'</h3>'+render_text(t['text'],issue,t)+source_layer(issue,t.get('source_ids',[]),'tension-sources')+'</section>'
+            '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+render_text(p['text'],issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p></section></div></section>')
 
 def bottom(issue):
-    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue)+source_shelf(issue)+publication_history(issue)+'</main><footer><div class="shell">'
+    methods='<details data-edition-layer="methods"><summary>How this was made</summary>'+render_text(issue.get('editorial_note',''),issue)
+    if publication_scope(issue):methods+='<p class="scope">'+esc(publication_scope(issue))+'</p>'
+    methods+='</details>'
+    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue,panel=True)+'<div class="edition-utilities">'+methods+source_shelf(issue,include_note=False)+publication_history(issue)+'</div></main><footer><div class="shell">'
             '<p><strong>THE ATTENTION BRIEF</strong></p><p>A weekly look at what AI changes about thinking, focus, and human agency.</p>'
             '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
-            '<p>Read online or follow via RSS. Email subscriptions are not active.</p></div></footer></body></html>')
+            '</div></footer>'+READER_SCRIPT+'</body></html>')
 
 def render_issue(issue, asset_prefix=""):
     if issue.get('status')!='published':
         return top_html({'subject':'The Attention Brief · Ideas about AI and attention'},asset_prefix)+'<h1>A place for ideas about attention.</h1><p>Explore the research library while new editions are published.</p></main></body></html>'
     validate_issue_citations(issue)
-    return top_html(issue,asset_prefix)+opening(issue)+overview(issue)+signal_cards(issue)+supplement_cards(issue)+question_and_try(issue)+bottom(issue)
+    return top_html(issue,asset_prefix)+opening(issue)+overview(issue)+reader_controls(issue)+signal_cards(issue)+supplement_cards(issue)+question_and_try(issue)+bottom(issue)
 
 def render_index(issues):
     links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+edition_label(i))+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]

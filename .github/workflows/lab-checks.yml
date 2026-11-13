@@ -7,6 +7,7 @@ on:
       - 'app.js'
       - 'styles.css'
       - 'assets/typography.css'
+      - 'assets/article-layers.css'
       - 'assets/fonts/**'
       - 'subscribe.html'
       - 'scripts/build_newsletter.py'
@@ -26,6 +27,8 @@ on:
       - 'tests/validate_article_ui.cjs'
       - 'lab-play.*'
       - 'tests/validate_playground*'
+      - 'tests/validate_lab_catalog.cjs'
+      - 'tests/validate_layers.cjs'
       - 'tests/validate_observatory_browser.py'
       - '.github/workflows/lab-checks.yml'
   push:
@@ -35,6 +38,7 @@ on:
       - 'app.js'
       - 'styles.css'
       - 'assets/typography.css'
+      - 'assets/article-layers.css'
       - 'assets/fonts/**'
       - 'subscribe.html'
       - 'scripts/build_newsletter.py'
@@ -54,6 +58,8 @@ on:
       - 'tests/validate_article_ui.cjs'
       - 'lab-play.*'
       - 'tests/validate_playground*'
+      - 'tests/validate_lab_catalog.cjs'
+      - 'tests/validate_layers.cjs'
       - 'tests/validate_observatory_browser.py'
       - '.github/workflows/lab-checks.yml'
   workflow_dispatch:
@@ -87,13 +93,17 @@ jobs:
         run: |
           node --check lab-play.js
           node tests/validate_playground.cjs
+          node tests/validate_lab_catalog.cjs
+          node tests/validate_layers.cjs
       - name: Install browser test dependencies
+        id: browser_dependencies
         run: |
           python -m pip install 'playwright==1.64.1'
           python -m playwright install --with-deps ${{ matrix.browser }}
       - name: Check desktop and mobile ${{ matrix.browser }} flows
         run: python tests/validate_playground_browser.py --browser ${{ matrix.browser }} --screenshots /tmp/lab-screenshots
       - name: Check Observatory browsing and responsive layouts
+        if: always() && steps.browser_dependencies.outcome == 'success'
         run: python tests/validate_observatory_browser.py --browser ${{ matrix.browser }} --screenshots /tmp/lab-screenshots
       - name: Retain desktop and mobile screenshots
         if: always()

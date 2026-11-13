@@ -4,6 +4,7 @@ import copy
 import html
 from html.parser import HTMLParser
 import json
+import re
 import tempfile
 from unittest.mock import patch
 from email.utils import parsedate_to_datetime
@@ -34,6 +35,56 @@ class WeeklyFeedTests(unittest.TestCase):
    if issue.get('status')=='published':
     return issue
   self.fail('The archive must contain a published issue for presentation regressions.')
+
+ def test_layered_reader_has_complete_no_script_content_and_valid_navigation(self):
+  issue=self.latest_published_issue()
+  page=build_newsletter.render_issue(issue)
+  markup=page.split('<script>')[0]
+  panels=re.findall(r'<section[^>]*id="([^"]+)"[^>]*data-edition-panel[^>]*>',markup)
+  options=re.findall(r'<option value="([^"]+)">',markup)
+  self.assertEqual(set(panels),set(options))
+  self.assertEqual(len(panels),len(options))
+  self.assertGreaterEqual(len(panels),4)
+  # Hidden panels are a browser enhancement: all content survives script failure.
+  for tag in re.findall(r'<section[^>]*data-edition-panel[^>]*>',markup):
+   self.assertNotIn('hidden',tag)
+  for i,section in enumerate(issue['signals'],1):
+   panel=markup.split('id="signal-'+str(i)+'"',1)[1].split('</section>',1)[0]
+   self.assertIn(' '.join(section['text'].split()),VisibleText(panel).text())
+   self.assertIn('data-edition-target="signal-'+str(i)+'"',markup)
+  self.assertIn('id="edition-read-all" aria-pressed="false"',markup)
+  self.assertIn('data-edition-layer="opening"',markup)
+  self.assertIn('data-edition-layer="methods"',markup)
+  self.assertIn('data-edition-layer="sources"',markup)
+  self.assertIn('AI-assisted summary. AI can make mistakes.',markup)
+  self.assertNotIn('AI source-check, not human review',markup)
+
+ def test_reading_map_uses_existing_labels_and_actual_source_counts(self):
+  issue=self.latest_published_issue()
+  page=build_newsletter.overview(issue)
+  for i,section in enumerate(issue['signals'],1):
+   card=page.split('data-edition-target="signal-'+str(i)+'"',1)[1].split('</a>',1)[0]
+   self.assertIn(html.escape(section.get('short') or section['title'],quote=True),card)
+   count=len(section['source_ids'])
+   self.assertIn(str(count)+' source'+('' if count==1 else 's'),card)
+  self.assertIn('Edition reading map',page)
+  self.assertNotIn('effect size',page)
+
+ def test_methods_and_dates_are_secondary_layers_without_losing_their_text(self):
+  issue=self.latest_published_issue()
+  page=build_newsletter.render_issue(issue)
+  opening=page.split('<nav class="reader-map"',1)[0]
+  self.assertNotIn(html.escape(issue['editorial_note'],quote=True),opening)
+  methods=page.split('data-edition-layer="methods"',1)[1].split('</details>',1)[0]
+  self.assertIn(' '.join(issue['editorial_note'].split()),VisibleText(methods).text())
+  self.assertIn(build_newsletter.publication_scope(issue),html.unescape(methods))
+  self.assertIn('data-edition-layer="history"',page)
+  # RSS remains a complete linear reading, with no controls or modal script.
+  rss=build_newsletter.rss_content(issue)
+  self.assertNotIn('<script',rss)
+  self.assertNotIn('data-edition-panel',rss)
+  self.assertNotIn('data-edition-layer',rss)
+  self.assertIn(' '.join(issue['editorial_note'].split()),VisibleText(rss).text())
 
  def test_brief_redesign_preserves_all_published_copy_and_source_versions(self):
   issue=self.latest_published_issue()

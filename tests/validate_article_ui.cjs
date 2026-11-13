@@ -22,10 +22,11 @@ assert(styles.includes(".editorial-grid{grid-template-columns:repeat(2"),"Editor
 assert(styles.includes("font:400 var(--reading-size)/var(--reading-leading) var(--reading-font)"),"Unified explanatory prose style missing");
 assert(!styles.includes("Article reading experience v2"),"Obsolete layered article CSS still present");
 class Element{
- constructor(tag){this.tag=tag;this.textContent="";this.className="";this.children=[];this.style={};this.hidden=false;this.open=false;this.attributes={}}
- append(...els){for(const e of els){assert(e instanceof Element,"Non-element child");this.children.push(e)}}
- replaceChildren(...els){this.children=[];this.textContent="";this.append(...els)}
+ constructor(tag){this.tag=tag;this.textContent="";this.className="";this.children=[];this.style={};this.hidden=false;this.open=false;this.attributes={};this.dataset={};this.parentNode=null}
+ append(...els){for(const e of els){assert(e instanceof Element,"Non-element child");if(e.parentNode)e.parentNode.children=e.parentNode.children.filter(child=>child!==e);e.parentNode=this;this.children.push(e)}}
+ replaceChildren(...els){for(const child of this.children)child.parentNode=null;this.children=[];this.textContent="";this.append(...els)}
  setAttribute(k,v){this.attributes[k]=v}
+ getAttribute(k){return this.attributes[k]??null}
  addEventListener(_name,_callback){}
 }
 const paperContainer=new Element("div");
@@ -41,6 +42,8 @@ const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls)
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
 const textContent=root=>nodes(root).map(n=>n.textContent).filter(Boolean).join(" | ");
 const proseText=root=>nodes(root).map(n=>n.textContent).filter(Boolean).join(" ").replace(/\s+/g," ").trim();
+const hiddenBySection=node=>Boolean(node?.hidden||(node?.parentNode&&hiddenBySection(node.parentNode)));
+const hasLayer=node=>Boolean(node&&match(node,"layer-trigger")&&node.children.some(child=>child.hidden));
 // Previously published links must resolve to an honest pending-source view,
 // not a fabricated one-paragraph reading when the full article was never read.
 const pending={kind:"nonacademic",title:"Not-yet-reviewed commentary",url:"https://theconversation.com/a-source-pending-full-reading",source_quality:{decision:"awaiting_full_article_reading"}};
@@ -99,7 +102,7 @@ for(const r of db){
    }
    assert(textContent(page).includes("not human review"),"AI source-check must not imply human review");
    if(reading.temporal_notice)assert(textContent(match(page,"rv-head")).includes(reading.temporal_notice),"Original date/version caveat must be prominent");
-   assert(evidence&&evidence.open===false,"Original source locators must have a collapsed disclosure");
+   assert(evidence&&hiddenBySection(evidence),"Original source locators belong in the optional Evidence view");
    const locators=Object.values(reading.evidence).flat();
    assert.equal(matching(evidence,"rv-source-locator").length,locators.length,"Every approved locator must be rendered");
    const commentary=reading.research_type==="attributed_commentary";
@@ -130,12 +133,12 @@ for(const r of db){
  assert(match(page,"rv-source"),"Source citation/links missing");
  assert(match(page,"rv-status"),"Reader cannot distinguish edited and automatic content");
  const provenance=match(page,"rv-provenance");
- assert(provenance&&provenance.tag==="details"&&!provenance.open,"Source details must start collapsed");
+ assert(hasLayer(provenance),"Source details must use an accessible, initially closed reading card");
  assert(match(provenance,"rv-status"),"Review status must remain in source details");
  const overview=match(page,"rv-overview");
- if(overview)assert(overview.tag==="details"&&!overview.open,"Overview must be optional");
+ if(overview)assert(hasLayer(overview),"The extended overview must be an optional reading card");
  for(const cls of ["rv-take","rv-research-longform"]){
-  const section=match(page,cls);if(section)assert(section.tag==="details"&&!section.open,"Long reading section must be optional: "+cls);
+  const section=match(page,cls);if(section)assert(hiddenBySection(section),"Long reading section belongs in the optional Analysis view: "+cls);
  }
  if(r.reading?.original_summary){
   const version=match(page,"rv-source-row");
@@ -151,7 +154,10 @@ for(const r of db){
   assert(match(page,"rv-overview")&&proseText(match(page,"rv-overview")).includes(d.explain),"Edited reading lacks its complete explanation: "+r.title);
  }else sourceOnly++;
  const excerpt=match(page,"rv-drawer");
- if(excerpt)assert(excerpt.open===false,"Raw passages should be collapsed");
+ if(excerpt)assert(hiddenBySection(excerpt),"Raw passages should start in the optional Evidence view");
+ assert.equal(match(page,"rv-ai-notice").textContent,"AI-generated summary. AI can make mistakes.");
+ assert.equal(page.getAttribute("data-reading-view"),"overview");
+ assert(!match(page,"rv-panel-overview").hidden,"The finding and material limits must be available without a click");
  assert(!/\[object (?:HTML\w+Element|Object)\]/.test(textContent(page)),"Broken object rendering: "+r.title);
  checked++;
 }
@@ -273,17 +279,17 @@ assert(textContent(match(originalPage,"rv-head")).includes(original.reading.sour
 assert(!match(originalPage,"automatic-evidence"),"An older machine visual must not substitute for the checked summary");
 assert(!match(originalPage,"rv-research-longform"),"Do not mix older long-form notes into the original summary");
 const excerpts=match(originalPage,"rv-source-excerpts");
-assert(excerpts&&excerpts.tag==="details"&&excerpts.open===false,"Machine excerpts must remain optional and collapsed");
+assert(excerpts&&hiddenBySection(excerpts),"Machine excerpts must remain in the optional Evidence view");
 assert(textContent(excerpts).includes("Inspect machine-indexed excerpts and abstract"));
 for(const field of ["methods","results","discussion","limitations"])
  assert(textContent(excerpts).includes(original.analysis[field]),"Unchanged machine "+field+" must be retained separately");
 for(const field of ["methods","findings","interpretation","limitations"])
  assert(!textContent(excerpts).includes(original.reading[field]),"Original prose mislabeled as machine excerpts: "+field);
-const visibleText=root=>root.tag==="details"?"":[root.textContent,...root.children.map(visibleText)].filter(Boolean).join(" | ");
+const visibleText=root=>root.hidden?"":[root.textContent,...root.children.map(visibleText)].filter(Boolean).join(" | ");
 assert(!visibleText(originalPage).includes("machine results sentinel"),"Raw machine output leaked into primary reading");
 assert(!textContent(originalPage).includes("Stale unreviewed"),"Older claims must not override the checked source version");
 const evidence=match(originalPage,"rv-evidence");
-assert(evidence&&evidence.tag==="details"&&evidence.open===false,"Source locators need an accessible, collapsed disclosure");
+assert(evidence&&hiddenBySection(evidence),"Source locators need an accessible Evidence view");
 assert.equal(matching(evidence,"rv-source-locator").length,7,"Every summary-field locator must remain traceable");
 assert(textContent(evidence).includes("Section: Results · page 7 · paragraph 2"));
 assert(textContent(evidence).includes(original.reading.source_version));
@@ -302,6 +308,26 @@ assert(journalLink&&journalLink.textContent.includes("not the checked source"));
 assert.equal(journalLink.href,"https://doi.org/"+original.reading.related_journal_doi);
 assert(!textContent(citation).includes("Reviewed full article")&&!textContent(citation).includes("Full-text sections"),"Original summary must not be labeled as machine extraction or publisher full-article review");
 assert.equal(JSON.stringify(original),originalBefore,"Rendering must never rewrite the machine analysis or original summary");
+const originalProse=proseText(originalPage),articleSelector=match(originalPage,"rv-section-select");
+const overviewPanel=match(originalPage,"rv-panel-overview"),analysisPanel=match(originalPage,"rv-analysis"),evidencePanel=match(originalPage,"rv-evidence-panel"),sourcePanel=match(originalPage,"rv-sidebar");
+assert(!overviewPanel.hidden&&analysisPanel.hidden&&evidencePanel.hidden&&sourcePanel.hidden,"Overview is the only default reading view");
+assert(visibleText(originalPage).includes(originalDigest.finding)&&visibleText(originalPage).includes(originalDigest.limitation),"The finding and material limit must be visible together without opening a layer");
+const analysisTab=matching(originalPage,"rv-section-tab").find(button=>button.getAttribute("data-reading-view")==="analysis");
+analysisTab.onclick();
+assert(overviewPanel.hidden&&!analysisPanel.hidden&&evidencePanel.hidden&&sourcePanel.hidden,"Analysis replaces the overview instead of adding another long section");
+assert.equal(articleSelector.value,"analysis");assert.equal(analysisTab.getAttribute("aria-pressed"),"true");
+assert(visibleText(originalPage).includes(originalDigest.interpretation),"Analysis retains the full original interpretation");
+articleSelector.value="evidence";articleSelector.onchange();
+assert(evidencePanel.hidden===false&&analysisPanel.hidden&&sourcePanel.hidden,"Native reading menu must reveal Evidence only");
+assert(visibleText(originalPage).includes(original.analysis.methods),"The source reader must remain reachable from the Evidence view");
+articleSelector.value="source";articleSelector.onchange();
+assert(!sourcePanel.hidden&&evidencePanel.hidden&&analysisPanel.hidden&&overviewPanel.hidden,"Native reading menu must reveal Source only");
+assert(!visibleText(originalPage).includes(original.reading.review_scope),"Detailed process notes belong in the optional provenance card");
+match(originalPage,"rv-read-all").onclick();
+assert([overviewPanel,analysisPanel,evidencePanel,sourcePanel].every(panel=>!panel.hidden),"Read all must reveal every major section");
+assert.equal(proseText(originalPage),originalProse,"Changing layers must not duplicate, delete or rewrite the original content");
+articleSelector.value="overview";articleSelector.onchange();
+assert(!overviewPanel.hidden&&[analysisPanel,evidencePanel,sourcePanel].every(panel=>panel.hidden),"Returning to Overview must restore a compact page");
 assert.equal(vm.runInContext("TEST.shortIdea(selected,200)",ctx),originalDigest.idea);
 assert.equal(vm.runInContext("TEST.processedIdea(selected)",ctx),originalDigest.idea);
 assert.equal(vm.runInContext("TEST.ideaInfo(selected).text",ctx),originalDigest.idea);
@@ -559,18 +585,19 @@ const richSource={...future,analysis:{fulltext_url:"https://example.org/source.p
 ctx.selected=richSource;vm.runInContext("TEST.showPaper(selected)",ctx);
 const sourceReader=match(paperContainer,"rv-source-excerpts");
 const sourceSections=matching(sourceReader,"rv-source-section");
-assert(sourceSections.length>=3,"All available source sections need independent disclosures");
-assert(sourceSections.every(section=>section.tag==="details"&&!section.open),"Sections begin collapsed rather than reveal a wall of text");
+assert(sourceSections.length>=3,"All available source sections need independent navigation");
+assert(sourceSections.every((section,i)=>section.tag==="section"&&section.hidden===(i!==0)),"One source section begins visible rather than a wall of text");
 const methodProse=match(sourceSections[0],"rv-prose");
 assert(methodProse.children.length>3,"Long source text must be split into readable paragraphs");
 assert.equal(methodProse.children.map(p=>p.textContent).join(" "),longPassage.trim(),"Formatting must preserve every source word");
 assert(textContent(sourceReader).includes("Final source detail must remain visible."),"The complete indexed section must not be clipped to reading-card length");
 assert(match(sourceReader,"rv-reader-contents"),"Source sections need navigation");
 const controls=matching(sourceReader,"rv-reader-control");
-controls[0].onclick();assert(sourceSections.every(s=>s.open),"Expand all failed");
-controls[1].onclick();assert(sourceSections.every(s=>!s.open),"Collapse all failed");
-matching(sourceReader,"rv-reader-jump")[0].onclick();assert(sourceSections[0].open,"Section navigation must open the selected source section");
-assert(!sourceSections[1].open,"Section navigation should leave other sections unchanged");
+controls[0].onclick();assert(sourceSections.every(s=>!s.hidden),"Read all source sections failed");
+controls[1].onclick();assert(sourceSections.every((s,i)=>s.hidden===(i!==0)),"One-section source view failed");
+matching(sourceReader,"rv-reader-jump")[1].onclick();assert(!sourceSections[1].hidden,"Section navigation must reveal the selected source section");
+assert(sourceSections[0].hidden,"Section navigation should hide the prior section");
+assert.equal(matching(sourceReader,"rv-reader-jump")[1].getAttribute("aria-pressed"),"true");
 assert(match(paperContainer,"rv-coverage-table"),"Every scholarly reading needs a source-coverage table");
 ctx.selected=unknown;vm.runInContext("TEST.showPaper(selected)",ctx);
 for(const placeholder of ["Method details are not clear enough", "A source-specific limitation could not be verified"])
@@ -613,7 +640,7 @@ const studyLimits="Preprint, not verified peer-reviewed evidence. Cross-sectiona
 ctx.qualifications=processNotices[0]+" "+studyLimits+" "+processNotices[1];
 const fullQualifications=vm.runInContext("TEST.readingQualifications(qualifications)",ctx);
 const fullDrawer=match(fullQualifications,"rv-full-qualifications");
-assert(fullDrawer&&fullDrawer.tag==="details"&&!fullDrawer.open);
+assert(hasLayer(fullDrawer),"The full process note should open in an optional card");
 assert.equal(proseText(match(fullDrawer,"rv-prose")),ctx.qualifications,"Full approved qualification prose must be preserved exactly");
 const upfront=visibleText(fullQualifications);
 for(const sentence of processNotices)assert(!upfront.includes(sentence),"Generic process notice leaked into primary bullets");
