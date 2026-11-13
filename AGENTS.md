@@ -121,3 +121,14 @@ This policy is stored in the repository so future assistants working on it can s
 - Home cards, the library, related readings, and article pages must use the same headline policy. Regeneration must repair stale automatic headings without changing body findings or source passages.
 - Use short reader-oriented content labels such as Research, Commentary, Conceptual framework, and Product guide. Put reading depth in source metadata rather than a prominent process label. An abstract-derived finding remains abstract-based even if other full-text sections are available.
 - Test current-corpus and future-record headings, conceptual/commentary distinctions, mixed source depth, and keyboard/mobile rendering.
+
+## Typography maintenance
+
+- Follow [the Observatory typography guide](docs/typography.md). Reuse the reading,
+  editorial, and interface roles in `assets/typography.css`; do not add component-local
+  font stacks or shrink substantive copy into caption text.
+- Keep font licenses, provenance, and asset sizes with the self-hosted files. New
+  families need a clear role and the same mobile, zoom, fallback, and cross-page checks.
+- Edit newsletter typography in `scripts/build_newsletter.py` and regenerate its HTML.
+  Preserve frozen issue content and feed identity. Verify new font assets and stylesheets
+  are included in the Pages package, including nested archive paths.

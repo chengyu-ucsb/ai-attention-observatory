@@ -1,0 +1,104 @@
+/* Observatory typography: the authoritative font and scale contract.
+   See docs/typography.md before adding families, weights or exceptions. */
+@font-face {
+  font-family: 'Gentium Book Plus';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/gentium-book-plus-italic-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Gentium Book Plus';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url(fonts/gentium-book-plus-italic-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Gentium Book Plus';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(fonts/gentium-book-plus-normal-400.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Gentium Book Plus';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(fonts/gentium-book-plus-normal-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Jost';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url(fonts/jost-normal-400-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: italic;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(fonts/open-sans-italic-400-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-stretch: 100%;
+  font-display: swap;
+  src: url(fonts/open-sans-normal-400-700.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --font-reading: 'Open Sans', 'Segoe UI', Arial, sans-serif;
+  --font-editorial: 'Gentium Book Plus', Georgia, 'Times New Roman', serif;
+  --font-interface: 'Jost', 'Segoe UI', Arial, sans-serif;
+  --font-code: ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  /* Compatibility aliases keep existing components on the same contract. */
+  --sans: var(--font-reading);
+  --display: var(--font-editorial);
+  --brand: var(--font-interface);
+  --reading-font: var(--font-reading);
+  --heading-font: var(--font-editorial);
+  --type-caption: .8125rem;
+  --type-small: .875rem;
+  --type-body: 1rem;
+  --type-lead: clamp(1.125rem, 1.05rem + .3vw, 1.25rem);
+  --type-title: clamp(2.125rem, 1.5rem + 2.5vw, 4rem);
+  --type-section: clamp(1.75rem, 1.45rem + 1vw, 2.25rem);
+  --type-card: 1.5rem;
+  --leading-reading: 1.75;
+  --leading-heading: 1.15;
+  --measure-reading: 70ch;
+  --reading-size: var(--type-body);
+  --reading-leading: var(--leading-reading);
+}
+html { font-size: 100%; -webkit-text-size-adjust: 100%; }
+body { font-family: var(--font-reading); font-size: var(--type-body); line-height: var(--leading-reading); }
+input, select, textarea { font: inherit; }
+code, pre, kbd, samp { font-family: var(--font-code); }
+/* Opt-in roles for future components; existing components use the same tokens. */
+.type-title { font: 700 var(--type-title)/var(--leading-heading) var(--font-editorial); letter-spacing: -.015em; text-wrap: balance; }
+.type-section { font: 700 var(--type-section)/1.2 var(--font-editorial); letter-spacing: -.01em; }
+.type-card { font: 700 var(--type-card)/1.25 var(--font-editorial); letter-spacing: 0; }
+.type-prose { font: 400 var(--type-body)/var(--leading-reading) var(--font-reading); max-width: var(--measure-reading); }
+.type-caption { font: 400 var(--type-caption)/1.6 var(--font-reading); }
+.type-label { font: 600 var(--type-caption)/1.5 var(--font-interface); letter-spacing: .06em; }
+.type-action { font: 600 var(--type-body)/1.5 var(--font-interface); }
+.type-data { font-family: var(--font-reading); font-variant-numeric: tabular-nums; }
