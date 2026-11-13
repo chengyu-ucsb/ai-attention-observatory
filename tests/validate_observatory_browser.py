@@ -258,13 +258,35 @@ def check(page, url, width, out):
 
 
 def check_weekly_citations(page, url, width, out):
-    """Exercise real published source spans and definitions, without JSON fixtures."""
+    """Exercise citations/glossary with a frozen, real published edition.
+
+    The current edition is tested separately on the main routes and standalone
+    pages. It need not include glossary terms. This regression uses the immutable
+    November 7 edition so later valid issues cannot accidentally remove coverage
+    of source spans, term focus, and history navigation.
+    """
     import json
+    from hashlib import sha256
     from urllib.parse import parse_qs, urlsplit, urlunsplit
-    issue = json.loads((ROOT / 'data/public-featured-issue.json').read_text())
-    archived = json.loads((ROOT / 'data/approved-issues' / (issue['edition_date'] + '.json')).read_text())
-    assert issue == archived, 'Featured citation checks must use the actual archived edition'
-    assert issue.get('citation_schema_version') == 1 and issue.get('glossary'), 'Current edition lacks inline citations/glossary'
+    current = json.loads((ROOT / 'data/public-featured-issue.json').read_text())
+    archived = json.loads((ROOT / 'data/approved-issues' / (current['edition_date'] + '.json')).read_text())
+    assert current == archived, 'Featured edition must remain its exact published snapshot'
+    fixture_path = ROOT / 'data/approved-issues/2026-11-07.json'
+    issue = json.loads(fixture_path.read_text())
+    assert issue['status'] == 'published' and issue['edition_date'] == '2026-11-07'
+    assert issue.get('citation_schema_version') == 1 and issue.get('glossary'), 'Archived citation fixture lacks definitions'
+    assert all(section.get('citations') for section in [*issue['signals'], issue['tension']]), 'Archived citation fixture must exercise every source span section'
+    # Override only this page's edition projection. Keep the actual production
+    # index/assets, app rendering, and untouched archived HTML. No content is
+    # written to disk and the latest edition remains the public default.
+    manifest = json.loads((ROOT / 'data/reader-manifest.json').read_text())
+    manifest.update(issue=issue, edition_id=issue['edition_date'],
+                    edition_sha256=sha256((json.dumps(issue, ensure_ascii=False,
+                        sort_keys=True, separators=(',', ':')) + '\n').encode()).hexdigest())
+    page.route('**/data/reader-manifest.json', lambda route: route.fulfill(
+        status=200, content_type='application/json', body=json.dumps(manifest)))
+    page.route('**/data/public-featured-issue.json', lambda route: route.fulfill(
+        status=200, content_type='application/json', body=json.dumps(issue)))
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
     page.set_viewport_size({'width': width, 'height': 900})
@@ -366,7 +388,7 @@ def check_weekly_citations(page, url, width, out):
     page.go_back()
     expect(page).to_have_url(archive_url)
     assert not errors, errors
-    print(f'Published weekly citations and glossary passed at {width}px: exact source/page links, keyboard/touch, focus, Back/Forward, archive definitions.')
+    print(f'Archived 2026-11-07 citation regression passed at {width}px: exact source/page links, keyboard/touch, focus, Back/Forward, archive definitions.')
 
 
 def check_standalone_brief(page, url, width, out):
