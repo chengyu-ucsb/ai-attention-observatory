@@ -352,7 +352,7 @@ def validate_selection(value, attempted):
         queue.integer(value[key])
     queue.require(type(value['skipped']) is dict and not set(value['skipped']) - {
         'unsupported_kind', 'already_editorially_reviewed', 'complete_machine_reading',
-        'retry_cooldown', 'unverified_venue', 'off_topic', 'no_explicit_human_topic'})
+        'retry_cooldown', 'format_retry_exhausted', 'unverified_venue', 'off_topic', 'no_explicit_human_topic'})
     validate_counts(value['skipped'])
     queue.require(value['considered'] == value['eligible'] + sum(value['skipped'].values())
                   and value['eligible'] == attempted + value['deferred_by_limit'])
