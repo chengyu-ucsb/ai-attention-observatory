@@ -83,6 +83,32 @@ class PreparedReadingTests(unittest.TestCase):
                 self.assertEqual(selection, result['review_run']['selection'])
                 self.assertEqual(result['review_run']['attempted'], expected)
 
+    def test_exhausted_retry_is_saved_as_a_skip_not_a_failed_stage(self):
+        from preparation_pipeline import validate_stage_report
+        bundle=prepared.reconcile(self.packet,self.state,now=FRIDAY)
+        record=next(iter(bundle['records'].values()))['record']
+        record['complete_reading_attempt']={
+            'status':'verifier_indices_invalid','stage':'synthesis','last_at':'2026-11-13',
+            'next_at':'2026-11-15','provider_diagnostics':[], 'format_failures':3,
+            'format_input_sha256':reading.reading_retry_fingerprint(record)}
+        prepared.sealed(bundle)
+        retriever=Mock();model=Mock()
+        result=prepared.review(self.packet,self.state,bundle,model=model,now=FRIDAY,retriever=retriever)
+        self.assertEqual(result['review_run']['selection']['skipped'],{'format_retry_exhausted':1})
+        self.assertEqual(result['review_run']['attempted'],0)
+        validate_stage_report('review',result['review_run'])
+        prepared.validate_bundle(result,WINDOW,now=FRIDAY)
+        retriever.assert_not_called();model.create_chat_completion.assert_not_called()
+        saved=next(iter(result['records'].values()))['record']
+        self.assertEqual(saved['complete_reading_attempt'],record['complete_reading_attempt'])
+        self.assertNotIn('deep_analysis',saved)
+
+    def test_unknown_skip_reason_still_rejected(self):
+        from preparation_pipeline import validate_selection
+        with self.assertRaises(ValueError):
+            validate_selection({'considered':1,'eligible':0,'deferred_by_limit':0,
+                                'skipped':{'unknown_skip':1}},0)
+
     def test_machine_reading_is_private_and_never_an_approval(self):
         bundle = self.reviewed()
         self.assertEqual(bundle["review_run"]["summaries_completed"], 1)
