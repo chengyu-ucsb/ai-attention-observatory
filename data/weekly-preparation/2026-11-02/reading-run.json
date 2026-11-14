@@ -3,8 +3,8 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-14T19:22:12.272880+00:00",
-  "finished_at": "2026-11-14T19:23:20.100819+00:00",
+  "started_at": "2026-11-14T20:02:26.662764+00:00",
+  "finished_at": "2026-11-14T20:02:39.327114+00:00",
   "publication_window": {
     "from": "2026-11-02",
     "to": "2026-11-08",
@@ -12,25 +12,25 @@
   },
   "bindings": {
     "packet.json": "995aec2b1ef884e5bc5246e9e5a8d0245dfa1ddf6d191eed6abefa2e505606f1",
-    "acquisition.json": "444f294f6b0e21dcf39b78ec72e6ee0138db7cbb2cdbc67b5cb3f42a76787948",
-    "readings.json": "8f34ee9d4914f8de986cdc6daea34706b5cef7cedd1cc2b201772cc12457cf93"
+    "acquisition.json": "25e978aaac6798fd09ea3fdb0900adeda7740abc9b13f5f7c9291e962e3e3022",
+    "readings.json": "2d83f000a4f633b4c2b6d40911e552cdee13a06d4107295c2c1a1144930b099b"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-14T19:22:13.237236+00:00",
+      "checked_at": "2026-11-14T20:02:27.618774+00:00",
       "selected_records": 138,
       "attempted_records": 12,
       "attempted_stages": 12,
       "completed_records": 21,
       "pending_records": 117,
-      "deferred_retry_records": 42,
+      "deferred_retry_records": 45,
       "statuses": {
         "access_blocked": 3,
         "full_document_retrieved_not_reviewed": 11,
         "partial_full_text_not_reviewed": 2,
-        "pending": 48,
-        "pending_routes": 27,
-        "rate_limited": 42,
+        "pending": 47,
+        "pending_routes": 25,
+        "rate_limited": 45,
         "source_unavailable": 5
       },
       "excluded": {},
@@ -49,26 +49,22 @@
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 1,
-      "documents_retrieved": 1,
+      "attempted": 0,
+      "documents_retrieved": 0,
       "partial_inputs": 0,
       "summaries_completed": 0,
-      "failed": 1,
-      "failure_reasons": {
-        "copied_source_passage": 1
-      },
-      "failure_stages": {
-        "synthesis": 1
-      },
+      "failed": 0,
+      "failure_reasons": {},
+      "failure_stages": {},
       "source_text_saved": false,
       "skipped_no_model": false,
       "selection": {
         "considered": 13,
-        "eligible": 1,
+        "eligible": 0,
         "deferred_by_limit": 0,
         "skipped": {
           "unverified_venue": 4,
-          "retry_cooldown": 4,
+          "retry_cooldown": 5,
           "no_explicit_human_topic": 3,
           "format_retry_exhausted": 1
         }
