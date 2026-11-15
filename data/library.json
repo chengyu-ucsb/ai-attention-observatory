@@ -5138,19 +5138,52 @@
     "metadata_observed_at": "2026-11-14T23:58:21.461885+00:00",
     "preparation_first_seen_at": "2026-11-14T23:58:21.461885+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "Crossref publisher-supplied abstract",
-      "overview": "Abstract Large language models are increasingly being used to evaluate clinical texts, a concept known as LLM-as-a-judge. This study audited six open-weight models against expert judges on four German clinical datasets covering report and nursing documentation summarization, discharge summary generation, and patient letter generation.",
-      "methods": "",
-      "findings": "",
-      "interpretation": "",
+      "level": "full_text",
+      "provenance": "NCBI PMC OAI-PMH JATS (automatic source-section extraction)",
+      "overview": "Abstract Large language models are increasingly being used to evaluate clinical texts, a concept known as LLM-as-a-judge. However, most of the existing evidence focuses on English data and uses pooled agreement metrics that obscure clinically relevant failure modes.",
+      "methods": "The study design is summarized in Fig. 5 . Four expert-annotated German clinical datasets from previous studies served as the evaluation basis, each mapped to one of three evaluation paradigms. Six open-weight LLM judges were evaluated across four prompt configurations. Performance was assessed along four outcome dimensions: absolute alignment with expert consensus, chance-corrected inter-rater reliability, distributional and algorithmic robustness, and decision impact. This study followed the TRIPOD-LLM 28 reporting standard (Suppl. Table 1 ). Fig. 5 Study design for the cross-paradigm clinical audit of LLM-as-a-judge. 1) Data: Expert-annotated German medical text spanning radiology, pathology, and surgical report summaries, nursing documentation summaries, and molecular tumor board (MTB) patient letters. 2) Paradigms: Implements pointwise scoring (1–5 Likert scale), pairwise comparison (forced-choice ranking), and pass-or-fail detection (clinical safety guardrail checking). 3) Models and configurations: Six open-weight LLMs were evaluated across four prompt variants (baseline, rule, demo, and multiagent). 4) Outcomes: Measures judge performance through alignment with expert consensus, chance-corrected inter-rater reliability, algorithmic robustness against seed and position bias, and the impact on real-world clinical decisions. MAE mean absolute error, JSD Jensen–Shannon divergence, MTB molecular tumor board; Pass/Fail, pass-or-fail.",
+      "findings": "The following sections report judge performance measured by absolute alignment, reliability, and robustness for six open-weight LLMs ranging from 24B to 235B parameters. The case study further exemplifies how substituting the human panel with an LLM-as-a-judge can affect decision-relevant metrics.",
+      "interpretation": "This study shows that current open-weight LLM judges do not yet match expert review for German clinical text evaluation in the deployment-ready sense. The judges did not reproduce expert judgment of German clinical text on any of the four outcomes examined here. Alignment and reliability with expert consensus were dependent on criterion and context. Robustness analyses showed that judges diverged from the expert distribution most where experts were unanimous, showed substantial position bias, and preferred model-written to human-written text. The decision-impact case study shows that substituting a judge for the expert panel changed 57.2% of pointwise rating categories (95% CI [48.5, 64.8]), reversed 41.7% of pairwise winners (95% CI [26.9, 58.4]), and left 10% of clinician-flagged major or critical errors undetected (95% CI [5, 18]), which means that human oversight remains necessary regardless of which open-weight judge is chosen. Reliability analyses further revealed that the configuration with the highest pass-or-fail recall (Qwen3-235B-A22B-Instruct-2507-FP8/rule) reached this recall at the cost of the low AC1, which reflects a high false-positive rate. The rule-augmented prompt yielded the most counterintuitive finding of the audit. Prior work has proposed detailed operationalizations of each criterion as a remedy for evaluator drift 4 , 6 . However, this strategy decreased alignment and degraded reliability for most models. The likely mechanism concerns how judges acquire criterion meaning. Declarative rule text overrides the pre-trained semantics that the judge already attaches to terms such as accurate , thorough , or succinct , and defines a specification that the judge must apply on the fly. The demo prompt exposes the judge to canonical example judgments and",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
-      "reported_findings": false
+      "reported_findings": true
+    },
+    "oa_checked": "2026-11-15",
+    "oa_pass_version": 3,
+    "pmcid": "PMC13737126",
+    "analysis": {
+      "provenance": "NCBI PMC OAI-PMH JATS (automatic source-section extraction)",
+      "license": "https://creativecommons.org/licenses/by/4.0/ open access this article is licensed under a creative commons attribution 4.0 international license, which permits use, sharing, adaptation, dist",
+      "license_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13737126/",
+      "methods": "The study design is summarized in Fig. 5 . Four expert-annotated German clinical datasets from previous studies served as the evaluation basis, each mapped to one of three evaluation paradigms. Six open-weight LLM judges were evaluated across four prompt configurations. Performance was assessed along four outcome dimensions: absolute alignment with expert consensus, chance-corrected inter-rater reliability, distributional and algorithmic robustness, and decision impact. This study followed the TRIPOD-LLM 28 reporting standard (Suppl. Table 1 ). Fig. 5 Study design for the cross-paradigm clinical audit of LLM-as-a-judge. 1) Data: Expert-annotated German medical text spanning radiology, pathology, and surgical report summaries, nursing documentation summaries, and molecular tumor board (MTB) patient letters. 2) Paradigms: Implements pointwise scoring (1–5 Likert scale), pairwise comparison (forced-choice ranking), and pass-or-fail detection (clinical safety guardrail checking). 3) Models and configurations: Six open-weight LLMs were evaluated across four prompt variants (baseline, rule, demo, and multiagent). 4) Outcomes: Measures judge performance through alignment with expert consensus, chance-corrected inter-rater reliability, algorithmic robustness against seed and position bias, and the impact on real-world clinical decisions. MAE mean absolute error, JSD Jensen–Shannon divergence, MTB molecular tumor board; Pass/Fail, pass-or-fail.",
+      "results": "The following sections report judge performance measured by absolute alignment, reliability, and robustness for six open-weight LLMs ranging from 24B to 235B parameters. The case study further exemplifies how substituting the human panel with an LLM-as-a-judge can affect decision-relevant metrics.",
+      "discussion": "This study shows that current open-weight LLM judges do not yet match expert review for German clinical text evaluation in the deployment-ready sense. The judges did not reproduce expert judgment of German clinical text on any of the four outcomes examined here. Alignment and reliability with expert consensus were dependent on criterion and context. Robustness analyses showed that judges diverged from the expert distribution most where experts were unanimous, showed substantial position bias, and preferred model-written to human-written text. The decision-impact case study shows that substituting a judge for the expert panel changed 57.2% of pointwise rating categories (95% CI [48.5, 64.8]), reversed 41.7% of pairwise winners (95% CI [26.9, 58.4]), and left 10% of clinician-flagged major or critical errors undetected (95% CI [5, 18]), which means that human oversight remains necessary regardless of which open-weight judge is chosen. Reliability analyses further revealed that the configuration with the highest pass-or-fail recall (Qwen3-235B-A22B-Instruct-2507-FP8/rule) reached this recall at the cost of the low AC1, which reflects a high false-positive rate. The rule-augmented prompt yielded the most counterintuitive finding of the audit. Prior work has proposed detailed operationalizations of each criterion as a remedy for evaluator drift 4 , 6 . However, this strategy decreased alignment and degraded reliability for most models. The likely mechanism concerns how judges acquire criterion meaning. Declarative rule text overrides the pre-trained semantics that the judge already attaches to terms such as accurate , thorough , or succinct , and defines a specification that the judge must apply on the fly. The demo prompt exposes the judge to canonical example judgments and, therefore, implicitly refines the existing pre-trained meaning rather than replacing it. This aligns with the well-established finding that LLMs excel at few-shot learning 23 . Although these gains did not close the gap to the expert panel for all criterions. While prompting strategies can potentially boost performance, their effects remain inconsistent and vary by model and paradigm, necessitating empirical validation before implementation. Recent work has moved toward ensemble-based LLM judges (multiagent juries), which showed better agreement with human expert ratings than single-judge setups 24 and have been adopted in domain-specific medical benchmarks, such as MedHELM 8 . Our results did not replicate the simple jury benefit. We attribute this provisionally to outliers in the multi-agent configuration, though further investigation is required. Under our current setup, the additional compute and orchestration costs of prompting multiple models for one rating are not justified by a measurable gain. The signed-deviation analysis of the case study revealed an inversion of clinical priorities. The judge overrated succinct , comprehensible , and accurate , and underrated thorough . This pattern is consistent with the length and verbosity bias documented in general-domain judges 25 , 26 . This disparity may also stem from the highly specialized domain of clinical text, as LLM judges have been shown to align more closely with lay than expert criteria 21 . The clinical implications differ from those in the general domain because overrating accurate when rating clinical text has direct consequences for patient safety. Furthermore, increased verbosity hinders efficient communication, which is essential in highly busy clinical contexts. Prior work in English clinical text evaluation 6 , 8 has reported pointwise inter-rater reliability at or above the human baseline. While this audit mostly reproduces this pattern, it also shows that the same configurations diverge from the human panel when absolute alignment, consensus stratification, bias, and decision impact are analyzed. Every judge in this audit favored the LLM-written candidate over the human-written reference. Qwen3-235B-A22B-Instruct-2507-FP8 produced the report, nursing, and discharge summaries and also served as a judge, so self-preference could plausibly explain part of its margin. However, other judges were more likely to swap their rating to the LLM-written than the authoring model, which rules out self-recognition as the dominant mechanism in this setting and separates our result from prior work 27 . We instead attribute the effect to a shared preference for surface features typical of LLM output, which the judges reward independent of provenance. medgemma-27b-it showed the largest position and identity bias by a large margin. Domain-adapted pretraining therefore offers no protection against the effect in this pool, though a single medical model does not let us separate the contribution of domain data from model scale and instruction tuning. Arena-style benchmarks that aggregate judge votes over mixed human and AI references will inflate apparent model quality, which should be considered when interpreting rankings from such benchmarks. On items where humans themselves split, the human majority label is an unstable target (e.g., low AC1 for pairwise), and any judge that matches it perfectly would replicate that instability. Binned-JSD 12 compares the full judge distribution to the full human distribution to show these distributional failures. The audit confirms that diagnostic value in a clinical setting, where the highest divergence concentrates on items at unanimous expert agreement, that is, the items on which downstream clinicians will most readily defer to the judge. Pooled correlations and pooled accuracies therefore offer a false floor of safety in clinical contexts. We argue that any future audit of clinical LLM judges should report stratified divergence by consensus level as the default, alongside the aggregate metrics that the current clinical literature has standardized. The present audit suggests that within-paradigm validation may not reliably transfer. Judges that clear or approach human-human thresholds in one paradigm did not in others. Hospital governance bodies that select clinical AI based on a pointwise paradigm benchmark, therefore, lack the evidence base to extrapolate to deployment formats, such as safety guardrails. The findings of this audit have direct implications for how LLM-as-a-judge can responsibly enter clinical infrastructure. First, as an offline benchmarking tool, an LLM judge with documented directional bias may still rank model versions consistently within a fixed evaluation regime, provided that the bias is reported alongside the score. Second, as a triage layer within a human-in-the-loop pipeline, the judge can flag candidate outputs for clinician review and reduce expert workload, where the pass-or-fail miss rate sets the lower bound on the rate of escaped errors that the human review must catch. Third, current judges fall short as standalone evaluators in deployed clinical systems. The pass-or-fail miss",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13737126/",
+      "key_idea": "The following sections report judge performance measured by absolute alignment, reliability, and robustness for six open-weight LLMs ranging from 24B to 235B parameters. The case study further exemplifies how substituting the human panel with an LLM-as-a-judge can affect decision",
+      "extraction_date": "2026-11-15",
+      "extraction_version": 3,
+      "sections_available": [
+        "results",
+        "discussion",
+        "methods"
+      ]
+    },
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "full_text",
+      "last_at": "2026-11-15",
+      "next_at": "2027-11-15",
+      "attempts": 1
     }
   },
   {
@@ -7301,6 +7334,41 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-15",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-13",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-15T01:02:27+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-11-29T01:02:28+00:00"
+    },
+    "open_access_url": "https://doi.org/10.29309/tpmj/2026.33.11.10727",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-15",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked",
+        "s2_candidate"
+      ]
     }
   },
   {
@@ -29632,9 +29700,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -29706,9 +29774,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30103,9 +30171,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30180,9 +30248,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30256,9 +30324,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30330,9 +30398,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30408,9 +30476,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30639,9 +30707,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -30840,9 +30908,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "fulltext_attempt": {
       "attempts": 2,
@@ -31146,9 +31214,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -31221,9 +31289,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "fulltext_attempt": {
       "attempts": 2,
@@ -31303,9 +31371,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -31453,9 +31521,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -31524,9 +31592,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -31751,9 +31819,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -31897,9 +31965,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -32048,9 +32116,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -32399,9 +32467,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -32471,9 +32539,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -32918,9 +32986,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -32986,9 +33054,9 @@
     "pdf_fulltext_attempt": {
       "version": 1,
       "status": "no_licensed_machine_pdf",
-      "last_at": "2026-10-22",
-      "next_at": "2026-11-12",
-      "attempts": 1
+      "last_at": "2026-11-15",
+      "next_at": "2026-12-06",
+      "attempts": 2
     },
     "repository_recovery": {
       "version": 1,
@@ -48449,9 +48517,9 @@
     "pmc_oai_attempt": {
       "version": 1,
       "status": "transient_error",
-      "last_at": "2026-11-14",
-      "next_at": "2026-11-15",
-      "attempts": 20
+      "last_at": "2026-11-15",
+      "next_at": "2026-11-16",
+      "attempts": 21
     },
     "fulltext_attempt": {
       "attempts": 2,
@@ -63428,7 +63496,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "fulltext_attempt": {
       "attempts": 1,
@@ -63511,7 +63579,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "fulltext_attempt": {
       "attempts": 1,
@@ -63952,7 +64020,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "fulltext_attempt": {
       "attempts": 1,
@@ -64296,7 +64364,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "fulltext_attempt": {
       "attempts": 1,
@@ -64478,7 +64546,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "fulltext_attempt": {
       "attempts": 1,
@@ -64748,7 +64816,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -64835,7 +64903,7 @@
       "next_at": "2026-12-05",
       "attempts": 1
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "fulltext_attempt": {
       "attempts": 1,
@@ -65010,7 +65078,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-11-07",
+    "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
