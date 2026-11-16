@@ -145,10 +145,17 @@ jobs:
           cp data/pipeline-status.json data/issue-feed.json _site/data/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v6.0.0
-      - uses: actions/upload-pages-artifact@v5.0.0
+      - id: pages_artifact
+        uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: _site
           retention-days: 1
+      - name: Wait for uploaded Pages artifact visibility
+        env:
+          PAGES_ARTIFACT_ID: ${{ steps.pages_artifact.outputs.artifact_id }}
+        # Public metadata needs no added token permission. Fail closed on HTTP
+        # errors; retry only a successful list that has not caught up yet.
+        run: python scripts/wait_pages_artifact.py --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID" --artifact-id "$PAGES_ARTIFACT_ID"
       - id: deployment
         uses: actions/deploy-pages@v5.0.1
 
