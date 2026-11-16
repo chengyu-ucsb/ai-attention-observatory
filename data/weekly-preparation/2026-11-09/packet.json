@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "weekly_preparation",
-  "observation_at": "2026-11-16T23:25:49.741147+00:00",
+  "observation_at": "2026-11-16T23:44:04.209361+00:00",
   "target_publication_window": {
     "from": "2026-11-09",
     "to": "2026-11-15",
@@ -287,7 +287,7 @@
       "discovery_scope": "preparation",
       "discovery_query": "digital distraction notification fatigue attention",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-13T18:34:42.871467+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-13T18:34:42.871467+00:00"
     },
     {
@@ -888,8 +888,84 @@
       "discovery_scope": "preparation",
       "discovery_query": "digital distraction notification fatigue attention",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-12T18:58:35.636347+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-12T18:58:35.636347+00:00"
+    },
+    {
+      "title": "Location-Aware Scheduling for Multitasking MCM-GPUs",
+      "authors": [
+        "Tiejian Zhang",
+        "Guangda Zhang",
+        "Yandong He",
+        "Chen Zhang",
+        "Jiping Gao",
+        "Hengzhu Liu",
+        "Xia Zhao"
+      ],
+      "published": "2026-11-11",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              11,
+              11
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published-print",
+            "date_parts": [
+              2027,
+              3,
+              31
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              11,
+              11
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              11,
+              11
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-11-11"
+      },
+      "venue": "ACM Transactions on Design Automation of Electronic Systems",
+      "doi": "10.1145/3827618",
+      "url": "https://doi.org/10.1145/3827618",
+      "abstract_text": "To address the growing computational demands of high-performance computing (HPC) and machine learning (ML) applications, Graphics Processing Units (GPUs) have transitioned from single-chip designs to multi-chip module (MCM) architectures, driven by manufacturing constraints. Simultaneously, GPUs are increasingly deployed in cloud environments to accelerate a wide range of applications for multiple users. Spatial multitasking, which allows multiple applications to run concurrently on a single GPU by executing them on different sets of streaming multiprocessors (SMs), offers an efficient method for sharing GPU resources. However, effectively supporting multitasking in the emerging MCM-GPU architecture presents a significant challenge that remains an open problem. This article presents the key observation that the placement of co-executing applications in MCM-GPUs plays a critical role in system performance. Specifically, for certain multiprogram workloads, co-executing applications achieve better performance when located on the same GPU chip to maximize memory bandwidth utilization. Conversely, other workloads benefit from being distributed across different GPU chips to mitigate memory contention. To address this, we propose a Location-Aware Scheduler (LA-Scheduler) that identifies application characteristics and makes optimized scheduling decisions. The LA-Scheduler performs lightweight workload classification using a k-means-based clustering method and applies multitasking scheduling rules during runtime to determine the optimal placement of applications within the MCM-GPU architecture. Evaluation results show that the proposed LA-Scheduler improves system throughput (STP) by an average of 38.67% compared with single-task operation. Compared with the traditional methods intra-chip scheduling and inter-chip scheduling, the system throughput is improved by an average of 13.51% and 7.14% respectively.",
+      "abstract_source": "Crossref publisher-supplied abstract",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "To address the growing computational demands of high-performance computing (HPC) and machine learning (ML) applications, Graphics Processing Units (GPUs) have transitioned from single-chip designs to multi-chip module (MCM) architectures, driven by manufacturing constraints. Simultaneously, GPUs are increasingly deployed in cloud environments to accelerate a wide range of applications for multiple users. Spatial mult…",
+      "kind": "scholarly",
+      "lane": "Fragmentation",
+      "relation": "Adjacent digital-attention evidence",
+      "evidence": "Registry metadata screened; original paper not yet independently assessed",
+      "source": "Crossref",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "AI assistant interruptions distraction multitasking",
+      "historical_backfill": false,
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
     },
     {
       "title": "DEMO: End-to-End Privacy-Preserving LLM Inference: Linearity-Based Attention–FFN Split with Additive Masking over Two Cloud GPU Nodes",
@@ -1106,7 +1182,7 @@
       "discovery_scope": "closeout",
       "discovery_query": "generative AI cognitive offloading critical thinking",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
     },
     {
@@ -1256,7 +1332,7 @@
       "discovery_scope": "closeout",
       "discovery_query": "large language model cognitive engagement agency",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-16T13:32:20.837751+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
     },
     {
@@ -1918,7 +1994,7 @@
       "discovery_scope": "preparation",
       "discovery_query": "generative AI cognitive offloading critical thinking",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-10T08:40:33.102749+00:00",
       "abstract_completeness": "provider_text_preserved"
     },
@@ -1981,7 +2057,7 @@
       "discovery_scope": "preparation",
       "discovery_query": "generative AI cognitive offloading critical thinking",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-10T08:40:33.102749+00:00",
       "abstract_completeness": "provider_text_preserved"
     },
@@ -3223,6 +3299,69 @@
       "preparation_first_seen_at": "2026-11-15T02:45:53.116624+00:00"
     },
     {
+      "title": "Ethnomathematics in the Age of Artificial Intelligence: Navigating Cultural Preservation and Technological Advancement",
+      "authors": [
+        "Richmond Kakra Addae",
+        "Seth Amoako Atta",
+        "Hawa Adusei"
+      ],
+      "published": "2026-11-12",
+      "venue": "Journal of Mathematics Instruction Social Research and Opinion",
+      "doi": "10.58421/misro.v5i4.1757",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              11,
+              12
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              11,
+              12
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              11,
+              12
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-11-12"
+      },
+      "url": "https://doi.org/10.58421/misro.v5i4.1757",
+      "abstract_text": "This study maps and synthesises two adjacent bodies of literature—research on ethnomathematics and culturally responsive mathematics instruction focused on Akan cultural practices, and research on artificial intelligence (AI) in mathematics education—to propose a culturally responsive, AI-supported instructional framework for Ghanaian classrooms. A systematic scoping review was conducted following the PRISMA Extension for Scoping Reviews (PRISMA-ScR) and PRISMA 2020 flow conventions. Six databases were searched for records published between 2005 and 2025, supplemented by hand-searching. AI was operationalised broadly, from intelligent tutoring and adaptive learning systems to generative AI from late 2022 onwards. Of 612 records, 25 studies were retained for qualitative thematic synthesis. The synthesis indicates that kente weaving, Adinkra symbolism, market transactions, and drumming patterns encode mathematical ideas such as symmetry, proportion, sequence, and logical reasoning. The AI-focused studies, most of which predate generative AI, suggest that these tools can support personalised, interactive, and contextualised learning. No included study combines the two strands in the Akan context; this absence is a central finding and motivates the proposed framework. Blending ethnomathematics with AI is associated with greater cultural relevance, engagement, and conceptual clarity, although digitising Indigenous knowledge raises ethical questions of ownership, representation, and community consent.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "This study maps and synthesises two adjacent bodies of literature—research on ethnomathematics and culturally responsive mathematics instruction focused on Akan cultural practices, and research on artificial intelligence (AI) in mathematics education—to propose a culturally responsive, AI-supported instructional framework for Ghanaian classrooms. A systematic scoping review was conducted following the PRISMA Extensio…",
+      "kind": "scholarly",
+      "lane": "Interventions",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "AI attention management intervention focus assistant",
+      "historical_backfill": false,
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
       "title": "Dangerous (Artificial) Minds: Charting a Middle Path for AI in High School English",
       "authors": [
         "DAVID NURENBERG"
@@ -3413,6 +3552,69 @@
       "preparation_first_seen_at": "2026-11-11T08:02:07.776092+00:00"
     },
     {
+      "title": "The Influence of Artificial Intelligence (Ai) in the Teaching and Learning Process (PDPC) to Enhance Student Motivation: A Systematic Literature Review",
+      "authors": [
+        "Arliena Masdin",
+        "Zamri Mahamod",
+        "NURUL HUWAIDA ABDUL HAFIZ"
+      ],
+      "published": "2026-11-11",
+      "venue": "International Journal of Academic Research in Progressive Education and Development",
+      "doi": "10.6007/ijarped/v15-i4/29359",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              11,
+              11
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              11,
+              11
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              11,
+              11
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-11-11"
+      },
+      "url": "https://doi.org/10.6007/ijarped/v15-i4/29359",
+      "abstract_text": "Artificial Intelligence (AI) has increasingly garnered attention within the global education landscape due to its potential to transform the teaching and learning process in a comprehensive manner. AI is capable of offering more personalised teaching approaches by adapting content and delivery methods according to individual students' proficiency levels, interests, and needs. It can analyse student performance in real time and provide immediate, targeted feedback, thereby enhancing students’ motivation to remain focused during learning sessions.This systematic literature review aims to critically examine and analyse the influence of Artificial Intelligence (AI) on the teaching and learning process, as well as its impact on student motivation. Scholarly databases such as Google Scholar, the Educational Resource Information Centre (ERIC), and Semantic Scholar were utilised to access relevant articles published within the last five years (2020–2025). A total of 156 articles were identified during the initial screening phase, and 13 were selected for synthesis as they met the specific contextual criteria of the systematic literature review, conducted in accordance with the stages outlined in the Preferred Reporting Items for Systematic Reviews and Meta-Analyses (PRISMA) model.Findings from the review indicate a notable increase in both intrinsic and extrinsic motivation among students engaged in learning sessions that incorporate AI elements, particularly through the use of digital applications such as ChatGPT, Chatbot, Moodle, Ask AI, Image AI, Padlet, and others. These findings further substantiate the assertion that AI significantly contributes to enhancing students’ motivation during the teaching and learning process.The scope of this study specifically focuses on primary-level students to examine the influence of AI in the classroom context, thereby demonstrating the capacity of Artificial Intelligence to serve as a paradigm shift in fostering student motivation and cultivating a more productive teaching and learning environment.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Artificial Intelligence (AI) has increasingly garnered attention within the global education landscape due to its potential to transform the teaching and learning process in a comprehensive manner. AI is capable of offering more personalised teaching approaches by adapting content and delivery methods according to individual students' proficiency levels, interests, and needs. It can analyse student performance in rea…",
+      "kind": "scholarly",
+      "lane": "Interventions",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "AI attention management intervention focus assistant",
+      "historical_backfill": false,
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
       "title": "The mediating role of AI-assisted writing self-regulation on the predictors of writing quality",
       "authors": [],
       "published": "2026-11-09",
@@ -3533,7 +3735,7 @@
       "discovery_scope": "preparation",
       "discovery_query": "generative AI self regulation learning intervention",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-12T18:58:35.636347+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-12T18:58:35.636347+00:00"
     },
     {
@@ -3774,6 +3976,72 @@
       "preparation_first_seen_at": "2026-11-12T18:58:35.636347+00:00"
     },
     {
+      "title": "Transforming Science Education through Artificial Intelligence (AI): Opportunities, Challenges, and Implications for Students' Critical Thinking Skills in the Digital Era.",
+      "authors": [
+        "Meirita Sari",
+        "Faizah Amalia",
+        "Kaila Sri Wahyuni Amalia",
+        "Eva Ullifatus Sholihah",
+        "Ladiva Jufitri",
+        "Imam Prayogo"
+      ],
+      "published": "2026-11-09",
+      "venue": "Assoeltan Indonesian Journal of Community Research and Engagement",
+      "doi": "10.70610/edujavare.2244",
+      "publication_date_provenance": {
+        "source": "Crossref publisher metadata",
+        "evidence": [
+          {
+            "field": "published-online",
+            "date_parts": [
+              2026,
+              11,
+              9
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "published",
+            "date_parts": [
+              2026,
+              11,
+              9
+            ],
+            "precision": "day"
+          },
+          {
+            "field": "issued",
+            "date_parts": [
+              2026,
+              11,
+              9
+            ],
+            "precision": "day"
+          }
+        ],
+        "policy": "earliest precise publication event; no registry timestamp fallback",
+        "status": "day_known",
+        "field": "published-online",
+        "value": "2026-11-09"
+      },
+      "url": "https://doi.org/10.70610/edujavare.2244",
+      "abstract_text": "Artificial intelligence (AI) is reshaping science education by expanding access to information, supporting adaptive instruction, enabling simulations, and providing timely feedback. This article examines the opportunities, challenges, and implications of AI integration for students’ critical thinking in the digital era. Using a narrative literature review, the study synthesizes foundational scholarship on AI in education, science learning, AI literacy, and critical thinking, alongside recent reviews and international guidance. The synthesis indicates that AI can support critical thinking when it is embedded in inquiry-oriented activities that require students to formulate questions, interpret scientific evidence, compare explanations, identify limitations, and justify conclusions. AI-supported simulations, conversational systems, and feedback tools may make abstract concepts more accessible and provide opportunities for iterative reasoning. However, these benefits are not automatic. Hallucinated information, algorithmic bias, privacy risks, unequal access, academic integrity concerns, and cognitive over-reliance may weaken learning if AI outputs are accepted without verification. The article argues that AI should function as a cognitive partner rather than a substitute for students’ intellectual work. Effective integration therefore requires scientific and AI literacy, teacher mediation, transparent assessment, ethical safeguards, and learning tasks that make reasoning visible. A human-centred approach can help science education use AI to strengthen, rather than displace, independent and evidence-based thinking.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Artificial intelligence (AI) is reshaping science education by expanding access to information, supporting adaptive instruction, enabling simulations, and providing timely feedback. This article examines the opportunities, challenges, and implications of AI integration for students’ critical thinking in the digital era. Using a narrative literature review, the study synthesizes foundational scholarship on AI in educa…",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout",
+      "discovery_query": "generative AI cognitive offloading critical thinking",
+      "historical_backfill": false,
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
+    },
+    {
       "title": "Neural Mechanisms of Willed Attention Control",
       "authors": [
         "Changhao Xiong",
@@ -3829,7 +4097,7 @@
       "discovery_scope": "preparation",
       "discovery_query": "generative AI sustained attention task switching",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-12T18:58:35.636347+00:00",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
       "preparation_first_seen_at": "2026-11-11T08:02:07.776092+00:00"
     },
     {
@@ -7019,6 +7287,396 @@
       "acquisition_status": "original_publication_date_required",
       "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
       "preparation_first_seen_at": "2026-11-16T23:25:49.741147+00:00"
+    },
+    {
+      "title": "Feeling Easier, Working Harder: Cognitive Load in AI-Assisted Code Comprehension",
+      "authors": [
+        "Maryangela White",
+        "Maximilian Rose",
+        "Matthew Buckman",
+        "Amy McDonnell",
+        "Francisco Ortega",
+        "Bianca Trinkenreich"
+      ],
+      "published": "",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2611.12019",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2611.12019v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2611.12019v1",
+        "version_url": "https://arxiv.org/abs/2611.12019v1",
+        "status": "unresolved",
+        "reason": "HTTP None",
+        "verification_error": true,
+        "value": ""
+      },
+      "url": "https://doi.org/10.48550/arxiv.2611.12019",
+      "abstract_text": "Software developers spend significant time reading and understanding code, increasingly supplemented by generative AI. While these tools aim to reduce the difficulty of reading code, interacting with them introduces a dual-task environment that may impose extraneous cognitive load that is challenging to capture. This study investigates how access to generative AI affects developers' real-time cognitive workload, code comprehension performance, and self-perceived code comprehension strategies. We conducted a 3x2 within-subjects study with 20 novice CS students reviewing Java code snippets of varying lengths with or without AI assistance, followed by an AI-unassisted comprehension quiz. Cognitive workload was continuously captured using a Detection-Response Task (tDRT) during both reading and quiz phases, and compared to post-quiz NASA-TLX and SEQ scores. AI assistance significantly increased objective cognitive workload, raising tDRT reaction times by 11.2%, yet participants' perceived workload remained unchanged. Code comprehension scores were high under both conditions, with no evidence that AI assistance improved comprehension at the difficulty levels evaluated; a ceiling effect limited power to detect benefits on harder tasks. Qualitatively, participants reported trusting the AI conditionally -verifying its output against their own reading for more complex snippets, but directly trusting it for simpler code- and, while many felt their reading process was unchanged, a notable subset shifted toward skimming or reading the AI's explanations in place of the code itself. These findings reveal that developers do not accurately perceive the cognitive resources they expend when managing AI tools. This study provides evidence of added cognitive effort associated with using generative AI, pointing towards a need to account for this dual-task penalty in software engineering tools and education.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Software developers spend significant time reading and understanding code, increasingly supplemented by generative AI. While these tools aim to reduce the difficulty of reading code, interacting with them introduces a dual-task environment that may impose extraneous cognitive load that is challenging to capture. This study investigates how access to generative AI affects developers' real-time cognitive workload, code…",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout",
+      "discovery_query": "large language model cognitive engagement agency",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
+    },
+    {
+      "title": "Surrendering and Reclaiming Judgment: How Software Engineering Students Experience AI Reliance",
+      "authors": [
+        "Nathan Cassee",
+        "Ümit Akırmak",
+        "Luiz Guerra",
+        "Margaret‐Anne Storey",
+        "Neil Ernst"
+      ],
+      "published": "",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2611.12646",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2611.12646v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2611.12646v1",
+        "version_url": "https://arxiv.org/abs/2611.12646v1",
+        "status": "unresolved",
+        "reason": "HTTP None",
+        "verification_error": true,
+        "value": ""
+      },
+      "url": "https://doi.org/10.48550/arxiv.2611.12646",
+      "abstract_text": "Software architecture is one of the skills novice developers must master to succeed in industry, and as AI disrupts software development, it is also transforming how students learn architecture. Existing work on how students and novices work with AI has mostly focused on small programming exercises or on students' perceptions of AI, so little is known about how students experience AI as they learn software architecture in larger team projects. We report on an exploratory case study of 43 senior software engineering students who used AI throughout a semester-long, team-based software architecture project. We combined surveys with focus groups and analyzed the focus group transcripts and the open survey responses through Braun and Clarke's reflexive thematic analysis. We constructed two themes. The first, Surrendering Judgment to AI, traces how participants' reliance on AI deepened as they used it to architect and implement their systems, until they surrendered their judgment and became stuck in a codebase they had created but could not understand, which made them rely on AI even more. Participants described feeling ashamed, frustrated, and emotionally disconnected from their work, a toll that, in our reading, left them with even less reason to break their reliance. The second, Applying Human Judgment, centers on participants who kept or reclaimed their judgment: the knowledge and experience it rested on, and the strategies they used to apply it. Participants' accounts suggest that relaxed deadlines and a lecture and lab on working with AI gave them room to acquire knowledge and reclaim judgment. Given the expectations placed on junior developers and the widespread adoption of AI, we believe these first-hand accounts can help software engineering education and industry adopt AI in ways that preserve novice developers' judgment, ownership, and motivation.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Software architecture is one of the skills novice developers must master to succeed in industry, and as AI disrupts software development, it is also transforming how students learn architecture. Existing work on how students and novices work with AI has mostly focused on small programming exercises or on students' perceptions of AI, so little is known about how students experience AI as they learn software architectu…",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout",
+      "discovery_query": "ChatGPT metacognition memory cognitive effort",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
+    },
+    {
+      "title": "Algorithmic Refuge: Generative AI and Synthetic Media as Affective Digital Coping Mechanisms",
+      "authors": [
+        "Noel Santander"
+      ],
+      "published": "",
+      "venue": "International Journal of Research and Innovation in Social Science",
+      "doi": "10.47772/ijriss.2026.101000634",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-13"
+      },
+      "url": "https://doi.org/10.47772/ijriss.2026.101000634",
+      "abstract_text": "This research study investigates how individuals purposefully repurpose Generative Artificial Intelligence (GenAI) tools, synthetic media platforms, and algorithmic recommendation feeds as self-directed instruments for emotional regulation, cognitive restoration, and mediated social presence. Moving beyond traditional Human-Computer Interaction (HCI) paradigms focused on task efficiency or pathologized screen-time metrics, this investigation employs Interpretative Phenomenological Analysis (IPA) to examine qualitative narratives gathered via an asynchronous online survey on Google Forms from 20 technical and academic participants. Methodologically, the study clarifies how asynchronous qualitative text entries provide psychological depth, reflective privacy, and unhurried articulation of intimate coping experiences without interviewer demand characteristics. Furthermore, the paper explicitly differentiates general digital technology usage (e.g., passive scrolling, manual gaming) from Generative AI-assisted coping (e.g., adaptive LLM conversational processing, AI-composed ambient soundscapes, synthetically rendered visual loops, and machine-learning feed curation). The qualitative analysis reveals a reconciled four-pillar framework of algorithmic affect: (1) Synthetic Media & Generative AI Audio as an Affective Reset for Cognitive Slowing, (2) Algorithmic Recommendation Feeds as Digital Safe Spaces (Spatial Sheltering), (3) Technological Flow and Restored Agency in High-Focus AI-Assisted Tasks, and (4) Ambient Digital Environments and Mediated Co-Presence (Relational Co-Presence). These findings demonstrate that users actively co-create digital refuges to protect their emotional boundaries, offering vital empirical insights for designing well-being-centered, calm UI/UX interface architectures.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "This research study investigates how individuals purposefully repurpose Generative Artificial Intelligence (GenAI) tools, synthetic media platforms, and algorithmic recommendation feeds as self-directed instruments for emotional regulation, cognitive restoration, and mediated social presence. Moving beyond traditional Human-Computer Interaction (HCI) paradigms focused on task efficiency or pathologized screen-time me…",
+      "kind": "scholarly",
+      "lane": "AI & cognition",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "generative AI cognitive offloading critical thinking",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:25:49.741147+00:00"
+    },
+    {
+      "title": "Absent Partners – Artificial Allies: Conceptualizing genAI as Collaborative Actor in Educational Design Research",
+      "authors": [
+        "Steven Beyer",
+        "Pia Sander"
+      ],
+      "published": "",
+      "venue": "MedienPädagogik Zeitschrift für Theorie und Praxis der Medienbildung",
+      "doi": "10.21240/mpaed/73/2026.11.12.x",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "2026-11-12",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-12"
+      },
+      "url": "https://doi.org/10.21240/mpaed/73/2026.11.12.x",
+      "abstract_text": "Collaboration between researchers and practitioners is central to Educational Design Research (EDR). However, epistemic-temporal misalignments as well as power-dependency relations frequently impede such collaboration, particularly in projects addressing technology-rich educational contexts. This paper examines these collaboration challenges as a constitutive part of EDR rather than as contingent implementation problems. Drawing on Actor-Network Theory (ANT), the paper reconceptualises collaboration as an emergent effect of socio-material networks where technologies are not treated as neutral tools but as actors. Against this backdrop, it explores how generative artificial intelligence (genAI) might strengthen research-practice interactions by assuming specific collaborative functions in situations where human participation is constrained or unevenly resourced. Through two constructed scenarios situated in school contexts, the paper illustrates how genAI could formalise tacit knowledge or provisionally represent absent stakeholders within EDR networks. Rather than positioning genAI as a substitute for human collaboration, the paper argues that genAI-enhanced collaboration may contribute to the stabilisation and extension of collaborative relations within EDR networks. In doing so, it advances a theoretically grounded and methodologically transferable perspective on AI integration in EDR – one that treats the design of human-AI collaboration as a scholarly decision worthy of explicit documentation and critical scrutiny, rather than an ad hoc response to resource constraints.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Collaboration between researchers and practitioners is central to Educational Design Research (EDR). However, epistemic-temporal misalignments as well as power-dependency relations frequently impede such collaboration, particularly in projects addressing technology-rich educational contexts. This paper examines these collaboration challenges as a constitutive part of EDR rather than as contingent implementation probl…",
+      "kind": "scholarly",
+      "lane": "Fragmentation",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "generative AI sustained attention task switching",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
+      "title": "AI-Powered Mock Interview Platform for Personalized Multimodal Interview Preparation and Performance Evaluation",
+      "authors": [
+        "Sitheswar K",
+        "Siva M",
+        "R. Vinoth Kumar"
+      ],
+      "published": "",
+      "venue": "Research Square",
+      "doi": "10.21203/rs.3.rs-11485890/v1",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "2026-11-13",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-13"
+      },
+      "url": "https://doi.org/10.21203/rs.3.rs-11485890/v1",
+      "abstract_text": "Abstract Modern campus placement and technical recruitment pipelines demand a multilayer evaluation of graduating software engineers, encompassing algorithmic problem-solving proficiency, structured verbal reasoning, and composed nonverbal delivery. However, scalable mock interview preparation remains constrained by human-resource-intensive faculty panels and the summative, non-pedagogical design of commercial video screening software. This paper presents an integrated, privacy-preserving multimodal mock interview platform tailored to formative placement training and objective competency evaluation. The decoupled multi-tier architecture combines generative language model reasoning (LLaMA 3.3 70B via Groq Language Processing Unit acceleration), client-side facial and iris landmark telemetry using Google MediaPipe Face Landmarker in WebAssembly, browser-native acoustic speech transcription, neural vocal synthesis via ElevenLabs, and an isolated Wandbox Docker compiler sandbox integrated with a Monaco code editor. Because computer vision inference executes exclusively within volatile client-side browser memory at 5 frames per second (FPS) before immediate frame disposal, the platform requires 0.0 kbps of cloud video streaming bandwidth and preserves candidate biometric privacy with sub-12 ms local tracking latency. A normalized late-fusion assessment algorithm synthesizes verbal semantic depth (55%), vocal cadence and articulation (25%), and visual gaze stability (20%) into auditable multi-tier diagnostic scorecards. Empirical validation across 39 multi-stage simulation sessions (1,367 cumulative practice minutes) achieved 94.2% precision in structured behavioral evaluation, 92.0% steady gaze retention, a 100% test-case pass rate across sandboxed programming challenges, an Applicant Tracking System (ATS) readiness score of 85/100, and an average longitudinal competency gain of +26.4% alongside a reduction in speech disfluencies from 4.2 to 0.2 fillers per minute.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Abstract Modern campus placement and technical recruitment pipelines demand a multilayer evaluation of graduating software engineers, encompassing algorithmic problem-solving proficiency, structured verbal reasoning, and composed nonverbal delivery. However, scalable mock interview preparation remains constrained by human-resource-intensive faculty panels and the summative, non-pedagogical design of commercial video …",
+      "kind": "scholarly",
+      "lane": "Fragmentation",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "generative AI sustained attention task switching",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
+      "title": "Changes in specific dimensions of English writing anxiety during AI chatbot-supported blended instruction: evidence from Chinese vocational college students",
+      "authors": [
+        "Xiaoyan Bao",
+        "Jiping Zhang"
+      ],
+      "published": "",
+      "venue": "Frontiers in Psychology",
+      "doi": "10.3389/fpsyg.2026.1962253",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "2026-11-13",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-13"
+      },
+      "url": "https://doi.org/10.3389/fpsyg.2026.1962253",
+      "abstract_text": "Background Writing anxiety remains a major obstacle to second language (L2) writing, particularly among vocational college students with limited English proficiency. Although artificial intelligence (AI)-powered chatbots have shown considerable potential in supporting language learning, their role in alleviating writing anxiety has received insufficient empirical attention. Methods This study examined whether integrating an AI-based chatbot into English writing instruction was associated with changes in English writing anxiety among Chinese vocational college students. A quasi-experimental design was employed with 120 students from two intact classes, with one class designated as the experimental group and the other as the control group. Over eight weeks, the experimental group received blended writing instruction incorporating Doubao, an AI-based chatbot, whereas the control group received conventional writing instruction. Writing anxiety was measured before and after the intervention across five dimensions: test anxiety, self-doubt, somatic anxiety, time anxiety, and avoidance behavior. Semi-structured interviews were also conducted with ten students from the experimental group to explore their learning experiences and perceptions of chatbot-assisted writing. Results The quantitative analyses showed that the experimental group experienced greater reductions in somatic anxiety and avoidance behavior than the control group, whereas no statistically significant between-group differences were found in test anxiety, self-doubt, or time anxiety. Qualitative evidence indicated that participants perceived the chatbot as a supportive and non-judgmental learning companion and reported reduced emotional pressure and greater writing confidence. Participants also described actively seeking help from the chatbot, checking its suggestions, and revising their writing during the writing process. Conclusion These findings suggest that, under the instructional conditions examined, AI chatbot-supported blended writing instruction was associated with alleviations in some dimensions of writing anxiety. The findings should be interpreted in the context of the broader instructional condition, which combined chatbot support with regular classroom instruction and writing activities. As writing performance was not directly assessed, the study focused on changes in writing anxiety rather than writing proficiency or writing quality. Further research with larger samples, more closely matched instructional conditions, and longer follow-up periods is needed to further examine these relationships.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "Background Writing anxiety remains a major obstacle to second language (L2) writing, particularly among vocational college students with limited English proficiency. Although artificial intelligence (AI)-powered chatbots have shown considerable potential in supporting language learning, their role in alleviating writing anxiety has received insufficient empirical attention. Methods This study examined whether integra…",
+      "kind": "scholarly",
+      "lane": "Interventions",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "AI attention management intervention focus assistant",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
+      "title": "Anti-Cyberbullying AI Chatbots: A Systematic Review of Criminological Theories, Evidence, and Criminal Justice Applications",
+      "authors": [
+        "Zariatu Ibrahim",
+        "Hua Zhong"
+      ],
+      "published": "",
+      "venue": "OpenAlex",
+      "doi": "10.67734/cc31568.a55",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "2026-11-13",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-13"
+      },
+      "url": "https://doi.org/10.67734/cc31568.a55",
+      "abstract_text": "This systematic review synthesizes evidence on AI chatbots for cyberbullying prevention and intervention from a criminological perspective, with explicit attention to Asia Pacific applicability. Following PRISMA 2020 guidelines, we identified 25 studies (2018-2025) across seven databases and appraised each using criteria adapted from MMAT and JBI tools, assigning every source an evidentiary weight (High, Moderate, Low, or Indicative proof-of-concept). Four chatbot roles emerged: real-time detection, victim support, preventive education, and bystander intervention training. Disaggregated analysis tempers headline performance claims. The frequently cited 89-99% accuracy range reflects laboratory classification on benchmark datasets, predominantly English-language Western corpora, evaluated under balanced class distributions and within-dataset conditions. No included study reported AUC or class-imbalance-adjusted metrics, employed temporal validation, or evaluated systems in real-world deployment with adolescents. Where precision and recall were disaggregated, asymmetric error profiles emerged with criminologically distinct social costs that single-metric reporting obscures. Only three studies qualified as High evidentiary weight, all addressing user-centred design in Western individualist contexts; victim support claims rest predominantly on Indicative proof-of-concept demonstrations. Geographic and linguistic concentration is a defining characteristic of the evidence base: zero studies have validated systems for Southeast Asian languages, no participatory design has engaged Asian youth, and no work has evaluated Asia Pacific platforms (WeChat, LINE, KakaoTalk). Drawing on Asian and Southern criminology, we argue that the uncritical transfer of Western-validated systems risks ineffectiveness, discriminatory false positives, and failure to detect culture-specific harms. The paper offers five criminological practice implications, each framed as theoretically informed extrapolations requiring local validation. AI chatbots are positioned as potentially valuable complementary tools within human-led prevention ecosystems, conditional on rigorous local research, transparent metric reporting, and sustained interdisciplinary collaboration.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "This systematic review synthesizes evidence on AI chatbots for cyberbullying prevention and intervention from a criminological perspective, with explicit attention to Asia Pacific applicability. Following PRISMA 2020 guidelines, we identified 25 studies (2018-2025) across seven databases and appraised each using criteria adapted from MMAT and JBI tools, assigning every source an evidentiary weight (High, Moderate, Lo…",
+      "kind": "scholarly",
+      "lane": "Interventions",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "AI attention management intervention focus assistant",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
+      "title": "Sage-Taiyi: A Metacognitive Architecture for Scientific Discovery",
+      "authors": [
+        "Weida Wang",
+        "Benteng Chen",
+        "Yigeng Jiang",
+        "Shuchen Pu",
+        "Weiping Shen",
+        "Zichao Liu",
+        "Yulin Su",
+        "Zitong Wang"
+      ],
+      "published": "",
+      "venue": "arXiv (Cornell University)",
+      "doi": "10.48550/arxiv.2611.12762",
+      "publication_date_provenance": {
+        "source": "Official arXiv Atom metadata",
+        "basis": "arxiv_first_submitted",
+        "field": "published",
+        "requested_id": "2611.12762v1",
+        "source_url": "https://export.arxiv.org/api/query?id_list=2611.12762v1",
+        "version_url": "https://arxiv.org/abs/2611.12762v1",
+        "status": "unresolved",
+        "reason": "HTTP None",
+        "verification_error": true,
+        "value": ""
+      },
+      "url": "https://doi.org/10.48550/arxiv.2611.12762",
+      "abstract_text": "We introduce Sage-Taiyi, a metacognition-inspired architecture that uses accumulated scientific understanding to guide what to investigate next and how to investigate it. Through explicit monitoring and control, the system revises its understanding of evidence, assumptions, and unresolved questions, then uses these assessments to adapt research targets and select reusable reasoning methods. On Taiyi-Bench, an AI co-scientist ideation benchmark comprising 265 tasks from 50 papers across ten disciplines, Sage-Taiyi ranks first on all eight metrics of historical rediscovery and open-ended ideation, achieving an Overall score of 54.0 compared with 47.9 for the strongest baseline, AI Scientist-v2. It also performs well on two external scientific ideation benchmarks. Five expert-guided collaborations further connect its proposals to experimental and computational validation across chemistry, materials science, and engineering. In chemistry, reaction-condition optimization raises the yield of cobalt-catalyzed carbonylation from trace amounts to 84% and photocatalytic allylic amination from 13% to 69%. These results support metacognitive regulation as an approach to scientific ideation and its progression toward practical validation.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "We introduce Sage-Taiyi, a metacognition-inspired architecture that uses accumulated scientific understanding to guide what to investigate next and how to investigate it. Through explicit monitoring and control, the system revises its understanding of evidence, assumptions, and unresolved questions, then uses these assessments to adapt research targets and select reusable reasoning methods. On Taiyi-Bench, an AI co-s…",
+      "kind": "scholarly",
+      "lane": "Fragmentation",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "generative AI sustained attention task switching",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
+      "title": "ConflictBench: Evaluating Human–AI Conflict via Interactive and Visually Grounded Environments",
+      "authors": [
+        "Weixiang Zhao",
+        "Haozhen Li",
+        "Yanyan Zhao",
+        "Yanyan Zhao",
+        "Xuda Zhi",
+        "Bing Qin",
+        "Ting Liu"
+      ],
+      "published": "",
+      "venue": "ACM International Conference on Multimedia (ACM MM)",
+      "doi": "10.1145/3767308.3832544",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "2026-11-09",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-09"
+      },
+      "url": "https://doi.org/10.1145/3767308.3832544",
+      "abstract_text": "As large language models (LLMs) evolve into autonomous agents capable of acting in open-ended environments, ensuring behavioral alignment with human values becomes a critical concern. Existing benchmarks, focused on static, single-turn prompts, fail to capture the interactive and multi-modal nature of real-world conflicts. We introduce ConflictBench, a benchmark for evaluating human–AI conflict through 150 multi-turn scenarios derived from prior alignment queries. ConflictBench integrates a text-based simulation engine with a visually grounded world model, enabling agents to perceive, plan, and act under dynamic conditions. Results show that while agents often act safely when human harm is immediate, they frequently prioritize self-preservation or adopt deceptive strategies in delayed or low-risk settings. A regret test further reveals that aligned decisions are often reversed under escalating pressure, especially with visual input. These findings underscore the need for interaction-level, multi-modal evaluation to surface alignment failures that remain hidden in conventional benchmarks. Beyond evaluation, we show that ConflictBench can also support alignment improvement by generating high-quality interactive trajectories for targeted fine-tuning, significantly enhancing agent behavior in complex conflict scenarios. Code and data are available at: https://github.com/Yranes/ConflictBench.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "As large language models (LLMs) evolve into autonomous agents capable of acting in open-ended environments, ensuring behavioral alignment with human values becomes a critical concern. Existing benchmarks, focused on static, single-turn prompts, fail to capture the interactive and multi-modal nature of real-world conflicts. We introduce ConflictBench, a benchmark for evaluating human–AI conflict through 150 multi-turn…",
+      "kind": "scholarly",
+      "lane": "Fragmentation",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "generative AI sustained attention task switching",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+    },
+    {
+      "title": "Does AI Reinforce Gender Stereotypes? Gender Bias in Job Descriptions Generated by 40+ Large Language Models",
+      "authors": [
+        "Jennifer M. Krebsbach",
+        "Jane E. Lee",
+        "Steven Zeck",
+        "Arti Thakur",
+        "Martin Hilbert"
+      ],
+      "published": "",
+      "venue": "Gender Work and Organization",
+      "doi": "10.1111/gwao.70291",
+      "publication_date_provenance": {
+        "source": "OpenAlex",
+        "field": "publication_date",
+        "value": "2026-11-10",
+        "status": "unresolved",
+        "original_day_verified": false,
+        "reason": "Original-day verification deferred by provider, lookup budget, or retry schedule",
+        "provider_publication_date": "2026-11-10"
+      },
+      "url": "https://doi.org/10.1111/gwao.70291",
+      "abstract_text": "ABSTRACT Human resource (HR) professionals and office staff are often responsible for competing tasks that quickly accumulate. To increase efficiency, some HR staff are turning to large language models (LLMs) to automate tasks, including creating job postings based on job titles alone. We sought to examine how this practice has the potential to influence applicant pools and hiring outcomes, with attention to gendered effects in organizational settings. Using a broad sample of 48 LLMs, we conducted an algorithm audit to evaluate whether the use of a gender‐neutral or gender‐coded job title would influence the output created by LLMs. We measured salary disparities, unmasked comparative narrative ratings, and BSRI‐informed discursive patterning utilized throughout the job description. We selected 32 jobs and created a female‐coded, male‐coded, and gender‐neutral version of each job title (e.g., firewoman, fireman, and firefighter), studying a total of 4608 job descriptions. In comparing the LLM outputs, we found that for white‐collar job titles, male‐coded job descriptions were assigned higher salaries, but this was not robust across all analyses. Across occupations, advertisements generated from gender‐coded titles received higher unmasked comparative LLM ratings than matched advertisements generated from gender‐neutral titles, with female‐coded advertisements receiving the highest ratings. Minimal optimization appeared to substantially reduce these ratings and perform comparably to maximal optimization, but neither reached the lower ratings observed when generation began with a gender‐neutral title. As the use of AI tools is becoming commonplace, our findings emphasize the need for feminist, organizationally accountable approaches to AI‐assisted HR work. Simple prompt modifications can mitigate, but not fully eliminate, some measured gendered differences in LLM‐generated job descriptions, but they do not eliminate deeper occupationally gendered patterns.",
+      "abstract_source": "OpenAlex abstract index",
+      "abstract_completeness": "provider_text_preserved",
+      "preview": "ABSTRACT Human resource (HR) professionals and office staff are often responsible for competing tasks that quickly accumulate. To increase efficiency, some HR staff are turning to large language models (LLMs) to automate tasks, including creating job postings based on job titles alone. We sought to examine how this practice has the potential to influence applicant pools and hiring outcomes, with attention to gendered…",
+      "kind": "scholarly",
+      "lane": "Interventions",
+      "relation": "AI-related literature",
+      "evidence": "Metadata screened (unverified)",
+      "source": "OpenAlex",
+      "first_seen": "2026-11-16",
+      "discovery_scope": "closeout_late_index",
+      "discovery_query": "AI attention management intervention focus assistant",
+      "historical_backfill": false,
+      "acquisition_status": "original_publication_date_required",
+      "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+      "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
     }
   ],
   "coverage": {
@@ -7035,7 +7693,7 @@
     },
     "closeout_started_at": "2026-11-16T13:32:20.837751+00:00",
     "coverage_note": "Bounded configured provider queries and publisher snapshots only. Delayed indexing, unavailable sources and unresolved dates can remain partial; calendar closure is not exhaustive coverage, source review or approval.",
-    "academic_requests_this_run": 10,
+    "academic_requests_this_run": 11,
     "academic": [
       {
         "window": {
@@ -7045,8 +7703,8 @@
         "checkpoint": {
           "window_id": "closeout_late_index:2026-11-09:2026-11-15",
           "active_queries": 32,
-          "completed_queries": 5,
-          "pending_queries": 27,
+          "completed_queries": 8,
+          "pending_queries": 24,
           "status": "partial",
           "stale_windows": [
             {
@@ -7153,12 +7811,12 @@
           "superseded_queries": 0,
           "provider_state": {
             "OpenAlex": {
-              "last_request_at": 1794871549.741147,
+              "last_request_at": 1794872644.209361,
               "consecutive_failures": 0,
               "next_retry_at": 0
             },
             "Crossref": {
-              "last_request_at": 1794871549.741147,
+              "last_request_at": 1794872644.209361,
               "consecutive_failures": 0,
               "next_retry_at": 0
             },
@@ -7170,8 +7828,8 @@
           }
         },
         "general": {
-          "openalex": 204,
-          "crossref": 200,
+          "openalex": 422,
+          "crossref": 600,
           "provider_windows": [
             {
               "provider": "OpenAlex",
@@ -7179,13 +7837,13 @@
               "query": "generative AI cognitive offloading critical thinking",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 84,
               "records_unique": 84,
               "provider_total": 84,
-              "max_pages": 1,
+              "max_pages": 0,
               "page_size": 100,
               "status": "complete",
               "truncated": false,
@@ -7205,13 +7863,13 @@
               "query": "ChatGPT metacognition memory cognitive effort",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 20,
               "records_unique": 20,
               "provider_total": 20,
-              "max_pages": 1,
+              "max_pages": 0,
               "page_size": 100,
               "status": "complete",
               "truncated": false,
@@ -7231,17 +7889,17 @@
               "query": "large language model cognitive engagement agency",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 100,
               "records_unique": 100,
               "provider_total": 648,
               "max_pages": 1,
               "page_size": 100,
-              "status": "truncated",
+              "status": "error",
               "truncated": true,
-              "reason": "page budget reached",
+              "reason": "Preparation request/time budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -7256,22 +7914,22 @@
               "query_id": "efd67121e783aaba5b6d04b342e40f60abbc1e927c74dd5ca8d40e13998004f9",
               "query": "generative AI sustained attention task switching",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 173,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "theme": "Fragmentation",
@@ -7282,24 +7940,24 @@
               "query_id": "093af10495c09c10d3fa0a41401ead85d093ba0d49598b2b6f8a163347baf990",
               "query": "AI assistant interruptions distraction multitasking",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 2,
+              "records_unique": 2,
+              "provider_total": 2,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
-              "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "status": "complete",
+              "truncated": false,
+              "reason": "Provider query exhausted",
               "completion_scope": "configured provider query and original publication window only",
-              "query_status": "partial",
+              "query_status": "complete_for_configured_query",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
-              "resumable": true,
+              "resumable": false,
               "theme": "Fragmentation",
               "scope": "closeout_late_index"
             },
@@ -7308,24 +7966,24 @@
               "query_id": "41fd9780658258e23435039ad03bb22f8fa6858800ec695298db70f5f9661f03",
               "query": "digital distraction notification fatigue attention",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 16,
+              "records_unique": 16,
+              "provider_total": 16,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
-              "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "status": "complete",
+              "truncated": false,
+              "reason": "Provider query exhausted",
               "completion_scope": "configured provider query and original publication window only",
-              "query_status": "partial",
+              "query_status": "complete_for_configured_query",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
-              "resumable": true,
+              "resumable": false,
               "theme": "Fragmentation",
               "scope": "closeout_late_index"
             },
@@ -7334,22 +7992,22 @@
               "query_id": "d81341374abd34b16e5c0e78a631d6ec659480bfaebfb02ffb99c823c8a5e338",
               "query": "AI attention management intervention focus assistant",
               "filter": "from_publication_date:2026-11-09,to_publication_date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 281,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "theme": "Interventions",
@@ -7491,17 +8149,17 @@
               "query": "generative AI cognitive offloading critical thinking",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 100,
               "records_unique": 100,
               "provider_total": 4139,
               "max_pages": 1,
               "page_size": 100,
-              "status": "truncated",
+              "status": "error",
               "truncated": true,
-              "reason": "page budget reached",
+              "reason": "Preparation request/time budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -7517,17 +8175,17 @@
               "query": "ChatGPT metacognition memory cognitive effort",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 100,
               "records_unique": 100,
               "provider_total": 1123,
               "max_pages": 1,
               "page_size": 100,
-              "status": "truncated",
+              "status": "error",
               "truncated": true,
-              "reason": "page budget reached",
+              "reason": "Preparation request/time budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -7542,22 +8200,22 @@
               "query_id": "1f309ec9ba774a8525d7ff09278cea153b2e2b5c0b9927f970933aea4543af77",
               "query": "large language model cognitive engagement agency",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 4891,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "theme": "AI & cognition",
@@ -7568,22 +8226,22 @@
               "query_id": "d750640e99697b33a7c804c0e2dededb94bae35476044104147510beee3fc2b6",
               "query": "generative AI sustained attention task switching",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 3347,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "theme": "Fragmentation",
@@ -7594,22 +8252,22 @@
               "query_id": "da0843a7c6a37010f636e6ce0334abd7d3bd180ce966ddb24d50435c6514fd24",
               "query": "AI assistant interruptions distraction multitasking",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 2526,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "theme": "Fragmentation",
@@ -7620,22 +8278,22 @@
               "query_id": "fef9dbb5e7c916e34e77690d794db10adb77b21186a9b6039634455eda4546a7",
               "query": "digital distraction notification fatigue attention",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 2605,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "theme": "Fragmentation",
@@ -7798,10 +8456,10 @@
               "scope": "closeout_late_index"
             }
           ],
-          "publication_date_rejected": 32,
-          "publication_date_unverified": 134,
+          "publication_date_rejected": 152,
+          "publication_date_unverified": 227,
           "date_lookups": 1,
-          "date_lookups_deferred": 119,
+          "date_lookups_deferred": 197,
           "search_scopes": [
             {
               "theme": "AI & cognition",
@@ -7889,28 +8547,28 @@
             }
           ],
           "queries_planned": 24,
-          "queries_attempted": 5,
+          "queries_attempted": 8,
           "arxiv_publication_verification": {
             "provider": "arXiv",
             "purpose": "v1 original publication date",
             "request_limit": 20,
             "minimum_interval_seconds": 3,
-            "requests": 8,
+            "requests": 20,
             "verified": 0,
-            "failures": 8,
-            "deferred": 0,
+            "failures": 20,
+            "deferred": 1,
             "status": "partial"
           },
           "crossref_provider_paused": true,
-          "queries_completed": 2,
-          "queries_deferred": 19,
+          "queries_completed": 4,
+          "queries_deferred": 14,
           "discovery_status": "partial",
           "configured_query_status": "partial",
           "checkpoint": {
             "window_id": "closeout_late_index:2026-11-09:2026-11-15",
             "active_queries": 32,
-            "completed_queries": 5,
-            "pending_queries": 27,
+            "completed_queries": 8,
+            "pending_queries": 24,
             "status": "partial",
             "stale_windows": [
               {
@@ -8017,12 +8675,12 @@
             "superseded_queries": 0,
             "provider_state": {
               "OpenAlex": {
-                "last_request_at": 1794871549.741147,
+                "last_request_at": 1794872644.209361,
                 "consecutive_failures": 0,
                 "next_retry_at": 0
               },
               "Crossref": {
-                "last_request_at": 1794871549.741147,
+                "last_request_at": 1794872644.209361,
                 "consecutive_failures": 0,
                 "next_retry_at": 0
               },
@@ -8038,9 +8696,9 @@
         "journals": {
           "priority_dois_requested": 0,
           "priority_dois_found": 0,
-          "journal_queries_attempted": 5,
-          "journal_queries_succeeded": 3,
-          "journal_records_seen": 370,
+          "journal_queries_attempted": 3,
+          "journal_queries_succeeded": 4,
+          "journal_records_seen": 636,
           "journal_relevant": 0,
           "publication_date_rejected": 0,
           "provider_windows": [
@@ -8050,17 +8708,17 @@
               "query": "generative AI",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 100,
               "records_unique": 100,
               "provider_total": 183,
               "max_pages": 1,
               "page_size": 100,
-              "status": "truncated",
+              "status": "error",
               "truncated": true,
-              "reason": "page budget reached",
+              "reason": "Preparation request/time budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -8075,13 +8733,13 @@
               "query": "generative AI",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 74,
               "records_unique": 74,
               "provider_total": 74,
-              "max_pages": 1,
+              "max_pages": 0,
               "page_size": 100,
               "status": "complete",
               "truncated": false,
@@ -8100,13 +8758,13 @@
               "query": "artificial intelligence",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 27,
               "records_unique": 27,
               "provider_total": 27,
-              "max_pages": 1,
+              "max_pages": 0,
               "page_size": 100,
               "status": "complete",
               "truncated": false,
@@ -8125,17 +8783,17 @@
               "query": "generative AI",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 100,
               "records_unique": 100,
               "provider_total": 232,
               "max_pages": 1,
               "page_size": 100,
-              "status": "truncated",
+              "status": "error",
               "truncated": true,
-              "reason": "page budget reached",
+              "reason": "Preparation request/time budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -8150,13 +8808,13 @@
               "query": "artificial intelligence",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
               "pages": 1,
-              "pages_this_run": 1,
-              "cached_pages": 0,
-              "requests_this_run": 1,
+              "pages_this_run": 0,
+              "cached_pages": 1,
+              "requests_this_run": 0,
               "records_seen": 69,
               "records_unique": 69,
               "provider_total": 69,
-              "max_pages": 1,
+              "max_pages": 0,
               "page_size": 100,
               "status": "complete",
               "truncated": false,
@@ -8174,24 +8832,24 @@
               "query_id": "5c05f7a66fb90848d7a78a1f76b7129292389706390fb7c1b23c891a98c29030",
               "query": "artificial intelligence",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 66,
+              "records_unique": 66,
+              "provider_total": 66,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
-              "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "status": "complete",
+              "truncated": false,
+              "reason": "Provider query exhausted",
               "completion_scope": "configured provider query and original publication window only",
-              "query_status": "partial",
+              "query_status": "complete_for_configured_query",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
-              "resumable": true,
+              "resumable": false,
               "venue": "Psychological Science"
             },
             {
@@ -8199,22 +8857,22 @@
               "query_id": "bfc9482943399c1c6ce95be615870701d6fac10037c6162a040306c782c0217a",
               "query": "artificial intelligence",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 120,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "venue": "Information Systems Research"
@@ -8224,22 +8882,22 @@
               "query_id": "67e4431ce2e38f1f74d3aef54ede6c02487df620a6702eac262d6ba2a5407741",
               "query": "generative AI",
               "filter": "from-pub-date:2026-11-09,until-pub-date:2026-11-15",
-              "pages": 0,
-              "pages_this_run": 0,
+              "pages": 1,
+              "pages_this_run": 1,
               "cached_pages": 0,
-              "requests_this_run": 0,
-              "records_seen": 0,
-              "records_unique": 0,
-              "provider_total": null,
+              "requests_this_run": 1,
+              "records_seen": 100,
+              "records_unique": 100,
+              "provider_total": 105,
               "max_pages": 1,
               "page_size": 100,
-              "status": "error",
+              "status": "truncated",
               "truncated": true,
-              "reason": "Preparation request/time budget reached",
+              "reason": "page budget reached",
               "completion_scope": "configured provider query and original publication window only",
               "query_status": "partial",
               "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-              "observed_at": null,
+              "observed_at": 1794872644.209361,
               "window_id": "closeout_late_index:2026-11-09:2026-11-15",
               "resumable": true,
               "venue": "Computers in Human Behavior Reports"
@@ -8247,31 +8905,43 @@
           ],
           "publication_date_unverified": 0,
           "journal_queries_planned": 8,
-          "journal_queries_deferred": 3,
+          "journal_queries_deferred": 2,
           "discovery_status": "partial",
           "configured_query_status": "partial"
         }
       }
     ],
     "publisher_snapshots": {
-      "checked_at": "2026-11-16T23:25:49.741147+00:00",
-      "requests": 0,
+      "checked_at": "2026-11-16T23:44:04.209361+00:00",
+      "requests": 4,
       "sources": [
         {
           "source_id": "conversation-ai",
-          "status": "deferred_budget"
+          "status": "ok",
+          "pages": 1,
+          "retained_candidates": 5,
+          "next_retry_at": null
         },
         {
           "source_id": "verge",
-          "status": "deferred_budget"
+          "status": "ok",
+          "pages": 1,
+          "retained_candidates": 0,
+          "next_retry_at": null
         },
         {
           "source_id": "ars-technology",
-          "status": "deferred_budget"
+          "status": "ok",
+          "pages": 1,
+          "retained_candidates": 0,
+          "next_retry_at": null
         },
         {
           "source_id": "tech-policy-press",
-          "status": "deferred_budget"
+          "status": "ok",
+          "pages": 1,
+          "retained_candidates": 19,
+          "next_retry_at": null
         },
         {
           "source_id": "guardian-ai",
@@ -8774,11 +9444,6 @@
       "OpenAlex search unavailable: Preparation request/time budget reached",
       "OpenAlex search unavailable: Preparation request/time budget reached",
       "OpenAlex search unavailable: Preparation request/time budget reached",
-      "OpenAlex search unavailable: Preparation request/time budget reached",
-      "OpenAlex search unavailable: Preparation request/time budget reached",
-      "OpenAlex search unavailable: Preparation request/time budget reached",
-      "Crossref search unavailable: Preparation request/time budget reached",
-      "Crossref search unavailable: Preparation request/time budget reached",
       "Crossref search unavailable: Preparation request/time budget reached",
       "Crossref search unavailable: Preparation request/time budget reached",
       "Crossref search unavailable: Preparation request/time budget reached",
@@ -8788,7 +9453,6 @@
       "Crossref search unavailable: Preparation request/time budget reached",
       "Crossref search unavailable: Preparation request/time budget reached",
       "Original publication date unavailable for 10.71317/jgst.2.11.2026.1014: ProviderDeferred",
-      "Crossref search unavailable: Preparation request/time budget reached",
       "Crossref search unavailable: Preparation request/time budget reached",
       "Crossref search unavailable: Preparation request/time budget reached"
     ],
@@ -126738,6 +127402,3209 @@
           "status": "day_known",
           "field": "published-online",
           "value": "2026-11-13"
+        }
+      ],
+      "10.31234/osf.io/mvyzx": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.7554/elife.110377": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1145/3821440": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2027,
+                3,
+                31
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1364/optcon.616845": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1364/ol.614826": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1145/3827618": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2027,
+                3,
+                31
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.29019/gwe9eh18": [
+        "2026-11-15",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-15"
+        }
+      ],
+      "10.2196/98855": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.2196/106677": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.2196/86011": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.2196/103398": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.2196/106933": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.2196/99657": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1093/elt/ccag062": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.48550/arxiv.2611.15777": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.15777v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.15777v1",
+          "version_url": "https://arxiv.org/abs/2611.15777v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.13774": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.13774v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.13774v1",
+          "version_url": "https://arxiv.org/abs/2611.13774v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.14260": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.14260v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.14260v1",
+          "version_url": "https://arxiv.org/abs/2611.14260v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.12076": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.12076v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.12076v1",
+          "version_url": "https://arxiv.org/abs/2611.12076v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.15310": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.15310v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.15310v1",
+          "version_url": "https://arxiv.org/abs/2611.15310v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.12762": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.12762v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.12762v1",
+          "version_url": "https://arxiv.org/abs/2611.12762v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.15121": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.15121v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.15121v1",
+          "version_url": "https://arxiv.org/abs/2611.15121v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.12304": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.12304v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.12304v1",
+          "version_url": "https://arxiv.org/abs/2611.12304v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.12296": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.12296v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.12296v1",
+          "version_url": "https://arxiv.org/abs/2611.12296v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.15837": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.15837v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.15837v1",
+          "version_url": "https://arxiv.org/abs/2611.15837v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.12167": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.12167v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.12167v1",
+          "version_url": "https://arxiv.org/abs/2611.12167v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.14242": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.14242v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.14242v1",
+          "version_url": "https://arxiv.org/abs/2611.14242v1",
+          "status": "unresolved",
+          "reason": "HTTP None",
+          "verification_error": true
+        }
+      ],
+      "10.48550/arxiv.2611.13211": [
+        "",
+        {
+          "source": "Official arXiv Atom metadata",
+          "basis": "arxiv_first_submitted",
+          "field": "published",
+          "requested_id": "2611.13211v1",
+          "source_url": "https://export.arxiv.org/api/query?id_list=2611.13211v1",
+          "version_url": "https://arxiv.org/abs/2611.13211v1",
+          "status": "unresolved",
+          "reason": "arXiv verification budget or provider pause"
+        }
+      ],
+      "10.65237/11-12-2026-25": [
+        "2026-11-15",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-15"
+        }
+      ],
+      "10.70382/tijerls.v13i8.0120": [
+        "2026-11-14",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-14"
+        }
+      ],
+      "10.31435/ijitss.4(52).2026.6894": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.70671/4js25h02": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1002/acr.80140": [
+        "2026-11-15",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                15
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-15"
+        }
+      ],
+      "10.67693/bjcr-7efplu8u": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.56578/jemse050404": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.67693/bjcr-uuir2mg2": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.68263/bjar-xhq49dde": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.68263/bjar-3h72psf7": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.56201/rjhcs.v12.no8.2026.pg51.61": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.68263/bjar-3dtz86pp": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.3390/info17111128": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.1108/intr-10-2026-036": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.65415/gpcpye71": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.65415/m269x629": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.59543/yrfek347": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.1002/mdr2.70099": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.33448/rsd-v15i11.52038": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.1002/acr.80202": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.9734/ajrcd/2026/v8i1173": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.3390/systems14111448": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1007/s10669-026-10165-z": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2027,
+                3
+              ],
+              "precision": "unresolved"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1002/ptr.70505": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.37985/jer.v7i4.4334": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.53982/ajerd.2026.0903.21-j": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.58421/misro.v5i4.1757": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1142/s0218126626503226": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1007/s10457-026-01650-0": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2027,
+                1
+              ],
+              "precision": "unresolved"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.3390/audiolres16060174": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.71317/kjard.2.11.2026.1021": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.21511/bbs.21(4).2026.19": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.9734/air/2026/v27i61778": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.56201/jbgr.vol.12.no6.2026.pg69.76": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.31713/mcit.2026.014": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.70610/edujavare.2244": [
+        "2026-11-09",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                9
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                9
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                9
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-09"
+        }
+      ],
+      "10.69693/ijim.v4i4.3350": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.4018/ijisp.427691": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-print",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.33448/rsd-v15i11.52063": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.47119/ijrp10020811120269900": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.3389/frma.2026.1994953": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.3390/info17111146": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.2174/0125899775507558261106114223": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-print",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.61359/11.2206-2652": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1080/14778238.2026.2760859": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.59256/ijsreat.20260606019": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.59256/ijsreat.20260606020": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.1021/acs.jcim.6c02159": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.15276/aait.09.2026.43": [
+        "2026-11-10",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                10
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-10"
+        }
+      ],
+      "10.33448/rsd-v15i11.52018": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.33448/rsd-v15i11.52064": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.65218/jius.2026.155": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.34190/icer.3.1.5664": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.65150/ep-jmrr/v2e11/2026-06": [
+        "2026-11-13",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                13
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-13"
+        }
+      ],
+      "10.1007/s13346-026-02237-z": [
+        "2026-11-14",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-14"
+        }
+      ],
+      "10.33448/rsd-v15i11.52066": [
+        "2026-11-14",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                14
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-14"
+        }
+      ],
+      "10.1038/s41598-026-78150-9": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1038/s41598-026-74589-y": [
+        "2026-11-11",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        }
+      ],
+      "10.1038/s41598-026-78218-6": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1038/s41598-026-79683-9": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        }
+      ],
+      "10.1038/s41598-026-80455-8": [
+        "2026-11-12",
+        {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
         }
       ]
     }
