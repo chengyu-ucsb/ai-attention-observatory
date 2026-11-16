@@ -421,7 +421,7 @@
   "use strict";
   const CATALOG = [
     {id:"evidence-detective",title:"Evidence Detective",status:"new",version:"1.0.0",released:"2026-11-13",duration:"3 minutes",topic:"Reading AI claims",evidenceBasis:"Fictional teaching scenarios",description:"Turn over the evidence. Decide how far a claim can go.",glyph:"◈"},
-    {id:"notification-studio",title:"Notification Studio",status:"new",version:"1.0.0",released:"2026-11-13",duration:"2 minutes",topic:"Designing interruptions",evidenceBasis:"Explicit arithmetic simulation",description:"Remix a stream of messages. See the trade-off between alerts and waiting.",glyph:"▥"},
+    {id:"notification-studio",title:"Notification Studio",status:"new",version:"1.1.0",released:"2026-11-13",updated:"2026-11-16",duration:"2 minutes",topic:"Designing interruptions",evidenceBasis:"Explicit arithmetic simulation",description:"Remix a stream of messages. See the trade-off between alerts and waiting.",glyph:"▥"},
     {id:"switch",title:"Switch Lab",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"2 minutes",topic:"Task switching",evidenceBasis:"Exploratory task demonstration",description:"Try a stable rule, then a changing rule. Timed and untimed play.",glyph:"⇄"},
     {id:"recovery",title:"Return Point",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"3 minutes",topic:"Returning to a task",evidenceBasis:"Fictional task comparison",description:"Leave a task and find your way back, with or without a checkpoint.",glyph:"↩"},
     {id:"assist",title:"Assistance Dial",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-09",duration:"3 minutes",topic:"Choosing AI help",evidenceBasis:"Scripted reasoning scenarios",description:"Choose reflection, a hint, or an answer. Keep the judgment yours.",glyph:"◐"}
@@ -465,7 +465,7 @@
   const node=(tag,cls,text)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el};
   const add=(el,...children)=>{children.forEach(child=>el.append(child));return el};
   const control=(text,fn,cls="play-secondary")=>{const el=node("button",cls,text);el.type="button";el.addEventListener("click",fn);return el};
-  const state={active:null,filter:"new",caseIndex:0,answers:Array(CASES.length).fill(null),flipped:Array(CASES.length).fill(null).map(()=>[false,false,false]),mode:"batch",urgent:true};
+  const state={active:null,filter:"new",caseIndex:0,answers:Array(CASES.length).fill(null),flipped:Array(CASES.length).fill(null).map(()=>[false,false,false]),mode:"batch",urgent:true,pinned:null};
   let pendingNavigationFocus;
   const classicTabs=q(".play-tabs"),sessionControls=q(".play-session-controls");
   const panels=["switch","recovery","assist"].map(id=>q("#play-"+id));
@@ -574,12 +574,43 @@
     const label=node("label","","Deliver non-urgent messages");label.htmlFor=mode.id;
     const urgent=node("input");urgent.type="checkbox";urgent.id="lab-urgent-bypass";urgent.checked=state.urgent;
     const urgentLabel=node("label","lab-checkbox-label");add(urgentLabel,urgent,node("span","","Let urgent messages through immediately"));
-    const reset=control("Reset simulation",()=>{state.mode="batch";state.urgent=true;mode.value=state.mode;urgent.checked=true;render();reset.focus()});reset.id="lab-notification-reset";
+    const reset=control("Reset simulation",()=>{state.mode="batch";state.urgent=true;state.pinned=null;mode.value=state.mode;urgent.checked=true;render();reset.focus()});reset.id="lab-notification-reset";
     add(controls,add(node("div"),label,mode),urgentLabel,reset);
     const output=node("div","lab-studio-output");output.id="lab-notification-output";
-    add(stage,node("p","lab-fiction-label","Simulated 30-minute session · 12 invented messages"),node("p","","Change the delivery rule. The messages stay the same; the timing changes."),controls,output);workbench.append(stage);
+    add(stage,node("p","lab-fiction-label","Simulated 30-minute session · 12 invented messages"),node("p","","Change the delivery rule. The messages stay the same; the timing changes."),controls);workbench.append(stage);
+    const compare=node("section","lab-policy-comparison");compare.id="lab-policy-comparison";
+    const pin=control("Pin this rule to compare",()=>{state.pinned={mode:state.mode,urgent:state.urgent};renderComparison();pin.focus()});pin.id="lab-pin-policy";
+    const clear=control("Clear comparison",()=>{state.pinned=null;renderComparison();pin.focus()});clear.id="lab-clear-comparison";
+    const comparisonBody=node("div");comparisonBody.id="lab-policy-comparison-body";
+    add(compare,node("h3","","Compare two delivery rules"),node("p","","Pin a rule, then change the controls above. Both designs use the same twelve messages."),add(node("div","lab-comparison-actions"),pin,clear),comparisonBody);stage.append(compare,output);
+    function ruleLabel(rule){return ({immediate:"As they arrive",batch:"Every 10 minutes",end:"At the end"})[rule.mode]+" · urgent exception "+(rule.urgent?"on":"off")}
+    function renderComparison(){
+      comparisonBody.replaceChildren();output.hidden=Boolean(state.pinned);clear.hidden=!state.pinned;pin.textContent=state.pinned?"Replace pinned rule":"Pin this rule to compare";
+      if(!state.pinned)return;
+      const current=notificationPlan(state.mode,state.urgent),baseline=notificationPlan(state.pinned.mode,state.pinned.urgent);
+      const same=state.mode===state.pinned.mode&&state.urgent===state.pinned.urgent;
+      const summary=node("p","lab-comparison-status",same?"Rule pinned. Change a delivery setting above to explore a different design.":"Comparing your current rule with the pinned rule. Neither is scored as best.");summary.id="lab-comparison-status";summary.setAttribute("role","status");
+      const headers=node("div","lab-comparison-labels");
+      add(headers,add(node("p"),node("strong","","Pinned rule"),node("span","",ruleLabel(state.pinned))),add(node("p"),node("strong","","Current rule"),node("span","",ruleLabel(state))));
+      add(comparisonBody,summary,headers);
+      const rows=node("div","lab-comparison-rows");
+      [["Alert moments","alerts",12,""],["Average wait","meanWait",30," min"],["Longest alert-free gap","longestGap",30," min"],["Longest urgent wait","urgentWait",30," min"]].forEach(([label,key,max,unit])=>{
+        const row=node("div","lab-comparison-row");row.dataset.compareMetric=key;
+        const format=value=>(key==="meanWait"?value.toFixed(1):String(value))+unit;
+        const delta=current[key]-baseline[key];
+        const change=Math.abs(delta)<1e-9?"No change":format(Math.abs(delta))+ (delta>0?" more":" less");
+        add(row,node("h4","",label),node("p","lab-comparison-delta",change));
+        [["Pinned",baseline[key],"pinned"],["Current",current[key],"current"]].forEach(([name,value,kind])=>{
+          const bar=node("div","lab-comparison-bar");bar.setAttribute("aria-hidden","true");
+          const fill=node("span",kind);fill.style.width=(value/max*100)+"%";bar.append(fill);
+          add(row,add(node("div","lab-comparison-measure"),node("span","",name),bar,node("strong","",format(value))));
+        });rows.append(row);
+      });
+      add(comparisonBody,rows,node("p","lab-comparison-limit","These are differences in a timing model, not effects on attention. A longer quiet gap can also mean a longer wait for an urgent message. Which trade-off fits the task?"));
+    }
     mode.addEventListener("change",()=>{state.mode=mode.value;render()});urgent.addEventListener("change",()=>{state.urgent=urgent.checked;render()});
     function render(){
+      renderComparison();
       const plan=notificationPlan(state.mode,state.urgent);output.replaceChildren();
       const metrics=node("dl","lab-simulation-metrics");
       [["Alert moments",String(plan.alerts)],["Average wait",plan.meanWait.toFixed(1)+" min"],["Longest gap",plan.longestGap+" min"]].forEach(([name,value])=>add(metrics,add(node("div"),node("dt","",name),node("dd","",value))));output.append(metrics);
@@ -605,7 +636,7 @@
     render();
     const help=control("How the simulation works",()=>helpDialog("A transparent timing model",["The same 12 invented messages arrive at minutes 2, 4, 6, 8, 11, 13, 16, 18, 21, 23, 26, and 28. Two are marked urgent.","Immediate delivery uses arrival time. Batches round delivery up to minute 10, 20, or 30. End-only delivery uses minute 30. The urgent exception overrides those rules.","Messages delivered at the same minute count as one alert moment. Average wait is delivery time minus arrival time, averaged across the 12 messages. Longest gap includes the start and end of the session.","These are model outputs, not study results or predictions about your concentration."],help));stage.append(help);
   }
-  q("#play-reset").addEventListener("click",()=>{state.answers.fill(null);state.flipped=CASES.map(()=>[false,false,false]);state.caseIndex=0;state.mode="batch";state.urgent=true;const active=state.active;if(active&& !["switch","recovery","assist"].includes(active)){state.active=null;select(active,false)}});
+  q("#play-reset").addEventListener("click",()=>{state.answers.fill(null);state.flipped=CASES.map(()=>[false,false,false]);state.caseIndex=0;state.mode="batch";state.urgent=true;state.pinned=null;const active=state.active;if(active&& !["switch","recovery","assist"].includes(active)){state.active=null;select(active,false)}});
   document.addEventListener("observatory:lab-classic",event=>{
     if(!["switch","recovery","assist"].includes(state.active))return;
     state.active=event.detail;const entry=CATALOG.find(item=>item.id===event.detail);
