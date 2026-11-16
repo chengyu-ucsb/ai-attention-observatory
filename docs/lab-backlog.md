@@ -366,3 +366,41 @@ release status, not this historical record.
 
 
 
+
+### 16 November 2026 · Notification Studio paired policy view
+
+- Reviewed the live 9 November issue and the repository's new 16 November
+  coverage-only release. The latter explicitly endorses no new findings, so this
+  release adds no study claim or supposedly evidence-backed intervention.
+- Added an optional pinned-rule comparison to Notification Studio v1.1.0. Change
+  delivery settings while retaining one baseline; paired bars compare alert
+  moments, average wait, longest alert-free gap, and longest urgent wait on the
+  same fixed stream. Units and exact values accompany each bar. Neither rule
+  receives a score or recommendation.
+- The comparison replaces the single-rule output while active, avoiding another
+  long stacked view. Clear returns to the delivery timeline and inspector; reset
+  clears the pin. The pin survives navigation only within this visit, without
+  storage, collection, or telemetry.
+- Extended deterministic and browser regressions for immutable baselines,
+  changes, replacement, clearing, reset, focus, and narrow-screen layouts.
+- Local browser launch remains blocked by the environment's socket restriction,
+  including the escalated attempt. Actual hosted CI and deployment, rather than
+  this record, establish browser verification and publication.
+
+Next ready priorities: (1) verify the new comparison across all three hosted
+engines and inspect desktop/phone captures; (2) real assistive-technology and
+native zoom review when available; (3) add a genuinely different source-informed
+question only after a suitable later synthesis is published. Keep optional
+session export deferred until a concrete use case exists.
+- Aggregate checks also exposed five existing newsletter test assumptions when
+  the latest release is coverage-only. Synthesis-specific tests now use the
+  preserved full 9 November fixture; a separate coverage regression verifies its
+  complete copy, navigation, feed identity, and rejection of template changes.
+  No production validation or evidence standard was relaxed.
+- Hosted Chromium and Firefox completed the Lab flows at all four viewport/density
+  settings; desktop and 320 px comparison captures were inspected. The shared
+  browser suite then exposed a new motion-video article cover visually matching
+  an older literacy cover. Added a title-grounded filmstrip subject to the SVG
+  system, changing only that article's cover. Duplicate detection stays intact.
+  Local focused art, candidate, queue and similarity tests pass. Final hosted
+  engine checks and deployment remain authoritative for this release.

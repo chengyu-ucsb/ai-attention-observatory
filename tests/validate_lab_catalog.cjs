@@ -84,6 +84,35 @@ for(const mode of ["immediate","batch","end"])for(const urgent of [true,false]){
  assert(plan.deliveries.every(message=>message.delivered>=message.at&&message.delivered<=30));
  assert.equal(plan.alerts,new Set(plan.deliveries.map(message=>message.delivered)).size);
 }
+assert.equal(q("lab-clear-comparison").hidden,true);
+q("lab-pin-policy").click();assert.equal(doc.activeElement,q("lab-pin-policy"));
+assert(q("lab-comparison-status").textContent.includes("Rule pinned"));
+select("lab-notification-policy","end");q("lab-urgent-bypass").checked=false;q("lab-urgent-bypass").emit("change");
+const metric=key=>flatten(q("lab-policy-comparison-body")).find(node=>node.dataset.compareMetric===key);
+assert(metric("alerts").textContent.includes("4 less"));assert(metric("urgentWait").textContent.includes("22 min more"));
+assert(q("lab-policy-comparison-body").textContent.includes("Every 10 minutes · urgent exception on"),"Changing the current rule must not mutate the pinned one");
+route("#lab?experiment=evidence-detective");route("#lab?experiment=notification-studio");
+assert(metric("alerts").textContent.includes("4 less"),"Session comparison survives workspace navigation");
+q("lab-pin-policy").click();assert(q("lab-comparison-status").textContent.includes("Rule pinned"));
+assert(metric("alerts").textContent.includes("No change"));
+q("lab-clear-comparison").click();assert.equal(doc.activeElement,q("lab-pin-policy"));assert.equal(q("lab-policy-comparison-body").textContent,"");
+q("lab-pin-policy").click();q("lab-notification-reset").click();assert.equal(q("lab-policy-comparison-body").textContent,"");
+for(const pinnedMode of ["immediate","batch","end"])for(const pinnedUrgent of [true,false]){
+ select("lab-notification-policy",pinnedMode);q("lab-urgent-bypass").checked=pinnedUrgent;q("lab-urgent-bypass").emit("change");q("lab-pin-policy").click();
+ assert.equal(q("lab-notification-output").hidden,true,"Paired view replaces the single-rule output");
+ const baseline=notificationPlan(pinnedMode,pinnedUrgent);
+ for(const mode of ["immediate","batch","end"])for(const urgent of [true,false]){
+  select("lab-notification-policy",mode);q("lab-urgent-bypass").checked=urgent;q("lab-urgent-bypass").emit("change");
+  const current=notificationPlan(mode,urgent);
+  for(const key of ["alerts","meanWait","longestGap","urgentWait"]){
+   const values=flatten(metric(key)).filter(node=>node.tagName==="STRONG").map(node=>node.textContent);
+   const format=n=>(key==="meanWait"?n.toFixed(1):String(n))+(key==="alerts"?"":" min");
+   assert.deepEqual(values,[format(baseline[key]),format(current[key])]);
+  }
+ }
+}
+q("lab-clear-comparison").click();assert.equal(q("lab-notification-output").hidden,false);
+
 select("lab-notification-policy","end");q("lab-urgent-bypass").checked=false;q("lab-urgent-bypass").emit("change");
 assert(q("lab-notification-summary").textContent.includes("1 alert moment."));assert(q("lab-notification-summary").textContent.includes("22 minutes"));
 q("lab-inspect-delivery").click();const modal=doc.querySelector(".lab-help-dialog");assert(modal.open);assert(modal.textContent.includes("Minute 30"));assert(modal.textContent.includes("Time-sensitive request"));
