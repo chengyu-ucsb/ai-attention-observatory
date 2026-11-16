@@ -392,3 +392,8 @@ engines and inspect desktop/phone captures; (2) real assistive-technology and
 native zoom review when available; (3) add a genuinely different source-informed
 question only after a suitable later synthesis is published. Keep optional
 session export deferred until a concrete use case exists.
+- Aggregate checks also exposed five existing newsletter test assumptions when
+  the latest release is coverage-only. Synthesis-specific tests now use the
+  preserved full 9 November fixture; a separate coverage regression verifies its
+  complete copy, navigation, feed identity, and rejection of template changes.
+  No production validation or evidence standard was relaxed.

@@ -17,6 +17,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import build_newsletter
 from build_newsletter import FEED, build_rss
+from publish_deadline import coverage_from_sources
 
 class VisibleText(HTMLParser):
  def __init__(self,value):
@@ -36,8 +37,48 @@ class WeeklyFeedTests(unittest.TestCase):
     return issue
   self.fail('The archive must contain a published issue for presentation regressions.')
 
+ def synthesis_issue(self):
+  # Pin a known full synthesis. These tests deliberately vary its copy/date or
+  # exercise multiple themes; a coverage-only release has a fixed template and
+  # cannot serve as their fixture merely because it is the newest publication.
+  issue=json.loads((ROOT/'data/approved-issues/2026-11-09.json').read_text())
+  self.assertEqual(issue.get('edition_format'),'full')
+  self.assertGreaterEqual(len(issue['signals']),3)
+  return issue
+
+ def test_coverage_reader_and_feeds_preserve_fixed_template_and_limits(self):
+  issue=coverage_from_sources('2026-11-16','05',[],
+                              published_at='2026-11-16T18:00:00+00:00')
+  frozen=copy.deepcopy(issue)
+  page=build_newsletter.render_issue(issue)
+  rss=build_newsletter.rss_content(issue)
+  item=build_newsletter.json_feed([issue])['items'][0]
+  markup=page.split('<script>')[0]
+  panels=re.findall(r'<section[^>]*id="([^"]+)"[^>]*data-edition-panel[^>]*>',markup)
+  navigation=markup.split('<nav id="edition-section"',1)[1].split('</nav>',1)[0]
+  options=re.findall(r'data-edition-target="([^"]+)"',navigation)
+  self.assertEqual(set(panels),{'signal-1','edition-question'})
+  self.assertEqual(set(options),set(panels))
+  self.assertEqual(len(options),len(panels))
+  for tag in re.findall(r'<section[^>]*data-edition-panel[^>]*>',markup):
+   self.assertNotIn('hidden',tag)
+  for text in (issue['deck'],issue['letter'],issue['signals'][0]['text'],
+               issue['tension']['text'],issue['editorial_note'],issue['experiment']['caution']):
+   self.assertIn(' '.join(text.split()),VisibleText(page).text())
+   self.assertIn(' '.join(text.split()),VisibleText(rss).text())
+  self.assertNotIn('data-edition-panel',rss)
+  self.assertEqual(item['_observatory'],frozen)
+  self.assertEqual(item['content_html'],rss)
+  self.assertEqual(item['id'],build_newsletter.feed_identity(issue))
+  self.assertEqual(issue,frozen)
+  # Branding and retention tests must not weaken the coverage format's strict
+  # no-new-claims gate just to allow their intentional synthesis mutations.
+  issue['subject']='The Attention Edit · A changed coverage title'
+  with self.assertRaisesRegex(ValueError,'fixed, transparent coverage template'):
+   build_newsletter.json_feed([issue])
+
  def test_layered_reader_has_complete_no_script_content_and_valid_navigation(self):
-  issue=self.latest_published_issue()
+  issue=self.synthesis_issue()
   page=build_newsletter.render_issue(issue)
   markup=page.split('<script>')[0]
   panels=re.findall(r'<section[^>]*id="([^"]+)"[^>]*data-edition-panel[^>]*>',markup)
@@ -69,7 +110,7 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertNotIn('AI source-check, not human review',markup)
 
  def test_reading_map_uses_existing_labels_and_actual_source_counts(self):
-  issue=self.latest_published_issue()
+  issue=self.synthesis_issue()
   page=build_newsletter.overview(issue)
   for i,section in enumerate(issue['signals'],1):
    card=page.split('data-edition-target="signal-'+str(i)+'"',1)[1].split('</a>',1)[0]
@@ -80,7 +121,7 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertNotIn('effect size',page)
 
  def test_chapter_navigation_lists_every_choice_and_keeps_real_source_counts(self):
-  issue=self.latest_published_issue()
+  issue=self.synthesis_issue()
   navigation=build_newsletter.reader_controls(issue)
   self.assertIn('aria-label="Edition chapters"',navigation)
   self.assertIn('data-active-section=""',navigation)
@@ -135,7 +176,7 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertEqual(issue,frozen)
 
  def test_brief_brand_does_not_change_feed_identity_or_archived_snapshot(self):
-  issue=self.latest_published_issue()
+  issue=self.synthesis_issue()
   issue['subject']='The Attention Edit · A preserved issue'
   frozen=copy.deepcopy(issue)
   feed=build_newsletter.json_feed([issue])
@@ -245,7 +286,7 @@ class WeeklyFeedTests(unittest.TestCase):
 
 
  def test_monday_identity_does_not_rewrite_release_clock_or_feed_id(self):
-  issue=copy.deepcopy(self.latest_published_issue())
+  issue=copy.deepcopy(self.synthesis_issue())
   issue.update(edition_date='2026-11-09', first_published_date='2026-11-13',
                feed_id=build_newsletter.BASE+'issues/2026-11-13.html',
                feed_published_at='2026-11-13T12:00:00+00:00')
@@ -266,7 +307,7 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertEqual(issue,frozen)
 
  def test_merged_supplement_survives_html_and_feed_with_source_links(self):
-  issue=copy.deepcopy(self.latest_published_issue());source=issue['sources'][0]
+  issue=copy.deepcopy(self.synthesis_issue());source=issue['sources'][0]
   issue['supplements']=[{'title':'A retained question','text':'This earlier perspective raises a question.',
                          'source_ids':[source['id']],
                          'citations':[{'text':'earlier perspective','source_id':source['id']}]}]
@@ -277,7 +318,7 @@ class WeeklyFeedTests(unittest.TestCase):
    self.assertIn('class="inline-citation"',page)
 
  def test_legacy_links_redirect_and_original_versions_remain_readable(self):
-  original=copy.deepcopy(self.latest_published_issue());original['edition_date']='2026-11-13'
+  original=copy.deepcopy(self.synthesis_issue());original['edition_date']='2026-11-13'
   canonical=copy.deepcopy(original);canonical['edition_date']='2026-11-09'
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory);data=root/'data';data.mkdir();revisions=data/'edition-revisions';revisions.mkdir()
