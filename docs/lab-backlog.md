@@ -397,3 +397,10 @@ session export deferred until a concrete use case exists.
   preserved full 9 November fixture; a separate coverage regression verifies its
   complete copy, navigation, feed identity, and rejection of template changes.
   No production validation or evidence standard was relaxed.
+- Hosted Chromium and Firefox completed the Lab flows at all four viewport/density
+  settings; desktop and 320 px comparison captures were inspected. The shared
+  browser suite then exposed a new motion-video article cover visually matching
+  an older literacy cover. Added a title-grounded filmstrip subject to the SVG
+  system, changing only that article's cover. Duplicate detection stays intact.
+  Local focused art, candidate, queue and similarity tests pass. Final hosted
+  engine checks and deployment remain authoritative for this release.

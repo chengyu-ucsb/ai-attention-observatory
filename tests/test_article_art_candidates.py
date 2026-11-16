@@ -251,7 +251,12 @@ class CandidateRetryTests(unittest.TestCase):
                 a = row.pop("editorial_art")
                 previous = before.pop("editorial_art")
                 self.assertEqual(row, before)
-                if previous["status"] == "ready":
+                # Preserve accepted assets when their grounded candidate pool
+                # is unchanged; a new literal subject intentionally invalidates
+                # its old rendering. The full-corpus duplicate guards above
+                # still apply to every new candidate.
+                if (previous["status"] == "ready" and
+                        previous.get("candidate_pool_fingerprint") == a.get("candidate_pool_fingerprint")):
                     self.assertEqual(a["status"], "ready")
                     self.assertEqual(a["src"], previous["src"])
                 self.assertLessEqual(a["attempt_count"], art.MAX_ART_CANDIDATES)

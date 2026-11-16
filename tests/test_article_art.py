@@ -49,6 +49,41 @@ class ArticleArtTests(unittest.TestCase):
         spec = art.choose_concept(art.public_inputs(article("Siri app access and intention tracking")))
         self.assertNotIn("inequality", spec["visual_subjects"])
 
+    def test_instructional_motion_video_uses_literal_frames_not_literacy_art(self):
+        import art_similarity
+        titles = (
+            "Gender-differentiated effects of motion-enhanced AI-generated images in instructional videos: a mixed-process study using TAM-related perceptions and cognitive load theory",
+            "Beyond Access: How GenAI Literacy Relates to Task Performance, Motivation, Cognitive Load and Interaction Patterns in AI ‐Assisted Learning Environment",
+        )
+        records = [article(title, "10.1234/video" if i == 0 else "10.1234/literacy")
+                   for i, title in enumerate(titles)]
+        inputs = [art.public_inputs(row) for row in records]
+        specs = [art.choose_concept(value) for value in inputs]
+        self.assertIn("motion_video", specs[0]["visual_subjects"])
+        ground = next(item for item in specs[0]["source_grounding"]
+                      if item["subject"] == "motion_video")
+        self.assertEqual(ground["field"], "title")
+        self.assertIn("instructional videos", ground["phrases"])
+        self.assertNotIn("motion_video", specs[1]["visual_subjects"])
+        drawings = [art.render_svg("same", value, spec)
+                    for value, spec in zip(inputs, specs)]
+        self.assertFalse(art_similarity.is_near_twin(art_similarity.compare(
+            *(art_similarity.rasterize(drawing) for drawing in drawings))))
+        # A newly grounded subject invalidates only affected retry pools.
+        new_pools = [art.candidate_pool_fingerprint(row) for row in records]
+        old_subjects = {key: value for key, value in art.SUBJECTS.items()
+                        if key != "motion_video"}
+        with patch.object(art, "SUBJECTS", old_subjects):
+            old_pools = [art.candidate_pool_fingerprint(row) for row in records]
+        self.assertNotEqual(new_pools[0], old_pools[0])
+        self.assertEqual(new_pools[1], old_pools[1])
+        self.assertIn("filmstrip", specs[0]["alt"])
+        self.assertIn("Not a depiction of study results", specs[0]["alt"])
+        # General instruction or video-call wording must not invent animation.
+        unrelated = art.choose_concept(art.public_inputs(article(
+            "Video calls and instruction in language learning")))
+        self.assertNotIn("motion_video", unrelated["visual_subjects"])
+
     def test_actual_public_records_publish_distinct_grounded_art_or_explicit_review(self):
         records = public_records()
         self.assertGreater(len(records), 50)

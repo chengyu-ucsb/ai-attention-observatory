@@ -190,6 +190,7 @@ SUBJECTS = {
 # Specific research settings and tasks outrank broad themes. These are literal
 # subject cues, not labels inferred from statistical results.
 SUBJECTS.update({
+    "motion_video": (("motion-enhanced", "instructional videos", "animated images"), "a filmstrip with successive image frames", "digital_window"),
     "knowledge": (("knowledge innovation", "knowledge production"), "an open notebook with interlocking folded paper tabs", "library"),
     "fact_check": (("hallucinations", "reliable generative"), "a document assembled from separate paper pieces under inspection", "workbench"),
     "making": (("co-creators", "co-creation", "co-creating"), "two hands assembling an unfinished paper shape", "studio"),
@@ -241,7 +242,7 @@ def contextual_subjects(inputs: dict, spec: dict, *, limit: int | None = 2) -> l
             continue
         generic = name in {"practice", "support", "literacy", "critical", "metacognition", "effort", "feedback", "offload"}
         score = (100 if field == "title" else 0) + max(map(len, hits)) - (38 if generic else 0)
-        if name in {"knowledge", "fact_check", "making", "feedback_literacy", "experiment", "lesson", "ecology", "trust", "doctoral", "hci", "surveillance", "consent", "network", "science", "ownership", "time", "physical", "vision", "eap", "terminology", "preservice", "children", "workplace", "explanation", "multimodal", "comparison", "framework", "undergraduate", "routes", "market", "ballot", "parenting", "apps"}:
+        if name in {"motion_video", "knowledge", "fact_check", "making", "feedback_literacy", "experiment", "lesson", "ecology", "trust", "doctoral", "hci", "surveillance", "consent", "network", "science", "ownership", "time", "physical", "vision", "eap", "terminology", "preservice", "children", "workplace", "explanation", "multimodal", "comparison", "framework", "undergraduate", "routes", "market", "ballot", "parenting", "apps"}:
             score += 24
         ranked.append((score, -order, {"subject": name, "field": field, "phrases": sorted(hits)}))
     ranked.sort(key=lambda x: (x[0], x[1]), reverse=True)
@@ -616,7 +617,16 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
     y = y if y is not None else {"inspection": 300, "shared_table": 427, "threshold": 370,
          "separated_support": 281, "facing_panels": 377, "side_by_side": 354}[spec["arrangement"]]
     c.group(x, y, scale)
-    if subject == "knowledge":
+    if subject == "motion_video":
+        # A sequence of image frames, not a chart or a learning-outcome arrow.
+        c.rect(-156, -137, 312, 274, INK, rx=9)
+        for frame, position in enumerate((-105, 0, 105)):
+            c.rect(position-43, -98, 86, 196, PAPER, rx=2)
+            c.circle(position, (-35, 0, 35)[frame], 23, RED)
+            for edge in (-122, 108):
+                c.rect(position-30, edge, 18, 14, PAPER, rx=2)
+                c.rect(position+12, edge, 18, 14, PAPER, rx=2)
+    elif subject == "knowledge":
         book(c,-139,27,.99)
         c.path("M-96 -131 H-6 V-91 H35 V-4 H-96 Z",RED,INK,5)
         c.path("M20 -131 H115 V-4 H58 V-57 H20 Z",PAPER,INK,6)
