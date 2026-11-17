@@ -1,0 +1,38 @@
+name: Verify Monday newsletter release
+on:
+  schedule:
+    - cron: '45 8,10 * * 1'
+      timezone: America/New_York
+    - cron: '30 11 * * 1'
+      timezone: America/New_York
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/check_release_deadline.py'
+      - 'tests/test_release_deadline.py'
+      - '.github/workflows/release-check.yml'
+  pull_request:
+    paths:
+      - 'scripts/check_release_deadline.py'
+      - 'tests/test_release_deadline.py'
+      - '.github/workflows/release-check.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+# Read-only checks must never queue behind acquisition or model inference.
+concurrency:
+  group: release-check-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - name: Check release-deadline behavior offline
+        run: python -m unittest discover -s tests -p 'test_release_deadline.py' -v
+      - name: Require this Monday's synthesis on the actual website and feeds
+        if: github.event_name != 'pull_request'
+        run: python scripts/check_release_deadline.py

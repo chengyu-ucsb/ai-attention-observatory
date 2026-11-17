@@ -13,6 +13,7 @@ def publication_target(now=None):
     monday = utc_day - timedelta(days=utc_day.weekday())
     target = datetime.combine(monday, time(12), ZONE)
     return {'timezone': ZONE.key, 'target_at': target.isoformat(),
+            'verification_target_at': datetime.combine(monday, time(11, 30), ZONE).isoformat(),
             'target_collection_week': monday.isoformat(),
             'source_window': {'from': (monday-timedelta(days=7)).isoformat(),
                               'to': (monday-timedelta(days=1)).isoformat(), 'timezone': 'UTC'},

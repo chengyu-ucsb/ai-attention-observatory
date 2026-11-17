@@ -195,9 +195,10 @@ class EditionRecoveryTests(unittest.TestCase):
         self.assertEqual(row['runs'],1)
 
     def test_monday_cutoff_tracks_eastern_time_and_dst(self):
-        for month,day,hour in [(11,9,16),(6,8,15)]:
-            self.assertFalse(publication_cutoff(dt.datetime(2026,month,day,hour,29,tzinfo=dt.timezone.utc)))
-            self.assertTrue(publication_cutoff(dt.datetime(2026,month,day,hour,30,tzinfo=dt.timezone.utc)))
+        for month,day,hour in [(11,9,12),(6,8,11)]:
+            cutoff=dt.datetime(2026,month,day,hour,0,tzinfo=dt.timezone.utc)
+            self.assertFalse(publication_cutoff(cutoff-dt.timedelta(seconds=1)))
+            self.assertTrue(publication_cutoff(cutoff))
 
 
 if __name__ == '__main__':

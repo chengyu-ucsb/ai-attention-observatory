@@ -18,7 +18,9 @@ on:
   # Early closeout plus one late-index generation; later runs only resume cursors.
   # GitHub cron can be delayed. These are opportunities, not publication deadlines.
   schedule:
-    - cron: '7 0,2,6,10 * * 1'
+    - cron: '7 21 * * 0'
+      timezone: America/New_York
+    - cron: '7 2,6,14 * * 1'
       timezone: America/New_York
   workflow_dispatch:
     inputs:

@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "edition_date": "2026-11-16",
+  "checked_on": "2026-11-17",
+  "status": "coverage_gaps_confirmed_recovery_incomplete",
+  "publication_window": {"from": "2026-11-09", "to": "2026-11-15", "timezone": "UTC"},
+  "snapshot_commit": "f96bb5a568335d702824b144d63f37a09582ab01",
+  "counts": {
+    "weekly_candidate_records": 74,
+    "scholarly_candidate_records": 67,
+    "nonacademic_candidate_records": 7,
+    "published_synthesis_sources": 2,
+    "nonacademic_pending_acquisition": 4,
+    "nonacademic_access_blocked": 2,
+    "nonacademic_partial_text_unreviewed": 1
+  },
+  "count_limit": "Internal candidate and processing counts at the recorded commit, not a count of all relevant publications or a reconstruction of Monday's exact queue.",
+  "findings": [
+    "The rolling weekly_preparation collector calls editorial.collect with searches=[]; news discovery relies on the 12 configured publisher feeds.",
+    "All 12 feeds had successful observations during the source week, but that does not establish topical or publication completeness. The Markup feed's latest observed publication was October 15.",
+    "Education Week was absent from both the feed registry and the optional Google News publisher allowlist. The allowlist is now expanded, but the independent scheduled web-research process is still needed.",
+    "Pending acquisition, blocked access, incomplete dates and missing discovery must not be described as a scarcity of published material.",
+    "This audit has not rebuilt the November 16 issue or completed review of every candidate. The published two-source issue remains a partial selection."
+  ],
+  "executed_searches": [
+    "AI attention cognition learning November 2026 after:2026-11-08 before:2026-11-17",
+    "AI work education Nov 12, 2026 OR Nov 10, 2026 OR Nov 13, 2026",
+    "AI education research November 9 15 2026 news learning Stanford review",
+    "AI attention cognitive offloading November 2026 9 10 11 12 13",
+    "AI work productivity November 2026 after:2026-11-08 before:2026-11-16",
+    "site:edweek.org November 2026 52 Stanford",
+    "site:theconversation.com assessments wicked 2026",
+    "AI attention November 12, 2026 news"
+  ],
+  "candidates": [
+    {
+      "title": "Is AI Good or Bad for Learning? The Answer Isn't So Simple",
+      "url": "https://www.edweek.org/technology/is-ai-good-or-bad-for-learning-the-answer-isnt-so-simple/2026/11",
+      "publisher": "Education Week",
+      "published": "2026-11-10",
+      "date_evidence": "Original publisher byline date opened in web research",
+      "genre": "journalism",
+      "indexed_at_snapshot": false,
+      "disposition": "relevant_missing_discovery",
+      "next_action": "Review the reporting, inspect the linked Stanford evidence review, verify primary-source date and relationship, then incorporate through the source-checked editorial path."
+    },
+    {
+      "title": "Teacher-regulated generative AI in structured group tasks: independent performance and metacognitive judgements in higher education",
+      "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.2007654/full",
+      "doi": "10.3389/fpsyg.2026.2007654",
+      "published": "2026-11-13",
+      "date_evidence": "Original publisher full page publication field",
+      "genre": "original research",
+      "indexed_at_snapshot": true,
+      "stored_publication_date": "",
+      "disposition": "relevant_excluded_by_unresolved_date",
+      "next_action": "Reconcile publisher date provenance without fabricating registry precision; complete full-paper review and regenerate the affected packet/readings."
+    },
+    {
+      "title": "ChatGPT's Teen Mode could deprive teenagers of a fundamental need",
+      "url": "https://www.theguardian.com/commentisfree/2026/nov/10/chatgpt-teen-mode-cognitive-skills",
+      "published": "2026-11-10",
+      "date_evidence": "Original publisher byline; modified date is November 13",
+      "genre": "opinion",
+      "indexed_at_snapshot": true,
+      "disposition": "relevant_acquisition_blocked",
+      "next_action": "The publisher text was accessible through web research. Complete a source-checked original commentary reading rather than treating the machine access failure as absence."
+    },
+    {
+      "title": "Synergizing Mind and Machine: Unlocking the Potential of Generative AI With Metacognitive Scaffolding to Optimize Upper Elementary Student Learning",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0360131526002320",
+      "doi": "10.1016/j.compedu.2026.105792",
+      "published_candidate": "2026-11-10",
+      "date_evidence": "Publisher search result reports online publication; direct page access failed with HTTP 403",
+      "genre": "research candidate",
+      "indexed_at_snapshot": false,
+      "disposition": "lead_requires_metadata_and_text_verification",
+      "next_action": "Verify identity and original date through publisher/registry and obtain permitted text before synthesis."
+    },
+    {
+      "title": "How AI Is Changing the Way Employees Spend Time at Work",
+      "url": "https://www.gallup.com/workplace/716585/ai-changing-employees-spend-time-work.aspx",
+      "published": "2026-11-16",
+      "date_evidence": "Publisher search result",
+      "disposition": "outside_window_next_edition_lead",
+      "next_action": "Check for the November 23 edition; do not misdate as November 9–15 material."
+    }
+  ]
+}

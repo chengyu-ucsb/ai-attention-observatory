@@ -225,7 +225,7 @@ HTTP retries are idempotent. Stage attempts are saved before inference and
 limited to two, including interruptions and source-fidelity corrections.
 
 Each theme receives a separate-context source review. A rejected theme can be
-corrected once without rewriting accepted themes. At the Monday 11:30 a.m.
+corrected once without rewriting accepted themes. At the Monday 7:00 a.m.
 Eastern cutoff, a compact edition may use the accepted subset. Its framing is
 written only from retained themes and still receives a final review. The
 finalizer continues processing deferred sources. Unchanged held editions do

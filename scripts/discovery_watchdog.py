@@ -15,7 +15,8 @@ from zoneinfo import ZoneInfo
 from collection_window import window_metadata
 
 UTC = dt.timezone.utc
-PRIMARY_LOCAL = dt.time(0, 7, tzinfo=ZoneInfo('America/New_York'))
+PRIMARY_LOCAL = dt.time(21, 7, tzinfo=ZoneInfo('America/New_York'))
+PRIMARY_DAY_OFFSET = -1  # Sunday evening, after the UTC publication week closes.
 GRACE = dt.timedelta(hours=3)
 WORKFLOW_PATH = ".github/workflows/refresh.yml"
 
@@ -77,7 +78,7 @@ def plan(weekly, workflow, pages, *, now=None, current_run_id=None):
     now = now.astimezone(UTC)
     monday = now.date() - dt.timedelta(days=now.weekday())
     start = dt.datetime.combine(monday, dt.time(tzinfo=UTC))
-    due = (dt.datetime.combine(monday, PRIMARY_LOCAL) + GRACE).astimezone(UTC)
+    due = (dt.datetime.combine(monday + dt.timedelta(days=PRIMARY_DAY_OFFSET), PRIMARY_LOCAL) + GRACE).astimezone(UTC)
     result = {"dispatch": False, "status": "held", "expected_publication_window": window_metadata(now),
               "recovery_not_before": due.isoformat()}
 

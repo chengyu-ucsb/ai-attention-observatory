@@ -86,7 +86,8 @@ class RollingRecoveryTests(unittest.TestCase):
 
     def test_workflow_has_bounded_non_dispatching_recovery_slots(self):
         text=(Path(__file__).resolve().parents[1]/'.github/workflows/prepare-weekly-readings.yml').read_text()
-        self.assertIn("cron: '17 8,10,20,22 * * *'",text)
+        self.assertIn("cron: '17 8,10,20,22 * * 2-6'",text)
+        self.assertIn("cron: '17 12,16,20,22 * * 1'",text)
         self.assertIn("if: env.RETRY_ONLY != 'true'",text)
         self.assertIn('rolling-retry-plan --expected-week',text)
         self.assertIn('args+=(--retry-only)',text)

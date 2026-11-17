@@ -351,8 +351,8 @@ An attempt is reserved before inference; each stage gets one initial attempt and
 one correction across restarts. Unchanged held inputs skip model installation
 and download. A final source-fidelity review remains mandatory.
 
-Composition runs Monday at 8:17 a.m., 11:40 a.m. and 4:17 p.m. Eastern.
-After 11:30 a.m., it may publish a compact edition with one to three checked
+Composition runs Monday at 4:17, 7:17 and 9:17 a.m., with a 4:17 p.m. recovery.
+After 7:00 a.m. Eastern, it may publish a compact edition with one to three checked
 themes from at least two sources. Pending readings continue independently;
 source-date, citation, currentness and accuracy gates still apply. A separate
 `Meet weekly publication deadline` job runs Monday at 12:05 p.m. Eastern, with
@@ -362,6 +362,9 @@ clearly labelled coverage update with the eligible reading shelf, even when
 that shelf is empty. Its fixed template cannot contain rejected prose or new
 research claims. A later checked analysis replaces it at the same permanent
 URL. Artwork and intervention development remain outside this deadline.
+A coverage notice is a missed newsletter deadline, not a completed synthesis.
+The operational target is a verified live synthesis by 11:30 a.m. and chat
+delivery at noon Eastern. See [the release schedule](docs/release-schedule.md).
 The deadline job checks for an existing release before doing work and dispatches
 Pages only after saving a changed release; routine no-op checks add no artifacts.
 

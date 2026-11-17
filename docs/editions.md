@@ -19,7 +19,7 @@ For normal weekly editions, discovery covers the previous complete **Monday–Su
 
 Historical feeds already used a date-at-noon timestamp. Retaining that value preserves feed behavior; it is not a newly verified exact publication time. The original release date and immutable original snapshot remain available separately.
 
-The publication target is **Monday at 12:05 p.m. America/New_York**. Full synthesis can publish during Monday, starting at midnight Eastern; the UTC source-week rollover on Sunday evening does not open the release window early. A separate deadline job can publish a clearly labeled coverage update when a full synthesis has not passed review. A later approved synthesis upgrades the same Monday edition and link. Scheduled infrastructure can be delayed, and successful full synthesis is not guaranteed by the deadline; neither delay changes the edition's identity. Keep the free-service limits and bounded retry policy.
+The newsletter deadline is **Monday at noon America/New_York**, with a verified live synthesis targeted for **11:30 a.m.** The 12:05 p.m. fallback is only a missed-deadline coverage notice. See [the release schedule](release-schedule.md). Full synthesis can publish during Monday, starting at midnight Eastern; the UTC source-week rollover on Sunday evening does not open the release window early. A separate deadline job can publish a clearly labeled coverage update when a full synthesis has not passed review. A later approved synthesis upgrades the same Monday edition and link. Scheduled infrastructure can be delayed, and successful full synthesis is not guaranteed by the deadline; neither delay changes the edition's identity. Keep the free-service limits and bounded retry policy.
 
 ## Consolidated launch archive
 

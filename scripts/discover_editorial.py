@@ -52,6 +52,7 @@ PUBLISHERS = {
     "404 Media", "The Markup", "TechCrunch", "Poynter", "New Scientist", "Nature",
     "Scientific American", "Fast Company", "Nieman Lab", "AI Now Institute", "Brookings",
     "Electronic Frontier Foundation",
+    "Education Week", "Chalkbeat", "The Hechinger Report", "WBUR", "RAND", "Gallup",
 }
 AI = re.compile(r"\b(?:ai|genai|chatgpt|copilot|generative|artificial intelligence|language models?|llms?|claude|algorithmic)\b", re.I)
 FOCUS = re.compile(r"\b(?:attention|focus|distraction|cognitive|offloading|thinking|mental effort|memory|learning|interruption|notifications?|task.switching|mindful|productivity|deep work|wellbeing|well-being|autonomy)\b", re.I)

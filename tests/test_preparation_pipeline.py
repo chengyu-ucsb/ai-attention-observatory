@@ -603,7 +603,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn('run: python scripts/update.py', stage)
         self.assertIn("if: env.MODE == 'weekly'", stage)
         self.assertIn('preparation_pipeline.py closeout', stage)
-        self.assertIn("cron: '7 0,2,6,10 * * 1'", text)
+        self.assertIn("cron: '7 21 * * 0'", text)
+        self.assertIn("cron: '7 2,6,14 * * 1'", text)
         self.assertIn('timezone: America/New_York',text)
 
     def test_reading_runs_require_a_lease_and_a_successful_cloud_save(self):

@@ -26,9 +26,9 @@ on:
       - '.github/workflows/weekly-edition.yml'
   # Recovery if an upstream run fails before dispatching its successor.
   schedule:
-    - cron: '17 8,16 * * 1'
-      timezone: America/New_York
-    - cron: '40 11 * * 1'
+    # Last pre-deadline start leaves 60m for composition, 20m for deployment,
+    # and over an hour for queue delays or recovery before noon.
+    - cron: '17 4,7,9,16 * * 1'
       timezone: America/New_York
     - cron: '17 12 * * 0,2-6'
       timezone: America/New_York

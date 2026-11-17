@@ -12,7 +12,9 @@ on:
     paths:
       - '.github/workflows/resume-weekly-discovery.yml'
   schedule:
-    - cron: '17 2,8,14,20 * * *'
+    # UTC schedules: move Monday's mid-morning source mutation after release.
+    - cron: '17 2,8,14,20 * * 0,2-6'
+    - cron: '17 2,8,17,20 * * 1'
   workflow_dispatch:
 permissions:
   contents: read

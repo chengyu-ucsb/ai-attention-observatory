@@ -61,8 +61,8 @@ def _after_monday_time(now, hour, minute):
 
 
 def publication_cutoff(now=None):
-    """Allow the bounded compact synthesis at 11:30 a.m. Eastern on Monday."""
-    return _after_monday_time(now, 11, 30)
+    """Use the checked subset from 7 a.m.; reserve the morning for release QA."""
+    return _after_monday_time(now, 7, 0)
 
 
 def release_cutoff(now=None):

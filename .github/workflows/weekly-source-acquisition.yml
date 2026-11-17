@@ -15,7 +15,9 @@ on:
     branches: [main]
   # Discovery remains weekly. These bounded retries drain that same week's queue.
   schedule:
-    - cron: '43 2,8,14,20 * * *'
+    # UTC schedules: move Monday's mid-morning source mutation after release.
+    - cron: '43 2,8,14,20 * * 0,2-6'
+    - cron: '43 2,8,17,20 * * 1'
   workflow_dispatch:
 permissions:
   contents: read

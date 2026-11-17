@@ -8,11 +8,21 @@ on:
       - '.github/workflows/prepare-weekly-readings.yml'
   # Build the open week's source and reading coverage before Sunday closes.
   schedule:
-    - cron: '17 6,18 * * *'
+    - cron: '17 6,18 * * 2-6'
+      timezone: America/New_York
+    # Finish Sunday's last 80m pass before the UTC publication week closes.
+    - cron: '17 6,16 * * 0'
+      timezone: America/New_York
+    # Monday morning belongs to the edition being released, not the new week.
+    - cron: '17 14,18 * * 1'
       timezone: America/New_York
     # Two bounded recovery opportunities after each collection. These do not
     # repeat metadata discovery or acquire new sources, and skip idle queues.
-    - cron: '17 8,10,20,22 * * *'
+    - cron: '17 8,10,20,22 * * 2-6'
+      timezone: America/New_York
+    - cron: '17 8,10,12,14 * * 0'
+      timezone: America/New_York
+    - cron: '17 12,16,20,22 * * 1'
       timezone: America/New_York
   workflow_dispatch:
 permissions:
@@ -53,7 +63,7 @@ jobs:
     # This cap is not a measured full-corpus review throughput estimate.
     timeout-minutes: 80
     env:
-      RETRY_ONLY: ${{ github.event_name == 'schedule' && github.event.schedule == '17 8,10,20,22 * * *' }}
+      RETRY_ONLY: ${{ github.event_name == 'schedule' && contains(fromJSON('["17 8,10,20,22 * * 2-6","17 8,10,12,14 * * 0","17 12,16,20,22 * * 1"]'), github.event.schedule) }}
       OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
       OBSERVATORY_STORE_URL: https://jrndagmzayiwpmyjtczx.supabase.co/functions/v1/observatory-store
     steps:

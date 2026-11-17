@@ -25,7 +25,7 @@ publication.
   should care. Source names and understandable descriptions precede jargon.
 - Each theme may use one to three sources. A single-source account is preferable
   to a manufactured cross-paper claim. A full issue uses at least three sources;
-  a compact edition after Monday 11:30 a.m. Eastern uses at least two;
+  a compact edition after Monday 7:00 a.m. Eastern uses at least two;
   not every source must appear in the final research question.
 - Common preprint/review limits appear once in the source note. Material design
   limits stay with the relevant claim; removing repeated boilerplate does not
