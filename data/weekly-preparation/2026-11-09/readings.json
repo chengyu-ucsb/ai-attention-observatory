@@ -6,9 +6,9 @@
     "to": "2026-11-15",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-16T23:40:12.381430+00:00",
-  "packet_sha256": "d568aea389b7f8e6dba8ae4d67a1e60a8153c12020b8dd7fdeca651a0f160b64",
-  "acquisition_state_sha256": "47c8cbc930ebf9cbade9df3880054cd960cf94e3d8d2d1482955fd43e669ef1e",
+  "observation_at": "2026-11-17T00:08:00.353302+00:00",
+  "packet_sha256": "9eafc2047b4034eca1668bc4c94dd2de9e866532078b2c9088bbf259e14b8c9e",
+  "acquisition_state_sha256": "9d05b877d858beb83226018589cae5a684ebb1d3becb207bba216734215db517",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -288,7 +288,7 @@
         "discovery_scope": "preparation",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-13T18:34:42.871467+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-13T18:34:42.871467+00:00"
       }
     },
@@ -916,8 +916,87 @@
         "discovery_scope": "preparation",
         "discovery_query": "digital distraction notification fatigue attention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T18:58:35.636347+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-12T18:58:35.636347+00:00"
+      }
+    },
+    "8e8bd66250641c07903cd29798ee4fab502c9d478467f5b4ec209034bfb43869": {
+      "input_fingerprint": "f0fa865a81b93794126ff05560e51609d947a52a2aa8a3a734323bb194426eeb",
+      "record": {
+        "title": "Location-Aware Scheduling for Multitasking MCM-GPUs",
+        "authors": [
+          "Tiejian Zhang",
+          "Guangda Zhang",
+          "Yandong He",
+          "Chen Zhang",
+          "Jiping Gao",
+          "Hengzhu Liu",
+          "Xia Zhao"
+        ],
+        "published": "2026-11-11",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published-print",
+              "date_parts": [
+                2027,
+                3,
+                31
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        },
+        "venue": "ACM Transactions on Design Automation of Electronic Systems",
+        "doi": "10.1145/3827618",
+        "url": "https://doi.org/10.1145/3827618",
+        "abstract_text": "To address the growing computational demands of high-performance computing (HPC) and machine learning (ML) applications, Graphics Processing Units (GPUs) have transitioned from single-chip designs to multi-chip module (MCM) architectures, driven by manufacturing constraints. Simultaneously, GPUs are increasingly deployed in cloud environments to accelerate a wide range of applications for multiple users. Spatial multitasking, which allows multiple applications to run concurrently on a single GPU by executing them on different sets of streaming multiprocessors (SMs), offers an efficient method for sharing GPU resources. However, effectively supporting multitasking in the emerging MCM-GPU architecture presents a significant challenge that remains an open problem. This article presents the key observation that the placement of co-executing applications in MCM-GPUs plays a critical role in system performance. Specifically, for certain multiprogram workloads, co-executing applications achieve better performance when located on the same GPU chip to maximize memory bandwidth utilization. Conversely, other workloads benefit from being distributed across different GPU chips to mitigate memory contention. To address this, we propose a Location-Aware Scheduler (LA-Scheduler) that identifies application characteristics and makes optimized scheduling decisions. The LA-Scheduler performs lightweight workload classification using a k-means-based clustering method and applies multitasking scheduling rules during runtime to determine the optimal placement of applications within the MCM-GPU architecture. Evaluation results show that the proposed LA-Scheduler improves system throughput (STP) by an average of 38.67% compared with single-task operation. Compared with the traditional methods intra-chip scheduling and inter-chip scheduling, the system throughput is improved by an average of 13.51% and 7.14% respectively.",
+        "abstract_source": "Crossref publisher-supplied abstract",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "To address the growing computational demands of high-performance computing (HPC) and machine learning (ML) applications, Graphics Processing Units (GPUs) have transitioned from single-chip designs to multi-chip module (MCM) architectures, driven by manufacturing constraints. Simultaneously, GPUs are increasingly deployed in cloud environments to accelerate a wide range of applications for multiple users. Spatial mult…",
+        "kind": "scholarly",
+        "lane": "Fragmentation",
+        "relation": "Adjacent digital-attention evidence",
+        "evidence": "Registry metadata screened; original paper not yet independently assessed",
+        "source": "Crossref",
+        "first_seen": "2026-11-16",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI assistant interruptions distraction multitasking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+        "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
       }
     },
     "f99c417c2dcf99f561146efd7b75fbfe54a322fd2f888d3d40c817784f9e9d21": {
@@ -1143,7 +1222,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
       }
     },
@@ -1299,7 +1378,7 @@
         "discovery_scope": "closeout",
         "discovery_query": "large language model cognitive engagement agency",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-16T13:32:20.837751+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
       }
     },
@@ -1994,7 +2073,7 @@
         "discovery_scope": "preparation",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-10T08:40:33.102749+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -2060,7 +2139,7 @@
         "discovery_scope": "preparation",
         "discovery_query": "generative AI cognitive offloading critical thinking",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-16T23:25:49.741147+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-10T08:40:33.102749+00:00",
         "abstract_completeness": "provider_text_preserved"
       }
@@ -2452,8 +2531,8 @@
         "complete_reading_attempt": {
           "status": "copied_source_passage",
           "stage": "synthesis",
-          "last_at": "2026-11-15",
-          "next_at": "2026-11-17",
+          "last_at": "2026-11-17",
+          "next_at": "2026-11-19",
           "provider_diagnostics": [
             {
               "stage": "article",
@@ -3388,6 +3467,72 @@
         "preparation_first_seen_at": "2026-11-15T02:45:53.116624+00:00"
       }
     },
+    "3575e94471db437adf13a782ef69d7207d00c24749f233bfd2b0d3c7f0bd7afe": {
+      "input_fingerprint": "d7a987f6a436d79a8fba0f03a666dfc93aae377133ebb5bfdc1079009aadc35a",
+      "record": {
+        "title": "Ethnomathematics in the Age of Artificial Intelligence: Navigating Cultural Preservation and Technological Advancement",
+        "authors": [
+          "Richmond Kakra Addae",
+          "Seth Amoako Atta",
+          "Hawa Adusei"
+        ],
+        "published": "2026-11-12",
+        "venue": "Journal of Mathematics Instruction Social Research and Opinion",
+        "doi": "10.58421/misro.v5i4.1757",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                12
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-12"
+        },
+        "url": "https://doi.org/10.58421/misro.v5i4.1757",
+        "abstract_text": "This study maps and synthesises two adjacent bodies of literature—research on ethnomathematics and culturally responsive mathematics instruction focused on Akan cultural practices, and research on artificial intelligence (AI) in mathematics education—to propose a culturally responsive, AI-supported instructional framework for Ghanaian classrooms. A systematic scoping review was conducted following the PRISMA Extension for Scoping Reviews (PRISMA-ScR) and PRISMA 2020 flow conventions. Six databases were searched for records published between 2005 and 2025, supplemented by hand-searching. AI was operationalised broadly, from intelligent tutoring and adaptive learning systems to generative AI from late 2022 onwards. Of 612 records, 25 studies were retained for qualitative thematic synthesis. The synthesis indicates that kente weaving, Adinkra symbolism, market transactions, and drumming patterns encode mathematical ideas such as symmetry, proportion, sequence, and logical reasoning. The AI-focused studies, most of which predate generative AI, suggest that these tools can support personalised, interactive, and contextualised learning. No included study combines the two strands in the Akan context; this absence is a central finding and motivates the proposed framework. Blending ethnomathematics with AI is associated with greater cultural relevance, engagement, and conceptual clarity, although digitising Indigenous knowledge raises ethical questions of ownership, representation, and community consent.",
+        "abstract_source": "OpenAlex abstract index",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "This study maps and synthesises two adjacent bodies of literature—research on ethnomathematics and culturally responsive mathematics instruction focused on Akan cultural practices, and research on artificial intelligence (AI) in mathematics education—to propose a culturally responsive, AI-supported instructional framework for Ghanaian classrooms. A systematic scoping review was conducted following the PRISMA Extensio…",
+        "kind": "scholarly",
+        "lane": "Interventions",
+        "relation": "AI-related literature",
+        "evidence": "Metadata screened (unverified)",
+        "source": "OpenAlex",
+        "first_seen": "2026-11-16",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI attention management intervention focus assistant",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+        "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+      }
+    },
     "b83b96ded3dbb2166d461cf8ba0b83508c0530ef17c701ee749245373b20a909": {
       "input_fingerprint": "8e8d71e78cd156d0fa11a5e09ac550a54a2ebd5157209a6d13bee098aa2ae054",
       "record": {
@@ -3587,6 +3732,72 @@
         "preparation_first_seen_at": "2026-11-11T08:02:07.776092+00:00"
       }
     },
+    "2149c0b0733c2f7dc4b8606712d3e45d030560d441bc937a9bc97ca5db40986d": {
+      "input_fingerprint": "c0c5882e485b462216878d1be21f37b60df119f3fa4c1af1cbca660a9fc96051",
+      "record": {
+        "title": "The Influence of Artificial Intelligence (Ai) in the Teaching and Learning Process (PDPC) to Enhance Student Motivation: A Systematic Literature Review",
+        "authors": [
+          "Arliena Masdin",
+          "Zamri Mahamod",
+          "NURUL HUWAIDA ABDUL HAFIZ"
+        ],
+        "published": "2026-11-11",
+        "venue": "International Journal of Academic Research in Progressive Education and Development",
+        "doi": "10.6007/ijarped/v15-i4/29359",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                11
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-11"
+        },
+        "url": "https://doi.org/10.6007/ijarped/v15-i4/29359",
+        "abstract_text": "Artificial Intelligence (AI) has increasingly garnered attention within the global education landscape due to its potential to transform the teaching and learning process in a comprehensive manner. AI is capable of offering more personalised teaching approaches by adapting content and delivery methods according to individual students' proficiency levels, interests, and needs. It can analyse student performance in real time and provide immediate, targeted feedback, thereby enhancing students’ motivation to remain focused during learning sessions.This systematic literature review aims to critically examine and analyse the influence of Artificial Intelligence (AI) on the teaching and learning process, as well as its impact on student motivation. Scholarly databases such as Google Scholar, the Educational Resource Information Centre (ERIC), and Semantic Scholar were utilised to access relevant articles published within the last five years (2020–2025). A total of 156 articles were identified during the initial screening phase, and 13 were selected for synthesis as they met the specific contextual criteria of the systematic literature review, conducted in accordance with the stages outlined in the Preferred Reporting Items for Systematic Reviews and Meta-Analyses (PRISMA) model.Findings from the review indicate a notable increase in both intrinsic and extrinsic motivation among students engaged in learning sessions that incorporate AI elements, particularly through the use of digital applications such as ChatGPT, Chatbot, Moodle, Ask AI, Image AI, Padlet, and others. These findings further substantiate the assertion that AI significantly contributes to enhancing students’ motivation during the teaching and learning process.The scope of this study specifically focuses on primary-level students to examine the influence of AI in the classroom context, thereby demonstrating the capacity of Artificial Intelligence to serve as a paradigm shift in fostering student motivation and cultivating a more productive teaching and learning environment.",
+        "abstract_source": "OpenAlex abstract index",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Artificial Intelligence (AI) has increasingly garnered attention within the global education landscape due to its potential to transform the teaching and learning process in a comprehensive manner. AI is capable of offering more personalised teaching approaches by adapting content and delivery methods according to individual students' proficiency levels, interests, and needs. It can analyse student performance in rea…",
+        "kind": "scholarly",
+        "lane": "Interventions",
+        "relation": "AI-related literature",
+        "evidence": "Metadata screened (unverified)",
+        "source": "OpenAlex",
+        "first_seen": "2026-11-16",
+        "discovery_scope": "closeout_late_index",
+        "discovery_query": "AI attention management intervention focus assistant",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+        "preparation_first_seen_at": "2026-11-16T23:44:04.209361+00:00"
+      }
+    },
     "46c2120ce06811fd7407eec6b541dc5afbf66e10829ac005b5649bbb0974de0e": {
       "input_fingerprint": "dd676ed797cafb6f8cb9e72e86a095d969206d59ac1d849539aad939a3447ba5",
       "record": {
@@ -3713,7 +3924,7 @@
         "discovery_scope": "preparation",
         "discovery_query": "generative AI self regulation learning intervention",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T18:58:35.636347+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-12T18:58:35.636347+00:00"
       }
     },
@@ -3966,6 +4177,75 @@
         "preparation_first_seen_at": "2026-11-12T18:58:35.636347+00:00"
       }
     },
+    "39341c58402e85839c4feb8acace4784025f736792ee878e25db37aeb03d410e": {
+      "input_fingerprint": "493093cbf5c59250000657506779c88b259dbff2ac1ec5348c8b21b4f6278f7c",
+      "record": {
+        "title": "Transforming Science Education through Artificial Intelligence (AI): Opportunities, Challenges, and Implications for Students' Critical Thinking Skills in the Digital Era.",
+        "authors": [
+          "Meirita Sari",
+          "Faizah Amalia",
+          "Kaila Sri Wahyuni Amalia",
+          "Eva Ullifatus Sholihah",
+          "Ladiva Jufitri",
+          "Imam Prayogo"
+        ],
+        "published": "2026-11-09",
+        "venue": "Assoeltan Indonesian Journal of Community Research and Engagement",
+        "doi": "10.70610/edujavare.2244",
+        "publication_date_provenance": {
+          "source": "Crossref publisher metadata",
+          "evidence": [
+            {
+              "field": "published-online",
+              "date_parts": [
+                2026,
+                11,
+                9
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "published",
+              "date_parts": [
+                2026,
+                11,
+                9
+              ],
+              "precision": "day"
+            },
+            {
+              "field": "issued",
+              "date_parts": [
+                2026,
+                11,
+                9
+              ],
+              "precision": "day"
+            }
+          ],
+          "policy": "earliest precise publication event; no registry timestamp fallback",
+          "status": "day_known",
+          "field": "published-online",
+          "value": "2026-11-09"
+        },
+        "url": "https://doi.org/10.70610/edujavare.2244",
+        "abstract_text": "Artificial intelligence (AI) is reshaping science education by expanding access to information, supporting adaptive instruction, enabling simulations, and providing timely feedback. This article examines the opportunities, challenges, and implications of AI integration for students’ critical thinking in the digital era. Using a narrative literature review, the study synthesizes foundational scholarship on AI in education, science learning, AI literacy, and critical thinking, alongside recent reviews and international guidance. The synthesis indicates that AI can support critical thinking when it is embedded in inquiry-oriented activities that require students to formulate questions, interpret scientific evidence, compare explanations, identify limitations, and justify conclusions. AI-supported simulations, conversational systems, and feedback tools may make abstract concepts more accessible and provide opportunities for iterative reasoning. However, these benefits are not automatic. Hallucinated information, algorithmic bias, privacy risks, unequal access, academic integrity concerns, and cognitive over-reliance may weaken learning if AI outputs are accepted without verification. The article argues that AI should function as a cognitive partner rather than a substitute for students’ intellectual work. Effective integration therefore requires scientific and AI literacy, teacher mediation, transparent assessment, ethical safeguards, and learning tasks that make reasoning visible. A human-centred approach can help science education use AI to strengthen, rather than displace, independent and evidence-based thinking.",
+        "abstract_source": "OpenAlex abstract index",
+        "abstract_completeness": "provider_text_preserved",
+        "preview": "Artificial intelligence (AI) is reshaping science education by expanding access to information, supporting adaptive instruction, enabling simulations, and providing timely feedback. This article examines the opportunities, challenges, and implications of AI integration for students’ critical thinking in the digital era. Using a narrative literature review, the study synthesizes foundational scholarship on AI in educa…",
+        "kind": "scholarly",
+        "lane": "AI & cognition",
+        "relation": "AI-related literature",
+        "evidence": "Metadata screened (unverified)",
+        "source": "OpenAlex",
+        "first_seen": "2026-11-16",
+        "discovery_scope": "closeout",
+        "discovery_query": "generative AI cognitive offloading critical thinking",
+        "historical_backfill": false,
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
+        "preparation_first_seen_at": "2026-11-16T13:32:20.837751+00:00"
+      }
+    },
     "bbecbee4d2fd6727ef22faeb16389002afdb52873cbce06d8e443a23c6c41ca2": {
       "input_fingerprint": "81f860e3c1bbe2a6add29d82ee7ff7817baf75776497b337cf39460a73a62221",
       "record": {
@@ -4024,7 +4304,7 @@
         "discovery_scope": "preparation",
         "discovery_query": "generative AI sustained attention task switching",
         "historical_backfill": false,
-        "metadata_observed_at": "2026-11-12T18:58:35.636347+00:00",
+        "metadata_observed_at": "2026-11-16T23:44:04.209361+00:00",
         "preparation_first_seen_at": "2026-11-11T08:02:07.776092+00:00"
       }
     },
@@ -4068,14 +4348,41 @@
         "metadata_observed_at": "2026-11-14T08:54:47.757139+00:00",
         "preparation_first_seen_at": "2026-11-14T17:11:57.029405+00:00",
         "complete_reading_attempt": {
-          "status": "acquisition_receipt_content_changed",
-          "stage": "retrieval",
-          "last_at": "2026-11-16",
-          "next_at": "2026-11-18",
-          "provider_diagnostics": []
+          "status": "verifier_indices_invalid",
+          "stage": "synthesis",
+          "last_at": "2026-11-17",
+          "next_at": "2026-11-19",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.eff.org/deeplinks/2026/11/tech-companies-are-trying-shift-entire-concept-privacy-again",
+              "status": "partial_full_text",
+              "final_url": "https://www.eff.org/deeplinks/2026/11/tech-companies-are-trying-shift-entire-concept-privacy-again",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.eff.org/deeplinks/2026/11/tech-companies-are-trying-shift-entire-concept-privacy-again"
+            }
+          ],
+          "verifier_diagnostic": {
+            "claim_count": 6,
+            "duplicate_supported": false,
+            "duplicate_rejected": false,
+            "overlap_count": 0,
+            "missing_count": 0,
+            "out_of_range_count": 1
+          },
+          "format_input_sha256": "aac5ee6f515002215223e7a69fe9d1cb3f0d523541c858272f16d3c1cdea1a8f",
+          "format_failures": 1,
+          "retry_after": "2026-11-17T00:20:53.832484+00:00"
         }
       },
-      "acquisition_receipt_sha256": "1dc2e795b54e3fa1c96e9bf76c5afe8258dd509aaf94340bc151a52d3d9975d6"
+      "acquisition_receipt_sha256": "62f26134d654b767e344dda084ee6c5f558c9edc0ab0ea376b85cec5e2e33cf5"
     },
     "bcabe63cf45884465c18010e31968ac4d139cede8167497c217ff468443fa594": {
       "input_fingerprint": "ae7898bda9d2907e17644f92c65ec87cf4779a5e6084bad6a48900319eb1928b",
@@ -4329,5 +4636,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "a479f06e16f2c30dce192b3cd420a9e0cab286ef146990c0295582e25a94e5c3"
+  "metadata_sha256": "0179f31a5a7781d3deaad19b04846f4ac09a3001a56acc5c906dfe4bb5b8eaf5"
 }
