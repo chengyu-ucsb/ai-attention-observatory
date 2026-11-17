@@ -341,12 +341,12 @@
       "kind": "scholarly",
       "published": "2026-11-11",
       "source_url": "https://doi.org/10.1145/3795867.3831010",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -357,8 +357,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable"
     },
     "ce5c774da92cb7224c632e4829a89b253fb7a9b13dd2bad8366129851683bb4e": {
       "fingerprint": "588cf6c2818583c1776132e76667c45217b8845ed8c57fb5f5c4a357bca73fef",
@@ -556,12 +566,12 @@
       "kind": "scholarly",
       "published": "2026-11-11",
       "source_url": "https://doi.org/10.1007/s44217-026-02232-z",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -572,8 +582,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable"
     },
     "3db7459db369a2c216896e5d31d6adedc69990f737a1fd9610159015e7577398": {
       "fingerprint": "74efb76765aa50ec6c17216142c27e7406463925c93c95c883f506c0beae6a12",
@@ -997,9 +1017,9 @@
       "kind": "scholarly",
       "published": "2026-11-13",
       "source_url": "https://doi.org/10.1108/intr-07-2025-1110",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
@@ -1027,11 +1047,28 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T11:12:36.382895+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
+      "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        }
+      }
     },
     "2dc0008c8e231b112054dd1434a574315d5a0ccab4457777d0e440e46f4ffa77": {
       "fingerprint": "94c3103a35423c8e7e45d22a82fab6a35ab32cf2caed0ae5f9fedce6a963927a",
@@ -1113,15 +1150,17 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.12973/eu-jer.16.1.191",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "a2f351d9381705435b9f4b2512c67423c0668558a9df3fedf9460fb6fb3f96bc"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -1143,11 +1182,37 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.eu-jer.com/articles/EU-JER_16_1_191.pdf"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T11:12:36.382895+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
+      "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "a2f351d9381705435b9f4b2512c67423c0668558a9df3fedf9460fb6fb3f96bc"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        }
+      }
     },
     "7fb8338ceb715b365e52bbe366dfb2a82f56cf5309ca477f90885e1944c1f31a": {
       "fingerprint": "abd59ba007ac4d78bffb9bc0e2d8de2d5c20a0e3b224ba93b760aa92f8338aae",
@@ -1352,15 +1417,17 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.62159/isej.v8i1.2969",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "f33759c91d22aff54ec55b26938063a5c16b8167ee4483e1b576d37b4f98f5d0"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -1370,8 +1437,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://siducat.org/index.php/isej/article/view/2969"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable"
     },
     "d104f72fc57f05f74ffdcea508d6a83a0fa771d02521cf00caa3401600fb1f98": {
       "fingerprint": "8c62abd966dc54f303fdfd03b6af3fa770201b82efdc19b8f32f21f65191f1c4",
@@ -1509,9 +1586,9 @@
       "kind": "scholarly",
       "published": "2026-11-12",
       "source_url": "https://doi.org/10.21203/rs.3.rs-11039287/v1",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
@@ -1539,11 +1616,29 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "http_404",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.21203/rs.3.rs-11039287/v1",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T11:12:36.382895+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
+      "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        }
+      }
     },
     "f9c834a131bb6b89d153d01fc3ba4fd2be0b63e75d309dd9f4e421321ce598a1": {
       "fingerprint": "cc20ec74ce969c19bf56ae09a2f59b8e31b94972562af75ace43b3112f5b0be4",
@@ -1842,12 +1937,12 @@
       "kind": "scholarly",
       "published": "2026-11-12",
       "source_url": "https://doi.org/10.69709/caic.2026.162361",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -1858,8 +1953,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable"
     },
     "c19e7d43d1688571b16638cfab14570140f6b531a24241a6060ea3e5a527c973": {
       "fingerprint": "fe47c5ab1e497f3812b169a8d75d5aba01ecf63a14a2482d8e878893a3fa180a",
@@ -3347,9 +3452,9 @@
       "kind": "scholarly",
       "published": "2026-11-10",
       "source_url": "https://doi.org/10.1108/itp-12-2025-1853",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
@@ -3377,11 +3482,28 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T11:12:36.382895+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
+      "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        }
+      }
     },
     "c655ecbf2c3c7469498fb3b662b1351447c64adaf590906cd63d36a67f7ea387": {
       "fingerprint": "8a6066bae23b5504ec41e0967ebf3dcd369301ba6ceda3b71934ef5cf783f0d3",
@@ -3670,15 +3792,17 @@
       "kind": "scholarly",
       "published": "2026-11-10",
       "source_url": "https://doi.org/10.54254/2754-1169/2026.38925",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "c2fed01392c4335faaba0f34aa25bd9162bd89acff9993ee87f9dd57ea399231"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -3700,11 +3824,37 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://aemps.ewapub.com/article/view/38925.pdf"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T11:12:36.382895+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
+      "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "c2fed01392c4335faaba0f34aa25bd9162bd89acff9993ee87f9dd57ea399231"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        }
+      }
     },
     "777d203812534ab8e70cb1043fff828bf3a29071c877dcef917781ee3ccb3b2f": {
       "fingerprint": "9f0645e606c4a0e951ff56cd5d070ccf6b3cbd4dc2ec3921a79f4f7b765492b9",
@@ -3783,15 +3933,17 @@
       "kind": "nonacademic",
       "published": "2026-11-10",
       "source_url": "https://www.theguardian.com/technology/2026/nov/10/australia-manadatory-reporting-openai-medicare-hack",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "access_blocked",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "75a8cde73d2ad7d55c7c7ad1754634f4e7786f7ade1d1ac65e5d67ab422bf6be"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -3801,23 +3953,35 @@
         "doi_lookup_permitted": false
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "source_access_denied_this_run",
+          "retryable": false,
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.theguardian.com/technology/2026/nov/10/australia-manadatory-reporting-openai-medicare-hack"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "access_blocked"
     },
     "46c2120ce06811fd7407eec6b541dc5afbf66e10829ac005b5649bbb0974de0e": {
       "fingerprint": "dd676ed797cafb6f8cb9e72e86a095d969206d59ac1d849539aad939a3447ba5",
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.63498/injelps122",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "3164386b1f2d48ff409c6665269ff0c3f49ab52f5755755c40a9ed159fa4ea3c"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -3839,11 +4003,37 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://doi.org/10.63498/injelps122"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T11:12:36.382895+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
+      "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "3164386b1f2d48ff409c6665269ff0c3f49ab52f5755755c40a9ed159fa4ea3c"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        }
+      }
     },
     "39341c58402e85839c4feb8acace4784025f736792ee878e25db37aeb03d410e": {
       "fingerprint": "493093cbf5c59250000657506779c88b259dbff2ac1ec5348c8b21b4f6278f7c",
@@ -4074,15 +4264,17 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.2196/94097",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "c12135ce157dfa34fe38bb60c10dd2f3134c90c244bd0da158fa3022d100dddf"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -4092,8 +4284,1578 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "partial_full_text",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/",
+          "final_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/"
+        },
+        {
+          "status": "candidate_budget_exhausted",
+          "retryable": false,
+          "stage": "retrieval",
+          "candidates_attempted": 1
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "document": {
+        "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 9,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 41,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 168,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 104,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 33,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 467,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 312,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 436,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 591,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 755,
+            "has_text": true
+          },
+          {
+            "unit": 17,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 18,
+            "characters": 689,
+            "has_text": true
+          },
+          {
+            "unit": 19,
+            "characters": 972,
+            "has_text": true
+          },
+          {
+            "unit": 20,
+            "characters": 1317,
+            "has_text": true
+          },
+          {
+            "unit": 21,
+            "characters": 617,
+            "has_text": true
+          },
+          {
+            "unit": 22,
+            "characters": 1140,
+            "has_text": true
+          },
+          {
+            "unit": 23,
+            "characters": 1379,
+            "has_text": true
+          },
+          {
+            "unit": 24,
+            "characters": 1242,
+            "has_text": true
+          },
+          {
+            "unit": 25,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 26,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 27,
+            "characters": 427,
+            "has_text": true
+          },
+          {
+            "unit": 28,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 29,
+            "characters": 45,
+            "has_text": true
+          },
+          {
+            "unit": 30,
+            "characters": 305,
+            "has_text": true
+          },
+          {
+            "unit": 31,
+            "characters": 3,
+            "has_text": true
+          },
+          {
+            "unit": 32,
+            "characters": 633,
+            "has_text": true
+          },
+          {
+            "unit": 33,
+            "characters": 40,
+            "has_text": true
+          },
+          {
+            "unit": 34,
+            "characters": 520,
+            "has_text": true
+          },
+          {
+            "unit": 35,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 36,
+            "characters": 559,
+            "has_text": true
+          },
+          {
+            "unit": 37,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 38,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 39,
+            "characters": 568,
+            "has_text": true
+          },
+          {
+            "unit": 40,
+            "characters": 26,
+            "has_text": true
+          },
+          {
+            "unit": 41,
+            "characters": 609,
+            "has_text": true
+          },
+          {
+            "unit": 42,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 43,
+            "characters": 1027,
+            "has_text": true
+          },
+          {
+            "unit": 44,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 45,
+            "characters": 1551,
+            "has_text": true
+          },
+          {
+            "unit": 46,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 47,
+            "characters": 517,
+            "has_text": true
+          },
+          {
+            "unit": 48,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 49,
+            "characters": 27,
+            "has_text": true
+          },
+          {
+            "unit": 50,
+            "characters": 722,
+            "has_text": true
+          },
+          {
+            "unit": 51,
+            "characters": 63,
+            "has_text": true
+          },
+          {
+            "unit": 52,
+            "characters": 374,
+            "has_text": true
+          },
+          {
+            "unit": 53,
+            "characters": 49,
+            "has_text": true
+          },
+          {
+            "unit": 54,
+            "characters": 547,
+            "has_text": true
+          },
+          {
+            "unit": 55,
+            "characters": 37,
+            "has_text": true
+          },
+          {
+            "unit": 56,
+            "characters": 783,
+            "has_text": true
+          },
+          {
+            "unit": 57,
+            "characters": 142,
+            "has_text": true
+          },
+          {
+            "unit": 58,
+            "characters": 954,
+            "has_text": true
+          },
+          {
+            "unit": 59,
+            "characters": 17,
+            "has_text": true
+          },
+          {
+            "unit": 60,
+            "characters": 136,
+            "has_text": true
+          },
+          {
+            "unit": 61,
+            "characters": 157,
+            "has_text": true
+          },
+          {
+            "unit": 62,
+            "characters": 105,
+            "has_text": true
+          },
+          {
+            "unit": 63,
+            "characters": 55,
+            "has_text": true
+          },
+          {
+            "unit": 64,
+            "characters": 534,
+            "has_text": true
+          },
+          {
+            "unit": 65,
+            "characters": 632,
+            "has_text": true
+          },
+          {
+            "unit": 66,
+            "characters": 17,
+            "has_text": true
+          },
+          {
+            "unit": 67,
+            "characters": 37,
+            "has_text": true
+          },
+          {
+            "unit": 68,
+            "characters": 387,
+            "has_text": true
+          },
+          {
+            "unit": 69,
+            "characters": 95,
+            "has_text": true
+          },
+          {
+            "unit": 70,
+            "characters": 1032,
+            "has_text": true
+          },
+          {
+            "unit": 71,
+            "characters": 17,
+            "has_text": true
+          },
+          {
+            "unit": 72,
+            "characters": 283,
+            "has_text": true
+          },
+          {
+            "unit": 73,
+            "characters": 84,
+            "has_text": true
+          },
+          {
+            "unit": 74,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 75,
+            "characters": 18,
+            "has_text": true
+          },
+          {
+            "unit": 76,
+            "characters": 404,
+            "has_text": true
+          },
+          {
+            "unit": 77,
+            "characters": 655,
+            "has_text": true
+          },
+          {
+            "unit": 78,
+            "characters": 789,
+            "has_text": true
+          },
+          {
+            "unit": 79,
+            "characters": 530,
+            "has_text": true
+          },
+          {
+            "unit": 80,
+            "characters": 386,
+            "has_text": true
+          },
+          {
+            "unit": 81,
+            "characters": 690,
+            "has_text": true
+          },
+          {
+            "unit": 82,
+            "characters": 1705,
+            "has_text": true
+          },
+          {
+            "unit": 83,
+            "characters": 33,
+            "has_text": true
+          },
+          {
+            "unit": 84,
+            "characters": 1692,
+            "has_text": true
+          },
+          {
+            "unit": 85,
+            "characters": 796,
+            "has_text": true
+          },
+          {
+            "unit": 86,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 87,
+            "characters": 793,
+            "has_text": true
+          },
+          {
+            "unit": 88,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 89,
+            "characters": 3,
+            "has_text": true
+          },
+          {
+            "unit": 90,
+            "characters": 26,
+            "has_text": true
+          },
+          {
+            "unit": 91,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 92,
+            "characters": 25,
+            "has_text": true
+          },
+          {
+            "unit": 93,
+            "characters": 3,
+            "has_text": true
+          },
+          {
+            "unit": 94,
+            "characters": 27,
+            "has_text": true
+          },
+          {
+            "unit": 95,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 96,
+            "characters": 353,
+            "has_text": true
+          },
+          {
+            "unit": 97,
+            "characters": 322,
+            "has_text": true
+          },
+          {
+            "unit": 98,
+            "characters": 229,
+            "has_text": true
+          },
+          {
+            "unit": 99,
+            "characters": 1124,
+            "has_text": true
+          },
+          {
+            "unit": 100,
+            "characters": 37,
+            "has_text": true
+          },
+          {
+            "unit": 101,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 102,
+            "characters": 230,
+            "has_text": true
+          },
+          {
+            "unit": 103,
+            "characters": 217,
+            "has_text": true
+          },
+          {
+            "unit": 104,
+            "characters": 150,
+            "has_text": true
+          },
+          {
+            "unit": 105,
+            "characters": 338,
+            "has_text": true
+          },
+          {
+            "unit": 106,
+            "characters": 198,
+            "has_text": true
+          },
+          {
+            "unit": 107,
+            "characters": 177,
+            "has_text": true
+          },
+          {
+            "unit": 108,
+            "characters": 156,
+            "has_text": true
+          },
+          {
+            "unit": 109,
+            "characters": 286,
+            "has_text": true
+          },
+          {
+            "unit": 110,
+            "characters": 133,
+            "has_text": true
+          },
+          {
+            "unit": 111,
+            "characters": 212,
+            "has_text": true
+          },
+          {
+            "unit": 112,
+            "characters": 182,
+            "has_text": true
+          },
+          {
+            "unit": 113,
+            "characters": 213,
+            "has_text": true
+          },
+          {
+            "unit": 114,
+            "characters": 200,
+            "has_text": true
+          },
+          {
+            "unit": 115,
+            "characters": 393,
+            "has_text": true
+          },
+          {
+            "unit": 116,
+            "characters": 351,
+            "has_text": true
+          },
+          {
+            "unit": 117,
+            "characters": 320,
+            "has_text": true
+          },
+          {
+            "unit": 118,
+            "characters": 208,
+            "has_text": true
+          },
+          {
+            "unit": 119,
+            "characters": 259,
+            "has_text": true
+          },
+          {
+            "unit": 120,
+            "characters": 379,
+            "has_text": true
+          },
+          {
+            "unit": 121,
+            "characters": 282,
+            "has_text": true
+          },
+          {
+            "unit": 122,
+            "characters": 230,
+            "has_text": true
+          },
+          {
+            "unit": 123,
+            "characters": 287,
+            "has_text": true
+          },
+          {
+            "unit": 124,
+            "characters": 287,
+            "has_text": true
+          },
+          {
+            "unit": 125,
+            "characters": 337,
+            "has_text": true
+          },
+          {
+            "unit": 126,
+            "characters": 297,
+            "has_text": true
+          },
+          {
+            "unit": 127,
+            "characters": 187,
+            "has_text": true
+          },
+          {
+            "unit": 128,
+            "characters": 201,
+            "has_text": true
+          },
+          {
+            "unit": 129,
+            "characters": 256,
+            "has_text": true
+          },
+          {
+            "unit": 130,
+            "characters": 251,
+            "has_text": true
+          },
+          {
+            "unit": 131,
+            "characters": 306,
+            "has_text": true
+          },
+          {
+            "unit": 132,
+            "characters": 270,
+            "has_text": true
+          },
+          {
+            "unit": 133,
+            "characters": 428,
+            "has_text": true
+          },
+          {
+            "unit": 134,
+            "characters": 303,
+            "has_text": true
+          },
+          {
+            "unit": 135,
+            "characters": 279,
+            "has_text": true
+          },
+          {
+            "unit": 136,
+            "characters": 216,
+            "has_text": true
+          },
+          {
+            "unit": 137,
+            "characters": 259,
+            "has_text": true
+          },
+          {
+            "unit": 138,
+            "characters": 355,
+            "has_text": true
+          },
+          {
+            "unit": 139,
+            "characters": 102,
+            "has_text": true
+          },
+          {
+            "unit": 140,
+            "characters": 173,
+            "has_text": true
+          },
+          {
+            "unit": 141,
+            "characters": 95,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 41
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 168
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 104
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 33
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 467
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 312
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 436
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 591
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 755
+              },
+              {
+                "unit": 17,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 18,
+                "start": 0,
+                "end": 689
+              },
+              {
+                "unit": 19,
+                "start": 0,
+                "end": 972
+              },
+              {
+                "unit": 20,
+                "start": 0,
+                "end": 653
+              },
+              {
+                "unit": 20,
+                "start": 653,
+                "end": 826
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 20,
+                "start": 826,
+                "end": 1317
+              },
+              {
+                "unit": 21,
+                "start": 0,
+                "end": 617
+              },
+              {
+                "unit": 22,
+                "start": 0,
+                "end": 1140
+              },
+              {
+                "unit": 23,
+                "start": 0,
+                "end": 1379
+              },
+              {
+                "unit": 24,
+                "start": 0,
+                "end": 1242
+              },
+              {
+                "unit": 25,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 26,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 27,
+                "start": 0,
+                "end": 427
+              },
+              {
+                "unit": 28,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 29,
+                "start": 0,
+                "end": 45
+              },
+              {
+                "unit": 30,
+                "start": 0,
+                "end": 116
+              },
+              {
+                "unit": 30,
+                "start": 116,
+                "end": 118
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 30,
+                "start": 118,
+                "end": 305
+              },
+              {
+                "unit": 31,
+                "start": 0,
+                "end": 3
+              },
+              {
+                "unit": 32,
+                "start": 0,
+                "end": 633
+              },
+              {
+                "unit": 33,
+                "start": 0,
+                "end": 40
+              },
+              {
+                "unit": 34,
+                "start": 0,
+                "end": 520
+              },
+              {
+                "unit": 35,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 36,
+                "start": 0,
+                "end": 559
+              },
+              {
+                "unit": 37,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 38,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 39,
+                "start": 0,
+                "end": 568
+              },
+              {
+                "unit": 40,
+                "start": 0,
+                "end": 26
+              },
+              {
+                "unit": 41,
+                "start": 0,
+                "end": 609
+              },
+              {
+                "unit": 42,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 43,
+                "start": 0,
+                "end": 1027
+              },
+              {
+                "unit": 44,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 45,
+                "start": 0,
+                "end": 1195
+              },
+              {
+                "unit": 45,
+                "start": 1195,
+                "end": 1240
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 45,
+                "start": 1240,
+                "end": 1551
+              },
+              {
+                "unit": 46,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 47,
+                "start": 0,
+                "end": 517
+              },
+              {
+                "unit": 48,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 49,
+                "start": 0,
+                "end": 27
+              },
+              {
+                "unit": 50,
+                "start": 0,
+                "end": 722
+              },
+              {
+                "unit": 51,
+                "start": 0,
+                "end": 63
+              },
+              {
+                "unit": 52,
+                "start": 0,
+                "end": 374
+              },
+              {
+                "unit": 53,
+                "start": 0,
+                "end": 49
+              },
+              {
+                "unit": 54,
+                "start": 0,
+                "end": 547
+              },
+              {
+                "unit": 55,
+                "start": 0,
+                "end": 37
+              },
+              {
+                "unit": 56,
+                "start": 0,
+                "end": 783
+              },
+              {
+                "unit": 57,
+                "start": 0,
+                "end": 142
+              },
+              {
+                "unit": 58,
+                "start": 0,
+                "end": 954
+              },
+              {
+                "unit": 59,
+                "start": 0,
+                "end": 17
+              },
+              {
+                "unit": 60,
+                "start": 0,
+                "end": 136
+              },
+              {
+                "unit": 61,
+                "start": 0,
+                "end": 157
+              },
+              {
+                "unit": 62,
+                "start": 0,
+                "end": 105
+              },
+              {
+                "unit": 63,
+                "start": 0,
+                "end": 55
+              },
+              {
+                "unit": 64,
+                "start": 0,
+                "end": 346
+              },
+              {
+                "unit": 64,
+                "start": 346,
+                "end": 455
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 64,
+                "start": 455,
+                "end": 534
+              },
+              {
+                "unit": 65,
+                "start": 0,
+                "end": 632
+              },
+              {
+                "unit": 66,
+                "start": 0,
+                "end": 17
+              },
+              {
+                "unit": 67,
+                "start": 0,
+                "end": 37
+              },
+              {
+                "unit": 68,
+                "start": 0,
+                "end": 387
+              },
+              {
+                "unit": 69,
+                "start": 0,
+                "end": 95
+              },
+              {
+                "unit": 70,
+                "start": 0,
+                "end": 1032
+              },
+              {
+                "unit": 71,
+                "start": 0,
+                "end": 17
+              },
+              {
+                "unit": 72,
+                "start": 0,
+                "end": 283
+              },
+              {
+                "unit": 73,
+                "start": 0,
+                "end": 84
+              },
+              {
+                "unit": 74,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 75,
+                "start": 0,
+                "end": 18
+              },
+              {
+                "unit": 76,
+                "start": 0,
+                "end": 404
+              },
+              {
+                "unit": 77,
+                "start": 0,
+                "end": 655
+              },
+              {
+                "unit": 78,
+                "start": 0,
+                "end": 789
+              },
+              {
+                "unit": 79,
+                "start": 0,
+                "end": 530
+              },
+              {
+                "unit": 80,
+                "start": 0,
+                "end": 386
+              },
+              {
+                "unit": 81,
+                "start": 0,
+                "end": 28
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 81,
+                "start": 28,
+                "end": 690
+              },
+              {
+                "unit": 82,
+                "start": 0,
+                "end": 1705
+              },
+              {
+                "unit": 83,
+                "start": 0,
+                "end": 33
+              },
+              {
+                "unit": 84,
+                "start": 0,
+                "end": 1692
+              },
+              {
+                "unit": 85,
+                "start": 0,
+                "end": 796
+              },
+              {
+                "unit": 86,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 87,
+                "start": 0,
+                "end": 555
+              },
+              {
+                "unit": 87,
+                "start": 555,
+                "end": 594
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 87,
+                "start": 594,
+                "end": 793
+              },
+              {
+                "unit": 88,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 89,
+                "start": 0,
+                "end": 3
+              },
+              {
+                "unit": 90,
+                "start": 0,
+                "end": 26
+              },
+              {
+                "unit": 91,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 92,
+                "start": 0,
+                "end": 25
+              },
+              {
+                "unit": 93,
+                "start": 0,
+                "end": 3
+              },
+              {
+                "unit": 94,
+                "start": 0,
+                "end": 27
+              },
+              {
+                "unit": 95,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 96,
+                "start": 0,
+                "end": 353
+              },
+              {
+                "unit": 97,
+                "start": 0,
+                "end": 322
+              },
+              {
+                "unit": 98,
+                "start": 0,
+                "end": 229
+              },
+              {
+                "unit": 99,
+                "start": 0,
+                "end": 1124
+              },
+              {
+                "unit": 100,
+                "start": 0,
+                "end": 37
+              },
+              {
+                "unit": 101,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 102,
+                "start": 0,
+                "end": 230
+              },
+              {
+                "unit": 103,
+                "start": 0,
+                "end": 217
+              },
+              {
+                "unit": 104,
+                "start": 0,
+                "end": 150
+              },
+              {
+                "unit": 105,
+                "start": 0,
+                "end": 338
+              },
+              {
+                "unit": 106,
+                "start": 0,
+                "end": 198
+              },
+              {
+                "unit": 107,
+                "start": 0,
+                "end": 177
+              },
+              {
+                "unit": 108,
+                "start": 0,
+                "end": 156
+              },
+              {
+                "unit": 109,
+                "start": 0,
+                "end": 286
+              },
+              {
+                "unit": 110,
+                "start": 0,
+                "end": 133
+              },
+              {
+                "unit": 111,
+                "start": 0,
+                "end": 212
+              },
+              {
+                "unit": 112,
+                "start": 0,
+                "end": 182
+              },
+              {
+                "unit": 113,
+                "start": 0,
+                "end": 213
+              },
+              {
+                "unit": 114,
+                "start": 0,
+                "end": 200
+              },
+              {
+                "unit": 115,
+                "start": 0,
+                "end": 393
+              },
+              {
+                "unit": 116,
+                "start": 0,
+                "end": 2
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 116,
+                "start": 2,
+                "end": 351
+              },
+              {
+                "unit": 117,
+                "start": 0,
+                "end": 320
+              },
+              {
+                "unit": 118,
+                "start": 0,
+                "end": 208
+              },
+              {
+                "unit": 119,
+                "start": 0,
+                "end": 259
+              },
+              {
+                "unit": 120,
+                "start": 0,
+                "end": 379
+              },
+              {
+                "unit": 121,
+                "start": 0,
+                "end": 282
+              },
+              {
+                "unit": 122,
+                "start": 0,
+                "end": 230
+              },
+              {
+                "unit": 123,
+                "start": 0,
+                "end": 287
+              },
+              {
+                "unit": 124,
+                "start": 0,
+                "end": 287
+              },
+              {
+                "unit": 125,
+                "start": 0,
+                "end": 337
+              },
+              {
+                "unit": 126,
+                "start": 0,
+                "end": 297
+              },
+              {
+                "unit": 127,
+                "start": 0,
+                "end": 187
+              },
+              {
+                "unit": 128,
+                "start": 0,
+                "end": 201
+              },
+              {
+                "unit": 129,
+                "start": 0,
+                "end": 256
+              },
+              {
+                "unit": 130,
+                "start": 0,
+                "end": 251
+              },
+              {
+                "unit": 131,
+                "start": 0,
+                "end": 306
+              },
+              {
+                "unit": 132,
+                "start": 0,
+                "end": 270
+              },
+              {
+                "unit": 133,
+                "start": 0,
+                "end": 428
+              },
+              {
+                "unit": 134,
+                "start": 0,
+                "end": 303
+              },
+              {
+                "unit": 135,
+                "start": 0,
+                "end": 37
+              },
+              {
+                "unit": 135,
+                "start": 37,
+                "end": 43
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 135,
+                "start": 43,
+                "end": 279
+              },
+              {
+                "unit": 136,
+                "start": 0,
+                "end": 216
+              },
+              {
+                "unit": 137,
+                "start": 0,
+                "end": 259
+              },
+              {
+                "unit": 138,
+                "start": 0,
+                "end": 355
+              },
+              {
+                "unit": 139,
+                "start": 0,
+                "end": 102
+              },
+              {
+                "unit": 140,
+                "start": 0,
+                "end": 173
+              },
+              {
+                "unit": 141,
+                "start": 0,
+                "end": 95
+              }
+            ]
+          }
+        ],
+        "evidence_status": "partial_full_text",
+        "html_completeness": "not_verified",
+        "characters_retrieved": 45436,
+        "units_retrieved": 141,
+        "source_sha256": "ee6bdc75f58e79a787f5286e865d4cae6891f59d13b8918519303a1d2ea5b5d9",
+        "html_extraction_version": "article-body-v2"
+      },
+      "document_evidence": {
+        "status": "partial_full_text",
+        "retryable": false,
+        "stage": "article",
+        "provider": "existing_source",
+        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/",
+        "final_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/"
+      },
+      "last_outcome": "partial_full_text"
     },
     "9623527df8fae02bc64e93b4c493ac3ee7c58eae2c62cd0db555660ec7e2137a": {
       "fingerprint": "9e19333817ff9e021127ba1961038630b2d3ec4693c0f3255bb05ac6e8987821",
@@ -4240,7 +6002,7 @@
       }
     }
   },
-  "cursor": 23,
+  "cursor": 35,
   "provider_pauses": {
     "provider:CORE": "2026-11-17T20:07:29.192541+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
@@ -25124,22 +26886,22 @@
     }
   ],
   "input_fingerprint": "4b2378e5bc6ede17e9af30d66982b20b9f86ee5b4fad49108f2bb73d775aaa6b",
-  "state_sha256": "655a652f59da43d22328a4ab7e13d867de77fece7b236a9b28aee429f2971723",
+  "state_sha256": "d9a7b2320ee3355e1c73c1ba79f56028fc0fb9cbd36af25762d7199312798986",
   "run": {
-    "checked_at": "2026-11-17T19:07:28.482259+00:00",
+    "checked_at": "2026-11-17T19:09:13.252091+00:00",
     "selected_records": 77,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 6,
-    "pending_records": 71,
-    "deferred_retry_records": 14,
+    "completed_records": 7,
+    "pending_records": 70,
+    "deferred_retry_records": 20,
     "statuses": {
-      "access_blocked": 2,
+      "access_blocked": 3,
       "full_document_retrieved_not_reviewed": 3,
       "partial_full_text_not_reviewed": 1,
-      "pending": 48,
-      "pending_routes": 9,
-      "rate_limited": 9,
+      "pending": 42,
+      "pending_routes": 8,
+      "rate_limited": 15,
       "temporarily_unavailable": 5
     },
     "excluded": {},
