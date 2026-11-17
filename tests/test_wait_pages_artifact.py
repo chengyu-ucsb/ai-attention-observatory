@@ -4,10 +4,18 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-from wait_pages_artifact import artifact_visible, wait_for_artifact
+from wait_pages_artifact import artifact_visible, wait_for_artifact, artifact_request
 
 
 class PagesArtifactVisibilityTests(unittest.TestCase):
+    def test_runner_token_authenticates_metadata_only(self):
+        url="https://api.github.com/repos/example/site/actions/runs/11/artifacts"
+        request=artifact_request(url, "test-runner-token")
+        self.assertEqual(request.get_header("Authorization"), "Bearer test-runner-token")
+        self.assertEqual(request.get_method(), "GET")
+        self.assertEqual(request.full_url, url)
+        self.assertIsNone(artifact_request(url).get_header("Authorization"))
+
     def setUp(self):
         self.payload = {"artifacts": [{"id": 22, "name": "github-pages",
             "expired": False, "size_in_bytes": 100, "workflow_run": {"id": 11}}]}

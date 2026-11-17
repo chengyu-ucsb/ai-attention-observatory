@@ -18,6 +18,8 @@ LIMIT=re.compile(r"\b(?:limitations? (?:include|involve|are|of this|in this)|imp
 SAMPLE=re.compile(r"\b(?:n\s*=\s*(\d{2,6})|(\d{2,6})\s+(?:participants|students|respondents|workers|people|adults|adolescents|teachers|patients))\b",re.I)
 
 def clean(s):return re.sub(r"\s+"," ",html.unescape(re.sub(r"<[^>]+>"," ",s or ""))).strip()
+def is_editorial(r):
+    return r.get("research_type")=="editorial" or bool(re.match(r"^Editorial\s*:",r.get("title", ""),re.I))
 def sentences(text):
     s=clean(text)
     # Do not split decimals or abbreviations into phantom findings.
@@ -56,6 +58,7 @@ def make_note(r):
         src=clean(r["preview"])
     full=r.get("analysis") or {}
     conceptual=r.get("research_type")=="conceptual_framework"
+    editorial=is_editorial(r)
     framework=r.get("framework_notes") or {}
     licensed=bool(full.get("fulltext_url"))
     if licensed:
@@ -89,6 +92,20 @@ def make_note(r):
         provider="Initial editorial reference list (not full-text verified)"
     else:
         return {"level":"citation_only","provenance":"Citation only","overview":"","methods":"","findings":"","limitations":"","sample":"","notice":"No accessible abstract or licensed text has been indexed for this record."}
+    if editorial:
+        # An editorial may discuss several older studies. Do not give it their
+        # samples, methods or results, or reject its argument for lacking Results.
+        approach="Editorial discussion of previously published work; no new empirical study."
+        results=""
+        argument=clean(full.get("discussion")) if licensed else src
+        parts=sentences(argument)
+        selected=[]
+        for part in reversed(parts):
+            if len(" ".join([part]+selected))>1800:break
+            selected.insert(0,part)
+            if len(selected)==4:break
+        interpretation=" ".join(selected)
+        caveat="Editorial interpretation of earlier publications, not a new empirical finding."
     if conceptual:
         approach=framework.get("approach") or ""
         results=""  # A proposed framework cannot be counted as an observed result.
@@ -98,7 +115,7 @@ def make_note(r):
     sm=SAMPLE.search(approach or src)
     sample=sm.group(1) or sm.group(2) if sm else ""
     if sample and not METHOD.search(approach):sample=""  # Require an actual methodological context.
-    if conceptual:sample=""
+    if conceptual or editorial:sample=""
     has_finding=bool(results)
     return {
         "level":"full_text" if licensed else "abstract" if len(src)>=90 else "curated",
@@ -115,7 +132,7 @@ def make_note(r):
                   "Excerpts from licensed article sections; automatically selected, not independently reviewed." if licensed else
                   "Structured highlights selected from the source abstract; not an appraisal of the full paper." if len(src)>=90 else
                   "Initial topic synopsis, not a verified paper-level analysis."),
-        "research_type":"conceptual_framework" if conceptual else r.get("research_type") or "unclassified",
+        "research_type":"editorial" if editorial else "conceptual_framework" if conceptual else r.get("research_type") or "unclassified",
         "reported_findings":has_finding
     }
 

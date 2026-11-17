@@ -13,7 +13,7 @@ from build_visuals import visual_spec
 from article_art_queue import attach_persistent_art as attach_art
 from search_plan import source_class
 from source_lineage import prepare
-from build_readings import make_note
+from build_readings import make_note, is_editorial
 from editorial_corrections import apply as apply_editorial_corrections
 from source_quality import screen as screen_source
 from news_quality import substantive_article
@@ -111,7 +111,10 @@ def build():
     held=Counter()
     for source in all_records:
         source=public_record(source)
-        if not source.get("reading") or (source.get("research_type")=="conceptual_framework" and source.get("reading",{}).get("research_type")!="conceptual_framework"):
+        stale_editorial=(source.get("kind")=="scholarly" and is_editorial(source)
+                         and source.get("reading",{}).get("research_type")!="editorial"
+                         and not source.get("reading",{}).get("original_summary"))
+        if not source.get("reading") or stale_editorial or (source.get("research_type")=="conceptual_framework" and source.get("reading",{}).get("research_type")!="conceptual_framework"):
             source["reading"]=make_note(source)
         if source.get("kind")=="scholarly":
             quality=screen_source(source)

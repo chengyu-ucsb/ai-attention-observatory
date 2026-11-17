@@ -1,12 +1,25 @@
 """Wait briefly for a successfully uploaded Pages artifact to become list-visible.
 
-Public metadata reads only: no token, upload, deletion or deployment retries.
+Repository metadata reads only; use the runner token to avoid shared-IP quotas.
+No upload, deletion or deployment retries.
 """
 import argparse
 import json
+import os
 import re
 import time
 import urllib.request
+
+
+def artifact_request(url, token=""):
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "observatory-pages-visibility",
+    }
+    if token:
+        headers["Authorization"] = "Bearer " + token
+    return urllib.request.Request(url, headers=headers)
 
 
 def artifact_visible(payload, artifact_id, run_id):
@@ -44,11 +57,7 @@ def main():
     url = (f"https://api.github.com/repos/{args.repository}/actions/runs/"
            f"{args.run_id}/artifacts?per_page=100")
     def fetch():
-        request = urllib.request.Request(url, headers={
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "observatory-pages-visibility",
-        })
+        request = artifact_request(url, os.getenv("GH_TOKEN", ""))
         with urllib.request.urlopen(request, timeout=10) as response:
             return json.load(response)
     wait_for_artifact(fetch, args.artifact_id, args.run_id)

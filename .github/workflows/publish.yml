@@ -53,6 +53,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 concurrency:
@@ -153,8 +154,9 @@ jobs:
       - name: Wait for uploaded Pages artifact visibility
         env:
           PAGES_ARTIFACT_ID: ${{ steps.pages_artifact.outputs.artifact_id }}
-        # Public metadata needs no added token permission. Fail closed on HTTP
-        # errors; retry only a successful list that has not caught up yet.
+          GH_TOKEN: ${{ github.token }}
+        # Use the runner's read-only Actions access, not a shared anonymous IP
+        # quota. HTTP errors still fail closed without retrying denied requests.
         run: python scripts/wait_pages_artifact.py --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID" --artifact-id "$PAGES_ARTIFACT_ID"
       - id: deployment
         uses: actions/deploy-pages@v5.0.1

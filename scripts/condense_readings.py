@@ -568,6 +568,17 @@ def annotate(record):
   }
   return base
  curated=record.get("editorial_digest") or CURATED.get((record.get("doi") or "").lower())
+ if r.get("research_type")=="editorial":
+  # Keep attributed editorial reasoning eligible without inventing a study.
+  base["reading"]["digest"]={
+   "idea":source_title_headline(record), "explain":"",
+   "approach":r.get("methods", ""), "finding":"", "finding_source":"none",
+   "interpretation":r.get("interpretation", ""),
+   "limitation":r.get("limitations", ""), "tags":concept_tags(record),
+   "status":"automatically_condensed_source_text", "editorial_basis":level,
+   "reading_mode":"editorial_argument"
+  }
+  return base
  if curated and level in ("abstract","full_text"):
   digest=dict(curated)
   digest["status"]="editorially_written_from_indexed_sections"
