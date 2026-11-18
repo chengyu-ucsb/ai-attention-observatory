@@ -128,6 +128,23 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html subscribe.html app.js styles.css lab-play.js lab-play.css favicon.svg feed.xml issue-feed.xml newsletter.html _site/
+          # Returning visitors must receive the scripts and styles for this page.
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          import re
+
+          site = Path("_site")
+          index = site / "index.html"
+          html = index.read_text()
+          for asset in ("app.js", "lab-play.js", "styles.css", "lab-play.css"):
+              digest = hashlib.sha256((site / asset).read_bytes()).hexdigest()[:12]
+              pattern = r'((?:src|href)=")' + re.escape(asset) + r'(?:\?v=[a-f0-9]+)?"'
+              html, count = re.subn(pattern, rf'\g<1>{asset}?v={digest}"', html)
+              if count != 1:
+                  raise ValueError(f"Expected one reference to {asset}, found {count}")
+          index.write_text(html)
+          PY
           mkdir -p _site/assets
           cp assets/reading-*.svg assets/feed.xsl _site/assets/
           cp assets/typography.css _site/assets/

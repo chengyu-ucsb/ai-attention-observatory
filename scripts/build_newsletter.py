@@ -157,7 +157,12 @@ READER_SCRIPT = '''
     if(!id){show(panels[0].id);return;}
     const target=document.getElementById(id),panel=target&&target.closest('[data-edition-panel]');
     if(panel&&!showingAll)show(panel.id);
-    if(target){requestAnimationFrame(()=>{target.scrollIntoView({block:'start'});if(target.hasAttribute('tabindex'))target.focus({preventScroll:true});});}
+    if(target){
+      // Restore focus in the same history event as the visible chapter. A
+      // delayed callback can steal the next keyboard action from a control.
+      target.scrollIntoView({block:'start'});
+      if(target.hasAttribute('tabindex'))target.focus({preventScroll:true});
+    }
   }
   if(panels.length&&controls&&navigation&&all){
     controls.hidden=false;if(layout)layout.classList.add('is-enhanced');show(panels[0].id);

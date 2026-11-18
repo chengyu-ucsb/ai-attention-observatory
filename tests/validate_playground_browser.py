@@ -27,7 +27,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path.split("?")[0] == "/__lab_test__":
-            html = (ROOT / "index.html").read_text().replace('<script src="app.js" defer></script>', '')
+            html = re.sub(r'<script src="app\.js(?:\?[^"]*)?" defer></script>', '', (ROOT / "index.html").read_text())
             html = html.replace('</body>', '''<script>
               document.querySelectorAll('.view').forEach(v => v.hidden = v.id !== 'lab');
             </script></body>''')

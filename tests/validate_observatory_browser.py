@@ -709,6 +709,10 @@ def check_standalone_brief(page, url, width, out):
             opening = page.locator('[data-open-layer="opening"]')
             expect(opening).to_be_visible()
             opening.focus()
+            # Let pending paint callbacks run, then verify that history
+            # navigation hasn't taken the keyboard back from this control.
+            page.evaluate("() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)))")
+            expect(opening).to_be_focused()
             page.keyboard.press('Enter')
             dialog = page.get_by_role('dialog')
             expect(dialog).to_be_visible()
