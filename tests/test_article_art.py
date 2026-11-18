@@ -37,6 +37,22 @@ def png(width=12, height=8):
 
 
 class ArticleArtTests(unittest.TestCase):
+    def test_k12_evidence_review_is_distinct_from_scale_measurement(self):
+        import art_similarity
+        rows = public_records()
+        review = next(row for row in rows if "The Evidence Base on AI in K-12" in row["title"])
+        scale = next(row for row in rows if "Development, validation, and correlates of the critical thinking" in row["title"])
+        inputs = [art.public_inputs(row) for row in (review, scale)]
+        specs = [art.choose_concept(value) for value in inputs]
+        self.assertEqual(set(specs[0]["visual_subjects"]), {"children", "review"})
+        self.assertTrue(all(item["field"] == "title" for item in specs[0]["source_grounding"]))
+        self.assertNotIn("measurement", specs[0]["visual_subjects"])
+        drawings = [art.render_svg("same", value, spec) for value, spec in zip(inputs, specs)]
+        for width, height in ((120, 76), (76, 58)):
+            metrics = art_similarity.compare(*(art_similarity.rasterize(svg, width, height) for svg in drawings))
+            self.assertFalse(metrics["full_mean_difference"] < .025 and
+                             metrics["foreground_mean_difference"] < .12, metrics)
+
     def test_adviser_and_donation_tasks_get_distinct_grounded_subjects(self):
         rows = [row for row in public_records() if any(
             key in row.get("url", "") for key in ("2611.15732", "2611.16667"))]
