@@ -11,7 +11,7 @@ or replace the website-owned collection and publication jobs.
 | Stage | Eastern time | Completion criterion |
 | --- | --- | --- |
 | Rolling collection and source reading | Throughout the week; final Sunday collection starts 4:17 p.m. | Sources, access failures, checked reading progress and retries saved |
-| Supplementary web research | Wednesday, Friday and Sunday 6 p.m. | Search beyond feeds across all four themes and academic/news streams; save actual queries and candidate outcomes |
+| Supplementary web research | Wednesday, Friday and Sunday 6 p.m. | Search academic and news sources beyond feeds, follow emerging questions and record queries and candidate outcomes |
 | Prepublication audit | Sunday 6 p.m. | Inspect source coverage, unresolved readings, model holds and the previous run's errors; resolve available blockers |
 | Close the source week | Sunday 9:07 p.m. | Adopt the completed Monday–Sunday UTC publication window |
 | Late-index sweep | Monday 2:07 a.m.; recovery 6:07 a.m. | Preserve existing work and collect delayed indexing without restarting the corpus |

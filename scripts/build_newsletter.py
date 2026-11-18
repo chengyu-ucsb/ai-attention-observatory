@@ -154,6 +154,7 @@ READER_SCRIPT = '''
   function showAll(){showingAll=true;panels.forEach(panel=>panel.hidden=false);all.setAttribute('aria-pressed','true');all.textContent='One section at a time';document.querySelectorAll('[data-edition-target]').forEach(control=>{if(control.tagName==='BUTTON')control.setAttribute('aria-pressed','false');else control.removeAttribute('aria-current');});}
   function revealHash(){
     let id;try{id=decodeURIComponent(location.hash.slice(1));}catch{return;}
+    if(!id){show(panels[0].id);return;}
     const target=document.getElementById(id),panel=target&&target.closest('[data-edition-panel]');
     if(panel&&!showingAll)show(panel.id);
     if(target){requestAnimationFrame(()=>{target.scrollIntoView({block:'start'});if(target.hasAttribute('tabindex'))target.focus({preventScroll:true});});}
@@ -161,7 +162,7 @@ READER_SCRIPT = '''
   if(panels.length&&controls&&navigation&&all){
     controls.hidden=false;if(layout)layout.classList.add('is-enhanced');show(panels[0].id);
     all.addEventListener('click',()=>showingAll?show(activeId):showAll());
-    document.querySelectorAll('[data-edition-target]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();show(link.dataset.editionTarget,true);history.replaceState(null,'','#'+link.dataset.editionTarget);}));
+    document.querySelectorAll('[data-edition-target]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();const id=link.dataset.editionTarget;show(id,true);if(location.hash!=='#'+id)history.pushState(null,'','#'+id);}));
     window.addEventListener('hashchange',revealHash);revealHash();
   }
   if(typeof HTMLDialogElement==='undefined'||!HTMLDialogElement.prototype.showModal)return;
@@ -380,7 +381,7 @@ def publication_history(issue):
 def question_and_try(issue):
     t=issue['tension'];p=issue['experiment']
     return ('<section id="edition-question" class="edition-panel" data-edition-panel tabindex="-1" aria-label="The question and something to try"><div class="pair"><section class="card">'+section_label('The productive tension')+'<h3>'+esc(t['title'])+'</h3>'+render_text(t['text'],issue,t)+source_layer(issue,t.get('source_ids',[]),'tension-sources')+'</section>'
-            '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+render_text(p['text'],issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p></section></div></section>')
+            '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+render_text(p['text'],issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p><a href="'+BASE+'#lab">Explore the Attention Lab</a></section></div></section>')
 
 def bottom(issue):
     methods='<details data-edition-layer="methods"><summary>How this was made</summary>'+render_text(issue.get('editorial_note',''),issue)

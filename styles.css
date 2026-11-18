@@ -1278,3 +1278,41 @@ summary,.theme-browser button,.nav-toggle {
 @media print{.reading-layer,.section-menu,.flip-toggle,.library-pagination{display:none!important}.view:not([hidden]) [hidden]{display:block!important}.takeaway-back{display:block!important}}
 
 #lab .play-head-layout{min-height:230px;gap:26px}#lab .play-art{max-width:245px}#lab .play-wrap{padding-top:28px}#lab .play-head h1{font-size:clamp(38px,4.6vw,58px)}#lab .play-head p:not(.eyebrow){font-size:16px}#lab .play-note{padding-block:8px;margin-block:14px}
+
+.field-search { max-width: 42rem; margin-block: .75rem 1.6rem; }
+.field-search label { display: block; font-family: var(--font-interface); font-weight: 650; margin-bottom: .45rem; }
+.field-search > div { display: flex; flex-wrap: wrap; gap: .5rem; }
+.field-search input { flex: 1 1 15rem; min-width: 0; min-height: 44px; border: 1px solid var(--line); padding: .65rem .85rem; color: var(--ink); background: var(--paper,#fff); font: inherit; }
+.field-search .button { min-height: 44px; }
+
+.design-inbox {
+  display: grid;
+  grid-template-columns: minmax(15rem, .9fr) minmax(0, 1.1fr);
+  gap: clamp(1rem, 4vw, 3rem);
+  padding: clamp(1rem, 3vw, 2.25rem);
+  margin-bottom: 2rem;
+  background: #f7f4ee;
+  border: 1px solid #d7d2c8;
+  border-radius: 1rem;
+}
+.design-inbox[hidden], .design-inbox [hidden] {display:none}
+.design-inbox h3 {font:700 clamp(1.6rem, 3vw, 2.25rem)/1.12 var(--font-editorial,serif); margin:0 0 .5rem}
+.design-inbox p {margin:.5rem 0 1rem;line-height:1.5}
+.design-inbox-settings > label, .design-inbox legend {font-weight:700;display:block;margin-bottom:.35rem}
+.design-inbox select {font:inherit;min-height:44px;max-width:100%;width:100%;border:1px solid #847b71;background:white;color:#23201d;border-radius:.4rem;padding:.35rem .5rem}
+.design-inbox fieldset {min-width:0;border:0;padding:0;margin:1rem 0 0}
+.design-inbox fieldset label {cursor:pointer;display:flex;gap:.65rem;align-items:center;min-height:44px;border-top:1px solid #d7d2c8;padding:.3rem .2rem;line-height:1.25}
+.design-inbox input {accent-color:#ac1634;flex:none}
+.design-inbox-preview {align-self:start;min-width:0;background:white;border:1px solid #c4bfb8;border-radius:.85rem;overflow:hidden}
+.design-inbox-caption {display:block;background:#302d32;color:white;padding:.7rem 1rem;font-weight:650}
+#design-inbox-stage, #design-inbox-history {padding:1rem clamp(.85rem,2vw,1.4rem)}
+.design-inbox h4 {font-size:1.35rem;margin:0;line-height:1.22}
+.design-inbox h4:focus-visible {outline-offset:2px}
+.design-inbox button {min-height:44px;font:inherit;cursor:pointer;color:#23201d;background:white;border:1px solid #aaa49b;border-radius:.45rem;padding:.5rem .75rem;margin:.2rem .35rem .2rem 0;line-height:1.25;text-align:left}
+.design-inbox .design-inbox-primary {background:#97162c;color:white;border-color:#97162c;font-weight:650}
+.design-inbox button:hover {border-color:#97162c;box-shadow:inset 0 0 0 1px #97162c}
+.design-inbox .design-inbox-message {display:grid;width:100%;gap:.18rem;margin:.3rem 0;padding:.5rem .8rem;border-left:3px solid #9a3447}
+#design-inbox-history {background:#f7f5f2;border-top:1px solid #d7d2c8}
+#design-inbox-history h5 {font:inherit;font-weight:700;margin:0}
+#design-inbox-history ul {margin:.45rem 0 0;padding-left:1.15rem}
+@media (max-width:680px) {.design-inbox {grid-template-columns:minmax(0,1fr)}}

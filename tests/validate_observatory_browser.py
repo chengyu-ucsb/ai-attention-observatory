@@ -264,6 +264,26 @@ def check(page, url, width, out):
             art_box, title_box = artwork.bounding_box(), card.locator('h3').bounding_box()
             assert art_box['x'] + art_box['width'] <= title_box['x'] - 8, 'Editorial thumbnail overlaps its headline'
     choose_section(page, 'home-section', 'overview')
+    # A free text question travels independently of the starting lenses.
+    page.locator('#field-query').fill('notification')
+    page.locator('#field-query').press('Enter')
+    expect(page.locator('#library')).to_be_visible()
+    expect(page.locator('#search')).to_have_value('notification')
+    expect(page.locator('#scope-filter')).to_have_value('all')
+    expect(page.locator('.library-story').first).to_be_visible()
+    page.reload(wait_until='networkidle')
+    expect(page.locator('#search')).to_have_value('notification')
+    # Skip keeps the active route; a hash-only skip used to send readers home.
+    page.locator('.skip').focus()
+    page.keyboard.press('Enter')
+    expect(page.locator('#main')).to_be_focused()
+    expect(page.locator('#library')).to_be_visible()
+    page.goto(url + '#home', wait_until='networkidle')
+    page.locator('.home-source-drawer > .layer-trigger').click()
+    page.locator('.feature-go').first.click()
+    expect(page.locator('#issue-section')).to_have_attribute('data-active-section', 'sources')
+    expect(page.locator('#edition-source-0')).to_be_focused()
+    page.goto(url + '#home', wait_until='networkidle')
     # Theme links preserve selection when copied or opened in another tab.
     theme_url = page.locator('[data-explore-theme="AI & cognition"]').get_attribute('href')
     assert 'theme=AI%20%26%20cognition' in theme_url and 'scope=all' in theme_url
@@ -296,6 +316,8 @@ def check(page, url, width, out):
     expect(page.locator('#library-page-status')).to_contain_text('Page 2 of')
     expect(page.locator('#library-page-status')).to_be_focused()
     assert page.locator('.library-story h3').all_text_contents() != first_page_titles
+    page.reload(wait_until='networkidle')
+    expect(page.locator('#library-page-status')).to_contain_text('Page 2 of')
     page.locator('#library-page-size').select_option('24')
     expect(page.locator('#library-page-status')).to_contain_text('Page 1 of')
     expect(page.locator('.library-story')).to_have_count(24)
@@ -465,6 +487,15 @@ def check(page, url, width, out):
     expect(page.locator('#type-filter')).to_have_value('nonacademic')
     expect(page.locator('#scope-filter')).to_have_value('all')
     assert page.locator('.library-story').count() > 0
+    # A new source topic can be browsed directly from the atlas on first load.
+    page.evaluate("""() => {
+      S.records.push({...S.records[0], lane:'Joint attention fixture'});
+      extendTopicChoices();goto('atlas');
+    }""")
+    choose_section(page, 'atlas-section', 'themes')
+    page.get_by_role('button', name=re.compile('Joint attention fixture')).click()
+    expect(page.locator('#topic-filter')).to_have_value('Joint attention fixture')
+    expect(page.locator('.library-story')).to_have_count(1)
     check_nested_cards(page)
     assert not errors, errors
 
@@ -667,6 +698,14 @@ def check_standalone_brief(page, url, width, out):
                 choose_section(page, 'edition-section', 'signal-2', keyboard=True)
                 expect(page.locator('#signal-2')).to_be_visible()
                 expect(page.locator('#signal-1')).not_to_be_visible()
+                choose_section(page, 'edition-section', 'edition-question', keyboard=True)
+                expect(page.locator('#edition-question a[href="' + base + '#lab"]')).to_be_visible()
+                page.go_back()
+                expect(page.locator('#signal-2')).to_be_visible()
+                page.go_back()
+                expect(page.locator('#signal-1')).to_be_visible()
+                page.go_forward()
+                expect(page.locator('#signal-2')).to_be_visible()
             opening = page.locator('[data-open-layer="opening"]')
             expect(opening).to_be_visible()
             opening.focus()

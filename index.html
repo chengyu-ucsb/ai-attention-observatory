@@ -49,7 +49,7 @@
     </div>
   </header>
 
-  <main id="main">
+  <main id="main" tabindex="-1">
     <section id="home" class="view">
       <div class="publication-masthead shell">
         <div class="masthead-topline"><span>AN INDEPENDENT RESEARCH OBSERVATORY</span><a href="https://chengyufang.org/" target="_blank" rel="noopener noreferrer">BY CHENGYU FANG</a></div>
@@ -78,7 +78,11 @@
         <details class="home-source-drawer"><summary>Sources behind this issue</summary><div id="feature-grid" class="feature-grid"></div></details>
       </section>
       <section class="shell field-guide" aria-labelledby="field-guide-title">
-        <div class="field-guide-heading"><span class="eyebrow">EXPLORE THE FIELD</span><h2 id="field-guide-title">Four lenses. One human question.</h2></div>
+        <div class="field-guide-heading"><span class="eyebrow">EXPLORE THE FIELD</span><h2 id="field-guide-title">What has your attention?</h2></div>
+        <form class="field-search" id="field-search" role="search" aria-label="Search the Observatory library">
+          <label for="field-query">Explore your own topic</label>
+          <div><input id="field-query" type="search" placeholder="Try a topic, author or finding" autocomplete="off"><button class="button button-red" type="submit">Search the library</button></div>
+        </form>
         <div class="field-guide-grid">
           <a href="#library?theme=AI%20%26%20cognition&amp;scope=all" class="field-question" data-explore-theme="AI &amp; cognition"><span class="question-number">01</span><strong>Cognition</strong><span class="question-cta">What do we hand over to AI?</span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a>
           <a href="#library?theme=Fragmentation&amp;scope=all" class="field-question" data-explore-theme="Fragmentation"><span class="question-number">02</span><strong>Attention</strong><span class="question-cta">What happens between tasks?</span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></a>
@@ -116,7 +120,15 @@
         </div>
       </section>
 
-      <section class="shell lab-teaser"><div class="lab-teaser-inner play-teaser-inner"><div class="play-teaser-copy"><p class="eyebrow">EXPLORE / THE EXPERIMENTAL LAB</p><h2>Can you feel the difference?</h2><p>Challenge a claim, remix notifications, or return to a classic attention experiment.</p><div class="play-teaser-steps"><span>INSPECT</span><span>REMIX</span><span>EXPLORE</span></div><a href="#lab" class="button button-red">Try the playground</a></div><div class="play-teaser-demo" aria-hidden="true"><span class="play-teaser-counter">QUICK PREVIEW / 01</span><span class="play-teaser-rule">ODD OR EVEN?</span><strong>7</strong><div class="play-teaser-keys"><span>← ODD</span><span>EVEN →</span></div></div></div></section>
+      <section class="shell lab-teaser" aria-labelledby="home-lab-title">
+        <div class="lab-invitation"><div><p class="eyebrow">Experimental Lab</p><h2 id="home-lab-title">Where do you want to put your attention?</h2></div>
+          <div class="lab-doorways">
+            <a href="#lab?experiment=tide-pool"><strong>Take a playful break</strong><span>Spot three shapes in Tide Pool.</span></a>
+            <a href="#lab?experiment=focus-rehearsal"><strong>Return to a task</strong><span>Pick up a piece of your own work.</span></a>
+            <a href="#lab?section=design"><strong>Try a design choice</strong><span>See what changes when a tool steps in.</span></a>
+          </div>
+        </div>
+      </section>
       <section class="shell arrivals-section">
         <div class="section-heading"><div><p class="eyebrow">05 / FROM THE INDEX</p><h2>Recently added<span class="red-period">.</span></h2></div><a class="quiet-link" href="#library">Search the full library</a></div>
         <div class="table-scroll"><table class="arrival-table"><thead><tr><th>Added to index</th><th>Research / article</th><th>Theme</th><th>Coverage</th><th class="align-right">Read</th></tr></thead><tbody id="arrivals-body"></tbody></table></div>
@@ -142,7 +154,7 @@
         <section class="issue-extras" id="issue-extras"><div class="issue-tension"><p class="eyebrow">THE PRODUCTIVE TENSION</p><h2 id="issue-tension-title"></h2><div id="issue-tension-text"></div><div id="issue-tension-refs" class="issue-references"></div></div>
         <div class="issue-experiment"><p class="eyebrow">ONE TINY EXPERIMENT</p><h2 id="issue-experiment-title"></h2><p id="issue-experiment-text"></p><p id="issue-experiment-caution"></p><a href="#lab" class="quiet-link">Try the Experimental Lab</a></div></section>
         <section class="issue-closing"><p id="issue-closer"></p><details class="issue-editorial-details"><summary>About this synthesis</summary><p id="issue-qualification" hidden></p></details><details id="issue-history" class="issue-editorial-details" hidden><summary>Publication history</summary><div id="issue-history-body"></div></details></section>
-        <section class="issue-reading-shelf"><div class="section-heading"><div><p class="eyebrow">FURTHER READING</p><h2>Follow the sources<span class="red-period">.</span></h2><p id="issue-coverage" class="section-deck"></p></div></div><details><summary>Browse the complete source list and reading pages <span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></summary><div id="issue-sources" class="issue-sources"></div></details></section>
+        <section class="issue-reading-shelf"><div class="section-heading"><div><p class="eyebrow">FURTHER READING</p><h2>Sources in this edition<span class="red-period">.</span></h2><p id="issue-coverage" class="section-deck"></p></div></div><details><summary>Browse the complete source list and reading pages <span><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></summary><div id="issue-sources" class="issue-sources"></div></details></section>
         <section class="issue-follow"><div><p class="eyebrow">KEEP EXPLORING</p><h2>More ideas, less noise.</h2><p>Follow new editions through RSS, or explore the research library.</p></div><div><a class="button button-red" href="subscribe.html">Follow the weekly feed</a><p><a class="quiet-link" href="issues/">Read past issues</a></p></div></section>
         </div>
       </div>
@@ -160,7 +172,7 @@
         <div class="perspectives-quick-links">
           <a href="#perspectives" id="perspectives-essays-link">Reporting & essays ↓</a>
           <a href="#lab">Try Experimental Lab</a>
-          <a href="#library" id="perspectives-library-link">Search every source</a>
+          <a href="#library?type=nonacademic" id="perspectives-library-link">Search reporting &amp; tools</a>
         </div>
         <div class="perspectives-intro">
           <p class="eyebrow">01 / PUBLIC DISCOURSE</p>
@@ -179,10 +191,10 @@
     </section>
 
     <section id="library" class="view" hidden>
-      <div class="inner-hero"><div class="shell"><p class="eyebrow">THE SELECTED RESEARCH LIBRARY / 02</p><h1>A library for thinking <em>clearly.</em></h1><p>Find a question. Compare the evidence. Follow an idea back to its source.</p></div></div>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">THE SELECTED RESEARCH LIBRARY / 02</p><h1>Research <em>library.</em></h1><p>Find a question. Compare the evidence. Follow an idea back to its source.</p></div></div>
       <div class="shell library-section">
         <div class="library-discovery" aria-label="Browse the research collection">
-          <div class="library-discovery-title"><div><p class="eyebrow">START WITH A QUESTION</p><h2>Find your thread.</h2></div><p>Choose a theme, search an idea, or refine the evidence.</p></div>
+          <div class="library-discovery-title"><div><p class="eyebrow">START WITH A QUESTION</p><h2>Find your thread.</h2></div><p>Search the whole collection or browse a topic below.</p></div>
           <div class="theme-browser" role="group" aria-label="Browse by research theme">
             <button type="button" data-library-theme="" aria-pressed="true">All themes</button>
             <button type="button" data-library-theme="AI &amp; cognition" aria-pressed="false"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-focus"></use></svg></span> AI &amp; cognition</button>
@@ -193,21 +205,21 @@
           <label class="search-wrap"><span class="ui-icon search-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-search"></use></svg></span><input id="search" type="search" autocomplete="off" placeholder="Search a topic, method, author, or finding…" aria-label="Search research"></label>
           <details class="library-refine"><summary>Refine the collection <span>Scope, reading depth &amp; source type</span></summary>
             <div class="library-controls">
-              <label>Evidence scope<select id="scope-filter" aria-label="Choose evidence scope"><option value="core" selected>AI-specific research</option><option value="adjacent">Adjacent digital-attention research</option><option value="historical">Earlier foundations</option><option value="all">All sources</option></select></label>
+              <label>Evidence scope<select id="scope-filter" aria-label="Choose evidence scope"><option value="core">AI-specific research</option><option value="adjacent">Adjacent digital-attention research</option><option value="historical">Earlier foundations</option><option value="all" selected>All sources</option></select></label>
               <label>Research theme<select id="topic-filter" aria-label="Choose a research theme"><option value="">All themes</option><option>AI &amp; cognition</option><option>Fragmentation</option><option>Interventions</option><option>Technology &amp; society</option></select></label>
               <label>Reading material<select id="depth-filter" aria-label="Choose research material depth"><option value="readable">Source-backed readings</option><option value="full_text">Full-text excerpt available</option></select></label>
               <label>Source type<select id="type-filter" aria-label="Choose source type"><option value="">All source types</option><option value="scholarly">Academic research</option><option value="nonacademic">Commentary &amp; technology</option></select></label>
             </div>
           </details>
         </div>
-        <div class="library-results-heading"><div><p id="library-context" class="eyebrow">AI-SPECIFIC RESEARCH</p><div class="library-count" id="library-count" role="status" aria-live="polite" aria-atomic="true"></div></div><div class="library-order"><label for="library-sort">Order by<select id="library-sort"><option value="added">Recently added</option><option value="published">Publication date</option></select></label><button type="button" id="library-reset">Show all sources <span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button></div></div>
+        <div class="library-results-heading"><div><p id="library-context" class="eyebrow">ALL SOURCES</p><div class="library-count" id="library-count" role="status" aria-live="polite" aria-atomic="true"></div></div><div class="library-order"><label for="library-sort">Order by<select id="library-sort"><option value="added">Recently added</option><option value="published">Publication date</option></select></label><button type="button" id="library-reset">Show all sources <span aria-hidden="true"><span class="ui-icon " aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#icon-external"></use></svg></span></span></button></div></div>
         <div id="library-results" class="library-results"></div>
         <nav id="library-pagination" class="library-pagination" aria-label="Research result pages"><button type="button" id="library-previous">Previous</button><span id="library-page-status" role="status" aria-live="polite"></span><button type="button" id="library-next">Next</button><label>Per page<select id="library-page-size"><option value="12">12</option><option value="24">24</option><option value="48">48</option></select></label></nav>
       </div>
     </section>
 
     <section id="atlas" class="view" hidden>
-      <div class="inner-hero"><div class="shell"><p class="eyebrow">EVIDENCE ATLAS / 03</p><h1>Patterns, not <em>pronouncements.</em></h1><p>Explore the observatory's coverage across topics, publication years, and accessible source material.</p></div></div>
+      <div class="inner-hero"><div class="shell"><p class="eyebrow">EVIDENCE ATLAS / 03</p><h1>Evidence <em>atlas.</em></h1><p>Explore the observatory's coverage across topics, publication years, and accessible source material.</p></div></div>
       <div class="shell atlas-section">
         <div class="atlas-stat-row" id="atlas-stats"></div>
         <div class="atlas-grid">
@@ -226,31 +238,27 @@
     <section id="lab" class="view" hidden>
       <div class="play-head">
         <div class="shell play-head-layout">
-          <div><p class="eyebrow">THE ATTENTION PLAYGROUND · EXPERIMENTAL</p>
-            <h1>Less reading.<br><em>More trying.</em></h1>
-            <p>Challenge a claim. Reshape your notifications. Explore the ways we switch, recover, and work with AI.</p>
+          <div><p class="eyebrow">AI &amp; Attention Observatory</p>
+            <h1>The Attention Lab</h1>
+            <p>Take a short break, find your place in a task, or try changing a design that competes for your attention.</p>
             <div class="play-status"><span class="play-status-dot"></span> Interactive demonstrations, not cognitive tests.</div>
           </div>
-          <svg viewBox="0 0 380 300" class="play-art" role="img" aria-label="Abstract red and cream illustration of focus, task switching, and branching attention">
-            <rect x="25" y="25" width="330" height="250" rx="34" fill="#f9e7e4"/>
-            <circle cx="180" cy="147" r="85" fill="none" stroke="#c87d84" stroke-width="2" stroke-dasharray="4 9"/>
-            <circle cx="180" cy="147" r="51" fill="none" stroke="#af4250" stroke-width="2"/>
-            <path d="M180 147L80 90M180 147L291 95M180 147L283 215M180 147L95 211" stroke="#a33a49" stroke-width="2"/>
-            <circle cx="80" cy="90" r="12" fill="#bd6770"/><circle cx="291" cy="95" r="21" fill="#edb8b4"/><circle cx="283" cy="215" r="13" fill="#b44b5c"/><circle cx="95" cy="211" r="16" fill="#e4a09b"/>
-            <circle cx="180" cy="147" r="29" fill="#9e2b40"/><circle cx="180" cy="147" r="8" fill="#fff"/>
-            <text x="72" y="58" fill="#a34954" font-size="11" font-family="var(--font-interface)">SWITCH</text><text x="253" y="69" fill="#a34954" font-size="11" font-family="var(--font-interface)">PAUSE</text><text x="232" y="253" fill="#a34954" font-size="11" font-family="var(--font-interface)">RETURN</text>
-          </svg>
+          <div class="lab-doorways lab-doorways-light" aria-label="Start an activity">
+            <a href="#lab?experiment=tide-pool"><strong>Take a playful break</strong><span>Tide Pool</span></a>
+            <a href="#lab?experiment=focus-rehearsal"><strong>Return to a task</strong><span>Focus Rehearsal</span></a>
+            <a href="#lab?section=design"><strong>Try a design choice</strong><span>Design examples</span></a>
+          </div>
         </div>
       </div>
       <div class="shell play-wrap">
         <details class="play-update">
-          <summary><span>November lab update</span><span>Updated <time datetime="2026-11-13">13 Nov 2026</time> · What changed?</span></summary>
-          <p>Two new experiments: inspect claims in Evidence Detective, and remix message timing in Notification Studio. A filterable collection keeps Switch Lab, Return Point, and Assistance Dial available as classics. Each activity now has a permanent link and version.</p>
+          <summary><span>November lab update</span><span>Updated <time datetime="2026-11-18">18 Nov 2026</time> · What changed?</span></summary>
+          <p>Tide Pool and Focus Rehearsal add a place to take a break and a place to return to work. Design examples now let you try a rule and see its consequences. The <time datetime="2026-11-13">November 13</time> collection introduced Evidence Detective and Notification Studio.</p>
           <p><a href="https://github.com/chengyu-ucsb/ai-attention-observatory/blob/main/docs/lab-backlog.md">See the improvement plan</a></p>
         </details>
         <div id="lab-page-navigation"></div>
         <div id="lab-activities">
-        <div class="play-intro-row"><div><p class="eyebrow">CHOOSE AN EXPERIMENT</p><h2>Pick something to play.</h2></div><p>New experiences and returning favorites.</p></div>
+        <div class="play-intro-row"><div><h2>Activity collection</h2></div></div>
         <section id="lab-catalog" aria-label="Experiment collection"></section>
         <section id="lab-workbench" hidden aria-label="Selected experiment"></section>
         <div class="play-session-controls">
@@ -355,7 +363,26 @@
         </div>
         </div>
         <section class="play-precedents">
-          <div class="section-heading"><div><p class="eyebrow">OUTSIDE THE LAB / DESIGN PRECEDENTS</p><h2>How products approach focus<span class="red-period">.</span></h2><p class="section-deck">Compare design mechanisms, without mistaking product claims for outcome evidence.</p></div></div>
+          <div class="section-heading"><div><h2>How products approach focus<span class="red-period">.</span></h2><p class="section-deck">Try a design on the same inbox twice. See what it lets through when your priorities change.</p></div></div>
+          <section id="design-inbox" class="design-inbox" aria-labelledby="design-inbox-title" hidden>
+            <div class="design-inbox-settings">
+              <h3 id="design-inbox-title">The inbox trade-off</h3>
+              <p>Four messages arrive while you're drafting a proposal. Choose what you need, then try opening the inbox.</p>
+              <label for="design-goal">What do you need?</label>
+              <select id="design-goal"><option value="room">Find the new meeting room</option><option value="pickup">Check the school pickup time</option></select>
+              <fieldset><legend>What should the inbox do?</legend>
+                <label><input type="radio" name="inbox-rule" value="open" checked> Show everything</label>
+                <label><input type="radio" name="inbox-rule" value="intent"> Ask why I'm opening it</label>
+                <label><input type="radio" name="inbox-rule" value="work"> Show only my work account</label>
+                <label><input type="radio" name="inbox-rule" value="block"> Block the whole inbox</label>
+              </fieldset>
+            </div>
+            <div class="design-inbox-preview">
+              <span class="design-inbox-caption">Fictional inbox</span>
+              <div id="design-inbox-stage"></div>
+              <div id="design-inbox-history" hidden></div>
+            </div>
+          </section>
           <p class="precedent-evidence"><span>Official guides · Checked <time datetime="2026-11-06">6 Nov 2026</time></span>Design examples, not independent outcome evidence or endorsements. Plans and availability can change.</p>
           <ul id="product-examples" class="precedent-grid" role="list" aria-label="Four product design precedents">
             <li class="precedent-card">

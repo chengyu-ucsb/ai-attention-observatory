@@ -151,6 +151,18 @@ Status: needs a concrete use case before implementation.
 
 ## November 2026 change record
 
+### November 18
+
+Tide Pool adds an untimed, three-find observation game with shuffle, pause,
+shape names and a voluntary exit to a real task. Focus Rehearsal lets a visitor
+write one small action, park unrelated thoughts, leave a concrete return cue
+and retrieve it after a break. Visitors can move between the activities without
+losing their place during the current visit. The session ends with their own
+work and next move. The resumption cue draws on [Leroy and Glomb’s ready-to-resume
+study](https://doi.org/10.1287/orsc.2017.1184). The game’s three finds and the
+visitor’s completion report describe this round only.
+
+
 Prepared 5 November 2026. Publication status must be checked in the repository's
 Pages deployment; this date alone does not assert a live deployment.
 

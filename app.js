@@ -185,7 +185,7 @@ function artTopic(x){
  if(lane==="Fragmentation")return "fragmentation";
  if(lane==="Interventions")return "interventions";
  if(lane==="Technology & society")return "society";
- return "focus";
+ return lane==="AI & cognition"?"focus":"research";
 }
 function editorialArt(x){
  const art=x?.editorial_art,valid=src=>typeof src==="string"&&/^assets\/(?:article-art|editorial-covers)\/[a-z0-9-]+\.(?:svg|webp|png|jpg)$/.test(src);
@@ -278,7 +278,50 @@ function readingBasisName(x){
  return depthName(x);
 }
 function ideaInfo(x){return {text:readingHeadline(x),label:readingKind(x)}}
-function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=(r.digest?.finding||x.has_finding)?26:0;v+=(r.methods||x.has_methods)?10:0;v+=(r.limitations||x.has_limitations)?4:0;v+=x.lane==="AI & cognition"||x.lane==="Interventions"?6:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
+function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=(r.digest?.finding||x.has_finding)?26:0;v+=(r.methods||x.has_methods)?10:0;v+=(r.limitations||x.has_limitations)?4:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
+// The four starting lenses keep their familiar colors; the published collection supplies the topics.
+function collectionTopics(){
+ const counts=new Map();
+ for(const row of S.records){const label=row.lane||"Unassigned";counts.set(label,(counts.get(label)||0)+1);}
+ return [...counts].sort(([a],[b])=>a.localeCompare(b)).map(([label,count])=>({
+  label,count,color:themes.find(theme=>theme[0]===label)?.[4]||"#74676A"
+ }));
+}
+function extendTopicChoices(){
+ const select=$("#topic-filter"),browser=$(".theme-browser");
+ for(const {label} of collectionTopics()){
+  if(Array.from(select.options).some(option=>option.value===label))continue;
+  select.append(new Option(label,label));
+  const button=btn(label,()=>chooseLibraryTheme(label));button.dataset.libraryTheme=label;
+  button.setAttribute("aria-pressed","false");browser.append(button);
+ }
+}
+const libraryControls=[
+ ["theme","topic-filter",""],["scope","scope-filter","all"],["type","type-filter",""],
+ ["depth","depth-filter","readable"],["sort","library-sort","added"],["size","library-page-size","12"]
+];
+function readLibraryRoute(raw){
+ const params=new URLSearchParams(raw.split("?")[1]||"");
+ $("#search").value=params.get("q")||"";
+ for(const [key,id,fallback] of libraryControls){
+  const select=document.getElementById(id),value=params.get(key);
+  select.value=Array.from(select.options).some(option=>option.value===value)?value:fallback;
+ }
+ const page=Number(params.get("page"));
+ return Number.isSafeInteger(page)&&page>0?page-1:0;
+}
+function updateLibraryRoute(){
+ showLibrary();
+ const params=new URLSearchParams(),q=$("#search").value.trim();
+ if(q)params.set("q",q);
+ for(const [key,id,fallback] of libraryControls){
+  const value=document.getElementById(id).value;
+  if(value!==fallback)params.set(key,value);
+ }
+ if(libraryPage.number)params.set("page",String(libraryPage.number+1));
+ history.replaceState(history.state,"","#library"+(params.size?"?"+params:""));
+}
+function chooseLibraryTheme(label){$("#topic-filter").value=label;updateLibraryRoute();}
 function libraryHash(theme){return "#library?theme="+encodeURIComponent(theme)+"&scope=all"}
 function goto(page,k){
  const value=page==="paper"?"#paper/"+encodeURIComponent(k):page==="library"&&k?libraryHash(k):"#"+page;
@@ -289,23 +332,28 @@ function route(event){
  const raw=location.hash.slice(1)||"home";
  let page=raw.startsWith("paper/")?"paper":raw.split("?")[0];
  if(!["home","library","atlas","lab","paper","about","perspectives","issue"].includes(page))page="home";
- if(page==="library"&&raw.includes("?")){
-  const params=new URLSearchParams(raw.slice(raw.indexOf("?")+1)),theme=params.get("theme"),scope=params.get("scope");
-  $("#topic-filter").value=themes.some(t=>t[0]===theme)?theme:"";
-  $("#scope-filter").value=["core","adjacent","historical","all"].includes(scope)?scope:"all";
-  $("#search").value="";$("#type-filter").value="";$("#depth-filter").value="readable";
- }
  $$(".view").forEach(v=>v.hidden=v.id!==page);
  $$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});
  if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}void openPaper(key,event?.type==="hashchange")}
- if(page==="library")showLibrary();if(page==="atlas")showAtlas();
- if(page==="lab"&&raw.includes("experiment="))labPageMenu?.choose("experiments");
+ if(page==="library")showLibrary(readLibraryRoute(raw));if(page==="atlas")showAtlas();
+ if(page==="lab"){
+  const params=new URLSearchParams(raw.split("?")[1]||"");
+  labPageMenu?.choose(params.get("section")==="design"?"design":"experiments");
+ }
  window.scrollTo({top:0,behavior:"instant"});
  if(event?.type==="hashchange"){
   closeNavigation();
   const heading=$("#"+page+" h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
  }
- if(page==="issue")focusIssueTerm(raw);
+ if(page==="issue"){
+  focusIssueTerm(raw);
+  const source=new URLSearchParams(raw.split("?")[1]||"").get("source");
+  if(source){
+   const index=(S.issue.sources||[]).findIndex(item=>item.id===source);
+   const item=document.getElementById("edition-source-"+index);
+   if(item){issueMenu?.choose("sources");item.focus({preventScroll:true});item.scrollIntoView({block:"center"});}
+  }
+ }
 }
 function focusIssueTerm(raw){
  const term=new URLSearchParams(raw.split("?")[1]||"").get("term");
@@ -313,7 +361,15 @@ function focusIssueTerm(raw){
  if(target){issueMenu?.choose("about");target.focus({preventScroll:true});target.scrollIntoView({block:"center"})}
 }
 function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
-function topicBars(selector){const root=$(selector);root.replaceChildren();const max=Math.max(1,...themes.map(t=>S.records.filter(x=>x.lane===t[0]).length));for(const t of themes){const n=S.records.filter(x=>x.lane===t[0]).length,p=btn("",()=>goto("library",t[0]),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");fill.style.width=n/max*100+"%";fill.style.background=t[4];add(track,fill);add(p,make("span","bar-label",t[0]),track,make("span","bar-value",n));root.append(p)}}
+function topicBars(selector){
+ const root=$(selector),topics=collectionTopics(),max=Math.max(1,...topics.map(t=>t.count));
+ root.replaceChildren();
+ for(const {label,count,color} of topics){
+  const row=btn("",()=>goto("library",label),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");
+  fill.style.width=count/max*100+"%";fill.style.background=color;track.append(fill);
+  add(row,make("span","bar-label",label),track,make("span","bar-value",count));root.append(row);
+ }
+}
 function donut(){const cc=counts(),total=Math.max(1,S.records.length),legend=$("#depth-legend");$("#record-count").textContent=S.records.length;legend.replaceChildren();let at=0,parts=[];for(const d of depths){let pct=cc[d[0]]/total*100;parts.push(d[2]+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;const r=make("div","legend-item"),sw=make("span","legend-swatch"),copy=make("div");sw.style.background=d[2];add(copy,make("div","legend-title",d[1]+" · "+cc[d[0]]),make("span","legend-caption",Math.round(pct)+"% of records"));add(r,sw,copy);legend.append(r)}$("#evidence-donut").style.background="conic-gradient("+parts.join(",")+")"}
 function featureCoverage(x){
  const area=make("div","feature-evidence"),row=make("div","feature-evidence-row");
@@ -568,6 +624,7 @@ function renderIssue(){
 }
 function issueSourceShelfItem(src,index){
  const item=make("div","issue-shelf-item"),resolved=record(src.id),candidate=resolved&&depth(resolved)!=="citation_only"?resolved:null;
+ item.id="edition-source-"+index;item.tabIndex=-1;
  const original=src.original_summary===true;
  const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",id(candidate))):link(readableSourceTitle(src),src.url||"#library");
  const role=src.editorial_role==="previously_indexed_context"?"Earlier context":src.editorial_role==="collection_week"?"Collection-week reading":src.editorial_role==="publication_week"?"Published in previous week":"";
@@ -606,7 +663,7 @@ function renderEditionCards(){
       make("h3","feature-idea",readableSourceTitle(src)),
       make("p","source-meta",[src.venue,date(src.published)].filter(Boolean).join(" · ")),
       make("p","source-meta",src.review_label||(src.reading_level==="abstract"?"Based on the abstract":"Source material recorded in this edition")),
-      btn("Read this edition’s source notes",()=>goto("issue"),"feature-go"));
+      link("Read this edition’s source notes","#issue?source="+encodeURIComponent(src.id),"feature-go"));
   root.append(c);
  }
 }
@@ -675,9 +732,9 @@ function renderBacklog(){
  add(root,top,rail,detail);
 }
 const libraryPage={signature:"",number:0};
-function showLibrary(){
+function showLibrary(requestedPage){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value,scope=$("#scope-filter").value,order=$("#library-sort")?.value||"added";
- const xs=S.records.filter(x=>matchesSearch(x,q)&&(!t||x.lane===t)&&(!k||x.kind===k)&&(
+ const xs=S.records.filter(x=>matchesSearch(x,q)&&(!t||(x.lane||"Unassigned")===t)&&(!k||x.kind===k)&&(
    scope==="all"||(scope==="core"&&x.source_group==="AI-specific")||
    (scope==="adjacent"&&x.source_group==="Adjacent digital-attention evidence")||
    (scope==="historical"&&/^(Earlier|Historical)/.test(x.source_group||""))
@@ -693,7 +750,7 @@ function showLibrary(){
  const box=$("#library-results");box.replaceChildren();
  const pager=$("#library-pagination"),size=pager?Number($("#library-page-size").value)||12:Math.max(1,xs.length),signature=[q,t,d,k,scope,order,size].join("|");
  if(libraryPage.signature!==signature){libraryPage.signature=signature;libraryPage.number=0;}
- const pages=Math.max(1,Math.ceil(xs.length/size));libraryPage.number=Math.min(libraryPage.number,pages-1);
+ const pages=Math.max(1,Math.ceil(xs.length/size));libraryPage.number=Math.min(typeof requestedPage==="number"?requestedPage:libraryPage.number,pages-1);
  if(pager){pager.hidden=!xs.length;$("#library-page-status").textContent="Page "+(libraryPage.number+1)+" of "+pages+" · "+(xs.length?libraryPage.number*size+1:0)+"–"+Math.min(xs.length,(libraryPage.number+1)*size)+" of "+xs.length;
   $("#library-previous").disabled=libraryPage.number===0;$("#library-next").disabled=libraryPage.number>=pages-1;}
  if(!xs.length){box.append(make("div","empty-state","No source-backed items match those filters. Try a broader search."));return}
@@ -712,7 +769,8 @@ function showLibrary(){
   if(/^(Earlier|Historical)/.test(x.source_group||""))foot.append(make("span","", "Earlier foundation"));
   if(originalSummary(x))add(foot,make("span","card-source-version","Checked source: "+checkedSourceLabel(x.reading)),readingDetails(x.reading));
   add(body,make("span","card-type",ideaInfo(x).label),h,originalSummary(x)?make("p","card-summary",cut(x.reading.digest?.explain,260)):null,shortIdea(x)!==readableSourceTitle(x)?make("p","library-citation",readableSourceTitle(x)):null,foot);
-  c.setAttribute("data-theme",String(Math.max(0,themes.findIndex(theme=>theme[0]===x.lane))));
+  const colorIndex=themes.findIndex(theme=>theme[0]===x.lane);
+  if(colorIndex>=0)c.setAttribute("data-theme",String(colorIndex));
   add(c,image,body);box.append(c);
  }
 }
@@ -728,7 +786,7 @@ function showAtlas(){
  for(const [y,n] of values){let row=make("div","year-row"),track=make("div","year-track"),bar=make("span","year-bar");bar.style.width=(n?Math.max(2,100*n/max):0)+"%";bar.title=n+" AI-specific records from "+y;track.append(bar);add(row,make("span","year-label",y),track,make("span","year-value",n));chart.append(row)}
  const coverage=$("#atlas-depth");coverage.replaceChildren();for(const d of depths){const n=cc[d[0]],p=n/Math.max(1,S.records.length)*100,c=make("div","coverage-row"),top=make("div","coverage-top"),track=make("div","coverage-track"),fill=make("span","coverage-fill");fill.style.background=d[2];fill.style.width=p+"%";add(top,make("strong","",d[1]),make("span","",n+" · "+Math.round(p)+"%"));track.append(fill);add(c,top,track);coverage.append(c)}
  const table=$("#matrix-table"),thead=make("thead"),r=make("tr");add(r,make("th","","Theme"),...depths.map(d=>make("th","",d[1])));thead.append(r);
- const body=make("tbody");for(const t of themes){const row=make("tr");row.append(make("td","",t[0]));for(const d of depths)row.append(make("td","count-cell",S.records.filter(x=>x.lane===t[0]&&depth(x)===d[0]).length));body.append(row)}table.replaceChildren(thead,body)
+ const body=make("tbody");for(const {label} of collectionTopics()){const row=make("tr");row.append(make("th","",label));row.firstElementChild.scope="row";for(const d of depths)row.append(make("td","count-cell",S.records.filter(x=>(x.lane||"Unassigned")===label&&depth(x)===d[0]).length));body.append(row)}table.replaceChildren(thead,body)
 }
 function section(title,text,origin){const s=make("section","reading-section");add(s,make("p","eyebrow",title),make("h3","",title==="HOW IT WAS STUDIED"?"Method & data":title==="WHAT THE PAPER REPORTS"?"Findings":title==="LIMITATIONS"?"Limitations":title==="AUTHOR INTERPRETATION (DISCUSSION)"?"Authors’ interpretation":"Overview"),make("p","",text));if(origin)s.append(make("div","section-source",origin));return s}
 function paperFact(k,v){return add(make("div","paper-fact"),make("span","",k),make("span","",v))}
@@ -1473,6 +1531,7 @@ async function ensureLibrary(){
   const available=rows.filter(x=>x.reading?.level&&x.reading.level!=="citation_only");
   S.companions=available.filter(x=>Boolean(x.companion_to));
   S.records=available.filter(x=>!x.companion_to);S.libraryLoaded=true;
+  extendTopicChoices();
   home();renderIssue();renderBacklog();renderPerspectives();showLibrary();
  })().catch(error=>{libraryPromise=null;throw error});
  return libraryPromise;
@@ -1512,29 +1571,35 @@ async function init(){
   }catch{
    S.issue=await jsonPayload("data/public-featured-issue.json");
   }
-  renderIssue();route();
+  renderIssue();if(!location.hash.startsWith("#lab"))route();
  }catch{
   $("#weekly-deck").textContent="Read the published edition in the archive.";
   $("#weekly-scope").replaceChildren(link("Open the edition archive","issues/"));
-  route();
+  if(!location.hash.startsWith("#lab"))route();
  }
  // Optional data is isolated: a failed index cannot erase a valid edition.
- try{await ensureLibrary();route()}catch{
+ try{await ensureLibrary();if(!location.hash.startsWith("#lab"))route()}catch{
   $("#issue-label").textContent="RESEARCH INDEX TEMPORARILY UNAVAILABLE";
   $("#issue-meta").textContent="The published weekly brief is still available.";
  }
 }
 $$("[data-route]").forEach(a=>a.onclick=e=>{e.preventDefault();goto(a.dataset.route)});
-["search","scope-filter","topic-filter","depth-filter","type-filter"].forEach(s=>$("#"+s).addEventListener(s==="search"?"input":"change",showLibrary));
+["search","scope-filter","topic-filter","depth-filter","type-filter"].forEach(s=>$("#"+s).addEventListener(s==="search"?"input":"change",updateLibraryRoute));
 $("#browse-editorial").addEventListener("click",e=>{e.preventDefault();goto("perspectives")});
-$("#perspectives-library-link").addEventListener("click",e=>{e.preventDefault();$("#scope-filter").value="all";$("#topic-filter").value="";$("#search").value="";$("#type-filter").value="nonacademic";$("#depth-filter").value="readable";goto("library")});
+$("#field-search").addEventListener("submit",event=>{
+ event.preventDefault();const query=$("#field-query").value.trim();
+ location.hash=query?"#library?q="+encodeURIComponent(query):"#library";
+});
+$(".skip").addEventListener("click",event=>{
+ event.preventDefault();const main=$("#main");main.focus();main.scrollIntoView({block:"start"});
+});
 $("#perspectives-essays-link").addEventListener("click",e=>{e.preventDefault();$("#perspectives-essays").scrollIntoView({behavior:"smooth",block:"start"})});
-$$("[data-library-theme]").forEach(button=>button.addEventListener("click",()=>{$("#topic-filter").value=button.dataset.libraryTheme;showLibrary()}));
-$("#library-sort").addEventListener("change",showLibrary);
-$("#library-page-size")?.addEventListener("change",showLibrary);
-for(const [selector,step] of [["#library-previous",-1],["#library-next",1]])$(selector)?.addEventListener("click",()=>{libraryPage.number=Math.max(0,libraryPage.number+step);showLibrary();$(".library-results-heading").scrollIntoView({block:"start"});$("#library-page-status").tabIndex=-1;$("#library-page-status").focus({preventScroll:true});});
+$$("[data-library-theme]").forEach(button=>button.addEventListener("click",()=>chooseLibraryTheme(button.dataset.libraryTheme)));
+$("#library-sort").addEventListener("change",updateLibraryRoute);
+$("#library-page-size")?.addEventListener("change",updateLibraryRoute);
+for(const [selector,step] of [["#library-previous",-1],["#library-next",1]])$(selector)?.addEventListener("click",()=>{libraryPage.number=Math.max(0,libraryPage.number+step);updateLibraryRoute();$(".library-results-heading").scrollIntoView({block:"start"});$("#library-page-status").tabIndex=-1;$("#library-page-status").focus({preventScroll:true});});
 $("#library-reset").addEventListener("click",()=>{
- $("#search").value="";$("#scope-filter").value="all";$("#topic-filter").value="";$("#type-filter").value="";$("#depth-filter").value="readable";showLibrary();
+ $("#search").value="";$("#scope-filter").value="all";$("#topic-filter").value="";$("#type-filter").value="";$("#depth-filter").value="readable";updateLibraryRoute();
 });
 function closeNavigation(){
  $(".main-nav").classList.remove("is-open");$("#nav-toggle").setAttribute("aria-expanded","false");
@@ -1545,7 +1610,153 @@ menuToggle.addEventListener("click",()=>{const open=menuToggle.getAttribute("ari
 navigation.addEventListener("keydown",event=>{if(event.key==="Escape"&&menuToggle.getAttribute("aria-expanded")==="true"){closeNavigation();menuToggle.focus()}});
 window.addEventListener("hashchange",route);
 setupPageLayers();
+if(location.hash.startsWith("#lab"))route();
 init();
 
 
 
+
+/* A fictional inbox with four explicit access rules. All trial state stays in this view. */
+(() => {
+  const lab = document.querySelector('#design-inbox');
+  if (!lab) return;
+  const stage = lab.querySelector('#design-inbox-stage');
+  const history = lab.querySelector('#design-inbox-history');
+  const goal = lab.querySelector('#design-goal');
+  const messages = [
+    {id:'lunch', account:'Work', from:'Office chat', subject:'Friday lunch poll', body:'The team is choosing between tacos and dumplings.'},
+    {id:'pickup', account:'Personal', from:'School office', subject:'Pickup time change', body:'Pickup moved to 3:15 today. Use the usual gate.'},
+    {id:'offer', account:'Personal', from:'Local bookshop', subject:'A new reading list', body:'The bookshop posted five short novels for the weekend.'},
+    {id:'room', account:'Work', from:'Meeting organizer', subject:'Our room has changed', body:'The meeting moved to room 204.'}
+  ];
+  const rules = {
+    open: 'Show everything',
+    intent: 'Ask why',
+    work: 'Work account only',
+    block: 'Block the inbox'
+  };
+  let rule = 'open';
+  let trials = [];
+  let opened = new Set();
+
+  function button(label, action, className = '') {
+    const node = document.createElement('button');
+    node.type = 'button';
+    node.className = className;
+    node.textContent = label;
+    node.addEventListener('click', action);
+    return node;
+  }
+
+  function show(title, description, controls = [], focus = true) {
+    const heading = document.createElement('h4');
+    heading.textContent = title;
+    heading.tabIndex = -1;
+    const body = document.createElement('p');
+    body.textContent = description;
+    stage.replaceChildren(heading, body, ...controls);
+    if (focus) heading.focus({preventScroll:true});
+  }
+
+  function ready(focus = false) {
+    opened = new Set();
+    show('Back at your desk', 'Your proposal is open. You reach for your messages.', [
+      button('Open the inbox', tryOpen, 'design-inbox-primary')
+    ], focus);
+  }
+
+  function finish(title, detail, outcome) {
+    const visibleCount = visibleMessages().length;
+    const summary = rules[rule] + ' · ' + outcome;
+    trials = [...trials.filter(t => t.rule !== rule), {rule, summary}].slice(-4);
+    const heading = document.createElement('h5');
+    heading.textContent = 'Your comparisons for this task';
+    const list = document.createElement('ul');
+    for (const trial of trials) {
+      const entry = document.createElement('li');
+      entry.textContent = trial.summary;
+      list.append(entry);
+    }
+    history.replaceChildren(heading, list);
+    history.hidden = false;
+    const countText = rule === 'intent' && !opened.size ? '' : ' ' + visibleCount + ' of 4 messages available.';
+    show(title, detail + countText, [
+      button('Try another design', () => {
+        ready();
+        lab.querySelector('input:checked').focus();
+      }, 'design-inbox-primary'),
+      button('Start over', reset, 'design-inbox-secondary')
+    ]);
+  }
+
+  function visibleMessages() {
+    if (rule === 'block') return [];
+    return rule === 'work' ? messages.filter(message => message.account === 'Work') : messages;
+  }
+
+  function read(message) {
+    opened.add(message.id);
+    if (message.id === goal.value) {
+      const extra = opened.size > 1 ? ' You also opened ' + (opened.size - 1) + ' other ' + (opened.size === 2 ? 'message.' : 'messages.') : '';
+      finish('You found what you needed', message.body + extra, 'Found the message');
+    } else {
+      show(message.subject, message.body, [button('Back to messages', inbox)]);
+    }
+  }
+
+  function inbox() {
+    const visible = visibleMessages();
+    const controls = visible.map(message => {
+      const item = button('', () => read(message), 'design-inbox-message');
+      const sender = document.createElement('strong');
+      sender.textContent = message.from;
+      const subject = document.createElement('span');
+      subject.textContent = message.subject;
+      item.append(sender, subject);
+      return item;
+    });
+    const targetVisible = visible.some(message => message.id === goal.value);
+    if (!targetVisible) controls.push(button("I can't find it", () =>
+      finish('The school message is hidden', 'The filter kept work mail visible. Pickup details came to your personal account.', 'Needed message hidden'), 'design-inbox-secondary'));
+    show('Messages', rule === 'work' ? 'Only the work account is showing.' : 'Both accounts are showing.', controls);
+  }
+
+  function tryOpen() {
+    if (rule === 'block') {
+      finish('The inbox stays closed', 'The block protects your writing session. It also keeps the update you need out of reach until the session ends.', 'Needed message blocked');
+    } else if (rule === 'intent') {
+      show('Why open the inbox?', 'Take a moment to choose what you want to do.', [
+        button(goal.value === 'room' ? 'Look for the room change' : 'Check pickup time', inbox, 'design-inbox-primary'),
+        button('Keep writing instead', () => finish('Back to the proposal', 'You chose to keep writing. The update is still waiting in the inbox.', 'Deferred opening'), 'design-inbox-secondary')
+      ]);
+    } else {
+      inbox();
+    }
+  }
+
+  function clearComparisons() {
+    trials = [];
+    history.hidden = true;
+    history.replaceChildren();
+  }
+
+  function reset() {
+    goal.value = 'room';
+    rule = 'open';
+    lab.querySelector('input[value="open"]').checked = true;
+    clearComparisons();
+    ready();
+    goal.focus();
+  }
+
+  goal.addEventListener('change', () => {
+    clearComparisons();
+    ready();
+  });
+  lab.querySelector('fieldset').addEventListener('change', event => {
+    rule = event.target.value;
+    ready();
+  });
+  ready();
+  lab.hidden = false;
+})();

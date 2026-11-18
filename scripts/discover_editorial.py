@@ -20,7 +20,8 @@ import urllib.error
 import xml.etree.ElementTree as ET
 
 from collection_window import previous_week, date_in_window, weekly_eligible, window_metadata
-from search_plan import discovery_window
+from search_plan import OPEN_TOPIC, discovery_window
+from source_quality import emerging_human_topic
 from news_quality import useful_description, publisher_url
 from editorial_corrections import apply as apply_editorial_corrections
 from editorial_source_reviews import apply as apply_source_reviews
@@ -233,13 +234,15 @@ def label(title, desc, category):
 
 def classify(title, desc):
     value = (title + " " + desc).lower()
-    if re.search(r"\b(?:focus|notification|self.regulation|digital wellbeing|attention support|intervention|design)\b", value):
+    if re.search(r"\b(?:self.regulation|digital wellbeing|attention support|interventions?|notification batching|focus timers?)\b", value):
         return "Interventions"
-    if re.search(r"distraction|fragmentation|interruption|task.switching", value):
+    if re.search(r"distraction|fragmentation|interruption|notifications?|task.switching", value):
         return "Fragmentation"
     if re.search(r"attention economy|ethics|agency|platform|policy", value):
         return "Technology & society"
-    return "AI & cognition"
+    if re.search(r"\b(?:cognitive|attention|thinking|memory|metacognition|learning)\b", value):
+        return "AI & cognition"
+    return OPEN_TOPIC
 
 
 def eligible(item):
@@ -253,7 +256,7 @@ def eligible(item):
     # Technical model learning and ordinary rhetoric ("I think", regulatory
     # "agency", deployment "workflow") are not evidence of human cognition.
     human_body = re.sub(r"\b(?:machine|deep|reinforcement|representation|transfer) learning\b", "", body, flags=re.I)
-    return bool((AI.search(body) and FOCUS.search(human_body)) or
+    return bool((AI.search(body) and (FOCUS.search(human_body) or emerging_human_topic(human_body))) or
                 (re.search(r"attention|focus|digital wellbeing|notification|cognitive offload", title, re.I) and FOCUS.search(human_body)))
 
 

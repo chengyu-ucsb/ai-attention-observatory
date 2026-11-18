@@ -1,6 +1,7 @@
 """Weekly metadata collector for AI and attention research (no full-text scraping)."""
 import json, re, os, time, urllib.request, urllib.parse, urllib.error, datetime, pathlib
 from academic_state import DiscoveryState, ProviderDeferred, cursor_search
+from source_quality import emerging_human_topic
 from abstract_metadata import openalex_abstract, merge_abstract
 from search_plan import plan,source_class,discovery_window
 from arxiv_publication import ArxivPublicationVerifier, identifier_for as arxiv_identifier, fetch_atom
@@ -17,16 +18,21 @@ ATTENTION_TOPIC=re.compile(r"attention|focus|distract|interrupt|offload|critical
 ADJACENT_TOPIC=re.compile(r"attention (?:fragmentation|residue|economy|control|span)|digital distraction|distracted (?:work|learning)|notification(?:s)?|task.switch|multitask|sustained attention|focus(?:ed)? work",re.I)
 EXCLUDE_TITLE=re.compile(r"gaining .*attention|stock price|share price|trading|market investment|marketing personalization|consumer engagement|car.following|warehouse logistics|diabetes mellitus|security tools",re.I)
 TRUSTED_OUTLETS=re.compile(r"The Atlantic|WIRED|MIT Technology Review|Nature|Science|The Verge|Tech Policy Press|The Guardian|The Conversation|Ars Technica|Harvard Business Review|New York Times|Financial Times|Bloomberg|BBC|NPR|Vox|IEEE Spectrum|Quanta|The Decoder|Inside Higher Ed|EdSurge|PsyPost|New Scientist|Washington Post|Psychology Today|Communications of the ACM|The Economist|Rest of World",re.I)
+def candidate_terms(text):
+ return bool(KEYWORDS.search(text) or emerging_human_topic(text))
+
 def relevant(x, today=None):
  today=publication_date(today or TODAY).isoformat()
  if x.get("curated"):return True
  if x.get("kind")=="nonacademic" and x.get("source")=="Publisher RSS / Google News RSS":
-  return (not x.get("published") or x["published"]<=today) and bool(AI_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")) and ATTENTION_TOPIC.search((x.get("title") or "")+" "+(x.get("preview") or "")))
+  body=(x.get("title") or "")+" "+(x.get("preview") or "")
+  return (not x.get("published") or x["published"]<=today) and bool(AI_TOPIC.search(body) and (ATTENTION_TOPIC.search(body) or emerging_human_topic(body)))
  if x.get("published") and x["published"]>today:return False
- title=x.get("title","");blurb=x.get("preview","")
+ title=x.get("title","");blurb=x.get("abstract_text") or x.get("preview","")
  if EXCLUDE_TITLE.search(title):return False
  direct=(bool(AI_TOPIC.search(title)) and bool(ATTENTION_TOPIC.search(title+" "+blurb))) or (bool(ATTENTION_TOPIC.search(title)) and bool(AI_TOPIC.search(blurb)))
- adjacent=bool(ADJACENT_TOPIC.search(title)) and x.get("lane")=="Fragmentation" and x.get("kind")=="scholarly"
+ direct=direct or bool(AI_TOPIC.search(title+" "+blurb) and emerging_human_topic(title+" "+blurb))
+ adjacent=bool(ADJACENT_TOPIC.search(title)) and x.get("kind")=="scholarly"
  if not (direct or adjacent):return False
  if x.get("kind")=="nonacademic" and not TRUSTED_OUTLETS.search(x.get("venue","")):return False
  return True
@@ -98,7 +104,7 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
   errors.extend(provider_errors);stats["openalex"]+=len(works);stats["queries_attempted"]+=int(audit.get("requests_this_run",0)>0)
   for w in works:
    title=w.get("title") or "";abstract_fields=openalex_abstract(w.get("abstract_inverted_index"),completeness=w.get("abstract_completeness"));ab=abstract_fields["abstract_text"];doi=doi_id(w.get("doi"))
-   if not title or not KEYWORDS.search(title+" "+ab) or w.get("is_retracted"):continue
+   if not title or not candidate_terms(title+" "+ab) or w.get("is_retracted"):continue
    pub=publication_date(w.get("publication_date"))
    if not date_in_window(pub,start,end):stats["publication_date_rejected"]+=1;continue
    loc=w.get("primary_location") or {};venue=(loc.get("source") or {}).get("display_name") or "OpenAlex"
@@ -123,7 +129,7 @@ def discover(days=None,mode="weekly",max_pages=5,page_size=100,max_date_lookups=
     uncertain.append(x)
    if not x or not date_in_window(datev,start,end):stats["publication_date_rejected"]+=1;continue
    x["source"]="Crossref";x["historical_backfill"]=mode=="backfill"
-   if KEYWORDS.search(x["title"]+" "+x["abstract_text"]):found.append(x)
+   if candidate_terms(x["title"]+" "+x["abstract_text"]):found.append(x)
   if audit.get("provider_paused"):
    crossref_paused=True
   if audit.get("requests_this_run"):time.sleep(.3)

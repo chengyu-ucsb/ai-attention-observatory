@@ -145,7 +145,7 @@ The newsletter generator is `scripts/build_newsletter.py`. It builds the latest 
 ## Weekly search and PDF intake
 
 Every Monday, the Observatory's GitHub Actions [research refresh](.github/workflows/refresh.yml)
-runs the four-theme OpenAlex/Crossref discovery and an additional field-specific
+runs open and theme-guided OpenAlex/Crossref searches and an additional field-specific
 journal search. The latter uses DOI-verified priority leads and cross-checks
 journal names before accepting a candidate. The editorially nominated,
 publisher-verified DOI queue is in [`data/priority-research.json`](data/priority-research.json).
@@ -286,7 +286,7 @@ documented and testable:
   and the 2019 notifications paper, is retained for historical context but
   excluded from charts showing AI-specific research since 2023.
 - **Weekly publication window:** Every weekly search covers the previous
-  completed UTC Monday–Sunday week, across all four thematic lenses. A run
+  completed UTC Monday–Sunday week, using open searches alongside the four starting themes. A run
   on any day from November 2–8, 2026 searches October 26–November 1 inclusive.
   Missing or partial publication dates, later print dates for older online-first
   papers, rediscovery timestamps and nominations cannot make old work weekly.

@@ -9,6 +9,7 @@ from pathlib import Path
 from urllib.parse import quote
 from priority_research import crossref_article
 from arxiv_publication import ArxivPublicationVerifier
+from search_plan import OPEN_TOPIC
 from collection_window import previous_week, weekly_eligible
 from update import request, key
 
@@ -69,8 +70,7 @@ def main():
     today = dt.datetime.now(dt.timezone.utc).date()
     for lead in leads:
         dt.date.fromisoformat(lead['week'])
-        if lead['lane'] not in {'AI & cognition', 'Fragmentation', 'Interventions', 'Technology & society'}:
-            raise ValueError('Unsupported brief lane')
+        lead['lane'] = (lead.get('lane') or '').strip() or OPEN_TOPIC
         if not lead.get('origin') or not lead.get('title'):
             raise ValueError('Brief leads require title and origin')
         identity = 'doi:' + lead.get('doi', '').lower()

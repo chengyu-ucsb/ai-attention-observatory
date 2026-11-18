@@ -39,16 +39,16 @@ const {CATALOG,CASES,MESSAGES,notificationPlan}=context.module.exports;
 const q=id=>{const node=doc.querySelector("#"+id);assert(node,"Expected "+id);return node};
 const findData=(name,value)=>flatten(doc.body).find(node=>node.dataset[name]===value);
 const select=(id,value)=>{q(id).value=value;q(id).emit("change")};
-assert.equal(CATALOG.length,5);assert.equal(new Set(CATALOG.map(entry=>entry.id)).size,5);
+assert.equal(CATALOG.length,7);assert.equal(new Set(CATALOG.map(entry=>entry.id)).size,7);
 assert.deepEqual(Array.from(CATALOG.filter(entry=>entry.status==="classic"),entry=>entry.id),["switch","recovery","assist"]);
 for(const entry of CATALOG){assert(entry.version&&entry.released&&entry.evidenceBasis&&entry.duration);assert.match(entry.id,/^[a-z-]+$/)}
 assert.equal(q("lab-workbench").hidden,true,"Catalog must not preload a long activity");
 assert.equal(q("lab-classic-tabs").hidden,true);assert.equal(q("lab-session-controls").hidden,true);
-assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,2,"New is the initial collection");
+assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,4,"New is the initial collection");
 CATALOG.push({...CATALOG[0],id:"future-experiment",title:"Future experiment"});select("lab-collection-filter","new");
-assert.equal(doc.querySelector(".lab-catalog-count").textContent,"3 experiments · 3 new + 3 classics available","Collection counts must grow with the registry");
+assert.equal(doc.querySelector(".lab-catalog-count").textContent,"5 experiments · 5 new + 3 classics available","Collection counts must grow with the registry");
 CATALOG.pop();
-select("lab-collection-filter","all");assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,5);
+select("lab-collection-filter","all");assert.equal(flatten(q("lab-catalog")).filter(node=>node.dataset.labOpen).length,7);
 findData("labOpen","switch").click();assert.equal(view.location.hash,"#lab?experiment=switch");assert(q("lab-workbench").hidden,"New controls cannot appear before hash navigation settles");assert.equal(classicActivations,0);
 findData("labOpen","switch").click();assert(q("lab-workbench").hidden,"A repeated click cannot bypass pending route readiness");assert.equal(classicActivations,0);
 doc.activeElement=doc.body;route(view.location.hash);assert.equal(q("play-switch").hidden,false);assert.equal(q("play-recovery").hidden,true);assert.equal(classicActivations,1);assert.equal(frames.length,0);assert.equal(doc.activeElement,q("lab-workbench-title"),"Destination focus is established during the completed hash route");
@@ -126,3 +126,36 @@ route("#lab");assert(q("lab-workbench").hidden);route("#lab?experiment=unknown")
 route("#lab?experiment=assist");assert.equal(q("play-assist").hidden,false);assert.equal(q("play-switch").hidden,true);assert(visibilityNotices>=7);
 assert(!/fetch\s*\(|localStorage|sessionStorage|XMLHttpRequest|sendBeacon/.test(code),"Activities must stay local and session-only");
 console.log("Lab catalog regressions passed: registry, preserved classics, landing, deep links, card flips, all evidence verdicts, feedback/reset/focus, simulation arithmetic, delivery modal and unknown-route fallback.");
+
+// A self-paced break can be taken from a real work round without losing the return cue.
+const byText=text=>flatten(q("lab-workbench")).find(el=>el.tagName==="BUTTON"&&el.textContent===text&&!el.hidden);
+const write=(id,value)=>{q(id).value=value;q(id).emit("input")};
+route("#lab?experiment=focus-rehearsal");
+assert(byText("Start my task").disabled);
+write("lab-practice-goal","Send the workshop invitation");byText("Start my task").click();
+write("lab-practice-work","Could you join us on Friday?");
+write("lab-practice-thought","Check the room booking");byText("Park this thought").click();
+assert.equal(doc.activeElement,q("lab-practice-work"));
+byText("Pause and leave a cue").click();write("lab-practice-cue","Add the room number");
+byText("Take a break").click();byText("Visit Tide Pool").click();route(view.location.hash);
+assert(byText("Back to my paused task"),"A voluntary break can end before the first find");
+byText("Pause").click();assert.equal(flatten(q("lab-workbench")).filter(el=>el.dataset.shoreItem).length,0);
+byText("Resume").click();byText("Show names").click();
+for(let i=0;i<3;i++){
+  const heading=doc.querySelector(".lab-practice-heading"),target=heading.textContent.slice("Find the ".length);
+  const tiles=flatten(q("lab-workbench")).filter(el=>el.dataset.shoreItem);
+  assert.equal(tiles.length,9);assert.equal(new Set(tiles.map(el=>el.dataset.shoreItem)).size,9);
+  tiles.find(tile=>tile.dataset.shoreItem!==target).click();assert.equal(heading.textContent,"Find the "+target);
+  const correct=tiles.find(tile=>tile.dataset.shoreItem===target);assert(correct.textContent.includes(target));
+  correct.click();assert.equal(doc.activeElement,heading);
+}
+byText("Back to my paused task").click();route(view.location.hash);
+byText("Return to my task").click();assert(q("lab-workbench").textContent.includes("Add the room number"));
+assert.equal(q("lab-practice-work").value,"Could you join us on Friday?");
+byText("Finish this round").click();byText("Made a start").click();
+assert(q("lab-workbench").textContent.includes("1 completed return to this task. 1 thought parked."));
+assert(q("lab-workbench").textContent.includes("Check the room booking"));
+byText("Clear and start over").click();assert.equal(q("lab-practice-goal").value,"");
+route("#lab?experiment=tide-pool");byText("New pool").click();
+assert.equal(flatten(q("lab-workbench")).filter(el=>el.dataset.shoreItem).length,9);
+console.log("Tide Pool and Focus Rehearsal passed for discovery, pause, reset, feedback and transfer.");

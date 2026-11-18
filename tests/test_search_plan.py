@@ -6,7 +6,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/"scripts"))
-from search_plan import plan,source_class,LANES
+from search_plan import plan,source_class,LANES,HISTORICAL_TERMS,OPEN_TOPIC
 from enrich import extract_sections
 from enrich_openalex_fulltext import extract as extract_grobid,eligible as grobid_eligible
 
@@ -14,7 +14,7 @@ class SearchScopeTests(unittest.TestCase):
  def test_history_backfill_covers_every_early_year_across_four_themes(self):
   tasks=plan(dt.date(2026,10,21),"backfill")
   self.assertGreaterEqual(len(tasks),28)
-  for theme in LANES:
+  for theme in HISTORICAL_TERMS:
    for year in (2023,2024,2025):
     matches=[x for x in tasks if x[0]==theme and x[4]==f"historical:{year}"]
     self.assertEqual(len(matches),2 if year in (2023,2024) else 1,(theme,year))
@@ -28,6 +28,27 @@ class SearchScopeTests(unittest.TestCase):
    self.assertEqual({t[0] for t in tasks},set(LANES))
    self.assertTrue(all(t[2:]==("2026-10-26","2026-11-01","previous_publication_week") for t in tasks))
   self.assertTrue(all(t[2:4]==("2026-11-02","2026-11-08") for t in plan("2026-11-09")))
+
+ def test_open_queries_stay_inside_the_existing_weekly_request_budget(self):
+  tasks = plan("2026-11-09")
+  self.assertEqual(len(tasks), 12)
+  self.assertEqual(sum(task[0] == OPEN_TOPIC for task in tasks), 2)
+
+ def test_emerging_and_cross_theme_sources_reach_metadata_and_public_screening(self):
+  from discover_editorial import eligible, classify
+  from update import relevant, candidate_terms
+  from source_quality import topic_class
+  title = "How AI monitoring changes nurses’ alert fatigue"
+  row = {"kind": "scholarly", "title": title, "lane": "Clinical monitoring"}
+  self.assertTrue(candidate_terms(title))
+  self.assertTrue(relevant(row))
+  self.assertEqual(topic_class(row), "direct")
+  self.assertTrue(eligible({"title": title, "description": ""}))
+  self.assertEqual(classify(title, ""), OPEN_TOPIC)
+  self.assertEqual(classify("Can AI reduce smartphone notifications?", ""), "Fragmentation")
+  self.assertTrue(relevant(dict(row, title="Task switching during digital reading")))
+  unrelated = "Transformer cross-attention for object detection"
+  self.assertEqual(topic_class(dict(row, title=unrelated)), "off_topic")
 
  def test_older_attention_foundation_cannot_be_called_genai_study(self):
   old={"title":"The cost of interrupted work: More speed and stress","published":"2008-04-06"}

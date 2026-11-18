@@ -14,6 +14,20 @@ RULES=ROOT/"data/venue-standards.json"
 
 AI=re.compile(r"\b(?:generative(?:\s+artificial)?\s+ai|chatgpt|genai|copilot|llms?|large language models?|artificial intelligence|ai[- ](?:assisted|based|powered|generated|enabled)|human[- ]ai|\bAI\b)\b",re.I)
 FOCUS=re.compile(r"(?:\battention\b|attentional|sustained focus|distraction|interruptions?|task[- ]switching|multitask|cognitive (?:offload|effort|engagement|load|control|autonomy|process)|critical thinking|metacognit|self[- ]regulat|reasoning|human[- ]ai collaboration|cognitive dependency|ai dependenc|learning (?:engagement|strategy|strategies)|collaborative prompt|problem.solv|pedagogical scaffolding|digital well[- ]?being|digital distraction|attention economy|epistemic agency)",re.I)
+# Specific human experiences that can surface under vocabulary outside the
+# founding themes. A named human context keeps model benchmarks out.
+HUMAN_EXPERIENCE = re.compile(
+    r"\b(?:alert fatigue|vigilance|deskilling|work intensification|situation(?:al)? awareness|"
+    r"skill retention|time perception|prospective memory|attentional tunneling)\b", re.I)
+EXPERIENCE_CONTEXT = re.compile(
+    r"\b(?:clinicians?|nurses?|physicians?|doctors?|students?|workers?|employees?|"
+    r"operators?|readers?|writers?|participants?|users?|people|humans?|pilots?|teachers?)\b", re.I)
+
+
+def emerging_human_topic(text):
+    return bool(HUMAN_EXPERIENCE.search(text) and EXPERIENCE_CONTEXT.search(text))
+
+
 ADJACENT=re.compile(r"(?:attention|attentional|digital distraction|interruptions?|notification|task[- ]switching|multitask|focus|cognitive control|self[- ]regulat)",re.I)
 ENGINEERING=re.compile(r"(?:cross[- ]attention|transformer|gru|tabtransformer|image recognition|object detection|satellite|convolutional|computer vision)",re.I)
 PREPRINT=re.compile(r"(?:arxiv|research square|zenodo|osf|preprint|ssrn|ed.?arxiv)",re.I)
@@ -43,11 +57,14 @@ def topic_class(record):
     abstract=str(record.get("abstract_text") or "")
     text=title+" "+abstract
     direct=bool(AI.search(text))
+    emerging=emerging_human_topic(text)
     focused=bool(FOCUS.search(text))
     attention=bool(ADJACENT.search(text))
     # A code paper using 'cross-attention' is not human-attention research.
     if ENGINEERING.search(title) and not FOCUS.search(re.sub(r"cross[- ]attention", "", title, flags=re.I)) and not re.search(r"participants|students|users|human attention|human cognition",abstract,re.I):
         return "off_topic"
+    if direct and emerging:
+        return "direct"
     if direct and focused and (FOCUS.search(title) or (len(abstract)>160 and FOCUS.search(abstract))):
         return "direct"
     if not direct and attention and ADJACENT.search(title):
@@ -105,7 +122,7 @@ def private_reading_eligibility(record, public_screen=None):
     if topic_class(record) == 'off_topic':
         return 'skip_off_topic'
     text = str(record.get('title') or '') + ' ' + str(record.get('abstract_text') or '')
-    if (AI.search(text) and (PRIVATE_HUMAN_FOCUS.search(text)
+    if (AI.search(text) and (emerging_human_topic(text) or PRIVATE_HUMAN_FOCUS.search(text)
             or (HUMAN_CONTEXT.search(str(record.get('title') or ''))
                 and PRIVATE_TITLE_FOCUS.search(str(record.get('title') or ''))))):
         return 'human_ai_topic_for_private_review'

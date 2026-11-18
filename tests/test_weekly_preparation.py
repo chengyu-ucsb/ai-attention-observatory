@@ -77,6 +77,27 @@ class PreparationTests(unittest.TestCase):
         defaults.update(kwargs)
         return prep.prepare(self.root, now=now, **defaults)
 
+    def test_open_question_reaches_closed_packet_and_reader_with_its_own_label(self):
+        from build_public import readable
+        from build_reader import card
+        from build_readings import make_note
+        from source_quality import screen
+        from build_visuals import visual_spec
+
+        theme = "Clinical vigilance"
+        self.works = [{**crossref(), "title": ["How AI alerts shape nurses’ vigilance"],
+                       "abstract": "We observed nurses using AI alerts during medication rounds. Interviews explored when staff acted on an alert and which alerts they decided could wait."}]
+        with patch.object(search_plan, "LANES", {theme: ["AI nurse vigilance"]}):
+            self.prepare()
+            packet = self.prepare(now=MON, closeout=True)
+        row, = prep.closed_packet(packet, MON)["items"]
+        self.assertEqual(row["lane"], theme)
+        self.assertEqual(screen(row)["decision"], "include")
+        row["reading"] = make_note(row)
+        self.assertTrue(readable(row))
+        self.assertIn("kind", visual_spec(row))
+        self.assertEqual(card(row, "data/reader/articles/test.json")["lane"], theme)
+
     def test_preparation_is_private_actual_observation_and_completed_queries_replay(self):
         protected = {'library.json': '[{"published":"2020-01-01"}]', 'weekly.json': '{"published":"unchanged"}',
             'issue-editorial.json': '{"approved":"unchanged"}', 'readings.json': '[]'}

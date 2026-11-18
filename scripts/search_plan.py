@@ -10,11 +10,11 @@ import re
 from collection_window import previous_week, publication_date
 
 START_YEAR=2023
+OPEN_TOPIC = "Emerging topics"
 LANES={
  "AI & cognition":[
   "generative AI cognitive offloading critical thinking",
-  "ChatGPT metacognition memory cognitive effort",
-  "large language model cognitive engagement agency"
+  "ChatGPT metacognition memory cognitive effort"
  ],
  "Fragmentation":[
   "generative AI sustained attention task switching",
@@ -23,13 +23,16 @@ LANES={
  ],
  "Interventions":[
   "AI attention management intervention focus assistant",
-  "generative AI self regulation learning intervention",
-  "adaptive notifications attention digital wellbeing"
+  "generative AI self regulation learning intervention"
  ],
  "Technology & society":[
   "artificial intelligence attention economy cognitive autonomy",
   "generative AI interface attention design human agency",
   "AI information overload algorithmic mediation"
+ ],
+ OPEN_TOPIC:[
+  "generative AI everyday life",
+  "artificial intelligence human attention"
  ]
 }
 
@@ -76,11 +79,11 @@ def plan(today=None, mode="weekly", *, publication_window=None):
         return tasks
     # Manual backfill searches the current year and the complete historical
     # matrix. No historical task is mixed into the normal weekly collector.
-    for lane,queries in LANES.items():
-        for q in queries[:2]:
+    for lane in HISTORICAL_TERMS:
+        for q in LANES[lane][:2]:
             tasks.append((lane,q,f"{today.year}-01-01",today.isoformat(),f"historical:{today.year}"))
     weekly_index=today.toordinal()//7
-    for index,(lane,queries) in enumerate(LANES.items()):
+    for index,lane in enumerate(HISTORICAL_TERMS):
         for year in range(START_YEAR,today.year):
             options=HISTORICAL_TERMS[lane]
             start=(year-START_YEAR+index+weekly_index)%len(options)

@@ -420,6 +420,8 @@
 (() => {
   "use strict";
   const CATALOG = [
+    {id:"tide-pool", title:"Tide Pool", status:"new", version:"1.0.0", released:"2026-11-18", duration:"Under a minute", topic:"Take a playful break", evidenceBasis:"Untimed observation game", description:"Hunt for three little treasures along the shore, one detail at a time.", glyph:"◉", action:"Explore the pool"},
+    {id:"focus-rehearsal", title:"Focus Rehearsal", status:"new", version:"1.0.0", released:"2026-11-18", duration:"At your pace", topic:"Get back into a task", evidenceBasis:"Self-guided practice with a resumption cue", description:"Bring one small piece of real work. Leave yourself a clue, take a break and use it to pick up the thread.", glyph:"↳", action:"Practice on a task"},
     {id:"evidence-detective",title:"Evidence Detective",status:"new",version:"1.0.0",released:"2026-11-13",duration:"3 minutes",topic:"Reading AI claims",evidenceBasis:"Fictional teaching scenarios",description:"Turn over the evidence. Decide how far a claim can go.",glyph:"◈"},
     {id:"notification-studio",title:"Notification Studio",status:"new",version:"1.1.0",released:"2026-11-13",updated:"2026-11-16",duration:"2 minutes",topic:"Designing interruptions",evidenceBasis:"Explicit arithmetic simulation",description:"Remix a stream of messages. See the trade-off between alerts and waiting.",glyph:"▥"},
     {id:"switch",title:"Switch Lab",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"2 minutes",topic:"Task switching",evidenceBasis:"Exploratory task demonstration",description:"Try a stable rule, then a changing rule. Timed and untimed play.",glyph:"⇄"},
@@ -482,7 +484,7 @@
     count.textContent=shown.length+" experiments · "+CATALOG.filter(entry=>entry.status==="new").length+" new + "+CATALOG.filter(entry=>entry.status==="classic").length+" classics available";
     shown.forEach(entry=>{
       const card=node("article","lab-catalog-card"),symbol=node("span","lab-catalog-symbol",entry.glyph);symbol.setAttribute("aria-hidden","true");
-      const title=node("h3","",entry.title),open=control("Open experiment →",()=>navigate(entry.id),"play-primary");open.dataset.labOpen=entry.id;open.setAttribute("aria-label","Open "+entry.title);
+      const title=node("h3","",entry.title),open=control(entry.action||"Open experiment →",()=>navigate(entry.id),"play-primary");open.dataset.labOpen=entry.id;open.setAttribute("aria-label","Open "+entry.title);
       add(card,add(node("div","lab-catalog-meta"),node("span","",entry.status==="new"?"NEW · NOVEMBER":"CLASSIC"),node("span","",entry.duration)),symbol,title,node("p","",entry.description),node("p","lab-catalog-topic",entry.topic),open);
       grid.append(card);
     });
@@ -525,7 +527,10 @@
       if(classicTabs)classicTabs.hidden=false;
       if(sessionControls)sessionControls.hidden=false;
       document.dispatchEvent(new CustomEvent("observatory:lab-activate",{detail:id}));
-    } else if(id==="evidence-detective")drawDetective();else drawStudio();
+    } else if(id==="tide-pool") drawTidePool();
+    else if(id==="focus-rehearsal") drawFocusRehearsal();
+    else if(id==="evidence-detective") drawDetective();
+    else drawStudio();
     if(focus)title.focus();
   }
   function helpDialog(title,texts,opener){
@@ -536,6 +541,190 @@
     dialog.addEventListener("close",()=>{dialog.remove();document.dispatchEvent(new CustomEvent("observatory-layer-change"));if(opener.isConnected)opener.focus()});
     dialog.showModal();document.dispatchEvent(new CustomEvent("observatory-layer-change"));close.focus();
   }
+  const shoreObjects = [
+    {name:"shell", mark:"🐚", detail:"Look for the ridges on the shell."},
+    {name:"crab", mark:"🦀", detail:"Look for two claws."},
+    {name:"fish", mark:"🐟", detail:"Look for a tail fin."},
+    {name:"pebble", mark:"🪨", detail:"Look for a smooth, solid shape."},
+    {name:"octopus", mark:"🐙", detail:"Look for a cluster of curling arms."},
+    {name:"wave", mark:"🌊", detail:"Look for a curling crest."},
+    {name:"coral", mark:"🪸", detail:"Look for little branches."},
+    {name:"jellyfish", mark:"🪼", detail:"Look for a bell with trailing tentacles."},
+    {name:"star", mark:"⭐", detail:"Look for five points."}
+  ];
+  function mixed(values){
+    const items=values.slice();
+    for(let index=items.length-1;index>0;index--){
+      const other=Math.floor(Math.random()*(index+1));
+      [items[index],items[other]]=[items[other],items[index]];
+    }
+    return items;
+  }
+  let shore, focusPractice;
+  function freshShore(){
+    return {tiles:mixed(shoreObjects), targets:mixed(shoreObjects).slice(0,3), found:0, paused:false, labels:false};
+  }
+  function drawTidePool(){
+    shore=shore||freshShore();
+    const stage=node("section","lab-shore"),heading=node("h3","lab-practice-heading");
+    heading.tabIndex=-1;
+    const message=node("p","lab-shore-hint");
+    message.setAttribute("role","status");
+    const tray=node("ol","lab-shore-tray");
+    tray.setAttribute("aria-label","Your three finds");
+    const grid=node("div","lab-shore-grid");
+    grid.setAttribute("role","group");grid.setAttribute("aria-label","Tide pool");
+    const actions=node("div","lab-practice-actions");
+    const labels=control("Show names",()=>{
+      shore.labels=!shore.labels;
+      paint();labels.focus();
+    });
+    const pause=control("Pause",()=>{
+      shore.paused=!shore.paused;
+      paint();pause.focus();
+    });
+    const reset=control("New pool",()=>{
+      shore=freshShore();paint();heading.focus();
+    });
+    const next=control("Take one step on my task",()=>navigate("focus-rehearsal"),"play-primary");
+    add(actions,labels,pause,reset);
+    add(stage,heading,message,grid,tray,actions,next);
+    workbench.append(stage);
+    function paint(){
+      const finished=shore.found===shore.targets.length;
+      const target=shore.targets[shore.found];
+      heading.textContent=finished?"Three finds on the shore":shore.paused?"The pool can wait":"Find the "+target.name;
+      message.textContent=finished?"Let your eyes leave the screen. Pick one physical detail on your desk, then decide what you want to do next.":shore.paused?"Your finds will be here when you return.":target.detail+" Take as long as you like.";
+      labels.textContent=shore.labels?"Hide names":"Show names";
+      labels.setAttribute("aria-pressed",String(shore.labels));
+      labels.hidden=finished||shore.paused;
+      pause.hidden=finished;pause.textContent=shore.paused?"Resume":"Pause";
+      grid.hidden=finished||shore.paused;
+      const hasTaskBookmark=focusPractice?.stage==="paused";
+      next.hidden=!finished&&!hasTaskBookmark;
+      next.textContent=hasTaskBookmark?"Back to my paused task":"Take one step on my task";
+      tray.replaceChildren();grid.replaceChildren();
+      shore.targets.forEach((item,index)=>{
+        const slot=node("li",index<shore.found?"collected":"",index<shore.found?item.mark:"·");
+        slot.setAttribute("aria-label",index<shore.found?item.name:"Empty spot "+(index+1));tray.append(slot);
+      });
+      if(grid.hidden)return;
+      shore.tiles.forEach(item=>{
+        const tile=control("",()=>{
+          if(item!==target){
+            message.textContent="You found the "+item.name+". "+target.detail;
+            return;
+          }
+          shore.found++;paint();heading.focus();
+        },"lab-shore-tile");
+        tile.setAttribute("aria-label",item.name);tile.dataset.shoreItem=item.name;
+        const glyph=node("span","lab-shore-glyph",item.mark);glyph.setAttribute("aria-hidden","true");tile.append(glyph);
+        if(shore.labels)tile.append(node("span","lab-shore-name",item.name));
+        grid.append(tile);
+      });
+    }
+    paint();
+  }
+
+  function freshPractice(){
+    return {stage:"setup", goal:"", work:"", cue:"", parked:[], returns:0, outcome:""};
+  }
+  function drawFocusRehearsal(){
+    focusPractice=focusPractice||freshPractice();
+    const session=focusPractice;
+    const stage=node("section","lab-focus-practice");
+    const heading=node("h3","lab-practice-heading");
+    heading.tabIndex=-1;
+    const body=node("div","lab-practice-body");
+    const restart=control("Clear and start over",()=>{
+      focusPractice=freshPractice();stage.remove();drawFocusRehearsal();
+      q("#lab-practice-goal").focus();
+    });
+    add(stage,heading,body,restart);workbench.append(stage);
+    function field(id,label,value,change,multiline=false){
+      const input=node(multiline?"textarea":"input","lab-practice-input");
+      input.id="lab-practice-"+id;input.value=value;input.maxLength=multiline?4000:220;
+      if(multiline)input.rows=4;
+      input.addEventListener("input",()=>change(input.value));
+      const caption=node("label","",label);caption.htmlFor=input.id;
+      return {group:add(node("div","lab-practice-field"),caption,input),input};
+    }
+    function move(to){
+      session.stage=to;paint();heading.focus();
+    }
+    function action(text,fn,primary=false){
+      return control(text,fn,primary?"play-primary":"play-secondary");
+    }
+    function paint(){
+      body.replaceChildren();
+      if(session.stage==="setup"){
+        heading.textContent="What could you finish in one sitting?";
+        const goal=field("goal","One small action",session.goal,value=>{session.goal=value;start.disabled=!value.trim()});
+        goal.input.placeholder="e.g. Write the opening sentence of my memo";
+        const start=action("Start my task",()=>move("working"),true);start.disabled=!session.goal.trim();
+        const sample=action("Give me a writing prompt",()=>{
+          session.goal="Write a two-sentence invitation to a walk with a friend.";
+          move("working");
+        });
+        add(body,node("p","","Bring something you can start right here or on paper. You choose when to pause. Your notes stay in this tab until you clear or reload it."),goal.group,add(node("div","lab-practice-actions"),start,sample));
+      } else if(session.stage==="working"){
+        heading.textContent=session.goal;
+        if(session.returns&&session.cue)body.append(add(node("div","lab-practice-bookmark"),node("strong","","Your return cue"),node("p","",session.cue)));
+        const work=field("work","Work here or on paper",session.work,value=>session.work=value,true);
+        work.input.placeholder="Start the sentence, list or idea you came here for.";
+        const park=field("thought","Something else on your mind?", "",value=>{save.disabled=!value.trim()});
+        park.input.placeholder="A reminder you can come back to";
+        const parked=node("ul","lab-parked-thoughts");
+        parked.setAttribute("aria-label","Parked thoughts");
+        const status=node("p","lab-practice-status");status.setAttribute("role","status");
+        const save=action("Park this thought",()=>{
+          const thought=park.input.value.trim();if(!thought)return;
+          session.parked.push(thought);parked.append(node("li","",thought));park.input.value="";save.disabled=true;
+          status.textContent="Thought parked. Return to "+session.goal;
+          work.input.focus();
+        });save.disabled=true;
+        session.parked.forEach(thought=>parked.append(node("li","",thought)));
+        add(body,work.group,add(node("div","lab-parking"),park.group,save,status,parked),
+          add(node("div","lab-practice-actions"),action("Pause and leave a cue",()=>move("cue")),action("Finish this round",()=>move("reflect"),true)));
+      } else if(session.stage==="cue"){
+        heading.textContent="Where will you pick up?";
+        const cue=field("cue","Leave your next move",session.cue,value=>session.cue=value);
+        cue.input.placeholder="e.g. Add the time and meeting place to sentence two";
+        add(body,node("p","","Leave a few words that would help you restart. Then look away, stretch, or take a turn in Tide Pool."),cue.group,
+          add(node("div","lab-practice-actions"),action("Take a break",()=>move("paused"),true),action("Keep working",()=>move("working"))));
+        const research=node("details","lab-cue-research");
+        const citation=node("a","","Read Leroy and Glomb’s study");
+        citation.href="https://doi.org/10.1287/orsc.2017.1184";
+        citation.target="_blank";citation.rel="noopener noreferrer";
+        add(research,node("summary","","Why leave a cue?"),node("p","","In studies of interrupted work, people who briefly planned how to resume could give more attention to the intervening task when they expected a rushed return. Here you can try a cue on your own work."),citation);
+        body.append(research);
+      } else if(session.stage==="paused"){
+        heading.textContent="Take your break";
+        add(body,node("p","","Your workspace is paused. Return whenever you choose."),
+          add(node("div","lab-practice-actions"),action("Return to my task",()=>{session.returns++;move("working")},true),action("Visit Tide Pool",()=>navigate("tide-pool"))));
+      } else if(session.stage==="reflect"){
+        heading.textContent="Where did you leave the task?";
+        body.append(node("p","lab-practice-bookmark",session.goal));
+        const choices=node("div","lab-practice-actions");
+        ["Finished this step","Made a start","Want a smaller step"].forEach(choice=>choices.append(action(choice,()=>{session.outcome=choice;move("done")})));
+        add(body,choices,action("Keep working",()=>move("working")));
+      } else {
+        heading.textContent=session.outcome;
+        const feedback=session.outcome==="Finished this step"?"Choose what deserves your attention next.":session.outcome==="Made a start"?"Leave a next move while the work is still fresh.":"Try a step small enough to do in one action, such as writing a single sentence.";
+        add(body,node("p","lab-practice-bookmark",session.goal),node("p","",feedback),
+          node("p","",session.returns+" completed "+(session.returns===1?"return":"returns")+" to this task. "+session.parked.length+" "+(session.parked.length===1?"thought":"thoughts")+" parked."));
+        if(session.work.trim())add(body,node("h4","","Your work this round"),node("p","lab-own-work",session.work));
+        if(session.parked.length){
+          const list=node("ul");session.parked.forEach(thought=>list.append(node("li","",thought)));
+          add(body,node("h4","","Thoughts to revisit"),list);
+        }
+        add(body,action(session.outcome==="Want a smaller step"?"Revise my step":"Return to my workspace",()=>move(session.outcome==="Want a smaller step"?"setup":"working")));
+      }
+      restart.hidden=session.stage==="setup"&&!session.goal;
+    }
+    paint();
+  }
+
   function drawDetective(){
     const stage=node("div","lab-detective"),toolbar=node("div","lab-activity-toolbar"),picker=node("select","lab-collection-select");picker.id="lab-case-picker";
     const pickerLabel=node("label","","Choose a dossier");pickerLabel.htmlFor=picker.id;
@@ -636,7 +825,7 @@
     render();
     const help=control("How the simulation works",()=>helpDialog("A transparent timing model",["The same 12 invented messages arrive at minutes 2, 4, 6, 8, 11, 13, 16, 18, 21, 23, 26, and 28. Two are marked urgent.","Immediate delivery uses arrival time. Batches round delivery up to minute 10, 20, or 30. End-only delivery uses minute 30. The urgent exception overrides those rules.","Messages delivered at the same minute count as one alert moment. Average wait is delivery time minus arrival time, averaged across the 12 messages. Longest gap includes the start and end of the session.","These are model outputs, not study results or predictions about your concentration."],help));stage.append(help);
   }
-  q("#play-reset").addEventListener("click",()=>{state.answers.fill(null);state.flipped=CASES.map(()=>[false,false,false]);state.caseIndex=0;state.mode="batch";state.urgent=true;state.pinned=null;const active=state.active;if(active&& !["switch","recovery","assist"].includes(active)){state.active=null;select(active,false)}});
+  q("#play-reset").addEventListener("click",()=>{shore=undefined;focusPractice=undefined;state.answers.fill(null);state.flipped=CASES.map(()=>[false,false,false]);state.caseIndex=0;state.mode="batch";state.urgent=true;state.pinned=null;const active=state.active;if(active&& !["switch","recovery","assist"].includes(active)){state.active=null;select(active,false)}});
   document.addEventListener("observatory:lab-classic",event=>{
     if(!["switch","recovery","assist"].includes(state.active))return;
     state.active=event.detail;const entry=CATALOG.find(item=>item.id===event.detail);

@@ -14,10 +14,12 @@ through the current date and save work in the existing preparation namespace.
 Never infer publication day from indexing, modified timestamps or a search
 engine's relative-date label. Explicitly resolve missing dates at the publisher.
 
-Cover all four themes: AI and human cognition; distraction and interruptions;
-interventions and learning/self-regulation; and technology, agency and society.
-Search education, workplace, media and everyday-use contexts. Do not let an
-education-heavy result set silently replace the Observatory's full scope.
+Start with the question of how technology shapes what people notice, sustain,
+miss or return to. AI and cognition, fragmentation, interventions, and technology
+and society are starting points. Follow observations in education, work, media
+and everyday life wherever relevant evidence leads. Keep a source that crosses
+themes or raises a different question. Name an emerging topic in the record or
+leave its theme open until the reading supports a more specific label.
 
 ## Complementary searches
 
@@ -25,7 +27,10 @@ education-heavy result set silently replace the Observatory's full scope.
    cursors. Supplement registry queries with publisher and preprint searches.
    Search simple alternatives separately, such as AI + learning, ChatGPT +
    memory, AI + deskilling, AI + work intensity, AI + interruptions, chatbot +
-   autonomy. Do not require every concept in one restrictive query.
+   autonomy. Also run a broad search, then use unfamiliar vocabulary in titles
+   and abstracts for a follow-up. Trace references and related reporting.
+   Record the search and what it added. Give a nominated lead an apt theme
+   label, or omit the lane to queue it under Emerging topics.
 2. Run independent date-bounded web searches, then outlet-specific searches.
    Include general news (Guardian, BBC, Reuters, AP, NPR), technology reporting
    (MIT Technology Review, Wired, Ars Technica, Verge, 404 Media), education
@@ -58,7 +63,9 @@ readings. Adding a lead to the audit is not publication or completed reading.
 Verify the saved remote commit and, when publishing, the real website/feeds.
 
 Before calling the research ready, inspect both academic and nonacademic
-streams and all four themes. Explain a sparse stream using searches actually
+streams. Review the open search, emerging questions and cross-theme sources.
+Build issue themes around findings and disagreements in the material read that
+week. Explain a sparse stream using searches actually
 performed and candidate outcomes. A large metadata count, a green RSS run or a
 two-source synthesis does not establish sufficient coverage. Neither impose a
 quota of weak material nor claim there were few publications because retrieval
