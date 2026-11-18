@@ -993,7 +993,14 @@ def check_registered_readings(page, url, width, out, payloads):
         'author_posted_manuscript': 'Author manuscript',
         'published_institutional_report': 'Institutional report',
     }
-    for row in originals:
+    by_identifier = {row.get('doi') or row['url']: row for row in library}
+    for requested_row in originals:
+        identifier = requested_row.get('doi') or requested_row['url']
+        canonical_id = requested_row.get('companion_to') or identifier
+        assert canonical_id in by_identifier, 'Linked explainer lost its primary publication: ' + identifier
+        row = by_identifier[canonical_id]
+        assert not row.get('companion_to'), 'Source lineage must resolve to a primary publication'
+        assert row.get('reading', {}).get('original_summary'), 'Approved linked reading lost its canonical source review'
         reading = row['reading']
         version = reading['source_version']
         source_label = version_labels.get(version, re.sub(
@@ -1001,13 +1008,21 @@ def check_registered_readings(page, url, width, out, payloads):
         if reading.get('source_format'):
             source_label += ' · ' + reading['source_format'].upper()
         commentary = reading.get('research_type') == 'attributed_commentary'
-        identifier = row.get('doi') or row['url']
         page.goto(url + '#paper/' + quote(identifier, safe=''), wait_until='networkidle')
         paper = page.locator('#paper-content')
         expect(page.locator('#paper')).to_be_visible()
         choose_section(page, 'article-section', 'source')
         expect(paper.locator('.rv-source-title')).to_have_text(row['title'].strip())
         expect(paper.locator('.rv-source-title')).to_be_visible()
+        if requested_row.get('companion_to'):
+            # A legacy explainer deep link displays the reviewed original while
+            # preserving a visible link back to the related commentary.
+            assert row['title'] != requested_row['title'], 'Paired fixture must distinguish original and explainer'
+            expect(paper.locator('.rv-source-title')).not_to_have_text(requested_row['title'].strip())
+            companion_link = paper.locator('.rv-related a[href="' + requested_row['url'] + '"]')
+            expect(companion_link).to_be_visible()
+            expect(companion_link).to_have_text('Read the commentary')
+            expect(companion_link).to_have_attribute('href', requested_row['url'])
         expect(paper.locator('.rv-source .rv-source-version')).to_have_text('Checked source: ' + source_label)
         expect(paper.locator('.rv-source .rv-source-version')).to_be_visible()
         dialog, trigger = open_reading_card(page, paper.locator('.rv-provenance'))
@@ -1022,7 +1037,7 @@ def check_registered_readings(page, url, width, out, payloads):
         expect(paper).to_contain_text('not human review')
         if reading.get('quality_note'):
             expect(paper).to_contain_text(reading['quality_note'])
-        if identifier == '10.1016/j.chb.2024.108386':
+        if canonical_id == '10.1016/j.chb.2024.108386':
             expect(paper).to_contain_text('91 university students were analyzed after one exclusion')
             expect(paper).to_contain_text('1.20 versus 1.87 out of seven possible')
             expect(paper).to_contain_text('did not differ significantly')
