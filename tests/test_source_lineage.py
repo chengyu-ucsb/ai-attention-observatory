@@ -18,6 +18,14 @@ ARTICLE="https://theconversation.com/are-you-using-ai-to-study-heres-how-to-do-i
 DOI="10.3390/educsci16081291"
 
 
+def reviewed_headlines(folder):
+    # These lineage fixtures use real source metadata; retain the corresponding
+    # reviewed title so the independent heading gate does not hold the primary.
+    registered=json.loads((ROOT/"data/reading-headlines.json").read_text())
+    (folder/"reading-headlines.json").write_text(json.dumps({
+        key:registered[key] for key in (DOI,ARTICLE) if key in registered}))
+
+
 def explainer():
     return {"title":"Are you using AI to study? Here’s how to do it well",
             "kind":"nonacademic","doi":"","url":ARTICLE,"published":"2026-10-21",
@@ -61,6 +69,7 @@ class SourceLineageTests(unittest.TestCase):
     def test_older_primary_stays_out_of_weekly_but_preserves_legacy_route_data(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder=Path(tmp)
+            reviewed_headlines(folder)
             (folder/"library.json").write_text(json.dumps([explainer()]))
             (folder/"weekly.json").write_text(json.dumps({
                 "run":{"date":"2026-10-22","total":1}, "items":[explainer()]}))
@@ -83,6 +92,7 @@ class SourceLineageTests(unittest.TestCase):
             'field': 'published-online', 'value': '2026-10-20'})
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
+            reviewed_headlines(folder)
             (folder / 'library.json').write_text(json.dumps([explainer()]))
             (folder / 'weekly.json').write_text(json.dumps({
                 'run': {'date': '2026-10-26'}, 'items': [explainer()]}))

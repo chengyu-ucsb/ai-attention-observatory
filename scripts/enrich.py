@@ -11,36 +11,9 @@ def permitted(licenses):
   if "cc by" in val or "cc-by" in val or "cc0" in val or "creative commons zero" in val:return True
  return False
 def extract_sections(root):
- """Preserve several substantive paragraphs per article section for synthesis.
+ from publisher_sections import xml_sections
+ return xml_sections(root, "sec", "title", 7000)
 
- Methods, Results and Discussion remain separate. Avoid copying whole papers,
- and avoid indexing a references section as a research result.
- """
- sections={}
- for el in root.iter():el.tag=el.tag.rsplit("}",1)[-1]
- for sec in root.findall(".//body//sec"):
-  heading=sec.find("title")
-  title=clean(" ".join(heading.itertext()) if heading is not None else "").lower()
-  if not title:continue
-  key=("limitations" if "limitation" in title else
-       "results" if "result" in title or "finding" in title else
-       "discussion" if "discussion" in title or "conclusion" in title else
-       "methods" if any(x in title for x in ("method","study design","participant","procedure")) else "")
-  if not key:continue
-  # Exclude nested sections from a parent if both are labeled; nested text
-  # can be added again by its own section if useful.
-  paras=[clean(" ".join(p.itertext())) for p in sec.findall("./p")]
-  if not paras:paras=[clean(" ".join(p.itertext())) for p in sec.findall(".//p")]
-  paras=[p for p in paras if len(p)>=50]
-  # Method/Results samples should be meaningful, not a single heading.
-  if not paras:continue
-  old=sections.get(key,"")
-  candidate=" ".join(paras)
-  if old: candidate=old+" "+candidate
-  if len(candidate)>7000:
-   candidate=candidate[:7000].rsplit(" ",1)[0]
-  sections[key]=candidate
- return sections
 def run():
  path=DATA/"library.json";records=json.loads(path.read_text());updated=0;attempted=0
  today=datetime.date.today().isoformat();limit=max(1,min(75,int(os.getenv("OA_ENRICH_LIMIT","38"))))

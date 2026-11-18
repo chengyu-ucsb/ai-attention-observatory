@@ -7,6 +7,7 @@ from __future__ import annotations
 from collections import Counter
 import json
 from pathlib import Path
+from reading_depth import has_machine_sections
 
 ROOT=Path(__file__).resolve().parents[1]
 DATA=ROOT/"data"
@@ -22,7 +23,7 @@ def report():
     group=Counter(r.get("source_group") or "unclassified" for r in public)
     levels=Counter((r.get("reading") or {}).get("level") or "unknown" for r in public)
     fulltext=[r for r in scholarly if (r.get("reading") or {}).get("level")=="full_text"]
-    extracted=[r for r in scholarly if (r.get("analysis") or {}).get("fulltext_url") and not (r.get("analysis") or {}).get("original_paraphrases_only")]
+    extracted=[r for r in scholarly if has_machine_sections(r)]
     originals=[r for r in scholarly if (r.get("reading") or {}).get("original_summary")]
     return {
       "public_total":len(public),

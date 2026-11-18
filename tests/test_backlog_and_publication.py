@@ -22,7 +22,8 @@ class PublicReadingTests(unittest.TestCase):
   self.assertFalse(build_public.readable({"kind":"scholarly","reading":{"level":"curated","overview":"A source-free blurb"}}))
  def test_actual_abstract_or_fulltext_is_source_backed(self):
   self.assertTrue(build_public.readable({"kind":"scholarly","abstract_text":"a"*120,"reading":{"level":"abstract"}}))
-  self.assertTrue(build_public.readable({"kind":"scholarly","analysis":{"fulltext_url":"https://example.org/oa"},"reading":{"level":"full_text"}}))
+  self.assertTrue(build_public.readable({"kind":"scholarly","analysis":{"fulltext_url":"https://example.org/oa","results":"The observed groups differed on the second task only."},"reading":{"level":"full_text"}}))
+  self.assertFalse(build_public.readable({"kind":"scholarly","analysis":{"fulltext_url":"https://example.org/oa"},"reading":{"level":"full_text"}}))
  def test_publisher_synopsis_requires_content(self):
   self.assertTrue(build_public.readable({"kind":"nonacademic","reading":{"level":"curated","overview":"Editorial synopsis from its source"}}))
   self.assertFalse(build_public.readable({"kind":"nonacademic","reading":{"level":"curated"}}))

@@ -115,3 +115,39 @@ weekly shelf; accepting its current reading does not create an older snapshot.
 Offline lifecycle regressions cover rediscovery → verification, retained
 receipts, changed feed/publisher evidence, persistent conflicts, and the real
 EFF records. This reconciles existing decisions; it is not a new source check.
+
+## Reading-depth repair and audit (2026-11-18)
+
+Every public build now reconstructs scholarly reading cards from current source
+evidence. A stored `fulltext_url`, empty markup, or table digits cannot establish
+a full-text reading. Machine-extraction counts require actual section prose and
+exclude original paraphrases. Accepted original summaries retain their distinct
+source/version and review receipts. Limited section excerpts remain explicitly
+limited; their presence does not establish whole-document review.
+
+The checked-note register now removes its old projection when a note is removed,
+duplicated or invalid. It preserves separately acquired machine sections and
+restores metadata that the register overwrote. Explicit source formats distinguish
+JATS reviews from HTML reviews. Flattened, explicitly numbered TEI subsections
+inherit only the matching numbered ancestor; reference, hypothetical and future
+research branches cannot enter Results. Unknown peers stop inherited categories.
+
+The tutoring article (`10.1111/bjet.70100`) uses its accepted source-checked
+summary of the Wiley version of record, including the 149-person analytic sample
+and Table 2's section-specific comparisons. It does not infer accuracy or lasting
+learning from question attempts. Thirteen additional checked-note entries were
+recovered from the interrupted review and checked against their linked primary
+or author-deposited sources; this did not independently reanalyze the studies.
+
+`data/source-quality-audit.json` records remaining abstract-only readings, open
+locators without reviewed text, findings still drawn from abstracts despite
+available article sections, and cards without a selected empirical result. These
+are recovery priorities, not interchangeable failure counts: a conceptual article
+may correctly have no empirical result, while an open link may still fail machine
+retrieval. Do not describe the entire collection as fully reviewed when these
+gaps remain. The bounded acquisition queue reserves a recovery slot and retains
+existing provider limits and retry cooldowns.
+
+`tests/test_source_depth_integrity.py` covers review withdrawal and reapplication,
+machine/reviewed-source counts, stale labels, numbered section boundaries,
+conceptual-result separation, and the canonical tutoring reading.

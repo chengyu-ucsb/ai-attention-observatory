@@ -13,7 +13,7 @@ class ReaderExportTests(unittest.TestCase):
     def test_export_is_small_versioned_and_bound_to_published_edition(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory); data = root / 'data'; data.mkdir()
-            row = {'doi': '10.1234/a', 'title': 'An article', 'kind': 'scholarly',
+            row = {'doi': '10.1234/a', 'title': 'An article', 'display_headline': 'A shorter reading title', 'kind': 'scholarly',
                    'analysis': {'results': 'PRIVATE_OPERATION_MARKER' * 100},
                    'reading': {'level': 'full_text', 'digest': {'idea': 'An idea', 'finding': 'An observed result.'}}}
             issue = {'status': 'published', 'edition_date': '2026-11-07', 'sources': [{'id': 'old-source'}]}
@@ -30,6 +30,8 @@ class ReaderExportTests(unittest.TestCase):
             index = json.loads((root / manifest['index_url']).read_text())
             self.assertNotIn('PRIVATE_OPERATION_MARKER', json.dumps(index))
             self.assertEqual(json.loads((root / index[0]['article_payload']).read_text()), row)
+            self.assertEqual(index[0]['display_headline'], row['display_headline'])
+            self.assertEqual(index[0]['title'], row['title'])
             self.assertTrue(index[0]['has_finding'])
             self.assertIn('observed result', index[0]['search_text'])
             self.assertLess(report['index_bytes'], len(json.dumps(row)))

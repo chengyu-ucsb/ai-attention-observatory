@@ -143,8 +143,8 @@ RESULT_CLAIM = re.compile(
  r"(?:participants|students|respondents|workers|patients) (?:in [^.]{0,100} )?reported (?:significantly )?(?:higher|lower)|"
  r"(?<![-–—])(?:predicted|increased|decreased|moderated|mediated))\b",re.I)
 UNTESTED = re.compile(
- r"\b(?:hypothesi[sz]|we (?:propose|expect|aim|seek|explore|test)|"
- r"the present study (?:examines|investigates|aims)|"
+ r"\b(?:hypothesi[sz]\w*|we (?:propos(?:e|ed)|expect(?:ed|s)?|aim(?:ed|s)?|seek|sought|explore(?:d|s)?|test(?:ed|s)?)|"
+ r"(?:this|the present) study (?:examines|investigates|aims)|"
  r"may (?:be|lead|affect)|future research|should be studied|"
  r"previous research (?:suggests|shows)|prior studies|recent work|"
  r"evidence on whether|evidence (?:is|remains) (?:mixed|divided)|"
@@ -552,18 +552,20 @@ def annotate(record):
   return base
  if record.get("research_type")=="conceptual_framework":
   framework=record.get("framework_notes") or {}
-  idea=framework.get("idea") or source_title_headline(record)
+  checked=record.get("verified_article_review") or {}
+  edited=(record.get("editorial_digest") or {}) if checked else {}
+  idea=edited.get("idea") or framework.get("idea") or source_title_headline(record)
   base["reading"]["digest"]={
    "idea":idea,
-   "explain":"A proposed staged approach to AI use in formal learning; distinguish foundational independent work from guided and selective offloading.",
-   "approach":framework.get("approach") or "Conceptual framework based on published literature.",
+   "explain":edited.get("explain") or framework.get("idea") or "",
+   "approach":edited.get("approach") or framework.get("approach") or "Conceptual framework based on published literature.",
    "finding":"",
    "finding_source":"none",
-   "interpretation":" ".join(framework.get("stages") or []),
-   "limitation":framework.get("qualification") or "This is a proposal, not a new experimental result.",
+   "interpretation":edited.get("interpretation") or " ".join(framework.get("stages") or []),
+   "limitation":edited.get("limitation") or framework.get("qualification") or "This is a theoretical proposal.",
    "tags":concept_tags(record),
    "status":"conceptual_framework",
-   "editorial_basis":"publisher_source_abstract",
+   "editorial_basis":"publisher_full_article_paraphrased" if checked else "publisher_source_abstract",
    "reading_mode":"conceptual_proposal"
   }
   return base
@@ -582,7 +584,7 @@ def annotate(record):
  if curated and level in ("abstract","full_text"):
   digest=dict(curated)
   digest["status"]="editorially_written_from_indexed_sections"
-  digest["editorial_basis"]="publisher_full_article_paraphrased" if (record.get("analysis") or {}).get("original_paraphrases_only") else "full_text" if level=="full_text" else "abstract"
+  digest["editorial_basis"]="publisher_full_article_paraphrased" if record.get("verified_article_review") or (record.get("analysis") or {}).get("original_paraphrases_only") else "full_text" if level=="full_text" else "abstract"
   digest["finding_source"]="editorial" if digest.get("finding") else "none"
  else:
   # Never promote an introduction, source section heading, or model-fit check

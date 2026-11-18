@@ -18,7 +18,8 @@ FOCUS=re.compile(r"(?:\battention\b|attentional|sustained focus|distraction|inte
 # founding themes. A named human context keeps model benchmarks out.
 HUMAN_EXPERIENCE = re.compile(
     r"\b(?:alert fatigue|vigilance|deskilling|work intensification|situation(?:al)? awareness|"
-    r"skill retention|time perception|prospective memory|attentional tunneling)\b", re.I)
+    r"skill retention|time perception|prospective memory|attentional tunneling|"
+    r"reliance on (?:ai|llms?)|(?:ai|human) advice|trust ai assistants)\b", re.I)
 EXPERIENCE_CONTEXT = re.compile(
     r"\b(?:clinicians?|nurses?|physicians?|doctors?|students?|workers?|employees?|"
     r"operators?|readers?|writers?|participants?|users?|people|humans?|pilots?|teachers?)\b", re.I)
@@ -55,6 +56,17 @@ def venue_class(venue,rules=None):
 def topic_class(record):
     title=str(record.get("title") or "")
     abstract=str(record.get("abstract_text") or "")
+    # An institutional synthesis may provide a structured report rather than
+    # an abstract. Its signed original reading carries the reviewed topic.
+    if not abstract and record.get("research_type") == "research_synthesis":
+        from original_readings import eligible
+        note = record.get("original_reading") or {}
+        if (note.get("source") or {}).get("version") == "published_institutional_report" and not note.get("article_screen") and eligible(note, record):
+            summary = note["summary"]
+            abstract = " ".join(summary.values())
+            if (AI.search(title + " " + abstract) and EXPERIENCE_CONTEXT.search(abstract)
+                    and re.search(r"\b(?:recall|retrieval|self-regulation|reasoning)\b", abstract, re.I)):
+                return "direct"
     text=title+" "+abstract
     direct=bool(AI.search(text))
     emerging=emerging_human_topic(text)
@@ -91,6 +103,15 @@ def screen(record,rules=None):
             return {"decision":"include","venue_level":"preprint","topic":topic,
                     "reason":"article_screened_preprint_not_peer_reviewed"}
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"preprint_requires_article_screen"}
+    if (venue == "unverified" and record.get("research_type") == "research_synthesis"
+            and record.get("doi") and topic == "direct"):
+        from original_readings import eligible
+        note = record.get("original_reading") or {}
+        source = note.get("source") or {}
+        if (source.get("version") == "published_institutional_report"
+                and source.get("source_doi") == record["doi"] and eligible(note, record)):
+            return {"decision":"include","venue_level":"institutional_report","topic":topic,
+                    "reason":"source_checked_institutional_research_synthesis"}
     if venue=="unverified":
         return {"decision":"hold","venue_level":venue,"topic":topic,"reason":"publication_venue_unverified"}
     return {"decision":"include","venue_level":venue,"topic":topic,"reason":"field_venue_and_explicit_relevance"}

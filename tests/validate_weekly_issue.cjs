@@ -4,16 +4,23 @@ const root=path.resolve(__dirname,".."),text=p=>fs.readFileSync(path.join(root,p
 const issue=JSON.parse(text("data/public-issue.json"));
 const weekly=JSON.parse(text("data/public-weekly.json"));
 const site=text("index.html"),app=text("app.js"),newsletter=text("newsletter.html");
-// Every new source must remain in the editorial shelf; older contextual
-// readings are allowed only when explicitly identified as previously indexed.
+// Current discovery must remain in the shelf. A reviewed correction may recover
+// additional sources from that same publication week after discovery closes.
 const discoveredIds=new Set(weekly.items.map(s=>(s.doi||"").toLowerCase()||s.url||s.title));
 const editorialIds=new Set(issue.sources.map(s=>s.id));
 assert.equal(issue.source_count,issue.sources.length,"Editorial source count must match its actual citations");
 for(const id of discoveredIds)
  assert(editorialIds.has(id),"Newly indexed source missing from editorial evidence: "+id);
-for(const source of issue.sources)
- if(!discoveredIds.has(source.id))
+for(const source of issue.sources){
+ if(issue.publication_window?.scope==="original_publication_date_previous_completed_week"){
+  const window=issue.publication_window;
+  assert(source.published>=window.from&&source.published<=window.to,
+   "Source falls outside the edition's publication week: "+source.id);
+  assert.equal(source.editorial_role,"publication_week","Dated editions cannot add older contextual padding");
+ }else if(!discoveredIds.has(source.id)){
   assert.equal(source.editorial_role,"previously_indexed_context","Older evidence must be transparently marked");
+ }
+}
 assert.equal(editorialIds.size,issue.sources.length,"Editorial evidence must not contain duplicate sources");
 assert(issue.sources.every(s=>s.reading_level!=="citation_only"),"Citation-only source cannot enter an issue");
 assert(site.includes('id="issue"')&&site.includes('id="weekly-title"'),"Weekly issue not discoverable");

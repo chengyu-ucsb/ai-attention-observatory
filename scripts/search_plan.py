@@ -94,7 +94,7 @@ def plan(today=None, mode="weekly", *, publication_window=None):
     return tasks
 
 
-def source_class(record):
+def source_class(record, *, editorial_topic=None):
     """Keep historic digital-attention foundations separate from GenAI work."""
     year=(record.get("published") or "")[:4]
     title=(record.get("title") or "").lower()
@@ -103,6 +103,8 @@ def source_class(record):
         "chatgpt","generative ai","generative artificial intelligence",
         "large language model","llm","gpt-4","gpt-3","ai-assisted",
         "ai-based","ai powered","ai-powered","artificial intelligence"))
+    if editorial_topic in ("direct", "adjacent"):
+        direct = editorial_topic == "direct"
     if year.isdigit() and int(year)<START_YEAR:
         return "Earlier digital-attention foundation" if not direct else "Historical AI context"
     if direct:return "AI-specific"

@@ -12,8 +12,10 @@ SECTION_LIMIT = 6700
 NAMES = {
     'materials and methods': 'methods', 'methodology': 'methods',
     'method': 'methods', 'methods': 'methods',
+    'study design': 'methods',
     'result': 'results', 'results': 'results', 'findings': 'results',
     'path results': 'results', 'research results': 'results',
+    'data analysis and results': 'results',
     'discussion': 'discussion', 'conclusion': 'discussion',
     'conclusions': 'discussion', 'results and discussion': 'discussion',
     'results & discussion': 'discussion', 'discussion and conclusions': 'discussion',
@@ -43,6 +45,85 @@ def section_name(raw):
     if title in EXCLUDE:
         return 'exclude'
     return NAMES.get(title, '')
+
+
+def xml_sections(root, section_tag, title_tag, max_chars):
+    """Read disjoint body paragraphs in order, inheriting nested section headings."""
+    buckets = {}
+
+    def local(element):
+        return element.tag.rsplit('}', 1)[-1].lower()
+
+    def words(element):
+        return clean(' '.join(element.itertext()))
+
+    def heading_number(element):
+        """Use explicit section numbering, never infer hierarchy from topic words."""
+        heading = next((child for child in element if local(child) == title_tag), None)
+        if heading is None:
+            return ()
+        raw = heading.get('n') or element.get('n') or words(heading)
+        match = re.match(r'^\s*(\d+(?:\.\d+)*)(?:[.\s]|$)', raw)
+        return tuple(match.group(1).split('.')) if match else ()
+
+    def collect(element, inherited=''):
+        tag = local(element)
+        if tag in {'back', 'ref-list', 'listbibl', 'table', 'table-wrap', 'figure', 'fig',
+                   'caption', 'supplementary-material', 'fn-group'}:
+            return
+        key = inherited
+        if tag == section_tag:
+            title = next((words(child) for child in element if local(child) == title_tag), '')
+            name = section_name(title)
+            if not name:
+                prefix = re.sub(r'^\s*\d+(?:\.\d+)*[.\s]*', '', title).casefold()
+                name = section_name(prefix.split(':', 1)[0])
+                if not name and prefix in {'study design', 'participants', 'procedure', 'data collection', 'statistical analysis'}:
+                    name = 'methods'
+            if name in ('stop', 'exclude'):
+                return
+            if inherited == 'discussion' and name == 'results':
+                name = 'discussion'
+            key = name or inherited
+        if tag == 'p':
+            value = words(element)
+            if key and len(value) >= 45:
+                buckets.setdefault(key, []).append(value)
+            return
+        # GROBID may flatten numbered sections into sibling divs. Retain the
+        # nearest explicit numbered ancestor, but never carry a category across
+        # unnumbered unknown peers or excluded sections.
+        siblings = []
+        for child in element:
+            if local(child) == title_tag:
+                continue
+            child_key = key
+            if local(child) == section_tag:
+                number = heading_number(child)
+                if number:
+                    while siblings and not (len(siblings[-1][0]) < len(number)
+                            and number[:len(siblings[-1][0])] == siblings[-1][0]):
+                        siblings.pop()
+                    if siblings:
+                        child_key = siblings[-1][1]
+                    title = next((words(part) for part in child if local(part) == title_tag), '')
+                    category = section_name(title) or section_name(
+                        re.sub(r'^\s*\d+(?:\.\d+)*[.\s]*', '', title).split(':', 1)[0])
+                    effective = category or child_key
+                    if child_key in ('stop', 'exclude'):
+                        effective = child_key
+                    elif child_key == 'discussion' and effective == 'results':
+                        effective = 'discussion'
+                    siblings.append((number, effective))
+                else:
+                    siblings.clear()
+            if child_key not in ('stop', 'exclude'):
+                collect(child, child_key)
+
+    body = next((element for element in root.iter() if local(element) == 'body'), None)
+    if body is not None:
+        collect(body)
+    return {key: ' '.join(paragraphs)[:max_chars].rstrip() for key, paragraphs in buckets.items()}
 
 
 class ArticleHTML(HTMLParser):

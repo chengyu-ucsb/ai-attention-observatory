@@ -604,7 +604,28 @@ def verified_arxiv_v1(record):
     an unversioned URL or relabel prior unversioned retrieval evidence.
     """
     provenance = record.get('publication_date_provenance') or {}
-    if not isinstance(provenance, dict) or provenance.get('basis') != 'arxiv_first_submitted':
+    if not isinstance(provenance, dict):
+        return None
+    if provenance.get('basis') == 'arxiv_first_public_announcement':
+        # Public listing dates can follow the v1 submission, particularly over
+        # weekends. Keep the first submission's original Atom receipt intact.
+        submission = provenance.get('v1_submission') or {}
+        announced = publication_date(provenance.get('value'))
+        submitted = publication_date(submission.get('value')) if isinstance(submission, dict) else None
+        if (not announced or not submitted or submitted > announced
+                or announced != publication_date(record.get('published'))
+                or provenance.get('status') != 'day_known'
+                or provenance.get('field') != 'public_listing_date'
+                or provenance.get('source') != 'Official arXiv public listing'
+                or not re.fullmatch(r'https://arxiv\.org/list/[A-Za-z0-9.-]+/(?:recent|[0-9]{4})(?:\?show=[0-9]+)?',
+                                    str(provenance.get('source_url', '')))
+                or submission.get('basis') != 'arxiv_first_submitted'
+                or not arxiv_record_identifier(record)
+                or provenance.get('listed_id') != arxiv_record_identifier(record)):
+            return ''
+        return verified_arxiv_v1({**record, 'published': submission['value'],
+                                  'publication_date_provenance': submission})
+    if provenance.get('basis') != 'arxiv_first_submitted':
         return None
     base = arxiv_record_identifier(record)
     if not base:

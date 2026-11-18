@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-CARD_FIELDS = ('title', 'authors', 'published', 'venue', 'doi', 'url', 'kind',
+CARD_FIELDS = ('title', 'display_headline', 'authors', 'published', 'venue', 'doi', 'url', 'kind',
                'lane', 'relation', 'source', 'first_seen', 'source_group',
                'format', 'research_type', 'legacy_urls', 'companion_to', 'editorial_art')
 READING_FIELDS = ('level', 'original_summary', 'research_type', 'notice',

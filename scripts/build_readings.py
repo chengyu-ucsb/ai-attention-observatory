@@ -8,6 +8,7 @@ from editorial_corrections import apply as apply_editorial_corrections
 from news_quality import useful_description
 from source_lineage import prepare
 from original_readings import note_for
+from reading_depth import has_article_sections
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 STOP=("abstract unavailable","bibliographic metadata only","no abstract", "abstract not available")
@@ -56,11 +57,12 @@ def make_note(r):
     src=clean(r.get("abstract_text"))
     if len(src)<90 and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         src=clean(r["preview"])
-    full=r.get("analysis") or {}
+    checked=r.get("verified_article_review") or {}
+    full=checked or r.get("analysis") or {}
     conceptual=r.get("research_type")=="conceptual_framework"
     editorial=is_editorial(r)
     framework=r.get("framework_notes") or {}
-    licensed=bool(full.get("fulltext_url"))
+    licensed=has_article_sections(r)
     if licensed:
         approach=clean(full.get("methods"))[:1500]
         # Only the Results/Findings section can populate the reported-results field.
@@ -107,10 +109,10 @@ def make_note(r):
         interpretation=" ".join(selected)
         caveat="Editorial interpretation of earlier publications, not a new empirical finding."
     if conceptual:
-        approach=framework.get("approach") or ""
+        approach=checked.get("methods") or framework.get("approach") or ""
         results=""  # A proposed framework cannot be counted as an observed result.
-        interpretation=framework.get("idea") or ""
-        caveat=framework.get("qualification") or ""
+        interpretation=checked.get("discussion") or framework.get("idea") or ""
+        caveat=checked.get("limitations") or framework.get("qualification") or ""
     # Samples appear only if literally stated in the source text, never inferred.
     sm=SAMPLE.search(approach or src)
     sample=sm.group(1) or sm.group(2) if sm else ""

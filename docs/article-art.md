@@ -102,6 +102,33 @@ The standalone command rechecks publication eligibility and refuses an internal 
 
 Tests cover real public records, realistic repeated research concepts, repeated foreground pairs with different frames, independent geometry checks, tiny-decoration visual twins, changed dominant scenes, unsupported coarse-renderer handling, insufficient context, renamed identical rasters, repeated thumbnails, canonical-paper reuse, stable ordering, retained acceptance, content-addressed caching, safe SVG/path handling and honest review reports. Publication tests compare the full build with art disabled and verify that evidence, provenance, weekly membership and quarantine are unchanged. Run `python -m unittest discover -s tests -p test_art_similarity.py -v` for the coarse rasterizer's own geometry and metric tests.
 
+### Source tables and figure candidates
+
+An audit on November 18, 2026 found 45 figure-caption entries across 19 indexed
+articles, but no verified image URLs in those records. A caption alone cannot
+be displayed as a source image or used to reconstruct statistical geometry.
+
+`data/reviewed-visuals.json` now holds individually source-checked factual
+comparisons. The first simplifies Ennion and McLellan's tutoring study, Table 2
+(DOI `10.1111/bjet.70100`), as an accessible comparison table with the first and
+second task sets kept separate. Every direction was checked against the Wiley
+table. The display retains the exploratory-analysis, multiple-comparison and
+measurement limits; it makes no claim about answer accuracy or lasting learning.
+The paper's Figure 1 is interpretive, so it is not rendered as a measured effect.
+
+These are original factual displays, not redistributed source images. Each
+entry records its source URL, version, content hash, locator, attribution and
+AI-assisted check. `build_visuals.py` requires the exact approved reading and
+source identity, and rejects a changed visual until its content-bound check is
+renewed. The UI repeats the version check and uses real table headings, a text
+alternative and a direct source link. Other original summaries continue to
+suppress older indexed graphics. Source-image reuse still requires checking the
+actual image, its license and any third-party exception before adding it.
+
+Run `python -m unittest discover -s tests -p test_reviewed_visuals.py -v`,
+`node tests/validate_article_ui.cjs`, and the browser validator after the normal
+public build. Hashes prevent stale reuse; they do not prove review quality.
+
 ### Production visual checks
 
 Run visual QA after the normal build, on the exact deployment payload and image URLs. Include library cards, featured stories, weekly cards and reading pages at desktop and mobile sizes. Confirm that review-needed records have no rendered editorial `<img>` or shared fallback, and that accepted images load with nonzero natural dimensions. Check stale cached payloads and broken asset paths separately from artistic similarity.
