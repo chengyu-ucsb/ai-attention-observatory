@@ -27,6 +27,7 @@ This policy is stored in the repository so future assistants working on it can s
 - RSS descriptions are discovery metadata (`source_preview`), not curated
   research readings. Do not promote based solely on word count or publisher
   reputation; the full argument must be independently examined.
+- Check the article’s main argument for a specific use of AI by people or a mechanism of human attention. A topical feed, a brief example, a source check, or a suggested application does not establish that fit.
 - Only include commentary in reading collections after a substantive verified
   analysis of its thesis, explanatory reasoning, specific examples, tension
   and qualifications. Keep original source URL canonical; if relying on an
@@ -117,7 +118,7 @@ This policy is stored in the repository so future assistants working on it can s
 
 ## Reader-facing headings and evidence labels
 
-- Keep article headings separate from result excerpts. Use a concise source-checked editorial idea when available; otherwise retain the complete publication title. Never promote a raw results sentence, first thesis sentence, statistical fragment, or clipped qualifier into a heading, even when it fits a character limit.
+- Keep article headings separate from result excerpts. Maintain concise source-grounded display headlines in `data/reading-headlines.json` using a stable DOI or canonical URL. Use a specific topic or question when a finding needs more room for qualifications. For new readings, add a headline during source review. An unedited source keeps its complete publication title until a suitable heading is available. Keep the original bibliographic title and authors together in the Source panel. Never promote a raw results sentence, first thesis sentence, statistical fragment, or clipped qualifier into a heading, even when it fits a character limit.
 - Home cards, the library, related readings, and article pages must use the same headline policy. Regeneration must repair stale automatic headings without changing body findings or source passages.
 - Use short reader-oriented content labels such as Research, Commentary, Conceptual framework, and Product guide. Put reading depth in source metadata rather than a prominent process label. An abstract-derived finding remains abstract-based even if other full-text sections are available.
 - Test current-corpus and future-record headings, conceptual/commentary distinctions, mixed source depth, and keyboard/mobile rendering.

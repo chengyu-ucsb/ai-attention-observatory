@@ -12,6 +12,7 @@ import build_public
 import editorial_source_reviews
 import news_quality
 from condense_readings import annotate
+from compose_issue import evidence
 from enrich_deep_readings import refreshable
 
 KILL="https://theconversation.com/why-calling-for-a-kill-switch-is-the-wrong-way-to-think-about-reining-in-ai-293329"
@@ -95,6 +96,49 @@ class EditorialIntegrityTests(unittest.TestCase):
         self.assertEqual(len(retained),1)
         self.assertEqual(retained[0]["url"],KILL)
         self.assertIn("black box",retained[0]["source_review"]["reasoning"])
+
+    def test_scope_uses_the_checked_argument_not_examples_or_editorial_labels(self):
+        family = {"kind": "nonacademic", "title": "A shared family safety plan",
+                  "lane": "AI & cognition", "source_quality": {"decision": "include"},
+                  "preview": "Read more about artificial intelligence and human attention.",
+                  "reading": {"digest": {"longform": {
+                      "thesis": "Families can agree on a plan to protect children's privacy online.",
+                      "examples": "Examples include push notifications, autoplay and attention capture."}}}}
+        self.assertIsNone(news_quality.commentary_topic(family))
+        article = family["reading"]["digest"]["longform"]
+        article["thesis"] = "The authors found that batching notifications reduced interruptions at work."
+        self.assertEqual(news_quality.commentary_topic(family), "adjacent")
+        article["thesis"] = "Clinicians using AI on hospital wards describe alert fatigue."
+        self.assertEqual(news_quality.commentary_topic(family), "direct")
+        article["thesis"] = "The report draws attention to growing revenue for self-attention model chips."
+        self.assertIsNone(news_quality.commentary_topic(family))
+        for subject in ("Prices rose after supply interruptions at the refinery.",
+                        "The AI model achieves faster reasoning on a benchmark."):
+            article["thesis"] = subject
+            self.assertIsNone(news_quality.commentary_topic(family))
+
+    def test_real_family_article_stays_private_on_rebuild_and_in_stale_issue_input(self):
+        publication = json.loads((ROOT / 'data/original-readings.json').read_text())['articles']
+        notes = {n['id']: n for n in publication if n['id'].startswith('checked-eff-')}
+        library = json.loads((ROOT / 'data/library.json').read_text())
+        urls = {n['record_url'] for n in notes.values()}
+        rows = [r for r in library if r.get('url') in urls]
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            (root/"library.json").write_text(json.dumps(rows))
+            (root/"weekly.json").write_text(json.dumps({"run":{},"items":rows}))
+            with patch.object(build_public,"DATA",root):
+                selected,week=build_public.build()
+            audit=json.loads((root/"source-quality-audit.json").read_text())
+            pending=json.loads((root/"public-pending-sources.json").read_text())
+        family=notes['checked-eff-parenting-2026-10-29']['record_url']
+        self.assertEqual({r["url"] for r in selected}, urls - {family})
+        self.assertEqual({r["url"] for r in week["items"]}, urls - {family})
+        self.assertEqual({r["source_group"] for r in selected}, {"AI-specific"})
+        self.assertEqual(audit["withheld_by_reason"]["commentary_outside_editorial_scope"], 1)
+        self.assertFalse(any(r["url"]==family for r in pending))
+        raw=next(r for r in rows if r["url"]==family)
+        self.assertEqual(evidence([raw]), [])
 
     def test_deep_source_analysis_must_have_examples_and_tension(self):
         row=feed(THIN,"An analysis of AI","An article argues that automation reshapes our cognitive priorities.")

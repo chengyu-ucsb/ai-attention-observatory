@@ -64,7 +64,7 @@ for(const r of db){
  assert(page&&headline&&headline.tag==="h1","Missing primary insight heading for "+r.title);
  assert(headline.textContent.length>=10&&headline.textContent.length<=231,"Headline overflows for "+r.title);
  if(!r.reading?.original_summary)assert(!/^(?:the authors|the researchers|this study|this paper|we found)\b/i.test(headline.textContent),"Paper-centred headline: "+r.title+" / "+headline.textContent);
- assert(source&&source.textContent===vm.runInContext("TEST.readableSourceTitle(selected)",ctx),"Source title missing for "+r.title);
+ assert(source&&source.textContent===r.title.trim(),"Source title missing for "+r.title);
  assert(!matching(page,"concept-scene").length,"Decorative generic concept diagram present");
  assert(match(page,"rv-layout")&&match(page,"rv-content"),"Consistent story layout missing");
  const art=match(page,"story-visual-reading"),image=match(page,"story-image");
@@ -725,12 +725,29 @@ for(const row of db){
  assert.equal(vm.runInContext('TEST.processedIdea(selected)',ctx),heading,"Every heading surface needs the same policy");
  assert(!statisticalHeading.test(heading),"Statistical extract leaked into heading: "+row.title);
  assert(!/(?:…|\.\.\.)$/.test(heading),"Headline was truncated");
- if(row.reading?.digest?.status==='automatically_condensed_source_text')
+ if(row.display_headline){
+  assert.equal(heading,row.display_headline,'Use the curated headline on article and card');
+  assert(heading.length<=88,'Edited headlines must fit a reading card');
+ }else if(row.reading?.digest?.status==='automatically_condensed_source_text')
   assert.equal(heading,vm.runInContext('TEST.readableSourceTitle(selected)',ctx),'Unedited readings should retain their source title');
  vm.runInContext('TEST.showPaper(selected)',ctx);
  assert.equal(match(paperContainer,'rv-headline').textContent,heading);
  assert(!obsoleteLabels.test(textContent(paperContainer)),"Internal evidence label leaked into reader");
- assert(['Research','Commentary','Conceptual framework','Product guide'].includes(vm.runInContext('TEST.ideaInfo(selected).label',ctx)));
+ assert(['Research','Editorial','Commentary','Conceptual framework','Product guide','Opinion','Reporting'].includes(vm.runInContext('TEST.ideaInfo(selected).label',ctx)));
+}
+const tutoring=db.find(row=>row.title.startsWith('Human tutoring, generative AI tutoring'));
+assert(tutoring,'The tutoring comparison should remain discoverable by original title');
+ctx.selected=tutoring;
+assert.equal(vm.runInContext('TEST.readingHeadline(selected)',ctx),'Tough math problems with a human tutor, AI or web search');
+vm.runInContext('TEST.showPaper(selected)',ctx);
+assert.equal(match(paperContainer,'rv-source-title').textContent,tutoring.title);
+assert.equal(match(paperContainer,'rv-source-authors').textContent,tutoring.authors.join(', '));
+assert.equal(match(paperContainer,'rv-byline-link').href,tutoring.url);
+const editorialRecord=db.find(row=>row.reading?.research_type==='editorial');
+if(editorialRecord){
+ ctx.selected=editorialRecord;vm.runInContext('TEST.showPaper(selected)',ctx);
+ assert.equal(match(paperContainer,'rv-section-title').textContent,'The editorial’s argument');
+ assert(!textContent(paperContainer).includes('How it was studied'),'An editorial is not an empirical study');
 }
 const rawStats='In contrast, cognitive load was negatively correlated with AI Literacy ( r = −0.361, p < 0.01), self-reported Complex Problem-Solving Skills ( r = −0.368, p < 0.01), and Systematic Thinking Skills ( r = −0.271, p < 0.01).';
 const headlineFixture={kind:'scholarly',title:'AI literacy, cognitive load, and problem-solving skills',doi:'10.0000/future-headline',reading:{level:'full_text',digest:{status:'automatically_condensed_source_text',idea:rawStats,finding:rawStats,finding_source:'full_text'}}};

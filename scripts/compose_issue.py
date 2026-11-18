@@ -23,6 +23,7 @@ from edition_references import (with_evidence_options, section_response_schema,
 from edition_progress import Progress, MemoryStore, HeldStage, policy_signature
 from edition_schedule import publication_cutoff, canonical_edition_date
 from observatory_store import fingerprint
+from news_quality import commentary_topic
 
 ROOT = Path(__file__).resolve().parents[1]
 MODEL = 'Qwen2.5-7B-Instruct-Q4_K_M'
@@ -220,6 +221,8 @@ def evidence(items):
     for item in items:
         item = public_record(item, require_current=True)
         reading = item.get('reading') or {}
+        if item.get('kind') == 'nonacademic' and not commentary_topic(item):
+            continue
         if reading.get('level') == 'citation_only':
             continue
         digest = reading.get('digest') or {}

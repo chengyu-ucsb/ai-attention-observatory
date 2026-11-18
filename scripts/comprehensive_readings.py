@@ -477,7 +477,7 @@ def reading_candidates(records, today, observed_at, limit=2):
     return candidates,selection
 
 
-def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,checkpoint_factory=None):
+def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,checkpoint_factory=None,public_gaps=None):
     stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
            'failed':0,'failure_reasons':{},'failure_stages':{},
            'source_text_saved':False,'skipped_no_model':model is None}
@@ -489,6 +489,9 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
     today=run_date.isoformat()
     observed_at=run_at or datetime.combine(run_date,datetime.min.time(),tzinfo=timezone.utc)
     candidates,stats['selection']=reading_candidates(records,today,observed_at,limit)
+    if public_gaps:
+        from reading_depth import reserve_recovery_slot
+        reserve_recovery_slot(candidates, public_gaps, limit)
     for record in candidates[:max(0,limit)]:
         stats['attempted']+=1
         diagnostics=[]
@@ -562,7 +565,9 @@ def main():
     model=Llama(model_path=str(path),n_ctx=6144,chat_format='chatml',
                 n_threads=min(os.cpu_count() or 2,4),verbose=False)
     records=json.loads(LIB.read_text(encoding='utf-8'))
-    stats=process(records,model,limit=max(1,min(2,int(os.getenv('DEEP_READING_LIMIT','2')))),
+    from reading_depth import recovery_ids
+    stats=process(records,model,public_gaps=recovery_ids(LIB.parent),
+                  limit=max(1,min(2,int(os.getenv('DEEP_READING_LIMIT','2')))),
                   run_at=datetime.now(timezone.utc))
     LIB.write_text(json.dumps(records,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(stats))

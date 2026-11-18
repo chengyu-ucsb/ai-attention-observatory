@@ -919,9 +919,9 @@ def registered_reading_payloads():
     # than letting timestamp churn quietly reduce the set being tested.
     admitted_ids = {row['reading']['original_summary_id'] for row in originals}
     for note_id in ('checked-eff-moderation-2026-10-27',
-                    'checked-eff-parenting-2026-10-29',
                     'checked-eff-siri-controls-2026-10-28'):
         assert note_id in admitted_ids, 'Accepted EFF reading was not admitted: ' + note_id
+    assert 'checked-eff-parenting-2026-10-29' not in admitted_ids, 'Off-topic parenting advice reached the reader'
     if weekly.get('run', {}).get('publication_window'):
         start, end = previous_week(weekly['run']['date'])
         weekly_ids = {build_public.record_id(row) for row in weekly['items']}
@@ -1072,15 +1072,17 @@ def check_reader_headings(page, url, width):
     page.goto(url, wait_until='networkidle')
     expect(page.locator('#library-count')).to_contain_text('matching sources')
     audit = page.evaluate("""() => S.records.map(x => ({
-      title: readingHeadline(x), source: readableSourceTitle(x),
+      title: readingHeadline(x), source: readableSourceTitle(x), edited: x.display_headline,
       automatic: x.reading?.digest?.status === 'automatically_condensed_source_text',
       type: readingKind(x), basis: readingBasisName(x)
     }))""")
     assert len(audit) > 50
     for row in audit:
-        assert row['type'] in ('Research', 'Commentary', 'Conceptual framework', 'Product guide')
+        assert row['type'] in ('Research', 'Editorial', 'Commentary', 'Conceptual framework', 'Product guide', 'Opinion', 'Reporting')
         assert not re.search(r'\b(?:p|r|b|se|sd)\s*[=<>]|β\s*=', row['title'], re.I)
-        if row['automatic']:
+        if row.get('edited'):
+            assert row['title'] == row['edited'] and len(row['title']) <= 88
+        elif row['automatic']:
             assert row['title'] == row['source']
     page.evaluate("goto('library')")
     expect(page.locator('#library')).to_be_visible()
@@ -1090,7 +1092,7 @@ def check_reader_headings(page, url, width):
       const x = S.records.find(x => x.doi === '10.3389/fpsyg.2026.1971672');
       const full = x.article_payload ? await jsonPayload(readerPath(x.article_payload), true) : x;
       goto('paper', id(x));
-      return {title:readableSourceTitle(x), finding:full.reading.digest.finding};
+      return {title:readingHeadline(x), finding:full.reading.digest.finding};
     }""")
     expect(page.locator('.rv-headline')).to_have_text(sample['title'])
     assert page.locator('.rv-headline').evaluate('(el) => document.activeElement === el'), 'Navigation must focus the complete heading'

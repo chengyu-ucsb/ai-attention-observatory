@@ -45,6 +45,50 @@ def section_name(raw):
     return NAMES.get(title, '')
 
 
+def xml_sections(root, section_tag, title_tag, max_chars):
+    """Read disjoint body paragraphs in order, inheriting nested section headings."""
+    buckets = {}
+
+    def local(element):
+        return element.tag.rsplit('}', 1)[-1].lower()
+
+    def words(element):
+        return clean(' '.join(element.itertext()))
+
+    def collect(element, inherited=''):
+        tag = local(element)
+        if tag in {'back', 'ref-list', 'listbibl', 'table', 'table-wrap', 'figure', 'fig',
+                   'caption', 'supplementary-material', 'fn-group'}:
+            return
+        key = inherited
+        if tag == section_tag:
+            title = next((words(child) for child in element if local(child) == title_tag), '')
+            name = section_name(title)
+            if not name:
+                prefix = re.sub(r'^\s*\d+(?:\.\d+)*[.\s]*', '', title).casefold()
+                name = section_name(prefix.split(':', 1)[0])
+                if not name and prefix in {'study design', 'participants', 'procedure', 'data collection', 'statistical analysis'}:
+                    name = 'methods'
+            if name in ('stop', 'exclude'):
+                return
+            if inherited == 'discussion' and name == 'results':
+                name = 'discussion'
+            key = name or inherited
+        if tag == 'p':
+            value = words(element)
+            if key and len(value) >= 45:
+                buckets.setdefault(key, []).append(value)
+            return
+        for child in element:
+            if local(child) != title_tag:
+                collect(child, key)
+
+    body = next((element for element in root.iter() if local(element) == 'body'), None)
+    if body is not None:
+        collect(body)
+    return {key: ' '.join(paragraphs)[:max_chars].rstrip() for key, paragraphs in buckets.items()}
+
+
 class ArticleHTML(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)

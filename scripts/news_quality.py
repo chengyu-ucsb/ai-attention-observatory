@@ -4,7 +4,11 @@ Google News often provides the headline plus publisher name rather than an
 article body. Its redirect URL is not a publisher article URL. Such records
 are internal leads, not article-based public analysis.
 """
+import json
 import re
+from functools import lru_cache
+from pathlib import Path
+from source_quality import AI, emerging_human_topic
 from urllib.parse import urlsplit
 
 def normalized_words(s):
@@ -67,3 +71,74 @@ def substantive_article(record):
         # to its original research, not counted as an independent reading.
         return bool((record.get("reading") or {}).get("overview")) and publisher_url(record.get("url"))
     return commentary_reading_depth(record)
+
+
+# Classify the checked central argument. Incidental examples, generic topic
+# labels, RSS descriptions and reviewers' suggested design applications do not
+# establish a public reading's subject.
+ATTENTION_MECHANISM = re.compile(
+    r"\b(?:attentional|attention (?:economy|capture|span|control|residue|allocation)|"
+    r"(?:human|student|sustained|selective|divided|visual|collective) attention|"
+    r"(?:capture|hold|sustain|redirect|compete for)(?:s|ing)? (?:\w+ ){0,2}attention|"
+    r"(?:digital|mental|phone|screen|classroom|workplace) distractions?|task[- ]switching|multitasking|"
+    r"digital well[- ]?being|deep work|focus (?:mode|filters?|timers?)|"
+    r"(?:filter|silence|batch|pause|limit)\w* (?:\w+ ){0,2}notifications?|"
+    r"cognitive (?:load|offloading|control)|mental workload|alert fatigue)\b", re.I)
+ATTENTION_BEHAVIOR = re.compile(
+    r"\b(?:distract(?:ed|ing|ions?)?|interruptions?|concentrat(?:e|ion)|"
+    r"stay(?:ing)? focused|sustain(?:ing)? focus)\b", re.I)
+BEHAVIOR_CONTEXT = re.compile(
+    r"\b(?:people|students?|learners?|workers?|employees?|readers?|participants?|"
+    r"clinicians?|teachers?|users?|children|kids|smartphones?|notifications?|"
+    r"classrooms?|study sessions?|study habits|work periods?|at work|distracting apps?)\b", re.I)
+SYSTEM_EVALUATION = re.compile(
+    r"\b(?:benchmarks?|model[- ]only|model architecture|training (?:data|compute)|"
+    r"inference (?:speed|cost)|tokens per second|transformers?)\b", re.I)
+HUMAN_AI_USE = re.compile(
+    r"\b(?:human (?:oversight|control|decisions?|agency)|agency|agentiality|"
+    r"delegat\w*|consent\w*|autonomy|on (?:people.s|\w+ users?.?|their) behalf|"
+    r"(?:assistant|app)[- ](?:level|access)|user controls?|control over|"
+    r"learning|learners?|studying|thinking|reasoning|recall|judg(?:e)?ment|"
+    r"decision[- ]making|writing|readers?|reliance|rely(?:ing)? on|overreliance|"
+    r"(?:teachers?|students?|employees?|workers?) (?:use|using|used|adopt\w*)|"
+    r"(?:work|study) (?:habits|practices)|reflection|cognitive|attention)\b", re.I)
+TECHNICAL_OR_FIGURATIVE = re.compile(
+    r"\b(?:(?:self|cross|multi[- ]?head|scaled dot[- ]product)[- ]attention|"
+    r"(?:machine|deep|reinforcement|representation|transfer) learning|"
+    r"(?:pay(?:s|ing)?|paid|draw(?:s|ing)?|drew|attract(?:s|ed|ing)?) "
+    r"(?:\w+ ){0,2}attention to|attention to detail)\b", re.I)
+
+
+@lru_cache(maxsize=1)
+def checked_topic_decisions():
+    path = Path(__file__).resolve().parents[1] / 'data/editorial-topic-decisions.json'
+    return {item['url']: item for item in json.loads(path.read_text(encoding='utf-8'))['entries']}
+
+
+def commentary_topic(record):
+    """Return direct or adjacent only for a source-supported central topic."""
+    note = record.get('original_reading') or {}
+    decision = checked_topic_decisions().get(record.get('url'))
+    if decision and decision['source_sha256'] == (note.get('source') or {}).get('source_sha256'):
+        return decision['topic']
+    reading = record.get('reading') or {}
+    longform = (reading.get('digest') or {}).get('longform') or {}
+    argument = (note.get('summary') or {}).get('thesis') or longform.get('thesis') or ''
+    if record.get('source') == 'Official product documentation':
+        argument += ' ' + (reading.get('overview') or '')
+    # A verified explainer links to its source and is never an independent
+    # publication. Its checked synopsis can describe the source's subject.
+    if record.get('companion_to'):
+        argument += ' ' + (reading.get('overview') or '')
+    argument = TECHNICAL_OR_FIGURATIVE.sub(' ', argument)
+    title = TECHNICAL_OR_FIGURATIVE.sub(' ', str(record.get('title') or ''))
+    attention = (ATTENTION_MECHANISM.search(argument) or
+                 (ATTENTION_BEHAVIOR.search(argument) and BEHAVIOR_CONTEXT.search(argument)))
+    if SYSTEM_EVALUATION.search(argument) and not BEHAVIOR_CONTEXT.search(argument):
+        return None
+    human_use = HUMAN_AI_USE.search(argument) or emerging_human_topic(argument)
+    if AI.search(title + ' ' + argument) and (human_use or attention):
+        return 'direct'
+    if attention:
+        return 'adjacent'
+    return None

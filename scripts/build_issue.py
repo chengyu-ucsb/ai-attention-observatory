@@ -5,7 +5,7 @@ Manually edited copy is also supported. Failed drafts never replace a published 
 The issue includes citations to the exact source records and a complete source shelf.
 """
 from __future__ import annotations
-import json,datetime,pathlib,re
+import hashlib,json,datetime,pathlib,re
 from urllib.parse import urlsplit
 from original_readings import public_record, publication_digest, apply as apply_original_readings, note_for, identifier
 from checked_reading_types import record_context, RECORD_FIELDS
@@ -131,8 +131,68 @@ def resolve_queued_original(item):
  record["reading"]=note_for(record)
  return record
 
-def build(edition_date=None, use_published_sources=False):
- if use_published_sources and not edition_date:raise ValueError("Published source correction requires an explicit edition date")
+def correction_digest(value):
+    """Use the same canonical UTF-8 encoding as the manual edition audit."""
+    return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
+def correction_reading_digest(record):
+    note = record.get("original_reading")
+    return publication_digest(note) if note else correction_digest(record.get("reading"))
+
+def reviewed_correction_items(date, archive, draft):
+    """Resolve a dated editorial amendment independently of the rolling queue."""
+    from build_public import readable
+    packet = json.loads((DATA / "edition-corrections" / (date + ".json")).read_text(encoding="utf-8"))
+    if datetime.date.fromisoformat(date).weekday() != 0 or packet.get("edition_date") != date or archive.get("edition_date") != date:
+        raise ValueError("Correction and archive must identify the same Monday")
+    if not draft or draft.get("number") != archive.get("number") or draft.get("citation_schema_version") != 1:
+        raise ValueError("Correction requires checked editorial copy for the existing issue number")
+    if packet.get("editorial_sha256") != correction_digest(draft):
+        raise ValueError("Correction needs editorial review: approved copy or citations changed")
+
+    baseline = packet.get("baseline_source_ids")
+    additions = packet.get("reviewed_additions")
+    if not isinstance(baseline, list) or not all(isinstance(k, str) and k for k in baseline):
+        raise ValueError("Correction needs the original edition's source IDs")
+    if not isinstance(additions, list) or not additions:
+        raise ValueError("Correction needs explicit reviewed additions")
+    archived = {row["id"]: row for row in archive["sources"]}
+    public = {identifier(row): row for row in json.loads((DATA / "public-library.json").read_text(encoding="utf-8"))}
+    if len(archived) != len(archive["sources"]) or len(set(baseline)) != len(baseline) or not set(baseline) <= archived.keys():
+        raise ValueError("Correction baseline does not match the archived source shelf")
+    items = [resolve_queued_original({**archived[k], "reading": {"level": archived[k]["reading_level"]}}) for k in baseline]
+    added_ids = set()
+    for entry in additions:
+        source = entry["source"]
+        key = source["id"]
+        checks = entry.get("checks")
+        locator = entry.get("source_locator")
+        if isinstance(locator, str):
+            locator = [locator]
+        if not all(isinstance(parts, list) and parts and all(isinstance(s, str) and s.strip() for s in parts)
+                   for parts in (checks, locator)):
+            raise ValueError("Correction needs source-specific checks and locators for " + key)
+        if key in baseline or key in added_ids or key not in public:
+            raise ValueError("Duplicate or unavailable public reading in correction: " + key)
+        cached = public[key]
+        current = public_record(cached, require_current=True)
+        if (current.get("original_reading") != cached.get("original_reading") or not readable(current)
+            or current.get("companion_to") or entry.get("reading_sha256") != correction_reading_digest(current)):
+            raise ValueError("Correction needs source review: accepted reading changed or unavailable for " + key)
+        if any(source.get(k) != current.get(k) for k in ("title", "kind", "url", "published")):
+            raise ValueError("Correction needs source review: title, identity or date changed for " + key)
+        items.append({**current, "id": key, "editorial_role": "publication_week"})
+        added_ids.add(key)
+    if archived.keys() - set(baseline) - added_ids:
+        raise ValueError("Correction would remove an existing archived source")
+    return items, added_ids
+
+def build(edition_date=None, use_published_sources=False, reviewed_correction=False, check_only=False):
+ if (use_published_sources or reviewed_correction) and not edition_date:raise ValueError("Published source correction requires an explicit edition date")
+ if use_published_sources and reviewed_correction:raise ValueError("Select one correction source shelf")
+ if check_only and not reviewed_correction:raise ValueError("Check-only mode requires a reviewed correction")
+ drafts=json.loads((DATA/"issue-editorial.json").read_text())
+ added_ids=set()
  weekly=json.loads((DATA/"public-weekly.json").read_text())
  editorial_path=DATA/"editorial-weekly.json"
  if not edition_date and editorial_path.exists():
@@ -143,13 +203,16 @@ def build(edition_date=None, use_published_sources=False):
    raise ValueError("Editorial evidence packet is stale; rebuild public readings")
  if edition_date:
   datetime.date.fromisoformat(edition_date)
-  packet_path=DATA/("approved-issues" if use_published_sources else "editorial-queue")/(edition_date+".json")
+  packet_path=DATA/("approved-issues" if use_published_sources or reviewed_correction else "editorial-queue")/(edition_date+".json")
   packet=json.loads(packet_path.read_text(encoding="utf-8"))
-  if use_published_sources and packet.get("status")!="published":raise ValueError("Correction requires an existing published edition")
-  weekly={"run":{"date":edition_date,"publication_window":packet.get("publication_window") or window_metadata(edition_date)},"items":[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]}
+  if (use_published_sources or reviewed_correction) and packet.get("status")!="published":raise ValueError("Correction requires an existing published edition")
+  weekly={"run":{"date":edition_date,"publication_window":packet.get("publication_window") or window_metadata(edition_date)}}
+  if reviewed_correction:
+   weekly["items"],added_ids=reviewed_correction_items(edition_date,packet,drafts.get(edition_date))
+  else:
+   weekly["items"]=[{**x,"reading":{"level":x.get("reading_level","")}} for x in packet["sources"]]
  issue_date=(weekly.get("run") or {}).get("date") or ""
  if issue_date:issue_date=canonical_edition_date(DATA.parent,issue_date)
- drafts=json.loads((DATA/"issue-editorial.json").read_text())
  items=weekly.get("items") or []
  if not edition_date:
   checked=[]
@@ -159,7 +222,7 @@ def build(edition_date=None, use_published_sources=False):
     raise ValueError("Original reading changed or was revoked; rebuild the public source shelf and revalidate the issue before publication")
    if (current.get("reading") or {}).get("level") != "citation_only":checked.append(current)
   items=checked
- else:
+ elif not reviewed_correction:
   items=[resolve_queued_original(item) for item in items]
  if weekly.get("run",{}).get("date"):
   weekly["run"].setdefault("publication_window",window_metadata(weekly["run"]["date"]))
@@ -220,6 +283,15 @@ def build(edition_date=None, use_published_sources=False):
   schema.setdefault('first_published_date',schema['published_at'][:10])
   schema['updated_at']=stamp
   validate_issue_citations(schema)
+  if reviewed_correction:
+   used={c["source_id"] for s in schema["signals"]+[schema["tension"]]+schema.get("supplements",[]) for c in s["citations"]}
+   if added_ids-used:raise ValueError("Each reviewed addition must be cited in the corrected issue")
+   if {k:v for k,v in previous.items() if k!="updated_at"}=={k:v for k,v in schema.items() if k!="updated_at"}:
+    schema['updated_at']=previous.get('updated_at') or previous['published_at']
+ if reviewed_correction and schema["status"]!="published":raise ValueError("Correction is not ready for publication")
+ if check_only:
+  print(json.dumps({"edition_date":issue_date,"correction":"checked","sources":len(items)}))
+  return schema
  (DATA/"public-issue.json").write_text(json.dumps(schema,ensure_ascii=False,indent=2)+"\n")
  # Readers see the latest completed issue while the next week's editorial
  # work stays private. Keep the newest unreviewed source shelf in public-issue
@@ -239,6 +311,8 @@ if __name__=="__main__":
  parser=argparse.ArgumentParser()
  parser.add_argument("--edition-date",help="Build a reviewed issue from its saved source shelf")
  parser.add_argument("--use-published-sources",action="store_true",help="Correct an archived edition against its frozen source shelf, revalidating current review and original dates")
+ parser.add_argument("--reviewed-correction",action="store_true",help="Apply the dated source and copy checks in data/edition-corrections to the existing edition")
+ parser.add_argument("--check-only",action="store_true",help="Validate a reviewed correction without changing any publication files")
  args=parser.parse_args()
- build(args.edition_date,use_published_sources=args.use_published_sources)
+ build(args.edition_date,use_published_sources=args.use_published_sources,reviewed_correction=args.reviewed_correction,check_only=args.check_only)
 

@@ -73,6 +73,19 @@ class QualityScreenTests(unittest.TestCase):
  def test_preprint_must_be_reviewed(self):
   self.assertEqual(source_quality.screen(self.study("arXiv (Cornell University)"))["reason"],"preprint_requires_article_screen")
 
+ def test_institutional_synthesis_requires_current_source_bound_reading(self):
+  from test_original_readings import accepted, approve, record
+  row=record();row.update(venue="University education research group",research_type="research_synthesis",
+                          abstract_text="")
+  row["title"]="Generative AI and student learning in classrooms"
+  note=accepted();note["title"]=row["title"]
+  note["source"]["version"]="published_institutional_report"
+  note["summary"]["interpretation"]="Students could use AI for retrieval or for a complete answer."
+  row["original_reading"]=approve(note)
+  self.assertEqual(source_quality.screen(row)["reason"],"source_checked_institutional_research_synthesis")
+  row["original_reading"]["summary"]["interpretation"]="Unreviewed replacement."
+  self.assertEqual(source_quality.screen(row)["decision"],"hold")
+
  def test_engineering_cross_attention_is_not_human_attention(self):
   x=self.study("Scientific Reports","GRU TabTransformer with cross-attention for image classification")
   x["abstract_text"]="The proposed model improves classification accuracy on an image dataset."

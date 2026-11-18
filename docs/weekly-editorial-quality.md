@@ -78,6 +78,37 @@ The correction path still revalidates every original-reading approval, source
 identity and original publication date. It cannot resurrect revoked readings or
 bypass the weekly date gate. The ordinary queue path remains unchanged.
 
+### Add late-reviewed sources to the same issue
+
+A dated supplement in `data/edition-corrections/YYYY-MM-DD.json` records
+an editorial decision to expand that Monday's issue. Keep the original
+`baseline_source_ids` and list each addition under `reviewed_additions`.
+Each entry identifies its public `source` by id, title, kind, URL and publication
+day, records its `source_locator` and source-specific `checks`, and binds the
+reading that was checked in `reading_sha256` (`build_issue.correction_reading_digest`).
+The packet's `editorial_sha256` binds the reviewed copy in
+`data/issue-editorial.json` (`build_issue.correction_digest`). Save both checks
+after reviewing the new evidence and its use in the issue.
+
+For the November 16 edition, rebuild the current public reading library, check the
+supplement, and publish on the existing archive and feed entry.
+
+```sh
+python scripts/build_public.py
+python scripts/build_issue.py --edition-date 2026-11-16 --reviewed-correction --check-only
+python scripts/build_issue.py --edition-date 2026-11-16 --reviewed-correction
+python scripts/build_newsletter.py
+python scripts/build_issue.py
+node tests/validate_weekly_issue.cjs
+```
+
+The final issue build restores the ordinary rolling source shelf. Later
+discovery runs may replace that shelf. The accepted issue and its supplement
+remain available independently. The read-only check reports changed source
+readings or copy for editorial review. Reapplying the same approved correction
+keeps its previous revision timestamp. Dates, citations and source approvals
+are still checked on every invocation.
+
 ## Tests
 
 ```sh

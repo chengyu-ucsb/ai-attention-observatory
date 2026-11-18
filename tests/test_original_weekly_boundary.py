@@ -73,6 +73,27 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
             n=deepcopy(row);n['publication_date_provenance'].pop(key)
             self.assertFalse(weekly_eligible(n,*bounds),key)
 
+    def test_announcement_date_and_v1_submission_survive_rediscovery(self):
+        from update import apply_publication_evidence
+        row=self.arxiv()
+        submission=deepcopy(row["publication_date_provenance"])
+        row["published"]="2026-11-03"
+        listing={"source":"Official arXiv public listing","basis":"arxiv_first_public_announcement",
+                 "status":"day_known","field":"public_listing_date","value":row["published"],
+                 "source_url":"https://arxiv.org/list/cs.HC/recent?show=2000",
+                 "listed_id":"2610.12345","v1_submission":submission}
+        row["publication_date_provenance"]=listing
+        article_screen(row["original_reading"],row);approve(row["original_reading"])
+        self.assertFalse(weekly_eligible(row,*previous_week("2026-11-02")))
+        self.assertTrue(weekly_eligible(row,*previous_week("2026-11-09")))
+        apply_publication_evidence(row,submission["value"],submission)
+        self.assertEqual(row["publication_date_provenance"],listing)
+        self.assertEqual(row["published"],"2026-11-03")
+        for key, bad in (("listed_id","2610.00000"),("source_url","https://example.org/list/cs.HC/recent")):
+            wrong=deepcopy(row);wrong["publication_date_provenance"][key]=bad
+            article_screen(wrong["original_reading"],wrong);approve(wrong["original_reading"])
+            self.assertFalse(weekly_eligible(wrong,*previous_week("2026-11-09")))
+
     def test_arxiv_explicit_version_labels_cannot_contradict_source(self):
         for changed in ('url', 'doi', 'version'):
             row=self.arxiv();note=row['original_reading']

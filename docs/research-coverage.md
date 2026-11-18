@@ -38,7 +38,10 @@ leave its theme open until the reading supports a more specific label.
    Report), and policy/analysis (Conversation, Tech Policy Press, Brookings,
    EFF). This is a search checklist, not a claim every outlet has a working feed
    or accessible article. Add other relevant outlets found through searching.
-3. Open canonical articles; verify original date, actual relevance and genre.
+3. Open canonical articles and verify original date, genre and the central claim.
+   Identify the specific decision, activity or human attention outcome at stake.
+   A passing example of notifications, a publisher label or a technology topic
+   does not establish relevance.
    Follow reported studies to original papers/reports and retain explicit
    source lineage. Do not double-count the paper and its news explanation.
 4. Resolve relevant pending sources while time remains. Distinguish failed
@@ -75,3 +78,17 @@ At the Sunday audit, prioritize unresolved relevant articles and draft from
 reviewed material. Monday's 7 a.m. compact option preserves the release deadline;
 it does not excuse omitting the earlier research. Carry genuine late-indexed
 discoveries into a dated revision of the same issue after verification.
+
+
+## Repairing existing reading pages
+
+Each public build records the actual basis of scholarly findings and flags open
+links with abstract-only readings, abstract findings on partially extracted
+articles, and uncategorized papers without a finding in
+`data/source-quality-audit.json`. Check those records against the original
+body and distinguish an unreported result, a conceptual article, a published
+conference abstract, and a failed retrieval. Revisit the oldest eligible gaps
+during ordinary research sessions. The scheduled historical reader reserves
+one place in each multi-paper batch for a public gap and keeps its existing
+retry and source checks. A public URL alone cannot certify that a particular
+finding came from the full paper.

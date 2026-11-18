@@ -39,33 +39,8 @@ def parse(value):
 def local(tag):return tag.split("}")[-1].lower()
 def content(el):return " ".join(" ".join(el.itertext()).split())
 def extract(root):
- """Read TEI body sections, including older wrapper layouts and subsections.
-
- OpenAlex TEI is sometimes nested in html/tei and repeated as sibling divs.
- The former parser stopped at the first heading per category (often mere
- reliability diagnostics) and dropped the more useful later Results.
- """
- sections={}
- counts={}
- for div in root.iter():
-  if local(div.tag)!="div":continue
-  head=next((content(e).lower() for e in div if local(e.tag)=="head"),"")
-  if not head:continue
-  key=next((k for k,words in HEADINGS.items() if any(w in head for w in words)),None)
-  if not key:continue
-  # Avoid parent and nested heading sections duplicating one another.
-  paras=[content(p) for p in div if local(p.tag)=="p"]
-  if not paras:
-   paras=[content(p) for p in div.iter() if local(p.tag)=="p"][:8]
-  value=" ".join(x for x in paras if len(x)>40)
-  if not value:continue
-  current=sections.get(key,"")
-  if value in current:continue
-  if current:value=current+" "+value
-  if len(value)>7500:value=value[:7500].rsplit(" ",1)[0]
-  sections[key]=value
-  counts[key]=counts.get(key,0)+1
- return sections
+ from publisher_sections import xml_sections
+ return xml_sections(root, "div", "head", 7500)
 
 def get(url,key):
  u=url+("&" if "?" in url else "?")+urllib.parse.urlencode({"api_key":key})
@@ -98,10 +73,15 @@ def priority(r):
 def eligible(r,t):
  if r.get("kind")!="scholarly" or not r.get("doi"):return False
  existing=r.get("analysis") or {}
- if existing:
-  return ("OpenAlex" in str(existing.get("provenance","")) and
-          existing.get("extraction_version",0)<3 and not existing.get("reprocess_checked_v3"))
  attempt=r.get("fulltext_attempt") or {}
+ if existing:
+  if ("OpenAlex" not in str(existing.get("provenance",""))
+      or existing.get("extraction_version",0)>=4
+      or r.get("verified_article_review") or r.get("original_reading")):
+   return False
+  if attempt.get("section_repair_version")==4 and attempt.get("next_at"):
+   return parse(attempt["next_at"])<=t
+  return True
  # Make one targeted pass after changes in retrieval logic; then honor backoff.
  if attempt.get("pipeline_version")!=3:return True
  return parse(attempt.get("next_at"))<=t
@@ -140,8 +120,8 @@ def run():
    if content_calls>=content_limit:break
    info["attempted"]+=1
    was_read=bool(r.get("analysis"))
-   if was_read:r["analysis"]["reprocess_checked_v3"]=now().date().isoformat()
    entry=r.get("fulltext_attempt") or {}
+   if was_read:entry["section_repair_version"]=4
    entry["attempts"]=entry.get("attempts",0)+1
    entry["last_at"]=iso(now())
    entry["pipeline_version"]=3
@@ -170,6 +150,9 @@ def run():
     if not (secs.get("results") or secs.get("discussion")):
      entry.update(status="missing_sections",next_at=next_retry(14))
      continue
+    if was_read and any(r["analysis"].get(section) and not secs.get(section) for section in HEADINGS):
+     entry.update(status="incomplete_reparse",next_at=next_retry(21))
+     continue
     lic_url=loc.get("landing_page_url") or loc.get("pdf_url") or href or work.get("doi") or ""
     r["analysis"]={
       "provenance":"OpenAlex OA GROBID XML (automatic parsing; verify source)",
@@ -180,7 +163,7 @@ def run():
       "figures":[],"fulltext_url":lic_url,
       "key_idea":(secs.get("results") or secs.get("discussion") or "")[:280],
       "extraction_date":now().date().isoformat(),
-      "extraction_version":3,"sections_available":list(secs.keys())}
+      "extraction_version":4,"sections_available":list(secs.keys())}
     r["oa_grobid_checked"]=now().date().isoformat()
     entry.update(status="full_text",next_at=None)
     if was_read:info["refreshed_sections"]+=1

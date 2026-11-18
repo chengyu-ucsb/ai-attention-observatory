@@ -1316,3 +1316,41 @@ summary,.theme-browser button,.nav-toggle {
 #design-inbox-history h5 {font:inherit;font-weight:700;margin:0}
 #design-inbox-history ul {margin:.45rem 0 0;padding-left:1.15rem}
 @media (max-width:680px) {.design-inbox {grid-template-columns:minmax(0,1fr)}}
+
+/* Reader headings and citations */
+#paper-content .rv-article .rv-head > .rv-headline {
+  max-width: 32ch;
+  margin-block: .35em .4em;
+  font-size: clamp(2rem, 1.45rem + 2.95vw, 3.65rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+#paper-content .rv-article .rv-source-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem 1.1rem;
+  line-height: 1.5;
+}
+#paper-content .rv-article .rv-source-row span { overflow-wrap: anywhere; }
+#paper-content .rv-article .rv-source-row a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font: 600 var(--type-small)/1.4 var(--font-interface);
+  color: var(--red);
+  text-underline-offset: .2em;
+}
+#paper-content .rv-article .rv-source-authors {
+  max-width: var(--measure-reading);
+  margin-block: .45em 1em;
+  font: 400 var(--type-small)/1.6 var(--font-interface);
+  overflow-wrap: anywhere;
+}
+@media (max-width: 700px) {
+  #paper-content .rv-article .rv-head > .rv-headline { max-width: none; }
+  #paper-content .rv-article .rv-section-tab { min-height: 48px; gap: 4px 8px; }
+  #paper-content .rv-article .rv-section-description { display: none; }
+  #paper-content .rv-article .rv-section-position { margin-bottom: 8px; }
+  #paper-content .rv-article .rv-lede-layout { align-items: start; }
+}

@@ -64,6 +64,9 @@ def weekly_eligible(record, start, end):
     registry=(provenance.get("status")=="day_known" and provenance.get("source")=="Crossref publisher metadata"
         and provenance.get("field") in {"published-online","published-print","published","issued"})
     arxiv=(provenance.get("status")=="day_known" and basis=="arxiv_first_submitted" and provenance.get("field")=="published")
+    if basis=="arxiv_first_public_announcement":
+        from collect_weekly_sources import verified_arxiv_v1
+        arxiv=bool(verified_arxiv_v1(record))
     if not (original_publisher or registry or arxiv):return False
     if record.get("kind") not in {"scholarly","nonacademic"}:return False
     from urllib.parse import urlsplit

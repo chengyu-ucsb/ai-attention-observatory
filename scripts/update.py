@@ -261,6 +261,17 @@ def apply_publication_evidence(current, day, provenance):
   return
  trusted_prior=weekly_eligible({**current,"historical_backfill":False,"discovery_scope":""},datetime.date.min,datetime.date.max)
  older=current.get("published") if trusted_prior else None
+ if older and not provenance.get("requires_explicit_date_resolution"):
+  # Preserve edition evidence when routine ingestion rediscovers the same day.
+  # A v1 submission is a different event from its first public listing.
+  checked_basis=prior.get("basis")
+  if checked_basis in {"editor_verified_original_publication_date","arxiv_first_public_announcement"}:
+   if day==older or (not day and provenance.get("status")=="unresolved"):
+    return
+   if (checked_basis=="arxiv_first_public_announcement" and provenance.get("basis")=="arxiv_first_submitted"
+       and provenance.get("requested_id")==prior["v1_submission"]["requested_id"]
+       and day==prior["v1_submission"]["value"]):
+    return
  if provenance.get("verification_error") and publication_date(older):return
  selected=min(older,day) if day and publication_date(older) else day
  refreshed=dict(provenance,value=selected)

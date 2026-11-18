@@ -56,7 +56,8 @@ def make_note(r):
     src=clean(r.get("abstract_text"))
     if len(src)<90 and r.get("preview") and not any(w in r["preview"].lower() for w in STOP):
         src=clean(r["preview"])
-    full=r.get("analysis") or {}
+    checked=r.get("verified_article_review") or {}
+    full=checked or r.get("analysis") or {}
     conceptual=r.get("research_type")=="conceptual_framework"
     editorial=is_editorial(r)
     framework=r.get("framework_notes") or {}
@@ -107,10 +108,10 @@ def make_note(r):
         interpretation=" ".join(selected)
         caveat="Editorial interpretation of earlier publications, not a new empirical finding."
     if conceptual:
-        approach=framework.get("approach") or ""
+        approach=checked.get("methods") or framework.get("approach") or ""
         results=""  # A proposed framework cannot be counted as an observed result.
-        interpretation=framework.get("idea") or ""
-        caveat=framework.get("qualification") or ""
+        interpretation=checked.get("discussion") or framework.get("idea") or ""
+        caveat=checked.get("limitations") or framework.get("qualification") or ""
     # Samples appear only if literally stated in the source text, never inferred.
     sm=SAMPLE.search(approach or src)
     sample=sm.group(1) or sm.group(2) if sm else ""
