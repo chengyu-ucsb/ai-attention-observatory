@@ -1973,11 +1973,12 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-17T11:51:16+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-18T19:03:33+00:00",
       "pipeline_version": 3,
-      "status": "full_text",
-      "next_at": null
+      "status": "incomplete_reparse",
+      "next_at": "2026-12-09T19:03:34+00:00",
+      "section_repair_version": 4
     },
     "open_access_url": "https://doi.org/10.3389/fpsyg.2026.2007654",
     "analysis": {
@@ -2923,6 +2924,40 @@
     "research_type": "research_synthesis",
     "source_version": "published_institutional_report",
     "evidence": "Institutional research synthesis; reviewed evidence across education settings",
+    "oa_checked": "2026-11-18",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-18",
+      "next_at": "2026-12-16",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-18T19:03:33+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-02T19:03:33+00:00"
+    },
+    "open_access_url": "https://doi.org/10.26300/80wn-ca81",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-18",
+      "next_at": "2026-12-09",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-18",
+      "next_at": "2026-11-20",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_no_entry"
+      ]
+    },
     "original_reading": {
       "id": "week-nov16-stanford",
       "doi": "10.26300/80wn-ca81",
@@ -3157,9 +3192,9 @@
       "retry_status": "accepted",
       "retry_attempts": [
         {
-          "candidate_index": 0,
+          "status": "needs_review",
           "candidate_fingerprint": "843e17ea5b7128fe8e9566389dd1b50abb41de01ff79c81e5e9ad535350c7509",
-          "status": "needs_review",
+          "candidate_index": 0,
           "review_reasons": [
             "duplicate_asset_bytes",
             "duplicate_composition",
@@ -3169,37 +3204,37 @@
           ],
           "review_collisions": [
             {
-              "reason": "duplicate_foreground_subjects",
-              "identity": "doi:10.3389/fpsyg.2026.1832219"
-            },
-            {
-              "reason": "duplicate_foreground_geometry",
-              "identity": "doi:10.3389/fpsyg.2026.1832219"
-            },
-            {
-              "reason": "duplicate_composition",
-              "identity": "doi:10.3389/fpsyg.2026.1832219"
-            },
-            {
-              "reason": "duplicate_asset_bytes",
-              "identity": "doi:10.3389/fpsyg.2026.1832219"
-            },
-            {
-              "reason": "near_visual_twin",
               "identity": "doi:10.3389/fpsyg.2026.1832219",
+              "reason": "duplicate_foreground_subjects"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1832219",
+              "reason": "duplicate_foreground_geometry"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1832219",
+              "reason": "duplicate_composition"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1832219",
+              "reason": "duplicate_asset_bytes"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1832219",
+              "reason": "near_visual_twin",
               "metrics": {
-                "full_mean_difference": 0.0,
-                "foreground_mean_difference": 0.0,
                 "foreground_iou": 1.0,
-                "foreground_pixels": 543
+                "foreground_mean_difference": 0.0,
+                "foreground_pixels": 543,
+                "full_mean_difference": 0.0
               }
             }
           ]
         },
         {
-          "candidate_index": 1,
-          "candidate_fingerprint": "5ef28a87a735b2f3e66e1cf2584a45a6731658c1e1989bfa9d95bc1ce3db8171",
           "status": "needs_review",
+          "candidate_fingerprint": "5ef28a87a735b2f3e66e1cf2584a45a6731658c1e1989bfa9d95bc1ce3db8171",
+          "candidate_index": 1,
           "review_reasons": [
             "duplicate_asset_bytes",
             "duplicate_composition",
@@ -3209,37 +3244,37 @@
           ],
           "review_collisions": [
             {
-              "reason": "duplicate_foreground_subjects",
-              "identity": "doi:10.3389/fpsyg.2026.1930030"
-            },
-            {
-              "reason": "duplicate_foreground_geometry",
-              "identity": "doi:10.3389/fpsyg.2026.1930030"
-            },
-            {
-              "reason": "duplicate_composition",
-              "identity": "doi:10.3389/fpsyg.2026.1930030"
-            },
-            {
-              "reason": "duplicate_asset_bytes",
-              "identity": "doi:10.3389/fpsyg.2026.1930030"
-            },
-            {
-              "reason": "near_visual_twin",
               "identity": "doi:10.3389/fpsyg.2026.1930030",
+              "reason": "duplicate_foreground_subjects"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1930030",
+              "reason": "duplicate_foreground_geometry"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1930030",
+              "reason": "duplicate_composition"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1930030",
+              "reason": "duplicate_asset_bytes"
+            },
+            {
+              "identity": "doi:10.3389/fpsyg.2026.1930030",
+              "reason": "near_visual_twin",
               "metrics": {
-                "full_mean_difference": 0.0,
-                "foreground_mean_difference": 0.0,
                 "foreground_iou": 1.0,
-                "foreground_pixels": 576
+                "foreground_mean_difference": 0.0,
+                "foreground_pixels": 576,
+                "full_mean_difference": 0.0
               }
             }
           ]
         },
         {
-          "candidate_index": 2,
-          "candidate_fingerprint": "1f4bc2ac860511281c604db8fa4188865e8f34d0c8fb967c2b5b6af61412e737",
           "status": "ready",
+          "candidate_fingerprint": "1f4bc2ac860511281c604db8fa4188865e8f34d0c8fb967c2b5b6af61412e737",
+          "candidate_index": 2,
           "review_reasons": []
         }
       ],
@@ -3923,11 +3958,12 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-16T13:44:26+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-18T19:03:38+00:00",
       "pipeline_version": 3,
-      "status": "full_text",
-      "next_at": null
+      "status": "incomplete_reparse",
+      "next_at": "2026-12-09T19:03:39+00:00",
+      "section_repair_version": 4
     },
     "open_access_url": "https://doi.org/10.3389/fpsyg.2026.1920791",
     "analysis": {
@@ -4414,11 +4450,12 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-09T17:25:49+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-18T19:03:43+00:00",
       "pipeline_version": 3,
-      "status": "full_text",
-      "next_at": null
+      "status": "incomplete_reparse",
+      "next_at": "2026-12-09T19:03:44+00:00",
+      "section_repair_version": 4
     },
     "open_access_url": "https://doi.org/10.1038/s41598-026-77337-4",
     "analysis": {
@@ -5226,44 +5263,6 @@
     "historical_backfill": false,
     "metadata_observed_at": "2026-11-14T19:14:26.293674+00:00",
     "preparation_first_seen_at": "2026-11-12T09:56:50.354598+00:00",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
-      "overview": "Generative artificial intelligence (AI) can alter final second-language (L2) texts, yet cognitive differences may shape which changes emerge. This exploratory study examined 38 upper-intermediate learners of Russian who each produced one composition with AI assistance and one without it.",
-      "methods": "Thirty-eight upper-intermediate learners each wrote twice about a hobby, a month apart. AI access order was counterbalanced. Researchers compared eleven text measures and examined associations with premeasured cognitive abilities.",
-      "findings": "The AI-assisted texts contained longer words, more connectives and fewer first-person markers. Stronger attention control was associated with a smaller increase in one vocabulary-diversity measure across sensitivity checks.",
-      "interpretation": "The authors interpret the differences as changes in the final texts. They could not trace which suggestions writers accepted or show that their unassisted language skills improved.",
-      "limitations": "One prompt per condition, a small sample, and many unadjusted tests make the individual-difference results exploratory.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "empirical_study",
-      "reported_findings": true,
-      "digest": {
-        "idea": "AI-assisted Russian essays used longer words and fewer first-person expressions",
-        "explain": "The study compared what writers produced with and without AI, including how their vocabulary changed.",
-        "approach": "Two timed compositions per learner, with and without AI.",
-        "finding": "When AI was available, writers used longer words and more connectives. Total word count showed no clear difference.",
-        "interpretation": "Changes in the finished text do not establish independent language learning.",
-        "limitation": "Thirty-eight writers answered the same prompt twice. The study tested many associations.",
-        "tags": [
-          "Second-language writing",
-          "Attention control",
-          "Paired comparison"
-        ],
-        "finding_source": "editorial",
-        "approach_source": "full_text",
-        "limitation_source": "full_text",
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased"
-      }
-    },
     "oa_checked": "2026-11-12",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -5382,6 +5381,44 @@
       "limitation_source": "full_text"
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
+      "overview": "Generative artificial intelligence (AI) can alter final second-language (L2) texts, yet cognitive differences may shape which changes emerge. This exploratory study examined 38 upper-intermediate learners of Russian who each produced one composition with AI assistance and one without it.",
+      "methods": "Thirty-eight upper-intermediate learners each wrote twice about a hobby, a month apart. AI access order was counterbalanced. Researchers compared eleven text measures and examined associations with premeasured cognitive abilities.",
+      "findings": "The AI-assisted texts contained longer words, more connectives and fewer first-person markers. Stronger attention control was associated with a smaller increase in one vocabulary-diversity measure across sensitivity checks.",
+      "interpretation": "The authors interpret the differences as changes in the final texts. They could not trace which suggestions writers accepted or show that their unassisted language skills improved.",
+      "limitations": "One prompt per condition, a small sample, and many unadjusted tests make the individual-difference results exploratory.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "empirical_study",
+      "reported_findings": true,
+      "digest": {
+        "idea": "AI-assisted Russian essays used longer words and fewer first-person expressions",
+        "explain": "The study compared what writers produced with and without AI, including how their vocabulary changed.",
+        "approach": "Two timed compositions per learner, with and without AI.",
+        "finding": "When AI was available, writers used longer words and more connectives. Total word count showed no clear difference.",
+        "interpretation": "Changes in the finished text do not establish independent language learning.",
+        "limitation": "Thirty-eight writers answered the same prompt twice. The study tested many associations.",
+        "tags": [
+          "Second-language writing",
+          "Attention control",
+          "Paired comparison"
+        ],
+        "finding_source": "editorial",
+        "approach_source": "full_text",
+        "limitation_source": "full_text",
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased"
+      }
+    },
     "display_headline": "Attention and memory when revising Russian writing with AI",
     "source_quality": {
       "decision": "include",
@@ -5553,44 +5590,6 @@
     "historical_backfill": false,
     "metadata_observed_at": "2026-11-14T19:14:26.293674+00:00",
     "preparation_first_seen_at": "2026-11-12T21:29:44.511993+00:00",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
-      "overview": "AI-mediated teaching requires teachers to evaluate uncertain information, respond to changing conditions, and integrate AI with pedagogical judgment. This study examined four cognitive-professional resource domains relevant to intelligent professional action: digital literacy, digital resilience, AI-mediated epistemic agency (AMEA), and AI-TPACK.",
-      "methods": "At one Chinese university, researchers surveyed trainee teachers in a national preparation program. A profile analysis grouped 942 responses using ratings of digital literacy, resilience, judgment about AI-generated knowledge and AI-related teaching knowledge.",
-      "findings": "Four profiles mainly differed in overall self-rated resources. Reported teaching innovation competence rose across those groups. More perceived support was associated with higher-resource profiles.",
-      "interpretation": "The authors suggest checking whether the survey patterns appear in lesson design and observed teaching.",
-      "limitations": "The measures were collected together at one institution. Respondents rated their own capabilities, and alternate screening decisions changed the profile composition.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "empirical_study",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Trainee teachers who felt better supported also felt more prepared to innovate",
-        "explain": "The survey compared educators’ perceptions of their training, their digital skills and their readiness to change teaching practice.",
-        "approach": "Cross-sectional survey and profile analysis of 942 trainee teachers.",
-        "finding": "People in higher-resource profiles also gave themselves higher ratings for teaching innovation.",
-        "interpretation": "The profiles describe perceived readiness for AI-mediated teaching.",
-        "limitation": "Observed classroom performance and training effects were not measured.",
-        "tags": [
-          "Teacher education",
-          "Self-report",
-          "Cross-sectional survey"
-        ],
-        "finding_source": "editorial",
-        "approach_source": "full_text",
-        "limitation_source": "full_text",
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased"
-      }
-    },
     "oa_checked": "2026-11-12",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -5709,6 +5708,44 @@
       "limitation_source": "full_text"
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
+      "overview": "AI-mediated teaching requires teachers to evaluate uncertain information, respond to changing conditions, and integrate AI with pedagogical judgment. This study examined four cognitive-professional resource domains relevant to intelligent professional action: digital literacy, digital resilience, AI-mediated epistemic agency (AMEA), and AI-TPACK.",
+      "methods": "At one Chinese university, researchers surveyed trainee teachers in a national preparation program. A profile analysis grouped 942 responses using ratings of digital literacy, resilience, judgment about AI-generated knowledge and AI-related teaching knowledge.",
+      "findings": "Four profiles mainly differed in overall self-rated resources. Reported teaching innovation competence rose across those groups. More perceived support was associated with higher-resource profiles.",
+      "interpretation": "The authors suggest checking whether the survey patterns appear in lesson design and observed teaching.",
+      "limitations": "The measures were collected together at one institution. Respondents rated their own capabilities, and alternate screening decisions changed the profile composition.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "empirical_study",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Trainee teachers who felt better supported also felt more prepared to innovate",
+        "explain": "The survey compared educators’ perceptions of their training, their digital skills and their readiness to change teaching practice.",
+        "approach": "Cross-sectional survey and profile analysis of 942 trainee teachers.",
+        "finding": "People in higher-resource profiles also gave themselves higher ratings for teaching innovation.",
+        "interpretation": "The profiles describe perceived readiness for AI-mediated teaching.",
+        "limitation": "Observed classroom performance and training effects were not measured.",
+        "tags": [
+          "Teacher education",
+          "Self-report",
+          "Cross-sectional survey"
+        ],
+        "finding_source": "editorial",
+        "approach_source": "full_text",
+        "limitation_source": "full_text",
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased"
+      }
+    },
     "display_headline": "How teachers describe the support they need to teach with AI",
     "source_quality": {
       "decision": "include",
@@ -5883,42 +5920,6 @@
     "historical_backfill": false,
     "metadata_observed_at": "2026-11-15T19:50:07.001515+00:00",
     "preparation_first_seen_at": "2026-11-15T09:36:03.539201+00:00",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked JATS article",
-      "overview": "Introduction Generative artificial intelligence is increasingly used in engineering education, but self-reported literacy may not establish whether students can evaluate its outputs. The distinction between perceived competence and performance on engineering-specific AI scenarios remains insufficiently examined.",
-      "methods": "At three Chinese universities, 1,206 engineering undergraduates rated their AI literacy, completed a scenario test, and reported how often they checked AI output. Two scored engineering problems required them to spot and correct flawed advice on shaft stresses and material selection.",
-      "findings": "Self-rated literacy and scenario-test performance correlated at r = .265, sharing about 7% of their variance. Higher scenario scores were associated with more frequent reported checks after adjustment. More checking was also associated with better engineering answers. The authors found an indirect association in both their proposed ordering and a reversed ordering.",
-      "interpretation": "The authors treat confidence, tested literacy and checking habits as different aspects of AI use. Students' descriptions of checking can complement task evidence, but neither alone establishes what was verified correctly.",
-      "limitations": "The online assessments were unproctored, so independent performance could not be confirmed. The survey measured reported checking frequency, not the quality of the checks. The single-time-point design cannot establish causal direction.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Confidence in AI literacy only modestly tracked tested skill",
-        "explain": "Students could rate themselves highly without scoring equally highly on scenarios that required them to evaluate AI output.",
-        "approach": "1,206 engineering students completed an online questionnaire, a literacy test and two tasks with flawed AI advice.",
-        "finding": "Self-ratings and tested literacy shared about 7% of their variance. Higher test scores accompanied more reported checking, which in turn was associated with better engineering answers.",
-        "interpretation": "A confidence rating cannot substitute for testing how students handle a plausible but flawed answer.",
-        "limitation": "Checking was self-reported and the assessment was unproctored. The associations do not establish the order of effects.",
-        "tags": [
-          "verification",
-          "AI literacy",
-          "engineering education"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "oa_checked": "2026-11-15",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -6003,6 +6004,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked JATS article",
+      "overview": "Introduction Generative artificial intelligence is increasingly used in engineering education, but self-reported literacy may not establish whether students can evaluate its outputs. The distinction between perceived competence and performance on engineering-specific AI scenarios remains insufficiently examined.",
+      "methods": "At three Chinese universities, 1,206 engineering undergraduates rated their AI literacy, completed a scenario test, and reported how often they checked AI output. Two scored engineering problems required them to spot and correct flawed advice on shaft stresses and material selection.",
+      "findings": "Self-rated literacy and scenario-test performance correlated at r = .265, sharing about 7% of their variance. Higher scenario scores were associated with more frequent reported checks after adjustment. More checking was also associated with better engineering answers. The authors found an indirect association in both their proposed ordering and a reversed ordering.",
+      "interpretation": "The authors treat confidence, tested literacy and checking habits as different aspects of AI use. Students' descriptions of checking can complement task evidence, but neither alone establishes what was verified correctly.",
+      "limitations": "The online assessments were unproctored, so independent performance could not be confirmed. The survey measured reported checking frequency, not the quality of the checks. The single-time-point design cannot establish causal direction.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Confidence in AI literacy only modestly tracked tested skill",
+        "explain": "Students could rate themselves highly without scoring equally highly on scenarios that required them to evaluate AI output.",
+        "approach": "1,206 engineering students completed an online questionnaire, a literacy test and two tasks with flawed AI advice.",
+        "finding": "Self-ratings and tested literacy shared about 7% of their variance. Higher test scores accompanied more reported checking, which in turn was associated with better engineering answers.",
+        "interpretation": "A confidence rating cannot substitute for testing how students handle a plausible but flawed answer.",
+        "limitation": "Checking was self-reported and the assessment was unproctored. The associations do not establish the order of effects.",
+        "tags": [
+          "verification",
+          "AI literacy",
+          "engineering education"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "Do engineering students check the AI answers they trust?",
     "source_quality": {
       "decision": "include",
@@ -10469,42 +10506,6 @@
     "abstract_text": "Cognitive flexibility, a core component of executive function, is frequently impaired in individuals with insomnia. However, the neural mechanisms underlying this impairment, particularly in response to sleep-related stimuli, remain unclear. A total of 48 participants, comprising 24 individuals with insomnia disorder (ID) and 24 healthy controls (HC), were recruited to perform a modified task-switching paradigm incorporating sleep-related (e.g., bed) and general stimuli during functional Magnetic Resonance Imaging (fMRI) scanning. Behavioral measures (reaction time, accuracy, and switch cost), task activation and generalized psychophysiological interaction (gPPI)-based task-dependent functional connectivity were analyzed. Two subjective questionaires, the Cognitive Flexibility Inventory and the Insomnia Severity Index were collectely simultaneously. The ID group exhibited significantly lower CFI scores compared to the HC group, indicating subjective cognitive flexibility impairment. Notably, in the task-switching performance, the ID group demonstrated faster reaction times to sleep-related stimuli. fMRI results revealed altered activation in the right precuneus, angular gyrus, and superior temporal gyrus, with interaction effects between group and stimulus type. The gPPI analyses showed that, compared to HC, ID group exhibited enhanced connectivity between the precuneus and cerebellar under sleep stimulus conditions, as well as disrupted connectivity between the angular gyrus and frontal-parietal regions, and reduced integration from the superior temporal gyrus to multiple association regions across networks. These findings suggest that insomnia is characterized by both subjective deficits in cognitive flexibility and altered neural network dynamics during task switching, with sleep-related stimuli exerting a significant modulatory effect. Enhanced attention captured by sleep-related information may interfere with the optimal task-related network coordination, providing a potential mechanism linking insomnia to executive dysfunction. Not applicable.",
     "abstract_source": "OpenAlex abstract index",
     "abstract_updated": "2026-10-18",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked PDF article",
-      "overview": "Cognitive flexibility, a core component of executive function, is frequently impaired in individuals with insomnia. However, the neural mechanisms underlying this impairment, particularly in response to sleep-related stimuli, remain unclear.",
-      "methods": "Yang and colleagues compared 24 adults with insomnia and 24 controls using questionnaires and a task-switching experiment during functional MRI. Trials used general images and images related to sleep.",
-      "findings": "The insomnia group reported lower cognitive flexibility and responded faster overall. The groups did not differ significantly in the extra response time or loss of accuracy when a rule changed. Several patterns of brain activity or connectivity differed between groups.",
-      "interpretation": "Participants’ experience, measured speed and brain activity describe different aspects of task switching. The behavioral contrasts did not establish a specific attentional bias toward sleep-related images.",
-      "limitations": "This small cross-sectional study cannot establish why the groups differed. A fixed block order may have affected results. The study did not involve AI.",
-      "sample": "24",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Insomnia and the cost of switching between tasks",
-        "explain": "Participants’ experience, measured speed and brain activity describe different aspects of task switching. The behavioral contrasts did not establish a specific attentional bias toward sleep-related images.",
-        "approach": "Yang and colleagues compared 24 adults with insomnia and 24 controls using questionnaires and a task-switching experiment during functional MRI. Trials used general images and images related to sleep.",
-        "finding": "The insomnia group reported lower cognitive flexibility and responded faster overall. The groups did not differ significantly in the extra response time or loss of accuracy when a rule changed. Several patterns of brain activity or connectivity differed between groups.",
-        "interpretation": "Participants’ experience, measured speed and brain activity describe different aspects of task switching. The behavioral contrasts did not establish a specific attentional bias toward sleep-related images.",
-        "limitation": "This small cross-sectional study cannot establish why the groups differed. A fixed block order may have affected results. The study did not involve AI.",
-        "tags": [
-          "task switching",
-          "attention",
-          "insomnia"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "oa_meta_checked": "2026-10-18",
     "open_access_url": "https://link.springer.com/content/pdf/10.1186/s12888-026-08635-4_reference.pdf",
     "open_access_license": "cc-by-nc-nd",
@@ -10626,6 +10627,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked PDF article",
+      "overview": "Cognitive flexibility, a core component of executive function, is frequently impaired in individuals with insomnia. However, the neural mechanisms underlying this impairment, particularly in response to sleep-related stimuli, remain unclear.",
+      "methods": "Yang and colleagues compared 24 adults with insomnia and 24 controls using questionnaires and a task-switching experiment during functional MRI. Trials used general images and images related to sleep.",
+      "findings": "The insomnia group reported lower cognitive flexibility and responded faster overall. The groups did not differ significantly in the extra response time or loss of accuracy when a rule changed. Several patterns of brain activity or connectivity differed between groups.",
+      "interpretation": "Participants’ experience, measured speed and brain activity describe different aspects of task switching. The behavioral contrasts did not establish a specific attentional bias toward sleep-related images.",
+      "limitations": "This small cross-sectional study cannot establish why the groups differed. A fixed block order may have affected results. The study did not involve AI.",
+      "sample": "24",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Insomnia and the cost of switching between tasks",
+        "explain": "Participants’ experience, measured speed and brain activity describe different aspects of task switching. The behavioral contrasts did not establish a specific attentional bias toward sleep-related images.",
+        "approach": "Yang and colleagues compared 24 adults with insomnia and 24 controls using questionnaires and a task-switching experiment during functional MRI. Trials used general images and images related to sleep.",
+        "finding": "The insomnia group reported lower cognitive flexibility and responded faster overall. The groups did not differ significantly in the extra response time or loss of accuracy when a rule changed. Several patterns of brain activity or connectivity differed between groups.",
+        "interpretation": "Participants’ experience, measured speed and brain activity describe different aspects of task switching. The behavioral contrasts did not establish a specific attentional bias toward sleep-related images.",
+        "limitation": "This small cross-sectional study cannot establish why the groups differed. A fixed block order may have affected results. The study did not involve AI.",
+        "tags": [
+          "task switching",
+          "attention",
+          "insomnia"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "How sleep-related cues affect task switching in insomnia",
     "source_quality": {
       "decision": "include",
@@ -11881,41 +11918,6 @@
     "abstract_text": "Generative artificial intelligence (GenAI) confronts educational psychology with sharply heterogeneous evidence: meta-analyses report positive average effects on learning alongside prediction intervals spanning harm to benefit, and experiments document gains in some configurations and learning penalties in others. This article develops an augmentation–erosion framework that accounts for part of this heterogeneity by treating the educational effect of GenAI not as a property of the tool but as a property of the partition of cognitive labor between learner and machine. Integrating research on cognitive offloading, distributed cognition, cognitive load theory, and self-regulated learning, the framework holds that offloading augments learning when it discharges operations peripheral to the current learning goal, and risks erosion, whether of acquisition or of maintenance, when it bypasses the processing constitutive of that goal, unless the learner substantively processes the output or later reconstructs it. It supplies criteria for locating operations along a graded peripheral–constitutive continuum, specifies the comparison condition against which augmentation and erosion are defined, and states seven conditioned, testable propositions, each illustrated with a common example and paired with supporting and challenging patterns. On this basis, offloading regulation is proposed as a learning-oriented dimension of AI literacy with domain-general and discipline-specific components: a competence comprising partition discernment, calibrated monitoring, disciplinary verification, and re-internalization, enacted through metacognitive control and conditioned by learners’ goals and motivation. The article closes with an intervention research program, a measurement strategy that triangulates interaction logs with process measures, and equity implications, using STEM learning as a strategically revealing case.",
     "abstract_source": "OpenAlex abstract index",
     "abstract_updated": "2026-10-18",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
-      "overview": "Generative artificial intelligence (GenAI) confronts educational psychology with sharply heterogeneous evidence: meta-analyses report positive average effects on learning alongside prediction intervals spanning harm to benefit, and experiments document gains in some configurations and learning penalties in others. This article develops an augmentation–erosion framework that accounts for part of this…",
-      "methods": "The author integrates research on cognitive offloading, distributed cognition, cognitive load and self-regulation to develop predictions for STEM learning.",
-      "findings": "",
-      "interpretation": "Students may use AI for peripheral operations while retaining or later reconstructing the reasoning they need to learn. The author proposes checking AI output against discipline-specific evidence.",
-      "limitations": "The proposed regulatory capacities still need measurement and tests distinguishing them from subject knowledge and general self-regulation.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "conceptual_framework",
-      "reported_findings": false,
-      "digest": {
-        "idea": "What students delegate matters for what they learn",
-        "explain": "A step that can be delegated in one lesson may be the very skill another lesson asks a student to develop.",
-        "approach": "Theory development using literature and worked disciplinary examples.",
-        "finding": "",
-        "finding_source": "none",
-        "interpretation": "Identify which reasoning serves the learning goal. Check machine-produced work against the subject’s standards and practice reconstructing essential steps.",
-        "limitation": "The framework’s predictions and measures remain untested.",
-        "tags": [
-          "Cognitive offloading",
-          "Learning"
-        ],
-        "status": "conceptual_framework",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "reading_mode": "conceptual_proposal"
-      }
-    },
     "oa_meta_checked": "2026-10-18",
     "open_access_url": "https://link.springer.com/article/10.1007/s10648-026-10224-6",
     "open_access_license": "cc-by-nc-nd",
@@ -12029,6 +12031,41 @@
       "limitation_source": "full_text"
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
+      "overview": "Generative artificial intelligence (GenAI) confronts educational psychology with sharply heterogeneous evidence: meta-analyses report positive average effects on learning alongside prediction intervals spanning harm to benefit, and experiments document gains in some configurations and learning penalties in others. This article develops an augmentation–erosion framework that accounts for part of this…",
+      "methods": "The author integrates research on cognitive offloading, distributed cognition, cognitive load and self-regulation to develop predictions for STEM learning.",
+      "findings": "",
+      "interpretation": "Students may use AI for peripheral operations while retaining or later reconstructing the reasoning they need to learn. The author proposes checking AI output against discipline-specific evidence.",
+      "limitations": "The proposed regulatory capacities still need measurement and tests distinguishing them from subject knowledge and general self-regulation.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "conceptual_framework",
+      "reported_findings": false,
+      "digest": {
+        "idea": "What students delegate matters for what they learn",
+        "explain": "A step that can be delegated in one lesson may be the very skill another lesson asks a student to develop.",
+        "approach": "Theory development using literature and worked disciplinary examples.",
+        "finding": "",
+        "finding_source": "none",
+        "interpretation": "Identify which reasoning serves the learning goal. Check machine-produced work against the subject’s standards and practice reconstructing essential steps.",
+        "limitation": "The framework’s predictions and measures remain untested.",
+        "tags": [
+          "Cognitive offloading",
+          "Learning"
+        ],
+        "status": "conceptual_framework",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "reading_mode": "conceptual_proposal"
+      }
+    },
     "display_headline": "When STEM students hand parts of a task to AI",
     "source_quality": {
       "decision": "include",
@@ -12153,42 +12190,6 @@
     "oa_checked": "2026-11-12",
     "abstract_text": " This study examines how college students’ trust in generative artificial intelligence (GenAI) is associated with critical thinking engagement in GenAI-supported learning through multiple psychological mechanisms. Drawing on Distributed Cognition Theory (DCT), we propose and test a structural model including five constructs: trust in AI, perceived usefulness, cognitive offloading, AI self-efficacy, and critical thinking. Drawing on survey data from a convenience sample of college students who engaged in learning activities using GenAI tools (e.g., ChatGPT), we assessed hypothesized relationships using structural equation modeling (SEM). The results show that trust in AI is positively associated with perceived usefulness and AI self-efficacy, and both constructs are positively associated with critical thinking. In contrast, cognitive offloading is negatively associated with critical thinking, indicating a potential constraining pathway through which stronger reliance on GenAI may be associated with lower engagement in higher-order thinking. Overall, the findings suggest that trust in GenAI is linked to critical thinking through both supportive and constraining pathways. This study extends DCT in GenAI-supported learning by showing that trust in AI is not uniformly beneficial. The findings highlight the importance of educational approaches that cultivate students’ efficacy beliefs and strategic use of GenAI while discouraging overreliance that reduces cognitive engagement. ",
     "abstract_source": "Crossref abstract",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked HTML article",
-      "overview": "This study examines how college students’ trust in generative artificial intelligence (GenAI) is associated with critical thinking engagement in GenAI-supported learning through multiple psychological mechanisms. Drawing on Distributed Cognition Theory (DCT), we propose and test a structural model including five constructs: trust in AI, perceived usefulness, cognitive offloading, AI self-efficacy, and…",
-      "methods": "Cheng and Li analyzed questionnaires from 976 students at three colleges in China. They modeled how trust, perceived usefulness, confidence using AI and delegation related to students’ accounts of how they evaluate information.",
-      "findings": "Trust was positively associated with reported critical thinking. Perceived usefulness and confidence showed positive indirect associations, while greater reported delegation showed a negative indirect association.",
-      "interpretation": "Students who trusted AI also described judgments and habits with different relationships to thinking critically. A trust score alone obscures that distinction.",
-      "limitations": "The convenience sample completed all measures once. The model cannot show which came first or whether students performed better on a critical-thinking task.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Trust, delegation and self-reported critical thinking",
-        "explain": "Students who trusted AI also described judgments and habits with different relationships to thinking critically. A trust score alone obscures that distinction.",
-        "approach": "Cheng and Li analyzed questionnaires from 976 students at three colleges in China. They modeled how trust, perceived usefulness, confidence using AI and delegation related to students’ accounts of how they evaluate information.",
-        "finding": "Trust was positively associated with reported critical thinking. Perceived usefulness and confidence showed positive indirect associations, while greater reported delegation showed a negative indirect association.",
-        "interpretation": "Students who trusted AI also described judgments and habits with different relationships to thinking critically. A trust score alone obscures that distinction.",
-        "limitation": "The convenience sample completed all measures once. The model cannot show which came first or whether students performed better on a critical-thinking task.",
-        "tags": [
-          "self-report",
-          "delegation",
-          "critical thinking"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "oa_meta_checked": "2026-10-18",
     "open_access_url": "https://journals.sagepub.com/doi/full/10.1177/21582440261497404",
     "open_access_license": "cc-by-nc",
@@ -12310,6 +12311,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked HTML article",
+      "overview": "This study examines how college students’ trust in generative artificial intelligence (GenAI) is associated with critical thinking engagement in GenAI-supported learning through multiple psychological mechanisms. Drawing on Distributed Cognition Theory (DCT), we propose and test a structural model including five constructs: trust in AI, perceived usefulness, cognitive offloading, AI self-efficacy, and…",
+      "methods": "Cheng and Li analyzed questionnaires from 976 students at three colleges in China. They modeled how trust, perceived usefulness, confidence using AI and delegation related to students’ accounts of how they evaluate information.",
+      "findings": "Trust was positively associated with reported critical thinking. Perceived usefulness and confidence showed positive indirect associations, while greater reported delegation showed a negative indirect association.",
+      "interpretation": "Students who trusted AI also described judgments and habits with different relationships to thinking critically. A trust score alone obscures that distinction.",
+      "limitations": "The convenience sample completed all measures once. The model cannot show which came first or whether students performed better on a critical-thinking task.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Trust, delegation and self-reported critical thinking",
+        "explain": "Students who trusted AI also described judgments and habits with different relationships to thinking critically. A trust score alone obscures that distinction.",
+        "approach": "Cheng and Li analyzed questionnaires from 976 students at three colleges in China. They modeled how trust, perceived usefulness, confidence using AI and delegation related to students’ accounts of how they evaluate information.",
+        "finding": "Trust was positively associated with reported critical thinking. Perceived usefulness and confidence showed positive indirect associations, while greater reported delegation showed a negative indirect association.",
+        "interpretation": "Students who trusted AI also described judgments and habits with different relationships to thinking critically. A trust score alone obscures that distinction.",
+        "limitation": "The convenience sample completed all measures once. The model cannot show which came first or whether students performed better on a critical-thinking task.",
+        "tags": [
+          "self-report",
+          "delegation",
+          "critical thinking"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "Trust in AI and critical thinking among college students",
     "source_quality": {
       "decision": "include",
@@ -14848,42 +14885,6 @@
     "open_access_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1878665/full",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked JATS article",
-      "overview": "Introduction The rapid integration of generative artificial intelligence (GenAI) into higher education has generated increasing concern regarding its influence on students' epistemic agency, critical thinking, and cognitive autonomy. This systematic review synthesizes current evidence on the epistemic implications of GenAI in higher education, with particular emphasis on the tension between cognitive…",
-      "methods": "Reviewers searched Scopus, Web of Science and databases available through EBSCOhost. They coded findings from 26 eligible higher-education studies and compared themes across different study designs.",
-      "findings": "One recurring theme concerned checking whether plausible AI output was reliable. The included studies described incorrect answers and fabricated citations, alongside verification practices such as comparing other sources. The review organized these observations thematically and did not estimate a pooled change in students' reasoning.",
-      "interpretation": "The authors propose teaching students to evaluate the support behind AI answers and to explain who is responsible for a claim. They present their framework as a provisional interpretation of the included studies.",
-      "limitations": "The search excluded grey literature. Differences in design, populations and measures constrained comparison, and the proposed framework has not been independently validated.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Plausible answers make verification a separate learning task",
-        "explain": "A review of higher-education research traces how students decide whether to trust AI-generated claims and citations.",
-        "approach": "Reviewers coded findings from 26 studies of generative AI in higher education.",
-        "finding": "Checking sources recurred across studies. Individual accounts described students encountering convincing errors and false citations, as well as efforts to cross-check them.",
-        "interpretation": "The authors propose making evaluation of AI-produced evidence an explicit part of coursework.",
-        "limitation": "The studies used different designs. Their patterns do not establish how often students check AI or the effect of a specific intervention.",
-        "tags": [
-          "source evaluation",
-          "cognitive offloading",
-          "systematic review"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "oa_checked": "2026-10-22",
     "oa_pass_version": 2,
     "fulltext_attempt": {
@@ -15009,6 +15010,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked JATS article",
+      "overview": "Introduction The rapid integration of generative artificial intelligence (GenAI) into higher education has generated increasing concern regarding its influence on students' epistemic agency, critical thinking, and cognitive autonomy. This systematic review synthesizes current evidence on the epistemic implications of GenAI in higher education, with particular emphasis on the tension between cognitive…",
+      "methods": "Reviewers searched Scopus, Web of Science and databases available through EBSCOhost. They coded findings from 26 eligible higher-education studies and compared themes across different study designs.",
+      "findings": "One recurring theme concerned checking whether plausible AI output was reliable. The included studies described incorrect answers and fabricated citations, alongside verification practices such as comparing other sources. The review organized these observations thematically and did not estimate a pooled change in students' reasoning.",
+      "interpretation": "The authors propose teaching students to evaluate the support behind AI answers and to explain who is responsible for a claim. They present their framework as a provisional interpretation of the included studies.",
+      "limitations": "The search excluded grey literature. Differences in design, populations and measures constrained comparison, and the proposed framework has not been independently validated.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Plausible answers make verification a separate learning task",
+        "explain": "A review of higher-education research traces how students decide whether to trust AI-generated claims and citations.",
+        "approach": "Reviewers coded findings from 26 studies of generative AI in higher education.",
+        "finding": "Checking sources recurred across studies. Individual accounts described students encountering convincing errors and false citations, as well as efforts to cross-check them.",
+        "interpretation": "The authors propose making evaluation of AI-produced evidence an explicit part of coursework.",
+        "limitation": "The studies used different designs. Their patterns do not establish how often students check AI or the effect of a specific intervention.",
+        "tags": [
+          "source evaluation",
+          "cognitive offloading",
+          "systematic review"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "How much thinking do university students hand over to AI?",
     "source_quality": {
       "decision": "include",
@@ -15597,42 +15634,6 @@
     "open_access_url": "https://pubsonline.informs.org/doi/full/10.1287/isre.2024.1431",
     "open_access_license": "unknown",
     "open_access_version": "acceptedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked HTML article",
-      "overview": "Many organizations seek to combine human expertise with explainable artificial intelligence (XAI), but they often overlook a core requirement for effective collaboration; humans must understand their own abilities. This understanding of one’s own abilities is referred to as metacognition, which captures how well individuals monitor and regulate their own decision making.",
-      "methods": "Von Zahn and colleagues tested whether seeing how an algorithm weights features changes which cases people delegate. One experiment asked 149 German real estate agents to price apartments. The other used loan-repayment predictions.",
-      "findings": "Among the agents, exposure to explanations reduced average overconfidence from 43.3 to 29.3 percentage points. Delegation rose from 41% to 54%. The change in confidence did not coincide with a statistically detectable improvement in unaided pricing accuracy.",
-      "interpretation": "The explanation provided information about the model and gave participants a reason to reconsider their own judgment before assigning work.",
-      "limitations": "Participants decided who would take a case before seeing the AI prediction. They received no performance feedback between delegation choices. Results may differ when people learn over repeated exchanges or can revise an assignment.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "When a model explanation changes who takes the case",
-        "explain": "The explanation provided information about the model and gave participants a reason to reconsider their own judgment before assigning work.",
-        "approach": "Von Zahn and colleagues tested whether seeing how an algorithm weights features changes which cases people delegate. One experiment asked 149 German real estate agents to price apartments. The other used loan-repayment predictions.",
-        "finding": "Among the agents, exposure to explanations reduced average overconfidence from 43.3 to 29.3 percentage points. Delegation rose from 41% to 54%. The change in confidence did not coincide with a statistically detectable improvement in unaided pricing accuracy.",
-        "interpretation": "The explanation provided information about the model and gave participants a reason to reconsider their own judgment before assigning work.",
-        "limitation": "Participants decided who would take a case before seeing the AI prediction. They received no performance feedback between delegation choices. Results may differ when people learn over repeated exchanges or can revise an assignment.",
-        "tags": [
-          "delegation",
-          "confidence",
-          "predictive models"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "oa_checked": "2026-11-12",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -15747,6 +15748,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked HTML article",
+      "overview": "Many organizations seek to combine human expertise with explainable artificial intelligence (XAI), but they often overlook a core requirement for effective collaboration; humans must understand their own abilities. This understanding of one’s own abilities is referred to as metacognition, which captures how well individuals monitor and regulate their own decision making.",
+      "methods": "Von Zahn and colleagues tested whether seeing how an algorithm weights features changes which cases people delegate. One experiment asked 149 German real estate agents to price apartments. The other used loan-repayment predictions.",
+      "findings": "Among the agents, exposure to explanations reduced average overconfidence from 43.3 to 29.3 percentage points. Delegation rose from 41% to 54%. The change in confidence did not coincide with a statistically detectable improvement in unaided pricing accuracy.",
+      "interpretation": "The explanation provided information about the model and gave participants a reason to reconsider their own judgment before assigning work.",
+      "limitations": "Participants decided who would take a case before seeing the AI prediction. They received no performance feedback between delegation choices. Results may differ when people learn over repeated exchanges or can revise an assignment.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "When a model explanation changes who takes the case",
+        "explain": "The explanation provided information about the model and gave participants a reason to reconsider their own judgment before assigning work.",
+        "approach": "Von Zahn and colleagues tested whether seeing how an algorithm weights features changes which cases people delegate. One experiment asked 149 German real estate agents to price apartments. The other used loan-repayment predictions.",
+        "finding": "Among the agents, exposure to explanations reduced average overconfidence from 43.3 to 29.3 percentage points. Delegation rose from 41% to 54%. The change in confidence did not coincide with a statistically detectable improvement in unaided pricing accuracy.",
+        "interpretation": "The explanation provided information about the model and gave participants a reason to reconsider their own judgment before assigning work.",
+        "limitation": "Participants decided who would take a case before seeing the AI prediction. They received no performance feedback between delegation choices. Results may differ when people learn over repeated exchanges or can revise an assignment.",
+        "tags": [
+          "delegation",
+          "confidence",
+          "predictive models"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "What explainable AI reveals about knowing what you know",
     "source_quality": {
       "decision": "include",
@@ -16085,42 +16122,6 @@
     "open_access_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1906199/full",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked JATS article",
-      "overview": "Introduction Writing with generative artificial intelligence (GenAI) can improve a supported product without necessarily strengthening the competence that remains after support is removed. This study examined that distinction through a layer-sensitive account of cognitive offloading.",
-      "methods": "Six university English-writing classes in China followed one of three approaches for eight weeks. Students wrote without AI, chose how to use AI, or followed limits on what they could delegate and explained their choices. The analysis included 168 students. Everyone completed a supervised writing and revision task without AI at the end.",
-      "findings": "Students who chose freely how to use AI had the highest observed writing scores during supported work. Students with delegation limits and required reflection had the highest observed scores on all four final unaided outcomes, including argument depth and revision quality. Open collaboration also involved more delegation of ideas and reasoning. Estimates accounting for the six classes were imprecise.",
-      "interpretation": "The authors distinguish the quality of writing a student can produce with help from the choices the student can make independently on another piece in the same genre.",
-      "limitations": "Whole classes followed different approaches, so class differences could affect the comparison. The study cannot separate the effects of reflection and delegation limits, and it measured no delayed or cross-genre transfer.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Who wrote best changed when the AI was taken away",
-        "explain": "Students with broad access produced the highest-scoring assisted drafts. Their classmates who had to explain and limit AI use led on the unaided assessment.",
-        "approach": "Researchers followed 168 students across six English-writing classes and scored a final supervised task.",
-        "finding": "The bounded-support group had the highest observed unaided writing quality, higher-order thinking, argument-depth and revision scores. Open collaboration led during assisted writing.",
-        "interpretation": "A polished assisted draft and an independently revised essay measure different things.",
-        "limitation": "Six intact classes shared three conditions. Class differences, limits on delegation and required reflection cannot be disentangled.",
-        "tags": [
-          "AI-assisted writing",
-          "cognitive offloading",
-          "independent performance"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "fulltext_attempt": {
       "attempts": 2,
       "last_at": "2026-10-23T08:32:25+00:00",
@@ -16250,6 +16251,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked JATS article",
+      "overview": "Introduction Writing with generative artificial intelligence (GenAI) can improve a supported product without necessarily strengthening the competence that remains after support is removed. This study examined that distinction through a layer-sensitive account of cognitive offloading.",
+      "methods": "Six university English-writing classes in China followed one of three approaches for eight weeks. Students wrote without AI, chose how to use AI, or followed limits on what they could delegate and explained their choices. The analysis included 168 students. Everyone completed a supervised writing and revision task without AI at the end.",
+      "findings": "Students who chose freely how to use AI had the highest observed writing scores during supported work. Students with delegation limits and required reflection had the highest observed scores on all four final unaided outcomes, including argument depth and revision quality. Open collaboration also involved more delegation of ideas and reasoning. Estimates accounting for the six classes were imprecise.",
+      "interpretation": "The authors distinguish the quality of writing a student can produce with help from the choices the student can make independently on another piece in the same genre.",
+      "limitations": "Whole classes followed different approaches, so class differences could affect the comparison. The study cannot separate the effects of reflection and delegation limits, and it measured no delayed or cross-genre transfer.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Who wrote best changed when the AI was taken away",
+        "explain": "Students with broad access produced the highest-scoring assisted drafts. Their classmates who had to explain and limit AI use led on the unaided assessment.",
+        "approach": "Researchers followed 168 students across six English-writing classes and scored a final supervised task.",
+        "finding": "The bounded-support group had the highest observed unaided writing quality, higher-order thinking, argument-depth and revision scores. Open collaboration led during assisted writing.",
+        "interpretation": "A polished assisted draft and an independently revised essay measure different things.",
+        "limitation": "Six intact classes shared three conditions. Class differences, limits on delegation and required reflection cannot be disentangled.",
+        "tags": [
+          "AI-assisted writing",
+          "cognitive offloading",
+          "independent performance"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "Which writing skills carry over when AI is removed?",
     "source_quality": {
       "decision": "include",
@@ -16394,40 +16431,6 @@
     "curated": false,
     "evidence": "Verified conceptual publication; source abstract/summary only",
     "preview": "Debate over the role of generative artificial intelligence in formal education is marked by sharply divergent claims about its effects on student learning. Much of this disagreement reflects a failure to distinguish immediate performance gains from durable learning. This article addresses a central gap in the literature by focusing on when and how students should be permitted to rely on AI. It introduces the Gradual …",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
-      "overview": "Debate over the role of generative artificial intelligence in formal education is marked by sharply divergent claims about its effects on student learning. Much of this disagreement reflects a failure to distinguish immediate performance gains from durable learning.",
-      "methods": "The author draws on selected learning-science literature on practice, memory, cognitive effort and judging one’s knowledge to adapt the gradual-release model.",
-      "findings": "",
-      "interpretation": "Progression depends on the skill and learning goal. A student ready to delegate a familiar step may still need independent practice on an unfamiliar one.",
-      "limitations": "The review is selective and does not test the proposed stages against other teaching approaches.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "conceptual_framework",
-      "reported_findings": false,
-      "digest": {
-        "idea": "Let the skill a student can demonstrate guide when to introduce AI",
-        "explain": "The proposed model gives teachers a way to decide when students should work independently, share the task with AI or delegate a step.",
-        "approach": "Conceptual synthesis and a three-stage instructional proposal.",
-        "finding": "",
-        "finding_source": "none",
-        "interpretation": "Begin with independent practice, introduce constrained assistance, then allow selective delegation after the learner shows mastery.",
-        "limitation": "The model’s proposed progression still needs classroom testing.",
-        "tags": [
-          "Learning"
-        ],
-        "status": "conceptual_framework",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "reading_mode": "conceptual_proposal"
-      }
-    },
     "abstract_updated": "2026-10-22",
     "oa_meta_checked": "2026-10-22",
     "open_access_version": "publishedVersion",
@@ -16546,6 +16549,40 @@
       "limitation_source": "full_text"
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Full-article synthesis of verified publisher HTML; original paraphrases",
+      "overview": "Debate over the role of generative artificial intelligence in formal education is marked by sharply divergent claims about its effects on student learning. Much of this disagreement reflects a failure to distinguish immediate performance gains from durable learning.",
+      "methods": "The author draws on selected learning-science literature on practice, memory, cognitive effort and judging one’s knowledge to adapt the gradual-release model.",
+      "findings": "",
+      "interpretation": "Progression depends on the skill and learning goal. A student ready to delegate a familiar step may still need independent practice on an unfamiliar one.",
+      "limitations": "The review is selective and does not test the proposed stages against other teaching approaches.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "conceptual_framework",
+      "reported_findings": false,
+      "digest": {
+        "idea": "Let the skill a student can demonstrate guide when to introduce AI",
+        "explain": "The proposed model gives teachers a way to decide when students should work independently, share the task with AI or delegate a step.",
+        "approach": "Conceptual synthesis and a three-stage instructional proposal.",
+        "finding": "",
+        "finding_source": "none",
+        "interpretation": "Begin with independent practice, introduce constrained assistance, then allow selective delegation after the learner shows mastery.",
+        "limitation": "The model’s proposed progression still needs classroom testing.",
+        "tags": [
+          "Learning"
+        ],
+        "status": "conceptual_framework",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "reading_mode": "conceptual_proposal"
+      }
+    },
     "display_headline": "A proposal for introducing AI in stages as students learn",
     "source_quality": {
       "decision": "include",
@@ -18429,42 +18466,6 @@
     "open_access_url": "https://www.researchgate.net/publication/405348341_Cognitive_offloading_in_student-AI_collaboration_A_longitudinal_analysis_of_prompting_strategies",
     "open_access_license": "cc-by-nc-nd",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked HTML article",
-      "overview": "Prompting an AI is not a neutral act: it reflects how students think, plan, and offload cognitive effort. As large language models (LLMs) become increasingly integrated into higher education, understanding how students engage with these tools is essential.",
-      "methods": "Misiejuk and colleagues coded 281 AI prompts across 122 submissions on four assignments in a social network analysis course. They compared how prompt features occurred together in higher- and lower-quality work.",
-      "findings": "Higher-quality submissions more often paired instructions with background details. Lower-quality submissions more often contained disagreement or commands with little context.",
-      "interpretation": "The prompts give a record of what students asked AI to do. Providing context can look different from repeatedly telling the tool that its output is wrong.",
-      "limitations": "The task required structured datasets. Prompt wording was a proxy for thinking, and the design cannot show that one wording strategy produced better learning or reduced mental effort.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "observational",
-      "reported_findings": true,
-      "digest": {
-        "idea": "How students asked AI to generate a dataset",
-        "explain": "The prompts give a record of what students asked AI to do. Providing context can look different from repeatedly telling the tool that its output is wrong.",
-        "approach": "Misiejuk and colleagues coded 281 AI prompts across 122 submissions on four assignments in a social network analysis course. They compared how prompt features occurred together in higher- and lower-quality work.",
-        "finding": "Higher-quality submissions more often paired instructions with background details. Lower-quality submissions more often contained disagreement or commands with little context.",
-        "interpretation": "The prompts give a record of what students asked AI to do. Providing context can look different from repeatedly telling the tool that its output is wrong.",
-        "limitation": "The task required structured datasets. Prompt wording was a proxy for thinking, and the design cannot show that one wording strategy produced better learning or reduced mental effort.",
-        "tags": [
-          "prompting",
-          "cognitive offloading",
-          "student work"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "oa_checked": "2026-11-13",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -18581,6 +18582,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked HTML article",
+      "overview": "Prompting an AI is not a neutral act: it reflects how students think, plan, and offload cognitive effort. As large language models (LLMs) become increasingly integrated into higher education, understanding how students engage with these tools is essential.",
+      "methods": "Misiejuk and colleagues coded 281 AI prompts across 122 submissions on four assignments in a social network analysis course. They compared how prompt features occurred together in higher- and lower-quality work.",
+      "findings": "Higher-quality submissions more often paired instructions with background details. Lower-quality submissions more often contained disagreement or commands with little context.",
+      "interpretation": "The prompts give a record of what students asked AI to do. Providing context can look different from repeatedly telling the tool that its output is wrong.",
+      "limitations": "The task required structured datasets. Prompt wording was a proxy for thinking, and the design cannot show that one wording strategy produced better learning or reduced mental effort.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "observational",
+      "reported_findings": true,
+      "digest": {
+        "idea": "How students asked AI to generate a dataset",
+        "explain": "The prompts give a record of what students asked AI to do. Providing context can look different from repeatedly telling the tool that its output is wrong.",
+        "approach": "Misiejuk and colleagues coded 281 AI prompts across 122 submissions on four assignments in a social network analysis course. They compared how prompt features occurred together in higher- and lower-quality work.",
+        "finding": "Higher-quality submissions more often paired instructions with background details. Lower-quality submissions more often contained disagreement or commands with little context.",
+        "interpretation": "The prompts give a record of what students asked AI to do. Providing context can look different from repeatedly telling the tool that its output is wrong.",
+        "limitation": "The task required structured datasets. Prompt wording was a proxy for thinking, and the design cannot show that one wording strategy produced better learning or reduced mental effort.",
+        "tags": [
+          "prompting",
+          "cognitive offloading",
+          "student work"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "How students’ AI prompting changes over time",
     "source_quality": {
       "decision": "include",
@@ -22765,42 +22802,6 @@
     "first_seen": "2026-10-22",
     "source_checked": "2026-10-22",
     "discovery_scope": "historical_anchor",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked PDF article",
-      "overview": "This study investigated the impact of using ChatGPT, a state-of-the-art generative AI-based model, on the critical, creative, and reflective thinking skills of university students in Ghana. The study utilized a mixed-methods research approach, incorporating quantitative and qualitative data collection instruments, and an experimental procedure with a pretest-posttest control group.",
-      "methods": "Essel and colleagues compared 60 ChatGPT users with 65 other students in a quantitative research course in Ghana. Students completed thinking questionnaires before and after three weeks of activities.",
-      "findings": "The ChatGPT group had higher adjusted post-course scores on the self-report scales for critical, creative and reflective thinking.",
-      "interpretation": "The scores capture how students described their thinking after the activities. They do not measure independent success at evaluating an unfamiliar claim.",
-      "limitations": "The methods describe random assignment, but the analysis text says the groups were not randomly formed. Participants came from one course, initial critical-thinking scores differed, and the study did not test lasting transfer.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "Thinking questionnaires after a ChatGPT-assisted research course",
-        "explain": "The scores capture how students described their thinking after the activities. They do not measure independent success at evaluating an unfamiliar claim.",
-        "approach": "Essel and colleagues compared 60 ChatGPT users with 65 other students in a quantitative research course in Ghana. Students completed thinking questionnaires before and after three weeks of activities.",
-        "finding": "The ChatGPT group had higher adjusted post-course scores on the self-report scales for critical, creative and reflective thinking.",
-        "interpretation": "The scores capture how students described their thinking after the activities. They do not measure independent success at evaluating an unfamiliar claim.",
-        "limitation": "The methods describe random assignment, but the analysis text says the groups were not randomly formed. Participants came from one course, initial critical-thinking scores differed, and the study did not test lasting transfer.",
-        "tags": [
-          "research methods",
-          "self-report",
-          "ChatGPT"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "source_group": "AI-specific",
     "abstract_updated": "2026-10-22",
     "oa_meta_checked": "2026-10-22",
@@ -22922,6 +22923,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked PDF article",
+      "overview": "This study investigated the impact of using ChatGPT, a state-of-the-art generative AI-based model, on the critical, creative, and reflective thinking skills of university students in Ghana. The study utilized a mixed-methods research approach, incorporating quantitative and qualitative data collection instruments, and an experimental procedure with a pretest-posttest control group.",
+      "methods": "Essel and colleagues compared 60 ChatGPT users with 65 other students in a quantitative research course in Ghana. Students completed thinking questionnaires before and after three weeks of activities.",
+      "findings": "The ChatGPT group had higher adjusted post-course scores on the self-report scales for critical, creative and reflective thinking.",
+      "interpretation": "The scores capture how students described their thinking after the activities. They do not measure independent success at evaluating an unfamiliar claim.",
+      "limitations": "The methods describe random assignment, but the analysis text says the groups were not randomly formed. Participants came from one course, initial critical-thinking scores differed, and the study did not test lasting transfer.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "Thinking questionnaires after a ChatGPT-assisted research course",
+        "explain": "The scores capture how students described their thinking after the activities. They do not measure independent success at evaluating an unfamiliar claim.",
+        "approach": "Essel and colleagues compared 60 ChatGPT users with 65 other students in a quantitative research course in Ghana. Students completed thinking questionnaires before and after three weeks of activities.",
+        "finding": "The ChatGPT group had higher adjusted post-course scores on the self-report scales for critical, creative and reflective thinking.",
+        "interpretation": "The scores capture how students described their thinking after the activities. They do not measure independent success at evaluating an unfamiliar claim.",
+        "limitation": "The methods describe random assignment, but the analysis text says the groups were not randomly formed. Participants came from one course, initial critical-thinking scores differed, and the study did not test lasting transfer.",
+        "tags": [
+          "research methods",
+          "self-report",
+          "ChatGPT"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "What instant AI answers mean for undergraduate thinking",
     "source_quality": {
       "decision": "include",
@@ -23061,42 +23098,6 @@
     "open_access_url": "https://www.researchgate.net/publication/376559924_Investigating_students%27_cognitive_processes_in_generative_AI-assisted_digital_multimodal_composing_and_traditional_writing",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked HTML article",
-      "overview": "Recently, generative artificial intelligence (AI)-powered chatbots such as ChatGPT and Bing Chat have garnered increasing attention on a global scale. Previous studies have focused mostly on the influence of generative AI on writing while few researchers have investigated how generative AI can facilitate students' multimodal writing process.",
-      "methods": "Liu and colleagues followed eight Chinese undergraduate volunteers at a New Zealand university for two weeks. Four wrote an essay and four made slides on the same topic. Screen recordings, think-aloud accounts, completed work and interviews documented their choices.",
-      "findings": "Slide makers used AI to find examples and connect claims. Some took a proposed image description from one tool to another, then reviewed and revised the image for the slide.",
-      "interpretation": "Making a slide deck gave students decisions about the relationship between an image and its argument that an essay did not require in the same way.",
-      "limitations": "Eight volunteers at a single university completed different assignments. The qualitative evidence describes strategies and does not establish an improvement in writing ability or attention.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true,
-      "digest": {
-        "idea": "How students used AI when making slides and writing essays",
-        "explain": "Making a slide deck gave students decisions about the relationship between an image and its argument that an essay did not require in the same way.",
-        "approach": "Liu and colleagues followed eight Chinese undergraduate volunteers at a New Zealand university for two weeks. Four wrote an essay and four made slides on the same topic. Screen recordings, think-aloud accounts, completed work and interviews documented their choices.",
-        "finding": "Slide makers used AI to find examples and connect claims. Some took a proposed image description from one tool to another, then reviewed and revised the image for the slide.",
-        "interpretation": "Making a slide deck gave students decisions about the relationship between an image and its argument that an essay did not require in the same way.",
-        "limitation": "Eight volunteers at a single university completed different assignments. The qualitative evidence describes strategies and does not establish an improvement in writing ability or attention.",
-        "tags": [
-          "writing",
-          "slides",
-          "multimodal composing"
-        ],
-        "status": "editorially_written_from_indexed_sections",
-        "editorial_basis": "publisher_full_article_paraphrased",
-        "finding_source": "editorial"
-      }
-    },
     "fulltext_attempt": {
       "attempts": 5,
       "last_at": "2026-11-12T21:51:40+00:00",
@@ -23214,6 +23215,42 @@
       ]
     },
     "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked HTML article",
+      "overview": "Recently, generative artificial intelligence (AI)-powered chatbots such as ChatGPT and Bing Chat have garnered increasing attention on a global scale. Previous studies have focused mostly on the influence of generative AI on writing while few researchers have investigated how generative AI can facilitate students' multimodal writing process.",
+      "methods": "Liu and colleagues followed eight Chinese undergraduate volunteers at a New Zealand university for two weeks. Four wrote an essay and four made slides on the same topic. Screen recordings, think-aloud accounts, completed work and interviews documented their choices.",
+      "findings": "Slide makers used AI to find examples and connect claims. Some took a proposed image description from one tool to another, then reviewed and revised the image for the slide.",
+      "interpretation": "Making a slide deck gave students decisions about the relationship between an image and its argument that an essay did not require in the same way.",
+      "limitations": "Eight volunteers at a single university completed different assignments. The qualitative evidence describes strategies and does not establish an improvement in writing ability or attention.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true,
+      "digest": {
+        "idea": "How students used AI when making slides and writing essays",
+        "explain": "Making a slide deck gave students decisions about the relationship between an image and its argument that an essay did not require in the same way.",
+        "approach": "Liu and colleagues followed eight Chinese undergraduate volunteers at a New Zealand university for two weeks. Four wrote an essay and four made slides on the same topic. Screen recordings, think-aloud accounts, completed work and interviews documented their choices.",
+        "finding": "Slide makers used AI to find examples and connect claims. Some took a proposed image description from one tool to another, then reviewed and revised the image for the slide.",
+        "interpretation": "Making a slide deck gave students decisions about the relationship between an image and its argument that an essay did not require in the same way.",
+        "limitation": "Eight volunteers at a single university completed different assignments. The qualitative evidence describes strategies and does not establish an improvement in writing ability or attention.",
+        "tags": [
+          "writing",
+          "slides",
+          "multimodal composing"
+        ],
+        "status": "editorially_written_from_indexed_sections",
+        "editorial_basis": "publisher_full_article_paraphrased",
+        "finding_source": "editorial"
+      }
+    },
     "display_headline": "How students think while composing with and without AI",
     "source_quality": {
       "decision": "include",

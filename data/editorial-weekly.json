@@ -154571,11 +154571,12 @@
         "attempts": 1
       },
       "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-11-17T11:51:16+00:00",
+        "attempts": 2,
+        "last_at": "2026-11-18T19:03:33+00:00",
         "pipeline_version": 3,
-        "status": "full_text",
-        "next_at": null
+        "status": "incomplete_reparse",
+        "next_at": "2026-12-09T19:03:34+00:00",
+        "section_repair_version": 4
       },
       "open_access_url": "https://doi.org/10.3389/fpsyg.2026.2007654",
       "analysis": {
@@ -155197,6 +155198,40 @@
       "research_type": "research_synthesis",
       "source_version": "published_institutional_report",
       "evidence": "Institutional research synthesis; reviewed evidence across education settings",
+      "oa_checked": "2026-11-18",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-18",
+        "next_at": "2026-12-16",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-18T19:03:33+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-02T19:03:33+00:00"
+      },
+      "open_access_url": "https://doi.org/10.26300/80wn-ca81",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-18",
+        "next_at": "2026-12-09",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-18",
+        "next_at": "2026-11-20",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_no_entry"
+        ]
+      },
       "original_reading": {
         "id": "week-nov16-stanford",
         "doi": "10.26300/80wn-ca81",
@@ -155431,9 +155466,9 @@
         "retry_status": "accepted",
         "retry_attempts": [
           {
-            "candidate_index": 0,
+            "status": "needs_review",
             "candidate_fingerprint": "843e17ea5b7128fe8e9566389dd1b50abb41de01ff79c81e5e9ad535350c7509",
-            "status": "needs_review",
+            "candidate_index": 0,
             "review_reasons": [
               "duplicate_asset_bytes",
               "duplicate_composition",
@@ -155443,37 +155478,37 @@
             ],
             "review_collisions": [
               {
-                "reason": "duplicate_foreground_subjects",
-                "identity": "doi:10.3389/fpsyg.2026.1832219"
-              },
-              {
-                "reason": "duplicate_foreground_geometry",
-                "identity": "doi:10.3389/fpsyg.2026.1832219"
-              },
-              {
-                "reason": "duplicate_composition",
-                "identity": "doi:10.3389/fpsyg.2026.1832219"
-              },
-              {
-                "reason": "duplicate_asset_bytes",
-                "identity": "doi:10.3389/fpsyg.2026.1832219"
-              },
-              {
-                "reason": "near_visual_twin",
                 "identity": "doi:10.3389/fpsyg.2026.1832219",
+                "reason": "duplicate_foreground_subjects"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1832219",
+                "reason": "duplicate_foreground_geometry"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1832219",
+                "reason": "duplicate_composition"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1832219",
+                "reason": "duplicate_asset_bytes"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1832219",
+                "reason": "near_visual_twin",
                 "metrics": {
-                  "full_mean_difference": 0.0,
-                  "foreground_mean_difference": 0.0,
                   "foreground_iou": 1.0,
-                  "foreground_pixels": 543
+                  "foreground_mean_difference": 0.0,
+                  "foreground_pixels": 543,
+                  "full_mean_difference": 0.0
                 }
               }
             ]
           },
           {
-            "candidate_index": 1,
-            "candidate_fingerprint": "5ef28a87a735b2f3e66e1cf2584a45a6731658c1e1989bfa9d95bc1ce3db8171",
             "status": "needs_review",
+            "candidate_fingerprint": "5ef28a87a735b2f3e66e1cf2584a45a6731658c1e1989bfa9d95bc1ce3db8171",
+            "candidate_index": 1,
             "review_reasons": [
               "duplicate_asset_bytes",
               "duplicate_composition",
@@ -155483,37 +155518,37 @@
             ],
             "review_collisions": [
               {
-                "reason": "duplicate_foreground_subjects",
-                "identity": "doi:10.3389/fpsyg.2026.1930030"
-              },
-              {
-                "reason": "duplicate_foreground_geometry",
-                "identity": "doi:10.3389/fpsyg.2026.1930030"
-              },
-              {
-                "reason": "duplicate_composition",
-                "identity": "doi:10.3389/fpsyg.2026.1930030"
-              },
-              {
-                "reason": "duplicate_asset_bytes",
-                "identity": "doi:10.3389/fpsyg.2026.1930030"
-              },
-              {
-                "reason": "near_visual_twin",
                 "identity": "doi:10.3389/fpsyg.2026.1930030",
+                "reason": "duplicate_foreground_subjects"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1930030",
+                "reason": "duplicate_foreground_geometry"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1930030",
+                "reason": "duplicate_composition"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1930030",
+                "reason": "duplicate_asset_bytes"
+              },
+              {
+                "identity": "doi:10.3389/fpsyg.2026.1930030",
+                "reason": "near_visual_twin",
                 "metrics": {
-                  "full_mean_difference": 0.0,
-                  "foreground_mean_difference": 0.0,
                   "foreground_iou": 1.0,
-                  "foreground_pixels": 576
+                  "foreground_mean_difference": 0.0,
+                  "foreground_pixels": 576,
+                  "full_mean_difference": 0.0
                 }
               }
             ]
           },
           {
-            "candidate_index": 2,
-            "candidate_fingerprint": "1f4bc2ac860511281c604db8fa4188865e8f34d0c8fb967c2b5b6af61412e737",
             "status": "ready",
+            "candidate_fingerprint": "1f4bc2ac860511281c604db8fa4188865e8f34d0c8fb967c2b5b6af61412e737",
+            "candidate_index": 2,
             "review_reasons": []
           }
         ],
@@ -156200,11 +156235,12 @@
         "attempts": 1
       },
       "fulltext_attempt": {
-        "attempts": 1,
-        "last_at": "2026-11-16T13:44:26+00:00",
+        "attempts": 2,
+        "last_at": "2026-11-18T19:03:38+00:00",
         "pipeline_version": 3,
-        "status": "full_text",
-        "next_at": null
+        "status": "incomplete_reparse",
+        "next_at": "2026-12-09T19:03:39+00:00",
+        "section_repair_version": 4
       },
       "open_access_url": "https://doi.org/10.3389/fpsyg.2026.1920791",
       "analysis": {
