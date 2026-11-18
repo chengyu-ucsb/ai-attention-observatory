@@ -424,12 +424,12 @@
       "kind": "scholarly",
       "published": "2026-11-14",
       "source_url": "https://doi.org/10.1093/ser/mwag076",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -440,8 +440,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
+      "last_outcome": "source_unavailable"
     },
     "2149c0b0733c2f7dc4b8606712d3e45d030560d441bc937a9bc97ca5db40986d": {
       "fingerprint": "c0c5882e485b462216878d1be21f37b60df119f3fa4c1af1cbca660a9fc96051",
@@ -542,10 +552,10 @@
       "source_url": "https://doi.org/10.1145/3795867.3831010",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -563,10 +573,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable"
     },
     "752ac044121a5f4104c03a96c31df887eedd4ba5a8b513928af92635df0cd67d": {
@@ -624,10 +641,10 @@
       "source_url": "https://doi.org/10.1007/s44217-026-02232-z",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -645,10 +662,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable"
     },
     "f7560b6cb3a123972eef657cf1503fdd931489e97a824028b6a915b539f43cf9": {
@@ -1034,14 +1058,16 @@
       "source_url": "https://doi.org/10.12973/eu-jer.16.1.191",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [
-        "a2f351d9381705435b9f4b2512c67423c0668558a9df3fedf9460fb6fb3f96bc"
+        "a2f351d9381705435b9f4b2512c67423c0668558a9df3fedf9460fb6fb3f96bc",
+        "dad5bfb5e25f6ea9010949227d1d8c9861c601700b187aa09592de561fb3ed0b",
+        "f8a4e5fc2eedb0676029495ef357aade5fbfe719cc22bd11f863734935931616"
       ],
       "plan": {
         "provider_plan_version": 2,
@@ -1078,10 +1104,31 @@
           "stage": "article",
           "provider": "Semantic Scholar",
           "url": "https://www.eu-jer.com/articles/EU-JER_16_1_191.pdf"
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 2
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.eu-jer.com/EU-JER_16_1_191.pdf"
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.eu-jer.com/university-students-perceptions-of-artificial-intelligence-as-a-tool-for-enhancing-emotional-intelligence-skills-a-descriptive-survey-at-yarmouk-university"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
@@ -1093,6 +1140,15 @@
           ],
           "status": "exhausted",
           "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "dad5bfb5e25f6ea9010949227d1d8c9861c601700b187aa09592de561fb3ed0b",
+            "f8a4e5fc2eedb0676029495ef357aade5fbfe719cc22bd11f863734935931616"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-18T02:41:12.189302+00:00"
         }
       }
     },
@@ -1162,13 +1218,16 @@
       "source_url": "https://doi.org/10.1108/intr-07-2025-1110",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "140b6684182d25a70f0ecc41ced31a16a68e68e83d97c2267cd121bf2ab3ba10",
+        "e33667bbbe1cef31cbfbdb9d4fa6866661cccf538f465b5cf58deaa2673a6dcc"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -1197,10 +1256,31 @@
           "stage": "discovery",
           "provider": "Semantic Scholar",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 2
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.emerald.com/intr/article-pdf/doi/10.1108/INTR-07-2025-1110/11965876/intr-07-2025-1110en.pdf"
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.emerald.com/intr/article/doi/10.1108/INTR-07-2025-1110/1408477/Augmentation-or-automation-A-dual-path-model-of"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
@@ -1210,6 +1290,15 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "140b6684182d25a70f0ecc41ced31a16a68e68e83d97c2267cd121bf2ab3ba10",
+            "e33667bbbe1cef31cbfbdb9d4fa6866661cccf538f465b5cf58deaa2673a6dcc"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-18T02:41:12.189302+00:00"
         }
       }
     },
@@ -1393,10 +1482,10 @@
       "source_url": "https://doi.org/10.62159/isej.v8i1.2969",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 1,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [
@@ -1418,10 +1507,17 @@
           "stage": "article",
           "provider": "existing_source",
           "url": "https://siducat.org/index.php/isej/article/view/2969"
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable"
     },
     "720a7d01a6c05154e3b945f9d6da9222641fe1ac99b90eb60b7a8f2b3973f938": {
@@ -1429,12 +1525,12 @@
       "kind": "scholarly",
       "published": "2026-11-12",
       "source_url": "https://doi.org/10.1108/ijpsm-07-2026-0482",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -1445,8 +1541,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
+      "last_outcome": "source_unavailable"
     },
     "063a352c28da5c09b03daa846c41c41df586e06f14f4b7cffd99a0603b560353": {
       "fingerprint": "2d248604a124003d0f70fc3616be55f88ea024d2db9b07cfefdf5ff28156d24f",
@@ -1743,13 +1849,16 @@
       "source_url": "https://doi.org/10.21203/rs.3.rs-11039287/v1",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "3c78e560c05f62448d97e4e42cf446e871999519805485583bb95d3f623509b1",
+        "d40b7fd7ebdb226c272a714e7bb12b0d3981390657693a8b298f03819e049204"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -1779,10 +1888,31 @@
           "provider": "Semantic Scholar",
           "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.21203/rs.3.rs-11039287/v1",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 2
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.researchsquare.com/article/rs-11039287/v1"
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.researchsquare.com/article/rs-11039287/v1.html"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
@@ -1792,6 +1922,15 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "3c78e560c05f62448d97e4e42cf446e871999519805485583bb95d3f623509b1",
+            "d40b7fd7ebdb226c272a714e7bb12b0d3981390657693a8b298f03819e049204"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-18T02:41:12.189302+00:00"
         }
       }
     },
@@ -2182,12 +2321,12 @@
       "kind": "scholarly",
       "published": "2026-11-11",
       "source_url": "https://doi.org/10.1145/3821523",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -2198,8 +2337,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
+      "last_outcome": "source_unavailable"
     },
     "cbaf773457e350a5c1c5176832ad5e1bf5a3393b9757a6fff47da5516e10b8b3": {
       "fingerprint": "9ad4d18d62264dfc9c2ae7d88adae4fa13fab2139a1802cea5579492809e1c4a",
@@ -3228,13 +3377,16 @@
       "source_url": "https://doi.org/10.1108/itp-12-2025-1853",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "553b3891022772ac2132e84d467fab841c69e80e11182b3a52994fb632a0b793",
+        "ba61b1a9802b0ccaecf9ceb5043fae88ad077311d8c1917e525fc847d70b8c18"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -3263,10 +3415,31 @@
           "stage": "discovery",
           "provider": "Semantic Scholar",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 2
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.emerald.com/itp/article-pdf/doi/10.1108/ITP-12-2025-1853/11958490/itp-12-2025-1853en.pdf"
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://www.emerald.com/itp/article/doi/10.1108/ITP-12-2025-1853/1407802/The-challenge-of-AI-dependence-exploring-its"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
@@ -3276,6 +3449,15 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "553b3891022772ac2132e84d467fab841c69e80e11182b3a52994fb632a0b793",
+            "ba61b1a9802b0ccaecf9ceb5043fae88ad077311d8c1917e525fc847d70b8c18"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-18T02:41:12.189302+00:00"
         }
       }
     },
@@ -3591,13 +3773,14 @@
       "source_url": "https://doi.org/10.54254/2754-1169/2026.38925",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [
+        "861f49d7914663892f464e6974c284ba32c87b1a9f75d5a36660cfb75851975a",
         "c2fed01392c4335faaba0f34aa25bd9162bd89acff9993ee87f9dd57ea399231"
       ],
       "plan": {
@@ -3635,10 +3818,24 @@
           "stage": "article",
           "provider": "Semantic Scholar",
           "url": "https://aemps.ewapub.com/article/view/38925.pdf"
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://aemps.ewapub.com/article/view/38925"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-17T20:07:29.192541+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
@@ -3650,6 +3847,14 @@
           ],
           "status": "exhausted",
           "attempted_at": "2026-11-17T19:09:13.252091+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "861f49d7914663892f464e6974c284ba32c87b1a9f75d5a36660cfb75851975a"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-18T02:41:12.189302+00:00"
         }
       }
     },
@@ -4135,15 +4340,18 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.2196/94097",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 2,
       "cursor": {
         "known": 1,
         "provider": 0,
-        "provider_tried": []
+        "provider_tried": [
+          "a9f0aebca6989c3fe9ffd31c7e4185cc532d4dcd88bedc5081be67660b1fa719"
+        ]
       },
       "tried_sources": [
+        "a9f0aebca6989c3fe9ffd31c7e4185cc532d4dcd88bedc5081be67660b1fa719",
         "c12135ce157dfa34fe38bb60c10dd2f3134c90c244bd0da158fa3022d100dddf"
       ],
       "plan": {
@@ -4169,13 +4377,28 @@
           "retryable": false,
           "stage": "retrieval",
           "candidates_attempted": 1
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 1
+        },
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Europe PMC full-text API",
+          "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13747262/fullTextXML",
+          "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13747262/fullTextXML"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-17T19:09:13.252091+00:00",
+      "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "document": {
-        "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/",
-        "document_version": "unspecified",
+        "source_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13747262/fullTextXML",
+        "document_version": "repository_article_xml",
         "semantic_completeness": "not_verified",
         "review_status": "not_reviewed",
         "source_text_saved": false,
@@ -4185,312 +4408,312 @@
         "units": [
           {
             "unit": 1,
-            "characters": 41,
+            "characters": 50,
             "has_text": true
           },
           {
             "unit": 2,
-            "characters": 168,
+            "characters": 11,
             "has_text": true
           },
           {
             "unit": 3,
-            "characters": 104,
+            "characters": 8,
             "has_text": true
           },
           {
             "unit": 4,
-            "characters": 22,
+            "characters": 8,
             "has_text": true
           },
           {
             "unit": 5,
-            "characters": 33,
+            "characters": 8,
             "has_text": true
           },
           {
             "unit": 6,
-            "characters": 8,
-            "has_text": true
-          },
-          {
-            "unit": 7,
-            "characters": 10,
-            "has_text": true
-          },
-          {
-            "unit": 8,
-            "characters": 467,
-            "has_text": true
-          },
-          {
-            "unit": 9,
-            "characters": 9,
-            "has_text": true
-          },
-          {
-            "unit": 10,
-            "characters": 312,
-            "has_text": true
-          },
-          {
-            "unit": 11,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 12,
-            "characters": 436,
-            "has_text": true
-          },
-          {
-            "unit": 13,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 14,
-            "characters": 591,
-            "has_text": true
-          },
-          {
-            "unit": 15,
-            "characters": 11,
-            "has_text": true
-          },
-          {
-            "unit": 16,
-            "characters": 755,
-            "has_text": true
-          },
-          {
-            "unit": 17,
-            "characters": 12,
-            "has_text": true
-          },
-          {
-            "unit": 18,
-            "characters": 689,
-            "has_text": true
-          },
-          {
-            "unit": 19,
-            "characters": 972,
-            "has_text": true
-          },
-          {
-            "unit": 20,
-            "characters": 1317,
-            "has_text": true
-          },
-          {
-            "unit": 21,
-            "characters": 617,
-            "has_text": true
-          },
-          {
-            "unit": 22,
-            "characters": 1140,
-            "has_text": true
-          },
-          {
-            "unit": 23,
-            "characters": 1379,
-            "has_text": true
-          },
-          {
-            "unit": 24,
-            "characters": 1242,
-            "has_text": true
-          },
-          {
-            "unit": 25,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 26,
-            "characters": 12,
-            "has_text": true
-          },
-          {
-            "unit": 27,
-            "characters": 427,
-            "has_text": true
-          },
-          {
-            "unit": 28,
-            "characters": 11,
-            "has_text": true
-          },
-          {
-            "unit": 29,
-            "characters": 45,
-            "has_text": true
-          },
-          {
-            "unit": 30,
-            "characters": 305,
-            "has_text": true
-          },
-          {
-            "unit": 31,
-            "characters": 3,
-            "has_text": true
-          },
-          {
-            "unit": 32,
-            "characters": 633,
-            "has_text": true
-          },
-          {
-            "unit": 33,
-            "characters": 40,
-            "has_text": true
-          },
-          {
-            "unit": 34,
-            "characters": 520,
-            "has_text": true
-          },
-          {
-            "unit": 35,
-            "characters": 9,
-            "has_text": true
-          },
-          {
-            "unit": 36,
-            "characters": 559,
-            "has_text": true
-          },
-          {
-            "unit": 37,
             "characters": 13,
             "has_text": true
           },
           {
-            "unit": 38,
-            "characters": 8,
+            "unit": 7,
+            "characters": 168,
             "has_text": true
           },
           {
-            "unit": 39,
-            "characters": 568,
+            "unit": 8,
+            "characters": 117,
             "has_text": true
           },
           {
-            "unit": 40,
-            "characters": 26,
+            "unit": 9,
+            "characters": 14,
             "has_text": true
           },
           {
-            "unit": 41,
-            "characters": 609,
+            "unit": 10,
+            "characters": 154,
             "has_text": true
           },
           {
-            "unit": 42,
-            "characters": 22,
+            "unit": 11,
+            "characters": 86,
             "has_text": true
           },
           {
-            "unit": 43,
-            "characters": 1027,
+            "unit": 12,
+            "characters": 231,
             "has_text": true
           },
           {
-            "unit": 44,
-            "characters": 20,
+            "unit": 13,
+            "characters": 9,
             "has_text": true
           },
           {
-            "unit": 45,
-            "characters": 1551,
+            "unit": 14,
+            "characters": 1,
             "has_text": true
           },
           {
-            "unit": 46,
-            "characters": 22,
+            "unit": 15,
+            "characters": 6,
             "has_text": true
           },
           {
-            "unit": 47,
-            "characters": 517,
+            "unit": 16,
+            "characters": 6,
             "has_text": true
           },
           {
-            "unit": 48,
+            "unit": 17,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 18,
+            "characters": 630,
+            "has_text": true
+          },
+          {
+            "unit": 19,
+            "characters": 2636,
+            "has_text": true
+          },
+          {
+            "unit": 20,
+            "characters": 124,
+            "has_text": true
+          },
+          {
+            "unit": 21,
+            "characters": 86,
+            "has_text": true
+          },
+          {
+            "unit": 22,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 23,
+            "characters": 693,
+            "has_text": true
+          },
+          {
+            "unit": 24,
+            "characters": 982,
+            "has_text": true
+          },
+          {
+            "unit": 25,
+            "characters": 1331,
+            "has_text": true
+          },
+          {
+            "unit": 26,
+            "characters": 625,
+            "has_text": true
+          },
+          {
+            "unit": 27,
+            "characters": 1158,
+            "has_text": true
+          },
+          {
+            "unit": 28,
+            "characters": 1389,
+            "has_text": true
+          },
+          {
+            "unit": 29,
+            "characters": 1244,
+            "has_text": true
+          },
+          {
+            "unit": 30,
             "characters": 7,
             "has_text": true
           },
           {
+            "unit": 31,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 32,
+            "characters": 427,
+            "has_text": true
+          },
+          {
+            "unit": 33,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 34,
+            "characters": 45,
+            "has_text": true
+          },
+          {
+            "unit": 35,
+            "characters": 307,
+            "has_text": true
+          },
+          {
+            "unit": 36,
+            "characters": 3,
+            "has_text": true
+          },
+          {
+            "unit": 37,
+            "characters": 637,
+            "has_text": true
+          },
+          {
+            "unit": 38,
+            "characters": 40,
+            "has_text": true
+          },
+          {
+            "unit": 39,
+            "characters": 520,
+            "has_text": true
+          },
+          {
+            "unit": 40,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 41,
+            "characters": 559,
+            "has_text": true
+          },
+          {
+            "unit": 42,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 43,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 44,
+            "characters": 568,
+            "has_text": true
+          },
+          {
+            "unit": 45,
+            "characters": 26,
+            "has_text": true
+          },
+          {
+            "unit": 46,
+            "characters": 613,
+            "has_text": true
+          },
+          {
+            "unit": 47,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 48,
+            "characters": 1031,
+            "has_text": true
+          },
+          {
             "unit": 49,
-            "characters": 27,
+            "characters": 20,
             "has_text": true
           },
           {
             "unit": 50,
-            "characters": 722,
+            "characters": 1557,
             "has_text": true
           },
           {
             "unit": 51,
-            "characters": 63,
+            "characters": 22,
             "has_text": true
           },
           {
             "unit": 52,
-            "characters": 374,
+            "characters": 517,
             "has_text": true
           },
           {
             "unit": 53,
-            "characters": 49,
+            "characters": 7,
             "has_text": true
           },
           {
             "unit": 54,
-            "characters": 547,
+            "characters": 27,
             "has_text": true
           },
           {
             "unit": 55,
-            "characters": 37,
+            "characters": 726,
             "has_text": true
           },
           {
             "unit": 56,
-            "characters": 783,
+            "characters": 63,
             "has_text": true
           },
           {
             "unit": 57,
-            "characters": 142,
+            "characters": 377,
             "has_text": true
           },
           {
             "unit": 58,
-            "characters": 954,
+            "characters": 49,
             "has_text": true
           },
           {
             "unit": 59,
-            "characters": 17,
+            "characters": 554,
             "has_text": true
           },
           {
             "unit": 60,
-            "characters": 136,
+            "characters": 37,
             "has_text": true
           },
           {
             "unit": 61,
-            "characters": 157,
+            "characters": 785,
             "has_text": true
           },
           {
             "unit": 62,
-            "characters": 105,
+            "characters": 1508,
             "has_text": true
           },
           {
@@ -4500,7 +4723,7 @@
           },
           {
             "unit": 64,
-            "characters": 534,
+            "characters": 542,
             "has_text": true
           },
           {
@@ -4510,382 +4733,112 @@
           },
           {
             "unit": 66,
-            "characters": 17,
+            "characters": 37,
             "has_text": true
           },
           {
             "unit": 67,
-            "characters": 37,
+            "characters": 389,
             "has_text": true
           },
           {
             "unit": 68,
-            "characters": 387,
+            "characters": 1504,
             "has_text": true
           },
           {
             "unit": 69,
-            "characters": 95,
+            "characters": 10,
             "has_text": true
           },
           {
             "unit": 70,
-            "characters": 1032,
-            "has_text": true
-          },
-          {
-            "unit": 71,
-            "characters": 17,
-            "has_text": true
-          },
-          {
-            "unit": 72,
-            "characters": 283,
-            "has_text": true
-          },
-          {
-            "unit": 73,
-            "characters": 84,
-            "has_text": true
-          },
-          {
-            "unit": 74,
-            "characters": 10,
-            "has_text": true
-          },
-          {
-            "unit": 75,
             "characters": 18,
             "has_text": true
           },
           {
-            "unit": 76,
+            "unit": 71,
             "characters": 404,
             "has_text": true
           },
           {
-            "unit": 77,
-            "characters": 655,
+            "unit": 72,
+            "characters": 665,
             "has_text": true
           },
           {
-            "unit": 78,
-            "characters": 789,
+            "unit": 73,
+            "characters": 795,
             "has_text": true
           },
           {
-            "unit": 79,
+            "unit": 74,
             "characters": 530,
             "has_text": true
           },
           {
-            "unit": 80,
-            "characters": 386,
+            "unit": 75,
+            "characters": 388,
             "has_text": true
           },
           {
-            "unit": 81,
-            "characters": 690,
+            "unit": 76,
+            "characters": 694,
             "has_text": true
           },
           {
-            "unit": 82,
-            "characters": 1705,
+            "unit": 77,
+            "characters": 1715,
             "has_text": true
           },
           {
-            "unit": 83,
+            "unit": 78,
             "characters": 33,
             "has_text": true
           },
           {
-            "unit": 84,
-            "characters": 1692,
+            "unit": 79,
+            "characters": 1694,
             "has_text": true
           },
           {
-            "unit": 85,
+            "unit": 80,
             "characters": 796,
             "has_text": true
           },
           {
-            "unit": 86,
+            "unit": 81,
             "characters": 11,
             "has_text": true
           },
           {
-            "unit": 87,
+            "unit": 82,
             "characters": 793,
             "has_text": true
           },
           {
-            "unit": 88,
-            "characters": 13,
+            "unit": 83,
+            "characters": 107,
             "has_text": true
           },
           {
-            "unit": 89,
-            "characters": 3,
-            "has_text": true
-          },
-          {
-            "unit": 90,
-            "characters": 26,
-            "has_text": true
-          },
-          {
-            "unit": 91,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 92,
-            "characters": 25,
-            "has_text": true
-          },
-          {
-            "unit": 93,
-            "characters": 3,
-            "has_text": true
-          },
-          {
-            "unit": 94,
-            "characters": 27,
-            "has_text": true
-          },
-          {
-            "unit": 95,
+            "unit": 84,
             "characters": 9,
             "has_text": true
           },
           {
-            "unit": 96,
-            "characters": 353,
+            "unit": 85,
+            "characters": 2069,
             "has_text": true
           },
           {
-            "unit": 97,
-            "characters": 322,
-            "has_text": true
-          },
-          {
-            "unit": 98,
-            "characters": 229,
-            "has_text": true
-          },
-          {
-            "unit": 99,
-            "characters": 1124,
-            "has_text": true
-          },
-          {
-            "unit": 100,
-            "characters": 37,
-            "has_text": true
-          },
-          {
-            "unit": 101,
+            "unit": 86,
             "characters": 10,
             "has_text": true
           },
           {
-            "unit": 102,
-            "characters": 230,
-            "has_text": true
-          },
-          {
-            "unit": 103,
-            "characters": 217,
-            "has_text": true
-          },
-          {
-            "unit": 104,
-            "characters": 150,
-            "has_text": true
-          },
-          {
-            "unit": 105,
-            "characters": 338,
-            "has_text": true
-          },
-          {
-            "unit": 106,
-            "characters": 198,
-            "has_text": true
-          },
-          {
-            "unit": 107,
-            "characters": 177,
-            "has_text": true
-          },
-          {
-            "unit": 108,
-            "characters": 156,
-            "has_text": true
-          },
-          {
-            "unit": 109,
-            "characters": 286,
-            "has_text": true
-          },
-          {
-            "unit": 110,
-            "characters": 133,
-            "has_text": true
-          },
-          {
-            "unit": 111,
-            "characters": 212,
-            "has_text": true
-          },
-          {
-            "unit": 112,
-            "characters": 182,
-            "has_text": true
-          },
-          {
-            "unit": 113,
-            "characters": 213,
-            "has_text": true
-          },
-          {
-            "unit": 114,
-            "characters": 200,
-            "has_text": true
-          },
-          {
-            "unit": 115,
-            "characters": 393,
-            "has_text": true
-          },
-          {
-            "unit": 116,
-            "characters": 351,
-            "has_text": true
-          },
-          {
-            "unit": 117,
-            "characters": 320,
-            "has_text": true
-          },
-          {
-            "unit": 118,
-            "characters": 208,
-            "has_text": true
-          },
-          {
-            "unit": 119,
-            "characters": 259,
-            "has_text": true
-          },
-          {
-            "unit": 120,
-            "characters": 379,
-            "has_text": true
-          },
-          {
-            "unit": 121,
-            "characters": 282,
-            "has_text": true
-          },
-          {
-            "unit": 122,
-            "characters": 230,
-            "has_text": true
-          },
-          {
-            "unit": 123,
-            "characters": 287,
-            "has_text": true
-          },
-          {
-            "unit": 124,
-            "characters": 287,
-            "has_text": true
-          },
-          {
-            "unit": 125,
-            "characters": 337,
-            "has_text": true
-          },
-          {
-            "unit": 126,
-            "characters": 297,
-            "has_text": true
-          },
-          {
-            "unit": 127,
-            "characters": 187,
-            "has_text": true
-          },
-          {
-            "unit": 128,
-            "characters": 201,
-            "has_text": true
-          },
-          {
-            "unit": 129,
-            "characters": 256,
-            "has_text": true
-          },
-          {
-            "unit": 130,
-            "characters": 251,
-            "has_text": true
-          },
-          {
-            "unit": 131,
-            "characters": 306,
-            "has_text": true
-          },
-          {
-            "unit": 132,
-            "characters": 270,
-            "has_text": true
-          },
-          {
-            "unit": 133,
-            "characters": 428,
-            "has_text": true
-          },
-          {
-            "unit": 134,
-            "characters": 303,
-            "has_text": true
-          },
-          {
-            "unit": 135,
-            "characters": 279,
-            "has_text": true
-          },
-          {
-            "unit": 136,
-            "characters": 216,
-            "has_text": true
-          },
-          {
-            "unit": 137,
-            "characters": 259,
-            "has_text": true
-          },
-          {
-            "unit": 138,
-            "characters": 355,
-            "has_text": true
-          },
-          {
-            "unit": 139,
-            "characters": 102,
-            "has_text": true
-          },
-          {
-            "unit": 140,
-            "characters": 173,
-            "has_text": true
-          },
-          {
-            "unit": 141,
-            "characters": 95,
+            "unit": 87,
+            "characters": 9040,
             "has_text": true
           }
         ],
@@ -4896,107 +4849,127 @@
               {
                 "unit": 1,
                 "start": 0,
-                "end": 41
+                "end": 50
               },
               {
                 "unit": 2,
                 "start": 0,
-                "end": 168
+                "end": 11
               },
               {
                 "unit": 3,
                 "start": 0,
-                "end": 104
+                "end": 8
               },
               {
                 "unit": 4,
                 "start": 0,
-                "end": 22
+                "end": 8
               },
               {
                 "unit": 5,
                 "start": 0,
-                "end": 33
+                "end": 8
               },
               {
                 "unit": 6,
                 "start": 0,
-                "end": 8
+                "end": 13
               },
               {
                 "unit": 7,
                 "start": 0,
-                "end": 10
+                "end": 168
               },
               {
                 "unit": 8,
                 "start": 0,
-                "end": 467
+                "end": 117
               },
               {
                 "unit": 9,
                 "start": 0,
-                "end": 9
+                "end": 14
               },
               {
                 "unit": 10,
                 "start": 0,
-                "end": 312
+                "end": 154
               },
               {
                 "unit": 11,
                 "start": 0,
-                "end": 7
+                "end": 86
               },
               {
                 "unit": 12,
                 "start": 0,
-                "end": 436
+                "end": 231
               },
               {
                 "unit": 13,
                 "start": 0,
-                "end": 7
+                "end": 9
               },
               {
                 "unit": 14,
                 "start": 0,
-                "end": 591
+                "end": 1
               },
               {
                 "unit": 15,
                 "start": 0,
-                "end": 11
+                "end": 6
               },
               {
                 "unit": 16,
                 "start": 0,
-                "end": 755
+                "end": 6
               },
               {
                 "unit": 17,
                 "start": 0,
-                "end": 12
+                "end": 10
               },
               {
                 "unit": 18,
                 "start": 0,
-                "end": 689
+                "end": 630
               },
               {
                 "unit": 19,
                 "start": 0,
-                "end": 972
+                "end": 2636
               },
               {
                 "unit": 20,
                 "start": 0,
-                "end": 653
+                "end": 124
               },
               {
-                "unit": 20,
-                "start": 653,
-                "end": 826
+                "unit": 21,
+                "start": 0,
+                "end": 86
+              },
+              {
+                "unit": 22,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 23,
+                "start": 0,
+                "end": 693
+              },
+              {
+                "unit": 24,
+                "start": 0,
+                "end": 366
+              },
+              {
+                "unit": 24,
+                "start": 366,
+                "end": 395
               }
             ]
           },
@@ -5004,64 +4977,39 @@
             "chunk": "C0002",
             "ranges": [
               {
-                "unit": 20,
-                "start": 826,
-                "end": 1317
-              },
-              {
-                "unit": 21,
-                "start": 0,
-                "end": 617
-              },
-              {
-                "unit": 22,
-                "start": 0,
-                "end": 1140
-              },
-              {
-                "unit": 23,
-                "start": 0,
-                "end": 1379
-              },
-              {
                 "unit": 24,
-                "start": 0,
-                "end": 1242
+                "start": 395,
+                "end": 982
               },
               {
                 "unit": 25,
                 "start": 0,
-                "end": 7
+                "end": 1331
               },
               {
                 "unit": 26,
                 "start": 0,
-                "end": 12
+                "end": 625
               },
               {
                 "unit": 27,
                 "start": 0,
-                "end": 427
+                "end": 1158
               },
               {
                 "unit": 28,
                 "start": 0,
-                "end": 11
+                "end": 1389
               },
               {
                 "unit": 29,
                 "start": 0,
-                "end": 45
+                "end": 309
               },
               {
-                "unit": 30,
-                "start": 0,
-                "end": 116
-              },
-              {
-                "unit": 30,
-                "start": 116,
-                "end": 118
+                "unit": 29,
+                "start": 309,
+                "end": 404
               }
             ]
           },
@@ -5069,89 +5017,109 @@
             "chunk": "C0003",
             "ranges": [
               {
+                "unit": 29,
+                "start": 404,
+                "end": 1244
+              },
+              {
                 "unit": 30,
-                "start": 118,
-                "end": 305
+                "start": 0,
+                "end": 7
               },
               {
                 "unit": 31,
                 "start": 0,
-                "end": 3
+                "end": 12
               },
               {
                 "unit": 32,
                 "start": 0,
-                "end": 633
+                "end": 427
               },
               {
                 "unit": 33,
                 "start": 0,
-                "end": 40
+                "end": 11
               },
               {
                 "unit": 34,
                 "start": 0,
-                "end": 520
+                "end": 45
               },
               {
                 "unit": 35,
                 "start": 0,
-                "end": 9
+                "end": 307
               },
               {
                 "unit": 36,
                 "start": 0,
-                "end": 559
+                "end": 3
               },
               {
                 "unit": 37,
                 "start": 0,
-                "end": 13
+                "end": 637
               },
               {
                 "unit": 38,
                 "start": 0,
-                "end": 8
+                "end": 40
               },
               {
                 "unit": 39,
                 "start": 0,
-                "end": 568
+                "end": 520
               },
               {
                 "unit": 40,
                 "start": 0,
-                "end": 26
+                "end": 9
               },
               {
                 "unit": 41,
                 "start": 0,
-                "end": 609
+                "end": 559
               },
               {
                 "unit": 42,
                 "start": 0,
-                "end": 22
+                "end": 13
               },
               {
                 "unit": 43,
                 "start": 0,
-                "end": 1027
+                "end": 8
               },
               {
                 "unit": 44,
                 "start": 0,
-                "end": 20
+                "end": 568
               },
               {
                 "unit": 45,
                 "start": 0,
-                "end": 1195
+                "end": 26
               },
               {
-                "unit": 45,
-                "start": 1195,
-                "end": 1240
+                "unit": 46,
+                "start": 0,
+                "end": 613
+              },
+              {
+                "unit": 47,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 48,
+                "start": 0,
+                "end": 739
+              },
+              {
+                "unit": 48,
+                "start": 739,
+                "end": 813
               }
             ]
           },
@@ -5159,94 +5127,89 @@
             "chunk": "C0004",
             "ranges": [
               {
-                "unit": 45,
-                "start": 1240,
-                "end": 1551
-              },
-              {
-                "unit": 46,
-                "start": 0,
-                "end": 22
-              },
-              {
-                "unit": 47,
-                "start": 0,
-                "end": 517
-              },
-              {
                 "unit": 48,
-                "start": 0,
-                "end": 7
+                "start": 813,
+                "end": 1031
               },
               {
                 "unit": 49,
                 "start": 0,
-                "end": 27
+                "end": 20
               },
               {
                 "unit": 50,
                 "start": 0,
-                "end": 722
+                "end": 1557
               },
               {
                 "unit": 51,
                 "start": 0,
-                "end": 63
+                "end": 22
               },
               {
                 "unit": 52,
                 "start": 0,
-                "end": 374
+                "end": 517
               },
               {
                 "unit": 53,
                 "start": 0,
-                "end": 49
+                "end": 7
               },
               {
                 "unit": 54,
                 "start": 0,
-                "end": 547
+                "end": 27
               },
               {
                 "unit": 55,
                 "start": 0,
-                "end": 37
+                "end": 726
               },
               {
                 "unit": 56,
                 "start": 0,
-                "end": 783
+                "end": 63
               },
               {
                 "unit": 57,
                 "start": 0,
-                "end": 142
+                "end": 377
               },
               {
                 "unit": 58,
                 "start": 0,
-                "end": 954
+                "end": 49
               },
               {
                 "unit": 59,
                 "start": 0,
-                "end": 17
+                "end": 554
               },
               {
                 "unit": 60,
                 "start": 0,
-                "end": 136
+                "end": 37
               },
               {
                 "unit": 61,
                 "start": 0,
-                "end": 157
+                "end": 785
               },
               {
                 "unit": 62,
                 "start": 0,
-                "end": 105
+                "end": 527
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 62,
+                "start": 527,
+                "end": 1508
               },
               {
                 "unit": 63,
@@ -5256,22 +5219,7 @@
               {
                 "unit": 64,
                 "start": 0,
-                "end": 346
-              },
-              {
-                "unit": 64,
-                "start": 346,
-                "end": 455
-              }
-            ]
-          },
-          {
-            "chunk": "C0005",
-            "ranges": [
-              {
-                "unit": 64,
-                "start": 455,
-                "end": 534
+                "end": 542
               },
               {
                 "unit": 65,
@@ -5281,82 +5229,47 @@
               {
                 "unit": 66,
                 "start": 0,
-                "end": 17
+                "end": 37
               },
               {
                 "unit": 67,
                 "start": 0,
-                "end": 37
+                "end": 389
               },
               {
                 "unit": 68,
                 "start": 0,
-                "end": 387
+                "end": 1504
               },
               {
                 "unit": 69,
                 "start": 0,
-                "end": 95
+                "end": 10
               },
               {
                 "unit": 70,
                 "start": 0,
-                "end": 1032
+                "end": 18
               },
               {
                 "unit": 71,
                 "start": 0,
-                "end": 17
+                "end": 404
               },
               {
                 "unit": 72,
                 "start": 0,
-                "end": 283
+                "end": 665
               },
               {
                 "unit": 73,
                 "start": 0,
-                "end": 84
+                "end": 132
               },
               {
-                "unit": 74,
-                "start": 0,
-                "end": 10
-              },
-              {
-                "unit": 75,
-                "start": 0,
-                "end": 18
-              },
-              {
-                "unit": 76,
-                "start": 0,
-                "end": 404
-              },
-              {
-                "unit": 77,
-                "start": 0,
-                "end": 655
-              },
-              {
-                "unit": 78,
-                "start": 0,
-                "end": 789
-              },
-              {
-                "unit": 79,
-                "start": 0,
-                "end": 530
-              },
-              {
-                "unit": 80,
-                "start": 0,
-                "end": 386
-              },
-              {
-                "unit": 81,
-                "start": 0,
-                "end": 28
+                "unit": 73,
+                "start": 132,
+                "end": 251
               }
             ]
           },
@@ -5364,44 +5277,44 @@
             "chunk": "C0006",
             "ranges": [
               {
-                "unit": 81,
-                "start": 28,
-                "end": 690
+                "unit": 73,
+                "start": 251,
+                "end": 795
               },
               {
-                "unit": 82,
+                "unit": 74,
                 "start": 0,
-                "end": 1705
+                "end": 530
               },
               {
-                "unit": 83,
+                "unit": 75,
+                "start": 0,
+                "end": 388
+              },
+              {
+                "unit": 76,
+                "start": 0,
+                "end": 694
+              },
+              {
+                "unit": 77,
+                "start": 0,
+                "end": 1715
+              },
+              {
+                "unit": 78,
                 "start": 0,
                 "end": 33
               },
               {
-                "unit": 84,
+                "unit": 79,
                 "start": 0,
-                "end": 1692
+                "end": 1501
               },
               {
-                "unit": 85,
-                "start": 0,
-                "end": 796
-              },
-              {
-                "unit": 86,
-                "start": 0,
-                "end": 11
-              },
-              {
-                "unit": 87,
-                "start": 0,
-                "end": 555
-              },
-              {
-                "unit": 87,
-                "start": 555,
-                "end": 594
+                "unit": 79,
+                "start": 1501,
+                "end": 1589
               }
             ]
           },
@@ -5409,154 +5322,54 @@
             "chunk": "C0007",
             "ranges": [
               {
-                "unit": 87,
-                "start": 594,
+                "unit": 79,
+                "start": 1589,
+                "end": 1694
+              },
+              {
+                "unit": 80,
+                "start": 0,
+                "end": 796
+              },
+              {
+                "unit": 81,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 82,
+                "start": 0,
                 "end": 793
               },
               {
-                "unit": 88,
+                "unit": 83,
                 "start": 0,
-                "end": 13
+                "end": 107
               },
               {
-                "unit": 89,
-                "start": 0,
-                "end": 3
-              },
-              {
-                "unit": 90,
-                "start": 0,
-                "end": 26
-              },
-              {
-                "unit": 91,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 92,
-                "start": 0,
-                "end": 25
-              },
-              {
-                "unit": 93,
-                "start": 0,
-                "end": 3
-              },
-              {
-                "unit": 94,
-                "start": 0,
-                "end": 27
-              },
-              {
-                "unit": 95,
+                "unit": 84,
                 "start": 0,
                 "end": 9
               },
               {
-                "unit": 96,
+                "unit": 85,
                 "start": 0,
-                "end": 353
+                "end": 2069
               },
               {
-                "unit": 97,
-                "start": 0,
-                "end": 322
-              },
-              {
-                "unit": 98,
-                "start": 0,
-                "end": 229
-              },
-              {
-                "unit": 99,
-                "start": 0,
-                "end": 1124
-              },
-              {
-                "unit": 100,
-                "start": 0,
-                "end": 37
-              },
-              {
-                "unit": 101,
+                "unit": 86,
                 "start": 0,
                 "end": 10
               },
               {
-                "unit": 102,
+                "unit": 87,
                 "start": 0,
-                "end": 230
+                "end": 1589
               },
               {
-                "unit": 103,
-                "start": 0,
-                "end": 217
-              },
-              {
-                "unit": 104,
-                "start": 0,
-                "end": 150
-              },
-              {
-                "unit": 105,
-                "start": 0,
-                "end": 338
-              },
-              {
-                "unit": 106,
-                "start": 0,
-                "end": 198
-              },
-              {
-                "unit": 107,
-                "start": 0,
-                "end": 177
-              },
-              {
-                "unit": 108,
-                "start": 0,
-                "end": 156
-              },
-              {
-                "unit": 109,
-                "start": 0,
-                "end": 286
-              },
-              {
-                "unit": 110,
-                "start": 0,
-                "end": 133
-              },
-              {
-                "unit": 111,
-                "start": 0,
-                "end": 212
-              },
-              {
-                "unit": 112,
-                "start": 0,
-                "end": 182
-              },
-              {
-                "unit": 113,
-                "start": 0,
-                "end": 213
-              },
-              {
-                "unit": 114,
-                "start": 0,
-                "end": 200
-              },
-              {
-                "unit": 115,
-                "start": 0,
-                "end": 393
-              },
-              {
-                "unit": 116,
-                "start": 0,
-                "end": 2
+                "unit": 87,
+                "start": 1589,
+                "end": 1591
               }
             ]
           },
@@ -5564,109 +5377,14 @@
             "chunk": "C0008",
             "ranges": [
               {
-                "unit": 116,
-                "start": 2,
-                "end": 351
+                "unit": 87,
+                "start": 1591,
+                "end": 7077
               },
               {
-                "unit": 117,
-                "start": 0,
-                "end": 320
-              },
-              {
-                "unit": 118,
-                "start": 0,
-                "end": 208
-              },
-              {
-                "unit": 119,
-                "start": 0,
-                "end": 259
-              },
-              {
-                "unit": 120,
-                "start": 0,
-                "end": 379
-              },
-              {
-                "unit": 121,
-                "start": 0,
-                "end": 282
-              },
-              {
-                "unit": 122,
-                "start": 0,
-                "end": 230
-              },
-              {
-                "unit": 123,
-                "start": 0,
-                "end": 287
-              },
-              {
-                "unit": 124,
-                "start": 0,
-                "end": 287
-              },
-              {
-                "unit": 125,
-                "start": 0,
-                "end": 337
-              },
-              {
-                "unit": 126,
-                "start": 0,
-                "end": 297
-              },
-              {
-                "unit": 127,
-                "start": 0,
-                "end": 187
-              },
-              {
-                "unit": 128,
-                "start": 0,
-                "end": 201
-              },
-              {
-                "unit": 129,
-                "start": 0,
-                "end": 256
-              },
-              {
-                "unit": 130,
-                "start": 0,
-                "end": 251
-              },
-              {
-                "unit": 131,
-                "start": 0,
-                "end": 306
-              },
-              {
-                "unit": 132,
-                "start": 0,
-                "end": 270
-              },
-              {
-                "unit": 133,
-                "start": 0,
-                "end": 428
-              },
-              {
-                "unit": 134,
-                "start": 0,
-                "end": 303
-              },
-              {
-                "unit": 135,
-                "start": 0,
-                "end": 37
-              },
-              {
-                "unit": 135,
-                "start": 37,
-                "end": 43
+                "unit": 87,
+                "start": 7077,
+                "end": 7090
               }
             ]
           },
@@ -5674,59 +5392,33 @@
             "chunk": "C0009",
             "ranges": [
               {
-                "unit": 135,
-                "start": 43,
-                "end": 279
-              },
-              {
-                "unit": 136,
-                "start": 0,
-                "end": 216
-              },
-              {
-                "unit": 137,
-                "start": 0,
-                "end": 259
-              },
-              {
-                "unit": 138,
-                "start": 0,
-                "end": 355
-              },
-              {
-                "unit": 139,
-                "start": 0,
-                "end": 102
-              },
-              {
-                "unit": 140,
-                "start": 0,
-                "end": 173
-              },
-              {
-                "unit": 141,
-                "start": 0,
-                "end": 95
+                "unit": 87,
+                "start": 7090,
+                "end": 9040
               }
             ]
           }
         ],
-        "evidence_status": "partial_full_text",
-        "html_completeness": "not_verified",
-        "characters_retrieved": 45436,
-        "units_retrieved": 141,
-        "source_sha256": "ee6bdc75f58e79a787f5286e865d4cae6891f59d13b8918519303a1d2ea5b5d9",
-        "html_extraction_version": "article-body-v2"
+        "evidence_status": "full_document_retrieved",
+        "document_format": "jats",
+        "structured_text_coverage": "all_text_in_supplied_article_xml",
+        "source_document_equivalence": "not_verified",
+        "layout_fidelity": "not_verified",
+        "rights_basis": "article_metadata_permissive_license",
+        "characters_retrieved": 45943,
+        "units_retrieved": 87,
+        "source_sha256": "ee44b6ea74075b2670e071b835c1c902018a8f437a10323fc2995f2a5267d1c3"
       },
       "document_evidence": {
-        "status": "partial_full_text",
+        "status": "full_document_retrieved",
         "retryable": false,
         "stage": "article",
-        "provider": "existing_source",
-        "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/",
-        "final_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13747262/"
+        "provider": "Europe PMC full-text API",
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13747262/fullTextXML",
+        "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13747262/fullTextXML"
       },
-      "last_outcome": "partial_full_text"
+      "last_outcome": "full_document_retrieved",
+      "provider_attempted_at": "2026-11-18T02:41:12.189302+00:00"
     },
     "9623527df8fae02bc64e93b4c493ac3ee7c58eae2c62cd0db555660ec7e2137a": {
       "fingerprint": "9e19333817ff9e021127ba1961038630b2d3ec4693c0f3255bb05ac6e8987821",
@@ -5905,7 +5597,7 @@
       }
     }
   },
-  "cursor": 23,
+  "cursor": 36,
   "provider_pauses": {
     "provider:CORE": "2026-11-18T03:35:36.394089+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
@@ -27252,21 +26944,21 @@
     }
   ],
   "input_fingerprint": "1208414bf6ac43685e026091893418d3c7ecd808d301e37f47390f9be4d5c8f0",
-  "state_sha256": "bd03f0fa4fbdc60888b0b663b8590d2e16e7d84852bf00babaa9219f1efcf917",
+  "state_sha256": "a08e5b63e2224641cc8330f22db1a5f32467400500c3ea1da9104c03f17fc267",
   "run": {
-    "checked_at": "2026-11-18T02:35:35.684009+00:00",
+    "checked_at": "2026-11-18T02:41:12.189302+00:00",
     "selected_records": 75,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 6,
-    "pending_records": 69,
+    "completed_records": 7,
+    "pending_records": 68,
     "deferred_retry_records": 22,
     "statuses": {
       "access_blocked": 3,
-      "full_document_retrieved_not_reviewed": 2,
+      "full_document_retrieved_not_reviewed": 3,
       "partial_full_text_not_reviewed": 1,
-      "pending": 42,
-      "pending_routes": 5,
+      "pending": 39,
+      "pending_routes": 7,
       "rate_limited": 18,
       "temporarily_unavailable": 4
     },
