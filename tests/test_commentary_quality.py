@@ -140,6 +140,69 @@ class EditorialIntegrityTests(unittest.TestCase):
         raw=next(r for r in rows if r["url"]==family)
         self.assertEqual(evidence([raw]), [])
 
+    def test_human_practice_and_control_are_distinct_from_generic_ai_mentions(self):
+        row = {"kind": "nonacademic", "title": "AI and society",
+               "reading": {"digest": {"longform": {}}}}
+        thesis = row["reading"]["digest"]["longform"]
+        for argument in (
+            "An AI tutor may leave teenagers fewer opportunities to develop their own judgments.",
+            "The guide asks when AI can support a developing skill and when it can displace practice.",
+            "Schools ask whether students can access search without enabling AI features.",
+            "A review of generative AI in education examines the limits of evidence available to schools.",
+        ):
+            with self.subTest(argument=argument):
+                thesis["thesis"] = argument
+                self.assertEqual(news_quality.commentary_topic(row), "direct")
+        for argument in (
+            "Families can develop a plan to protect children's online privacy.",
+            "Families can develop their own skills to protect children's online privacy.",
+            "Schools ask families to review passwords and account security.",
+            "The company expanded access to AI models with faster inference speed.",
+            "The supplier forecasts growing sales of AI chips to schools.",
+        ):
+            with self.subTest(argument=argument):
+                thesis["thesis"] = argument
+                thesis["examples"] = "One example discusses AI tutors and independent judgments."
+                self.assertIsNone(news_quality.commentary_topic(row))
+
+    def test_ai_headline_cannot_relabel_an_adjacent_attention_argument(self):
+        row = {"kind": "nonacademic", "title": "Living in an AI age",
+               "reading": {"digest": {"longform": {
+                   "thesis": "Workers can batch notifications to reduce interruptions during focused work."}}}}
+        self.assertEqual(news_quality.commentary_topic(row), "adjacent")
+        row["reading"]["digest"]["longform"]["thesis"] = (
+            "An automated agent can make choices on a person's behalf, complicating meaningful consent.")
+        self.assertEqual(news_quality.commentary_topic(row), "direct")
+
+    def test_current_correction_sources_survive_fresh_public_projection(self):
+        """The real reviewed issue must rebuild after the relevance gate changes."""
+        import build_issue
+        date = "2026-11-16"
+        packet = json.loads((ROOT / 'data/edition-corrections' / (date + '.json')).read_text())
+        library = json.loads((ROOT / 'data/library.json').read_text())
+        additions = {entry['source']['id'] for entry in packet['reviewed_additions']}
+        with tempfile.TemporaryDirectory() as directory:
+            data = Path(directory)
+            (data / 'library.json').write_text(json.dumps(library))
+            (data / 'weekly.json').write_text(json.dumps({"run": {}, "items": library}))
+            (data / 'reading-headlines.json').write_text((ROOT / 'data/reading-headlines.json').read_text())
+            for folder in ('approved-issues', 'edition-corrections'):
+                (data / folder).mkdir()
+                (data / folder / (date + '.json')).write_text((ROOT / 'data' / folder / (date + '.json')).read_text())
+            (data / 'issue-editorial.json').write_text((ROOT / 'data/issue-editorial.json').read_text())
+            with patch.object(build_public, 'DATA', data), patch.object(build_public, 'attach_art'):
+                selected, _ = build_public.build()
+            public_ids = {build_public.record_id(row) for row in selected}
+            self.assertTrue(additions <= public_ids, additions - public_ids)
+            for row in selected:
+                if row.get('kind') == 'nonacademic' and build_public.record_id(row) in additions:
+                    self.assertEqual(news_quality.commentary_topic(row), 'direct')
+            with patch.object(build_issue, 'DATA', data):
+                issue = build_issue.build(date, reviewed_correction=True, check_only=True)
+            self.assertEqual(issue['source_count'], len(packet['baseline_source_ids']) + len(additions))
+            self.assertEqual({row['id'] for row in issue['sources']}, set(packet['baseline_source_ids']) | additions)
+            self.assertFalse((data / 'public-issue.json').exists())
+
     def test_deep_source_analysis_must_have_examples_and_tension(self):
         row=feed(THIN,"An analysis of AI","An article argues that automation reshapes our cognitive priorities.")
         row["deep_analysis"]={"kind":"nonacademic","source_depth":"source_html",

@@ -226,6 +226,8 @@ SUBJECTS.update({
     "parenting": (("parent", "family"), "a larger and smaller open book side by side", "classroom"),
     "apps": (("apps", "app permissions", "app and website", "focus filters", "ios", "android"), "a phone with separately shuttered app windows", "digital_window"),
     "comparison": (("performance and metacognition", "support-dependence discrepancy", "dependent and autonomous"), "two separated work surfaces connected by a loose paper ribbon", "workbench"),
+    "advice": (("advice", "adviser", "advisor"), "a hand holding two separate proposal cards", "folded_paper"),
+    "donation": (("donation", "donate", "charitable"), "an open giving envelope beside a single unmarked coin", "workbench"),
 })
 
 # All noun choices retain the exact source phrase and field that licensed them.
@@ -242,7 +244,7 @@ def contextual_subjects(inputs: dict, spec: dict, *, limit: int | None = 2) -> l
             continue
         generic = name in {"practice", "support", "literacy", "critical", "metacognition", "effort", "feedback", "offload"}
         score = (100 if field == "title" else 0) + max(map(len, hits)) - (38 if generic else 0)
-        if name in {"motion_video", "knowledge", "fact_check", "making", "feedback_literacy", "experiment", "lesson", "ecology", "trust", "doctoral", "hci", "surveillance", "consent", "network", "science", "ownership", "time", "physical", "vision", "eap", "terminology", "preservice", "children", "workplace", "explanation", "multimodal", "comparison", "framework", "undergraduate", "routes", "market", "ballot", "parenting", "apps"}:
+        if name in {"motion_video", "knowledge", "fact_check", "making", "feedback_literacy", "experiment", "lesson", "ecology", "trust", "doctoral", "hci", "surveillance", "consent", "network", "science", "ownership", "time", "physical", "vision", "eap", "terminology", "preservice", "children", "workplace", "explanation", "multimodal", "comparison", "framework", "undergraduate", "routes", "market", "ballot", "parenting", "apps", "advice", "donation"}:
             score += 24
         ranked.append((score, -order, {"subject": name, "field": field, "phrases": sorted(hits)}))
     ranked.sort(key=lambda x: (x[0], x[1]), reverse=True)
@@ -773,6 +775,17 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
         c.rect(36,-95,118,208,RED,stroke=INK,stroke_width=8)
         c.path("M-111 7 Q5 130 116 7", "none", INK, 18)
         c.path("M-111 7 Q5 130 116 7", "none", PAPER, 7)
+    elif subject == "advice":
+        # Competing proposals, with no implied best choice or outcome.
+        c.path("M-140 -131 L-25 -156 L5 8 L-109 33 Z", PAPER, INK, 8)
+        c.path("M17 -131 L133 -104 L98 58 L-18 31 Z", RED, INK, 8)
+        hand(c,-68,101,.86,-12)
+    elif subject == "donation":
+        # A literal task setting; the single unmarked coin encodes no amount.
+        c.path("M-138 -5 L0 -112 L138 -5 V151 H-138 Z", PAPER, INK, 8)
+        c.path("M-138 -5 L0 91 L138 -5 M-138 151 L-37 65 M138 151 L37 65", "none", INK, 6)
+        c.circle(0,-63,53,RED,stroke=INK,stroke_width=7)
+        c.circle(0,-63,32,PAPER,stroke=INK,stroke_width=4)
     elif subject == "craft":
         c.path("M-122 -30 H126 V151 H-122 Z M-57 -31 V-77 H62 V-31", PAPER, INK, 9)
         c.path("M-108 13 H112 M-14 1 V26", "none", RED, 13)

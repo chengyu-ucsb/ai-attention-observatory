@@ -489,13 +489,14 @@
 /* Future articles: automatic source-based visual, no pseudo-statistics. */
 #paper-content .rv-artwork .automatic-evidence{background:#fcf6f3;border:1px solid #e2cdca;padding:24px 25px 19px}
 #paper-content .automatic-evidence .figure-insight-title{font:400 clamp(23px,2.5vw,29px)/1.2 var(--display);margin:10px 0 20px;letter-spacing:-.015em}
-#paper-content .auto-evidence-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px}
+#paper-content .auto-evidence-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:12px}
+#paper-content .auto-evidence-board:has(.auto-evidence-wide){grid-template-columns:minmax(0,1fr)}
 #paper-content .auto-evidence-item{background:#f2dfdd;padding:22px 19px;border-top:4px solid #a94458;min-width:0}
 #paper-content .auto-evidence-item:nth-child(2){background:#e9c8c9;border-top-color:#804052}
 #paper-content .auto-evidence-item:nth-child(3){background:#f2e7e2;border-top-color:#b87982}
 #paper-content .auto-evidence-n{font:600 28px/1 var(--display);color:#bd7f89;display:block;margin-bottom:20px}
 #paper-content .auto-evidence-label{display:block;color:#49343b;font:700 var(--type-caption)/1.4 var(--sans);margin-bottom:10px}
-#paper-content .auto-evidence-text{font:400 var(--type-small)/1.69 var(--sans);color:#5a5053;overflow-wrap:break-word;margin:0}
+#paper-content .auto-evidence-text{font:400 var(--type-body)/1.69 var(--sans);color:#5a5053;overflow-wrap:break-word;margin:0;max-width:var(--measure-reading)}
 #paper-content .automatic-evidence figcaption{margin:17px 0 0;font:400 var(--type-caption)/1.65 var(--sans);color:#776a70}
 @media(max-width:650px){#paper-content .rv-artwork .automatic-evidence{padding:19px 16px}
 #paper-content .auto-evidence-board{grid-template-columns:1fr}
@@ -1318,6 +1319,17 @@ summary,.theme-browser button,.nav-toggle {
 @media (max-width:680px) {.design-inbox {grid-template-columns:minmax(0,1fr)}}
 
 /* Reader headings and citations */
+#paper-content .reviewed-table-scroll { overflow-x:auto; max-width:100%; }
+#paper-content .reviewed-comparison-table { min-width:420px; }
+#paper-content .reviewed-comparison-table th,
+#paper-content .reviewed-comparison-table td {
+  text-align:left;
+  font-size:var(--type-body);
+  line-height:1.5;
+  letter-spacing:0;
+  vertical-align:top;
+}
+#paper-content .reviewed-evidence .concept-note a { display:block; margin-top:10px; }
 #paper-content .rv-article .rv-head > .rv-headline {
   max-width: 32ch;
   margin-block: .35em .4em;

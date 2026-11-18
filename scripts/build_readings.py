@@ -8,6 +8,7 @@ from editorial_corrections import apply as apply_editorial_corrections
 from news_quality import useful_description
 from source_lineage import prepare
 from original_readings import note_for
+from reading_depth import has_article_sections
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 LIB=ROOT/"data/library.json"
 STOP=("abstract unavailable","bibliographic metadata only","no abstract", "abstract not available")
@@ -61,7 +62,7 @@ def make_note(r):
     conceptual=r.get("research_type")=="conceptual_framework"
     editorial=is_editorial(r)
     framework=r.get("framework_notes") or {}
-    licensed=bool(full.get("fulltext_url"))
+    licensed=has_article_sections(r)
     if licensed:
         approach=clean(full.get("methods"))[:1500]
         # Only the Results/Findings section can populate the reported-results field.

@@ -2,6 +2,35 @@
 from collections import Counter
 import json
 from pathlib import Path
+import re
+
+
+SECTION_KEYS = ("methods", "results", "discussion", "limitations")
+
+
+def has_article_sections(record):
+    """A source locator alone is not a reading of article text.
+
+    This validates presence only, not completeness, quality, or reuse rights.
+    A partial extraction stays partial even when it has usable paragraphs.
+    """
+    source = record.get("verified_article_review") or record.get("analysis") or {}
+    if not isinstance(source, dict) or not source.get("fulltext_url"):
+        return False
+    for key in SECTION_KEYS:
+        value = source.get(key)
+        if isinstance(value, str):
+            value = re.sub(r"<[^>]+>", " ", value)
+            if len(value.strip()) >= 20 and len(re.findall(r"[^\W\d_]+", value)) >= 4:
+                return True
+    return False
+
+
+def has_machine_sections(record):
+    """Count extracted article prose separately from original reviewed paraphrases."""
+    source = record.get("analysis") or {}
+    return (isinstance(source, dict) and not source.get("original_paraphrases_only")
+            and has_article_sections({"analysis": source}))
 
 
 def identity(record):
@@ -24,6 +53,8 @@ def depth_audit(records):
         open_link = record.get("open_access_url") or ""
         if level == "abstract":
             reason = "abstract_only_open_link" if open_link else "abstract_only"
+        elif level == "full_text" and not reading.get("original_summary") and not has_article_sections(record):
+            reason = "full_text_label_without_article_sections"
         elif level == "full_text" and basis == "abstract":
             reason = "finding_from_abstract_despite_article_sections"
         elif level == "full_text" and basis == "none" and reading.get("research_type") not in (
@@ -32,7 +63,7 @@ def depth_audit(records):
         else:
             continue
         counts[reason] += 1
-        gaps.append({"id": identity(record), "title": record["title"], "reason": reason,
+        gaps.append({"id": identity(record), "title": record.get("title", ""), "reason": reason,
                      "open_access_url": open_link, "reading_level": level,
                      "finding_source": basis})
     return {"counts": dict(sorted(counts.items())), "finding_basis": dict(sorted(findings.items())),

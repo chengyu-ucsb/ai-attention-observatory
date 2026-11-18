@@ -198,7 +198,9 @@ class OriginalSummaryTests(unittest.TestCase):
     def test_actual_public_projection_and_rss_preserve_or_withhold(self):
         with tempfile.TemporaryDirectory() as tmp:
             data=Path(tmp)/'data';data.mkdir()
-            row=record();row['reading']=make_note(row)
+            row=record()
+            row['analysis']['results']='ORIGINAL MACHINE RESULTS: Students reported lower effort on the second task.'
+            row['reading']=make_note(row)
             (data/'library.json').write_text(json.dumps([row]))
             (data/'weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
             manifest=data/'original-readings.json';manifest.write_text(json.dumps({'articles':[accepted()]}))

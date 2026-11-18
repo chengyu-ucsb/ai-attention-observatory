@@ -24,7 +24,7 @@ def commentary():
     n = accepted(); n.update(doi='', record_url=row['url'])
     n['source'].update(url=row['url'], version='publisher_article', format='html', source_doi='')
     n['summary'] = {
-        'thesis': 'The synthetic author argues that human oversight should accompany automated decisions.',
+        'thesis': 'The synthetic author argues that human oversight should accompany AI-based decisions.',
         'reasoning': 'The author reasons that context can change the meaning of an automated decision and that review offers an opportunity to challenge mistakes.',
         'examples': 'A fictional appeal process illustrates how a person could supply missing context without demonstrating that every appeal would improve outcomes.',
         'tension': 'The synthetic essay describes a tension between handling many decisions quickly and making room for individual context and accountability.',

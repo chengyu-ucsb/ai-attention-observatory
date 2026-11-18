@@ -400,6 +400,17 @@ def check(page, url, width, out):
     expect(page.locator('.rv-content')).to_contain_text('n = 47')
     expect(page.locator('.automatic-evidence')).to_contain_text('Source: abstract')
     overflow(); screenshot('source-reading')
+    choose_section(page, 'article-section', 'overview')
+    # A full-width long card must not leave other paragraphs in a narrow,
+    # mostly empty multi-column grid (the tutoring reading exposed this bug).
+    board = page.locator('.auto-evidence-board')
+    if board.count():
+        measurements = board.evaluate('''el => ({width:el.getBoundingClientRect().width,
+          cards:Array.from(el.children).map(card=>({width:card.getBoundingClientRect().width,
+            font:parseFloat(getComputedStyle(card.querySelector(".auto-evidence-text")).fontSize)}))})''')
+        for card in measurements['cards']:
+            assert card['width'] >= min(280, measurements['width']) - 2, measurements
+            assert card['font'] >= 16, measurements
     choose_section(page, 'article-section', 'evidence')
     reader = page.locator('.rv-source-excerpts')
     expect(reader.locator('.rv-reader-contents')).to_be_visible()
@@ -991,7 +1002,17 @@ def check_registered_readings(page, url, width, out, payloads):
         if 'Preprint, not verified peer-reviewed evidence' in reading['notice']:
             expect(paper).to_contain_text('Limited reading.')
             expect(paper).to_contain_text('Article screening is not peer review')
-        expect(paper.locator('.automatic-evidence, .rv-artwork, .rv-original-figure')).to_have_count(0)
+        expect(paper.locator('.automatic-evidence, .rv-original-figure')).to_have_count(0)
+        if row.get('visual', {}).get('kind') == 'reviewed_comparison':
+            expect(paper.locator('.reviewed-evidence')).to_have_count(1)
+            table = paper.locator('.reviewed-comparison-table')
+            expect(table).to_have_attribute('aria-label', row['visual']['description'])
+            for comparison in row['visual']['rows']:
+                for cell in comparison:
+                    expect(table).to_contain_text(cell)
+            expect(paper.locator('.reviewed-evidence a')).to_have_attribute('href', reading['source_url'])
+        else:
+            expect(paper.locator('.rv-artwork')).to_have_count(0)
         evidence = paper.locator('.rv-evidence')
         expect(evidence).to_have_count(1)
         choose_section(page, 'article-section', 'evidence')

@@ -143,8 +143,8 @@ RESULT_CLAIM = re.compile(
  r"(?:participants|students|respondents|workers|patients) (?:in [^.]{0,100} )?reported (?:significantly )?(?:higher|lower)|"
  r"(?<![-–—])(?:predicted|increased|decreased|moderated|mediated))\b",re.I)
 UNTESTED = re.compile(
- r"\b(?:hypothesi[sz]|we (?:propose|expect|aim|seek|explore|test)|"
- r"the present study (?:examines|investigates|aims)|"
+ r"\b(?:hypothesi[sz]\w*|we (?:propos(?:e|ed)|expect(?:ed|s)?|aim(?:ed|s)?|seek|sought|explore(?:d|s)?|test(?:ed|s)?)|"
+ r"(?:this|the present) study (?:examines|investigates|aims)|"
  r"may (?:be|lead|affect)|future research|should be studied|"
  r"previous research (?:suggests|shows)|prior studies|recent work|"
  r"evidence on whether|evidence (?:is|remains) (?:mixed|divided)|"

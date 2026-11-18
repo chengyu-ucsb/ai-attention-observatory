@@ -970,6 +970,38 @@ function additionalArtwork(x){
  }
 }
 
+function reviewedEvidenceArtwork(x){
+ const spec=x.visual||{},reading=x.reading||{},source=spec.source||{};
+ if(spec.kind!=="reviewed_comparison"||!reading.original_summary||
+    spec.reading_id!==reading.original_summary_id||spec.doi!==x.doi||
+    source.url!==reading.source_url||source.version!==reading.source_version||
+    source.sha256!==reading.source_sha256||!httpsSourceUrl(source.url)||
+    !Array.isArray(spec.headers)||!Array.isArray(spec.rows)||
+    spec.headers.length<2||spec.headers.length>4||spec.rows.length>6||
+    !spec.rows.every(row=>Array.isArray(row)&&row.length===spec.headers.length))return null;
+ const figure=make("figure","article-concept-art article-data-visual evidence-graphic reviewed-evidence");
+ add(figure,make("p","eyebrow","Source table, simplified"),make("h3","figure-insight-title",spec.title));
+ const table=make("table","matrix-table reviewed-comparison-table");
+ table.setAttribute("aria-label",spec.description);
+ const thead=make("thead",""),heading=make("tr","");
+ for(const label of spec.headers){const th=make("th","",label);th.setAttribute("scope","col");heading.append(th);}
+ thead.append(heading);table.append(thead);
+ const tbody=make("tbody","");
+ for(const row of spec.rows){
+  const tr=make("tr","");
+  row.forEach((value,index)=>{const cell=make(index?"td":"th","",value);if(!index)cell.setAttribute("scope","row");tr.append(cell);});
+  tbody.append(tr);
+ }
+ table.append(tbody);
+ const caption=make("figcaption","concept-note",spec.caption);
+ caption.append(link(source.attribution+" · "+source.locator,source.url,"rv-secondary-link"));
+ const tableScroll=make("div","reviewed-table-scroll");
+ tableScroll.setAttribute("role","region");
+ tableScroll.setAttribute("aria-label",spec.title+" comparison table");
+ tableScroll.setAttribute("tabindex","0");
+ tableScroll.append(table);
+ add(figure,tableScroll,caption);return figure;
+}
 function automaticEvidenceArtwork(x){
  const spec=x.visual||{};
  if(x.kind!=="scholarly"||!["evidence_snapshot","research_design"].includes(spec.kind))return null;
@@ -1308,7 +1340,7 @@ function showPaper(x){
  const body=make("section","rv-content"),analysis=make("section","rv-analysis"),evidencePanel=make("section","rv-evidence-panel");
  // Older indexed graphics can describe a different source version. Keep the
  // checked original prose primary instead of reusing those unreviewed visuals.
- const art=original?null:conceptArtwork(x);
+ const art=reviewedEvidenceArtwork(x)||(original?null:conceptArtwork(x));
  const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
  const lead=make("div","rv-section-head");
  add(lead,make("span","rv-section-overline",scholarly&&!journalEditorial?"Research at a glance":"At a glance"),

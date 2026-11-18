@@ -98,10 +98,29 @@ HUMAN_AI_USE = re.compile(
     r"\b(?:human (?:oversight|control|decisions?|agency)|agency|agentiality|"
     r"delegat\w*|consent\w*|autonomy|on (?:people.s|\w+ users?.?|their) behalf|"
     r"(?:assistant|app)[- ](?:level|access)|user controls?|control over|"
-    r"learning|learners?|studying|thinking|reasoning|recall|judg(?:e)?ment|"
+    r"learning|learners?|studying|thinking|reasoning|recall|judg(?:e)?ments?|tutor(?:s|ing)?|"
     r"decision[- ]making|writing|readers?|reliance|rely(?:ing)? on|overreliance|"
     r"(?:teachers?|students?|employees?|workers?) (?:use|using|used|adopt\w*)|"
     r"(?:work|study) (?:habits|practices)|reflection|cognitive|attention)\b", re.I)
+# These phrases describe the work or choice a person keeps. Check only the
+# source's central argument, never a feed category or a list of examples.
+HUMAN_PRACTICE = re.compile(
+    r"\b(?:(?:develop(?:ing)?|build(?:ing)?|practis(?:e|ing)|practic(?:e|ing)) "
+    r"(?:\w+ ){0,3}skills?|(?:displac|replac|bypass|skip)\w* "
+    r"(?:\w+ ){0,2}(?:practice|problem[- ]solving)|"
+    r"(?:research|review|evidence|studies)\b[^.!?]{0,70}"
+    r"\b(?:AI|artificial intelligence) in (?:education|teaching|classrooms?))\b", re.I)
+HUMAN_AI_ACCESS = re.compile(
+    r"\b(?:access to|enabl\w*|disabl\w*|opt\w* (?:in|out)|"
+    r"turn\w* (?:on|off))\b[^.!?]{0,65}\b(?:AI|artificial intelligence)\b", re.I)
+# A title can identify which system the thesis discusses, but cannot supply
+# the topic on its own. These aliases retain checked accounts of AI agents or
+# classifications without admitting unrelated skill/attention pieces merely
+# because their headline mentions AI.
+AI_ARGUMENT_ALIAS = re.compile(
+    r"\b(?:automated (?:agents?|assistants?|systems?|moderation)|"
+    r"machine (?:classifications?|decisions?|recommendations?)|"
+    r"language models?|chatbots?)\b", re.I)
 TECHNICAL_OR_FIGURATIVE = re.compile(
     r"\b(?:(?:self|cross|multi[- ]?head|scaled dot[- ]product)[- ]attention|"
     r"(?:machine|deep|reinforcement|representation|transfer) learning|"
@@ -136,8 +155,11 @@ def commentary_topic(record):
                  (ATTENTION_BEHAVIOR.search(argument) and BEHAVIOR_CONTEXT.search(argument)))
     if SYSTEM_EVALUATION.search(argument) and not BEHAVIOR_CONTEXT.search(argument):
         return None
-    human_use = HUMAN_AI_USE.search(argument) or emerging_human_topic(argument)
-    if AI.search(title + ' ' + argument) and (human_use or attention):
+    human_use = (HUMAN_AI_USE.search(argument) or emerging_human_topic(argument)
+                 or HUMAN_PRACTICE.search(argument)
+                 or (HUMAN_AI_ACCESS.search(argument) and BEHAVIOR_CONTEXT.search(argument)))
+    central_ai = AI.search(argument) or (AI.search(title) and AI_ARGUMENT_ALIAS.search(argument))
+    if central_ai and (human_use or attention):
         return 'direct'
     if attention:
         return 'adjacent'

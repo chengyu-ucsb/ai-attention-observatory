@@ -37,6 +37,31 @@ def png(width=12, height=8):
 
 
 class ArticleArtTests(unittest.TestCase):
+    def test_adviser_and_donation_tasks_get_distinct_grounded_subjects(self):
+        rows = [row for row in public_records() if any(
+            key in row.get("url", "") for key in ("2611.15732", "2611.16667"))]
+        self.assertEqual(len(rows), 2)
+        with tempfile.TemporaryDirectory() as directory:
+            art.attach_art(rows, Path(directory))
+        artworks = [row["editorial_art"] for row in rows]
+        self.assertTrue(all(item["status"] == "ready" for item in artworks))
+        self.assertTrue(all("advice" in item["visual_subjects"] for item in artworks))
+        choices = next(row["editorial_art"] for row in rows if "2611.15732" in row["url"])
+        giving = next(row["editorial_art"] for row in rows if "2611.16667" in row["url"])
+        self.assertIn("agency", choices["visual_subjects"])
+        self.assertIn("donation", giving["visual_subjects"])
+        self.assertNotEqual(choices["foreground_signature"], giving["foreground_signature"])
+        for row in rows:
+            inputs = art.public_inputs(row)
+            for ground in row["editorial_art"]["source_grounding"]:
+                self.assertTrue(ground["phrases"])
+                self.assertTrue(all(phrase in inputs[ground["field"]].lower()
+                                    for phrase in ground["phrases"]))
+            self.assertIn("Not a depiction of study results", row["editorial_art"]["alt"])
+        # An advice topic alone does not satisfy the two-context requirement.
+        thin = art.choose_concept(art.public_inputs(article("A perspective on advice")))
+        self.assertEqual(len(thin["source_grounding"]), 1)
+
     def test_context_cues_do_not_confuse_substrings_or_unrelated_subjects(self):
         self.assertFalse(art.matches("restrictions for students", ("rest", "or ")))
         self.assertFalse(art.matches("rather than treating constant monitoring as the default", ("monitoring",)))
@@ -671,6 +696,9 @@ class PublicationBoundaryTests(unittest.TestCase):
             data.mkdir()
             (data / "library.json").write_text(json.dumps(rows))
             (data / "weekly.json").write_text(json.dumps({"run": {}, "items": rows}))
+            # Keep the accepted heading for this real source so the fixture
+            # reaches the artwork gate rather than the editorial heading queue.
+            (data / "reading-headlines.json").write_bytes((ROOT / "data/reading-headlines.json").read_bytes())
             with patch.object(build_public, "DATA", data):
                 selected, week = build_public.build()
             self.assertEqual(len(selected), 1)

@@ -13,7 +13,8 @@ from build_visuals import visual_spec
 from article_art_queue import attach_persistent_art as attach_art
 from search_plan import source_class
 from verified_full_article_notes import apply as apply_checked_sections
-from reading_depth import depth_audit
+from reading_depth import depth_audit, has_article_sections, has_machine_sections
+from reading_headlines import headline_decision, review_item
 from source_lineage import prepare
 from build_readings import make_note, is_editorial
 from editorial_corrections import apply as apply_editorial_corrections
@@ -32,7 +33,7 @@ def readable(record):
     level=reading.get("level")
     if level=="citation_only":return False
     if record.get("kind")=="scholarly":
-        if level=="full_text":return bool(record.get("analysis",{}).get("fulltext_url"))
+        if level=="full_text":return has_article_sections(record)
         # Scholarly sources must contain real abstract text, not title-based synopsis.
         return level=="abstract" and len(record.get("abstract_text") or "")>=90
     # Nonacademic descriptions and editorial annotations can be used if attributable
@@ -113,13 +114,17 @@ def build():
     headlines = json.loads(headlines_path.read_text()) if headlines_path.exists() else {}
     selected=[]
     pending=[]
+    headline_queue=[]
     held=Counter()
     for source in all_records:
         source=public_record(source)
         stale_editorial=(source.get("kind")=="scholarly" and is_editorial(source)
                          and source.get("reading",{}).get("research_type")!="editorial"
                          and not source.get("reading",{}).get("original_summary"))
-        if source.get("verified_article_review") or not source.get("reading") or stale_editorial or (source.get("research_type")=="conceptual_framework" and source.get("reading",{}).get("research_type")!="conceptual_framework"):
+        # Recompute scholarly cards from their current evidence on every build.
+        # Existing full-text labels and digests may predate corrected extraction
+        # or removal of a review. make_note preserves accepted original readings.
+        if source.get("kind")=="scholarly" or source.get("verified_article_review") or not source.get("reading") or stale_editorial or (source.get("research_type")=="conceptual_framework" and source.get("reading",{}).get("research_type")!="conceptual_framework"):
             source["reading"]=make_note(source)
         if source.get("kind")=="scholarly":
             quality=screen_source(source)
@@ -150,17 +155,18 @@ def build():
         if not readable(published):
             held["insufficient_source_text"]+=1
             continue
-        display_headline = headlines.get(record_id(published))
-        if display_headline:
-            published["display_headline"] = display_headline
+        heading = headline_decision(published, headlines)
+        if heading["status"] == "review_needed":
+            headline_queue.append(review_item(published, heading))
+            held["heading_awaiting_editorial_review"] += 1
+            continue
+        published["display_headline"] = heading["headline"]
         published["source_quality"]=quality
         published["source_group"]=source_class(source, editorial_topic=quality.get("topic") if source.get("kind")=="nonacademic" else None)
         published["visual"]=visual_spec(published)
         selected.append(published)
-    long_titles = [record_id(row) for row in selected
-                  if len(row.get("title") or "") > 88 and not row.get("display_headline")]
-    if long_titles:
-        print(json.dumps({"headlines_needing_editorial_review": long_titles}))
+    (DATA/"headline-review-queue.json").write_text(json.dumps(
+        {"version":1,"items":headline_queue},ensure_ascii=False,indent=2)+"\n")
     # Editorial illustrations are a separate presentation layer, created only
     # after every source-depth and publication gate above has passed. They never
     # alter evidence graphics, source provenance, eligibility, or public counts.
@@ -199,7 +205,7 @@ def build():
     run["companion_count"]=len(selected)-len(canonical)
     run["full_text_count"]=sum(x.get("reading",{}).get("level")=="full_text" for x in canonical)
     run["original_summary_count"]=sum(bool(x.get("reading",{}).get("original_summary")) for x in canonical)
-    run["machine_sections_count"]=sum(bool(x.get("analysis",{}).get("fulltext_url")) and not x.get("analysis",{}).get("original_paraphrases_only") for x in canonical)
+    run["machine_sections_count"]=sum(has_machine_sections(x) for x in canonical)
     run["abstract_count"]=sum(x.get("reading",{}).get("level")=="abstract" for x in canonical)
     run["ai_specific_count"]=sum(x["source_group"]=="AI-specific" for x in canonical)
     run["historical_foundations_count"]=sum(x["source_group"].startswith(("Earlier","Historical")) for x in canonical)
