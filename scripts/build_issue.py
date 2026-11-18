@@ -232,6 +232,11 @@ def build(edition_date=None, use_published_sources=False, reviewed_correction=Fa
   bounds=previous_week(weekly["run"]["date"])
   if any(not weekly_eligible(x,*bounds) for x in items):
    raise ValueError("Weekly source lacks verified previous-week original publication evidence; rebuild/review the source shelf")
+  # Revalidating an original summary can replace its weekly snapshot with the
+  # current index row, which deliberately carries no edition-specific role.
+  # Derive that role only after every source passes the original-date boundary;
+  # never relabel an older source merely because its snapshot claimed this role.
+  items=[{**item,"editorial_role":"publication_week"} for item in items]
  schema={
   "edition_date":issue_date,"source_count":len(items),
   **({"publication_window":weekly["run"]["publication_window"]} if weekly.get("run",{}).get("publication_window") else {}),

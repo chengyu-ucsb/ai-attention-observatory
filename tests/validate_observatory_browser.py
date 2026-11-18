@@ -798,6 +798,10 @@ def typed_reading_payloads():
     preprint = public_record(annotate(preprint))
     assert readable(preprint) and preprint['reading'].get('original_summary')
     assert 'not verified peer-reviewed evidence' in preprint['reading']['notice']
+    # The display heading is separate from both the bibliographic title and
+    # approved summary prose. Exercise that distinction in navigation fixtures.
+    checked['display_headline'] = 'Human oversight in AI decisions'
+    preprint['display_headline'] = 'Easier tasks and lasting learning'
     library = [x for x in [checked, preprint, *rejected] if readable(x)]
     assert len(library) == 2
     for item in library:
@@ -831,7 +835,10 @@ def check_typed_readings(page, url, width, out):
     page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
     page.goto(url + '#library', wait_until='networkidle')
     expect(page.locator('.library-story')).to_have_count(2)
-    card = page.locator('.library-story').filter(has_text=commentary['reading']['digest']['idea'])
+    card = page.locator('.library-story').filter(
+        has=page.get_by_role('button', name=commentary['display_headline'], exact=True))
+    expect(card.locator('h3 button')).to_have_text(commentary['display_headline'])
+    expect(card.locator('h3 button')).to_be_visible()
     temporal = commentary['reading']['temporal_notice']
     for value in (temporal, 'policy analysis', 'Synthetic policy author', 'not human review'):
         expect(card).to_contain_text(value)
@@ -843,6 +850,11 @@ def check_typed_readings(page, url, width, out):
     card.locator('h3 button').click()
     expect(page.locator('#paper')).to_be_visible()
     paper = page.locator('#paper-content')
+    expect(paper.locator('.rv-headline')).to_have_text(commentary['display_headline'])
+    choose_section(page, 'article-section', 'source')
+    expect(paper.locator('.rv-source-title')).to_have_text(commentary['title'])
+    expect(paper.locator('.rv-source-title')).to_be_visible()
+    choose_section(page, 'article-section', 'overview')
     expect(paper.locator('.rv-head')).to_contain_text(temporal)
     dates = paper.locator('.rv-source-dates')
     dialog, trigger = open_reading_card(page, dates)
@@ -871,7 +883,16 @@ def check_typed_readings(page, url, width, out):
         page.screenshot(path=str(out / f'observatory-{width}-synthetic-commentary.png'), full_page=True)
     paper.locator('.rv-back').click()
     expect(page.locator('#library')).to_be_visible()
-    page.locator('.library-story').filter(has_text=preprint['title']).locator('h3 button').click()
+    preprint_card = page.locator('.library-story').filter(
+        has=page.get_by_role('button', name=preprint['display_headline'], exact=True))
+    expect(preprint_card.locator('h3 button')).to_have_text(preprint['display_headline'])
+    expect(preprint_card.locator('h3 button')).to_be_visible()
+    preprint_card.locator('h3 button').click()
+    expect(paper.locator('.rv-headline')).to_have_text(preprint['display_headline'])
+    choose_section(page, 'article-section', 'source')
+    expect(paper.locator('.rv-source-title')).to_have_text(preprint['title'])
+    expect(paper.locator('.rv-source-title')).to_be_visible()
+    choose_section(page, 'article-section', 'overview')
     expect(paper).to_contain_text('Limited reading.')
     expect(paper).to_contain_text('not verified peer-reviewed evidence')
     expect(paper).to_contain_text('How it was studied')
@@ -965,15 +986,37 @@ def check_registered_readings(page, url, width, out, payloads):
             route.continue_()
     page.route('**/data/*.json*', fulfill)
     page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
+    version_labels = {
+        'publisher_article': 'Publisher article',
+        'publisher_version_of_record': 'Publisher article',
+        'publishedVersion': 'Published version',
+        'author_posted_manuscript': 'Author manuscript',
+        'published_institutional_report': 'Institutional report',
+    }
     for row in originals:
         reading = row['reading']
+        version = reading['source_version']
+        source_label = version_labels.get(version, re.sub(
+            r'^arxiv_preprint_v(\d+)$', r'arXiv preprint v\1 · review unverified', version))
+        if reading.get('source_format'):
+            source_label += ' · ' + reading['source_format'].upper()
         commentary = reading.get('research_type') == 'attributed_commentary'
         identifier = row.get('doi') or row['url']
         page.goto(url + '#paper/' + quote(identifier, safe=''), wait_until='networkidle')
         paper = page.locator('#paper-content')
         expect(page.locator('#paper')).to_be_visible()
+        choose_section(page, 'article-section', 'source')
+        expect(paper.locator('.rv-source-title')).to_have_text(row['title'].strip())
+        expect(paper.locator('.rv-source-title')).to_be_visible()
+        expect(paper.locator('.rv-source .rv-source-version')).to_have_text('Checked source: ' + source_label)
+        expect(paper.locator('.rv-source .rv-source-version')).to_be_visible()
+        dialog, trigger = open_reading_card(page, paper.locator('.rv-provenance'))
+        expect(dialog).to_contain_text('Source version identifier: ' + version)
+        close_reading_card(page, dialog, trigger)
+        choose_section(page, 'article-section', 'overview')
         expect(paper.locator('.rv-primary-link')).to_have_attribute('href', reading['source_url'])
-        expect(paper).to_contain_text(reading['source_version'])
+        expect(paper.locator('.rv-source-row')).to_contain_text(source_label)
+        expect(paper.locator('.rv-source-row')).to_be_visible()
         expect(paper).to_contain_text(reading['review_scope'])
         expect(paper).to_contain_text(reading['notice'])
         expect(paper).to_contain_text('not human review')

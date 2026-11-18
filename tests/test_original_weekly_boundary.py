@@ -43,6 +43,47 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
     def test_checked_same_doi_source_still_enters_week(self):
         self.assertTrue(weekly_eligible(self.row(),*previous_week('2026-11-02')))
 
+    def test_revalidated_original_gets_week_role_only_after_date_check(self):
+        """Exercise the real current-index replacement that drops snapshot roles."""
+        for older in (False, True):
+            row=self.arxiv()
+            if older:
+                row['published']='2026-10-01'
+                row['publication_date_provenance'].update(
+                    value=row['published'],raw=row['published']+'T12:00:00Z')
+                article_screen(row['original_reading'],row)
+                approve(row['original_reading'])
+                row=annotate(row)
+            snapshot={**deepcopy(row),'editorial_role':'publication_week'}
+            with self.subTest(older=older),tempfile.TemporaryDirectory() as tmp:
+                data=Path(tmp);manifest=data/'original-readings.json'
+                manifest.write_text(json.dumps({'articles':[row['original_reading']]}))
+                (data/'library.json').write_text(json.dumps([row]))
+                (data/'public-weekly.json').write_text(json.dumps({
+                    'run':{'date':'2026-11-02','publication_window':window_metadata('2026-11-02')},
+                    'items':[snapshot]}))
+                (data/'issue-editorial.json').write_text('{}')
+                archive=data/'approved-issues';archive.mkdir()
+                historical=archive/'2026-10-26.json'
+                historical.write_text(json.dumps({'edition_date':'2026-10-26',
+                    'status':'published','sources':[{'id':'historical-fixture',
+                    'editorial_role':'collection_week'}]}))
+                frozen=historical.read_bytes()
+                with patch.object(original,'MANIFEST',manifest),patch.object(build_issue,'DATA',data):
+                    current=original.public_record(snapshot,require_current=True)
+                    self.assertTrue(current['reading']['original_summary'])
+                    self.assertNotIn('editorial_role',current)
+                    if older:
+                        with self.assertRaisesRegex(ValueError,'previous-week original publication'):
+                            build_issue.build()
+                        self.assertFalse((data/'public-issue.json').exists())
+                    else:
+                        issue=build_issue.build()
+                        self.assertEqual(issue['sources'][0]['editorial_role'],'publication_week')
+                        self.assertEqual(issue['sources'][0]['published'],row['published'])
+                        self.assertEqual(issue['source_count'],1)
+                self.assertEqual(historical.read_bytes(),frozen)
+
     def test_old_working_version_is_library_only_and_cannot_pad_week(self):
         row=record();note=accepted();note['source'].update(
             source_doi='10.9999/working-paper',related_journal_doi=row['doi'],version='working_paper')
