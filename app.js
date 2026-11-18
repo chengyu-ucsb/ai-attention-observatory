@@ -1091,7 +1091,10 @@ function httpsSourceUrl(value){
 function doiUrl(doi){return "https://doi.org/"+encodeURIComponent(doi).replace(/%2F/gi,"/")}
 function checkedSourceLabel(reading){
  const version=reading.source_version||"Source version not recorded";
- const label=version.replace(/^arxiv_preprint_v(\d+)$/,"arXiv preprint v$1 · review unverified").replace(/^publisher_article$/,"Publisher article");
+ const labels={publisher_article:"Publisher article",publisher_version_of_record:"Publisher article",
+  publishedVersion:"Published version",author_posted_manuscript:"Author manuscript",
+  published_institutional_report:"Institutional report"};
+ const label=labels[version]||version.replace(/^arxiv_preprint_v(\d+)$/,"arXiv preprint v$1 · review unverified");
  return label+(reading.source_format?" · "+reading.source_format.toUpperCase():"");
 }
 function originalEvidence(reading){

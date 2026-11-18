@@ -149,7 +149,9 @@ for(const r of db){
  }
  if(r.reading?.original_summary){
   const version=match(page,"rv-source-row");
-  const expectedVersion=r.reading.source_version.replace(/^arxiv_preprint_v(\d+)$/,"arXiv preprint v$1 · review unverified").replace(/^publisher_article$/,"Publisher article");
+  const versionLabels={publisher_article:"Publisher article",publisher_version_of_record:"Publisher article",
+   publishedVersion:"Published version",author_posted_manuscript:"Author manuscript",published_institutional_report:"Institutional report"};
+  const expectedVersion=versionLabels[r.reading.source_version]||r.reading.source_version.replace(/^arxiv_preprint_v(\d+)$/,"arXiv preprint v$1 · review unverified");
   assert(version&&proseText(version).includes(expectedVersion),"Specific readable version must be outside optional disclosures");
   assert(proseText(provenance).includes(r.reading.source_version),"Raw source version must remain in provenance");
  }
