@@ -659,7 +659,6 @@ def annotate(record):
   digest={
    "idea":source_title_headline(record),
    "explain":context,
-   "explain_source":"abstract_paraphrase" if context and paraphrase else "abstract_excerpt" if context else "none",
    "approach":approach,
    "approach_source":approach_source,
    "finding":reported,
@@ -672,6 +671,8 @@ def annotate(record):
    "editorial_basis":"full_text" if fulltext else "abstract",
    "reading_mode":"finding" if reported else "research_question"
   }
+  if context:
+   digest["explain_source"]="abstract_paraphrase" if paraphrase else "abstract_excerpt"
  machine=record.get("deep_analysis") or {}
  if (level=="full_text" and machine.get("kind")=="scholarly" and
      machine.get("source_depth")=="full_text"):
