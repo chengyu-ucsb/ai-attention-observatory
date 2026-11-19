@@ -13,7 +13,7 @@ article reader, permanent editions, and Experimental Lab. The
 | --- | --- | --- |
 | Understand | The main idea, a few takeaways, a meaningful visual, and the limitation needed to interpret the claim | Visible at the start of the selected section |
 | Explore | A related theme, method, example, comparison, or activity | Visible chapter navigation, a theme card, or a bounded two-sided card |
-| Inspect | Full context, source locators, publication history, and how the summary was made | A clearly named dialog or dedicated reading view |
+| Inspect | Original publication, relevant source passages, and edition history | Source panel or permanent edition link |
 
 Do not make the reader open a control to discover every substantive statement.
 Do not show every level at once. Preserve complete text and source links when
@@ -82,24 +82,23 @@ than adding a new visual identity to each component.
 
 ## Brief notices, precise evidence
 
-Use one short general notice on a reading surface, such as:
+Use one short general notice on the article or edition: “AI-generated summary.
+AI can make mistakes.” Keep a preprint version or abstract-only basis near the
+claim it qualifies. Link to the original publication and retain its full title
+and authors in the source panel.
 
-> AI-generated summary. AI can make mistakes; check the original source.
+Give a finding its population, comparison, and measured outcome where known.
+Only include an interpretation when it adds something specific that the source
+supports. For news, explain what happened and who said what. For an opinion
+piece, name the writer and explain the argument. A journal can publish an
+editorial and a newspaper can report on a study. Classify the work being linked.
 
-Put the fuller account of source checking, extraction, and editorial history in
-an optional **About this summary** or **Source details** dialog. Do not repeat a
-long generic warning on every card or under every paragraph.
+Keep review receipts, extraction logs, repeated section locators, and
+source-check timestamps in the editorial records. This applies to public cards,
+article tabs, edition shelves, archive pages, and feeds. Readers can follow a
+direct link to a relevant page, table, or section when it helps them assess a claim.
 
-Generic AI notices and research limitations have different purposes. Keep
-essential distinctions near the relevant claim: abstract-based material,
-preprints, a proposed framework, a correlation, a self-report outcome, or a
-fictional demonstration. The brief general notice does not replace these facts.
-Do not describe an AI check as independent human review.
-
-For the Lab, the default notice is simply **Interactive demonstrations, not
-cognitive tests.** A fictional scenario or simulated timeline also needs that
-short identification beside its activity. Longer explanations belong in the
-activity's background panel, not its main controls.
+Identify fictional scenarios and simulated outcomes within their Lab activities.
 
 ## A Lab that can grow
 

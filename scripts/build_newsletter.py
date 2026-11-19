@@ -6,9 +6,10 @@ An unreviewed new week must not erase the latest published edition.
 from __future__ import annotations
 from datetime import date, datetime, time, timezone
 from email.utils import format_datetime
-from original_readings import safe_url as safe_original_url
+from reading_headlines import genre_label, reader_genre, reader_headline
 from build_issue import citation_url, validate_issue_citations, validate_section_citations
 from build_reader import encoded
+from reader_issue import feed_snapshot
 from hashlib import sha256
 import html
 import json
@@ -108,8 +109,8 @@ button:hover{border-color:#b6001c;color:#b6001c}
 .edition-intro details{margin:4px 0 12px}.edition-intro .layer-open{margin:0 0 12px}
 .ai-note{font-size:var(--type-caption);color:#646064;margin:12px 0 22px}
 .reader-map{padding:22px;background:#f5f1ee;border:1px solid #ded6d1;margin:26px 0 20px;border-radius:8px}
-.reader-map .stamp{margin:0 0 14px}.map-hub{display:flex;align-items:center;gap:10px;font:600 var(--type-small)/1.4 var(--font-interface);margin:0 0 16px}
-.map-hub svg{width:34px;height:34px;flex:none;color:#b6001c}.map-note{font-size:var(--type-caption);margin:0;color:#646064}
+.reader-map .stamp{margin:0 0 14px}
+.edition-sources{list-style:none;margin:0;padding:0}.edition-sources li{margin:0;padding:12px 0;border-bottom:1px solid #ded6d1}.edition-sources li:last-child{border-bottom:0}.edition-sources a{font-weight:600}.edition-sources p{margin:4px 0 0}.source-group{margin:20px 0 30px}.source-group h3{margin:0;border-bottom:2px solid #b6001c;padding-bottom:8px}.edition-utilities>.scope{flex:1 0 100%;margin:0}
 .overview{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:0 0 12px}.overview li{padding:0;border:0;position:relative}
 .overview a{display:flex;flex-direction:column;gap:6px;height:100%;min-height:108px;padding:15px;background:#fffefa;border:1px solid #cfc5c2;border-top:3px solid #b6001c;border-radius:5px;text-decoration:none;color:#333}
 .overview a:hover,.overview a[aria-current="true"]{border-color:#b6001c;background:#fff}.map-index{font:600 var(--type-caption)/1.2 var(--font-interface);color:#b6001c}
@@ -195,44 +196,73 @@ def brief_title(value):
     return str(value or '').replace('Attention Edit','Attention Brief').replace('Weekly Edit','Weekly Brief')
 
 def readable_version(value):
-    version=str(value or 'stated version')
-    return version.replace('_',' ').replace('arxiv','arXiv').replace('publisher article','Publisher article')
+    """Only versions with a meaningful public distinction belong in the citation."""
+    version = ' '.join(str(value or '').lower().replace('_', ' ').split())
+    if 'arxiv' in version or 'preprint' in version:
+        revision = re.search(r'\bv[0-9]+\b', version)
+        return ('arXiv preprint' if 'arxiv' in version else 'Preprint') + (' ' + revision[0] if revision else '')
+    if 'working paper' in version:
+        return 'Working paper'
+    return ''
 
-def source_links(issue,ids):
-    lookup={r['id']:r for r in issue.get('sources',[])}
-    out=[]
-    for number,ident in enumerate(ids or [],1):
-        source=lookup.get(ident)
-        if not source:continue
-        original=source.get('original_summary') and safe_original_url(source.get('source_url'))
-        url=citation_url(source)
-        version=(' · '+readable_version(source.get('source_version'))) if original else ''
-        out.append('<a class="source-link" href="'+esc(url)+'" title="'+esc(source.get('title') or 'Original source')+'">'+esc((source.get('title') or 'Original source')+version)+'</a>')
-    return ' · '.join(out)
 
-def source_shelf(issue, disclosure=True, include_note=True):
-    """One provenance shelf, complete in RSS and expandable on the web."""
-    rows=[]
-    for source in issue.get('sources',[]):
-        original=source.get('original_summary') and safe_original_url(source.get('source_url'))
-        url=citation_url(source)
-        row='<li><a href="'+esc(url)+'">'+esc(source.get('title') or 'Original source')+'</a>'
-        meta=[source.get(k) for k in ('kind','venue','published','reading_level','source_version') if source.get(k)]
-        row+='<p class="source-meta">'+esc(' · '.join(meta))+'</p>'
-        for key,label in [('source_doi','Source DOI'),('related_journal_doi','Related journal DOI (different version)'),('review_label','Source assessment'),('review_scope','Scope'),('quality_note','Limits')]:
-            if source.get(key):row+='<p>'+esc(label+': '+source[key])+'</p>'
-        notices=[]
-        for key in ('notice','temporal_notice'):
-            notice=source.get(key)
-            if notice and notice not in notices:
-                row+='<p>'+esc(notice)+'</p>'
-                notices.append(notice)
-        rows.append(row+'</li>')
-    note=render_text(issue.get('editorial_note',''),issue) if include_note else ''
-    if include_note and any(s.get('original_summary') for s in issue.get('sources',[])):
-        note+='<p>AI source-check, not human review or independent replication. Version-specific scope and limitations are listed with each source.</p>'
-    content=note+'<ol>'+''.join(rows)+'</ol>'
-    return ('<details class="source-shelf" data-edition-layer="sources"><summary>Sources · '+str(len(rows))+'</summary>'+content+'</details>') if disclosure else '<h2>Sources &amp; reading details</h2>'+content
+def source_rows(sources, *, bibliography=False):
+    """A reader citation is an allowlist, independent of what the audit stores."""
+    rows = []
+    for source in sources:
+        url = citation_url(source)
+        headline = reader_headline(source) or 'Original source'
+        title = source.get('title') or headline
+        metadata = [genre_label(source), source.get('attributed_to'), source.get('venue'),
+                    readable_version(source.get('source_version'))]
+        if source.get('reading_level') == 'abstract':
+            metadata.append('Abstract only')
+        if bibliography:
+            metadata.append(source.get('published'))
+        byline = ' · '.join(dict.fromkeys(value for value in metadata if value))
+        row = ('<li><a class="source-link" href="' + esc(url) + '" title="' + esc(title) + '">'
+               + esc(headline) + '</a><p class="source-meta">' + esc(byline) + '</p>')
+        related = source.get('related_journal_doi')
+        if bibliography and related and re.fullmatch(r'10\.\d{4,9}/[^\s<>"]+', related, re.I):
+            row += '<a href="https://doi.org/' + esc(related) + '">Related journal version</a>'
+        rows.append(row + '</li>')
+    return '<ul class="edition-sources">' + ''.join(rows) + '</ul>' if rows else ''
+
+
+def source_links(issue, ids):
+    lookup = {s['id']: s for s in issue.get('sources', [])}
+    return source_rows([lookup[ident] for ident in ids or [] if ident in lookup])
+
+
+def grouped_sources(issue):
+    groups = {'Research': [], 'Reporting and analysis': [], 'Opinion and editorials': [], 'Guides': []}
+    for source in issue.get('sources', []):
+        genre = reader_genre(source)
+        if genre in ('research', 'review', 'conceptual', 'proposal'):
+            group = 'Research'
+        elif genre in ('reporting', 'analysis'):
+            group = 'Reporting and analysis'
+        elif genre == 'guide':
+            group = 'Guides'
+        else:
+            group = 'Opinion and editorials'
+        groups[group].append(source)
+    return groups
+
+
+def source_shelf(issue, disclosure=True):
+    groups = grouped_sources(issue)
+    count = sum(map(len, groups.values()))
+    if not count:
+        return ''
+    heading = 'Sources · ' + str(count)
+    sections = ''.join('<section class="source-group"><h3>' + esc(label) + '</h3>'
+                       + source_rows(sources, bibliography=True) + '</section>'
+                       for label, sources in groups.items() if sources)
+    if disclosure:
+        return ('<details class="source-shelf" data-edition-layer="sources"><summary>'
+                + heading + '</summary>' + sections + '</details>')
+    return '<h2>' + heading + '</h2>' + sections
 
 def top_html(issue, asset_prefix=""):
     """Load the shared type system relative to this page, including archives."""
@@ -246,11 +276,12 @@ def section_label(label):
     return '<p class="stamp">'+esc(label)+'</p>'
 
 def publication_scope(issue):
-    if issue.get('scope_kind')=='legacy_collection':
-        return 'Historical collection, including earlier sources; not a strict previous-week digest.'
-    window=issue.get('publication_window') or {}
-    return ('Sources originally published '+str(window.get('from'))+' through '+str(window.get('to'))+
-            ' (UTC). Older background sources are not included.') if window else ''
+    if issue.get('scope_kind') == 'legacy_collection':
+        return 'Historical reading collection'
+    window = issue.get('publication_window') or {}
+    if window.get('from') and window.get('to'):
+        return f"Publication week · {window['from']} to {window['to']}"
+    return ''
 
 def glossary_id(index,entry):
     slug=re.sub(r'[^a-z0-9]+','-',entry['term'].casefold()).strip('-') or 'definition'
@@ -330,9 +361,8 @@ def opening(issue):
 
 def overview(issue):
     return ('<nav class="reader-map" aria-label="Edition reading map">'+section_label('At a glance')
-            +'<p class="map-hub"><svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="10" r="5"/><path d="M20 15v8M7 30v-7h26v7"/><circle cx="7" cy="33" r="3"/><circle cx="20" cy="33" r="3"/><circle cx="33" cy="33" r="3"/><path d="M20 23v7"/></svg>One argument, several lenses</p>'
             +'<ul class="overview">'+''.join('<li><a href="#signal-'+str(i)+'" data-edition-target="signal-'+str(i)+'"><span class="map-index">'+str(i).zfill(2)+'</span><span class="map-label">'+esc(s.get('short',s.get('title','')))+'</span><span class="map-count">'+str(len(s.get('source_ids',[])))+' source'+('' if len(s.get('source_ids',[]))==1 else 's')+'</span></a></li>' for i,s in enumerate(issue.get('signals',[]),1))+'</ul>'
-            +'<p class="map-note">A guide to this edition. Choose a theme to explore.</p></nav>')
+            +'</nav>')
 
 def reader_controls(issue):
     options=[('signal-'+str(i),s.get('short') or s['title'],
@@ -349,8 +379,10 @@ def reader_controls(issue):
             +'</nav><button type="button" id="edition-read-all" aria-pressed="false">Show all sections</button></aside>')
 
 def source_layer(issue,ids,key):
+    if not ids:
+        return ''
     return ('<details class="source-links" data-edition-layer="'+esc(key)+'"><summary>Sources behind this theme · '+str(len(ids))+'</summary>'
-            +'<p>'+source_links(issue,ids)+'</p></details>')
+            +source_links(issue,ids)+'</details>')
 
 def signal_cards(issue):
     return ''.join('<section class="signal edition-panel" id="signal-'+str(i)+'" data-edition-panel tabindex="-1">'+section_label('Theme '+str(i).zfill(2))+'<h2>'+esc(s['title'])+'</h2>'+render_text(s['text'],issue,s)+source_layer(issue,s.get('source_ids',[]),'signal-'+str(i)+'-sources')+'</section>' for i,s in enumerate(issue.get('signals',[]),1))
@@ -369,7 +401,7 @@ def publication_history(issue):
     parts=['<details class="publication-history" data-edition-layer="history"><summary>Publication history</summary>']
     if first:
         date.fromisoformat(first)
-        parts.append('<p>First published '+esc(first)+'. The Monday label identifies the edition; it does not change when this version was released.</p>')
+        parts.append('<p>First published '+esc(first)+'.</p>')
     if updated:
         date.fromisoformat(updated)
         parts.append('<p>Updated '+esc(updated)+'.</p>')
@@ -378,8 +410,7 @@ def publication_history(issue):
         for entry in entries:
             path=entry.get('url','')
             if not re.fullmatch(r'history/20\d\d-\d\d-\d\d\.html',path):raise ValueError('Invalid edition history path')
-            parts.append('<li><a href="'+BASE+'issues/'+esc(path)+'">Original version · '+esc(entry['original_date'])+'</a>'
-                         +(' — '+esc(entry['note']) if entry.get('note') else '')+'</li>')
+            parts.append('<li><a href="'+BASE+'issues/'+esc(path)+'">Original version · '+esc(entry['original_date'])+'</a></li>')
         parts.append('</ul>')
     return ''.join(parts)+'</details>'
 
@@ -389,10 +420,9 @@ def question_and_try(issue):
             '<section class="card">'+section_label('Try it')+'<h3>'+esc(p['title'])+'</h3>'+render_text(p['text'],issue)+'<p class="caution">'+esc(p.get('caution',''))+'</p><a href="'+BASE+'#lab">Explore the Attention Lab</a></section></div></section>')
 
 def bottom(issue):
-    methods='<details data-edition-layer="methods"><summary>How this was made</summary>'+render_text(issue.get('editorial_note',''),issue)
-    if publication_scope(issue):methods+='<p class="scope">'+esc(publication_scope(issue))+'</p>'
-    methods+='</details>'
-    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue,panel=True)+'<div class="edition-utilities">'+methods+source_shelf(issue,include_note=False)+publication_history(issue)+'</div></div></div></main><footer><div class="shell">'
+    scope = publication_scope(issue)
+    dates = '<p class="scope">' + esc(scope) + '</p>' if scope else ''
+    return ('<p class="takeaway">'+esc(issue['closer'])+'</p>'+glossary_html(issue,panel=True)+'<div class="edition-utilities">'+dates+source_shelf(issue)+publication_history(issue)+'</div></div></div></main><footer><div class="shell">'
             '<p><strong>THE ATTENTION BRIEF</strong></p><p>A weekly look at what AI changes about thinking, focus, and human agency.</p>'
             '<p><a href="'+BASE+'issues/">Past editions</a> · <a href="'+FEED+'">Weekly RSS</a> · <a href="https://chengyufang.org/">About the editor</a></p>'
             '</div></footer>'+READER_SCRIPT+'</body></html>')
@@ -405,8 +435,17 @@ def render_issue(issue, asset_prefix=""):
             +reader_controls(issue)+'<div class="edition-reading">'+signal_cards(issue)+supplement_cards(issue)+question_and_try(issue)+bottom(issue))
 
 def render_index(issues):
-    links=['<a class="archive-card" href="'+esc(i['edition_date'])+'.html">'+section_label('Issue '+str(i.get('number','—'))+' · '+edition_label(i))+'<h2>'+esc(i['headline'])+'</h2><p>'+esc(i.get('deck',''))+'</p><strong>Read the edition</strong></a>' for i in issues]
-    return top_html({'subject':'The Attention Brief · Archive'},'../')+'<h1>The Attention Brief.</h1><p>Past issues, ready to revisit.</p>'+(''.join(links) if links else '<p>No approved issues yet.</p>')+'</main></body></html>'
+    links = []
+    for issue in issues:
+        mix = ' · '.join(f'{len(group)} {label.lower()}' for label,group in grouped_sources(issue).items() if group)
+        context = 'Historical collection' if issue.get('scope_kind') == 'legacy_collection' else 'Weekly edition'
+        metadata = f'<p class="source-meta">{esc(context)}' + (' · ' + esc(mix) if mix else '') + '</p>'
+        links.append('<a class="archive-card" href="' + esc(issue['edition_date']) + '.html">'
+                     + section_label(edition_label(issue)) + '<h2>' + esc(issue['headline']) + '</h2>'
+                     + '<p>' + esc(issue.get('deck','')) + '</p>' + metadata + '</a>')
+    return (top_html({'subject':'The Attention Brief · Archive'},'../')
+            + '<h1>The Attention Brief archive</h1>'
+            + (''.join(links) or '<p>No editions have been published yet.</p>') + '</main></body></html>')
 
 def rss_content(issue):
     """The same published copy, with sources, for downstream RSS/chat delivery."""
@@ -418,12 +457,13 @@ def rss_content(issue):
     for section in issue.get('signals',[]) + issue.get('supplements',[]) + [issue.get('tension',{})]:
         parts += ['<h2>'+esc(section.get('title',''))+'</h2>',
                   render_text(section.get('text',''),issue,section),
-                  '<p>'+source_links(issue, section.get('source_ids',[]))+'</p>']
+                  source_links(issue, section.get('source_ids',[]))]
     experiment=issue.get('experiment',{})
     parts += ['<h2>'+esc(experiment.get('title',''))+'</h2>',
               render_text(experiment.get('text',''),issue),
               '<p>'+esc(experiment.get('caution',''))+'</p>']
-    parts += ['<p>'+esc(issue.get('closer',''))+'</p>', glossary_html(issue), source_shelf(issue, disclosure=False)]
+    parts += ['<p>'+esc(issue.get('closer',''))+'</p>', glossary_html(issue), source_shelf(issue, disclosure=False),
+              '<p>AI-assisted summary. AI can make mistakes.</p>']
     return ''.join(parts)
 
 
@@ -471,7 +511,7 @@ def json_feed(issues):
                       'url':BASE+'issues/'+i['edition_date']+'.html',
                       'title':brief_title(i['subject']), 'date_published':publication_timestamp(i).isoformat(),
                       'summary':i.get('deck',''), 'content_html':rss_content(i),
-                      '_observatory':i} for i in issues[:50] if i.get('status')=='published']}
+                      '_observatory':feed_snapshot(i)} for i in issues[:50] if i.get('status')=='published']}
 
 
 
@@ -501,8 +541,8 @@ def build_history_pages(folder,issues):
             raise ValueError('Original edition snapshot hash mismatch: '+original)
         source=json.loads(snapshot)
         page=render_issue(source,asset_prefix='../../')
-        notice=('<aside class="scope"><strong>Original published version · '+esc(original)+'</strong><p>'+esc(entry.get('note',''))+'</p>'
-                '<p><a href="../'+esc(target)+'.html">Read the consolidated '+esc(target)+' Monday edition</a>.</p></aside>')
+        notice=('<aside class="scope"><strong>Original published version · '+esc(original)+'</strong>'
+                '<p><a href="../'+esc(target)+'.html">Read the updated edition</a></p></aside>')
         page=page.replace('<link rel="canonical" href="'+BASE+'issues/'+source['edition_date']+'.html">',
                           '<link rel="canonical" href="'+BASE+'issues/'+target+'.html">',1)
         page=page.replace('</head>','<meta name="robots" content="noindex"></head>',1)

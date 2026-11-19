@@ -347,9 +347,9 @@
              hint:"Adults imagining student use can raise design questions. They are not a sample of students learning with the tool.",
              answer:"The interviews can inform design through these adults' experiences. They do not establish students' experiences or learning outcomes."},
       feedback:"Match the conclusion to the people and activity studied. Qualitative feedback can identify useful design tensions without establishing an effect for intended users.",
-      context:{note:"This fictional teaching example is informed by Lin and colleagues’ exploratory v1 preprint, not a replication. Seven adult researchers role-played student use of one AI peer prototype, then gave interviews. The study examined expert interpretations; it did not test student learning or compare teaching conditions. Peer review is unverified. These accounts can inform design questions, but do not establish benefits for learners or validate this Lab.",
+      context:{note:"Seven adult researchers tried an AI peer prototype while role-playing as students. Lin and colleagues interviewed them about its design. Their preprint did not test student learning.",
                source:"https://arxiv.org/pdf/2610.38990v1#page=6",
-               issue:"https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-07.html"}}
+               issue:"https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-02.html"}}
   ];
   function assistDraw(){
     const r=practice.assist,data=scenarios[r.scenario];r.chosen=false;
@@ -374,7 +374,7 @@
       const details=E("details","assist-source"),summary=E("summary","","Source and limits");
       add(details,summary,E("p","",data.context.note));
       const sources=E("div","assist-source-links");
-      [["Original study (v1, PDF)",data.context.source],["Published issue · 7 Nov",data.context.issue]].forEach(([label,url])=>{
+      [["Original study (v1, PDF)",data.context.source],["November 2 brief",data.context.issue]].forEach(([label,url])=>{
         const a=E("a","",label);a.setAttribute("href",url);a.setAttribute("target","_blank");a.setAttribute("rel","noopener noreferrer");sources.append(a);
       });
       add(details,sources);root.append(details);

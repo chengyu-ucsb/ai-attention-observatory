@@ -24,7 +24,7 @@ class ReleaseDeadlineTests(unittest.TestCase):
         (folder/'2026-11-23.json').write_text(json.dumps(issue))
         digest=sha256(encoded(issue)).hexdigest()
         url=BASE+'issues/2026-11-23.html'
-        manifest={'edition_id':'2026-11-23','edition_sha256':digest,'issue':issue,'index_url':'data/reader/index.json'}
+        manifest={'edition_id':'2026-11-23','edition_sha256':digest,'reader_sha256':digest,'issue':issue,'index_url':'data/reader/index.json'}
         responses={BASE+'data/reader-manifest.json':encoded(manifest),
             url:('<meta name="observatory-edition-sha256" content="'+digest+'">A checked synthesis').encode(),
             BASE+'issue-feed.xml':('<rss><channel><item><guid>'+url+'</guid><link>'+url+'</link></item></channel></rss>').encode(),

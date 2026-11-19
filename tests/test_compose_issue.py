@@ -167,7 +167,7 @@ class CompositionTests(unittest.TestCase):
                'editorial_note':'Automatically synthesized; limited evidence.'}
         html=rss_content(issue)
         for content in ('Canonical &amp; safe','The website opening.','A published claim.',
-                        'https://example.org/paper','Automatically synthesized'):
+                        'https://example.org/paper','AI-assisted summary.'):
             self.assertIn(content,html)
 
 
@@ -179,7 +179,7 @@ class CompositionTests(unittest.TestCase):
         self.assertEqual(items[0]['id'],items[0]['url'])
         self.assertTrue(items[0]['id'].endswith('/issues/2026-10-26.html'))
         self.assertEqual(items[0]['content_html'],rss_content(issue))
-        self.assertEqual(items[0]['_observatory'],issue)
+        self.assertEqual(items[0]['_observatory']['headline'],issue['headline'])
 
     def test_source_access_and_commentary_require_explicit_labels(self):
         for source in ({'level':'abstract'}, {'kind':'nonacademic'}):
@@ -188,6 +188,18 @@ class CompositionTests(unittest.TestCase):
         composer.qualify_section({'text':'The abstract reports a limited comparison.'},[{'level':'abstract'}])
         composer.qualify_section({'text':'The commentary proposes a design question.'},[{'kind':'nonacademic'}])
 
+
+    def test_reporting_and_journal_editorials_require_their_own_genre(self):
+        from edition_references import depth_label
+        report={'kind':'nonacademic','reader_genre':'reporting'}
+        editorial={'kind':'scholarly','reader_genre':'editorial','level':'abstract'}
+        self.assertEqual(depth_label(report),'News report. ')
+        self.assertEqual(depth_label({'kind':'scholarly','research_type':'opinion'}),'Opinion. ')
+        self.assertIn('Journal editorial.',depth_label(editorial))
+        composer.qualify_section({'text':'News reporting describes the policy dispute.'},[report])
+        composer.qualify_section({'text':'The journal editorial introduces the theme in its abstract.'},[editorial])
+        with self.assertRaisesRegex(ValueError,'reporting'):
+            composer.qualify_section({'text':'The opinion piece endorses the policy.'},[report])
 
     def preprint_fixture(self):
         draft, packet = self.fixture()

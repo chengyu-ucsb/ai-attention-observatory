@@ -119,6 +119,15 @@ class Store:
                 'editions':self.conn.execute('select count(*) as count from observatory.editions').fetchone()['count']}
 
 
+def import_approved_editions(store, root):
+    """Import full publication receipts from the archive, independent of the public feed."""
+    folder = root / 'data/approved-issues'
+    for path in sorted(folder.glob('????-??-??.json')):
+        issue = json.loads(path.read_text())
+        if issue.get('status') == 'published' and issue.get('sources'):
+            store.freeze_edition(issue)
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action',choices=('status','import','enqueue-window'))
@@ -135,10 +144,7 @@ def main():
                     if record.get('kind') not in ('scholarly','nonacademic') or not source_id(record):
                         skipped+=1;continue
                     store.put_source(record);imported+=1
-                issues=json.loads((args.root/'data/issue-feed.json').read_text()).get('items',[])
-                for item in issues:
-                    issue=item.get('_observatory')
-                    if issue and issue.get('status')=='published':store.freeze_edition(issue)
+                import_approved_editions(store,args.root)
                 result={'metadata_imported':imported,'skipped':skipped,'source_bodies_imported':False,
                         'publication_verified':False}
             elif args.action=='enqueue-window':

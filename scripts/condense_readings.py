@@ -385,9 +385,22 @@ def research_question(record):
   "Technology & society":"What does AI change about our digital lives?"
  }.get(lane,"What question does this source explore?")
 
+# Reader introductions written from these publications' indexed abstracts.
+ABSTRACT_LEADS = {
+ "https://openalex.org/W7164777577": "During a reading task, researchers tracked where people looked when they could block a distraction themselves or someone else blocked it for them.",
+ "https://openalex.org/W7161620989": "The authors propose interviewing employees and managers about when a chatbot feels trustworthy enough to take over part of their thinking.",
+ "10.1016/j.ijhcs.2025.103653": "A review of AI well-being tools asks what designers need to know about users, which interventions to offer, and how to protect personal data.",
+ "10.3389/feduc.2025.1697554": "The authors propose giving students an AI novice to teach. Its questions would help them notice gaps in their explanations.",
+ "10.3389/fpsyg.2023.1261955": "Two university English classes followed different lessons, one with AI support. Researchers compared their language skills, motivation, and ability to manage their own learning.",
+ "10.3389/feduc.2026.1953305": "International policies on AI and academic integrity assign different responsibilities to students and universities. The paper asks how those policies draw the line between authorship and cheating.",
+ "10.3389/fpsyg.2026.1929666": "A survey of 1,760 terminology practitioners examined how they prompt language models, how confident they feel using them, and how mentally demanding they find the work.",
+ "10.3389/feduc.2026.1944529": "The authors propose that students’ use of AI in academic writing depends on both the demands of the assignment and the support their teacher provides.",
+ "10.1016/j.chbr.2026.101420": "Researchers followed a group of medical students for eight months to examine how patterns of worry and attention relate to problematic smartphone app use.",
+}
+
 def short_source_context(record):
  """One intact line of the indexed abstract, not an invented answer."""
- abstract=record.get("abstract_text") or (record.get("reading") or {}).get("overview") or ""
+ abstract=record.get("abstract_text") or ""
  # Avoid repeating sweeping scene-setting paragraphs; select an attributable
  # method or aim that directly concerns this source.
  for line in sentence_list(abstract):
@@ -519,6 +532,33 @@ def deep_perspective(record,notes):
                  "editorial_synopsis" if argument else "publisher_synopsis"
  }
 
+# Source-specific paraphrases, keyed to the original publication DOI. These
+# journal articles advance arguments, including when the publisher calls the
+# format a review. Their examples do not supply measured effects.
+JOURNAL_ARGUMENTS = {
+ "10.3389/feduc.2026.1997466": {
+  "thesis": "Danny Glick and colleagues ask how AI can help learners plan their work and use feedback while leaving decisions about learning in their hands.",
+  "reasoning": "The editors bring together four papers. One review found more consistent benefits for planning than for following through, a distinction the editors use to explain why learners still need opportunities to act on their plans.",
+  "examples": "One contributor proposes that an AI partner challenge a learner’s explanation. Another paper compares AI feedback with peer feedback in a Hong Kong classroom. The editors use them to illustrate different ways learners might stay involved in judging their work.",
+ },
+ "10.1080/00131857.2026.2733624": {
+  "thesis": "Nin Kirkham argues that teaching critical thinking means giving students room to reach conclusions their instructors might disagree with.",
+  "reasoning": "Drawing on her experience teaching philosophy and ethics, Kirkham questions the practice of presenting each new threat, including AI, as a crisis that critical thinking can solve.",
+  "examples": "She recommends having students take an unfamiliar position seriously and give reasons for their own. A class that rewards only one acceptable conclusion would defeat that purpose.",
+ },
+ "10.3389/fpsyg.2025.1699320": {
+  "thesis": "Ginto Chirayath and colleagues ask when AI helps people cope with stress and when the work of monitoring themselves becomes another source of strain.",
+  "reasoning": "Their argument turns on who interprets the experience. A person decides what to record in a diary. A mood-tracking app can also assign a score or suggest what the person should do next.",
+  "examples": "The authors contrast tools that free people from remembering routine tasks with tools that invite constant checking of emotional feedback. They present these as two possible uses of a tool, not as an estimate of how often either occurs.",
+ },
+ "10.1007/s00146-025-02405-8": {
+  "thesis": "Gunter Bombaerts and colleagues argue in this manifesto that attention policy should ask what technology helps people care for, alongside how much of their time it takes.",
+  "reasoning": "Drawing on Buddhist philosophy, the authors describe attention as a practice shaped by the body, social relationships and values. They propose evaluating designs by whether those designs help people notice and respond to suffering.",
+  "examples": "The authors ask how a design could make its underlying values visible to the people using it. They offer this as a question for further research and design.",
+ },
+}
+
+
 def annotate(record):
  from original_readings import public_record, note_for
  record=public_record(record)
@@ -532,6 +572,9 @@ def annotate(record):
   notes=record.get("editorial_notes") or {}
   rewritten=public_commentary_idea(record)
   depth=deep_perspective(record,notes)
+  if record.get("source")=="Official product documentation" and depth["qualification"] == (
+      "Product documentation is a description of features, not independently established evidence of effectiveness."):
+   depth["qualification"]=""
   # Only an explicitly edited takeaway is a headline. A thesis excerpt may
   # omit the qualification in its next sentence; retain it in the body.
   idea=record.get("editorial_takeaway") or rewritten or source_title_headline(record)
@@ -549,6 +592,18 @@ def annotate(record):
             "locally_analyzed_article" if depth["source_depth"]=="machine_read_full_article" else "publisher_or_editorial_synopsis",
    "editorial_basis":depth["basis"]
   }
+  return base
+ from reading_headlines import reader_genre
+ genre=reader_genre(record)
+ if genre in ("editorial", "opinion", "commentary", "analysis") and record.get("kind")=="scholarly":
+  argument=JOURNAL_ARGUMENTS.get((record.get("doi") or "").lower(), {})
+  thesis=argument.get("thesis", "")
+  base["reading"].update(research_type="editorial" if genre=="editorial" else "opinion", methods="", findings="", sample="",
+                         reported_findings=False, overview=thesis, interpretation=argument.get("reasoning", ""), limitations="")
+  base["reading"]["digest"]={"idea":thesis, "explain":thesis, "approach":"", "finding":"",
+      "finding_source":"none", "interpretation":"", "limitation":"", "tags":concept_tags(record),
+      "longform":{**argument, "source_depth":"journal_argument"} if argument else {},
+      "status":"journal_argument" if argument else "journal_abstract_preview", "editorial_basis":level}
   return base
  if record.get("research_type")=="conceptual_framework":
   framework=record.get("framework_notes") or {}
@@ -570,17 +625,6 @@ def annotate(record):
   }
   return base
  curated=record.get("editorial_digest") or CURATED.get((record.get("doi") or "").lower())
- if r.get("research_type")=="editorial":
-  # Keep attributed editorial reasoning eligible without inventing a study.
-  base["reading"]["digest"]={
-   "idea":source_title_headline(record), "explain":"",
-   "approach":r.get("methods", ""), "finding":"", "finding_source":"none",
-   "interpretation":r.get("interpretation", ""),
-   "limitation":r.get("limitations", ""), "tags":concept_tags(record),
-   "status":"automatically_condensed_source_text", "editorial_basis":level,
-   "reading_mode":"editorial_argument"
-  }
-  return base
  if curated and level in ("abstract","full_text"):
   digest=dict(curated)
   digest["status"]="editorially_written_from_indexed_sections"
@@ -610,9 +654,11 @@ def annotate(record):
    approach=abstract_approach
    approach_source="abstract"
   limitation=source_snippet((record.get("analysis") or {}).get("limitations") or r.get("limitations"),"limitations")
+  paraphrase=ABSTRACT_LEADS.get(record.get("doi") or record.get("url"))
+  context=(paraphrase or short_source_context(record)) if not reported else ""
   digest={
    "idea":source_title_headline(record),
-   "explain":short_source_context(record) if not reported else "",
+   "explain":context,
    "approach":approach,
    "approach_source":approach_source,
    "finding":reported,
@@ -625,6 +671,8 @@ def annotate(record):
    "editorial_basis":"full_text" if fulltext else "abstract",
    "reading_mode":"finding" if reported else "research_question"
   }
+  if context:
+   digest["explain_source"]="abstract_paraphrase" if paraphrase else "abstract_excerpt"
  machine=record.get("deep_analysis") or {}
  if (level=="full_text" and machine.get("kind")=="scholarly" and
      machine.get("source_depth")=="full_text"):

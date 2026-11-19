@@ -162,7 +162,7 @@ SUBJECTS = {
     "sleep": (("insomnia", "sleep", "rest"), "a crescent moon behind a shuttered window", "night_window"),
     "games": (("game-based", "game based", "gaming"), "a controller and a loose puzzle piece", "digital_window"),
     "dashboard": (("dashboard",), "a viewing window and an adjustable lens", "digital_window"),
-    "policy": (("governance", "policy", "accountability", "consent", "democracy"), "a key beside a folded agreement", "threshold"),
+    "policy": (("governance", "policy", "council leaders", "council members", "accountability", "consent", "democracy"), "a key beside a folded agreement", "threshold"),
     "integrity": (("cheating", "integrity", "responsib", "rigor", "commitment"), "a seal and an unclosed document", "threshold"),
     "teacher": (("teacher", "teaching", "educator", "lesson plan", "instruction"), "a book resting on a teaching stand", "classroom"),
     "medical": (("medical", "clinical", "adhd", "pediatric", "neuropsych"), "a blank clipboard beside a waiting chair", "quiet_room"),

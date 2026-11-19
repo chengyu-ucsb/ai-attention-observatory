@@ -364,7 +364,7 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
                 links = details.locator("a")
                 assert links.count() == 2
                 assert links.nth(0).get_attribute("href") == "https://arxiv.org/pdf/2610.38990v1#page=6"
-                assert links.nth(1).get_attribute("href").endswith("/issues/2026-11-07.html")
+                assert links.nth(1).get_attribute("href").endswith("/issues/2026-11-02.html")
                 for link in links.all():
                     page.keyboard.press("Tab")
                     assert link.evaluate("el => el === document.activeElement")

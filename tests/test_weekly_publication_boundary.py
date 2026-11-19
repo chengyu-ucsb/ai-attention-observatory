@@ -119,17 +119,12 @@ class WeeklyPublicationBoundaryTests(unittest.TestCase):
             self.assertEqual(json.loads((data/'approved-issues/2026-11-02.json').read_text()),archive)
 
     def test_newsletter_and_issue_rss_explain_original_publication_window(self):
-        # The complete web edition keeps source-date qualifications in its
-        # accessible methods card; the concise opening need not repeat them.
         issue=json.loads((ROOT/'data/approved-issues/2026-11-02.json').read_text())
         self.assertEqual(issue['publication_window'],window_metadata('2026-11-02'))
-        html=build_newsletter.render_issue(issue);rss=build_newsletter.rss_content(issue)
-        for rendered in (html,rss):
-            self.assertIn('2026-10-26 through 2026-11-01 (UTC)',rendered)
-            self.assertIn('Older background sources are not included',rendered)
-        methods=html.split('data-edition-layer="methods"',1)[1].split('</details>',1)[0]
-        self.assertIn('<summary>How this was made</summary>',methods)
-        self.assertIn(build_newsletter.publication_scope(issue),methods)
+        for rendered in (build_newsletter.render_issue(issue),build_newsletter.rss_content(issue)):
+            self.assertIn('Publication week · 2026-10-26 to 2026-11-01',rendered)
+            self.assertNotIn('How this was made',rendered)
+            self.assertNotIn('No historical snapshot',rendered)
         self.assertEqual(build_newsletter.publication_scope({'edition_date':'2026-10-26'}),'')
 
     def test_workflows_separate_weekly_retrieval_and_historical_backfill(self):

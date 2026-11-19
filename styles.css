@@ -1366,3 +1366,40 @@ summary,.theme-browser button,.nav-toggle {
   #paper-content .rv-article .rv-section-position { margin-bottom: 8px; }
   #paper-content .rv-article .rv-lede-layout { align-items: start; }
 }
+
+/* Keep genre available alongside search on every screen size. */
+.library-discovery-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 18rem);
+  align-items: end;
+  gap: 1rem;
+}
+.library-genre-filter {
+  display: grid;
+  gap: .35rem;
+  color: var(--ink);
+  font: 600 var(--type-caption)/1.4 var(--font-interface);
+}
+.library-genre-filter select {
+  min-height: 48px;
+  width: 100%;
+  padding: .55rem .8rem;
+  border: 1px solid #b4adae;
+  background: white;
+  color: var(--ink);
+  font: 400 1rem/1.4 var(--font-interface);
+}
+.library-genre-filter select:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+.about-steps h3 a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .16em;
+}
+@media (max-width: 650px) {
+  .library-discovery-controls { grid-template-columns: minmax(0, 1fr); }
+}
