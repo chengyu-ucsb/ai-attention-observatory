@@ -207,6 +207,25 @@ class ReadingCompletenessTests(unittest.TestCase):
  def test_generic_background_is_not_a_method(self):
   from condense_readings import source_snippet
   self.assertEqual(source_snippet("AI has become increasingly important for how people learn and work in a changing society.","approach"),"")
+ def test_research_leads_distinguish_paraphrases_from_abstract_excerpts(self):
+  from condense_readings import ABSTRACT_LEADS
+  rows=json.loads((ROOT/"data/public-library.json").read_text())
+  indexed={x.get("doi") or x["url"]:x for x in rows}
+  for key in ABSTRACT_LEADS.keys() & indexed.keys():
+   lead=ABSTRACT_LEADS[key]
+   row=indexed[key]
+   digest=annotate(row)["reading"]["digest"]
+   if digest.get("finding"):
+    continue  # A later reading may identify a result.
+   self.assertEqual(digest["explain"],lead)
+   self.assertNotIn(lead,row["abstract_text"])
+   self.assertEqual(digest["explain_source"],"abstract_paraphrase")
+  abstract="In this study we examine how workers use chatbots to plan their tasks."
+  future={"kind":"scholarly","title":"Chatbots at work","abstract_text":abstract,
+          "reading":{"level":"abstract"}}
+  digest=annotate(future)["reading"]["digest"]
+  self.assertEqual(digest["explain"],abstract)
+  self.assertEqual(digest["explain_source"],"abstract_excerpt")
  def test_missing_limitations_stay_missing(self):
   paper={"kind":"scholarly","title":"An AI study","abstract_text":"The authors surveyed 47 students about their learning activities.","reading":{"level":"abstract","limitations":""}}
   self.assertEqual(annotate(paper)["reading"]["digest"]["limitation"],"")

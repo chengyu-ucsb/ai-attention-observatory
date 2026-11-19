@@ -644,6 +644,13 @@ assert.equal(match(paperContainer,"rv-section-title").textContent,"From the publ
 assert(textContent(match(paperContainer,"rv-panel-overview")).includes(ctx.selected.abstract_text));
 assert(!match(paperContainer,"rv-ai-notice")&&!match(paperContainer,"rv-context-grid"));
 assert.equal(match(paperContainer,"rv-primary-link").href,ctx.selected.url);
+const excerptLead="Researchers examined how workers use chatbots to plan their tasks.";
+ctx.selected={kind:"scholarly",title:"Chatbots at work",abstract_text:excerptLead,reading:{level:"abstract",digest:{
+ status:"automatically_condensed_source_text",explain:excerptLead,explain_source:"abstract_excerpt"}}};
+vm.runInContext("TEST.showPaper(selected)",ctx);
+const leadSection=match(paperContainer,"rv-summary-idea");
+assert.equal(leadSection.children[0].textContent,"From the abstract");
+assert.equal(leadSection.children[1].textContent,excerptLead);
 // Older signed records may contain a clean summary and a second audit-prefixed
 // digest. Preserve the source-specific limit while excluding internal notes.
 const qualifiedOriginal=JSON.parse(JSON.stringify(original));

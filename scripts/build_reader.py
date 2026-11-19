@@ -20,7 +20,7 @@ CARD_FIELDS = ('title', 'display_headline', 'authors', 'published', 'venue', 'do
 READING_FIELDS = ('level', 'original_summary', 'research_type', 'source_format',
                   'source_version', 'source_url', 'source_doi', 'related_journal_doi',
                   'genre', 'attributed_to')
-DIGEST_FIELDS = ('idea', 'explain', 'status', 'finding_source', 'editorial_basis')
+DIGEST_FIELDS = ('idea', 'explain', 'explain_source', 'status', 'finding_source', 'editorial_basis')
 
 
 def encoded(value):

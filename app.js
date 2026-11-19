@@ -1228,7 +1228,8 @@ function showPaper(x){
  const family=sourceFamily(x),genre=sourceGenre(x),kind=readingKind(x),research=family==="research";
  const conceptual=genre==="conceptual",proposal=genre==="proposal",review=genre==="review";
  const journalEditorial=genre==="editorial",reporting=genre==="reporting",product=genre==="guide";
- const edited=d.status==="editorially_written_from_indexed_sections",abstractPreview=d.status==="journal_abstract_preview";
+ const edited=d.status==="editorially_written_from_indexed_sections";
+ const abstractPreview=d.status==="journal_abstract_preview"||(journalEditorial&&!deep.thesis&&Boolean(x.abstract_text));
  // Backward compatibility for previously cached article payloads that mixed
  // an intake notice into the public digest. Current exports supply clean text.
  function limitText(value,field){
@@ -1249,9 +1250,11 @@ function showPaper(x){
   used.add(key);return text;
  }
  const leadText=abstractPreview?"":research?((original||edited||d.status==="conceptual_framework")?d.idea:d.explain):
-  (deep.thesis||(journalEditorial?d.interpretation:"")||(!research&&x.kind==="scholarly"?"":d.explain)||d.idea);
+  (deep.thesis||(x.kind==="scholarly"?"":d.explain)||d.idea);
  const lead=fresh(leadText);
- const leadParagraph=lead?make("p","rv-summary-idea",lead):null;
+ const leadParagraph=!lead?null:d.explain_source==="abstract_excerpt"
+  ?add(make("div","rv-summary-idea"),make("span","rv-source-meta","From the abstract"),make("p","",lead))
+  :make("p","rv-summary-idea",lead);
  if(leadParagraph)intro.append(leadParagraph);
  if(research&&(original||edited||conceptual)){
   const overview=fresh(d.explain);
@@ -1317,10 +1320,8 @@ function showPaper(x){
    const abstract=String(x.abstract_text||"").trim();
    if(abstract)article.append(compactReading(abstract,"Read the full abstract"));
   }else if(journalEditorial){
-   // Journal editorials can discuss another paper's sample. Do not treat the
-   // indexed abstract or a borrowed design as this article's own findings.
-   paragraph(article,"",d.interpretation);
-   paragraph(article,"Scope",d.approach);
+   paragraph(article,"",deep.reasoning);
+   paragraph(article,"In the collection",deep.examples);
   }else{
    paragraph(article,"",deep.reasoning);
    paragraph(article,product?"In use":reporting?"Details from the story":"An example",deep.examples);
