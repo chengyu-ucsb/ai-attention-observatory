@@ -84,6 +84,22 @@ class SourceLineageTests(unittest.TestCase):
         self.assertEqual(week["items"], [])
         self.assertEqual(week['run']['publication_window'], window_metadata('2026-10-22'))
 
+    def test_queued_display_title_cannot_break_a_verified_companion_link(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp)
+            register = json.loads((ROOT / "data/reading-headlines.json").read_text())
+            (folder / "reading-headlines.json").write_text(json.dumps({DOI: register[DOI]}))
+            source = dict(explainer(), title="A detailed discussion of handling AI study aids in a classroom while maintaining student autonomy")
+            (folder / "library.json").write_text(json.dumps([source]))
+            (folder / "weekly.json").write_text(json.dumps({"run": {}, "items": [source]}))
+            with patch.object(build_public, "DATA", folder), patch.object(build_public, "attach_art"):
+                public, weekly = build_public.build()
+            companion = next(x for x in public if x.get("companion_to") == DOI)
+            self.assertEqual(companion["title"], source["title"])
+            self.assertEqual(companion["display_headline"], "Read the article in The Conversation")
+            self.assertEqual(weekly["run"]["total"], 1)
+            self.assertEqual(json.loads((folder / "headline-review-queue.json").read_text())["items"][0]["id"], ARTICLE)
+
     def test_eligible_primary_and_explainer_count_once(self):
         config = source_lineage.load()
         primary = next(x for x in config['primary_publications'] if x['doi'] == DOI)

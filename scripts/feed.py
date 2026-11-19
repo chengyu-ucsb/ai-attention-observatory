@@ -1,9 +1,10 @@
-"""Publish readable, standards-compliant research RSS from the public library digest.
+"""Publish readable, standards-compliant reading RSS from the public library digest.
 
 The newsletter issue feed (issue-feed.xml) is different: it includes only
-published cross-source essays. Research RSS contains short source-linked notes.
+published cross-source essays. Reading RSS contains short source-linked notes.
 """
 from __future__ import annotations
+from reading_headlines import reader_headline, genre_label
 import datetime
 import json
 import pathlib
@@ -42,9 +43,9 @@ def build():
  root=ET.Element("rss",{"version":"2.0"})
  channel=ET.SubElement(root,"channel")
  fields={
-  "title":"New research | AI & Attention Observatory",
+  "title":"Latest readings | AI & Attention Observatory",
   "link":BASE+"#library",
-  "description":"New studies and ideas about AI, cognition, and attention. Research notes link to the original evidence.",
+  "description":"Research, reporting, and opinion about AI and human attention.",
   "language":"en-us",
   "ttl":"60"
  }
@@ -60,25 +61,20 @@ def build():
   digest=read.get("digest") or {}
   idea=(digest.get("idea") or "").strip()
   if not idea:continue
-  # Do not use full Results extracts as article descriptions.
-  text=idea
-  explain=(digest.get("explain") or "").strip()
-  if explain and explain.lower() not in text.lower():
-   text+=" "+explain
-  kind=x.get("kind") or "scholarly"
-  label="Conceptual framework" if x.get("research_type")=="conceptual_framework" else "Research finding" if digest.get("finding") else ("Research question" if kind=="scholarly" else "Perspective")
-  if read.get("original_summary"):
-   label="AI source-checked summary (not human review; "+read["source_version"]+")"
-   if (x.get("original_reading") or {}).get("article_screen"):
-    label+=". "+read.get("notice","")
+  label=genre_label(x)
+  attribution=read.get("attributed_to") or x.get("venue")
+  byline=" · ".join(part for part in (label,attribution) if part)
+  # A bibliographic title alone is not a synopsis. Keep that item's
+  # attribution instead of recycling the original title as its whole lead.
+  description=byline if idea.casefold()==str(x.get("title") or "").casefold() else byline+". "+idea
   stable=x.get("doi") or x.get("url") or x.get("title")
   if not stable:continue
   permalink=BASE+"#paper/"+urllib.parse.quote(str(stable),safe="")
   item=ET.SubElement(channel,"item")
   for field,value in [
-   ("title",idea[:165]),
+   ("title",reader_headline(x)),
    ("link",permalink),
-   ("description",label+": "+text[:490]),
+   ("description",description),
    ("pubDate",rss_date(x.get("published") or (weekly.get("run") or {}).get("date"))),
    ("guid",permalink)
   ]:
@@ -86,7 +82,8 @@ def build():
    if field=="guid":el.attrib["isPermaLink"]="true"
    el.text=value
   if read.get("original_summary"):
-   ET.SubElement(item,"source",{"url":read["source_url"]}).text=read["source_version"]
+   ET.SubElement(item,"source",{"url":read["source_url"]}).text=x.get("venue") or "Original source"
+  ET.SubElement(item,"category").text=label
   ET.SubElement(item,"category").text=x.get("lane") or "AI and attention"
   entries+=1
  ET.SubElement(channel,"lastBuildDate").text=rss_date((weekly.get("run") or {}).get("date"))

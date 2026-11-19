@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from reading_headlines import genre_label, reader_genre, reader_headline
 
 # llama.cpp translates patterns directly to grammar character classes. A
 # negated digit class alone also admits JSON quotes and backslashes, allowing
@@ -71,11 +72,12 @@ def section_response_schema(sources):
 
 def depth_label(source):
     """Labels describe the actual packet, never inferred study quality."""
-    if source.get('kind') == 'nonacademic':
-        return 'Commentary. '
+    parts = []
+    if source.get('kind') and reader_genre(source) in {'reporting','analysis','opinion','editorial','guide','commentary'}:
+        parts.append(genre_label(source) + '.')
     if source.get('level') == 'abstract':
-        return 'Abstract-based account. '
-    return ''
+        parts.append('Abstract-based account.')
+    return ' '.join(parts) + ' ' if parts else ''
 
 
 def source_labels(sources):
@@ -83,7 +85,7 @@ def source_labels(sources):
     for source in sources:
         authors = source.get('authors') or []
         labels[source['key']] = (authors[0] + (' and colleagues' if len(authors) > 1 else '')
-                                 if authors and isinstance(authors[0], str) else source['title'])
+                                 if authors and isinstance(authors[0], str) else source.get('attributed_to') or reader_headline(source))
     for source in sources:
         if list(labels.values()).count(labels[source['key']]) > 1:
             labels[source['key']] = source['title']

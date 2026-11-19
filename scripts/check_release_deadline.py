@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 
 from build_reader import encoded
+from reader_issue import feed_snapshot
 from verify_publication import BASE, fetch, verify
 from worker_schedule import publication_target
 
@@ -33,6 +34,7 @@ def check(root=ROOT, now=None, reader=fetch):
         manifest = json.loads(reader(BASE + 'data/reader-manifest.json'))
         expected = {'edition_id': edition,
                     'edition_sha256': sha256(encoded(issue)).hexdigest(),
+                    'reader_sha256': sha256(encoded(feed_snapshot(issue))).hexdigest(),
                     'index_url': manifest.get('index_url')}
         verified = verify(expected, reader=reader)
     except Exception as error:

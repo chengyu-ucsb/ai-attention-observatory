@@ -22,8 +22,9 @@ def verify(expected,base=BASE,reader=fetch):
     live=json.loads(reader(urljoin(base,'data/reader-manifest.json')))
     if live.get('edition_id')!=expected.get('edition_id') or live.get('edition_sha256')!=expected.get('edition_sha256') or live.get('index_url')!=expected.get('index_url'):
         raise ValueError('deployed_manifest_mismatch')
-    if sha256(encoded(live.get('issue',{}))).hexdigest()!=live.get('edition_sha256'):
-        raise ValueError('deployed_edition_hash_invalid')
+    reader_hash = sha256(encoded(live.get('issue', {}))).hexdigest()
+    if (reader_hash != live.get('reader_sha256') or reader_hash != expected.get('reader_sha256')):
+        raise ValueError('deployed_reader_hash_invalid')
     edition=live.get('edition_id')
     if not edition:raise ValueError('no_published_edition')
     permanent=urljoin(base,'issues/'+edition+'.html')
@@ -40,7 +41,7 @@ def verify(expected,base=BASE,reader=fetch):
         raise ValueError('published_feed_entry_missing')
     structured=json.loads(reader(urljoin(base,'data/issue-feed.json')))
     item=next((item for item in structured.get('items',[]) if item.get('id')==feed_id),None)
-    if not item or item.get('url')!=permanent or sha256(encoded(item.get('_observatory',{}))).hexdigest()!=live['edition_sha256']:
+    if not item or item.get('url')!=permanent or item.get('_observatory')!=live['issue']:
         raise ValueError('published_feed_content_mismatch')
     return {'status':'live_verified','edition_id':edition,'permanent_url':permanent,
             'edition_sha256':live['edition_sha256'],

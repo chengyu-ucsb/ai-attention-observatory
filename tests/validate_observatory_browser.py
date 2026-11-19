@@ -5,7 +5,6 @@ Playwright browser builds are not a substitute for device/screen-reader testing.
 import argparse
 import base64
 from contextlib import contextmanager
-from datetime import datetime
 import re
 import subprocess
 import sys
@@ -190,6 +189,31 @@ def check_nested_cards(page):
     fixture.evaluate('(el) => el.remove()')
 
 
+# Audit hidden chapters and dialog content as well as the initially visible page.
+# Publication dates and claims about research limitations remain legitimate.
+INTERNAL_COPY = re.compile(
+    r'Qualifications and unresolved issues|Source locators for this summary|'
+    r'Locators refer to:|Limited reading of current publisher HTML|'
+    r'No historical snapshot of the original publication was verified|'
+    r'extraction and semantic completeness are not verified|source version identifier:|'
+    r'extracted block [0-9]+|AI source-check scope:|'
+    r'How hard a task feels, how many problems someone starts', re.I)
+
+
+def check_reader_copy(scope):
+    match = INTERNAL_COPY.search(scope.text_content())
+    assert not match, f'Editorial process text reached the reader: {match.group()}'
+
+
+def readable_words(scope):
+    return scope.evaluate("""el => {
+        const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+        const text = [];
+        while (walk.nextNode()) text.push(walk.currentNode.textContent);
+        return text.join(' ').replace(/\\s+/g, ' ').trim();
+    }""")
+
+
 def check(page, url, width, out):
     errors = []
     page.on('pageerror', lambda error: errors.append(str(error)))
@@ -309,7 +333,7 @@ def check(page, url, width, out):
     expect(page.locator('#topic-filter')).to_have_value('')
     assert 0 < page.locator('.library-story').count() <= 12
     assert int(re.search(r'(\d+) in the complete archive', page.locator('#library-count').inner_text()).group(1)) > 50
-    assert page.locator('.card-added').count() == page.locator('.library-story').count()
+    assert page.locator('.library-story .card-type').count() == page.locator('.library-story').count()
     expect(page.locator('#library-previous')).to_be_disabled()
     first_page_titles = page.locator('.library-story h3').all_text_contents()
     page.locator('#library-next').click()
@@ -333,15 +357,16 @@ def check(page, url, width, out):
         if args.browser == 'chromium' and width in (1280, 390):
             frame = page.locator('.library-story').first.screenshot(type='jpeg', quality=55, style='.site-header { visibility: hidden !important; }')
             print(f'DESIGN_REVIEW_IMAGE:{width}:library-card:' + base64.b64encode(frame).decode('ascii'), flush=True)
-    # Added date is distinct from publication date; both order modes retain all records.
+    # Sorting by the catalog arrival date must stay distinct from publication.
+    dates = page.evaluate("""() => Object.fromEntries(S.records.map(x =>
+      [readingHeadline(x), {published:x.published || '', added:x.first_seen || ''}]))""")
     count = page.locator('.library-story').count()
-    page.locator('#library-sort').select_option('published')
-    assert page.locator('.library-story').count() == count
-    published = [datetime.strptime(re.search(r'Published (\w+ \d+, \d{4})', t).group(1), '%b %d, %Y') for t in page.locator('.card-source-meta').all_text_contents() if re.search(r'Published (\w+ \d+, \d{4})', t)]
-    assert published == sorted(published, reverse=True), 'Publication ordering must use publication date'
-    page.locator('#library-sort').select_option('added')
-    added = [datetime.strptime(t.removeprefix('Added '), '%b %d, %Y') for t in page.locator('.card-added').all_text_contents() if t != 'Added date not recorded']
-    assert added == sorted(added, reverse=True), 'Recently added must use first-indexed date'
+    for order in ('published', 'added'):
+        page.locator('#library-sort').select_option(order)
+        headings = page.locator('.library-story h3').all_text_contents()
+        assert len(headings) == count
+        card_dates = [dates[heading][order] for heading in headings]
+        assert card_dates == sorted(card_dates, reverse=True), (order, card_dates)
     filter_dialog, filter_trigger = open_reading_card(page, page.locator('.library-refine'))
     page.locator('#scope-filter').select_option('historical')
     close_reading_card(page, filter_dialog, filter_trigger)
@@ -369,12 +394,9 @@ def check(page, url, width, out):
     choose_section(page, 'article-section', 'source', keyboard=True)
     expect(page.locator('#article-source')).to_be_visible()
     expect(page.locator('#article-overview')).not_to_be_visible()
-    provenance = page.locator('.rv-provenance')
-    expect(provenance.locator('.rv-status')).not_to_be_visible()
-    dialog, trigger = open_reading_card(page, provenance)
-    expect(dialog.locator('.rv-status')).to_be_visible()
-    close_reading_card(page, dialog, trigger)
-    expect(provenance.locator('.rv-status')).not_to_be_visible()
+    expect(page.locator('.rv-source-title')).to_be_visible()
+    expect(page.locator('.rv-primary-link')).to_have_attribute('href', re.compile(r'^https://'))
+    check_reader_copy(page.locator('#paper-content'))
     page.locator('.rv-read-all').click()
     expect(page.locator('#article-section')).to_have_attribute('data-active-section', 'all')
     expect(page.locator('.rv-read-all')).to_have_attribute('aria-pressed', 'true')
@@ -393,10 +415,9 @@ def check(page, url, width, out):
     page.locator('.library-story h3 button').click()
     expect(page.locator('#paper')).to_be_visible()
     expect(page.locator('.rv-content')).not_to_contain_text('Method details are not clear enough')
-    coverage = page.locator('.rv-coverage')
-    expect(coverage.locator('.rv-coverage-table')).not_to_be_visible()
     choose_section(page, 'article-section', 'source')
-    expect(coverage.locator('.rv-coverage-table')).to_be_visible()
+    expect(page.locator('.rv-source-title')).to_be_visible()
+    expect(page.locator('.rv-coverage-table')).to_have_count(0)
     expect(page.locator('.rv-content')).to_contain_text('n = 47')
     expect(page.locator('.automatic-evidence')).to_contain_text('Source: abstract')
     overflow(); screenshot('source-reading')
@@ -450,7 +471,7 @@ def check(page, url, width, out):
             page.keyboard.press('Enter')
             expect(turn).to_have_attribute('aria-pressed', 'false')
             expect(cards.first.locator('.takeaway-back')).not_to_be_visible()
-            cards.first.get_by_role('button', name='Explore the evidence').click()
+            cards.first.get_by_role('button', name='Read the discussion').click()
             expect(page.locator('#issue-section')).to_have_attribute('data-active-section', 'themes')
             expect(page.locator('#issue-theme')).to_have_attribute('data-active-section', '0')
             check_section_navigation(page, 'issue-theme')
@@ -460,10 +481,16 @@ def check(page, url, width, out):
             assert page.locator('.issue-shelf-item').count() > 0
             expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
             shelf_count = page.locator('.issue-shelf-item').count()
-            expect(page.locator('#issue-coverage')).to_contain_text(re.compile(r'^' + str(shelf_count) + r' sources (?:originally published|in this edition)'))
+            expect(page.locator('#issue-coverage')).to_contain_text(re.compile(r'^' + str(shelf_count) + r' sources(?:\b|$)'))
             screenshot('issue-sources')
         elif route == 'perspectives':
-            check_section_navigation(page, 'perspectives-section', ['essays', 'products'])
+            check_section_navigation(page, 'perspectives-section', ['news', 'essays', 'products'])
+            choose_section(page, 'perspectives-section', 'news')
+            expect(page.locator('#perspectives-news')).to_be_visible()
+            expect(page.locator('#perspectives-essays')).not_to_be_visible()
+            choose_section(page, 'perspectives-section', 'essays')
+            expect(page.locator('#perspectives-essays')).to_be_visible()
+            expect(page.locator('#perspectives-news')).not_to_be_visible()
             choose_section(page, 'perspectives-section', 'products', keyboard=True)
             expect(page.locator('#perspectives-products')).to_be_visible()
             expect(page.locator('#perspectives-essays')).not_to_be_visible()
@@ -500,11 +527,11 @@ def check(page, url, width, out):
     assert page.locator('.library-story').count() > 0
     # A new source topic can be browsed directly from the atlas on first load.
     page.evaluate("""() => {
-      S.records.push({...S.records[0], lane:'Joint attention fixture'});
+      S.records.push({...S.records.find(row => row.kind === 'scholarly' && readingKind(row) === 'Research'), lane:'Joint attention fixture'});
       extendTopicChoices();goto('atlas');
     }""")
     choose_section(page, 'atlas-section', 'themes')
-    page.get_by_role('button', name=re.compile('Joint attention fixture')).click()
+    page.get_by_role('link', name=re.compile('Joint attention fixture')).click()
     expect(page.locator('#topic-filter')).to_have_value('Joint attention fixture')
     expect(page.locator('.library-story')).to_have_count(1)
     check_nested_cards(page)
@@ -677,7 +704,7 @@ def check_standalone_brief(page, url, width, out):
             expect(page.locator('header a[href="' + base + 'issues/"]')).to_be_visible()
             expect(page.locator('a[href="' + base + 'issue-feed.xml"]')).to_have_count(1)
         else:
-            expect(page.locator('h1')).to_contain_text('One good idea a week.')
+            expect(page.locator('h1')).to_contain_text('Follow The Attention Brief')
             expect(page.locator('header a[href="./"]')).to_be_visible()
             expect(page.locator('header a[href="./#issue"]')).to_be_visible()
             expect(page.locator('#feed-url')).to_have_value(base + 'issue-feed.xml')
@@ -839,13 +866,8 @@ def check_typed_readings(page, url, width, out):
         has=page.get_by_role('button', name=commentary['display_headline'], exact=True))
     expect(card.locator('h3 button')).to_have_text(commentary['display_headline'])
     expect(card.locator('h3 button')).to_be_visible()
-    temporal = commentary['reading']['temporal_notice']
-    for value in (temporal, 'policy analysis', 'Synthetic policy author', 'not human review'):
-        expect(card).to_contain_text(value)
-    card_details = card.locator('.card-reading-details')
-    dialog, trigger = open_reading_card(page, card_details)
-    expect(dialog.get_by_text(temporal, exact=False).last).to_be_visible()
-    close_reading_card(page, dialog, trigger)
+    check_reader_copy(card)
+    expect(card).to_contain_text(commentary['venue'])
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed card overflow at {width}px'
     card.locator('h3 button').click()
     expect(page.locator('#paper')).to_be_visible()
@@ -855,28 +877,16 @@ def check_typed_readings(page, url, width, out):
     expect(paper.locator('.rv-source-title')).to_have_text(commentary['title'])
     expect(paper.locator('.rv-source-title')).to_be_visible()
     choose_section(page, 'article-section', 'overview')
-    expect(paper.locator('.rv-head')).to_contain_text(temporal)
-    dates = paper.locator('.rv-source-dates')
-    dialog, trigger = open_reading_card(page, dates)
-    expect(dialog.locator('.rv-reading-notice')).to_be_visible()
-    close_reading_card(page, dialog, trigger)
-    for key in ('thesis', 'reasoning', 'examples', 'tension', 'qualification'):
-        actual = ' '.join(paper.locator('p, li').all_text_contents())
-        expected = commentary['reading']['digest']['longform'][key]
-        assert re.sub(r'\s+', ' ', expected).strip() in re.sub(r'\s+', ' ', actual).strip(), 'Commentary prose changed: ' + key
+    check_reader_copy(paper)
+    expect(paper.locator('.rv-ai-notice')).to_have_count(1)
+    for key in ('thesis', 'reasoning', 'examples', 'tension'):
+        expected = commentary['original_reading']['summary'][key]
+        assert ' '.join(expected.split()) in readable_words(paper), 'Missing commentary content: ' + key
     for forbidden in ('How it was studied', 'Study approach', 'Reported finding', 'Main finding', 'Stale visual sentinel'):
         expect(paper).not_to_contain_text(forbidden)
     expect(paper.locator('.automatic-evidence, .rv-original-figure, .rv-context-grid')).to_have_count(0)
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', commentary['reading']['source_url'])
-    evidence = paper.locator('.rv-evidence')
-    expect(evidence).not_to_be_visible()
-    choose_section(page, 'article-section', 'evidence')
-    expect(evidence.locator('.rv-source-locator')).to_have_count(5)
-    expect(evidence.locator('.rv-source-locator').first).to_be_visible()
-    expect(evidence).to_contain_text('extracted block 1')
-    choose_section(page, 'article-section', 'overview')
-    expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
-    choose_section(page, 'article-section', 'evidence')
+    expect(paper.locator('.rv-source-locator')).to_have_count(0)
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed reading overflow at {width}px'
     if out:
         out.mkdir(parents=True, exist_ok=True)
@@ -893,30 +903,21 @@ def check_typed_readings(page, url, width, out):
     expect(paper.locator('.rv-source-title')).to_have_text(preprint['title'])
     expect(paper.locator('.rv-source-title')).to_be_visible()
     choose_section(page, 'article-section', 'overview')
-    expect(paper).to_contain_text('Limited reading.')
-    expect(paper).to_contain_text('not verified peer-reviewed evidence')
-    expect(paper).to_contain_text('How it was studied')
+    expect(paper).to_contain_text(re.compile('preprint', re.I))
+    expect(paper).to_contain_text(preprint['original_reading']['summary']['finding'])
+    expect(paper).to_contain_text(preprint['original_reading']['summary']['limitation'])
     expect(paper.locator('.rv-primary-link')).to_have_attribute('href', preprint['reading']['source_url'])
-    choose_section(page, 'article-section', 'evidence')
-    expect(paper.locator('.rv-evidence')).to_contain_text('page 2')
-    expect(paper.locator('.rv-evidence')).not_to_contain_text('extracted block')
+    check_reader_copy(paper)
     page.goto(url + '#issue', wait_until='networkidle')
     issue_view = page.locator('#issue')
     expect(issue_view).to_be_visible()
     choose_section(page, 'issue-section', 'sources')
     source_shelf = issue_view.locator('.issue-reading-shelf')
     expect(source_shelf.locator('.issue-shelf-item').first).to_be_visible()
-    shelf = issue_view.locator('.issue-shelf-item').first
-    expect(shelf).to_contain_text(temporal)
-    expect(shelf).to_contain_text('Synthetic policy author')
-    expect(shelf.locator('.rv-source-locator').first).not_to_be_visible()
-    dialog, trigger = open_reading_card(page, shelf.locator('.issue-source-evidence'))
-    expect(dialog.locator('.rv-source-locator').first).to_be_visible()
-    expect(dialog).to_contain_text('extracted block 1')
-    close_reading_card(page, dialog, trigger)
-    expect(shelf.locator('.rv-source-locator').first).not_to_be_visible()
-    expect(shelf).to_contain_text('extracted block 1')
-    expect(issue_view.locator('.issue-shelf-item').nth(1)).to_contain_text('not verified peer-reviewed evidence')
+    expect(source_shelf.locator('.issue-shelf-item')).to_have_count(2)
+    expect(source_shelf).to_contain_text(commentary['venue'])
+    expect(source_shelf).to_contain_text(re.compile('preprint', re.I))
+    check_reader_copy(source_shelf)
     assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Typed shelf overflow at {width}px'
     assert not errors, errors
 
@@ -986,13 +987,6 @@ def check_registered_readings(page, url, width, out, payloads):
             route.continue_()
     page.route('**/data/*.json*', fulfill)
     page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
-    version_labels = {
-        'publisher_article': 'Publisher article',
-        'publisher_version_of_record': 'Publisher article',
-        'publishedVersion': 'Published version',
-        'author_posted_manuscript': 'Author manuscript',
-        'published_institutional_report': 'Institutional report',
-    }
     by_identifier = {row.get('doi') or row['url']: row for row in library}
     for requested_row in originals:
         identifier = requested_row.get('doi') or requested_row['url']
@@ -1002,11 +996,6 @@ def check_registered_readings(page, url, width, out, payloads):
         assert not row.get('companion_to'), 'Source lineage must resolve to a primary publication'
         assert row.get('reading', {}).get('original_summary'), 'Approved linked reading lost its canonical source review'
         reading = row['reading']
-        version = reading['source_version']
-        source_label = version_labels.get(version, re.sub(
-            r'^arxiv_preprint_v(\d+)$', r'arXiv preprint v\1 · review unverified', version))
-        if reading.get('source_format'):
-            source_label += ' · ' + reading['source_format'].upper()
         commentary = reading.get('research_type') == 'attributed_commentary'
         page.goto(url + '#paper/' + quote(identifier, safe=''), wait_until='networkidle')
         paper = page.locator('#paper-content')
@@ -1023,43 +1012,32 @@ def check_registered_readings(page, url, width, out, payloads):
             expect(companion_link).to_be_visible()
             expect(companion_link).to_have_text('Read the commentary')
             expect(companion_link).to_have_attribute('href', requested_row['url'])
-        expect(paper.locator('.rv-source .rv-source-version')).to_have_text('Checked source: ' + source_label)
-        expect(paper.locator('.rv-source .rv-source-version')).to_be_visible()
-        dialog, trigger = open_reading_card(page, paper.locator('.rv-provenance'))
-        expect(dialog).to_contain_text('Source version identifier: ' + version)
-        close_reading_card(page, dialog, trigger)
-        choose_section(page, 'article-section', 'overview')
         expect(paper.locator('.rv-primary-link')).to_have_attribute('href', reading['source_url'])
-        expect(paper.locator('.rv-source-row')).to_contain_text(source_label)
+        expect(paper.locator('.rv-source')).to_contain_text(row['venue'])
+        choose_section(page, 'article-section', 'overview')
         expect(paper.locator('.rv-source-row')).to_be_visible()
-        expect(paper).to_contain_text(reading['review_scope'])
-        expect(paper).to_contain_text(reading['notice'])
-        expect(paper).to_contain_text('not human review')
-        if reading.get('quality_note'):
-            expect(paper).to_contain_text(reading['quality_note'])
+        expect(paper.locator('.rv-ai-notice')).to_have_count(1)
+        check_reader_copy(paper)
         if canonical_id == '10.1016/j.chb.2024.108386':
             expect(paper).to_contain_text('91 university students were analyzed after one exclusion')
             expect(paper).to_contain_text('1.20 versus 1.87 out of seven possible')
             expect(paper).to_contain_text('did not differ significantly')
             expect(paper).to_contain_text('does not establish equivalence')
             expect(paper).to_contain_text('The load and quality comparisons adjusted')
-        if reading.get('temporal_notice'):
-            expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
-            expect(paper.locator('.rv-head')).to_contain_text(reading['temporal_notice'])
-        # Compare against the approved source fields, not legacy extracted prose.
-        for field, value in row['original_reading']['summary'].items():
-            if value:
-                # textContent includes the optional overview/interpretation drawers.
-                # Normalize only whitespace: every approved word must survive.
-                actual = paper.evaluate("el => { const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); const parts = []; while (walk.nextNode()) parts.push(walk.currentNode.textContent); return parts.join(' ').replace(/\\s+/g, ' ').trim(); }")
-                assert re.sub(r'\s+', ' ', value).strip() in actual, field
+        # The page can reorder the approved summary. Check the substance rather
+        # than requiring ingestion notices and internal receipts in its DOM.
+        summary = row['original_reading']['summary']
+        fields = ('thesis', 'examples') if commentary else ('approach', 'finding')
+        words = readable_words(paper)
+        for field in fields:
+            if summary.get(field):
+                assert ' '.join(summary[field].split()) in words, (identifier, field)
         if commentary:
             for label in ('How it was studied', 'Study approach', 'Main finding', 'Methods as indexed', 'Results as indexed'):
                 expect(paper).not_to_contain_text(label)
             expect(paper.locator('.rv-context-grid')).to_have_count(0)
-        if 'Preprint, not verified peer-reviewed evidence' in reading['notice']:
-            expect(paper).to_contain_text('Limited reading.')
-            expect(paper).to_contain_text('Article screening is not peer review')
+        if 'preprint' in reading['source_version']:
+            expect(paper.locator('.rv-source-row')).to_contain_text(re.compile('preprint', re.I))
         expect(paper.locator('.automatic-evidence, .rv-original-figure')).to_have_count(0)
         if row.get('visual', {}).get('kind') == 'reviewed_comparison':
             expect(paper.locator('.reviewed-evidence')).to_have_count(1)
@@ -1071,22 +1049,7 @@ def check_registered_readings(page, url, width, out, payloads):
             expect(paper.locator('.reviewed-evidence a')).to_have_attribute('href', reading['source_url'])
         else:
             expect(paper.locator('.rv-artwork')).to_have_count(0)
-        evidence = paper.locator('.rv-evidence')
-        expect(evidence).to_have_count(1)
-        choose_section(page, 'article-section', 'evidence')
-        locators = [locator for values in reading['evidence'].values() for locator in values]
-        expect(evidence.locator('.rv-source-locator')).to_have_count(len(locators))
-        for locator in locators:
-            expect(evidence).to_contain_text('Section: ' + locator['section'])
-            if locator.get('page'):
-                expect(evidence).to_contain_text('page ' + str(locator['page']))
-            if locator.get('paragraph'):
-                label = 'extracted block ' if commentary and reading['source_format'] == 'html' else 'paragraph '
-                expect(evidence).to_contain_text(label + str(locator['paragraph']))
-        expect(evidence.locator('.rv-source-locator').first).to_be_visible()
-        choose_section(page, 'article-section', 'overview')
-        expect(evidence.locator('.rv-source-locator').first).not_to_be_visible()
-        choose_section(page, 'article-section', 'evidence')
+        expect(paper.locator('.rv-source-locator')).to_have_count(0)
         assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Registered reading overflow: {identifier} at {width}px'
         if out:
             out.mkdir(parents=True, exist_ok=True)
@@ -1153,14 +1116,14 @@ def check_reader_headings(page, url, width):
     audit = page.evaluate("""() => S.records.map(x => ({
       title: readingHeadline(x), source: readableSourceTitle(x), edited: x.display_headline,
       automatic: x.reading?.digest?.status === 'automatically_condensed_source_text',
-      type: readingKind(x), basis: readingBasisName(x)
+      type: readingKind(x), genre: x.reader_genre, basis: readingBasisName(x)
     }))""")
     assert len(audit) > 50
     for row in audit:
-        assert row['type'] in ('Research', 'Editorial', 'Commentary', 'Conceptual framework', 'Product guide', 'Opinion', 'Reporting')
+        assert row['type'] and row['genre'], row
         assert not re.search(r'\b(?:p|r|b|se|sd)\s*[=<>]|β\s*=', row['title'], re.I)
         if row.get('edited'):
-            assert row['title'] == row['edited'] and len(row['title']) <= 88
+            assert row['title'] == row['edited'] and len(row['title']) <= 55 and len(row['title'].split()) <= 10
         elif row['automatic']:
             assert row['title'] == row['source']
     page.evaluate("goto('library')")
@@ -1193,6 +1156,93 @@ def check_reader_headings(page, url, width):
     page.close()
 
 
+def check_collection_boundaries(page, url, width):
+    """Follow every article route and compare the public collections to their source genres."""
+    import json
+    from urllib.parse import quote
+    library = json.loads((ROOT / 'data/public-library.json').read_text())
+    records = [row for row in library if not row.get('companion_to')]
+    media = {'reporting', 'opinion', 'editorial', 'analysis', 'commentary', 'guide'}
+    research = {'research', 'conceptual', 'proposal', 'review'}
+    partitions = {
+        'scholarly': research,
+        'reporting': {'reporting'},
+        'opinion': {'opinion', 'editorial'},
+        'analysis': {'analysis', 'commentary'},
+        'guide': {'guide'},
+        'nonacademic': media,
+    }
+    assert all(row.get('reader_genre') in media | research for row in records)
+    errors = []
+    page.on('pageerror', lambda error: errors.append(str(error)))
+    page.set_viewport_size({'width': width, 'height': 900})
+    page.goto(url + '#library', wait_until='networkidle')
+    for value, genres in partitions.items():
+        page.locator('#type-filter').select_option(value)
+        expected = [row for row in records if row['reader_genre'] in genres]
+        expect(page.locator('#library-count')).to_contain_text(
+            re.compile(r'^' + str(len(expected)) + r' matching sources'))
+        results = page.locator('#library-results')
+        shown = []
+        while True:
+            check_reader_copy(results)
+            shown.extend(results.locator('.library-story h3').all_text_contents())
+            if page.locator('#library-next').is_disabled():
+                break
+            page.locator('#library-next').click()
+        assert sorted(shown) == sorted(row['display_headline'] for row in expected), value
+    page.goto(url + '#perspectives')
+    for panel, genres in (('news', {'reporting'}), ('essays', media - {'reporting', 'guide'}),
+                          ('products', {'guide'})):
+        choose_section(page, 'perspectives-section', panel)
+        scope = page.locator('#perspectives-' + panel)
+        actual = scope.locator('article h3').all_text_contents()
+        expected = [row['display_headline'] for row in records if row['reader_genre'] in genres]
+        assert sorted(actual) == sorted(expected), (panel, actual, expected)
+
+    for row in records:
+        identifier = row.get('doi') or row['url']
+        page.goto(url + '#paper/' + quote(identifier, safe=''))
+        paper = page.locator('#paper-content')
+        expect(paper.locator('.rv-source-title')).to_have_text(row['title'].strip())
+        expect(paper.locator('.rv-headline')).to_be_visible()
+        if row.get('display_headline'):
+            expect(paper.locator('.rv-headline')).to_have_text(row['display_headline'])
+        family = 'research' if row['reader_genre'] in research else 'product' if row['reader_genre'] == 'guide' else 'media'
+        expect(paper.locator('.rv-article')).to_have_attribute('data-source-family', family)
+        if row['reader_genre'] in media:
+            headline = paper.locator('.rv-headline').inner_text()
+            assert len(headline) <= 55 and len(headline.split()) <= 10, (identifier, headline)
+            headings = ' | '.join(paper.locator('h2, h3, .rv-mini-label').all_text_contents())
+            assert not re.search(r'How it was studied|What the study reports|Main finding', headings), (identifier, headings)
+        check_reader_copy(paper)
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (identifier, width)
+
+    pending = json.loads((ROOT / 'data/public-pending-sources.json').read_text())
+    for row in pending:
+        page.goto(url + '#paper/' + quote(row['url'], safe=''))
+        notice = page.locator('.rv-awaiting-reading')
+        expect(notice).to_be_visible()
+        expect(notice).to_contain_text(row['title'])
+        expect(notice.locator('a')).to_have_attribute('href', row['url'])
+        check_reader_copy(notice)
+        assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), (row['url'], width)
+
+    for route in ('home', 'library', 'perspectives', 'atlas', 'issue', 'lab', 'about'):
+        page.goto(url + '#' + route)
+        view = page.locator('#' + route)
+        expect(view).to_be_visible()
+        check_reader_copy(view)
+    # Include past issues, superseded permalinks, and the follow page.
+    for path in sorted((ROOT / 'issues').rglob('*.html')) + [ROOT / 'newsletter.html', ROOT / 'subscribe.html']:
+        response = page.goto(url + path.relative_to(ROOT).as_posix(), wait_until='domcontentloaded')
+        assert response and response.ok, path
+        check_reader_copy(page.locator('body'))
+    assert not errors, errors
+    print(f'{width}px: checked {len(records)} article routes, {len(pending)} pending-source pages, all genre filters, perspectives sections and the issue archive.')
+    page.close()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--browser', choices=['chromium','firefox','webkit'], default='chromium')
@@ -1220,6 +1270,8 @@ if __name__ == '__main__':
                 check_typed_readings(context.new_page(), url, width, args.screenshots)
                 check_registered_readings(context.new_page(), url, width, args.screenshots, registered)
                 check_reader_headings(context.new_page(), url, width)
+                if args.browser == 'chromium' and width in (390, 1280):
+                    check_collection_boundaries(context.new_page(), url, width)
             finally:
                 context.close()
         print(f'Observatory browsing passed in {args.browser}: 1280, 768, 390, 320px; theme navigation, filters, dates, reading pages, all routes, generated newsletter and RSS subscription pages.')

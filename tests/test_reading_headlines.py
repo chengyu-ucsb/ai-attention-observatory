@@ -10,7 +10,8 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 sys.path.insert(0, str(ROOT / "tests"))
-from reading_headlines import accepted_heading, headline_decision, review_item, source_id
+from reading_headlines import (accepted_heading, genre_label, headline_decision,
+                              reader_genre, reader_headline, review_item, source_id)
 import original_readings
 import build_public
 from test_original_readings import accepted, approve, record
@@ -92,6 +93,42 @@ class ReadingHeadlineTests(unittest.TestCase):
                 restored = next(row for row in public if row["doi"] == long["doi"])
                 self.assertEqual(restored["title"], long["title"])
                 self.assertEqual(restored["display_headline"], "AI assistance and students’ classroom attention")
+
+    def test_short_titles_across_current_and_frozen_source_shelves(self):
+        register = json.loads((ROOT / "data/reading-headlines.json").read_text())
+        editions = (list((ROOT / "data/approved-issues").glob("*.json")) +
+                    list((ROOT / "data/edition-revisions").glob("*.json")))
+        for path in editions:
+            for row in json.loads(path.read_text()).get("sources", []):
+                with self.subTest(edition=path.name, source=source_id(row)):
+                    heading = reader_headline(row)
+                    self.assertEqual(heading, register[source_id(row)])
+                    self.assertLessEqual(len(heading), 55)
+                    self.assertLessEqual(len(heading.split()), 10)
+
+    def test_long_titles_cannot_return_through_a_snapshot_or_checkless_excerpt(self):
+        title = "How the tasks students try to perform change when a teacher allows them to use an AI tutor"
+        source = {"kind": "nonacademic", "title": title, "display_headline": title}
+        self.assertFalse(accepted_heading("A B C D E F G H I J K"))
+        self.assertNotEqual(reader_headline(source, {}), title)
+        self.assertEqual(source["title"], title)
+        self.assertEqual(headline_decision(source, {})["status"], "review_needed")
+
+    def test_genre_describes_the_publication_before_its_subject(self):
+        media = {"kind": "nonacademic", "title": "A systematic review of AI at school",
+                 "companion_to": "10.12345/original", "genre": "reported_analysis"}
+        self.assertEqual(reader_genre(media), "reporting")
+        self.assertEqual(genre_label(dict(media, reader_genre="research")), "News report")
+        self.assertEqual(reader_genre({"kind": "nonacademic", "format": "Product & design"}), "commentary")
+        self.assertEqual(reader_genre({"kind": "nonacademic", "source": "Official product documentation"}), "guide")
+        self.assertEqual(reader_genre({"kind": "scholarly", "article_type": "Opinion", "research_type": "unclassified"}), "opinion")
+        self.assertEqual(reader_genre({"kind": "scholarly", "title": "Editorial: A review of AI"}), "editorial")
+        self.assertEqual(reader_genre({"kind": "scholarly", "article_type": "news", "title": "Researchers report a breakthrough"}), "reporting")
+        self.assertEqual(reader_genre({"kind": "scholarly", "article_type": "study-protocol", "title": "A systematic review protocol"}), "proposal")
+        self.assertEqual(reader_genre({"kind": "scholarly", "title": "AI and learning: a systematic review"}), "review")
+        self.assertEqual(reader_genre({"kind": "scholarly", "research_type": "conceptual_framework"}), "conceptual")
+        self.assertEqual(reader_genre({"kind": "scholarly", "research_type": "research_proposal"}), "proposal")
+        self.assertEqual(reader_genre({"kind": "scholarly", "research_type": "observational"}), "research")
 
     def test_current_public_corpus_has_complete_concise_headings(self):
         rows = json.loads((ROOT / "data/public-library.json").read_text())

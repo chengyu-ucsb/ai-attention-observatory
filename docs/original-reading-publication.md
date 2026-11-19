@@ -34,6 +34,12 @@ The adapter requires:
   from the journal DOI. No claim of journal-version equivalence is allowed.
 - Six bounded, original prose fields: idea, explanation, approach, finding,
   interpretation, and limitation. A conceptual framework may omit a finding.
+  An interpretation is optional. Include it only for a distinct, attributable
+  inference or proposal. If the finding and its limits already explain the
+  result, leave the interpretation and its locator list empty. Write study
+  limits about the sample, comparison, measurement or setting. In reporting,
+  identify what was pending when the story ran. Keep retrieval and verification
+  details in the source receipt.
 - A section locator for every field, with optional positive page/paragraph
   numbers. Figures and supplements must be addressed in the stated review scope;
   source-byte coverage alone cannot establish that their meaning was checked.
@@ -67,15 +73,15 @@ summary does not erase otherwise eligible source material.
 original notes instead of trusting a cached digest. `analysis`, bibliographic
 identity, source OA links, and extraction status are not modified.
 
-Original summaries lead the card and detail page. AI-check labels, exact source
-version/format, review scope, section/page locators, and separate source/journal
-DOIs remain visible. Machine sections are a separate collapsed disclosure. Old
+The public reading includes a short AI notice, a source link, source version
+and limitations relevant to the article. Field-by-field locators, review
+scope and editorial verification notes stay in the source record. Indexed
+source passages are available separately where relevant. Old
 DOI-specific diagrams and machine long-form prose cannot override the versioned
 summary. No sample size is inferred by the adapter.
 
 Weekly synthesis receives exact source/version/review metadata, not only the
-summary prose. Research RSS carries the AI-check/version label and actual source
-link. These downstream paths revalidate cached original-summary snapshots.
+summary prose. The readings feed carries the genre, attribution and source link. These downstream paths revalidate cached original-summary snapshots.
 Historical published issue archives are not rewritten by this change.
 
 `original_summary_count` and `machine_sections_count` are distinct. A record may
@@ -158,9 +164,9 @@ Both types require an `article_screen` object with exactly:
 This object is inside both existing receipt hashes. Unreviewed, held, duplicate,
 changed or revoked entries remain excluded. Known preprint signals include
 repository venues, arXiv URLs/DOIs, first-submission provenance, and manuscript
-version labels. Preprint articles retain independent topic screening. Projected
-notices and limitations explicitly distinguish article screening from peer
-review and strong causal evidence. Weekly synthesis requires those qualifications
+version labels. Preprint articles retain independent topic screening. Public reading pages identify
+the version, then explain limitations specific to the design or measure. Internal
+review metadata records how screening was performed. Weekly synthesis requires appropriate qualifications
 in each cited comparison, including its tension section. These lexical checks
 are a conservative guard, not semantic proof of every generated claim.
 
@@ -198,10 +204,9 @@ any abstract needed for topic screening; no abstract/source body is copied into
 the queue. Missing, duplicated or changed indexed records require rebuilding and
 revalidating the issue. Revoked/changed acceptance still fails afterward.
 
-The accompanying narrowly scoped renderer exposes all five commentary lenses
-from `reading.digest.longform`, with genre, attribution, main-argument scope,
-source blocks, temporal caveats and no scholarly methods/results labels. It is
-independent of the broader reading-design work. Synthetic backend-to-renderer
+Reading pages give reporting, opinion and guides their own headings. They draw
+the event or argument, its support and any substantive open question from
+`reading.digest.longform`. Each page identifies the source and preserves its link. Synthetic backend-to-renderer
 and hosted browser regressions cover accepted commentary/preprints and excluded
 revoked/stale receipts, repeated disclosures and responsive layouts. Passing
 these checks validates presentation behavior, not actual source claims or
@@ -212,11 +217,9 @@ Commentary additionally requires `commentary.temporal` with exact
 `original_published` (matching indexed publication date), `reported_modified`
 (a verified date or null for unknown), `checked_on` (matching source-check date),
 and `historical_snapshot_verified: false`. Known modification must not precede
-publication or follow the source check. Dates and unknowns are projected in a
-prominent `temporal_notice`, alongside `quality_note` and “limited reading”
-framing. A known modification after the weekly window withholds that current
-version from that week's shelf; library inclusion remains possible with the
-caveat. Same-week modifications remain eligible. Modified/check dates never
+publication or follow the source check. Review dates and audit notes stay in the editorial record; visitors see the
+publication date and any substantive uncertainty relevant to the piece. A known modification after the weekly window withholds that current
+version from that week's shelf; the library can still index the article. Same-week modifications remain eligible. Modified/check dates never
 replace original publication dates. Queue reconstruction restores temporal
 metadata from the current accepted receipt, so dropping displayed dates cannot
 bypass the weekly gate. An unknown modification date remains explicitly unknown,

@@ -15,6 +15,8 @@ on:
       - 'feed.xml'
       - 'scripts/build_public.py'
       - 'scripts/build_reader.py'
+      - 'scripts/reader_issue.py'
+      - 'scripts/reading_headlines.py'
       - 'scripts/verify_publication.py'
       - 'scripts/pipeline_status.py'
       - 'scripts/source_audit.py'
@@ -156,9 +158,8 @@ jobs:
           mkdir -p _site/issues
           cp -R issues/. _site/issues/
           mkdir -p _site/data
-          cp data/public-library.json data/public-weekly.json data/public-issue.json data/public-featured-issue.json data/public-pending-sources.json _site/data/
-          cp data/reader-manifest.json _site/data/
-          cp -R data/reader _site/data/
+          python scripts/build_reader.py --pages-data _site/data
+          cp data/public-pending-sources.json _site/data/
           if [ -s data/fulltext-backfill-state.json ]; then cp data/fulltext-backfill-state.json _site/data/; fi
           cp data/pipeline-status.json data/issue-feed.json _site/data/
           touch _site/.nojekyll

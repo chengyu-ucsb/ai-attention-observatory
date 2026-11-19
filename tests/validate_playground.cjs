@@ -256,7 +256,7 @@ for(const mode of ["reflect","hint","answer"]){
    assert(content.some(x=>x.textContent.includes("Seven adult researchers")));
    assert(content.some(x=>x.textContent.includes("did not test student learning")));
    const links=content.filter(x=>x.tagName==="A");
-   assert.deepEqual(links.map(x=>x.getAttribute("href")),["https://arxiv.org/pdf/2610.38990v1#page=6","https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-07.html"]);
+   assert.deepEqual(links.map(x=>x.getAttribute("href")),["https://arxiv.org/pdf/2610.38990v1#page=6","https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-02.html"]);
    assert(links.every(x=>x.getAttribute("rel")==="noopener noreferrer"));
   }
   assert.equal(by("assist-next").textContent,i===4?"Replay the first scenario":"Try another scenario");

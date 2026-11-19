@@ -106,14 +106,18 @@ def eligible(note, record):
         fields = COMMENTARY_FIELDS if commentary else FIELDS
         summary = note['summary']
         if not isinstance(summary, dict) or set(summary) != set(fields): return False
-        if any(not text(summary[k]) for k in fields if k != 'finding'): return False
+        required = fields if commentary else ('idea', 'explain', 'approach', 'limitation')
+        if any(not text(summary[k]) for k in required): return False
+        if not commentary and summary['interpretation'] != '' and not text(summary['interpretation']): return False
         if not commentary and record.get('research_type') == 'conceptual_framework' and summary['finding'] != '': return False
         if not commentary and not text(summary['finding']) and not (summary['finding'] == '' and record.get('research_type') == 'conceptual_framework'): return False
         if commentary and any(len(summary[k].split()) < 8 for k in fields): return False
         if sum(len(summary[k].split()) for k in fields) > (320 if commentary else 220): return False
         evidence = note['evidence']
         if not isinstance(evidence, dict) or set(evidence) != set(fields): return False
-        for locations in evidence.values():
+        for key, locations in evidence.items():
+            if not commentary and key == 'interpretation' and summary[key] == '' and locations == []:
+                continue
             if not isinstance(locations, list) or not 1 <= len(locations) <= 8: return False
             for loc in locations:
                 if not isinstance(loc, dict) or not set(loc) <= {'section', 'page', 'paragraph'} or not text(loc.get('section'), 180): return False
@@ -211,8 +215,6 @@ def note_for(record):
     s = original['summary']; source = original['source']
     if record['kind'] == 'nonacademic': return commentary_note(original)
     qualifier = 'Limited reading. ' + PREPRINT_NOTICE if is_preprint(record, source) else ''
-    s = deepcopy(s)
-    if qualifier: s['limitation'] = qualifier + ' ' + s['limitation']
     return {
         'level': 'full_text', 'original_summary': True, 'original_summary_id': original['id'],
         'provenance': BASIS, 'notice': BASIS + ' ' + qualifier + ' Source version: ' + source['version'] + '.',
@@ -285,7 +287,13 @@ def commentary_note(original):
     s = deepcopy(original['summary']); source = original['source']; c = original['commentary']
     time_notice = temporal_notice(c['temporal'])
     label = time_notice + ' ' + BASIS + ' ' + COMMENTARY_NOTICE + ' Attributed to: ' + c['attributed_to'] + ' (' + c['genre'] + ').'
-    qualification = time_notice + ' ' + COMMENTARY_NOTICE + ' ' + s['qualification']
+    qualification = s['qualification']
+    # Older accepted notes sometimes mix editorial housekeeping with material
+    # limits. Keep the original receipt intact and omit that housekeeping from
+    # the reader's qualification.
+    qualification = ' '.join(sentence for sentence in re.split(r'(?<=[.!?])\s+', qualification)
+                             if not re.match(r'(?:The current page was retrieved|Its linked incident claims '
+                                             r'and numerical examples were not independently verified)', sentence))
     return {'level': 'curated', 'original_summary': True, 'original_summary_id': original['id'],
             'provenance': label, 'notice': label, 'overview': s['thesis'],
             'genre': c['genre'], 'attributed_to': c['attributed_to'],

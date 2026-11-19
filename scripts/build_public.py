@@ -14,7 +14,7 @@ from article_art_queue import attach_persistent_art as attach_art
 from search_plan import source_class
 from verified_full_article_notes import apply as apply_checked_sections
 from reading_depth import depth_audit, has_article_sections, has_machine_sections
-from reading_headlines import headline_decision, review_item
+from reading_headlines import accepted_heading, headline_decision, headline_register, reader_genre, review_item
 from source_lineage import prepare
 from build_readings import make_note, is_editorial
 from editorial_corrections import apply as apply_editorial_corrections
@@ -111,7 +111,7 @@ def build():
     apply_checked_sections(all_records)
     apply_original_readings(all_records)
     headlines_path = DATA / "reading-headlines.json"
-    headlines = json.loads(headlines_path.read_text()) if headlines_path.exists() else {}
+    headlines = json.loads(headlines_path.read_text()) if headlines_path.exists() else headline_register()
     selected=[]
     pending=[]
     headline_queue=[]
@@ -158,9 +158,17 @@ def build():
         heading = headline_decision(published, headlines)
         if heading["status"] == "review_needed":
             headline_queue.append(review_item(published, heading))
-            held["heading_awaiting_editorial_review"] += 1
-            continue
+            if published.get("companion_to") and published.get("companion_verified_via"):
+                # A verified companion is a source link on its parent. Preserve
+                # that relationship even while its own display title is edited.
+                venue = published.get("venue") or ""
+                heading["headline"] = accepted_heading(f"Read the article in {venue}") if venue else ""
+                heading["headline"] = heading["headline"] or "Read the companion article"
+            else:
+                held["heading_awaiting_editorial_review"] += 1
+                continue
         published["display_headline"] = heading["headline"]
+        published["reader_genre"] = reader_genre(published)
         published["source_quality"]=quality
         published["source_group"]=source_class(source, editorial_topic=quality.get("topic") if source.get("kind")=="nonacademic" else None)
         published["visual"]=visual_spec(published)

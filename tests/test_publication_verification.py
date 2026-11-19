@@ -13,7 +13,7 @@ class PublicationVerificationTests(unittest.TestCase):
     def setUp(self):
         issue={'edition_date':'2026-11-09','headline':'What changed?','status':'published',
                'publication_window':{'from':'2026-11-02','to':'2026-11-08'}}
-        self.manifest={'edition_id':'2026-11-09','issue':issue,'edition_sha256':sha256(encoded(issue)).hexdigest(),'index_url':'data/reader/indexes/a.json'}
+        self.manifest={'edition_id':'2026-11-09','issue':issue,'edition_sha256':sha256(encoded(issue)).hexdigest(),'reader_sha256':sha256(encoded(issue)).hexdigest(),'index_url':'data/reader/indexes/a.json'}
         url=BASE+'issues/2026-11-09.html'
         self.pages={BASE+'data/reader-manifest.json':encoded(self.manifest),
                     url:('<meta name="observatory-edition-sha256" content="'+self.manifest['edition_sha256']+'"><h1>What changed?</h1>').encode(),
@@ -38,10 +38,18 @@ class PublicationVerificationTests(unittest.TestCase):
         self.pages[BASE+'data/issue-feed.json']=encoded(stale)
         with self.assertRaisesRegex(ValueError,'feed_content_mismatch'):verify(self.manifest,reader=self.pages.__getitem__)
 
+    def test_stale_reader_projection_is_rejected_even_if_archive_id_matches(self):
+        stale=deepcopy(self.manifest)
+        stale['issue']['headline']='Old reader copy'
+        stale['reader_sha256']=sha256(encoded(stale['issue'])).hexdigest()
+        self.pages[BASE+'data/reader-manifest.json']=encoded(stale)
+        with self.assertRaisesRegex(ValueError,'deployed_reader_hash_invalid'):
+            verify(self.manifest,reader=self.pages.__getitem__)
+
     def test_retained_legacy_feed_identity_requires_canonical_monday_link(self):
         canonical=BASE+'issues/2026-11-09.html';legacy=BASE+'issues/2026-11-13.html'
         issue=self.manifest['issue'];issue['feed_id']=legacy
-        self.manifest['edition_sha256']=sha256(encoded(issue)).hexdigest()
+        self.manifest['edition_sha256']=self.manifest['reader_sha256']=sha256(encoded(issue)).hexdigest()
         self.pages[BASE+'data/reader-manifest.json']=encoded(self.manifest)
         self.pages[canonical]=('<meta name="observatory-edition-sha256" content="'+self.manifest['edition_sha256']+'"><h1>What changed?</h1>').encode()
         self.pages[BASE+'issue-feed.xml']=('<rss><channel><item><link>'+canonical+'</link><guid>'+legacy+'</guid></item></channel></rss>').encode()

@@ -117,7 +117,8 @@ def model_json(content, record, kind, model):
       + ", ".join(fields) + " and an anchors array containing two exact 3-to-8-word "
       "phrases copied from the input (only for internal validation, not publication). "
       "Write accurate, specific prose. Avoid generic descriptions, filler, direct quotations, "
-      "and repeated phrases. Implications are hypotheses, not measured results. "
+      "and repeated phrases. Include an implication only when you can attribute a specific "
+      "explanation or proposal to the author. Keep access and review-process notes out of claims. "
       + instruction + "\nTITLE: " + str(record.get("title") or "")[:240]
       + "\nSOURCE TEXT:\n" + content[:16000]
     )

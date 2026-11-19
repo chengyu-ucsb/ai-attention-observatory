@@ -18,8 +18,9 @@ class ObservatoryTests(unittest.TestCase):
   self.assertTrue(f.exists(),"RSS generator must run before tests")
   root=ET.parse(f).getroot()
   self.assertEqual(root.tag,"rss")
- def test_no_false_publication_claim(self):
+ def test_site_links_to_original_research_and_attributes_the_editor(self):
   text=(ROOT/"index.html").read_text()
-  self.assertIn("metadata",text.lower())
+  self.assertIn('href="#library?type=scholarly"',text)
+  self.assertIn("links to the paper",text)
   self.assertIn("chengyufang.org",text)
 if __name__=="__main__":unittest.main()

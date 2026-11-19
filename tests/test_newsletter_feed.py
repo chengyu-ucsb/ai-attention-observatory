@@ -18,6 +18,8 @@ sys.path.insert(0,str(ROOT/"scripts"))
 import build_newsletter
 from build_newsletter import FEED, build_rss
 from publish_deadline import coverage_from_sources
+from observatory_store import import_approved_editions
+from unittest.mock import Mock
 
 class VisibleText(HTMLParser):
  def __init__(self,value):
@@ -63,11 +65,11 @@ class WeeklyFeedTests(unittest.TestCase):
   for tag in re.findall(r'<section[^>]*data-edition-panel[^>]*>',markup):
    self.assertNotIn('hidden',tag)
   for text in (issue['deck'],issue['letter'],issue['signals'][0]['text'],
-               issue['tension']['text'],issue['editorial_note'],issue['experiment']['caution']):
+               issue['tension']['text'],issue['experiment']['caution']):
    self.assertIn(' '.join(text.split()),VisibleText(page).text())
    self.assertIn(' '.join(text.split()),VisibleText(rss).text())
   self.assertNotIn('data-edition-panel',rss)
-  self.assertEqual(item['_observatory'],frozen)
+  self.assertEqual(item['_observatory'],build_newsletter.feed_snapshot(frozen))
   self.assertEqual(item['content_html'],rss)
   self.assertEqual(item['id'],build_newsletter.feed_identity(issue))
   self.assertEqual(issue,frozen)
@@ -104,7 +106,7 @@ class WeeklyFeedTests(unittest.TestCase):
    self.assertIn('data-edition-target="signal-'+str(i)+'"',markup)
   self.assertIn('id="edition-read-all" aria-pressed="false"',markup)
   self.assertIn('data-edition-layer="opening"',markup)
-  self.assertIn('data-edition-layer="methods"',markup)
+  self.assertNotIn('data-edition-layer="methods"',markup)
   self.assertIn('data-edition-layer="sources"',markup)
   self.assertIn('AI-assisted summary. AI can make mistakes.',markup)
   self.assertNotIn('AI source-check, not human review',markup)
@@ -135,45 +137,44 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertIn('data-edition-target="edition-question"',navigation)
   self.assertIn('Question &amp; experiment',navigation)
 
- def test_methods_and_dates_are_secondary_layers_without_losing_their_text(self):
-  issue=self.latest_published_issue()
-  page=build_newsletter.render_issue(issue)
-  opening=page.split('<nav class="reader-map"',1)[0]
-  self.assertNotIn(html.escape(issue['editorial_note'],quote=True),opening)
-  methods=page.split('data-edition-layer="methods"',1)[1].split('</details>',1)[0]
-  self.assertIn(' '.join(issue['editorial_note'].split()),VisibleText(methods).text())
-  self.assertIn(build_newsletter.publication_scope(issue),html.unescape(methods))
-  self.assertIn('data-edition-layer="history"',page)
-  # RSS remains a complete linear reading, with no controls or modal script.
-  rss=build_newsletter.rss_content(issue)
-  self.assertNotIn('<script',rss)
-  self.assertNotIn('data-edition-panel',rss)
-  self.assertNotIn('data-edition-layer',rss)
-  self.assertIn(' '.join(issue['editorial_note'].split()),VisibleText(rss).text())
-
- def test_brief_redesign_preserves_all_published_copy_and_source_versions(self):
+ def test_dates_sections_and_originals_survive_without_publishing_workflow_notes(self):
   issue=self.latest_published_issue()
   frozen=copy.deepcopy(issue)
+  item=build_newsletter.json_feed([issue])['items'][0]
   page=build_newsletter.render_issue(issue)
-  rss=build_newsletter.rss_content(issue)
-  self.assertIn('<details',page)
-  self.assertNotIn('<details',rss)
-  self.assertIn('THE ATTENTION BRIEF',page)
-  self.assertNotIn('Attention Edit',page)
-  self.assertNotIn('fonts.googleapis.com',page)
-  texts=[issue[k] for k in ('headline','deck','letter','closer','editorial_note')]
-  texts += [s['text'] for s in issue['signals']]
-  texts += [issue['tension']['text'],issue['experiment']['text'],issue['experiment']['caution']]
-  for text in texts:
-   self.assertIn(' '.join(text.split()),VisibleText(page).text())
-   self.assertIn(' '.join(text.split()),VisibleText(rss).text())
-  for source in issue['sources']:
-   self.assertIn(html.escape(source['title'],quote=True),page)
-   for key in ('source_version','source_doi','related_journal_doi','review_scope','quality_note','notice','temporal_notice'):
-    if source.get(key):
-     self.assertIn(html.escape(source[key],quote=True),page)
-     self.assertIn(html.escape(source[key],quote=True),rss)
+  for output in (page,item['content_html']):
+   text=VisibleText(output).text()
+   self.assertIn(build_newsletter.publication_scope(issue),text)
+   self.assertNotIn(issue['editorial_note'],text)
+   for key in ('headline','deck','letter','closer'):
+    self.assertIn(' '.join(issue[key].split()),text)
+   for section in issue['signals']+[issue['tension'],issue['experiment']]:
+    self.assertIn(' '.join(section['text'].split()),text)
+   for source in issue['sources']:
+    self.assertIn(html.escape(build_newsletter.citation_url(source),quote=True),output)
+    self.assertIn(build_newsletter.reader_headline(source),text)
+    for key in ('review_scope','quality_note','notice','temporal_notice','review_label'):
+     if source.get(key):self.assertNotIn(source[key],text)
+  structured=item['_observatory']
+  self.assertNotIn('editorial_note',structured)
+  self.assertEqual([s['id'] for s in structured['sources']],[s['id'] for s in frozen['sources']])
+  for source in structured['sources']:
+   self.assertNotIn('evidence',source)
+   self.assertNotIn('review_scope',source)
+   self.assertTrue(source['reader_genre'])
   self.assertEqual(issue,frozen)
+
+ def test_database_import_uses_approved_snapshot_even_when_feed_is_absent(self):
+  issue=self.latest_published_issue()
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory)
+   approved=root/'data/approved-issues'
+   approved.mkdir(parents=True)
+   (approved/'2026-11-16.json').write_text(json.dumps(issue))
+   (approved/'2026-11-23.json').write_text(json.dumps(dict(issue,status='awaiting_publication')))
+   store=Mock()
+   import_approved_editions(store,root)
+   store.freeze_edition.assert_called_once_with(issue)
 
  def test_brief_brand_does_not_change_feed_identity_or_archived_snapshot(self):
   issue=self.synthesis_issue()
@@ -181,7 +182,7 @@ class WeeklyFeedTests(unittest.TestCase):
   frozen=copy.deepcopy(issue)
   feed=build_newsletter.json_feed([issue])
   self.assertEqual(feed['items'][0]['title'],'The Attention Brief · A preserved issue')
-  self.assertEqual(feed['items'][0]['_observatory'],frozen)
+  self.assertEqual(feed['items'][0]['_observatory'],build_newsletter.feed_snapshot(frozen))
   with tempfile.TemporaryDirectory() as directory, patch.object(build_newsletter,'ROOT',Path(directory)):
    build_rss([issue])
    channel=ET.parse(Path(directory)/'issue-feed.xml').find('channel')
@@ -199,23 +200,20 @@ class WeeklyFeedTests(unittest.TestCase):
   self.assertIn(html.escape(text),rendered.split('<details>')[1])
   self.assertNotIn('<details',build_newsletter.long_copy('A short sentence.'))
 
- def test_inline_versions_are_readable_and_shelf_preserves_distinct_notices(self):
-  source={'id':'test','title':'Test source','source_url':'https://example.org/paper',
-          'original_summary':True,'source_version':'arxiv_preprint_v1',
-          'notice':'No historical snapshot is available.',
-          'temporal_notice':'Current HTML was read after publication.'}
-  issue={'sources':[source]}
-  links=build_newsletter.source_links(issue,['test'])
-  self.assertIn('arXiv preprint v1',links)
-  self.assertNotIn('arxiv_preprint_v1',links)
+ def test_bibliography_groups_by_source_genre_and_only_shows_useful_versions(self):
+  issue=json.loads((ROOT/'data/approved-issues/2026-11-16.json').read_text())
   for disclosure in (True,False):
    shelf=build_newsletter.source_shelf(issue,disclosure)
-   self.assertIn('arxiv_preprint_v1',shelf)
-   self.assertIn(source['notice'],shelf)
-   self.assertIn(source['temporal_notice'],shelf)
-  source['temporal_notice']=source['notice']
-  self.assertEqual(build_newsletter.source_shelf(issue).count(source['notice']),1)
-  self.assertEqual(build_newsletter.readable_version('publisher_article'),'Publisher article')
+   self.assertIn('arXiv preprint v1',shelf)
+   self.assertNotIn('arxiv_preprint_v1',shelf)
+   self.assertNotIn('No historical snapshot',shelf)
+   groups={html.unescape(name):VisibleText(body).text() for name,body in re.findall(
+       r'<section class="source-group"><h3>([^<]+)</h3>(.*?)</section>',shelf)}
+   self.assertIn('Journal editorial',groups['Opinion and editorials'])
+   self.assertIn('Guardian readers',groups['Opinion and editorials'])
+   self.assertIn('Adam Daly',groups['Reporting and analysis'])
+   self.assertNotIn('Adam Daly',groups['Research'])
+   self.assertIn('Abstract only',groups['Opinion and editorials'])
 
  def test_rss_feed_has_permanent_ids_and_dates(self):
   path=ROOT/"issue-feed.xml"

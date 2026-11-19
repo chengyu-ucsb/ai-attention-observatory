@@ -1,6 +1,6 @@
 "use strict";
 const $=s=>document.querySelector(s),$$=s=>Array.from(document.querySelectorAll(s));
-const S={records:[],companions:[],pending:[],week:{},issue:{},manifest:null,libraryLoaded:false,backlog:{},duration:10,left:600,timer:null,running:false,checkpoint:null};
+const S={records:[],companions:[],pending:[],week:{},issue:{},manifest:null,libraryLoaded:false,duration:10,left:600,timer:null,running:false,checkpoint:null};
 const themes=[["AI & cognition","When thinking is delegated","Offloading, metacognition and reasoning","◎","#E00122"],["Fragmentation","The cost of switching","Distraction, interruptions and re-entry","direction-mark","#A8001A"],["Interventions","Designing for focus","Focus tools and digital well-being","✳","#646464"],["Technology & society","Who shapes attention?","Platform incentives and human agency","◇","#9A9193"]];
 const depths=[["full_text","Full-text material","#E00122"],["abstract","Abstract-based","#666666"],["curated","Curated synopsis","#C6C0C1"]];
 function uiIcon(name,cls=""){
@@ -102,12 +102,12 @@ function sectionMenu(host,groups,id,label="Explore this page"){
  }
  choose(groups[0].key);return {choose,nav,focusActive:()=>Array.from(tabs.children).find(b=>b.dataset.section===nav.dataset.activeSection)?.focus({preventScroll:true})};
 }
-let homeMenu,issueMenu,issueThemeMenu,labPageMenu;
+let homeMenu,issueMenu,issueThemeMenu,labPageMenu,perspectiveMenu;
 function setupPageLayers(){
  const homeHost=make("div","shell home-section-controls");$("#home .field-guide").before(homeHost);
  homeMenu=sectionMenu(homeHost,[
   {key:"overview",label:"Start exploring",note:"Find your way in",nodes:[$("#home .field-guide"),$("#home .lab-teaser")]},
-  {key:"ideas",label:"Ideas & tools",note:"Perspectives in practice",nodes:[$("#beyond-journals")]},
+  {key:"ideas",label:"News & opinion",note:"Reporting, arguments & guides",nodes:[$("#beyond-journals")]},
   {key:"landscape",label:"Research landscape",note:"See the collection",nodes:[$("#home .glance-section"),$("#home .issue-strip")]},
   {key:"recent",label:"Recently added",note:"New reading material",nodes:[$("#home .arrivals-section")]},
   {key:"follow",label:"Follow the brief",note:"Keep up each week",nodes:[$("#home .follow-section")]}
@@ -120,8 +120,14 @@ function setupPageLayers(){
  const labNote=$(".play-note"),noteBody=make("div");while(labNote.firstChild)noteBody.append(labNote.firstChild);labNote.append(layerButton("About these experiments","About these experiments",noteBody));
  labPageMenu=sectionMenu($("#lab-page-navigation"),[{key:"experiments",label:"Experiments",note:"Play, compare, reflect",nodes:[$("#lab-activities")]},{key:"design",label:"Design examples",note:"Ideas behind the tools",nodes:[$(".play-precedents")]}],"lab-section","Explore the Lab");
  const perspectiveHost=make("div","perspective-section-controls"),intro=$$("#perspectives .perspectives-intro");$(".perspectives-quick-links").after(perspectiveHost);
- const perspectives=sectionMenu(perspectiveHost,[{key:"essays",label:"Reporting & essays",nodes:[intro[0],$("#perspectives-essays")]},{key:"products",label:"Tools & design",nodes:[intro[1],$("#perspectives-products")]}],"perspectives-section");
- $("#perspectives-essays-link").onclick=()=>perspectives.choose("essays");
+ perspectiveMenu=sectionMenu(perspectiveHost,[
+  {key:"news",label:"News reporting",nodes:[intro[0],$("#perspectives-news")]},
+  {key:"essays",label:"Opinion & analysis",nodes:[intro[1],$("#perspectives-essays")]},
+  {key:"products",label:"Product guides",nodes:[intro[2],$("#perspectives-products")]}
+ ],"perspectives-section","Browse by source type");
+ perspectiveMenu.nav.addEventListener("sectionchange",event=>{
+  if(location.hash.startsWith("#perspectives"))history.replaceState(history.state,"","#perspectives?section="+event.detail);
+ });
  const atlasHost=make("div");$(".atlas-stat-row").after(atlasHost);
  sectionMenu(atlasHost,[{key:"themes",label:"Research themes",nodes:[$(".atlas-topic")]},{key:"years",label:"Publication years",nodes:[$(".atlas-years")]},{key:"material",label:"Source material",nodes:[$(".atlas-coverage"),$(".atlas-matrix")]}],"atlas-section");
 }
@@ -131,24 +137,6 @@ function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).
 function depth(x){return x.reading?.level||"citation_only"}
 function originalSummary(x){return x.reading?.original_summary===true}
 function originalCommentary(reading){return reading?.original_summary===true&&reading.research_type==="attributed_commentary"}
-function checkedReadingContext(reading,cls="source-meta"){
- const box=make("div",cls),deep=reading.digest?.longform||{};
- if(originalCommentary(reading))box.append(make("p","","Attributed commentary · "+(reading.genre||deep.genre||"commentary").replace(/_/g," ")+((reading.attributed_to||deep.attributed_to)?" · "+(reading.attributed_to||deep.attributed_to):"")));
- box.append(make("p","",reading.notice||reading.review_label||"AI source-check · not human review or independent replication"));
- if(reading.review_scope)box.append(make("p","","AI source-check scope: "+reading.review_scope));
- if(reading.quality_note)box.append(make("p","","Article quality screening: "+reading.quality_note));
- if(reading.temporal_notice&&!String(reading.notice||"").includes(reading.temporal_notice))box.append(make("p","",reading.temporal_notice));
- return box;
-}
-function readingDetails(reading){
- const content=make("div","card-reading-context");
- content.append(checkedReadingContext(reading));
- if(reading.source_version)content.append(make("p","source-meta","Source version identifier: "+reading.source_version));
- const basis=reading.digest?.basis;
- if(basis&&!String(reading.notice||"").includes(basis))content.append(make("p","source-meta",basis));
- if(!/not human review|not independently reviewed/i.test(String(reading.notice||"")+String(basis||"")))content.append(make("p","source-meta","AI source-check; not human review or independent replication."));
- return layerButton("Reading details","Reading details",content,"card-reading-details");
-}
 function depthName(x){if(originalSummary(x))return "Original summary";if(x.kind==="nonacademic"&&depth(x)!=="citation_only"){const src=x.reading?.digest?.longform?.source_depth;return src==="read_article"?"Reviewed essay":src==="machine_read_full_article"?"Article-based synthesis":src==="product_documentation"?"Product documentation":src==="editorial_synopsis"?"Editorial synopsis":"Publisher synopsis";}return ({"full_text":x.analysis?.original_paraphrases_only?"Reviewed full article":"Full-text sections","abstract":"Abstract-based","curated":"Curated overview","citation_only":"Citation only"})[depth(x)]}
 function excerpt(x){return x.reading?.findings||x.reading?.overview||x.preview||"Citation only."}
 
@@ -242,43 +230,90 @@ function cleanLead(s,sourceTitle=""){
  if(letters.length>17&&uppers.length/letters.length>.80){x=readableSourceTitle({title:x});}
  return x?x[0].toUpperCase()+x.slice(1):"";
 }
-const readingTitles={
- "10.48550/arxiv.2610.38910":"How students describe critical engagement with AI",
- "10.48550/arxiv.2610.38950":"Changing how students ask AI for help",
- "10.48550/arxiv.2610.38990":"What makes an AI feel like a peer?",
- "https://www.eff.org/deeplinks/2026/10/victory-you-can-now-exclude-apps-siri-ai":"Choosing what an AI assistant can access",
- "https://www.eff.org/deeplinks/2026/10/social-media-when-elections-are-close-doing-impossible-better":"Challenging an automated moderation decision"
-};
-// Display headings are a different editorial field from source findings. Never
-// turn an extracted Results sentence (or a clipped version) into a page title.
+// Use complete edited phrases only; a published finding is never clipped into a heading.
 function readingHeadline(x){
  const d=x.reading?.digest||{};
  const edited=originalSummary(x)||["editorially_written_from_indexed_sections","edited_perspective","conceptual_framework"].includes(d.status);
- const options=[x.display_headline,readingTitles[id(x)],edited?d.idea:""];
+ const options=[x.display_headline,readableSourceTitle(x),edited?d.idea:""];
  const statistical=/\b(?:p|r(?:²|\^2)?|b|t|f|n|se|sd|cfi|rmsea)\s*(?:\([^)]*\))?\s*[=<>≤≥]|[βρχ](?:²|\^2)?\s*(?:\([^)]*\))?\s*[=<>≤≥]|\b\d+(?:\.\d+)?%\s*(?:CI|confidence)|\b(?:Table|Figure)\s+\d/i;
  const fragment=/^(?:In contrast|Similarly|Furthermore|Moreover|As shown|In conclusion|Results?|Conclusions?)\s*[,：:]|(?:…|\.\.\.)$/i;
  for(const value of options){
   const candidate=String(value||"").replace(/\s+/g," ").trim();
-  if(candidate&&candidate.length<=88&&!statistical.test(candidate)&&!fragment.test(candidate))return candidate;
+  if(candidate&&candidate.length<=55&&candidate.split(" ").length<=10&&!statistical.test(candidate)&&!fragment.test(candidate))return candidate;
  }
- // The verified publication title is safer than inventing or shortening a claim.
- return readableSourceTitle(x)||"Untitled source";
+ // New long titles are held for editing before publication. Older deep links
+ // still expose the full bibliographic title in their Source section.
+ return "Read the original article";
 }
 function shortIdea(x){return readingHeadline(x)}
-function editionReadingHeadline(source){
- // A source shelf can represent a different version from the current library.
- const current=record(source.id);
- if(current&&current.title===source.title&&current.display_headline)return readingHeadline(current);
- return readableSourceTitle(source);
+// A source's bibliographic identity and version belong to its edition. Only
+// reuse a catalog display label when both the source ID and original title match.
+function editionReading(source){
+ const candidate=record(source.id);
+ // Legacy explainer deep links resolve to a related paper. An edition link
+ // labelled as reporting must instead lead to the particular article it cites.
+ return candidate&&candidate.title===source.title&&depth(candidate)!=="citation_only"?candidate:null;
 }
-function readingKind(x){
- if(x.research_type==="conceptual_framework"||x.reading?.research_type==="conceptual_framework")return "Conceptual framework";
- if(x.reading?.research_type==="editorial")return "Editorial";
- if(x.reading?.genre==="reported_analysis")return "Reporting";
- if(x.reading?.genre==="opinion")return "Opinion";
- if(x.kind==="scholarly")return "Research";
- if(x.reading?.digest?.longform?.source_depth==="product_documentation")return "Product guide";
- return "Commentary";
+function editionPresentation(source){
+ const labels=S.manifest?.source_labels?.[source.id];
+ if(labels)return {...source,...labels};
+ const current=editionReading(source);
+ if(!current)return source;
+ return {...source,display_headline:source.display_headline||current.display_headline,
+  reader_genre:source.reader_genre||sourceGenre(current)};
+}
+function editionReadingHeadline(source){return readingHeadline(editionPresentation(source))}
+const genreLabels={
+ research:"Research",review:"Research review",conceptual:"Conceptual paper",proposal:"Research proposal",
+ reporting:"News report",opinion:"Opinion",editorial:"Journal editorial",analysis:"Analysis",commentary:"Commentary",
+ guide:"Product guide",other:"Source"
+};
+function sourceGenre(x){
+ if(Object.hasOwn(genreLabels,x.reader_genre)&&
+    !(x.kind==="nonacademic"&&["research","review","conceptual","proposal"].includes(x.reader_genre)))return x.reader_genre;
+ // Legacy snapshots and previously shared deep links can predate reader_genre.
+ const type=x.reading?.research_type||x.research_type||"",genre=x.reading?.genre||x.genre||x.reading?.digest?.longform?.genre||x.digest?.longform?.genre||"";
+ const format=x.format||"";
+ if(type==="editorial"||/^editorial\s*:/i.test(x.title||""))return "editorial";
+ if(/^(?:reported_analysis|news(?:_report(?:ing)?)?|press_reporting|journalism|reporting)$/.test(genre)||/reporting/i.test(format))return "reporting";
+ if(genre==="opinion"||format==="Opinion"||["opinion","perspective","commentary"].includes(type))return "opinion";
+ if(/analysis/.test(genre)||/analysis/i.test(format))return "analysis";
+ if(x.source==="Official product documentation"||x.reading?.digest?.longform?.source_depth==="product_documentation")return "guide";
+ if(type==="attributed_commentary"||x.kind==="nonacademic")return "commentary";
+ if(["conceptual","conceptual_framework","theoretical"].includes(type))return "conceptual";
+ if(["research_synthesis","systematic_review","meta_analysis","review"].includes(type))return "review";
+ if(x.kind==="scholarly"&&/\b(?:systematic (?:literature )?review|scoping review|narrative review|meta-analysis)\b/i.test(x.title||""))return "review";
+ if(["proposal","protocol","research_proposal"].includes(type))return "proposal";
+ return x.kind==="scholarly"?"research":"other";
+}
+function sourceFamily(x){
+ const genre=sourceGenre(x);
+ if(["research","review","conceptual","proposal"].includes(genre))return "research";
+ if(genre==="guide")return "product";
+ return genre==="other"?"other":"media";
+}
+function readingKind(x){return genreLabels[sourceGenre(x)]}
+function matchesSourceType(x,filter){
+ if(!filter)return true;
+ const genre=sourceGenre(x);
+ if(filter==="scholarly")return sourceFamily(x)==="research";
+ if(filter==="nonacademic")return ["media","product"].includes(sourceFamily(x));
+ if(filter==="opinion")return genre==="opinion"||genre==="editorial";
+ if(filter==="analysis")return genre==="analysis"||genre==="commentary";
+ return genre===filter;
+}
+function mediaByline(x){
+ const reading=x.reading||x;
+ return reading.attributed_to||reading.digest?.longform?.attributed_to||x.authors?.slice(0,2).join(" & ")||"";
+}
+function publicationContext(x){
+ const reading=x.reading||x;
+ const version=String(reading.source_version||"");
+ const preprint=version.match(/arxiv[_ ]preprint[_ ]v(\d+)/i);
+ if(preprint)return "arXiv preprint v"+preprint[1];
+ if(/preprint|working[ _]paper/i.test(version)||reading.research_type==="preprint"||x.research_type==="preprint")return "Preprint";
+ if((x.reading_level||reading.level)==="abstract")return "Based on the abstract";
+ return "";
 }
 function readingBasisName(x){
  const d=x.reading?.digest||{};
@@ -291,9 +326,9 @@ function readingBasisName(x){
 function ideaInfo(x){return {text:readingHeadline(x),label:readingKind(x)}}
 function rank(x){let r=x.reading||{},v=({"full_text":80,"abstract":46,"curated":25,"citation_only":0})[depth(x)]||0;v+=(r.digest?.finding||x.has_finding)?26:0;v+=(r.methods||x.has_methods)?10:0;v+=(r.limitations||x.has_limitations)?4:0;v+=/ai|generative|chatgpt|attention|offloading|focus/i.test(x.title)?9:0;v+=x.relation==="Adjacent digital-attention evidence"?-25:0;return v}
 // The four starting lenses keep their familiar colors; the published collection supplies the topics.
-function collectionTopics(){
+function collectionTopics(records=S.records){
  const counts=new Map();
- for(const row of S.records){const label=row.lane||"Unassigned";counts.set(label,(counts.get(label)||0)+1);}
+ for(const row of records){const label=row.lane||"Unassigned";counts.set(label,(counts.get(label)||0)+1);}
  return [...counts].sort(([a],[b])=>a.localeCompare(b)).map(([label,count])=>({
   label,count,color:themes.find(theme=>theme[0]===label)?.[4]||"#74676A"
  }));
@@ -333,7 +368,7 @@ function updateLibraryRoute(){
  history.replaceState(history.state,"","#library"+(params.size?"?"+params:""));
 }
 function chooseLibraryTheme(label){$("#topic-filter").value=label;updateLibraryRoute();}
-function libraryHash(theme){return "#library?theme="+encodeURIComponent(theme)+"&scope=all"}
+function libraryHash(theme,sourceType=""){return "#library?theme="+encodeURIComponent(theme)+"&scope=all"+(sourceType?"&type="+sourceType:"")}
 function goto(page,k){
  const value=page==="paper"?"#paper/"+encodeURIComponent(k):page==="library"&&k?libraryHash(k):"#"+page;
  if(location.hash===value)route({type:"hashchange"});else location.hash=value;
@@ -347,6 +382,7 @@ function route(event){
  $$("[data-route]").forEach(v=>{v.classList.toggle("active",v.dataset.route===page);if(v.dataset.route===page)v.setAttribute("aria-current","page");else v.removeAttribute("aria-current")});
  if(page==="paper"){let key;try{key=decodeURIComponent(raw.slice(6))}catch{key=""}void openPaper(key,event?.type==="hashchange")}
  if(page==="library")showLibrary(readLibraryRoute(raw));if(page==="atlas")showAtlas();
+ if(page==="perspectives")perspectiveMenu?.choose(new URLSearchParams(raw.split("?")[1]||"").get("section")||"news");
  if(page==="lab"){
   const params=new URLSearchParams(raw.split("?")[1]||"");
   labPageMenu?.choose(params.get("section")==="design"?"design":"experiments");
@@ -371,26 +407,29 @@ function focusIssueTerm(raw){
  const target=term?.startsWith("issue-term-")?document.getElementById(term):null;
  if(target){issueMenu?.choose("about");target.focus({preventScroll:true});target.scrollIntoView({block:"center"})}
 }
-function counts(){const result={};for(const d of depths)result[d[0]]=S.records.filter(x=>depth(x)===d[0]).length;return result}
-function topicBars(selector){
- const root=$(selector),topics=collectionTopics(),max=Math.max(1,...topics.map(t=>t.count));
+function researchRecords(){return S.records.filter(x=>sourceFamily(x)==="research")}
+function counts(records){return Object.fromEntries(depths.map(([level])=>[level,records.filter(x=>depth(x)===level).length]))}
+function topicBars(selector,records){
+ const root=$(selector),topics=collectionTopics(records),max=Math.max(1,...topics.map(t=>t.count));
  root.replaceChildren();
  for(const {label,count,color} of topics){
-  const row=btn("",()=>goto("library",label),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");
+  const row=link("",libraryHash(label,"scholarly"),"topic-bar-line"),track=make("span","bar-track"),fill=make("span","bar-fill");
   fill.style.width=count/max*100+"%";fill.style.background=color;track.append(fill);
   add(row,make("span","bar-label",label),track,make("span","bar-value",count));root.append(row);
  }
 }
-function donut(){const cc=counts(),total=Math.max(1,S.records.length),legend=$("#depth-legend");$("#record-count").textContent=S.records.length;legend.replaceChildren();let at=0,parts=[];for(const d of depths){let pct=cc[d[0]]/total*100;parts.push(d[2]+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;const r=make("div","legend-item"),sw=make("span","legend-swatch"),copy=make("div");sw.style.background=d[2];add(copy,make("div","legend-title",d[1]+" · "+cc[d[0]]),make("span","legend-caption",Math.round(pct)+"% of records"));add(r,sw,copy);legend.append(r)}$("#evidence-donut").style.background="conic-gradient("+parts.join(",")+")"}
-function featureCoverage(x){
- const area=make("div","feature-evidence"),row=make("div","feature-evidence-row");
- const tiers=["Citation","Abstract",originalSummary(x)?"Checked source text":"Full text"],active=depth(x)==="full_text"?3:depth(x)==="abstract"?2:1;
- const track=make("div","feature-evidence-track");
- for(let i=0;i<3;i++){const mark=make("span","feature-evidence-mark"+(i<active?" covered":""));mark.title=tiers[i];track.append(mark)}
- add(row,make("span","", "AVAILABLE MATERIAL"),make("span","",depthName(x)));
- add(area,row,track);
- if(originalSummary(x))add(area,make("p","source-meta","Checked source: "+checkedSourceLabel(x.reading)),readingDetails(x.reading));
- return area;
+function donut(records){
+ const cc=counts(records),total=records.length,legend=$("#depth-legend");
+ $("#record-count").textContent=total;legend.replaceChildren();
+ let at=0;const parts=[];
+ for(const [key,label,color] of depths){
+  if(!cc[key])continue;
+  const pct=100*cc[key]/total;parts.push(color+" "+at.toFixed(2)+"% "+(at+pct).toFixed(2)+"%");at+=pct;
+  const marker=make("span","legend-swatch");marker.style.background=color;
+  const copy=add(make("div"),make("div","legend-title",label+" · "+cc[key]),make("span","legend-caption",Math.round(pct)+"% of research sources"));
+  legend.append(add(make("div","legend-item"),marker,copy));
+ }
+ $("#evidence-donut").style.background=parts.length?"conic-gradient("+parts.join(",")+")":"";
 }
 
 function issueRefs(ids,target){
@@ -398,8 +437,8 @@ function issueRefs(ids,target){
  for(const key of ids||[]){
    const src=list.find(x=>x.id===key);
    if(!src)continue;
-   const resolved=record(key),matches=resolved&&depth(resolved)!=="citation_only"?resolved:null;
-   const b=matches?btn(editionReadingHeadline(src),()=>goto("paper",id(matches)),"issue-ref"):link(readableSourceTitle(src),src.url||"#library","issue-ref");
+   const matches=editionReading(src);
+   const b=matches?link(editionReadingHeadline(src),"#paper/"+encodeURIComponent(id(matches)),"issue-ref"):link(editionReadingHeadline(src),httpsSourceUrl(src.source_url)||httpsSourceUrl(src.url)||"#library","issue-ref");
    container.append(b);
  }
  return container;
@@ -481,11 +520,10 @@ function setupIssueLayers(issue){
   const bullets=make("ul","takeaway-statements");bullets.append(make("li","",textSentences(signal.text)[0]||signal.text));
   add(back,make("span","eyebrow","KEY STATEMENT"),bullets);
   const turn=btn("Turn card",()=>{const flipped=back.hidden;front.hidden=flipped;back.hidden=!flipped;card.classList.toggle("is-flipped",flipped);turn.setAttribute("aria-pressed",String(flipped));turn.textContent=flipped?"Back to theme":"Turn card";},"flip-toggle");turn.setAttribute("aria-pressed","false");
-  const read=btn("Explore the evidence",()=>{issueMenu.choose("themes");issueThemeMenu.choose(String(i));issueThemeMenu.nav.scrollIntoView({block:"start"});issueThemeMenu.focusActive();},"quiet-link");
+  const read=btn("Read the discussion",()=>{issueMenu.choose("themes");issueThemeMenu.choose(String(i));issueThemeMenu.nav.scrollIntoView({block:"start"});issueThemeMenu.focusActive();},"quiet-link");
   add(card,front,back,add(make("div","takeaway-actions"),turn,read));deck.append(card);
  }
  const intro=layerDisclosure($(".issue-letter"),"The big picture")||$(".issue-letter");
- layerDisclosure($(".issue-closing .issue-editorial-details"),"How this was made");
  layerDisclosure($("#issue-history"),"Publication history");
  const shelf=$(".issue-reading-shelf > details");if(shelf){const summary=shelf.querySelector("summary");summary?.remove();shelf.replaceWith(...shelf.childNodes);}
  let map=$("#issue-map");if(!map){map=make("div","issue-concept-map");map.id="issue-map";$("#issue-takeaways").before(map);}
@@ -515,39 +553,6 @@ function renderIssueGlossary(issue){
  }
  add(glossary,make("h2","","A few useful terms"),definitions);
 }
-function renderIssueLandscape(issue){
- const root=$("#issue-source-landscape");if(!root)return;root.replaceChildren();
- const n=Number(issue.source_count)||0;
- const groups=[
-  {title:"WHAT WE READ",rows:[["Scholarly literature",Number(issue.types?.scholarly)||0],["Public essays & other sources",Number(issue.types?.commentary)||0]],note:"Material covered by this edition, not evidence of agreement."},
-  {title:"HOW MUCH SOURCE TEXT",rows:[["Full-text extracts",Number(issue.material?.full_text)||0],["Abstract-based",Number(issue.material?.abstract)||0],["Publisher or editorial synopses",Number(issue.material?.publisher_or_editorial)||0]],note:"Coverage depth, not confidence in conclusions."}
- ];
- for(const [groupIndex,g] of groups.entries()){
-  const card=make("div","issue-mix-card");
-  const top=make("div","issue-mix-heading");
-  add(top,make("span","eyebrow",g.title),make("strong","",n+" sources"));
-  card.append(top);
-  const bar=make("div","issue-mix-bar");
-  bar.setAttribute("role","img");
-  bar.setAttribute("aria-label",g.rows.map(([name,value])=>name+": "+value).join("; "));
-  g.rows.forEach(([label,value],i)=>{
-    if(value<=0)return;
-    const piece=make("span","issue-mix-segment mix-"+groupIndex+"-"+i);
-    piece.style.width=(n?100*value/n:0)+"%";
-    piece.title=label+": "+value;
-    bar.append(piece)
-  });
-  card.append(bar);
-  const legend=make("div","issue-mix-legend");
-  g.rows.forEach(([label,value],i)=>{
-   const item=make("div","issue-mix-legend-item");
-   add(item,make("span","issue-mix-key mix-"+groupIndex+"-"+i),make("span","",label),make("strong","",String(value)));
-   legend.append(item)
-  });
-  add(card,legend,make("p","issue-mix-caveat",g.note));
-  root.append(card)
- }
-}
 function textSentences(value){
  const text=String(value||"").replace(/\s+/g," ").trim();
  if(!text)return [];
@@ -563,10 +568,7 @@ function compactReading(value,label="Read the full context"){
 }
 function evidenceTags(sources){
  const wrap=make("div","evidence-tags"),labels=new Set();
- for(const source of sources){
-  const version=String(source.source_version||source.venue||"").toLowerCase();
-  labels.add(/arxiv|preprint|working.paper/.test(version)?"Preprint · review unverified":source.kind==="nonacademic"||source.research_type==="attributed_commentary"?"Commentary":source.reading_level==="abstract"?"Abstract-based":"Research");
- }
+ for(const source of sources)labels.add(readingKind(editionPresentation(source)));
  for(const label of labels)wrap.append(make("span","",label));
  return wrap;
 }
@@ -574,7 +576,6 @@ function renderIssue(){
  const issue=S.issue||{},published=issue.status==="published";
  const edition=issue.edition_date||"";
  const sourceCount=Number(issue.source_count)||0;
- renderIssueLandscape(issue);
  renderIssueGlossary(issue);
  $("#weekly-kicker").textContent=published?"THE WEEKLY BRIEF / ISSUE "+String(issue.number).padStart(2,"0"):"THE ATTENTION BRIEF";
  $("#weekly-title").textContent=published?issue.headline:"Good questions about AI and attention.";
@@ -606,12 +607,11 @@ function renderIssue(){
  const history=$("#issue-history"),historyBody=$("#issue-history-body");historyBody.replaceChildren();
  const first=issue.first_published_date||String(issue.published_at||"").slice(0,10);
  history.hidden=!published||(!first&&!(issue.edition_history||[]).length);
- if(first)historyBody.append(make("p","","First published "+date(first)+". The Monday label identifies this edition; it does not change its release date."));
+ if(first)historyBody.append(make("p","","First published "+date(first)+"."));
  if(issue.updated_at)historyBody.append(make("p","","Updated "+date(issue.updated_at)+"."));
  for(const entry of issue.edition_history||[]){
    if(!/^history\/20\d\d-\d\d-\d\d\.html$/.test(entry.url||""))continue;
    const row=make("p");row.append(link("Original version · "+date(entry.original_date),"issues/"+entry.url));
-   if(entry.note)row.append(document.createTextNode(" — "+entry.note));
    historyBody.append(row);
  }
  $("#issue-extras").hidden=!published;
@@ -623,43 +623,30 @@ function renderIssue(){
  $("#issue-experiment-text").textContent=published?issue.experiment.text:"";
  $("#issue-experiment-caution").textContent=published?issue.experiment.caution:"";
  $("#issue-closer").textContent=published?issue.closer:"";
- const qualification=$("#issue-qualification");qualification.replaceChildren();
- if(published&&issue.editorial_note)qualification.replaceChildren(...issueProse(issue.editorial_note,{},issue).firstElementChild.childNodes);
- $("#issue-qualification").hidden=!published||!issue.editorial_note;
- const sourceList=issue.sources||[],earlier=sourceList.filter(source=>source.editorial_role==="previously_indexed_context").length,collection=sourceList.filter(source=>source.editorial_role==="collection_week").length;
- $("#issue-coverage").textContent=issue.scope_kind==="legacy_collection"?sourceList.length+" sources in a historical collection, including earlier sources; not a strict previous-week digest.":issue.publication_window?sourceList.length+" sources originally published "+date(issue.publication_window.from)+"–"+date(issue.publication_window.to)+" (UTC). No older context sources are included.":sourceList.length+" sources in this edition. "+(collection||earlier?collection+" collection-week reading"+(collection===1?"":"s")+" and "+earlier+" earlier context reading"+(earlier===1?"":"s")+". Collection-week does not mean newly published or first indexed this week.":"Explore the original research and reporting behind these ideas.");
+ const sourceList=issue.sources||[];
+ $("#issue-coverage").textContent=sourceList.length+" sources"+(issue.scope_kind==="legacy_collection"?" in this historical collection.":issue.publication_window?" · "+date(issue.publication_window.from)+" – "+date(issue.publication_window.to):" in this edition.");
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries())shelf.append(issueSourceShelfItem(src,i));
  renderEditionCards();
  setupIssueLayers(issue);
 }
 function issueSourceShelfItem(src,index){
- const item=make("div","issue-shelf-item"),resolved=record(src.id),candidate=resolved&&depth(resolved)!=="citation_only"?resolved:null;
+ const item=make("div","issue-shelf-item"),current=editionReading(src),presented=editionPresentation(src);
  item.id="edition-source-"+index;item.tabIndex=-1;
- const original=src.original_summary===true;
- const title=candidate?btn(readableSourceTitle(src),()=>goto("paper",id(candidate))):link(readableSourceTitle(src),src.url||"#library");
- const role=src.editorial_role==="previously_indexed_context"?"Earlier context":src.editorial_role==="collection_week"?"Collection-week reading":src.editorial_role==="publication_week"?"Published in previous week":"";
- const metadata=[src.venue,original?"Original summary":candidate?depthName(candidate):"Not in current reading library · Original source",candidate?.first_seen?"First indexed "+date(candidate.first_seen):"",role].filter(Boolean).join(" · ");
- const content=add(make("div","issue-shelf-content"),title,make("p","",metadata));
- if(original){
-  // Use the edition's source snapshot, not the current library reading: a
-  // later accepted version must not relabel an earlier working-paper source.
-  content.append(make("p","issue-source-version","Checked source: "+checkedSourceLabel(src)));
-  const sourceUrl=httpsSourceUrl(src.source_url),links=make("div","issue-source-links");
-  if(sourceUrl)links.append(add(make("p"),link("Read checked source: "+checkedSourceLabel(src)+"",sourceUrl,"issue-source-checked-link")));
-  const related=src.related_journal_doi&&src.related_journal_doi!==src.source_doi;
-  const publicationUrl=related?doiUrl(src.related_journal_doi):httpsSourceUrl(src.url);
-  if(publicationUrl&&publicationUrl!==sourceUrl)
-   links.append(add(make("p"),link(related?"Related journal publication (not the checked source)":"Publication record",publicationUrl,"issue-source-publication-link")));
-  if(links.children.length)content.append(links);
-  const scope=make("div","issue-source-review-body");
-  scope.append(checkedReadingContext(src,"issue-source-review-label"));
-  if(src.source_version)scope.append(make("p","","Source version identifier: "+src.source_version));
-  if(src.source_doi)scope.append(make("p","","Checked source DOI: "+src.source_doi));
-  if(related)scope.append(make("p","","Related journal DOI (not checked here): "+src.related_journal_doi));
-  if(scope.children.length)content.append(layerButton("Source details & reading basis","Source details & reading basis",scope,"issue-source-review"));
-  const evidence=originalEvidence(src);if(evidence)content.append(layerButton("Inspect source passages","Source passages",evidence,"issue-source-evidence"));
- }
+ const original=httpsSourceUrl(src.source_url),publication=httpsSourceUrl(src.url);
+ const title=editionReadingHeadline(src),sourceUrl=original||publication;
+ const reading=Boolean(current);
+ const heading=reading?link(title,"#paper/"+encodeURIComponent(id(current))):
+  sourceUrl?link(title,sourceUrl,original?"issue-source-checked-link":"issue-source-publication-link"):make("strong","",title);
+ const content=make("div","issue-shelf-content");
+ add(content,make("span","card-type",readingKind(presented)),heading,
+  make("p","source-meta",[mediaByline(src),src.venue,src.published?date(src.published):"",publicationContext(src)].filter(Boolean).join(" · ")));
+ const links=make("div","issue-source-links");
+ if(original&&reading)links.append(link("Read original",original,"issue-source-checked-link"));
+ if(publication&&reading&&!original)links.append(link("Read original",publication,"issue-source-publication-link"));
+ if(src.related_journal_doi&&src.related_journal_doi!==src.source_doi)
+  links.append(link("Related journal publication",doiUrl(src.related_journal_doi),"issue-source-publication-link"));
+ if(links.children.length)content.append(links);
  return add(item,make("span","issue-shelf-number",String(index+1).padStart(2,"0")),content);
 }
 
@@ -669,37 +656,37 @@ function renderEditionCards(){
  for(const [i,src] of (S.issue.sources||[]).slice(0,3).entries()){
   const c=make("article","feature-card"+(i===0?" primary":""));
   add(c,make("span","feature-number",String(i+1).padStart(2,"0")),
-      editorialMedia({editorial_art:record(src.id)?.editorial_art},"feature"),
-      make("p","feature-idea-label",src.kind==="scholarly"?"Research":"Commentary"),
+      editorialMedia({editorial_art:editionReading(src)?.editorial_art},"feature"),
+      make("p","feature-idea-label",readingKind(editionPresentation(src))),
       make("h3","feature-idea",editionReadingHeadline(src)),
-      make("p","source-meta",[src.venue,date(src.published)].filter(Boolean).join(" · ")),
-      make("p","source-meta",src.review_label||(src.reading_level==="abstract"?"Based on the abstract":"Source material recorded in this edition")),
-      link("Read this edition’s source notes","#issue?source="+encodeURIComponent(src.id),"feature-go"));
+      make("p","source-meta",[src.venue,src.published?date(src.published):"",publicationContext(src)].filter(Boolean).join(" · ")),
+      link("View source","#issue?source="+encodeURIComponent(src.id),"feature-go"));
   root.append(c);
  }
 }
 function home(){
- const run=S.week.run||{};
- const start=run.mode==="curated-starter";$("#issue-label").textContent=start?"STARTER COLLECTION / LIVE UPDATE PENDING":"LATEST INDEX / "+date(run.date);$("#issue-meta").textContent=(run.last_seven_days??0)+" in latest collection · "+S.records.length+" in library"+(run.publication_window?" · Published "+date(run.publication_window.from)+"–"+date(run.publication_window.to)+" UTC":"");
+ const run=S.week.run||{},research=researchRecords();
+ $("#issue-label").textContent=run.date?"Library updated "+date(run.date):"Reading library";
+ $("#issue-meta").textContent=S.records.length+" readings · "+research.length+" research sources";
  renderEditionCards();
  // Provider diagnostics belong in repository workflow logs, never in public content.
  renderEditorial();
- topicBars("#topic-bars");donut();
+ topicBars("#topic-bars",research);donut(research);
  const grid=$("#lens-grid");if(grid){grid.replaceChildren();themes.forEach((t,i)=>{const a=link("",libraryHash(t[0]),"lens");a.setAttribute("aria-label","Explore "+t[0]);a.setAttribute("data-theme",String(i));add(a,make("span","lens-mark",t[3]),make("h3","",t[1]),make("p","",t[2]),make("span","",S.records.filter(x=>x.lane===t[0]).length+" records →"));grid.append(a)});}
  const arr=$("#arrivals-body");arr.replaceChildren();
  const sorted=S.records.filter(x=>depth(x)!=="citation_only").slice().sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||"")).slice(0,7);
- for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x,94),()=>goto("paper",id(x))));go.append(btn("Read",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.first_seen)),name,make("td","",x.lane||"Research"),make("td","coverage-tag",depthName(x)),go);arr.append(tr)}
+ for(const x of sorted){let tr=make("tr"),name=make("td"),go=make("td","align-right");name.append(btn(shortIdea(x),()=>goto("paper",id(x))));go.append(btn("Read",()=>goto("paper",id(x))));add(tr,make("td","mono-date",date(x.first_seen)),name,make("td","",x.lane||"Unassigned"),make("td","coverage-tag",readingKind(x)),go);arr.append(tr)}
 }
 
 function renderEditorial(){
- const list=S.records.filter(x=>x.kind==="nonacademic");
+ const list=S.records.filter(x=>matchesSourceType(x,"nonacademic"));
  const sorted=list.filter(x=>depth(x)!=="citation_only").sort((a,b)=>(b.first_seen||"").localeCompare(a.first_seen||"")||(b.published||"").localeCompare(a.published||""));
- const featured=[];for(const test of [x=>x.format==="Product & design",x=>x.format==="Policy analysis",x=>x.source==="Publisher RSS / Google News RSS",x=>true]){const next=sorted.find(x=>!featured.includes(x)&&test(x));if(next)featured.push(next)};
+ const featured=[];for(const test of [x=>sourceGenre(x)==="reporting",x=>matchesSourceType(x,"opinion"),x=>matchesSourceType(x,"analysis"),x=>sourceGenre(x)==="guide"]){const next=sorted.find(x=>!featured.includes(x)&&test(x));if(next)featured.push(next)};
  const root=$("#editorial-grid");root.replaceChildren();
- if(!featured.length){root.append(make("div","empty-state","No source-supported perspectives have been indexed yet. The editorial feeds are checked every week."));return}
+ if(!featured.length){root.append(make("div","empty-state","No perspectives are available yet."));return}
  for(const x of featured){
-  const card=make("article","editorial-card"),label=make("span","editorial-category",x.format||"Expert perspective");
-  const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x,92),()=>goto("paper",id(x))));
+  const card=make("article","editorial-card"),label=make("span","editorial-category",readingKind(x));
+  const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x),()=>goto("paper",id(x))));
   const foot=make("div","editorial-foot");
   add(foot,make("span","",x.venue||"Original source"),btn("Explore",()=>goto("paper",id(x)),"editorial-cta"));
   add(card,editorialMedia(x,"editorial"),label,articleTitle,foot);root.append(card)
@@ -707,10 +694,12 @@ function renderEditorial(){
 }
 
 function renderPerspectives(){
- const all=S.records.filter(x=>x.kind==="nonacademic"&&depth(x)!=="citation_only");
- const product=all.filter(x=>x.source==="Official product documentation"||x.format==="Product & design");
- const essays=all.filter(x=>!product.includes(x));
- const lists=[["#perspectives-essays",essays],["#perspectives-products",product]];
+ const all=S.records.filter(x=>depth(x)!=="citation_only");
+ const lists=[
+  ["#perspectives-news",all.filter(x=>sourceGenre(x)==="reporting")],
+  ["#perspectives-essays",all.filter(x=>sourceFamily(x)==="media"&&sourceGenre(x)!=="reporting")],
+  ["#perspectives-products",all.filter(x=>sourceFamily(x)==="product")]
+ ];
  for(const [selector,records] of lists){
   const container=$(selector);container.replaceChildren();
   if(!records.length){container.append(make("div","empty-state","No indexed sources in this group yet."));continue}
@@ -718,33 +707,31 @@ function renderPerspectives(){
   for(const x of records){
     const item=make("article","perspective-item");
     const icon=uiIcon(x.source==="Official product documentation"?"book":x.format==="Policy analysis"?"shield":"external","perspective-glyph");
-    const label=make("div","perspective-type",x.format||"Reporting & analysis");
-    const title=make("h3");title.append(btn(shortIdea(x,105),()=>goto("paper",id(x))));
+    const label=make("div","perspective-type",readingKind(x));
+    const title=make("h3");title.append(btn(shortIdea(x),()=>goto("paper",id(x))));
     const bottom=make("div","perspective-bottom");
-    add(bottom,make("span","",x.venue||"Original source"),btn("Read source notes",()=>goto("paper",id(x)),"editorial-cta"));
+    add(bottom,make("span","",x.venue||"Original source"),btn("Read summary",()=>goto("paper",id(x)),"editorial-cta"));
     add(item,editorialMedia(x,"perspective"),icon,label,title,bottom);container.append(item);
   }
  }
 }
 function renderBacklog(){
- const b=S.backlog||{},root=$("#backlog-coverage");
+ const root=$("#backlog-coverage");
  root.replaceChildren();
- const scholarly=Number(b.total_scholarly)||S.records.filter(r=>r.kind==="scholarly").length;
- const done=Number.isFinite(b.full_text_extracted)?b.full_text_extracted:S.records.filter(r=>r.kind==="scholarly"&&r.analysis?.fulltext_url&&!r.analysis.original_paraphrases_only).length;
+ const papers=S.records.filter(x=>sourceFamily(x)==="research");
+ const scholarly=papers.length;
+ const done=papers.filter(x=>x.analysis?.fulltext_url&&!x.analysis.original_paraphrases_only).length;
  const pct=scholarly?Math.round(100*done/scholarly):0;
  const top=make("div","coverage-status-row");
  add(top,make("strong","",done+" of "+scholarly+" scholarly papers"),make("span","",pct+"% with extracted full-text sections"));
  const rail=make("div","coverage-status-rail"),bar=make("span","coverage-status-bar");
  bar.style.width=pct+"%";rail.append(bar);
- let pending=Number(b.ready_for_attempt)||0;
- const pause=b.status==="waiting_for_budget"?"Paused by OpenAlex's daily allowance; automatic catch-up will resume after reset.":"Checking the backlog four times daily, within source access and rate limits.";
- const detail=make("p","",pending+" papers ready for another extraction attempt. "+pause);
- add(root,top,rail,detail);
+ add(root,top,rail);
 }
 const libraryPage={signature:"",number:0};
 function showLibrary(requestedPage){
  const q=$("#search").value.trim().toLowerCase(),t=$("#topic-filter").value,d=$("#depth-filter").value,k=$("#type-filter").value,scope=$("#scope-filter").value,order=$("#library-sort")?.value||"added";
- const xs=S.records.filter(x=>matchesSearch(x,q)&&(!t||(x.lane||"Unassigned")===t)&&(!k||x.kind===k)&&(
+ const xs=S.records.filter(x=>matchesSearch(x,q)&&(!t||(x.lane||"Unassigned")===t)&&matchesSourceType(x,k)&&(
    scope==="all"||(scope==="core"&&x.source_group==="AI-specific")||
    (scope==="adjacent"&&x.source_group==="Adjacent digital-attention evidence")||
    (scope==="historical"&&/^(Earlier|Historical)/.test(x.source_group||""))
@@ -752,8 +739,8 @@ function showLibrary(requestedPage){
  $("#library-count").textContent=xs.length+" matching sources · "+S.records.length+" in the complete archive";
  const context=$("#library-context");
  if(context){
-  const scopeNames={core:"AI-specific research",adjacent:"Adjacent digital-attention research",historical:"Earlier foundations",all:"All sources"};
-  context.textContent=[scopeNames[scope]||"All sources",t,d==="full_text"?"Full-text material":"",k==="scholarly"?"Academic research":k==="nonacademic"?"Commentary & technology":""].filter(Boolean).join(" · ");
+  const scopeNames={core:"AI-specific sources",adjacent:"Digital attention",historical:"Earlier foundations",all:"All sources"};
+  context.textContent=[scopeNames[scope]||"All sources",t,d==="full_text"?"Full-text material":"",k?$("#type-filter").selectedOptions[0]?.textContent:""].filter(Boolean).join(" · ");
   $$("[data-library-theme]").forEach(button=>button.setAttribute("aria-pressed",String(button.dataset.libraryTheme===t)));
  }
 
@@ -770,33 +757,34 @@ function showLibrary(requestedPage){
   if(image){
   image.onclick=()=>goto("paper",id(x));
   image.setAttribute("role","button");
-  image.setAttribute("aria-label","Read: "+shortIdea(x,115));
+  image.setAttribute("aria-label","Read: "+shortIdea(x));
   image.tabIndex=0;
   image.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();goto("paper",id(x));}});
   }else c.className+=" library-story-no-art";
-  h.append(btn(shortIdea(x,115),()=>goto("paper",id(x))));
-  add(foot,make("span","card-source-meta",(x.venue||"Original source")+" · Published "+date(x.published)),make("span","card-added",x.first_seen?"Added "+date(x.first_seen):"Added date not recorded"),make("span","card-depth",readingBasisName(x)));
+  h.append(btn(shortIdea(x),()=>goto("paper",id(x))));
+  const attribution=sourceFamily(x)==="media"?mediaByline(x):"";
+  const metadata=[attribution,x.venue,x.published?date(x.published):"",publicationContext(x)].filter(Boolean);
+  if(metadata.length)foot.append(make("span","card-source-meta",metadata.join(" · ")));
   if(/^(Earlier|Historical)/.test(x.source_group||""))foot.append(make("span","", "Earlier foundation"));
-  if(originalSummary(x))add(foot,make("span","card-source-version","Checked source: "+checkedSourceLabel(x.reading)),readingDetails(x.reading));
-  add(body,make("span","card-type",ideaInfo(x).label),h,originalSummary(x)?make("p","card-summary",cut(x.reading.digest?.explain,260)):null,foot);
+  add(body,make("span","card-type",readingKind(x)),h,foot);
   const colorIndex=themes.findIndex(theme=>theme[0]===x.lane);
   if(colorIndex>=0)c.setAttribute("data-theme",String(colorIndex));
   add(c,image,body);box.append(c);
  }
 }
 function showAtlas(){
- const cc=counts(),n=S.records.length,stat=$("#atlas-stats");stat.replaceChildren();
- for(const [label,value] of [["Indexed sources",n],["Abstract readings",cc.abstract],["Full-text material",cc.full_text],["Records with findings",S.records.filter(x=>x.reading?.digest?.finding||x.has_finding).length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
- topicBars("#atlas-topic-bars");
+ const research=researchRecords(),cc=counts(research),n=research.length,stat=$("#atlas-stats");stat.replaceChildren();
+ for(const [label,value] of [["Research sources",n],["Abstract readings",cc.abstract],["Full-text material",cc.full_text],["Research reviews",research.filter(x=>sourceGenre(x)==="review").length]]){let c=make("div","atlas-stat");add(c,make("strong","",value),make("span","",label));stat.append(c)}
+ topicBars("#atlas-topic-bars",research);
  const years={};for(let y=2023;y<=new Date().getFullYear();y++)years[String(y)]=0;
- S.records.forEach(x=>{const y=(x.published||"").slice(0,4);if(x.source_group==="AI-specific"&&Object.prototype.hasOwnProperty.call(years,y))years[y]++});
- const foundation=S.records.filter(x=>/^(Earlier|Historical)/.test(x.source_group||"")).length;
- $("#year-context").textContent="AI-specific records published in 2023–"+new Date().getFullYear()+". "+foundation+" earlier foundation"+(foundation===1?" is":"s are")+" excluded from this chart but remain searchable. These counts describe this collection, not the field’s total publications.";
+ research.forEach(x=>{const y=(x.published||"").slice(0,4);if(x.source_group==="AI-specific"&&Object.prototype.hasOwnProperty.call(years,y))years[y]++});
+ const foundation=research.filter(x=>/^(Earlier|Historical)/.test(x.source_group||"")).length;
+ $("#year-context").textContent="AI-specific research published in 2023–"+new Date().getFullYear()+". "+foundation+" earlier research "+(foundation===1?"source is":"sources are")+" available in the library.";
  const values=Object.entries(years),max=Math.max(1,...values.map(x=>x[1])),chart=$("#year-chart");chart.replaceChildren();
  for(const [y,n] of values){let row=make("div","year-row"),track=make("div","year-track"),bar=make("span","year-bar");bar.style.width=(n?Math.max(2,100*n/max):0)+"%";bar.title=n+" AI-specific records from "+y;track.append(bar);add(row,make("span","year-label",y),track,make("span","year-value",n));chart.append(row)}
- const coverage=$("#atlas-depth");coverage.replaceChildren();for(const d of depths){const n=cc[d[0]],p=n/Math.max(1,S.records.length)*100,c=make("div","coverage-row"),top=make("div","coverage-top"),track=make("div","coverage-track"),fill=make("span","coverage-fill");fill.style.background=d[2];fill.style.width=p+"%";add(top,make("strong","",d[1]),make("span","",n+" · "+Math.round(p)+"%"));track.append(fill);add(c,top,track);coverage.append(c)}
+ const coverage=$("#atlas-depth");coverage.replaceChildren();for(const d of depths){const n=cc[d[0]],p=n/Math.max(1,research.length)*100,c=make("div","coverage-row"),top=make("div","coverage-top"),track=make("div","coverage-track"),fill=make("span","coverage-fill");fill.style.background=d[2];fill.style.width=p+"%";add(top,make("strong","",d[1]),make("span","",n+" · "+Math.round(p)+"%"));track.append(fill);add(c,top,track);coverage.append(c)}
  const table=$("#matrix-table"),thead=make("thead"),r=make("tr");add(r,make("th","","Theme"),...depths.map(d=>make("th","",d[1])));thead.append(r);
- const body=make("tbody");for(const {label} of collectionTopics()){const row=make("tr");row.append(make("th","",label));row.firstElementChild.scope="row";for(const d of depths)row.append(make("td","count-cell",S.records.filter(x=>(x.lane||"Unassigned")===label&&depth(x)===d[0]).length));body.append(row)}table.replaceChildren(thead,body)
+ const body=make("tbody");for(const {label} of collectionTopics(research)){const row=make("tr");row.append(make("th","",label));row.firstElementChild.scope="row";for(const d of depths)row.append(make("td","count-cell",research.filter(x=>(x.lane||"Unassigned")===label&&depth(x)===d[0]).length));body.append(row)}table.replaceChildren(thead,body)
 }
 function section(title,text,origin){const s=make("section","reading-section");add(s,make("p","eyebrow",title),make("h3","",title==="HOW IT WAS STUDIED"?"Method & data":title==="WHAT THE PAPER REPORTS"?"Findings":title==="LIMITATIONS"?"Limitations":title==="AUTHOR INTERPRETATION (DISCUSSION)"?"Authors’ interpretation":"Overview"),make("p","",text));if(origin)s.append(make("div","section-source",origin));return s}
 function paperFact(k,v){return add(make("div","paper-fact"),make("span","",k),make("span","",v))}
@@ -1008,20 +996,18 @@ function automaticEvidenceArtwork(x){
  const blocks=Array.isArray(spec.blocks)?spec.blocks.filter(b=>b&&typeof b.label==="string"&&typeof b.text==="string"&&b.text.length<=600).slice(0,3):[];
  if(!blocks.length)return null;
  const figure=make("figure","article-concept-art article-data-visual automatic-evidence");
- add(figure,make("p","eyebrow",spec.status==="edited"?"RESEARCH SNAPSHOT":"SOURCE-BASED READING"),
-    make("h3","figure-insight-title",spec.kind==="evidence_snapshot"?"What the evidence supports":"How this question was studied"));
+ figure.setAttribute("aria-label","Study details");
  const board=make("div","auto-evidence-board");
  blocks.forEach((block,i)=>{
   const item=make("div","auto-evidence-item");
   add(item,make("span","auto-evidence-n",String(i+1).padStart(2,"0")),
     make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
   const source=block.source||(block.label==="Reported finding"?spec.finding_source:spec.basis);
-  item.append(make("small","auto-evidence-source",source==="abstract"?"Source: abstract":source==="editorial"?"Source: editorial note":"Source: indexed full-text section"));
+  item.append(make("small","auto-evidence-source",source==="abstract"?"Source: abstract":source==="editorial"?"Source: editorial note":"Source: full text"));
   if(block.text.length>240)item.className+=" auto-evidence-wide";
   board.append(item);
  });
- add(figure,board,make("figcaption","concept-note",
-   "Source-derived statements, with the material used labelled on each card. Not an effect-size chart, causal model, or reproduction of published figures."));
+ figure.append(board);
  return figure;
 }
 function conceptArtwork(x){
@@ -1090,35 +1076,11 @@ function httpsSourceUrl(value){
 }
 function doiUrl(doi){return "https://doi.org/"+encodeURIComponent(doi).replace(/%2F/gi,"/")}
 function checkedSourceLabel(reading){
- const version=reading.source_version||"Source version not recorded";
- const labels={publisher_article:"Publisher article",publisher_version_of_record:"Publisher article",
-  publishedVersion:"Published version",author_posted_manuscript:"Author manuscript",
-  published_institutional_report:"Institutional report"};
- const label=labels[version]||version.replace(/^arxiv_preprint_v(\d+)$/,"arXiv preprint v$1 · review unverified");
- return label+(reading.source_format?" · "+reading.source_format.toUpperCase():"");
-}
-function originalEvidence(reading){
- const fields=originalCommentary(reading)?[["thesis","Attributed central argument"],["reasoning","How the argument develops"],
-  ["examples","Examples and distinctions"],["tension","The central tension"],["qualification","Qualifications"]]:[["idea","Main idea"],["explain","Explanation"],["approach","Study approach"],
-  ["finding","Reported finding"],["interpretation","Interpretation"],["limitation","Limitations"]];
- const details=make("section","rv-drawer rv-evidence"),body=make("div","rv-drawer-body");
- for(const [key,label] of fields){
-  const locators=reading.evidence?.[key];
-  if(!Array.isArray(locators))continue;
-  const list=make("ul","rv-source-locators");
-  for(const locator of locators){
-   if(!locator||typeof locator.section!=="string"||!locator.section.trim())continue;
-   const parts=["Section: "+locator.section];
-   if(Number.isInteger(locator.page)&&locator.page>0)parts.push("page "+locator.page);
-   if(Number.isInteger(locator.paragraph)&&locator.paragraph>0)parts.push((originalCommentary(reading)&&reading.source_format==="html"?"extracted block ":"paragraph ")+locator.paragraph);
-   list.append(make("li","rv-source-locator",parts.join(" · ")));
-  }
-  if(list.children.length)body.append(add(make("section","rv-excerpt"),make("h3","",label),list));
- }
- if(!body.children.length)return null;
- add(details,make("h3","","Source locators for this summary"),
-  make("p","rv-source-version","Locators refer to: "+checkedSourceLabel(reading)),body);
- return details;
+ const version=String(reading.source_version||"").trim();
+ const labels={publisher_article:"Published article",publisher_version_of_record:"Published article",
+  "Publisher version of record":"Published article",publishedVersion:"Published version",
+  author_posted_manuscript:"Author manuscript",published_institutional_report:"Institutional report"};
+ return Object.hasOwn(labels,version)?labels[version]:version.replace(/^arxiv_preprint_v(\d+)$/i,"arXiv preprint v$1");
 }
 // Break long readings into comfortable paragraphs without deleting or paraphrasing
 // source content. These are presentation breaks, not original PDF paragraph locators.
@@ -1158,23 +1120,6 @@ function readingBullets(content){
  for(const sentence of textSentences(content))list.append(make("li","",sentence));
  return list;
 }
-function readingQualifications(content){
- // Only these exact recurring process notices move backstage. Source-specific
- // limits and explicit preprint status remain ordinary, visible list items.
- const processNotices=new Set(["Limited reading.","Article screening is not peer review; reported results do not establish strong causal evidence."]);
- const sentences=textSentences(content);
- if(!sentences.some(sentence=>processNotices.has(sentence)))return readingBullets(content);
- const box=make("div","rv-qualifications");
- const substantive=sentences.filter(sentence=>!processNotices.has(sentence));
- // The mixed process sentence also carries a material causal qualification.
- // Keep that caution visible unless a source-specific causal limit already does.
- const mixedNotice="Article screening is not peer review; reported results do not establish strong causal evidence.";
- const hasCausalLimit=substantive.some(sentence=>/\b(?:cannot|can not|does not|do not|not establish|no|without|unverified|uncertain|limited|lack)\b[^.!?]*\bcausal(?:ity)?\b|\bcausal(?:ity)?\b[^.!?]*\b(?:cannot|not|unverified|uncertain|limited|lack)\b/i.test(sentence));
- if(sentences.includes(mixedNotice)&&!hasCausalLimit)substantive.push("Reported results do not establish strong causal evidence.");
- if(substantive.length)box.append(readingBullets(substantive.join(" ")));
- const full=layerButton("Full qualifications","Full qualifications",readingProse(content),"rv-full-qualifications");
- box.append(full);return box;
-}
 function readingProse(content,className=""){
  const prose=make("div","rv-prose "+className);
  for(const paragraph of readingParagraphs(content))prose.append(make("p","",paragraph));
@@ -1182,19 +1127,16 @@ function readingProse(content,className=""){
 }
 function sourceFields(x){
  const r=x.reading||{},a=x.analysis||{};
- // Checked commentary must not inherit stale scholarly extracts or synopsis.
- if(originalCommentary(r))return [];
- if(x.kind!=="scholarly")return [
-  ["Publisher or editorial synopsis",r.overview,"Synopsis"],
-  ["Original editorial notes",(x.editorial_notes||{}).argument,"Editorial notes"]];
+ // Journalism and journal editorials must never inherit study passages.
+ if(sourceFamily(x)!=="research")return [];
  // Do not mistake the shortened reading-card excerpts for all indexed text.
  // Original summaries always retain the separate, potentially older index.
  const original=originalSummary(x),hasSections=Boolean(a.fulltext_url);
  return [
-  ["Methods as indexed",a.methods||(!original?r.methods:"") ,hasSections?"Methods section":"Abstract selection"],
-  ["Results as indexed",a.results||(!original?r.findings:"") ,hasSections?"Results section":"Abstract selection"],
-  ["Discussion as indexed",a.discussion||(!original?r.interpretation:"") ,hasSections?"Discussion section":"Abstract selection"],
-  ["Limitations as indexed",a.limitations||(!original?r.limitations:"") ,hasSections?"Limitations section":"Abstract selection"],
+  ["Methods",a.methods||(!original?r.methods:"") ,hasSections?"Methods section":"Abstract selection"],
+  ["Results",a.results||(!original?r.findings:"") ,hasSections?"Results section":"Abstract selection"],
+  ["Discussion",a.discussion||(!original?r.interpretation:"") ,hasSections?"Discussion section":"Abstract selection"],
+  ["Limitations",a.limitations||(!original?r.limitations:"") ,hasSections?"Limitations section":"Abstract selection"],
   ["Abstract",x.abstract_text,x.abstract_source||"Source abstract"]
  ];
 }
@@ -1202,19 +1144,13 @@ function sourceReader(x){
  const fields=sourceFields(x),available=fields.filter(([,content])=>content),r=x.reading||{},a=x.analysis||{},original=originalSummary(x);
  if(!available.length)return null;
  const drawer=make("section","rv-drawer rv-source-excerpts");
- drawer.append(make("h3","",original?
-  a.original_paraphrases_only?"Inspect prior indexed notes and abstract":"Inspect machine-indexed excerpts and abstract":
-  "Inspect source text and abstract"));
+ drawer.append(make("h3","",a.original_paraphrases_only?"Source notes and abstract":"Source excerpts"));
  const panel=make("div","rv-reader-panel"),intro=make("div","rv-indexed-provenance");
- intro.append(make("p","rv-mini-label","SOURCE READER · "+available.length+" SECTIONS"));
- if(original)intro.append(make("p","","Indexed reference material, separate from the original summary above. It may refer to a different source version."));
- intro.append(make("p","",a.original_paraphrases_only?
-  "Original editorial paraphrases and the indexed abstract. These are not copied full-text passages.":
-  "Machine-indexed source passages, not an independent appraisal. Paragraph breaks are added for readability; extraction can retain citation, equation or table artifacts."));
- if(a.provenance||r.provenance)intro.append(make("p","rv-reader-basis",a.provenance||r.provenance));
- const url=httpsSourceUrl(a.fulltext_url)||(!original?httpsSourceUrl(x.url):null);
- if(url)intro.append(link("Open indexed reference source",url,"rv-secondary-link"));
- panel.append(intro);
+ if(a.original_paraphrases_only)intro.append(make("p","","These notes paraphrase the publication."));
+ else if(original&&a.fulltext_url&&a.fulltext_url!==r.source_url)intro.append(make("p","","These excerpts may come from a different version of the paper."));
+ const url=httpsSourceUrl(a.fulltext_url);
+ if(url)intro.append(link("Open full text",url,"rv-secondary-link"));
+ if(intro.children.length)panel.append(intro);
  const contents=make("nav","rv-reader-contents");contents.setAttribute("aria-label","Source sections");
  const drawerBody=make("div","rv-drawer-body"),sections=[];
  for(const [label,content,basis] of available){
@@ -1234,33 +1170,17 @@ function sourceReader(x){
   btn("One section at a time",()=>{sections.forEach((s,i)=>s.hidden=i!==0);Array.from(contents.children).forEach((b,i)=>b.setAttribute("aria-pressed",String(i===0)));},"rv-reader-control"));
  add(panel,contents,controls,drawerBody);drawer.append(panel);return drawer;
 }
-function evidenceCoverage(x){
- const r=x.reading||{},d=r.digest||{},fields=sourceFields(x);
- const section=make("section","rv-coverage");
- add(section,make("h3","","Available source material"),
-  make("p","rv-coverage-note",depth(x)==="abstract"?"This reading uses the abstract, not the full paper.":"Indexed sections can be incomplete. Availability does not rate study quality."));
- const table=make("table","rv-coverage-table"),body=make("tbody","");
- [["Methods",fields[0]?.[1],d.approach],["Results",fields[1]?.[1],d.finding],["Discussion",fields[2]?.[1],d.interpretation],["Limitations",fields[3]?.[1],d.limitation]].forEach(([label,content,summary])=>{
-  const row=make("tr",""),name=make("th","",label);name.setAttribute("scope","row");
-  const status=content?(depth(x)==="abstract"?"In abstract selection":"Indexed passage"):summary?"Summary note":"Not indexed";
-  add(row,name,make("td",content||summary?"rv-available":"rv-unavailable",status));body.append(row);
- });
- table.append(body);section.append(table);
- section.append(make("p","rv-coverage-note","“Not indexed” describes the material available here, not a flaw in the study or proof that the paper omitted it."));
- return section;
-}
-
-function articleSections(main,layout,body,side,analysis,evidence){
+function articleSections(main,layout,body,side,analysis,evidence,sections){
  const overview=make("section","rv-panel rv-panel-overview");
  overview.id="article-overview";overview.setAttribute("aria-label","Reading overview");
  for(const child of Array.from(body.children))overview.append(child);
- analysis.className+=" rv-panel";analysis.id="article-analysis";analysis.setAttribute("aria-label","Analysis");
- evidence.className+=" rv-panel";evidence.id="article-evidence";evidence.setAttribute("aria-label","Evidence");
+ analysis.className+=" rv-panel";analysis.id="article-analysis";analysis.setAttribute("aria-label",sections.label);
+ evidence.className+=" rv-panel";evidence.id="article-evidence";evidence.setAttribute("aria-label","Source excerpts");
  side.className+=" rv-panel";side.id="article-source";side.setAttribute("aria-label","Source and related readings");
  body.append(overview,analysis,evidence);
- const groups=[{value:"overview",label:"Overview",description:"The idea and its limits",node:overview},
-  ...(analysis.children.length?[{value:"analysis",label:"Analysis",description:"Context and interpretation",node:analysis}]:[]),
-  ...(evidence.children.length?[{value:"evidence",label:"Evidence",description:"Passages and source notes",node:evidence}]:[]),
+ const groups=[{value:"overview",label:"Overview",description:sections.overview,node:overview},
+  ...(analysis.children.length?[{value:"analysis",label:sections.label,description:sections.context,node:analysis}]:[]),
+  ...(evidence.children.length?[{value:"evidence",label:"Source excerpts",description:"Read passages from the paper",node:evidence}]:[]),
   {value:"source",label:"Source",description:"Publication and related reads",node:side}];
  const workspace=make("div","rv-reading-workspace"),controls=make("nav","rv-section-controls");
  controls.id="article-section";controls.setAttribute("aria-label","In this reading");
@@ -1293,220 +1213,154 @@ function articleSections(main,layout,body,side,analysis,evidence){
 function showPaper(x){
  const root=$("#paper-content");
  root.replaceChildren();
- if(!x){root.append(make("div","empty-state","This source has not been indexed as a public reading."));return;}
+ if(!x){root.append(make("div","empty-state","We couldn’t find a reading for this link."));return;}
  if(x.source_quality?.decision==="awaiting_full_article_reading"){
-  const page=make("article","rv-article rv-awaiting-reading");
-  page.append(btn("← Research library",()=>goto("library"),"rv-back"));
-  const head=make("header","rv-head");
-  add(head,make("p","eyebrow","DISCOVERED SOURCE · NOT YET ANALYZED"),
-    make("h1","rv-headline",readableSourceTitle(x)),
-    make("p","rv-deck","This article was identified by the discovery system, but its complete argument has not been retrieved and verified. A feed description is not a research reading, so no analysis is presented here."));
-  page.append(head);
-  const note=make("section","rv-source-gap");
-  add(note,make("h2","","What is missing?"),
-    make("p","","The article still needs source-level review of its reasoning, examples and qualifications before it can appear in the Observatory's editorial library."));
-  if(/^https:\/\//.test(x.url||""))note.append(link("Read the original article",x.url,"rv-secondary-link"));
-  page.append(note);root.append(page);return;
+  const page=make("article","rv-article rv-awaiting-reading"),head=make("header","rv-head");
+  const display=x.display_headline?readingHeadline(x):"About this source";
+  add(head,make("p","eyebrow","Source link"),make("h1","rv-headline",display));
+  if(x.title&&x.title.trim()!==display)head.append(make("p","rv-source-title",x.title.trim()));
+  if(x.venue)head.append(make("p","rv-source-meta",x.venue));
+  head.append(make("p","rv-deck","A summary of this article is not yet available."));
+  if(httpsSourceUrl(x.url))head.append(link("Read the original article",x.url,"rv-secondary-link"));
+  add(page,btn("All readings",()=>goto("library"),"rv-back"),head);root.append(page);return;
  }
- const r=x.reading||{},d=r.digest||{},original=originalSummary(x),editorial=d.status==="editorially_written_from_indexed_sections";
- const commentary=originalCommentary(r),journalEditorial=r.research_type==="editorial";
- const scholarly=x.kind==="scholarly",hasFinding=Boolean(d.finding),conceptual=x.research_type==="conceptual_framework"||r.research_type==="conceptual_framework";
- const isQuestion=scholarly&&!journalEditorial&&!hasFinding&&!editorial&&!original;
- // Unreviewed extracts are identifiable as source notes, not hand-written insight.
+ const r=x.reading||{},d=r.digest||{},deep=d.longform||{},original=originalSummary(x);
+ const family=sourceFamily(x),genre=sourceGenre(x),kind=readingKind(x),research=family==="research";
+ const conceptual=genre==="conceptual",proposal=genre==="proposal",review=genre==="review";
+ const journalEditorial=genre==="editorial",reporting=genre==="reporting",product=genre==="guide";
+ const edited=d.status==="editorially_written_from_indexed_sections",abstractPreview=d.status==="journal_abstract_preview";
+ // Backward compatibility for previously cached article payloads that mixed
+ // an intake notice into the public digest. Current exports supply clean text.
+ function limitText(value,field){
+  if(/^Limited reading(?:[.]| of current publisher HTML[.])/.test(value||""))return x.original_reading?.summary?.[field]||"";
+  return value||"";
+ }
+ const main=make("article","rv-article"),head=make("header","rv-head"),intro=make("div","rv-intro-copy");
+ main.setAttribute("data-source-family",family);
  const headline=readingHeadline(x);
- const main=make("article","rv-article");
- const back=btn("← All readings",()=>goto("library"),"rv-back");
- const head=make("header","rv-head");
  const metadata=make("div","rv-meta");
- add(metadata,make("span","rv-dot",x.lane||"Research"),
-  make("span","rv-meta-separator","·"),
-  make("span","",readingKind(x)));
- const status=make("p","rv-status",original?"AI source-check · not human review or independent replication":conceptual?"Proposed educational framework · not an experimental test":editorial?"Research reading":scholarly?"Based on indexed source material":"Commentary and perspectives");
- const title=make("h1","rv-headline",headline);
- const intro=(scholarly||original)&&d.explain?make("p","rv-deck",d.explain):null;
- add(head,metadata,title);
- const introCopy=make("div","rv-intro-copy");
- if((original||editorial||conceptual||d.status==="edited_perspective")&&d.idea&&headline!==d.idea)introCopy.append(make("p","rv-summary-idea",d.idea));
- if(intro)introCopy.append(layerButton("Read the overview","Overview",readingProse(d.explain),"rv-overview"));
+ metadata.append(make("span","rv-dot",kind));
+ if(x.lane&&x.lane.toLowerCase()!==kind.toLowerCase())add(metadata,make("span","rv-meta-separator","·"),make("span","",x.lane));
+ add(head,metadata,make("h1","rv-headline",headline));
+ const used=new Set([headline,x.title].filter(Boolean).map(t=>t.trim().toLowerCase()));
+ function fresh(value){
+  const text=String(value||"").trim(),key=text.toLowerCase();
+  if(!text||used.has(key))return "";
+  used.add(key);return text;
+ }
+ const leadText=abstractPreview?"":research?((original||edited||d.status==="conceptual_framework")?d.idea:d.explain):
+  (deep.thesis||(journalEditorial?d.interpretation:"")||(!research&&x.kind==="scholarly"?"":d.explain)||d.idea);
+ const lead=fresh(leadText);
+ const leadParagraph=lead?make("p","rv-summary-idea",lead):null;
+ if(leadParagraph)intro.append(leadParagraph);
+ if(research&&(original||edited||conceptual)){
+  const overview=fresh(d.explain);
+  if(overview)intro.append(layerButton("More context","Overview",readingProse(overview),"rv-overview"));
+ }
+ const author=research?"":r.attributed_to||deep.attributed_to||"";
+ const byline=[author,x.venue,date(x.published)].filter((v,i,a)=>v&&v!=="Undated"&&a.indexOf(v)===i);
  const sourceRow=make("div","rv-source-row");
- add(sourceRow,make("span","",[x.venue,date(x.published)].filter(Boolean).join(" · ")),make("span","",original?checkedSourceLabel(r):readingBasisName(x)));
- const originalUrl=httpsSourceUrl(original?r.source_url:x.url);
- if(originalUrl)sourceRow.append(link("Read original",originalUrl,"rv-byline-link"));
- introCopy.append(sourceRow);
- if(original&&r.temporal_notice)introCopy.append(layerButton("Source dates","Source dates",make("p","rv-reading-notice",r.temporal_notice),"rv-source-dates"));
- introCopy.append(make("p","rv-ai-notice","AI-generated summary. AI can make mistakes."));
- // Editorial art is separate from the source-grounded figures below.
- if(editorialArt(x)){const lede=make("div","rv-lede-layout");add(lede,introCopy,editorialMedia(x,"reading"));head.append(lede);}else head.append(introCopy);
-
- main.append(back,head);
+ if(byline.length)sourceRow.append(make("span","",byline.join(" · ")));
+ const basis=research?(original&&r.source_version?checkedSourceLabel(r):readingBasisName(x)):"";
+ if(basis)sourceRow.append(make("span","",basis));
+ const primaryUrl=httpsSourceUrl(original?r.source_url:x.url);
+ if(primaryUrl)sourceRow.append(link("Read original",primaryUrl,"rv-byline-link"));
+ intro.append(sourceRow);
+ if(!abstractPreview)intro.append(make("p","rv-ai-notice","AI-generated summary. AI can make mistakes."));
+ if(editorialArt(x)){const lede=make("div","rv-lede-layout");add(lede,intro,editorialMedia(x,"reading"));head.append(lede);}else head.append(intro);
+ add(main,btn("All readings",()=>goto("library"),"rv-back"),head);
  const layout=make("div","rv-layout"),story=make("div","rv-story"),side=make("aside","rv-sidebar");
  const body=make("section","rv-content"),analysis=make("section","rv-analysis"),evidencePanel=make("section","rv-evidence-panel");
- // Older indexed graphics can describe a different source version. Keep the
- // checked original prose primary instead of reusing those unreviewed visuals.
- const art=reviewedEvidenceArtwork(x)||(original?null:conceptArtwork(x));
- const autoGraphic=Boolean(art&&art.className&&art.className.includes("automatic-evidence"));
- const lead=make("div","rv-section-head");
- add(lead,make("span","rv-section-overline",scholarly&&!journalEditorial?"Research at a glance":"At a glance"),
-  make("h2","rv-section-title",journalEditorial?"The editorial’s argument":conceptual?"What the paper proposes":scholarly?isQuestion?"Explore the source":"Finding, method & limits":"The argument in context"));
- body.append(lead);
- if(original&&!commentary){
-  // A conceptual summary can intentionally have no measured finding. Its
-  // checked idea and interpretation must never fall through to legacy stages.
-  if(hasFinding||conceptual){
-   const claim=make("div","rv-claim");
-   add(claim,make("span","rv-mini-label",conceptual?"Proposed framework":"Main finding"),
-      readingBullets(d.finding||d.idea));
-   body.append(claim);
+ const sections=research?{label:"Discussion",overview:conceptual?"Proposal and boundaries":proposal?"Proposed design":review?"Review findings and scope":"Findings and study design",context:"The authors’ explanation"}:
+  {label:"Context",overview:product?"Features and use":reporting?"Events and perspectives":"The argument and its examples",context:product?"Trade-offs and limits":"Background and points of tension"};
+ const heading=abstractPreview?"From the published abstract":proposal?"What the researchers propose":journalEditorial?"The editorial’s argument":conceptual?"What the paper proposes":review?"What the review found":research?(d.finding?"What the study found":"Inside the study"):product?"How it works":reporting?"What happened":"The argument";
+ body.append(add(make("div","rv-section-head"),make("h2","rv-section-title",heading)));
+ function paragraph(parent,label,value,cls="rv-longform-part"){
+  const text=fresh(value);if(!text)return;
+  const section=make("section",cls);
+  if(label)section.append(make("h3","",label));
+  section.append(readingProse(text));parent.append(section);
+ }
+ if(research){
+  const graphic=proposal?null:reviewedEvidenceArtwork(x)||(original?null:conceptArtwork(x));
+  const art=conceptual&&graphic?.className.includes("automatic-evidence")?null:graphic;
+  const auto=Boolean(art?.className.includes("automatic-evidence"));
+  if(!auto){
+   const result=proposal?"":conceptual?(d.interpretation||d.explain||d.idea):d.finding;
+   const claim=fresh(result);
+   if(claim)body.append(add(make("div","rv-claim"),readingBullets(claim)));
   }
- }else if(editorial&&hasFinding&&!autoGraphic){
-  const claim=make("div","rv-claim");
-  add(claim,make("span","rv-mini-label","Main finding"),readingBullets(d.finding));
-  body.append(claim);
- }else if(scholarly&&hasFinding&&!autoGraphic&&!commentary){
-  body.append(add(make("div","rv-claim"),make("span","rv-mini-label","What the study reports"),readingBullets(d.finding)));
- }else if(commentary||!scholarly){
-  const deep=d.longform||{},hasDepth=Boolean(deep.reasoning||deep.examples||deep.tension||deep.implications);
-  const reading=make("div","rv-longform");
-  function lens(label,value){
-   if(!value)return;
-   const collapsed=!label.includes("central argument")&&!label.includes("Qualifications");
-   const part=make("section","rv-longform-part");
-   add(part,make("h3","",label),label.includes("central argument")?readingBullets(value):readingProse(value));
-   (collapsed?analysis:reading).append(part);
+  if(art)body.append(add(make("div","rv-artwork"),art));
+  const context=make("div","rv-context-grid");
+  if(!auto){
+   paragraph(context,proposal?"Proposed design":conceptual?"How the authors developed it":review?"What the authors reviewed":"How it was studied",d.approach,"rv-context");
+   paragraph(context,proposal||conceptual?"What still needs testing":"Study limitations",limitText(d.limitation,"limitation"),"rv-context");
+   if(context.children.length)body.append(context);
   }
-  // Publisher metadata alone cannot justify invented counterarguments or a
-  // faux methods section. Only display fields supported by source analysis.
-  lens(commentary?"The central argument":deep.source_depth==="publisher_synopsis"?"From the publisher’s description":"The central argument",deep.thesis||(commentary?"":r.overview));
-  lens("How the argument develops",deep.reasoning);
-  lens("Concrete examples and distinctions",deep.examples);
-  lens("The central tension",deep.tension);
-  lens("What this could mean for attention design",deep.implications);
-  lens("A question to investigate",deep.open_question);
-  lens("Qualifications and unresolved issues",deep.qualification);
-  if(deep.basis)evidencePanel.append(make("p","rv-longform-basis","Reading basis: "+deep.basis));
-  body.append(reading);
- }else if(conceptual){
-  const framework=x.framework_notes||{};
-  const claim=make("div","rv-claim");
-  add(claim,make("span","rv-mini-label","Proposed framework"),
-    make("p","",d.idea||framework.idea||"A theoretical proposal for staging AI use in learning."));
-  body.append(claim);
-  const phases=framework.stages||[];
-  if(phases.length){
-   const stages=make("div","rv-longform");
-   for(const phase of phases){
-    const cutAt=phase.indexOf(":");
-    const section=make("section","rv-longform-part");
-    add(section,make("h3","",cutAt>0?phase.slice(0,cutAt):"Stage"),
-      make("p","",cutAt>0?phase.slice(cutAt+1).trim():phase));
-    stages.append(section);
+  // The overview already carries the concrete result. A Discussion chapter is
+  // for an identifiable explanation or proposal from the authors.
+  if(conceptual||/\b(?:authors?|researchers?)\s+(?:also\s+)?(?:suggest|propos|argu|interpret|hypothes|speculat|attribut|explain|recommend)/i.test(d.interpretation||"")){
+   paragraph(analysis,conceptual?"Applying the framework":"The authors’ explanation",d.interpretation,"rv-take");
+  }
+  if(!original&&conceptual){
+   for(const phase of x.framework_notes?.stages||[]){
+    const cutAt=phase.indexOf(":");paragraph(analysis,cutAt>0?phase.slice(0,cutAt):"",cutAt>0?phase.slice(cutAt+1):phase);
    }
-   analysis.append(stages);
   }
- }else if(!hasFinding&&!journalEditorial){
-  const claim=make("div","rv-source-gap");
-  add(claim,make("span","rv-mini-label","The research question"),
-    make("p","",depth(x)==="abstract"?"Explore the indexed abstract below. A full-paper appraisal is not available here.":"Explore the indexed sections below. A source-checked result summary is not available here."));
-  body.append(claim);
- }
- if(art){
-  const visuals=make("div","rv-artwork");
-  visuals.append(art);
-  body.append(visuals);
- }
- const context=make("div","rv-context-grid");
- if(d.approach){
-  const method=make("section","rv-context");
-  add(method,make("h3","",journalEditorial?"What the editorial draws on":conceptual?"How the framework was developed":"How it was studied"),readingBullets(d.approach));context.append(method);
- }
- if(d.limitation){
-  const caveat=make("section","rv-context");
-  add(caveat,make("h3","",conceptual?"What has not been established":"What remains uncertain"),readingQualifications(d.limitation));context.append(caveat);
- }
- if(!commentary&&(scholarly||original)&&!autoGraphic)body.append(context);
- if(!commentary&&(original||journalEditorial||(scholarly&&editorial))&&d.interpretation){
-  const relevance=make("section","rv-take");
-  add(relevance,make("span","rv-section-overline","02 / INTERPRETATION"),
-    make("h2","rv-section-title",original?"Interpretation and implications":"Why this matters"),
-    readingProse(d.interpretation));
-  analysis.append(relevance);
- }
- if(scholarly&&!original&&d.longform){
-  const deep=d.longform;
-  const extended=make("section","rv-research-longform");
-  add(extended,make("span","rv-section-overline","02 / CLOSER READING"),
-     make("h2","rv-section-title","A deeper look at the study"));
-  const items=[
-    ["The research question",deep.research_question],
-    ["Design and evidence",deep.study_design],
-    ["What was actually reported",deep.reported_results],
-    ["How the authors interpret it",deep.authors_interpretation],
-    ["How to read this critically",deep.critical_context],
-    ["Limitations",deep.limitations],
-    ["A question worth pursuing",deep.open_question]
-  ];
-  const parts=make("div","rv-longform");
-  for(const [label,value] of items){
-   if(!value)continue;
-   const part=make("section","rv-longform-part");
-   add(part,make("h3","",label),readingProse(value));
-   parts.append(part);
+  if(!original&&deep.research_question&&!proposal){
+   for(const [label,value] of [["Research question",deep.research_question],["Study design",deep.study_design],["Reported results",deep.reported_results],["The authors’ explanation",deep.authors_interpretation],["Study limitations",deep.limitations]])paragraph(analysis,label,value);
   }
-  if(deep.basis)parts.append(make("p","rv-longform-basis",
-   "Reading basis: "+deep.basis+" · Machine-generated, not independently reviewed"));
-  extended.append(parts);
-  analysis.append(extended);
+  const reader=sourceReader(x);if(reader)evidencePanel.append(reader);
+ }else{
+  const article=make("div","rv-longform");
+  if(abstractPreview){
+   const abstract=String(x.abstract_text||"").trim();
+   if(abstract)article.append(compactReading(abstract,"Read the full abstract"));
+  }else if(journalEditorial){
+   // Journal editorials can discuss another paper's sample. Do not treat the
+   // indexed abstract or a borrowed design as this article's own findings.
+   paragraph(article,"",d.interpretation);
+   paragraph(article,"Scope",d.approach);
+  }else{
+   paragraph(article,"",deep.reasoning);
+   paragraph(article,product?"In use":reporting?"Details from the story":"An example",deep.examples);
+   paragraph(analysis,product?"Trade-offs":reporting?"An open issue":"A point of tension",deep.tension);
+   paragraph(analysis,product?"Scope of the guidance":reporting?"Scope of the reporting":"Scope of the argument",limitText(deep.qualification,"qualification"));
+   if(!article.children.length&&!analysis.children.length){
+    if(x.kind==="scholarly"&&x.abstract_text)paragraph(article,"From the published abstract",x.abstract_text);
+    else paragraph(article,"",d.explain||r.overview);
+   }
+  }
+  if(article.children.length)body.append(article);
+  if(!article.children.length&&analysis.children.length){for(const part of Array.from(analysis.children))article.append(part);body.append(article);}
+
  }
- // Keep the extracted text and metadata in one clearly optional evidence drawer.
- if(original){
-  const evidence=originalEvidence(r);
-  if(evidence)evidencePanel.append(evidence);
+ // A reading with only a research question should still open on meaningful
+ // content. Put its existing lead in the overview instead of repeating it.
+ if(body.children.length===1){
+  if(leadParagraph)body.append(leadParagraph);
+  else{
+   const rawAbstract=String(x.abstract_text||"").replace(/^abstract\b[:.\s]*/i,"").trim();
+   const complete=textSentences(rawAbstract).filter(line=>/[.!?][”"’)]?$/.test(line));
+   if(complete.length)paragraph(body,"From the abstract",complete.slice(0,2).join(" "));
+   else if(primaryUrl)body.append(link("Read the original publication",primaryUrl,"rv-secondary-link"));
+  }
  }
- const reader=sourceReader(x);
- if(reader)evidencePanel.append(reader);
  story.append(body);
  const cite=make("section","rv-source");
- add(cite,make("h2","","Original publication"),
-  make("h3","rv-source-title",String(x.title||"").trim()),
-  make("p","rv-source-meta",(original?"Indexed record: ":"")+[x.venue,date(x.published)].filter(Boolean).join(" · ")));
+ add(cite,make("h2","","Original publication"),make("h3","rv-source-title",String(x.title||"").trim()));
  if(x.authors?.length)cite.append(make("p","rv-source-authors",x.authors.join(", ")));
- const pills=make("div","rv-source-pills");
- add(pills,make("span","",depthName(x)),
-    make("span","",x.relation||"Unclassified"));
- cite.append(pills);
- if(original){
-  cite.append(make("p","rv-source-version","Checked source: "+checkedSourceLabel(r)));
-
-  // Preserve distinct legacy basis text without repeating an entire typed notice.
-
-  const sourceUrl=httpsSourceUrl(r.source_url);
-  if(sourceUrl)cite.append(link("Read the source",sourceUrl,"rv-primary-link"));
-  if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)
-   cite.append(link("Related journal publication (not the checked source)",doiUrl(r.related_journal_doi),"rv-secondary-link"));
- }else{
-  if(x.url&&/^https:\/\//.test(x.url))cite.append(link("Open publication",x.url,"rv-primary-link"));
-  if(x.analysis?.fulltext_url&&/^https:\/\//.test(x.analysis.fulltext_url))
-   cite.append(link("Read accessible full text",x.analysis.fulltext_url,"rv-secondary-link"));
-  if(x.source_review?.source_url&&/^https:\/\//.test(x.source_review.source_url))
-   cite.append(link("Read verified full-text republication",x.source_review.source_url,"rv-secondary-link"));
- }
- const provenanceBody=make("div","rv-provenance-body");
- provenanceBody.append(make("p","",r.provenance||"Publisher/source index"));
- if(original){
-  provenanceBody.append(status);
-  provenanceBody.append(checkedReadingContext(r,"rv-reading-notice"));
-  if(d.basis&&!String(r.notice||"").includes(d.basis))provenanceBody.append(make("p","rv-review-basis",d.basis));
- }else provenanceBody.append(status);
-  if(r.source_version)provenanceBody.append(make("p","","Source version identifier: "+r.source_version));
- if(original){
-  provenanceBody.append(make("p","",r.source_doi?"Checked source DOI: "+r.source_doi:"No DOI recorded for the checked source"));
-  if(r.related_journal_doi&&r.related_journal_doi!==r.source_doi)
-   provenanceBody.append(make("p","","Related journal DOI (not checked here): "+r.related_journal_doi));
- }else provenanceBody.append(make("p","",x.doi?"DOI: "+x.doi:"No DOI recorded"));
- const provenance=layerButton("Source details & reading basis","Source details & reading basis",provenanceBody,"rv-provenance");
- cite.append(provenance);side.append(cite);
- if(scholarly&&!original)side.append(evidenceCoverage(x));
- if(!original&&x.analysis?.figures?.length){
+ if(byline.length)cite.append(make("p","rv-source-meta",byline.join(" · ")));
+ if(basis)cite.append(make("p","rv-source-version",basis));
+ if(primaryUrl)cite.append(link("Read the source",primaryUrl,"rv-primary-link"));
+ if(original&&r.related_journal_doi&&r.related_journal_doi!==r.source_doi)
+  cite.append(link("Related journal publication",doiUrl(r.related_journal_doi),"rv-secondary-link"));
+ if(!original&&httpsSourceUrl(x.analysis?.fulltext_url)&&x.analysis.fulltext_url!==primaryUrl)
+  cite.append(link("Read accessible full text",x.analysis.fulltext_url,"rv-secondary-link"));
+ if(!original&&httpsSourceUrl(x.source_review?.source_url)&&x.source_review.source_url!==primaryUrl)
+  cite.append(link("Read the republication",x.source_review.source_url,"rv-secondary-link"));
+ side.append(cite);
+ if(research&&!original&&x.analysis?.figures?.length){
   const figureSection=make("section","rv-figures");
   figureSection.append(make("h3","","Original paper figures ("+x.analysis.figures.length+")"));
   const figureBody=make("div","rv-figures-content");
@@ -1530,19 +1384,17 @@ function showPaper(x){
  const companions=S.companions.filter(y=>y.companion_to===x.doi);
  if(companions.length){
   const origin=make("section","rv-related");
-  add(origin,make("span","rv-section-overline","FROM THE ORIGINAL AUTHOR"),
-    make("h2","","Related explanation and commentary"),
-    make("p","","The author discusses implications of this publication in a public-facing piece. This is not an independent study."));
+  origin.append(make("h2","","Coverage of this publication"));
   for(const companion of companions){
    const article=make("div","rv-excerpt");
    add(article,make("h3","",readingHeadline(companion)),
-     make("p","",companion.companion_relation||"Author commentary"));
-   if(/^https:\/\//.test(companion.url||""))article.append(link("Read the commentary",companion.url,"rv-secondary-link"));
+     make("p","",readingKind(companion)));
+   if(/^https:\/\//.test(companion.url||""))article.append(link("Read the original",companion.url,"rv-secondary-link"));
    origin.append(article);
   }
   side.append(origin);
  }
- const related=S.records.filter(y=>y!==x&&y.lane===x.lane&&y.kind===x.kind&&depth(y)!=="citation_only")
+ const related=S.records.filter(y=>y!==x&&y.lane===x.lane&&sourceFamily(y)===family&&depth(y)!=="citation_only")
                        .sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){
   const next=make("section","rv-related");
@@ -1551,13 +1403,13 @@ function showPaper(x){
   side.append(next);
  }
  add(layout,story,side);
- articleSections(main,layout,body,side,analysis,evidencePanel);
+ articleSections(main,layout,body,side,analysis,evidencePanel,sections);
  root.append(main);
 }
 let libraryPromise=null;
 const articlePromises=new Map();
 function matchesSearch(x,q){
- const text=[x.title,x.display_headline,x.venue,x.search_text,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
+ const text=[x.title,x.display_headline,readingKind(x),x.venue,x.search_text,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
  return text.includes(String(q).toLowerCase());
 }
 async function jsonPayload(path,immutable=false){
@@ -1614,7 +1466,7 @@ async function init(){
   try{
    const manifest=await jsonPayload("data/reader-manifest.json");
    if(manifest.schema_version!==1||manifest.edition_id!==(manifest.issue?.edition_date||null))throw new Error("Invalid publication manifest");
-   S.manifest=manifest;S.issue=manifest.issue;S.week={run:manifest.collection};S.backlog=manifest.backlog||{};
+   S.manifest=manifest;S.issue=manifest.issue;S.week={run:manifest.collection};
   }catch{
    S.issue=await jsonPayload("data/public-featured-issue.json");
   }
@@ -1640,7 +1492,6 @@ $("#field-search").addEventListener("submit",event=>{
 $(".skip").addEventListener("click",event=>{
  event.preventDefault();const main=$("#main");main.focus();main.scrollIntoView({block:"start"});
 });
-$("#perspectives-essays-link").addEventListener("click",e=>{e.preventDefault();$("#perspectives-essays").scrollIntoView({behavior:"smooth",block:"start"})});
 $$("[data-library-theme]").forEach(button=>button.addEventListener("click",()=>chooseLibraryTheme(button.dataset.libraryTheme)));
 $("#library-sort").addEventListener("change",updateLibraryRoute);
 $("#library-page-size")?.addEventListener("change",updateLibraryRoute);

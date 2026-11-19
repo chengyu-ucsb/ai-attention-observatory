@@ -145,7 +145,7 @@ class CheckedTypesTests(unittest.TestCase):
         article_screen(n,row);approve(n);row['original_reading']=n
         self.assertTrue(original.eligible(n,row));self.assertEqual(screen(row)['decision'],'include')
         note=make_note(row);self.assertIn('not verified peer-reviewed',note['notice'])
-        self.assertIn('strong causal',note['limitations'])
+        self.assertEqual(note['limitations'], n['summary']['limitation'])
         row['title']='Cross-attention transformer for object detection';row['abstract_text']=''
         n['title']=row['title'];article_screen(n,row);approve(n)
         self.assertFalse(original.eligible(n,row));self.assertEqual(screen(row)['decision'],'hold')
@@ -300,7 +300,8 @@ class CheckedTypesTests(unittest.TestCase):
                 self.assertEqual(packet[0]['attributed_to'],'Synthetic policy author')
                 with patch.object(feed,'ROOT',data),patch.object(feed,'DATA',data):
                     self.assertEqual(feed.build(),1)
-                self.assertIn('Attributed commentary',(data/'feed.xml').read_text())
+                self.assertIn('Analysis · Synthetic policy author',(data/'feed.xml').read_text())
+                self.assertNotIn('Limited reading of current publisher HTML',(data/'feed.xml').read_text())
                 manifest.write_text(json.dumps({'articles':[]}))
                 self.assertEqual(compose_issue.evidence(public),[])
                 with patch.object(feed,'ROOT',data),patch.object(feed,'DATA',data):

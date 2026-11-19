@@ -1,20 +1,23 @@
 """Build a small reader index and immutable, on-demand article payloads.
 
 Only the already screened public library is an input. Operational state and
-pending source bodies must never enter this export. The edition is an exact
-published snapshot; latest discovery cannot replace its source shelf.
+pending source bodies must never enter this export. The edition retains its canonical archive digest
+and displays a separately verifiable public projection.
 """
 from __future__ import annotations
+import argparse
 from hashlib import sha256
 import json
 from pathlib import Path
 
+from reading_headlines import reader_genre, reader_headline
+from reader_issue import feed_snapshot
+
 ROOT = Path(__file__).resolve().parents[1]
 CARD_FIELDS = ('title', 'display_headline', 'authors', 'published', 'venue', 'doi', 'url', 'kind',
                'lane', 'relation', 'source', 'first_seen', 'source_group',
-               'format', 'research_type', 'legacy_urls', 'companion_to', 'editorial_art')
-READING_FIELDS = ('level', 'original_summary', 'research_type', 'notice',
-                  'review_label', 'review_scope', 'quality_note', 'temporal_notice',
+               'format', 'source_type', 'reader_genre', 'research_type', 'legacy_urls', 'companion_to')
+READING_FIELDS = ('level', 'original_summary', 'research_type', 'source_format',
                   'source_version', 'source_url', 'source_doi', 'related_journal_doi',
                   'genre', 'attributed_to')
 DIGEST_FIELDS = ('idea', 'explain', 'status', 'finding_source', 'editorial_basis')
@@ -33,10 +36,42 @@ def immutable(data, folder, value):
     return 'data/' + relative.as_posix()
 
 
+def pick(record, fields):
+    return {key: record[key] for key in fields if key in record}
+
+
+def article(record):
+    # Select reader fields explicitly. Internal acquisition metadata, checks,
+    # fingerprints and per-field evidence receipts stay in the editorial index.
+    page = pick(record, CARD_FIELDS + ('abstract_text', 'abstract_source', 'preview',
+                                      'framework_notes', 'visual'))
+    if record.get('source_review'):
+        page['source_review'] = pick(record['source_review'], ('source_url',))
+    if record.get('analysis'):
+        page['analysis'] = pick(record['analysis'], ('fulltext_url', 'methods', 'results',
+                                'discussion', 'limitations', 'original_paraphrases_only', 'figures'))
+    if record.get('editorial_art'):
+        page['editorial_art'] = pick(record['editorial_art'], ('kind', 'status', 'src',
+                                   'thumbnail_src', 'alt', 'width', 'height'))
+    reading = record.get('reading') or {}
+    detail = pick(reading, READING_FIELDS + ('original_summary_id', 'source_sha256', 'overview',
+                  'methods', 'findings', 'interpretation', 'limitations', 'reported_findings'))
+    digest = reading.get('digest') or {}
+    detail['digest'] = pick(digest, DIGEST_FIELDS + ('approach', 'finding', 'interpretation',
+                              'limitation', 'approach_source', 'limitation_source', 'tags'))
+    if digest.get('longform'):
+        fields = ('source_depth', 'thesis', 'reasoning', 'examples', 'tension', 'qualification',
+                  'research_question', 'study_design', 'reported_results', 'authors_interpretation',
+                  'limitations')
+        detail['digest']['longform'] = pick(digest['longform'], fields)
+    page['reading'] = detail
+    return page
+
+
 def card(record, article_url):
     reading = record.get('reading') or {}
     digest = reading.get('digest') or {}
-    result = {key: record[key] for key in CARD_FIELDS if key in record}
+    result = pick(record, CARD_FIELDS + ('editorial_art',))
     result['reading'] = {key: reading[key] for key in READING_FIELDS if key in reading}
     result['reading']['digest'] = {key: digest[key] for key in DIGEST_FIELDS if key in digest}
     # Presence is sufficient for collection statistics/ranking; no findings are
@@ -59,7 +94,7 @@ def card(record, article_url):
     return result
 
 
-def build(root=ROOT):
+def build(root=ROOT, *, pages_data=None):
     data = Path(root) / 'data'
     records = json.loads((data / 'public-library.json').read_text())
     if not isinstance(records, list) or any((r.get('reading') or {}).get('level') in (None, 'citation_only') for r in records):
@@ -67,14 +102,30 @@ def build(root=ROOT):
     issue = json.loads((data / 'public-featured-issue.json').read_text())
     if issue.get('status') != 'published':
         issue = {}  # An unfinished draft is not a public edition.
-    cards = [card(row, immutable(data, 'articles', row)) for row in records]
-    index_url = immutable(data, 'indexes', cards)
+    destination = Path(pages_data) if pages_data else data
+    if pages_data and destination.resolve() == data.resolve():
+        raise ValueError('Pages compatibility files need a separate destination from editorial inputs')
+    destination.mkdir(parents=True, exist_ok=True)
+    pages = [article(record) for record in records]
+    cards = [card(page, immutable(destination, 'articles', page)) for page in pages]
+    index_url = immutable(destination, 'indexes', cards)
     weekly = json.loads((data / 'public-weekly.json').read_text())
     run = weekly.get('run') or {}
     backlog_path = data / 'fulltext-backfill-state.json'
     backlog = json.loads(backlog_path.read_text()) if backlog_path.exists() else {}
-    manifest = {'schema_version': 1, 'edition_id': issue.get('edition_date'),
-                'edition_sha256': sha256(encoded(issue)).hexdigest(), 'issue': issue,
+    # The canonical digest addresses the archived publication; public formats use the reader digest.
+    # Display metadata accompanies that frozen record, including older shelves.
+    current = {row.get('doi') or row.get('url'): row for row in records}
+    source_labels = {}
+    for source in issue.get('sources', []):
+        key = source.get('id')
+        if key:
+            row = current.get(key) or source
+            source_labels[key] = {'display_headline': reader_headline(row), 'reader_genre': reader_genre(row)}
+    published = feed_snapshot(issue)
+    manifest = {'schema_version': 1, 'source_labels': source_labels, 'edition_id': issue.get('edition_date'),
+                'edition_sha256': sha256(encoded(issue)).hexdigest(), 'issue': published,
+                'reader_sha256': sha256(encoded(published)).hexdigest(),
                 'index_url': index_url,
                 'collection': {'date': run.get('date'), 'mode': run.get('mode'),
                                'publication_window': run.get('publication_window'),
@@ -83,10 +134,32 @@ def build(root=ROOT):
                             ('total_scholarly','full_text_extracted','ready_for_attempt','status')
                             if key in backlog},
                 'library_count': sum(not r.get('companion_to') for r in records)}
-    (data / 'reader-manifest.json').write_bytes(encoded(manifest))
+    (destination / 'reader-manifest.json').write_bytes(encoded(manifest))
+    if pages_data:
+        current = json.loads((data / 'public-issue.json').read_text())
+        if current.get('status') == 'published':
+            public_issue = feed_snapshot(current)
+        else:
+            public_issue = pick(current, ('edition_date', 'publication_window', 'status'))
+            public_issue.update(sources=[], source_count=0)
+        collection = pick(run, ('date', 'mode', 'publication_window', 'last_seven_days',
+                                'reading_eligible_count', 'full_text_count', 'abstract_count'))
+        weekly_articles = []
+        for row in weekly.get('items', []):
+            if (row.get('reading') or {}).get('level') in (None, 'citation_only'):
+                raise ValueError('reader_requires_screened_public_weekly_items')
+            weekly_articles.append(article(row))
+        exports = {'public-library': pages,
+                   'public-weekly': {'run': collection, 'items': weekly_articles},
+                   'public-featured-issue': published if published else {'status': 'none'},
+                   'public-issue': public_issue}
+        for name, value in exports.items():
+            (destination / (name + '.json')).write_bytes(encoded(value))
     return {'manifest_bytes': len(encoded(manifest)), 'index_bytes': len(encoded(cards)),
             'articles': len(records), 'edition_id': manifest['edition_id']}
 
 
 if __name__ == '__main__':
-    print(json.dumps(build()))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pages-data', type=Path, help='Generate deployable reader URLs in this data directory.')
+    print(json.dumps(build(pages_data=parser.parse_args().pages_data)))

@@ -253,9 +253,10 @@ class ArtQueuePublicationTests(unittest.TestCase):
         publish = (workflows / "publish.yml").read_text()
         prepare = publish.split("- name: Prepare static website", 1)[1].split("- uses:", 1)[0]
         self.assertNotIn(queue.STATE_FILENAME, prepare)
-        # Only explicitly screened reader assets may be copied recursively.
+        # Build reader payloads from the screened projection at the Pages boundary.
         self.assertNotRegex(prepare, r"cp -R data(?:/\.?)?\s")
-        self.assertIn("cp -R data/reader _site/data/", prepare)
+        self.assertIn("python scripts/build_reader.py --pages-data _site/data", prepare)
+        self.assertNotIn("cp data/public-library.json", prepare)
         self.assertNotIn("cp data/*", prepare)
         self.assertIn("contents: read", publish)
         self.assertNotIn("contents: write", publish)
