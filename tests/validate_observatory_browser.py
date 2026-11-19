@@ -948,6 +948,8 @@ def registered_reading_payloads():
     cognitive_ease = [row for row in originals if row.get('doi') == '10.1016/j.chb.2024.108386']
     assert len(cognitive_ease) == 1, 'Accepted Cognitive Ease reading was not admitted'
     assert cognitive_ease[0]['reading']['source_version'] == 'publishedVersion'
+    assert any(row.get('companion_to') == '10.26300/80wn-ca81' and row['venue'] == 'Education Week'
+               for row in originals), 'Education Week coverage must retain its own reading'
     # Exercise the restored commentary through the real builder and DOM rather
     # than letting timestamp churn quietly reduce the set being tested.
     admitted_ids = {row['reading']['original_summary_id'] for row in originals}
@@ -966,7 +968,7 @@ def registered_reading_payloads():
     return library, weekly, pending, originals
 
 
-def check_registered_readings(page, url, width, out, payloads):
+def check_registered_readings(page, url, width, out, payloads, *, fallback=False):
     """Validate every actually admitted original, never create an approval."""
     import hashlib
     import json
@@ -985,40 +987,44 @@ def check_registered_readings(page, url, width, out, payloads):
             route.fulfill(status=200, content_type='application/json', body=json.dumps(data[name]))
         else:
             route.continue_()
-    page.route('**/data/*.json*', fulfill)
-    page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
+    if fallback:
+        page.route('**/data/*.json*', fulfill)
+        page.route('**/data/reader-manifest.json', lambda route: route.fulfill(status=404, body=''))
+    requests = []
+    page.on('request', lambda request: requests.append(request.url))
     by_identifier = {row.get('doi') or row['url']: row for row in library}
-    for requested_row in originals:
-        identifier = requested_row.get('doi') or requested_row['url']
-        canonical_id = requested_row.get('companion_to') or identifier
-        assert canonical_id in by_identifier, 'Linked explainer lost its primary publication: ' + identifier
-        row = by_identifier[canonical_id]
-        assert not row.get('companion_to'), 'Source lineage must resolve to a primary publication'
-        assert row.get('reading', {}).get('original_summary'), 'Approved linked reading lost its canonical source review'
+    for row in originals:
+        identifier = row.get('doi') or row['url']
         reading = row['reading']
         commentary = reading.get('research_type') == 'attributed_commentary'
         page.goto(url + '#paper/' + quote(identifier, safe=''), wait_until='networkidle')
         paper = page.locator('#paper-content')
         expect(page.locator('#paper')).to_be_visible()
+        expect(paper.locator('.rv-headline')).to_have_text(row['display_headline'])
         choose_section(page, 'article-section', 'source')
         expect(paper.locator('.rv-source-title')).to_have_text(row['title'].strip())
         expect(paper.locator('.rv-source-title')).to_be_visible()
-        if requested_row.get('companion_to'):
-            # A legacy explainer deep link displays the reviewed original while
-            # preserving a visible link back to the related commentary.
-            assert row['title'] != requested_row['title'], 'Paired fixture must distinguish original and explainer'
-            expect(paper.locator('.rv-source-title')).not_to_have_text(requested_row['title'].strip())
-            companion_link = paper.locator('.rv-related a[href="' + requested_row['url'] + '"]')
-            expect(companion_link).to_be_visible()
-            expect(companion_link).to_have_text('Read the commentary')
-            expect(companion_link).to_have_attribute('href', requested_row['url'])
+        if row.get('companion_to'):
+            parent_id = row['companion_to']
+            parent = by_identifier[parent_id]
+            parent_link = paper.locator('.rv-paired-publication a')
+            expect(parent_link).to_have_text(parent['display_headline'])
+            expect(parent_link).to_have_attribute('href', '#paper/' + quote(parent_id, safe=''))
+            expect(parent_link).to_be_visible()
+        for companion in (item for item in library if item.get('companion_to') == identifier):
+            companion_path = '#paper/' + quote(companion.get('doi') or companion['url'], safe='')
+            coverage = paper.locator('.rv-paired-coverage .rv-excerpt').filter(
+                has=page.get_by_role('link', name=companion['display_headline'], exact=True))
+            expect(coverage.get_by_role('link', name=companion['display_headline'], exact=True)).to_have_attribute('href', companion_path)
+            expect(coverage.get_by_role('link', name='Read the original story')).to_have_attribute(
+                'href', companion['reading'].get('source_url') or companion['url'])
         expect(paper.locator('.rv-primary-link')).to_have_attribute('href', reading['source_url'])
         expect(paper.locator('.rv-source')).to_contain_text(row['venue'])
         choose_section(page, 'article-section', 'overview')
         expect(paper.locator('.rv-source-row')).to_be_visible()
         expect(paper.locator('.rv-ai-notice')).to_have_count(1)
         check_reader_copy(paper)
-        if canonical_id == '10.1016/j.chb.2024.108386':
+        if identifier == '10.1016/j.chb.2024.108386':
             expect(paper).to_contain_text('91 university students were analyzed after one exclusion')
             expect(paper).to_contain_text('1.20 versus 1.87 out of seven possible')
             expect(paper).to_contain_text('did not differ significantly')
@@ -1055,6 +1061,11 @@ def check_registered_readings(page, url, width, out, payloads):
             out.mkdir(parents=True, exist_ok=True)
             key = hashlib.sha256(identifier.encode()).hexdigest()[:12]
             page.screenshot(path=str(out / f'observatory-{width}-registered-{key}.png'), full_page=True)
+    if fallback:
+        assert any('/data/public-library.json' in request for request in requests)
+    else:
+        assert any('/data/reader/articles/' in request for request in requests), 'Immutable reading payloads did not load'
+        assert not any('/data/public-library.json' in request for request in requests), 'Manifest unexpectedly fell back to the compatibility library'
     assert not errors, errors
 
 
@@ -1200,7 +1211,7 @@ def check_collection_boundaries(page, url, width):
         expected = [row['display_headline'] for row in records if row['reader_genre'] in genres]
         assert sorted(actual) == sorted(expected), (panel, actual, expected)
 
-    for row in records:
+    for row in library:
         identifier = row.get('doi') or row['url']
         page.goto(url + '#paper/' + quote(identifier, safe=''))
         paper = page.locator('#paper-content')
@@ -1239,7 +1250,7 @@ def check_collection_boundaries(page, url, width):
         assert response and response.ok, path
         check_reader_copy(page.locator('body'))
     assert not errors, errors
-    print(f'{width}px: checked {len(records)} article routes, {len(pending)} pending-source pages, all genre filters, perspectives sections and the issue archive.')
+    print(f'{width}px: checked {len(library)} article routes, {len(pending)} pending-source pages, all genre filters, perspectives sections and the issue archive.')
     page.close()
 
 
@@ -1268,7 +1279,7 @@ if __name__ == '__main__':
                 check_weekly_citations(context.new_page(), url, width, args.screenshots)
                 check_standalone_brief(context.new_page(), url, width, args.screenshots)
                 check_typed_readings(context.new_page(), url, width, args.screenshots)
-                check_registered_readings(context.new_page(), url, width, args.screenshots, registered)
+                check_registered_readings(context.new_page(), url, width, args.screenshots, registered, fallback=width <= 600)
                 check_reader_headings(context.new_page(), url, width)
                 if args.browser == 'chromium' and width in (390, 1280):
                     check_collection_boundaries(context.new_page(), url, width)

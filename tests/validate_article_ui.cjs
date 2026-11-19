@@ -436,7 +436,14 @@ vm.runInContext("TEST.S.records=[primary];TEST.S.companions=[paired]",ctx);
 const reportShelf=vm.runInContext("TEST.issueSourceShelfItem(citedReport,0)",ctx);
 assert.equal(match(reportShelf,"card-type").textContent,"News report");
 assert(nodes(reportShelf).some(node=>node.href===ctx.paired.url));
-assert(!nodes(reportShelf).some(node=>node.href?.startsWith("#paper/")));
+assert(nodes(reportShelf).some(node=>node.href==="#paper/"+encodeURIComponent(ctx.paired.url)));
+vm.runInContext("TEST.showPaper(primary)",ctx);
+const coverage=match(paperContainer,"rv-paired-coverage");
+assert(nodes(coverage).some(node=>node.href==="#paper/"+encodeURIComponent(ctx.paired.url)&&node.textContent===ctx.paired.title));
+assert(nodes(coverage).some(node=>node.href===ctx.paired.url));
+vm.runInContext("TEST.showPaper(paired)",ctx);
+const study=match(paperContainer,"rv-paired-publication");
+assert(nodes(study).some(node=>node.href==="#paper/"+encodeURIComponent(ctx.primary.doi)&&node.textContent===ctx.primary.title));
 vm.runInContext("TEST.S.records=database;TEST.S.companions=[]",ctx);
 
 const safeSummary=JSON.parse(JSON.stringify(original));

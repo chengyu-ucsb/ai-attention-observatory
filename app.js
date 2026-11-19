@@ -133,7 +133,12 @@ function setupPageLayers(){
 }
 function date(s){if(!s||!/^20\d\d/.test(s))return "Undated";let d=new Date(s.slice(0,10)+"T12:00:00Z");return isNaN(d.getTime())?"Undated":d.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"UTC"})}
 function id(x){return String(x.doi||x.url||x.title)}
-function record(k){const found=S.records.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.companions.find(x=>id(x)===k||(x.legacy_urls||[]).includes(k))||S.pending.find(x=>id(x)===k);return found?.companion_to?S.records.find(x=>id(x)===found.companion_to)||found:found}
+function record(key){
+ const published=[...S.records,...S.companions];
+ return published.find(row=>id(row)===key)||S.pending.find(row=>id(row)===key)||
+  published.find(row=>row.legacy_urls?.includes(key));
+}
+function readingPath(row){return "#paper/"+encodeURIComponent(id(row))}
 function depth(x){return x.reading?.level||"citation_only"}
 function originalSummary(x){return x.reading?.original_summary===true}
 function originalCommentary(reading){return reading?.original_summary===true&&reading.research_type==="attributed_commentary"}
@@ -250,8 +255,8 @@ function shortIdea(x){return readingHeadline(x)}
 // reuse a catalog display label when both the source ID and original title match.
 function editionReading(source){
  const candidate=record(source.id);
- // Legacy explainer deep links resolve to a related paper. An edition link
- // labelled as reporting must instead lead to the particular article it cites.
+ // An older alias can identify a different publication in the current catalog.
+ // Only attach an edition's original citation to the matching reading.
  return candidate&&candidate.title===source.title&&depth(candidate)!=="citation_only"?candidate:null;
 }
 function editionPresentation(source){
@@ -624,7 +629,7 @@ function renderIssue(){
  $("#issue-experiment-caution").textContent=published?issue.experiment.caution:"";
  $("#issue-closer").textContent=published?issue.closer:"";
  const sourceList=issue.sources||[];
- $("#issue-coverage").textContent=sourceList.length+" sources"+(issue.scope_kind==="legacy_collection"?" in this historical collection.":issue.publication_window?" · "+date(issue.publication_window.from)+" – "+date(issue.publication_window.to):" in this edition.");
+ $("#issue-coverage").textContent=sourceList.length+(sourceList.length===1?" source":" sources")+(issue.scope_kind==="legacy_collection"?" in this historical collection.":issue.publication_window?" · "+date(issue.publication_window.from)+" – "+date(issue.publication_window.to)+" (UTC)":" in this edition.");
  const shelf=$("#issue-sources");shelf.replaceChildren();
  for(const [i,src] of (issue.sources||[]).entries())shelf.append(issueSourceShelfItem(src,i));
  renderEditionCards();
@@ -1382,20 +1387,27 @@ function showPaper(x){
   }
   figureSection.append(figureBody);side.append(figureSection);
  }
- const companions=S.companions.filter(y=>y.companion_to===x.doi);
+ const primary=x.companion_to&&S.records.find(row=>id(row)===x.companion_to);
+ if(primary){
+  const section=make("section","rv-related rv-paired-publication");
+  add(section,make("h2","","Research behind this story"),link(readingHeadline(primary),readingPath(primary),"rv-related-item"));
+  side.append(section);
+ }
+ const companions=S.companions.filter(row=>row.companion_to===id(x));
  if(companions.length){
-  const origin=make("section","rv-related");
-  origin.append(make("h2","","Coverage of this publication"));
+  const coverage=make("section","rv-related rv-paired-coverage");
+  coverage.append(make("h2","","Coverage of this publication"));
   for(const companion of companions){
    const article=make("div","rv-excerpt");
-   add(article,make("h3","",readingHeadline(companion)),
-     make("p","",readingKind(companion)));
-   if(/^https:\/\//.test(companion.url||""))article.append(link("Read the original",companion.url,"rv-secondary-link"));
-   origin.append(article);
+   add(article,add(make("h3"),link(readingHeadline(companion),readingPath(companion),"rv-related-item")),
+    make("p","",readingKind(companion)));
+   const originalUrl=httpsSourceUrl(companion.reading?.source_url)||httpsSourceUrl(companion.url);
+   if(originalUrl)article.append(link("Read the original story",originalUrl,"rv-secondary-link"));
+   coverage.append(article);
   }
-  side.append(origin);
+  side.append(coverage);
  }
- const related=S.records.filter(y=>y!==x&&y.lane===x.lane&&sourceFamily(y)===family&&depth(y)!=="citation_only")
+ const related=S.records.filter(y=>id(y)!==id(x)&&y.lane===x.lane&&sourceFamily(y)===family&&depth(y)!=="citation_only")
                        .sort((a,b)=>rank(b)-rank(a)).slice(0,3);
  if(related.length){
   const next=make("section","rv-related");

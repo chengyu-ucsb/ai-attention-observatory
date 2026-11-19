@@ -64,7 +64,7 @@ This policy is stored in the repository so future assistants working on it can s
 
 - When an identifiable article is a plain-language explanation of a scholarly work, index the original publication with its DOI, article type and available source text before featuring its derivative account.
 - Use explicit source citations or editor-verified matching, never author/topic similarity alone, to connect commentary to a primary work. Record the source of relationship verification in `data/source-lineage.json`.
-- Canonical readings, source counts, evidence atlas and weekly discovery treat a paired original and derivative explainer as one research contribution. Preserve legacy commentary deep links by resolving them to the original and surface the explainer as a separate clickable link.
+- Canonical readings, source counts, evidence atlas and weekly discovery treat a paired original and derivative explainer as one research contribution. Give each reviewed publication its own reading URL and link paired readings in both directions. Resolve an older URL to its registered owner only when it does not identify a current source directly.
 - A conceptual/theoretical publication proposes a model; it does not itself supply new empirical effect estimates. Never fabricate sample sizes, tested effects or causal results, and visually distinguish proposals from measured findings. Differentiate systematic reviews from experiments when the source supports that distinction.
 - Prefer accessible, legitimately reusable original article text over publisher snippets; if only an abstract or edited summary is available, label that depth and link directly to the original. Keep paired-publication regression tests up to date.
 

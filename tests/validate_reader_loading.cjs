@@ -44,5 +44,33 @@ function environment(fetch){
  vm.runInContext('renderEditionCards()',context);
  const cards=elements.get('#feature-grid').children;
  assert.equal(cards.length,1);
+ // A source's direct identity takes priority over aliases, including when
+ // a paper and its linked news report are loaded from different payloads.
+ const researchId='10.1234/paper',storyId='https://example.org/news';
+ const oldPaper='https://example.org/old-paper',oldStory='https://example.org/old-story';
+ const parent={doi:researchId,title:'Research paper',reading:{level:'abstract'},legacy_urls:[storyId,oldPaper]};
+ const story={url:storyId,title:'News report',companion_to:researchId,reading:{level:'curated'},legacy_urls:[oldStory]};
+ for(const immutable of [true,false]){
+  const sourceRows=[parent,story],assets=new Map(),calls=[];
+  const cards=sourceRows.map((row,n)=>{
+   const path='data/reader/articles/'+String(n+1).repeat(64)+'.json';
+   assets.set(path,row);return {...row,article_payload:path};
+  });
+  const requestsForRoute=new Map(immutable?[[index,cards],...assets]:[['data/public-library.json',sourceRows]]);
+  const env=environment(async path=>{
+   assert(requestsForRoute.has(path),'Unexpected article request: '+path);
+   calls.push(path);return {ok:true,json:async()=>requestsForRoute.get(path)};
+  });
+  if(immutable)env.context.state.manifest=manifest;
+  vm.runInContext('extendTopicChoices=()=>{};showPaper=row=>{this.shown=row};',env.context);
+  for(const [key,wanted] of [[storyId,story],[oldPaper,parent],[oldStory,story],[researchId,parent]]){
+   env.context.key=key;
+   await vm.runInContext('openPaper(key)',env.context);
+   assert.equal(env.context.shown.title,wanted.title,key);
+  }
+  assert.equal(env.context.state.records.length,1);
+  assert.equal(env.context.state.companions.length,1);
+  assert.deepEqual(calls,immutable?[index,cards[1].article_payload,cards[0].article_payload]:['data/public-library.json']);
+ }
  console.log('Reader loading: edition survives failed archive; immutable assets and edition sources verified.');
 })().catch(error=>{console.error(error);process.exitCode=1});
