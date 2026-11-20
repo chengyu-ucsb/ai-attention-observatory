@@ -3,36 +3,36 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-19T22:23:19.530867+00:00",
-  "finished_at": "2026-11-19T22:23:42.311030+00:00",
+  "started_at": "2026-11-20T11:49:57.635288+00:00",
+  "finished_at": "2026-11-20T11:50:51.866834+00:00",
   "publication_window": {
     "from": "2026-11-09",
     "to": "2026-11-15",
     "timezone": "UTC"
   },
   "bindings": {
-    "packet.json": "39a59a39521669dd46694ac93c17958ba4dc4444ddba60e05d2972693fc69945",
-    "acquisition.json": "04ced80006561081c88cb1c81511cddabcffeb509c34399e4b971e827cc32795",
-    "readings.json": "bf7ef709d8d67d58164bf484992aeac39f7e1506d7b3646662eed792d91d25fb"
+    "packet.json": "9b44cbd1c608b4652ef7da557649b099618753a530919e7fa06f3dda8fcefb5d",
+    "acquisition.json": "e4d7ec013c75cc304f11ea66de758274d4848262bad4f4cdc47c0778ce56cdea",
+    "readings.json": "fe566748eaad27f1fd2e9760e1d9cec9f52208d79dea43353a9a8dfbda90699e"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-19T22:23:20.504124+00:00",
-      "selected_records": 132,
+      "checked_at": "2026-11-20T11:49:58.340529+00:00",
+      "selected_records": 150,
       "attempted_records": 12,
       "attempted_stages": 12,
       "completed_records": 23,
-      "pending_records": 109,
-      "deferred_retry_records": 44,
+      "pending_records": 127,
+      "deferred_retry_records": 46,
       "statuses": {
         "access_blocked": 7,
         "full_document_retrieved_not_reviewed": 4,
         "partial_full_text_not_reviewed": 1,
-        "pending": 47,
+        "pending": 63,
         "pending_routes": 18,
         "rate_limited": 32,
         "source_unavailable": 11,
-        "temporarily_unavailable": 12
+        "temporarily_unavailable": 14
       },
       "excluded": {},
       "duplicate_records": 0,
@@ -42,7 +42,9 @@
       "time_budget_seconds": 480,
       "item_time_budget_seconds": 60,
       "max_candidates_per_provider_stage": 8,
-      "active_provider_pauses": {},
+      "active_provider_pauses": {
+        "provider:CORE": "2026-11-20T12:49:58.821703+00:00"
+      },
       "scope": "Selected previous-week records only; not comprehensive web coverage.",
       "model_used": false,
       "publication_or_review_performed": false
