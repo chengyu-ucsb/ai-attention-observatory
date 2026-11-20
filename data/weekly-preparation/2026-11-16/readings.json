@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-20T04:30:25.161180+00:00",
-  "packet_sha256": "fa92c80696665d650e46dff0e8ca11c47b0695aa015ab493be3fedb6d6aa7258",
-  "acquisition_state_sha256": "e078b6338fa224c9b90a43a4c9ff8f7cbc18cd40d8cda167d2a084537e93be30",
+  "observation_at": "2026-11-20T19:42:27.623971+00:00",
+  "packet_sha256": "885caf63245e337bba07d6e77fa9f4affe34c1ca3479f33633d95d88850bb432",
+  "acquisition_state_sha256": "6b88da0a7ce33b062d762b7dda832a34208cea13c489ab12d38b64b5b387e3e7",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -5133,6 +5133,83 @@
       },
       "acquisition_receipt_sha256": "c790a366f899121d1caf9b956f38f9668e00be9a803188242d4e0cd555867d5a"
     },
+    "3915dcac1f041adf2ca7092ff958c482ab64206781fb7f9d20b9b39a64073710": {
+      "input_fingerprint": "ba309dfdcdfdf952e187768f05e79478812cecd6178a26e1fafc1738f113f29b",
+      "record": {
+        "title": "Outage Chaos: Who Turned Off All The Computer?",
+        "authors": [
+          "Starchy Grant",
+          "Jacob Hoffman-Andrews"
+        ],
+        "published": "2026-11-19",
+        "venue": "Electronic Frontier Foundation",
+        "doi": "",
+        "url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer",
+        "preview": "Source listed; editorial text not yet available.",
+        "kind": "nonacademic",
+        "lane": "Emerging topics",
+        "relation": "Nonacademic reporting / commentary",
+        "evidence": "Publisher feed metadata (not independently reviewed)",
+        "source": "Publisher RSS / Google News RSS",
+        "format": "Policy & analysis",
+        "source_type": "policy",
+        "source_type_basis": "provisional_feed_default",
+        "publication_date_provenance": {
+          "basis": "publisher_rss_pubDate",
+          "raw": "Thu, 19 Nov 2026 23:30:50 +0000",
+          "date": "2026-11-19",
+          "timezone": "UTC",
+          "source_url": "https://www.eff.org/rss/updates.xml",
+          "independently_verified": false
+        },
+        "discovery_provenance": {
+          "method": "publisher_feed",
+          "feed_id": "eff",
+          "feed_url": "https://www.eff.org/rss/updates.xml",
+          "checked_at": "2026-11-20",
+          "metadata_snapshot_observed_at": "2026-11-20T09:57:14.480797+00:00"
+        },
+        "first_seen": "2026-11-20",
+        "content_access": "headline_only",
+        "metadata_observed_at": "2026-11-20T09:57:14.480797+00:00",
+        "preparation_first_seen_at": "2026-11-20T19:06:08.776441+00:00",
+        "complete_reading_attempt": {
+          "status": "verifier_indices_invalid",
+          "stage": "synthesis",
+          "last_at": "2026-11-20",
+          "next_at": "2026-11-22",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer",
+              "status": "partial_full_text",
+              "final_url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer"
+            }
+          ],
+          "verifier_diagnostic": {
+            "claim_count": 6,
+            "duplicate_supported": false,
+            "duplicate_rejected": false,
+            "overlap_count": 0,
+            "missing_count": 0,
+            "out_of_range_count": 4
+          },
+          "format_input_sha256": "dce2ed836b6ee4dbcb38c884932adb6650bc3d9a9e5ded53567003a42cffc47b",
+          "format_failures": 1,
+          "retry_after": "2026-11-20T19:57:27.623971+00:00"
+        }
+      },
+      "acquisition_receipt_sha256": "7af1d29c60542dfa022a75ac8e79f923203c65111943bef8d48734e86b190e36"
+    },
     "3a54925ebbd02e40173976c78297e1732ba35e608eef4435bbfe773256090ad5": {
       "input_fingerprint": "f517e9297fa01a66aa8bb68cf40ccb7aeacbdf5720d1e037255550a3ec87e4c4",
       "record": {
@@ -5412,7 +5489,7 @@
     "summaries_completed": 0,
     "failed": 1,
     "failure_reasons": {
-      "claim_length_invalid": 1
+      "verifier_indices_invalid": 1
     },
     "failure_stages": {
       "synthesis": 1
@@ -5420,14 +5497,14 @@
     "source_text_saved": false,
     "skipped_no_model": false,
     "selection": {
-      "considered": 4,
+      "considered": 5,
       "eligible": 1,
       "deferred_by_limit": 0,
       "skipped": {
-        "retry_cooldown": 2,
+        "retry_cooldown": 3,
         "unverified_venue": 1
       }
     }
   },
-  "metadata_sha256": "c63611250649a9da53a00633dc32739dc870a647e2c0589e47b02afffa464fe2"
+  "metadata_sha256": "e1bb3546ac6ebe231b3f63b33ab39318e2368bee1c27a28c6cd5444da74f47fe"
 }
