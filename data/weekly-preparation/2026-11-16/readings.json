@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-19T19:53:23.330905+00:00",
-  "packet_sha256": "0c5e7a8031cd0bfacaacfdedc69105840d8162e9720f8136f783f828b5a42382",
-  "acquisition_state_sha256": "e495844a8f5891104c8ad0a8dc88d37712477f1e182ca21fd6e8b4f7f5d37716",
+  "observation_at": "2026-11-20T04:30:25.161180+00:00",
+  "packet_sha256": "fa92c80696665d650e46dff0e8ca11c47b0695aa015ab493be3fedb6d6aa7258",
+  "acquisition_state_sha256": "e078b6338fa224c9b90a43a4c9ff8f7cbc18cd40d8cda167d2a084537e93be30",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -4087,7 +4087,8 @@
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-19T19:28:59.574809+00:00",
         "preparation_first_seen_at": "2026-11-18T19:24:14.225611+00:00"
-      }
+      },
+      "acquisition_receipt_sha256": "e537f0b1d010ecfb0c654aeb81d7af34705261eddc61695366b448234f791525"
     },
     "e6dc4eec743e1d1a8fe98de4310a0348129899695aff797c1ed92f1e7b2c5ab4": {
       "input_fingerprint": "8316e53a800e8bd02132b063cfbf626abcbf4b657171818f2f681998c0ad4ee4",
@@ -5099,7 +5100,7 @@
           "method": "publisher_feed",
           "feed_id": "eff",
           "feed_url": "https://www.eff.org/rss/updates.xml",
-          "checked_at": "2026-11-19",
+          "checked_at": "2026-11-20",
           "metadata_snapshot_observed_at": "2026-11-17T05:07:04.280433+00:00"
         },
         "first_seen": "2026-11-17",
@@ -5165,14 +5166,38 @@
           "method": "publisher_feed",
           "feed_id": "eff",
           "feed_url": "https://www.eff.org/rss/updates.xml",
-          "checked_at": "2026-11-19",
+          "checked_at": "2026-11-20",
           "metadata_snapshot_observed_at": "2026-11-18T21:52:23.432298+00:00"
         },
         "first_seen": "2026-11-19",
         "content_access": "headline_only",
         "metadata_observed_at": "2026-11-18T21:52:23.432298+00:00",
-        "preparation_first_seen_at": "2026-11-19T04:11:00.566960+00:00"
-      }
+        "preparation_first_seen_at": "2026-11-19T04:11:00.566960+00:00",
+        "complete_reading_attempt": {
+          "status": "claim_length_invalid",
+          "stage": "synthesis",
+          "last_at": "2026-11-20",
+          "next_at": "2026-11-22",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.eff.org/deeplinks/2026/11/surveillance-isnt-safety-comic-about-organizing-against-surveillance",
+              "status": "partial_full_text",
+              "final_url": "https://www.eff.org/deeplinks/2026/11/surveillance-isnt-safety-comic-about-organizing-against-surveillance",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.eff.org/deeplinks/2026/11/surveillance-isnt-safety-comic-about-organizing-against-surveillance"
+            }
+          ]
+        }
+      },
+      "acquisition_receipt_sha256": "1ea6af86272906dee2684c5a4eebe020a84e96dd35c4fcd3563eb8177c4d90fd"
     },
     "4a09a1315d24e1de96decb19481a2309838d868e79b5161f64f420fc5deca682": {
       "input_fingerprint": "f55d2db7f0baed05aea2aafd56ba5fbe212f3f7c7261143e6d771accc42a4b02",
@@ -5206,7 +5231,7 @@
           "method": "publisher_feed",
           "feed_id": "conversation-ai",
           "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
-          "checked_at": "2026-11-19",
+          "checked_at": "2026-11-20",
           "metadata_snapshot_observed_at": "2026-11-16T23:22:03.144184+00:00"
         },
         "first_seen": "2026-11-17",
@@ -5247,13 +5272,54 @@
           "method": "publisher_feed",
           "feed_id": "guardian-ai",
           "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-          "checked_at": "2026-11-19",
+          "checked_at": "2026-11-20",
           "metadata_snapshot_observed_at": "2026-11-16T21:05:56.138909+00:00"
         },
         "first_seen": "2026-11-16",
         "content_access": "headline_only",
         "metadata_observed_at": "2026-11-16T21:05:56.138909+00:00",
         "preparation_first_seen_at": "2026-11-16T21:05:56.138909+00:00"
+      }
+    },
+    "96fea0d206cb1441a82b7e600b9243b894cc591b2fc29c12eb42dced76cccf6c": {
+      "input_fingerprint": "6a3b9e746126aab9a9cb9d57ad7b8500eed3d98a9bf931443a8140274e1b5c05",
+      "record": {
+        "title": "Academic integrity matters, but students shouldn’t be penalised for using AI | Letter",
+        "authors": [
+          "Guardian Staff"
+        ],
+        "published": "2026-11-19",
+        "venue": "The Guardian",
+        "doi": "",
+        "url": "https://www.theguardian.com/education/2026/nov/19/academic-integrity-matters-but-students-shouldnt-be-penalised-for-using-ai",
+        "preview": "Source listed; editorial text not yet available.",
+        "kind": "nonacademic",
+        "lane": "Emerging topics",
+        "relation": "Nonacademic reporting / commentary",
+        "evidence": "Publisher feed metadata (not independently reviewed)",
+        "source": "Publisher RSS / Google News RSS",
+        "format": "Technology journalism",
+        "source_type": "journalism",
+        "source_type_basis": "provisional_feed_default",
+        "publication_date_provenance": {
+          "basis": "publisher_rss_pubDate",
+          "raw": "Thu, 19 Nov 2026 18:07:23 GMT",
+          "date": "2026-11-19",
+          "timezone": "UTC",
+          "source_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
+          "independently_verified": false
+        },
+        "discovery_provenance": {
+          "method": "publisher_feed",
+          "feed_id": "guardian-ai",
+          "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
+          "checked_at": "2026-11-20",
+          "metadata_snapshot_observed_at": "2026-11-19T22:07:22.657141+00:00"
+        },
+        "first_seen": "2026-11-20",
+        "content_access": "headline_only",
+        "metadata_observed_at": "2026-11-19T22:07:22.657141+00:00",
+        "preparation_first_seen_at": "2026-11-20T03:58:29.696359+00:00"
       }
     },
     "79b15d6794e1fab37d436859f137e25129c28f0d31e26840324feca5953f4cf6": {
@@ -5288,7 +5354,7 @@
           "method": "publisher_feed",
           "feed_id": "guardian-ai",
           "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-          "checked_at": "2026-11-19",
+          "checked_at": "2026-11-20",
           "metadata_snapshot_observed_at": "2026-11-18T10:03:43.683056+00:00"
         },
         "first_seen": "2026-11-18",
@@ -5329,7 +5395,7 @@
           "method": "publisher_feed",
           "feed_id": "verge",
           "feed_url": "https://www.theverge.com/rss/index.xml",
-          "checked_at": "2026-11-19",
+          "checked_at": "2026-11-20",
           "metadata_snapshot_observed_at": "2026-11-18T19:24:14.225611+00:00"
         },
         "first_seen": "2026-11-18",
@@ -5340,25 +5406,28 @@
     }
   },
   "review_run": {
-    "attempted": 2,
-    "documents_retrieved": 2,
+    "attempted": 1,
+    "documents_retrieved": 1,
     "partial_inputs": 1,
     "summaries_completed": 0,
-    "failed": 2,
+    "failed": 1,
     "failure_reasons": {
-      "copied_source_passage": 2
+      "claim_length_invalid": 1
     },
     "failure_stages": {
-      "synthesis": 2
+      "synthesis": 1
     },
     "source_text_saved": false,
     "skipped_no_model": false,
     "selection": {
-      "considered": 2,
-      "eligible": 2,
+      "considered": 4,
+      "eligible": 1,
       "deferred_by_limit": 0,
-      "skipped": {}
+      "skipped": {
+        "retry_cooldown": 2,
+        "unverified_venue": 1
+      }
     }
   },
-  "metadata_sha256": "a6c9d9f10fb7e772a029151e7fb025da2c47c423ddeeb99532f1ced0e2e0c928"
+  "metadata_sha256": "c63611250649a9da53a00633dc32739dc870a647e2c0589e47b02afffa464fe2"
 }
