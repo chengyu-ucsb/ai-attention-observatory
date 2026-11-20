@@ -49829,6 +49829,108 @@
         "unpaywall_checked",
         "s2_candidate"
       ]
+    },
+    "complete_reading_attempt": {
+      "status": "no_article_text_available",
+      "stage": "retrieval",
+      "last_at": "2026-11-20",
+      "next_at": "2026-11-22",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "candidates_retained": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "status": "candidates",
+          "candidates": 3,
+          "candidates_retained": 3,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher deposit",
+          "url": "https://api.elsevier.com/content/article/PII:S0747563226000233",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher deposit",
+          "url": "https://api.elsevier.com/content/article/PII:S0747563226000233",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher landing page",
+          "url": "https://linkinghub.elsevier.com/retrieve/pii/S0747563226000233",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAlex XML and OA locations",
+          "status": "candidates",
+          "candidates": 1,
+          "candidates_retained": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://doi.org/10.1016/j.chb.2026.108926",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 2,
+          "candidates_retained": 2,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://dblp.org/rec/journals/chb/FournierFOKPGR26.html",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "failure_url": "https://api.core.ac.uk/v3/search/works",
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "candidates_retained": 1,
+          "retryable": false
+        }
+      ]
     }
   },
   {
@@ -52425,6 +52527,138 @@
         "results",
         "discussion",
         "limitations"
+      ]
+    },
+    "complete_reading_attempt": {
+      "status": "copied_source_passage",
+      "stage": "synthesis",
+      "last_at": "2026-11-20",
+      "next_at": "2026-11-22",
+      "provider_diagnostics": [
+        {
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "status": "no_exact_match",
+          "candidates": 0,
+          "candidates_retained": 0,
+          "retryable": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "status": "candidates",
+          "candidates": 3,
+          "candidates_retained": 3,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher deposit",
+          "url": "https://api.elsevier.com/content/article/PII:S1071581925002101",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher deposit",
+          "url": "https://api.elsevier.com/content/article/PII:S1071581925002101",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher landing page",
+          "url": "https://linkinghub.elsevier.com/retrieve/pii/S1071581925002101",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAlex XML and OA locations",
+          "status": "candidates",
+          "candidates": 4,
+          "candidates_retained": 4,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://iris.polito.it/bitstream/11583/3003529/4/1-s2.0-S1071581925002101-main.pdf",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex content API",
+          "url": "https://content.openalex.org/works/W4414974976.grobid-xml",
+          "retryable": false,
+          "status": "structured_article_identity_unverified"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://doi.org/10.1016/j.ijhcs.2025.103653",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://hdl.handle.net/11583/3003529",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 5,
+          "candidates_retained": 5,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://www.sciencedirect.com/science/article/pii/S1071581925002101",
+          "retryable": false,
+          "status": "robots_disallow_or_unavailable"
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://dblp.org/rec/journals/ijmms/ScibettaPRR25.html",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "failure_url": "https://api.core.ac.uk/v3/search/works",
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "candidates_retained": 1,
+          "retryable": false
+        }
       ]
     }
   },
