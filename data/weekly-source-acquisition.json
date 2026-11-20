@@ -104,7 +104,7 @@
           "attempted_at": "2026-11-17T19:07:28.482259+00:00"
         }
       },
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00"
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00"
     },
     "751a182db72b734ed34c6686073f83ca333e21498e1c286f09d20e9e4382210f": {
       "fingerprint": "c7b3a1775f96bc217c5840847ea6ffc6adbd99fc462843f094a5952f47c7a27d",
@@ -113,13 +113,15 @@
       "source_url": "https://doi.org/10.1007/s10462-026-11753-w",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "0260b9a455af9d510fc6955ce688ba4f79c7214bef7d2c743f79a28f9a0dde0e"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -148,10 +150,24 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://doi.org/10.1007/s10462-026-11753-w"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "53f5266536ca31101cd8a8150655f208313414c1ecc15973ceee23b4de3e7bdf": {
@@ -161,10 +177,10 @@
       "source_url": "https://doi.org/10.1111/bjet.70100",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 1,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [
@@ -193,11 +209,18 @@
           "retryable": false,
           "stage": "retrieval",
           "candidates_attempted": 1
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
-      "last_outcome": "access_blocked"
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
+      "last_outcome": "source_unavailable"
     },
     "f4e726a3f1d26ad4de684082b37708b55424a41678c9587264c00a810c914604": {
       "fingerprint": "95fa9c2816d9097d22006e001f1991de78b2ffd77e32e20cbd28fceaf13c50fd",
@@ -1608,10 +1631,10 @@
       "source_url": "https://doi.org/10.3389/fpsyg.2026.2007654",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -1629,10 +1652,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "90e863b44a60c69d4d579137c5257062139518fad8a1facc2d1e454b718dae38": {
@@ -2608,13 +2638,16 @@
       "source_url": "https://doi.org/10.1093/ser/mwag076",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "8a58b8a54f52730159444da8874e0e4a441a7b22e9dc308087c35b4294f32e23",
+        "a8e2cd28082c1447e3c7b6ec6e967cb6ac3fc5a51879f7539a106cb82f4bc683"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -2644,10 +2677,31 @@
           "provider": "Semantic Scholar",
           "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.1093/ser/mwag076",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 2
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://academic.oup.com/ser/advance-article-pdf/doi/10.1093/ser/mwag076/73631937/mwag076.pdf"
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://academic.oup.com/ser/advance-article/doi/10.1093/ser/mwag076/9055821"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
       "provider_attempted_at": "2026-11-18T17:27:26.596427+00:00",
@@ -2657,6 +2711,15 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-18T19:09:28.885882+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "8a58b8a54f52730159444da8874e0e4a441a7b22e9dc308087c35b4294f32e23",
+            "a8e2cd28082c1447e3c7b6ec6e967cb6ac3fc5a51879f7539a106cb82f4bc683"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-20T22:03:01.059872+00:00"
         }
       }
     },
@@ -2739,7 +2802,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-17T11:02:46.169478+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-16T23:38:49.797073+00:00",
       "provider_fallbacks": {
         "3": {
@@ -2829,8 +2892,8 @@
       ],
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
-      "last_outcome": "source_unavailable",
-      "next_retry_at": "2026-11-18T18:24:38.323175+00:00",
+      "last_outcome": "rate_limited",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-18T02:41:12.189302+00:00",
       "provider_fallbacks": {
         "3": {
@@ -3155,10 +3218,10 @@
       "source_url": "https://scale.stanford.edu/ai/evidence-base-review/evidence-base-ai-k12-november-review",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 1,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [
@@ -3180,10 +3243,17 @@
           "stage": "article",
           "provider": "original_article",
           "url": "https://scale.stanford.edu/ai/evidence-base-review/evidence-base-ai-k12-november-review"
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "752ac044121a5f4104c03a96c31df887eedd4ba5a8b513928af92635df0cd67d": {
@@ -3193,13 +3263,15 @@
       "source_url": "https://doi.org/10.1145/3850237",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "3fab89af1e5b5a0cf7b2362e19c0d76d807d43416a7cb633aaa68b6927358fcf"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -3228,10 +3300,24 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://dl.acm.org/doi/pdf/10.1145/3850237"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "f99c417c2dcf99f561146efd7b75fbfe54a322fd2f888d3d40c817784f9e9d21": {
@@ -3342,7 +3428,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T17:27:26.596427+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T19:07:28.482259+00:00",
       "provider_fallbacks": {
         "3": {
@@ -3833,7 +3919,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:35:35.684009+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:02:46.169478+00:00",
       "provider_fallbacks": {
         "3": {
@@ -3934,7 +4020,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T17:27:26.596427+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T19:07:28.482259+00:00",
       "provider_fallbacks": {
         "3": {
@@ -4026,7 +4112,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
       "provider_fallbacks": {
         "3": {
@@ -4162,8 +4248,8 @@
       ],
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
-      "last_outcome": "source_unavailable",
-      "next_retry_at": "2026-11-18T18:24:38.323175+00:00",
+      "last_outcome": "rate_limited",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-18T02:41:12.189302+00:00",
       "provider_fallbacks": {
         "3": {
@@ -4335,7 +4421,7 @@
         }
       },
       "provider_attempted_at": "2026-11-17T11:02:46.169478+00:00",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00"
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00"
     },
     "58c37f55cddd9e47dfddaa2fa35c541258bf720fd282d30c802da39bf3df6eda": {
       "fingerprint": "d748bd333ce9ca7c83bb97bedf9cf7d5aac57fc4256391b25c489fb76c6e76a4",
@@ -4416,7 +4502,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
       "provider_fallbacks": {
         "3": {
@@ -4445,10 +4531,10 @@
       "source_url": "https://doi.org/10.1108/ijpsm-07-2026-0482",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -4480,10 +4566,17 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "063a352c28da5c09b03daa846c41c41df586e06f14f4b7cffd99a0603b560353": {
@@ -4736,13 +4829,14 @@
       "source_url": "https://doi.org/10.62159/isej.v8i1.2969",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 4,
+      "attempts": 5,
       "cursor": {
         "known": 1,
         "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [
+        "2a2a2f83d36e650e1a854b75b16863d05a52b938d89a661328ef3fdb01d8ea88",
         "85c9d06016e5061ab713d097a3f570b2efa2289c996a191a0d854317bdb1c8db",
         "f33759c91d22aff54ec55b26938063a5c16b8167ee4483e1b576d37b4f98f5d0"
       ],
@@ -4790,10 +4884,24 @@
           "stage": "article",
           "provider": "Semantic Scholar",
           "url": "https://siducat.org/index.php/isej/article/download/2969/2053"
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://siducat.org/index.php/isej/article/download/2969/2054"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T19:09:28.885882+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
       "provider_attempted_at": "2026-11-18T17:27:26.596427+00:00",
@@ -4805,6 +4913,14 @@
           ],
           "status": "exhausted",
           "attempted_at": "2026-11-18T19:09:28.885882+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "2a2a2f83d36e650e1a854b75b16863d05a52b938d89a661328ef3fdb01d8ea88"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-20T22:03:01.059872+00:00"
         }
       }
     },
@@ -4906,7 +5022,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-17T11:02:46.169478+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-16T23:38:49.797073+00:00",
       "provider_fallbacks": {
         "3": {
@@ -5086,7 +5202,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
       "provider_fallbacks": {
         "3": {
@@ -5269,7 +5385,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-17T11:02:46.169478+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-16T23:38:49.797073+00:00",
       "provider_fallbacks": {
         "3": {
@@ -5403,7 +5519,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:35:35.684009+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:02:46.169478+00:00",
       "provider_fallbacks": {
         "3": {
@@ -5431,14 +5547,15 @@
       "source_url": "https://doi.org/10.55640/ijaair-v03i11-04",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 1,
         "provider": 0,
         "provider_tried": []
       },
       "tried_sources": [
-        "7054bf76354a2ce7e6db736fdd0f2d13e8c14df8a5d761c1c86fbeae0b4ef18e"
+        "7054bf76354a2ce7e6db736fdd0f2d13e8c14df8a5d761c1c86fbeae0b4ef18e",
+        "e32fe370ebc94092b4980d0dfb4e02a2434d213155b014a5f2572281cf7f2b66"
       ],
       "plan": {
         "provider_plan_version": 2,
@@ -5471,10 +5588,24 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://aimjournals.com/index.php/ijaair/article/download/1091/973/2241"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable",
       "provider_attempted_at": "2026-11-18T17:39:02.287755+00:00",
       "next_retry_at": "2026-11-18T18:39:51.103960+00:00",
@@ -5484,6 +5615,14 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-18T22:20:42.886671+00:00"
+        },
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "e32fe370ebc94092b4980d0dfb4e02a2434d213155b014a5f2572281cf7f2b66"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-20T22:03:01.059872+00:00"
         }
       }
     },
@@ -5619,10 +5758,10 @@
       "source_url": "https://doi.org/10.1145/3821523",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [
@@ -5663,10 +5802,17 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "cbaf773457e350a5c1c5176832ad5e1bf5a3393b9757a6fff47da5516e10b8b3": {
@@ -5883,7 +6029,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-17T11:02:46.169478+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-16T23:38:49.797073+00:00",
       "provider_fallbacks": {
         "3": {
@@ -6601,7 +6747,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
       "provider_fallbacks": {
         "3": {
@@ -6926,7 +7072,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-17T11:02:46.169478+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-16T23:38:49.797073+00:00",
       "provider_fallbacks": {
         "3": {
@@ -7112,7 +7258,7 @@
           "attempted_at": "2026-11-18T02:35:35.684009+00:00"
         }
       },
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00"
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00"
     },
     "5cdaa25dbadcb26a43dbacd30e1031c20d99354949fcb835c2c4dd32758ded40": {
       "fingerprint": "8869edd61be10fe3bea86e0de3be644990eff470a53fd7cab1a82b5d8f2e702e",
@@ -7185,7 +7331,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:41:12.189302+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
       "provider_fallbacks": {
         "3": {
@@ -7844,13 +7990,15 @@
       "source_url": "https://doi.org/10.59266/houjs.2026.1462",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "71c49396ad43caed1da08a5e59ef73d643d5f886e3d2d111b6fe395d3501387a"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -7879,10 +8027,24 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://jshou.edu.vn/houjs/article/download/1462/1281"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
       "last_outcome": "source_unavailable"
     },
     "39341c58402e85839c4feb8acace4784025f736792ee878e25db37aeb03d410e": {
@@ -7957,7 +8119,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T17:27:26.596427+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T19:07:28.482259+00:00",
       "provider_fallbacks": {
         "3": {
@@ -8048,7 +8210,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-18T02:35:35.684009+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-17T11:12:36.382895+00:00",
       "provider_fallbacks": {
         "3": {
@@ -8148,7 +8310,7 @@
       "source_text_saved": false,
       "last_attempt_at": "2026-11-17T11:02:46.169478+00:00",
       "last_outcome": "rate_limited",
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00",
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00",
       "provider_attempted_at": "2026-11-16T23:38:49.797073+00:00",
       "provider_fallbacks": {
         "3": {
@@ -8174,15 +8336,17 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.3389/fsoc.2026.1987590",
-      "status": "temporarily_unavailable",
-      "complete": false,
-      "attempts": 2,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "7e2c8c2413c9f91ff63e14d636b17aa16c2b9929e2b7d61d26c9c3343b142fad"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -8205,20 +8369,514 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/journals/sociology/articles/10.3389/fsoc.2026.1987590/pdf",
+          "final_url": "https://www.frontiersin.org/journals/sociology/articles/10.3389/fsoc.2026.1987590/pdf"
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-18T17:39:02.287755+00:00",
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
-      "last_outcome": "source_unavailable",
-      "next_retry_at": "2026-11-18T18:39:28.423484+00:00",
+      "last_attempt_at": "2026-11-20T22:03:01.059872+00:00",
+      "last_outcome": "full_document_retrieved",
       "provider_fallbacks": {
         "1": {
           "complete": true,
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-18T22:20:42.886671+00:00"
+        },
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "7e2c8c2413c9f91ff63e14d636b17aa16c2b9929e2b7d61d26c9c3343b142fad"
+          ],
+          "status": "full_document_retrieved",
+          "attempted_at": "2026-11-20T22:03:01.059872+00:00"
         }
+      },
+      "document": {
+        "source_url": "https://www.frontiersin.org/journals/sociology/articles/10.3389/fsoc.2026.1987590/pdf",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 20,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 4215,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 7225,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 7047,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 6862,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 6776,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 6755,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 6908,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 7406,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 6633,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 6866,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 3146,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 6966,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 6878,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 7233,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 5468,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 9007,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 4215
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 1265
+              },
+              {
+                "unit": 2,
+                "start": 1265,
+                "end": 1283
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 1283,
+                "end": 6763
+              },
+              {
+                "unit": 2,
+                "start": 6763,
+                "end": 6782
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 6782,
+                "end": 7225
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 5038
+              },
+              {
+                "unit": 3,
+                "start": 5038,
+                "end": 5055
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 3,
+                "start": 5055,
+                "end": 7047
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 3475
+              },
+              {
+                "unit": 4,
+                "start": 3475,
+                "end": 3506
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 3506,
+                "end": 6862
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 2118
+              },
+              {
+                "unit": 5,
+                "start": 2118,
+                "end": 2142
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 5,
+                "start": 2142,
+                "end": 6776
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 862
+              },
+              {
+                "unit": 6,
+                "start": 862,
+                "end": 864
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 864,
+                "end": 6341
+              },
+              {
+                "unit": 6,
+                "start": 6341,
+                "end": 6363
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 6363,
+                "end": 6755
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 5058
+              },
+              {
+                "unit": 7,
+                "start": 5058,
+                "end": 5106
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 7,
+                "start": 5106,
+                "end": 6908
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 3696
+              }
+            ]
+          },
+          {
+            "chunk": "C0010",
+            "ranges": [
+              {
+                "unit": 8,
+                "start": 3696,
+                "end": 7406
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 1758
+              },
+              {
+                "unit": 9,
+                "start": 1758,
+                "end": 1788
+              }
+            ]
+          },
+          {
+            "chunk": "C0011",
+            "ranges": [
+              {
+                "unit": 9,
+                "start": 1788,
+                "end": 6633
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 585
+              },
+              {
+                "unit": 10,
+                "start": 585,
+                "end": 653
+              }
+            ]
+          },
+          {
+            "chunk": "C0012",
+            "ranges": [
+              {
+                "unit": 10,
+                "start": 653,
+                "end": 6117
+              },
+              {
+                "unit": 10,
+                "start": 6117,
+                "end": 6152
+              }
+            ]
+          },
+          {
+            "chunk": "C0013",
+            "ranges": [
+              {
+                "unit": 10,
+                "start": 6152,
+                "end": 6866
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 3146
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 1599
+              },
+              {
+                "unit": 12,
+                "start": 1599,
+                "end": 1637
+              }
+            ]
+          },
+          {
+            "chunk": "C0014",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 1637,
+                "end": 6966
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 132
+              },
+              {
+                "unit": 13,
+                "start": 132,
+                "end": 169
+              }
+            ]
+          },
+          {
+            "chunk": "C0015",
+            "ranges": [
+              {
+                "unit": 13,
+                "start": 169,
+                "end": 5669
+              }
+            ]
+          },
+          {
+            "chunk": "C0016",
+            "ranges": [
+              {
+                "unit": 13,
+                "start": 5669,
+                "end": 6878
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 4287
+              },
+              {
+                "unit": 14,
+                "start": 4287,
+                "end": 4289
+              }
+            ]
+          },
+          {
+            "chunk": "C0017",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 4289,
+                "end": 7233
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 2501
+              },
+              {
+                "unit": 15,
+                "start": 2501,
+                "end": 2554
+              }
+            ]
+          },
+          {
+            "chunk": "C0018",
+            "ranges": [
+              {
+                "unit": 15,
+                "start": 2554,
+                "end": 5468
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 2583
+              },
+              {
+                "unit": 16,
+                "start": 2583,
+                "end": 2584
+              }
+            ]
+          },
+          {
+            "chunk": "C0019",
+            "ranges": [
+              {
+                "unit": 16,
+                "start": 2584,
+                "end": 8075
+              },
+              {
+                "unit": 16,
+                "start": 8075,
+                "end": 8083
+              }
+            ]
+          },
+          {
+            "chunk": "C0020",
+            "ranges": [
+              {
+                "unit": 16,
+                "start": 8083,
+                "end": 9007
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "layout_fidelity": "not_verified",
+        "characters_retrieved": 105406,
+        "units_retrieved": 16,
+        "source_byte_count": 1027237,
+        "pages_total": 16,
+        "pages_processed": 16,
+        "pages_with_text": 16,
+        "source_sha256": "a1e4b9b3d6f741f9b6878959b6c65195d65e825c5d971a5c689367d3addfd9bc",
+        "source_bytes_sha256": "9fe8349001d445d44d1aed29debeab49c2446beb0643249356f2b7131d1a4b51"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "Semantic Scholar",
+        "url": "https://www.frontiersin.org/journals/sociology/articles/10.3389/fsoc.2026.1987590/pdf",
+        "final_url": "https://www.frontiersin.org/journals/sociology/articles/10.3389/fsoc.2026.1987590/pdf"
       }
     },
     "3c3f3fa4f600cd999afd4155b9e67609a6d040768a350f77b74b1595a4289f94": {
@@ -8317,7 +8975,7 @@
           "attempted_at": "2026-11-18T02:35:35.684009+00:00"
         }
       },
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00"
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00"
     },
     "f12f9fa374b8ae155bb129b61e4e46ad098428c27d9cbb25bbe8c6b2290080a8": {
       "fingerprint": "53b574cb31e94c25f94e8130f68563f857c36a5f6b795e9871c7c3f448146b70",
@@ -12200,12 +12858,12 @@
           "attempted_at": "2026-11-18T02:35:35.684009+00:00"
         }
       },
-      "next_retry_at": "2026-11-18T20:09:29.475782+00:00"
+      "next_retry_at": "2026-11-20T22:59:58.955428+00:00"
     }
   },
-  "cursor": 2,
+  "cursor": 48,
   "provider_pauses": {
-    "provider:CORE": "2026-11-20T11:31:23.724637+00:00",
+    "provider:CORE": "2026-11-20T22:59:58.955428+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
   },
   "access_controls": {
@@ -12239,6 +12897,8 @@
       "https://theconversation.com/catching-ais-mistakes-is-a-mental-burden-and-a-drag-on-productivity-291748",
       "https://theconversation.com/cop31-how-ai-can-help-us-adapt-to-climate-change-294050",
       "https://theconversation.com/why-ai-cannot-think-like-humans-do-293188",
+      "https://www.mdpi.com/1422-0067/27/22/10223",
+      "https://www.mdpi.com/1422-0067/27/22/10223/pdf",
       "https://www.mdpi.com/2073-431X/15/11/792",
       "https://www.mdpi.com/2073-431X/15/11/792/pdf",
       "https://www.mdpi.com/2076-3417/16/21/10970",
@@ -12275,7 +12935,7 @@
     ],
     "denied_providers": [],
     "provider_pauses": {
-      "provider:CORE": "2026-11-20T11:31:23.724637+00:00",
+      "provider:CORE": "2026-11-20T22:59:58.955428+00:00",
       "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
     }
   },
@@ -33601,23 +34261,23 @@
     }
   ],
   "input_fingerprint": "c04381eb4a2a1b7e7f091b9af09511a7b432fae4cc6a29d46dff078a71f2358c",
-  "state_sha256": "56731fe2f8601618049d1294c7ab632d4df36d367bdf031de7c7aaa9d719282c",
+  "state_sha256": "c873f0031622f028664a55ad6e6b9e86d1be96892c9227520fef39eeaf7e044e",
   "run": {
-    "checked_at": "2026-11-20T10:28:44.758474+00:00",
+    "checked_at": "2026-11-20T22:03:01.059872+00:00",
     "selected_records": 89,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 19,
-    "pending_records": 70,
-    "deferred_retry_records": 39,
+    "completed_records": 20,
+    "pending_records": 69,
+    "deferred_retry_records": 38,
     "statuses": {
       "access_blocked": 7,
-      "full_document_retrieved_not_reviewed": 8,
+      "full_document_retrieved_not_reviewed": 9,
       "partial_full_text_not_reviewed": 1,
       "pending_routes": 31,
       "rate_limited": 27,
       "source_unavailable": 3,
-      "temporarily_unavailable": 12
+      "temporarily_unavailable": 11
     },
     "excluded": {},
     "duplicate_records": 0,
@@ -33628,7 +34288,7 @@
     "item_time_budget_seconds": 60.0,
     "max_candidates_per_provider_stage": 8,
     "active_provider_pauses": {
-      "provider:CORE": "2026-11-20T11:31:23.724637+00:00"
+      "provider:CORE": "2026-11-20T22:59:58.955428+00:00"
     },
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
