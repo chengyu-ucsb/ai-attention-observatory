@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-21T08:19:04.491599+00:00",
-  "packet_sha256": "5d7057ff14f1ce2b76fe89d9f7ee21f50bec52f24d70360164103748f697ec97",
-  "acquisition_state_sha256": "3f95a38c97bebbc3883d19e7ed26bbaa2d79740d80e64ca01c9d8a26addcd8ca",
+  "observation_at": "2026-11-21T18:56:48.809481+00:00",
+  "packet_sha256": "7a9221520d43d3c8a35c0d2dbc079025685302f911d6f91c73690d9ad76ccc0e",
+  "acquisition_state_sha256": "b392e570693c4b366a8fd8ac5307b811c6cc478d5baf8e9d67d8efd54ac914ae",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -3624,8 +3624,32 @@
         "discovery_query": "generative AI sustained attention task switching",
         "historical_backfill": false,
         "metadata_observed_at": "2026-11-16T21:05:56.138909+00:00",
-        "preparation_first_seen_at": "2026-11-16T21:05:56.138909+00:00"
-      }
+        "preparation_first_seen_at": "2026-11-16T21:05:56.138909+00:00",
+        "complete_reading_attempt": {
+          "status": "copied_source_passage",
+          "stage": "synthesis",
+          "last_at": "2026-11-21",
+          "next_at": "2026-11-23",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1993658/pdf",
+              "status": "full_document_retrieved",
+              "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1993658/pdf",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1993658/pdf"
+            }
+          ]
+        }
+      },
+      "acquisition_receipt_sha256": "69033da2afe1797f56e81c369d079dd480264c2377856e8db2ac99c407127f8c"
     },
     "e2884f7c6180413f64d59caef4960a563a07225140db4e5852e83e96beb5d19d": {
       "input_fingerprint": "3b2de9710415861e1c30d4a411bf459ebe9b33a72cdbcd15facaad7ce799e72a",
@@ -5537,15 +5561,15 @@
     "source_text_saved": false,
     "skipped_no_model": false,
     "selection": {
-      "considered": 5,
+      "considered": 6,
       "eligible": 1,
       "deferred_by_limit": 0,
       "skipped": {
+        "retry_cooldown": 3,
         "unverified_venue": 1,
-        "retry_cooldown": 2,
         "format_retry_exhausted": 1
       }
     }
   },
-  "metadata_sha256": "1d91f7eaf94b1b87fcdf91eb1c18df1e8bdfab987f3cdae964917de3f045e7be"
+  "metadata_sha256": "bbca375b59ffd896f504f87084f9637fc019e073a4cfeae7e7b70ca2d998327a"
 }
