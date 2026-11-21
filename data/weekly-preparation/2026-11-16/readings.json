@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-20T21:11:10.068644+00:00",
-  "packet_sha256": "885caf63245e337bba07d6e77fa9f4affe34c1ca3479f33633d95d88850bb432",
-  "acquisition_state_sha256": "81bed1b52d5014510a5534785b22b7a8e4a23bbfbed592eddc35cc4756012167",
+  "observation_at": "2026-11-21T04:38:01.462747+00:00",
+  "packet_sha256": "5d7057ff14f1ce2b76fe89d9f7ee21f50bec52f24d70360164103748f697ec97",
+  "acquisition_state_sha256": "4e49003500e8d057dcce934e285818165e2a17787b4316363b61001372ca3c95",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -5100,7 +5100,7 @@
           "method": "publisher_feed",
           "feed_id": "eff",
           "feed_url": "https://www.eff.org/rss/updates.xml",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-17T05:07:04.280433+00:00"
         },
         "first_seen": "2026-11-17",
@@ -5108,10 +5108,10 @@
         "metadata_observed_at": "2026-11-17T05:07:04.280433+00:00",
         "preparation_first_seen_at": "2026-11-17T05:07:04.280433+00:00",
         "complete_reading_attempt": {
-          "status": "copied_source_passage",
+          "status": "claim_length_invalid",
           "stage": "synthesis",
-          "last_at": "2026-11-19",
-          "next_at": "2026-11-21",
+          "last_at": "2026-11-21",
+          "next_at": "2026-11-23",
           "provider_diagnostics": [
             {
               "stage": "article",
@@ -5166,7 +5166,7 @@
           "method": "publisher_feed",
           "feed_id": "eff",
           "feed_url": "https://www.eff.org/rss/updates.xml",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-20T09:57:14.480797+00:00"
         },
         "first_seen": "2026-11-20",
@@ -5176,8 +5176,8 @@
         "complete_reading_attempt": {
           "status": "verifier_indices_invalid",
           "stage": "synthesis",
-          "last_at": "2026-11-20",
-          "next_at": "2026-11-22",
+          "last_at": "2026-11-21",
+          "next_at": "2026-11-23",
           "provider_diagnostics": [
             {
               "stage": "article",
@@ -5196,7 +5196,7 @@
             }
           ],
           "format_input_sha256": "dce2ed836b6ee4dbcb38c884932adb6650bc3d9a9e5ded53567003a42cffc47b",
-          "format_failures": 2,
+          "format_failures": 3,
           "verifier_diagnostic": {
             "claim_count": 6,
             "duplicate_supported": false,
@@ -5204,8 +5204,7 @@
             "overlap_count": 0,
             "missing_count": 0,
             "out_of_range_count": 4
-          },
-          "retry_after": "2026-11-20T21:41:10.068644+00:00"
+          }
         }
       },
       "acquisition_receipt_sha256": "7af1d29c60542dfa022a75ac8e79f923203c65111943bef8d48734e86b190e36"
@@ -5243,7 +5242,7 @@
           "method": "publisher_feed",
           "feed_id": "eff",
           "feed_url": "https://www.eff.org/rss/updates.xml",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-18T21:52:23.432298+00:00"
         },
         "first_seen": "2026-11-19",
@@ -5308,7 +5307,7 @@
           "method": "publisher_feed",
           "feed_id": "conversation-ai",
           "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-16T23:22:03.144184+00:00"
         },
         "first_seen": "2026-11-17",
@@ -5349,7 +5348,7 @@
           "method": "publisher_feed",
           "feed_id": "guardian-ai",
           "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-16T21:05:56.138909+00:00"
         },
         "first_seen": "2026-11-16",
@@ -5390,7 +5389,7 @@
           "method": "publisher_feed",
           "feed_id": "guardian-ai",
           "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-19T22:07:22.657141+00:00"
         },
         "first_seen": "2026-11-20",
@@ -5431,13 +5430,54 @@
           "method": "publisher_feed",
           "feed_id": "guardian-ai",
           "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-18T10:03:43.683056+00:00"
         },
         "first_seen": "2026-11-18",
         "content_access": "headline_only",
         "metadata_observed_at": "2026-11-18T10:03:43.683056+00:00",
         "preparation_first_seen_at": "2026-11-18T19:24:14.225611+00:00"
+      }
+    },
+    "e64317c8d3b5f597ddbecf13a0f9dd9317a29198ff863f6eb92d7b0c0efb4a95": {
+      "input_fingerprint": "2b2b205d0beda44f11277b98cb47b1b6c7f340d9c7206de71f6b3a03416994b0",
+      "record": {
+        "title": "AI is imposing a hidden ‘cognitive tax’ on the lowest-paid workers",
+        "authors": [
+          "Henrietta Moore"
+        ],
+        "published": "2026-11-20",
+        "venue": "The Guardian",
+        "doi": "",
+        "url": "https://www.theguardian.com/technology/2026/nov/20/ai-low-paid-workers-cognitive-tax",
+        "preview": "Source listed; editorial text not yet available.",
+        "kind": "nonacademic",
+        "lane": "AI & cognition",
+        "relation": "Nonacademic reporting / commentary",
+        "evidence": "Publisher feed metadata (not independently reviewed)",
+        "source": "Publisher RSS / Google News RSS",
+        "format": "Technology journalism",
+        "source_type": "journalism",
+        "source_type_basis": "provisional_feed_default",
+        "publication_date_provenance": {
+          "basis": "publisher_rss_pubDate",
+          "raw": "Fri, 20 Nov 2026 11:00:31 GMT",
+          "date": "2026-11-20",
+          "timezone": "UTC",
+          "source_url": "https://www.theguardian.com/commentisfree/rss",
+          "independently_verified": false
+        },
+        "discovery_provenance": {
+          "method": "publisher_feed",
+          "feed_id": "guardian-opinion",
+          "feed_url": "https://www.theguardian.com/commentisfree/rss",
+          "checked_at": "2026-11-21",
+          "metadata_snapshot_observed_at": "2026-11-20T21:46:27.503507+00:00"
+        },
+        "first_seen": "2026-11-21",
+        "content_access": "headline_only",
+        "metadata_observed_at": "2026-11-20T21:46:27.503507+00:00",
+        "preparation_first_seen_at": "2026-11-21T03:58:05.532398+00:00"
       }
     },
     "df5fbb0aa3b0664f3e8059dac4fb2539247e4cea7bcfba1fe453a6828b57201c": {
@@ -5472,7 +5512,7 @@
           "method": "publisher_feed",
           "feed_id": "verge",
           "feed_url": "https://www.theverge.com/rss/index.xml",
-          "checked_at": "2026-11-20",
+          "checked_at": "2026-11-21",
           "metadata_snapshot_observed_at": "2026-11-18T19:24:14.225611+00:00"
         },
         "first_seen": "2026-11-18",
@@ -5483,28 +5523,29 @@
     }
   },
   "review_run": {
-    "attempted": 1,
-    "documents_retrieved": 1,
-    "partial_inputs": 1,
+    "attempted": 2,
+    "documents_retrieved": 2,
+    "partial_inputs": 2,
     "summaries_completed": 0,
-    "failed": 1,
+    "failed": 2,
     "failure_reasons": {
-      "verifier_indices_invalid": 1
+      "verifier_indices_invalid": 1,
+      "claim_length_invalid": 1
     },
     "failure_stages": {
-      "synthesis": 1
+      "synthesis": 2
     },
     "source_text_saved": false,
     "skipped_no_model": false,
     "selection": {
       "considered": 5,
-      "eligible": 1,
-      "deferred_by_limit": 0,
+      "eligible": 3,
+      "deferred_by_limit": 1,
       "skipped": {
-        "retry_cooldown": 3,
-        "unverified_venue": 1
+        "unverified_venue": 1,
+        "retry_cooldown": 1
       }
     }
   },
-  "metadata_sha256": "0d85403e9167ae0ff3d81204a500e2c8e97adb21358b3186535a69e08aedbad9"
+  "metadata_sha256": "fb5f51df61549fa798bb1c626287d6023bbf67891357a1adc5db18df1dcfdfaf"
 }
