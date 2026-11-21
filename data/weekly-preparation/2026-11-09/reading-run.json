@@ -3,36 +3,36 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-20T21:59:57.134760+00:00",
-  "finished_at": "2026-11-20T22:00:09.877945+00:00",
+  "started_at": "2026-11-21T11:06:52.329120+00:00",
+  "finished_at": "2026-11-21T11:09:35.245790+00:00",
   "publication_window": {
     "from": "2026-11-09",
     "to": "2026-11-15",
     "timezone": "UTC"
   },
   "bindings": {
-    "packet.json": "57e735c32e1a5292101d89dde1ebbf21f606b3acefbbc2a28b76f9bc0594c9f2",
-    "acquisition.json": "53c509f1135989cb3b5b44c1e1dcb19e73662c144257f0dedb743f920f598a0d",
-    "readings.json": "0464d103ad7e8ec2a06b20e52deec03601da42e4d6040eacb7d64b5e427f9ee9"
+    "packet.json": "9f2253e50406d67b77db96443f2ce93d84bf2df5cb57035ef81a7eeb2785a9f0",
+    "acquisition.json": "d54e38bfc5371d3a38c9556db149d6aa1059a582d5685b83a3c372c07db0007a",
+    "readings.json": "0d6d43c6615eeb4db399fc504b88b5459a9d7bb95e8df4549fdccec26b4068ea"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-20T21:59:58.030462+00:00",
-      "selected_records": 157,
+      "checked_at": "2026-11-21T11:06:53.410418+00:00",
+      "selected_records": 168,
       "attempted_records": 12,
       "attempted_stages": 12,
-      "completed_records": 23,
-      "pending_records": 134,
-      "deferred_retry_records": 46,
+      "completed_records": 24,
+      "pending_records": 144,
+      "deferred_retry_records": 38,
       "statuses": {
         "access_blocked": 7,
-        "full_document_retrieved_not_reviewed": 4,
+        "full_document_retrieved_not_reviewed": 5,
         "partial_full_text_not_reviewed": 1,
-        "pending": 70,
-        "pending_routes": 18,
+        "pending": 80,
+        "pending_routes": 26,
         "rate_limited": 32,
         "source_unavailable": 11,
-        "temporarily_unavailable": 14
+        "temporarily_unavailable": 6
       },
       "excluded": {},
       "duplicate_records": 0,
@@ -43,29 +43,32 @@
       "item_time_budget_seconds": 60,
       "max_candidates_per_provider_stage": 8,
       "active_provider_pauses": {
-        "provider:CORE": "2026-11-20T22:59:58.955428+00:00"
+        "provider:CORE": "2026-11-21T11:12:14.792832+00:00"
       },
       "scope": "Selected previous-week records only; not comprehensive web coverage.",
       "model_used": false,
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 0,
-      "documents_retrieved": 0,
-      "partial_inputs": 0,
+      "attempted": 2,
+      "documents_retrieved": 2,
+      "partial_inputs": 1,
       "summaries_completed": 0,
-      "failed": 0,
-      "failure_reasons": {},
-      "failure_stages": {},
+      "failed": 2,
+      "failure_reasons": {
+        "copied_source_passage": 2
+      },
+      "failure_stages": {
+        "synthesis": 2
+      },
       "source_text_saved": false,
       "skipped_no_model": false,
       "selection": {
-        "considered": 5,
-        "eligible": 0,
-        "deferred_by_limit": 0,
+        "considered": 6,
+        "eligible": 3,
+        "deferred_by_limit": 1,
         "skipped": {
-          "unverified_venue": 3,
-          "retry_cooldown": 2
+          "unverified_venue": 3
         }
       }
     },
