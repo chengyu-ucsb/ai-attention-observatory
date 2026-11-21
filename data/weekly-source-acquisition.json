@@ -1597,10 +1597,10 @@
       "source_url": "https://doi.org/10.30935/cedtech/19954",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -1618,10 +1618,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
       "last_outcome": "source_unavailable"
     },
     "08cfa01a4129f7dbb290c779d1e5f7b60569e95a68d73f73036779ed40f6b103": {
@@ -1672,10 +1679,10 @@
       "source_url": "https://doi.org/10.1093/jamia/ocag191",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -1707,10 +1714,17 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
       "last_outcome": "source_unavailable"
     },
     "5531cce263d3f43b4a67284e165f0a3684a03f41675077983e8aa711cbd40cde": {
@@ -4711,15 +4725,17 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.63593/rae.2788-7057.2026.09.006",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "28184c06e3e307e7cdf9ceed6d764ca19b88511041ec846177313d74bb22262e"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -4741,11 +4757,37 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.paradigmpress.org/rae/article/download/2333/2153"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-21T11:12:14.792832+00:00",
+      "provider_attempted_at": "2026-11-19T10:45:37.338567+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "28184c06e3e307e7cdf9ceed6d764ca19b88511041ec846177313d74bb22262e"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-21T10:12:14.089594+00:00"
+        }
+      }
     },
     "d104f72fc57f05f74ffdcea508d6a83a0fa771d02521cf00caa3401600fb1f98": {
       "fingerprint": "8c62abd966dc54f303fdfd03b6af3fa770201b82efdc19b8f32f21f65191f1c4",
@@ -4786,9 +4828,9 @@
       "kind": "scholarly",
       "published": "2026-11-12",
       "source_url": "https://doi.org/10.1007/s41347-026-00760-x",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
@@ -4816,11 +4858,28 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-21T11:12:14.792832+00:00",
+      "provider_attempted_at": "2026-11-19T10:45:37.338567+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-21T10:12:14.089594+00:00"
+        }
+      }
     },
     "680b4ea642cdd51dca88e52cd3ac0532e749a88e4933c50acc1e8a381658454c": {
       "fingerprint": "bc4f4c67e8cb9c6d083991be505da7a70cfd3073f489e612130fc66f19402e48",
@@ -5048,13 +5107,15 @@
       "source_url": "https://doi.org/10.1186/s43014-026-00442-4",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "27120fef6194ddd7d6c1b834cc31883b1fabe08695df10c28599c532441c81f1"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -5077,11 +5138,31 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "document_identity_unverified",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://link.springer.com/content/pdf/10.1186/s43014-026-00442-4.pdf"
+        },
+        {
+          "status": "candidate_budget_exhausted",
+          "retryable": false,
+          "stage": "retrieval",
+          "candidates_attempted": 1
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-18T17:39:02.287755+00:00",
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
       "last_outcome": "source_unavailable",
       "next_retry_at": "2026-11-18T18:41:10.527158+00:00",
       "provider_fallbacks": {
@@ -5090,6 +5171,14 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-18T22:20:42.886671+00:00"
+        },
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "27120fef6194ddd7d6c1b834cc31883b1fabe08695df10c28599c532441c81f1"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-21T10:12:14.089594+00:00"
         }
       }
     },
@@ -5267,10 +5356,10 @@
       "source_url": "https://doi.org/10.21203/rs.3.rs-11407016/v1",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -5302,10 +5391,18 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "http_404",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.21203/rs.3.rs-11407016/v1",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
       "last_outcome": "source_unavailable"
     },
     "104bdf1e4db1740f57de5d6106e5085f56f68fc162c306af7421c3a4d6d90979": {
@@ -5667,10 +5764,10 @@
       "source_url": "https://doi.org/10.1145/3827618",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
-        "provider": 3,
+        "provider": 4,
         "provider_tried": []
       },
       "tried_sources": [
@@ -5711,10 +5808,17 @@
           "stage": "discovery",
           "provider": "CORE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
       "last_outcome": "source_unavailable"
     },
     "b3290816c9581cf42519861d1e8245f772716dc8dea7a7de2d05d4b11f45f217": {
@@ -5724,10 +5828,10 @@
       "source_url": "https://doi.org/10.64628/aa.mm7nut7jy",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -5745,10 +5849,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
       "last_outcome": "source_unavailable"
     },
     "70ca2a614cbeaa3326758ecbaaff346a253a3e01794a0aa3ef448634992e067a": {
@@ -5856,7 +5967,7 @@
       "source_url": "https://doi.org/10.21203/rs.3.rs-11138232/v1",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -5878,13 +5989,28 @@
           "provider": "Europe PMC XML",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-19T11:46:22.966865+00:00"
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-19T11:46:22.966865+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-21T10:12:14.089594+00:00"
+        }
+      }
     },
     "bcabe63cf45884465c18010e31968ac4d139cede8167497c217ff468443fa594": {
       "fingerprint": "ae7898bda9d2907e17644f92c65ec87cf4779a5e6084bad6a48900319eb1928b",
@@ -7431,9 +7557,9 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.1007/s41060-026-01367-4",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
@@ -7461,11 +7587,22 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "http_429",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "CORE",
+          "failure_url": "https://api.core.ac.uk/v3/search/works",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T22:20:42.886671+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
+      "last_outcome": "rate_limited",
+      "provider_attempted_at": "2026-11-21T10:12:14.089594+00:00",
+      "next_retry_at": "2026-11-21T11:12:14.792832+00:00"
     },
     "67ea591fc75e074b4ec196e0921ca994951f1a33bd02b4aa1363f800a0a20970": {
       "fingerprint": "a93036d63ea14f555c4239badb165b7dda19ba9867803d343c9dab007e21d0ab",
@@ -7512,7 +7649,7 @@
       "source_url": "https://doi.org/10.1145/3767308.3835290",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -7534,13 +7671,28 @@
           "provider": "Europe PMC XML",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-19T11:46:46.755648+00:00"
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-19T11:46:46.755648+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-21T10:12:14.089594+00:00"
+        }
+      }
     },
     "bd1e602a835ba1b5bbc37498df7540f421b34453179b0a3d5562e7d4c41dab9f": {
       "fingerprint": "8988fef58047a47edca0ffe9609af5bc4ac0984a9d05a12e2e75083184d3ba2e",
@@ -12679,15 +12831,17 @@
       "kind": "scholarly",
       "published": "2026-11-09",
       "source_url": "https://doi.org/10.3389/fenvs.2026.1974405",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 2,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "99ee0652c41fef6acf4e8840100cef1ac9810f636ad21688588b074baf65f474"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -12709,11 +12863,574 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.frontiersin.org/journals/environmental-science/articles/10.3389/fenvs.2026.1974405/pdf",
+          "final_url": "https://www.frontiersin.org/journals/environmental-science/articles/10.3389/fenvs.2026.1974405/pdf"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-19T10:45:37.338567+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-21T10:12:14.089594+00:00",
+      "last_outcome": "full_document_retrieved",
+      "provider_attempted_at": "2026-11-19T10:45:37.338567+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "99ee0652c41fef6acf4e8840100cef1ac9810f636ad21688588b074baf65f474"
+          ],
+          "status": "full_document_retrieved",
+          "attempted_at": "2026-11-21T10:12:14.089594+00:00"
+        }
+      },
+      "document": {
+        "source_url": "https://www.frontiersin.org/journals/environmental-science/articles/10.3389/fenvs.2026.1974405/pdf",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 21,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 3569,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 7133,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 4517,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 7012,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 5724,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 6639,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 5744,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 5179,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 3882,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 5587,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 4996,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 1917,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 5023,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 7028,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 6337,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 6964,
+            "has_text": true
+          },
+          {
+            "unit": 17,
+            "characters": 6270,
+            "has_text": true
+          },
+          {
+            "unit": 18,
+            "characters": 5481,
+            "has_text": true
+          },
+          {
+            "unit": 19,
+            "characters": 10864,
+            "has_text": true
+          },
+          {
+            "unit": 20,
+            "characters": 3502,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 3569
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 1878
+              },
+              {
+                "unit": 2,
+                "start": 1878,
+                "end": 1929
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 1929,
+                "end": 7133
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 280
+              },
+              {
+                "unit": 3,
+                "start": 280,
+                "end": 294
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 3,
+                "start": 294,
+                "end": 4517
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 1272
+              },
+              {
+                "unit": 4,
+                "start": 1272,
+                "end": 1275
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 1275,
+                "end": 6728
+              },
+              {
+                "unit": 4,
+                "start": 6728,
+                "end": 6774
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 6774,
+                "end": 7012
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 5237
+              },
+              {
+                "unit": 5,
+                "start": 5237,
+                "end": 5260
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 5,
+                "start": 5260,
+                "end": 5724
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 5008
+              },
+              {
+                "unit": 6,
+                "start": 5008,
+                "end": 5034
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 5034,
+                "end": 6639
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 3869
+              },
+              {
+                "unit": 7,
+                "start": 3869,
+                "end": 3893
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 7,
+                "start": 3893,
+                "end": 5744
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 3642
+              },
+              {
+                "unit": 8,
+                "start": 3642,
+                "end": 3647
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 8,
+                "start": 3647,
+                "end": 5179
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 3882
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 63
+              },
+              {
+                "unit": 10,
+                "start": 63,
+                "end": 83
+              }
+            ]
+          },
+          {
+            "chunk": "C0010",
+            "ranges": [
+              {
+                "unit": 10,
+                "start": 83,
+                "end": 5560
+              },
+              {
+                "unit": 10,
+                "start": 5560,
+                "end": 5582
+              }
+            ]
+          },
+          {
+            "chunk": "C0011",
+            "ranges": [
+              {
+                "unit": 10,
+                "start": 5582,
+                "end": 5587
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 4996
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 433
+              },
+              {
+                "unit": 12,
+                "start": 433,
+                "end": 496
+              }
+            ]
+          },
+          {
+            "chunk": "C0012",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 496,
+                "end": 1917
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 4070
+              },
+              {
+                "unit": 13,
+                "start": 4070,
+                "end": 4077
+              }
+            ]
+          },
+          {
+            "chunk": "C0013",
+            "ranges": [
+              {
+                "unit": 13,
+                "start": 4077,
+                "end": 5023
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 4530
+              },
+              {
+                "unit": 14,
+                "start": 4530,
+                "end": 4552
+              }
+            ]
+          },
+          {
+            "chunk": "C0014",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 4552,
+                "end": 7028
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 3007
+              },
+              {
+                "unit": 15,
+                "start": 3007,
+                "end": 3022
+              }
+            ]
+          },
+          {
+            "chunk": "C0015",
+            "ranges": [
+              {
+                "unit": 15,
+                "start": 3022,
+                "end": 6337
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 2141
+              },
+              {
+                "unit": 16,
+                "start": 2141,
+                "end": 2183
+              }
+            ]
+          },
+          {
+            "chunk": "C0016",
+            "ranges": [
+              {
+                "unit": 16,
+                "start": 2183,
+                "end": 6964
+              },
+              {
+                "unit": 17,
+                "start": 0,
+                "end": 702
+              },
+              {
+                "unit": 17,
+                "start": 702,
+                "end": 717
+              }
+            ]
+          },
+          {
+            "chunk": "C0017",
+            "ranges": [
+              {
+                "unit": 17,
+                "start": 717,
+                "end": 6179
+              },
+              {
+                "unit": 17,
+                "start": 6179,
+                "end": 6216
+              }
+            ]
+          },
+          {
+            "chunk": "C0018",
+            "ranges": [
+              {
+                "unit": 17,
+                "start": 6216,
+                "end": 6270
+              },
+              {
+                "unit": 18,
+                "start": 0,
+                "end": 5443
+              },
+              {
+                "unit": 18,
+                "start": 5443,
+                "end": 5444
+              }
+            ]
+          },
+          {
+            "chunk": "C0019",
+            "ranges": [
+              {
+                "unit": 18,
+                "start": 5444,
+                "end": 5481
+              },
+              {
+                "unit": 19,
+                "start": 0,
+                "end": 5457
+              },
+              {
+                "unit": 19,
+                "start": 5457,
+                "end": 5461
+              }
+            ]
+          },
+          {
+            "chunk": "C0020",
+            "ranges": [
+              {
+                "unit": 19,
+                "start": 5461,
+                "end": 10864
+              },
+              {
+                "unit": 20,
+                "start": 0,
+                "end": 94
+              },
+              {
+                "unit": 20,
+                "start": 94,
+                "end": 95
+              }
+            ]
+          },
+          {
+            "chunk": "C0021",
+            "ranges": [
+              {
+                "unit": 20,
+                "start": 95,
+                "end": 3502
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "layout_fidelity": "not_verified",
+        "characters_retrieved": 113387,
+        "units_retrieved": 20,
+        "source_byte_count": 3285121,
+        "pages_total": 20,
+        "pages_processed": 20,
+        "pages_with_text": 20,
+        "source_sha256": "f87edc3472329e850294d42f4d63dd60578d51ea9a28952ecb98e75159d600a1",
+        "source_bytes_sha256": "3f46856b3bd8af108704def20194fe0ff4a2377da461a3fcf066d368bc1a89d8"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "Semantic Scholar",
+        "url": "https://www.frontiersin.org/journals/environmental-science/articles/10.3389/fenvs.2026.1974405/pdf",
+        "final_url": "https://www.frontiersin.org/journals/environmental-science/articles/10.3389/fenvs.2026.1974405/pdf"
+      }
     },
     "b83b96ded3dbb2166d461cf8ba0b83508c0530ef17c701ee749245373b20a909": {
       "fingerprint": "8e8d71e78cd156d0fa11a5e09ac550a54a2ebd5157209a6d13bee098aa2ae054",
@@ -12861,9 +13578,9 @@
       "next_retry_at": "2026-11-20T22:59:58.955428+00:00"
     }
   },
-  "cursor": 48,
+  "cursor": 62,
   "provider_pauses": {
-    "provider:CORE": "2026-11-20T22:59:58.955428+00:00",
+    "provider:CORE": "2026-11-21T11:12:14.792832+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
   },
   "access_controls": {
@@ -12935,7 +13652,7 @@
     ],
     "denied_providers": [],
     "provider_pauses": {
-      "provider:CORE": "2026-11-20T22:59:58.955428+00:00",
+      "provider:CORE": "2026-11-21T11:12:14.792832+00:00",
       "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
     }
   },
@@ -34261,21 +34978,21 @@
     }
   ],
   "input_fingerprint": "c04381eb4a2a1b7e7f091b9af09511a7b432fae4cc6a29d46dff078a71f2358c",
-  "state_sha256": "c873f0031622f028664a55ad6e6b9e86d1be96892c9227520fef39eeaf7e044e",
+  "state_sha256": "a8d94c0910ab593802cb6c84913572994df7a9376d8e1c8fae47f2b88989e2bd",
   "run": {
-    "checked_at": "2026-11-20T22:03:01.059872+00:00",
+    "checked_at": "2026-11-21T10:12:14.089594+00:00",
     "selected_records": 89,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 20,
-    "pending_records": 69,
-    "deferred_retry_records": 38,
+    "completed_records": 21,
+    "pending_records": 68,
+    "deferred_retry_records": 41,
     "statuses": {
       "access_blocked": 7,
-      "full_document_retrieved_not_reviewed": 9,
+      "full_document_retrieved_not_reviewed": 10,
       "partial_full_text_not_reviewed": 1,
-      "pending_routes": 31,
-      "rate_limited": 27,
+      "pending_routes": 27,
+      "rate_limited": 30,
       "source_unavailable": 3,
       "temporarily_unavailable": 11
     },
@@ -34288,7 +35005,7 @@
     "item_time_budget_seconds": 60.0,
     "max_candidates_per_provider_stage": 8,
     "active_provider_pauses": {
-      "provider:CORE": "2026-11-20T22:59:58.955428+00:00"
+      "provider:CORE": "2026-11-21T11:12:14.792832+00:00"
     },
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
