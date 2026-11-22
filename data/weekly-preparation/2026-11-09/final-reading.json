@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "kind": "weekly_final_reading",
-  "completed_at": "2026-11-22T11:26:30.882117+00:00",
+  "completed_at": "2026-11-22T20:58:45.076082+00:00",
   "binding_policy_version": 2,
   "publication_window": {
     "from": "2026-11-09",
@@ -9,24 +9,24 @@
     "timezone": "UTC"
   },
   "bindings": {
-    "packet.json": "7a6e2c58600d1f1c9aa2cf9970d959d1e9280b3df7a44be370211e3be910e84e",
-    "acquisition.json": "8d9120e0390a71515f57b345f20e968b9a74731b354aeb342cca188b68abb7c4",
-    "readings.json": "fb6fc895b29b30d771ae3c993e7a4dd2732c67e5d8c89ebfbf63849a009daa05",
-    "library.json": "6befc4d74ffa7c8441d6c2d18192d214c26317fd0e5826e8b349bdf37618862a",
+    "packet.json": "af14e212e99e1c3357ac14babc6a2909420d7c806021b36fe1b27d15b29bfedb",
+    "acquisition.json": "464b09e424c0b930ca44657a5c344926f97faad26b25ffa52c71f1589e44fcfc",
+    "readings.json": "75f1bec03d2a987efa6ed9f82daa99434258826d4e131bb7c3462da0910f4540",
+    "library.json": "4bd79caaedd6dd3ea537e68eb1cabb6e6d8a215d06bb9a9132d89c08f2b3f47e",
     "weekly.json": "df7f296f72afe123c5e77843e3d930bd08259cc66b727bc39c3b2b061586dacb"
   },
-  "reading_run_sha256": "d15e2421a7d72519302b28c9be1608b7ab02fcffcb2b4eff222aa10b2019cb8e",
+  "reading_run_sha256": "332b0cfbe7fcefd85be279b27a851ca15680ab9df1aa511aba0bb159d929775f",
   "approved": false,
   "source_text_saved": false,
-  "status": "bounded_stage_completed",
+  "status": "completed_with_review_failures",
   "coverage": {
-    "eligible_metadata": 174,
+    "eligible_metadata": 184,
     "eligible_canonical_records": 89,
-    "quarantined_metadata": 1261,
+    "quarantined_metadata": 1325,
     "metadata_status": "partial",
     "configured_query_status": "partial",
-    "acquisition_records": 174,
-    "full_documents_acquired": 6,
+    "acquisition_records": 184,
+    "full_documents_acquired": 7,
     "partial_documents_acquired": 1,
     "machine_checked_full_readings": 0,
     "machine_checked_partial_readings": 0,
@@ -37,18 +37,18 @@
     "expert_review_verified_by_pipeline": false,
     "acquisition_statuses": {
       "access_blocked": 8,
-      "full_document_retrieved_not_reviewed": 6,
+      "full_document_retrieved_not_reviewed": 7,
       "partial_full_text_not_reviewed": 1,
-      "pending": 77,
-      "pending_routes": 27,
-      "rate_limited": 34,
-      "source_unavailable": 18,
-      "temporarily_unavailable": 3
+      "pending": 85,
+      "pending_routes": 23,
+      "rate_limited": 39,
+      "source_unavailable": 20,
+      "temporarily_unavailable": 1
     },
     "note": "Bounded source acquisition and machine checking are not independent or expert approval. Missing, partial, deferred and failed readings remain gaps. The edition may use explicitly labelled substantive abstracts under its existing evidence policy.",
-    "review_attempted_this_run": 0,
+    "review_attempted_this_run": 1,
     "review_completed_this_run": 0,
-    "review_failed_this_run": 0,
+    "review_failed_this_run": 1,
     "machine_checked_readings_applied_this_run": 0
   }
 }
