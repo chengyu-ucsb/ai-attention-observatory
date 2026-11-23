@@ -572,10 +572,15 @@ function textSentences(value){
 // Work only with text already cleared for the public reader. A stored abstract
 // may end mid-word. Never turn an unfinished excerpt into a sentence.
 function abstractSentences(value){
- const text=String(value||"").trim().replace(/^abstract\b[\s:.–—-]*/i,"");
+ const text=String(value||"").trim().replace(/^(?:Abstract|ABSTRACT|abstract)(?:\s*[:.–—-]\s*|\s+(?=[A-Z]))/,"");
  const parts=textSentences(text);
- const tail=parts.at(-1)||"";
- if(!/[.!?][”’"'\])]?$/.test(tail)||/\b(?:e\.g|i\.e|et al|figs?|eq|vol|dr|mr|ms|prof|vs)\.$/i.test(tail))parts.pop();
+ // A clipped “(Fig. 2” can be segmented into two unfinished fragments.
+ while(parts.length){
+  const last=parts.at(-1);
+  if(/[.!?][”’"'\])]*$/.test(last)&&!/(?:\.\.\.|…)\s*$/.test(last)&&
+     !/\b(?:e\.g|i\.e|et al|figs?|eqs?|vol|dr|mr|ms|prof|vs)\.$/i.test(last))break;
+  parts.pop();
+ }
  return parts;
 }
 function cardContext(x){

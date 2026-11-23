@@ -686,6 +686,9 @@ ctx.selected.abstract_text+=" The students practiced with a tutor on a different
 vm.runInContext("TEST.showPaper(selected)",ctx);
 assert(proseText(match(paperContainer,"rv-abstract-account")).endsWith("different topic."));
 assert(!proseText(match(paperContainer,"rv-panel-overview")).includes("61"));
+ctx.selected.abstract_text="Abstract reasoning was part of both tasks. Students compared two images (Fig. 2";
+vm.runInContext("TEST.showPaper(selected)",ctx);
+assert.equal(proseText(match(paperContainer,"rv-abstract-account")),"Abstract reasoning was part of both tasks.");
 ctx.selected.reading.machine_account={source_url:"https://example.org/checked-source",source_version:"publishedVersion",
  review_status:"machine_checked_not_independently_reviewed",study_design:"Students took turns using two tools.",
  reported_results:"The authors counted individual practice sessions.",limitations:"The topics changed between tasks."};
