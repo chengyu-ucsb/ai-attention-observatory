@@ -467,7 +467,8 @@ def due(record,today,now=None):
         return False
     deep=record.get('deep_analysis') or {}
     coverage=deep.get('coverage',{})
-    if (deep.get('version',0)>=READER_VERSION and coverage.get('all_retrieved_text_processed')
+    if (deep.get('version',0)>=READER_VERSION and deep.get('account_status')=='article_account'
+            and coverage.get('all_retrieved_text_processed')
             and coverage.get('evidence_status')=='full_document_retrieved'):
         return False
     # A complete pass over partial input must remain eligible for fuller access.
@@ -607,7 +608,7 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
             else: record['deep_analysis']=result
             record['reading_coverage']=result['coverage']
             record['complete_reading_attempt']={'status':'summarized' if complete else 'partial_summary',
-                'last_at':today,'next_at':(run_date+timedelta(days=30 if complete else 7)).isoformat(),
+                'last_at':today,'next_at':(run_date+timedelta(days=30 if complete and result.get('account_status')=='article_account' else 7)).isoformat(),
                 'provider_diagnostics':diagnostics}
             stats['summaries_completed']+=1
             if result.get('account_status')=='article_account': stats['article_accounts']+=1

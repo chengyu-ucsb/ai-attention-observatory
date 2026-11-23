@@ -99,8 +99,12 @@ class EditorialClaimTests(unittest.TestCase):
 
     def test_current_and_stale_complete_machine_readings(self):
         for ver, eligible in ((3, True), (reader.READER_VERSION, False)):
-            row = {"deep_analysis": {"version": ver, "coverage": {"all_retrieved_text_processed": True,
+            row = {"deep_analysis": {"version": ver, "account_status": "article_account", "coverage": {"all_retrieved_text_processed": True,
                    "evidence_status": "full_document_retrieved"}}}
             self.assertEqual(reader.due(row,"2026-11-20"), eligible)
+            row["deep_analysis"]["account_status"] = "checked_evidence_only"
+            row["complete_reading_attempt"] = {"next_at":"2026-11-21"}
+            self.assertFalse(reader.due(row,"2026-11-20"))
+            self.assertTrue(reader.due(row,"2026-11-21"))
             row["source_review"] = {"status": "checked"}
             self.assertFalse(reader.due(row,"2026-11-20"))

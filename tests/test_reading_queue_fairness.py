@@ -123,6 +123,7 @@ class ReadingQueueFairnessTests(unittest.TestCase):
 
     def test_completed_fulltext_and_editorially_checked_rows_are_untouched(self):
         completed = article('completed', deep_analysis={'version': reading.READER_VERSION, 'source_depth': 'full_text',
+                            'account_status':'article_account',
                             'coverage': {'all_retrieved_text_processed': True,
                                          'evidence_status': 'full_document_retrieved'}},
                             complete_reading_attempt={'next_at': '2020-01-01'})
