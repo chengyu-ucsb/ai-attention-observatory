@@ -385,9 +385,10 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
                     page.keyboard.press("Tab")
                     assert link.evaluate("el => el === document.activeElement")
                     box = link.bounding_box()
-                    assert box["height"] >= 44
-                if screenshots and mode == "reflect" and i == 5:
-                    page.screenshot(path=str(screenshots / f"lab-study-context-{width}-zoom{zoom}.png"), full_page=True)
+                    assert box["height"] >= 44, f"Scenario {i} link {link.inner_text()!r} at {width // zoom}px is {box['height']}px tall"
+                if screenshots and mode == "reflect":
+                    capture = "study-context" if i == 5 else "disclosure-contrast"
+                    page.screenshot(path=str(screenshots / f"lab-{capture}-{width}-zoom{zoom}.png"), full_page=True)
                 summary.focus()
                 page.keyboard.press("Space")
                 assert not details.evaluate("el => el.open")

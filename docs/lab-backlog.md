@@ -151,6 +151,18 @@ Status: needs a concrete use case before implementation.
 
 ## November 2026 change record
 
+### November 23 · Matched editing disclosures
+
+- Add the sixth Assistance Dial question, based on a conceptual hypothesis
+  linked from the November 23 coverage update. Visitors swap only the
+  provenance label, not the text or methods. Distinguish checking provenance
+  from assuming the strength of the evidence has changed.
+- Keep keyboard focus on the disclosure switch and announce just the changed
+  label. Give source links extra tap-target room. Closing a Lab dialog no
+  longer reclaims focus from a control reached before the native close event.
+- Verify across all three hosted engines before release. Native browser zoom
+  and real assistive-technology review remain open.
+
 ### November 18
 
 Tide Pool adds an untimed, three-find observation game with shuffle, pause,

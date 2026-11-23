@@ -16,6 +16,7 @@ class Element{
  addEventListener(type,fn){(this.handlers[type]??=[]).push(fn)}
  emit(type,extra={}){for(const fn of this.handlers[type]||[])fn({target:this,preventDefault(){},...extra})}
  click(){if(!this.disabled)this.emit("click")}focus(){doc.activeElement=this}
+ contains(target){return target===this||this.children.some(child=>child.contains(target))}
  get isConnected(){let node=this;while(node){if(node===doc.body)return true;node=node.parentNode}return false}
  remove(){if(this.parentNode){this.parentNode.children=this.parentNode.children.filter(child=>child!==this);this.parentNode=null}}
  showModal(){this.open=true}close(){this.open=false;this.emit("close")}
@@ -120,6 +121,13 @@ assert.equal(layerNotices,1,"Opening the activity dialog must pause any covered 
 const modalFocus=doc.activeElement;route(view.location.hash);assert.equal(doc.querySelector(".lab-help-dialog"),modal,"A repeated route cannot close a newly opened dialog in the same workspace");assert.equal(doc.activeElement,modalFocus,"Settled navigation cannot steal focus from a delivery dialog");assert.equal(frames.length,0);
 flatten(modal).find(node=>node.tagName==="BUTTON").click();assert.equal(doc.querySelector(".lab-help-dialog"),null);assert.equal(doc.activeElement,q("lab-inspect-delivery"));
 assert.equal(layerNotices,2,"Closing the activity dialog must notify timing controllers");
+const inspector=q("lab-inspect-delivery");
+inspector.click();const queued=doc.querySelector(".lab-help-dialog");queued.open=false;
+inspector.focus();q("lab-pin-policy").focus();
+queued.emit("close");
+assert.equal(doc.activeElement,q("lab-pin-policy"),"A queued native close must not steal focus from a subsequent control");
+assert.equal(doc.querySelector(".lab-help-dialog"),null);
+
 q("lab-inspect-delivery").click();route("#home");assert.equal(doc.querySelector(".lab-help-dialog"),null,"Navigation cannot leave a Lab dialog over another page");route("#lab?experiment=notification-studio");
 q("lab-notification-reset").click();assert.equal(q("lab-notification-policy").value,"batch");assert.equal(q("lab-urgent-bypass").checked,true);assert(q("lab-notification-summary").textContent.includes("5 alert moments"));
 route("#lab");assert(q("lab-workbench").hidden);route("#lab?experiment=unknown");assert(q("lab-workbench").hidden,"Unknown links fall back to collection");

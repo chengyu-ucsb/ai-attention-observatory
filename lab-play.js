@@ -561,7 +561,13 @@
     const close=control("Close",()=>dialog.close());
     add(dialog,heading,...texts.map(text=>node("p","",text)),close);document.body.append(dialog);
     dialog.addEventListener("click",event=>{if(event.target===dialog)dialog.close()});
-    dialog.addEventListener("close",()=>{dialog.remove();document.dispatchEvent(new CustomEvent("observatory-layer-change"));if(opener.isConnected)opener.focus()});
+    dialog.addEventListener("close",()=>{
+      // Native close may restore focus before dispatching its queued event. Do
+      // not steal focus if the visitor has already moved to another control.
+      const focused=document.activeElement, needsFocus=!focused||focused===document.body||dialog.contains(focused);
+      dialog.remove();document.dispatchEvent(new CustomEvent("observatory-layer-change"));
+      if(needsFocus&&opener.isConnected)opener.focus({preventScroll:true});
+    });
     dialog.showModal();document.dispatchEvent(new CustomEvent("observatory-layer-change"));close.focus();
   }
   const shoreObjects = [
