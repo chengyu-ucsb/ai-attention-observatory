@@ -676,10 +676,51 @@ def scene_canvas(spec: dict) -> Canvas:
     return c
 
 
+def draw_object_surface(c: Canvas, subject: str, x, y, scale):
+    """Set the supporting object on a surface drawn for its physical context."""
+    setting = SUBJECTS[subject][2]
+    p = PRINT_PALETTES[setting]
+    c.group(x, y, scale)
+    if setting == "digital_window":
+        c.path("M-179 -103 L135 -152 L184 107 L-141 151 Z", p.surface, p.second, 3)
+        c.path("M-175 -100 L-71 -116 L-163 -12 Z M17 128 L119 -148 L143 -142 L43 124 Z", p.paper)
+    elif setting == "workbench":
+        c.path("M-180 56 L78 -53 L189 53 L-68 167 Z", p.surface, p.ink, 4)
+        c.path("M-167 61 L-69 151 L172 51 M101 1 L86 10 M124 20 L111 28 M147 39 L133 48", "none", p.paper, 4)
+    elif setting == "quiet_room":
+        c.path("M-147 120 V-35 Q-153 -157 -8 -159 Q130 -159 135 -39 V120 Z", p.light, p.surface, 4)
+        c.path("M-146 109 L55 -146 Q93 -138 112 -105 L-55 120 H-146 Z", p.paper)
+        c.path("M-158 118 H152 V134 L-158 145 Z", p.second)
+    elif setting == "studio":
+        c.path("M-175 -90 L133 -143 L180 104 L-119 159 Z", p.second)
+        c.path("M-166 -101 L127 -152 L171 94 L-124 148 Z", p.light)
+        c.path("M86 -145 L127 -152 L136 -100 Z", p.paper, p.ink, 2)
+    elif setting == "classroom":
+        c.path("M-184 49 L74 0 L182 55 L-81 125 Z", p.light, p.ink, 4)
+        c.path("M-81 125 L182 55 V77 L-81 151 Z", p.surface, p.ink, 3)
+        c.path("M-158 59 L-88 102 M93 17 L143 42", "none", p.accent, 3)
+    elif setting == "folded_paper":
+        c.path("M-169 -104 L-11 -147 L159 -95 L128 133 L-27 89 L-151 136 Z", p.paper, p.ink, 4)
+        c.path("M-11 -147 L159 -95 L128 133 L-27 89 Z", p.surface)
+        c.path("M-11 -146 L-27 89 M-151 136 L-106 83 L-60 104", "none", p.accent, 4)
+    elif setting == "library":
+        c.path("M-159 -85 Q-86 -137 -7 -101 Q58 -139 150 -116 L151 120 Q80 90 -4 139 Q-97 105 -159 141 Z", p.surface, p.ink, 4)
+        c.path("M-3 -96 L-4 131 M-146 121 Q-80 94 -29 110", "none", p.paper, 5)
+    elif setting == "night_window":
+        c.path("M-139 124 V-87 Q0 -200 139 -87 V124 Z", p.ink)
+        c.circle(65, -66, 37, p.light)
+        c.path("M-148 124 H151 V141 H-148 Z", p.surface)
+    else:  # threshold
+        c.path("M-155 -113 L50 -147 L152 -82 L-37 -48 Z M-155 -113 V101 L-37 156 V-48 Z", p.light, p.surface, 4)
+        c.path("M-37 156 L152 109 V-82 L-37 -48 Z", p.surface)
+    c.end()
+
+
 def place_subject(c: Canvas, spec: dict, subject: str, x, y, scale):
     """A second spot ink distinguishes the supporting object from its companion."""
     first_ink = c.paints[RED]
     if subject == spec["visual_subjects"][1]:
+        draw_object_surface(c, subject, x, y, scale)
         c.paints[RED] = c.second_ink
     draw_subject(c, {**spec, "secondary_subject": subject}, x=x, y=y, scale=scale)
     c.paints[RED] = first_ink
@@ -1232,6 +1273,27 @@ def render_contextual_scene(spec: dict) -> bytes | None:
     elif "teacher" in pair and "critical" in pair:
         object_at("teacher",337,343,1.99);object_at("critical",961,286,1.44)
         c.path("M628 612 H1114", "none",RED,20)
+    elif "surveillance" in pair:
+        # Show the camera in a privacy shutter, with the civic object alongside.
+        c.path("M80 137 H679 V565 H80 Z", MUTED, INK, 9)
+        c.path("M93 150 H231 L93 328 Z M668 368 V553 H526 Z", RED)
+        c.path("M93 377 L249 151 M503 550 L668 324", "none", PAPER, 9)
+        object_at("surveillance", 386, 349, 1.67)
+        object_at(other("surveillance"), 957, 455, 1.24)
+    elif "ballot" in pair:
+        # The slot, folded card and polling table anchor the subject in voting.
+        c.path("M61 597 L609 493 L773 562 L215 685 Z", MUTED, INK, 8)
+        c.path("M215 685 L773 562 V583 L215 704 Z", INK)
+        object_at("ballot", 408, 307, 1.86)
+        object_at(other("ballot"), 953, 416, 1.26)
+    elif "music" in pair:
+        # Place the headphones and fork on a practice stand. The second object
+        # has space beside the stand instead of repeating the wellbeing vignette.
+        c.path("M74 507 L570 437 L733 539 L172 641 Z", MUTED, INK, 8)
+        c.path("M172 641 L733 539 V559 L172 662 Z", INK)
+        c.path("M302 631 V703 M655 571 V652", "none", INK, 14)
+        object_at("music", 377, 294, 1.96)
+        object_at(other("music"), 960, 426, 1.35)
     elif "language" in pair and spec["motif"]=="language":
         object_at("language",350,326,1.8);object_at(other("language"),944,429,1.35)
         c.path("M668 93 Q554 219 703 346 Q839 478 704 668", "none",RED,15)

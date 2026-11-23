@@ -44,7 +44,7 @@ class ArticleArtTests(unittest.TestCase):
 
         # Dashboard gets a custom scene; the workshop uses the motif renderer.
         custom = fixture("dashboard", "writing")
-        general = fixture("craft", "music")
+        general = fixture("craft", "writing")
         self.assertIsNotNone(art.render_contextual_scene(custom))
         self.assertIsNone(art.render_contextual_scene(general))
         for spec in (custom, general):
@@ -64,6 +64,26 @@ class ArticleArtTests(unittest.TestCase):
             rooms.setdefault(setting, geometry(fixture(subject, "writing")))
         self.assertEqual(set(rooms), set(art.PRINT_PALETTES))
         self.assertEqual(len({tuple(shapes) for shapes in rooms.values()}), len(rooms))
+
+    def test_distinct_tasks_remain_legible_in_shared_settings_at_card_size(self):
+        import art_similarity
+        # The papers in each pair share a physical setting and primary object.
+        cases = (
+            ("stress", "wellbeing", "music", "effort"),
+            ("teacher", "reflection", "metacognition", "writing"),
+            ("undergraduate", "learning", "practice", "stress"),
+            ("network", "autonomy", "agency", "ballot"),
+        )
+        for primary, motif, left, right in cases:
+            specs = [{"visual_subjects": [primary, subject], "motif": motif,
+                      "arrangement": "side_by_side"} for subject in (left, right)]
+            for width, height in ((120, 76), (76, 58)):
+                with self.subTest(subjects=(left, right), size=(width, height)):
+                    images = [art.render_svg("", {}, spec) for spec in specs]
+                    metrics = art_similarity.compare(*(art_similarity.rasterize(image, width, height)
+                                                       for image in images))
+                    self.assertFalse(metrics["full_mean_difference"] < .025 and
+                                     metrics["foreground_mean_difference"] < .12, metrics)
 
     def test_k12_evidence_review_is_distinct_from_scale_measurement(self):
         import art_similarity
