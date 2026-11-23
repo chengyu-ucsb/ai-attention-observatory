@@ -122,8 +122,8 @@ def verify_source_claims(model,claims,source,*,guidance='',deadline=None):
         'Use supported only when the source establishes the entire sentence: its groups, '
         'comparison, direction, effect, units, timing and qualifications. Rejected means '
         'the passage contradicts the sentence. Insufficient means the anchor or context '
-        'does not establish it, even if it sounds plausible. A randomly assigned control '
-        'group contradicts a claim that no comparison group existed. Decide each claim '
+        'does not establish it, even if it sounds plausible. Check experimental design '
+        'and comparison groups against the named procedure, not the title. Decide each claim '
         'independently. Use each required key once, with its one decision.\nCLAIMS:\n'
         +json.dumps(labelled,ensure_ascii=False)+'\nORIGINAL SOURCE:\n'+source)
     answer=model_json(model,prompt,240,schema=schema,deadline=deadline,attempts=1,decision_count=count)
