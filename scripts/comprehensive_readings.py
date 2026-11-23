@@ -14,10 +14,12 @@ import re
 import time
 from full_document_access import Document, diagnostic_url, retrieve
 from enrich_deep_readings import FIELDS, has_copied_sequence
+import reading_evidence_context as evidence
 from source_quality import screen as screen_source, private_reading_eligibility
 
 ROOT=Path(__file__).resolve().parents[1]
 LIB=ROOT/'data/library.json'
+READER_VERSION=4
 NUMBERS=re.compile(r'(?<!\w)[+-]?\d+(?:[.,]\d+)*(?:%|\b)')
 
 
@@ -153,13 +155,26 @@ def source_spans(chunk):
     """
     text=chunk['text']; words=list(re.finditer(r'\S+',text))
     if len(words)<5: raise ValueError('deferred_chunk_without_evidence_span')
-    spans=[]; word_start=0; start=0
-    while word_start<len(words):
-        word_end=word_start+16 if len(words)-word_start>24 else len(words)
-        end=words[word_end].start() if word_end<len(words) else len(text)
-        spans.append({'id':chunk['id']+f':S{len(spans)+1:03d}',
-                      'text':text[start:end],'start':start,'end':end})
-        start=end; word_start=word_end
+    spans=[]
+    parts=list(evidence.source_parts(chunk)) or [(0,len(text),{}, {})]
+    for index,(left,right,item,context) in enumerate(parts):
+        boundary=parts[index+1][0] if index+1<len(parts) else len(text)
+        segment=text[left:boundary]
+        segment_words=list(re.finditer(r'\S+',segment))
+        word_start=0; start=left
+        if not segment_words and boundary>left:
+            spans.append({'id':chunk['id']+f':S{len(spans)+1:03d}',
+                          'text':segment,'start':left,'end':boundary,'citable':False})
+        while word_start<len(segment_words):
+            word_end=word_start+16 if len(segment_words)-word_start>24 else len(segment_words)
+            end=left+segment_words[word_end].start() if word_end<len(segment_words) else boundary
+            span={'id':chunk['id']+f':S{len(spans)+1:03d}','text':text[start:end],
+                  'start':start,'end':end}
+            if item:
+                span.update(unit_index=index,role=context.get('role','body'),
+                            citable=word_end-word_start>=5 and context.get('role') not in evidence.UNCITABLE)
+            spans.append(span)
+            start=end; word_start=word_end
     if ''.join(s['text'] for s in spans)!=text:
         raise ValueError('evidence_span_coverage_gap')
     return spans
@@ -168,27 +183,29 @@ def source_spans(chunk):
 def chunk_document(document,limit=5500):
     """Pack all text into chunks, preserving source-unit character ranges."""
     if limit<200: raise ValueError('chunk_limit_too_small')
-    chunks=[]; parts=[]; ranges=[]; length=0
+    chunks=[]; parts=[]; ranges=[]; contexts=[]; length=0
     def flush():
-        nonlocal parts,ranges,length
+        nonlocal parts,ranges,contexts,length
         if parts:
             chunks.append({'id':f'C{len(chunks)+1:04d}',
-                           'text':'\n'.join(parts),'ranges':ranges})
-        parts=[]; ranges=[]; length=0
+                           'text':'\n'.join(parts),'ranges':ranges,'unit_context':contexts})
+        parts=[]; ranges=[]; contexts=[]; length=0
     for unit in document.units:
-        text=unit['text']; start=0
-        while start<len(text):
-            space=limit-length-(1 if parts else 0)
-            if space<1: flush(); continue
-            end=min(len(text),start+space)
-            if end<len(text):
-                point=max(text.rfind('\n',start,end),text.rfind('. ',start,end))
-                if point>start+space//2: end=point+1
-            parts.append(text[start:end])
-            ranges.append({'location':unit['location'],'start':start,'end':end})
-            length+=end-start+(1 if len(parts)>1 else 0)
-            start=end
-            if length>=limit: flush()
+        for start,stop,context in evidence.source_intervals(unit):
+            text=unit['text']
+            while start<stop:
+                space=limit-length-(1 if parts else 0)
+                if space<1: flush(); continue
+                end=min(stop,start+space)
+                if end<stop:
+                    point=max(text.rfind('\n',start,end),text.rfind('. ',start,end))
+                    if point>start+space//2: end=point+1
+                parts.append(text[start:end])
+                ranges.append({'location':unit['location'],'start':start,'end':end})
+                contexts.append({key:context[key] for key in ('role','headings','columns') if context.get(key)})
+                length+=end-start+(1 if len(parts)>1 else 0)
+                start=end
+                if length>=limit: flush()
     flush()
     return chunks
 
@@ -272,27 +289,22 @@ def model_json(model,instruction,max_tokens=900,*,schema=None,deadline=None,
             if attempt==1: raise
 
 
-def read_chunk(model,chunk,kind,title,deadline=None):
+def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
     fields=', '.join(FIELDS[kind])
     spans=source_spans(chunk)
-    by_id={s['id']:s for s in spans}
-    labelled='\n'.join('['+s['id']+']\n'+s['text'] for s in spans)
+    by_id={s['id']:s for s in spans if s.get('citable',True)}
+    if not by_id:
+        return []
+    labelled=evidence.labelled_spans(chunk,spans)
+    if kind=='scholarly':
+        writing=evidence.SCHOLARLY_WRITING
+        verifying=evidence.SCHOLARLY_VERIFICATION
+    else:
+        from nonacademic_reading_voice import writing_guidance,verification_guidance
+        writing=writing_guidance(genre)
+        verifying=verification_guidance(genre)
     instruction=(
-        'Read this entire text segment. Capture its substantive evidence and qualifications, '
-        'including main AND null results, allocation, measurement, sample, theory, '
-        'limitations, and what is interpretation rather than observation. '
-        'For research, name the people or material studied and what they did. Identify '
-        'the comparison, timing and measured outcome where reported. Say what a count '
-        'or percentage counts (people, sessions, responses, or another unit). Explain '
-        'which conclusion a specific design limit leaves open. Use only details this '
-        'segment supports, and keep participant reports distinct from recorded behavior. '
-        'Conceptual/review/commentary text need not report an experiment. '
-        'For research, retain an interpretation only when the authors offer a distinct '
-        'explanation or implication for the observed result. For reporting, identify what '
-        'happened, who said what and what was unresolved at publication. For opinion and '
-        'policy proposals, attribute the argument and its examples. Keep retrieval notes '
-        'and verification language out of substantive fields. '
-        'Do not force empirical results into a conceptual argument. '
+        'Read the whole source segment, including qualifications. '+writing+' '
         'Return {"claims":[{"field":"one allowed field","text":"original paraphrase",'
         '"source_span":"one supporting source-span ID shown below"}],'
         '"no_claim_reason":"explain empty claims, otherwise an empty string"}. '
@@ -303,7 +315,7 @@ def read_chunk(model,chunk,kind,title,deadline=None):
         'Do not paraphrase references as findings. '
         'Every claim must be supported by THIS segment. Leave unsupported fields absent. '
         'Allowed fields: '+fields+'\nTitle: '+title+'\nSegment '+chunk['id']+':\n'+labelled)
-    answer=model_json(model,instruction,2200,schema=claim_schema(kind,spans),
+    answer=model_json(model,instruction,2200,schema=claim_schema(kind,list(by_id.values())),
                       deadline=deadline,source_span_ids=set(by_id))
     proposed=answer.get('claims')
     if not isinstance(proposed,list) or len(proposed)>6: raise ValueError('invalid_claim_list')
@@ -314,13 +326,21 @@ def read_chunk(model,chunk,kind,title,deadline=None):
         ident=proposal.get('source_span')
         if not isinstance(ident,str) or ident not in by_id:
             raise ValueError('unknown_source_span')
+        span=by_id[ident]
+        if proposal.get('field')=='reported_results' and span.get('role') in evidence.RESULT_EXCLUDED:
+            raise ValueError('claim_source_role_mismatch')
         claim={'field':proposal.get('field'),'text':proposal.get('text'),
                'quote':' '.join(by_id[ident]['text'].split())}
         validate_claim(claim,chunk,kind)
+        if 'unit_index' in span:
+            claim['source_span']=ident
+            columns=(chunk.get('unit_context') or [{}]*len(chunk['ranges']))[span['unit_index']].get('columns',[])
+            if not set(NUMBERS.findall(claim['text']))<=set(NUMBERS.findall(span['text']+' '+' '.join(columns))):
+                raise ValueError('unsupported_numeric_claim')
         claims.append(claim)
     if claims:
         check=model_json(model,
-            'Check each claim against the supplied original source segment. '
+            'Check each claim against the supplied original source segment. '+verifying+' '
             'Reject incorrect quantities, effect directions, causal language unsupported by '
             'the design, omitted decisive caveats, or claims assigned to the wrong type. '
             'An exact quote alone is insufficient. Return {"supported":[zero-based indexes],'
@@ -328,53 +348,61 @@ def read_chunk(model,chunk,kind,title,deadline=None):
             'The selected quote must be relevant evidence for that claim, not an unrelated '
             'passage. Check its meaning against the full original context and caveats. '
             '\nCLAIMS:\n'+json.dumps(claims,ensure_ascii=False)+
-            '\nORIGINAL SOURCE:\n'+chunk['text'],500,
+            '\nORIGINAL SOURCE:\n'+(labelled if chunk.get('unit_context') else chunk['text']),500,
             schema=verification_schema(),deadline=deadline,claim_count=len(claims))
         validate_verdict(check,len(claims))
     return claims
 
 
-def synthesize(document,model,kind,title,max_chunks=80,deadline=None,checkpoint=None):
+def synthesize(document,model,kind,title,max_chunks=80,deadline=None,checkpoint=None,genre=''):
     chunks=chunk_document(document)
     if not coverage_is_complete(document,chunks): raise ValueError('coverage_gap')
     if len(chunks)>max_chunks: raise ValueError('deferred_document_exceeds_chunk_budget')
     notes=[]; processed=[]; empty=[]
+    cache_title=json.dumps([title,genre],ensure_ascii=False) if genre else title
     for chunk in chunks:
         check_deadline(deadline)
-        claims=checkpoint.load(document,chunk,kind,title) if checkpoint else None
+        claims=checkpoint.load(document,chunk,kind,cache_title) if checkpoint else None
         if claims is None:
-            claims=read_chunk(model,chunk,kind,title,deadline=deadline)
-            if checkpoint: checkpoint.save(document,chunk,kind,title,claims)
+            options={'genre':genre} if genre else {}
+            claims=read_chunk(model,chunk,kind,title,deadline=deadline,**options)
+            if checkpoint: checkpoint.save(document,chunk,kind,cache_title,claims)
         processed.append(chunk['id'])
         if not claims: empty.append(chunk['id'])
+        spans=source_spans(chunk) if claims else []
         for claim in claims:
-            notes.append({**claim,'chunk_id':chunk['id'],'locations':chunk['ranges']})
+            ident,locations=evidence.locate_claim(claim,chunk,spans)
+            notes.append({**claim,'chunk_id':chunk['id'],'source_span':ident,'locations':locations})
     if not notes: raise ValueError('no_supported_substantive_claims')
-    # Assemble checked original paraphrases, without an uncited final generation
-    # step, early/middle/late sampling, or another final input cutoff.
+    # The editorial pass may only select and reorder already checked sentences.
     output={key:[] for key in FIELDS[kind]}
     public_claims=[]; seen=set()
     for note in notes:
-        ident=(note['field'],normalize(note['text']))
+        ident=tuple(re.findall(r'\w+',note['text'].casefold()))
         if ident in seen: continue
         seen.add(ident)
-        output[note['field']].append(note['text'])
-        public_claims.append({'field':note['field'],'text':note['text'],
+        public_claims.append({'field':note['field'],'text':note['text'],'source_span':note['source_span'],
             'chunk_id':note['chunk_id'],'locations':note['locations'],
             'evidence_anchor_sha256':sha256(normalize(note['quote']).encode()).hexdigest()})
+    def choose(instruction,schema):
+        return model_json(model,instruction,200,schema=schema,deadline=deadline)
+    order=evidence.edit_article(public_claims,kind,title,choose)
+    for idx in order:
+        claim=public_claims[idx]
+        output[claim['field']].append(claim['text'])
     manifest=document.manifest()
     manifest.update(chunks_total=len(chunks),chunks_processed=len(processed),
         all_retrieved_text_processed=True,empty_claim_chunks=empty,
         claims_checked=len(public_claims),claim_check='anchor_numeric_copy_and_second_model_pass',
         review_status='machine_checked_not_independently_reviewed')
     return {**{key:' '.join(value) for key,value in output.items()},
-            'claim_evidence':public_claims,'coverage':manifest}
+            'claim_evidence':public_claims,'narrative_order':order,'coverage':manifest}
 
 
 def indexed_sections(record):
     """Use ALL retained sections, explicitly not the complete source document."""
     analysis=record.get('analysis') or {}
-    units=[{'location':'indexed_section:'+key,'text':str(analysis[key])}
+    units=[{'location':'indexed_section:'+key,'text':str(analysis[key]),'role':key}
            for key in ('methods','results','discussion','limitations') if analysis.get(key)]
     if not units: return None
     return Document(units,analysis.get('fulltext_url') or record.get('url',''),
@@ -402,7 +430,7 @@ def due(record,today,now=None):
         return False
     deep=record.get('deep_analysis') or {}
     coverage=deep.get('coverage',{})
-    if (deep.get('version',0)>=3 and coverage.get('all_retrieved_text_processed')
+    if (deep.get('version',0)>=READER_VERSION and coverage.get('all_retrieved_text_processed')
             and coverage.get('evidence_status')=='full_document_retrieved'):
         return False
     # A complete pass over partial input must remain eligible for fuller access.
@@ -435,7 +463,10 @@ def reading_queue_key(record):
 
 def source_coverage_basis(document):
     """Describe the retrieved representation, never guess it from kind or URL."""
-    coverage=document.coverage
+    return coverage_basis(document.coverage)
+
+
+def coverage_basis(coverage):
     if coverage.get('evidence_status')!='full_document_retrieved':
         return 'Partial source coverage; not a whole-article review.'
     format=coverage.get('document_format')
@@ -516,11 +547,14 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
                 stats['partial_inputs']+=1
             stage='synthesis'
             options={'checkpoint':checkpoint_factory(record)} if checkpoint_factory else {}
+            if record['kind']=='nonacademic':
+                from reading_headlines import reader_genre
+                options['genre']=reader_genre(record)
             result=synthesize(document,model,record['kind'],record.get('title',''),
                               deadline=time.monotonic()+1200,**options)
             complete=document.coverage.get('evidence_status')=='full_document_retrieved'
             depth=('full_text' if complete else 'partial_full_text') if record['kind']=='scholarly' else ('source_html' if complete else 'partial_source_html')
-            result.update(version=3,kind=record['kind'],source_depth=depth,
+            result.update(version=READER_VERSION,kind=record['kind'],source_depth=depth,
                 source_url=diagnostic_url(document.url),source_hash=result['coverage']['source_sha256'],
                 model='Qwen2.5-1.5B-Instruct (on-runner; chunked with claim checking)',
                 basis=('Every retrieved text chunk processed; claim-level machine checks. '
