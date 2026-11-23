@@ -35,6 +35,12 @@ def model_with(*values):
     return model
 
 
+def read_prescribed_chunk(*args, **kwargs):
+    # These fixtures exercise the original adverse, truncated and contradictory
+    # index-array outputs used by the prescribed claim benchmark.
+    return reading.read_chunk(*args, prescribed_verifier=True, **kwargs)
+
+
 class SynthesisFormatTests(unittest.TestCase):
     def test_source_spans_preserve_text_and_anchor_bounds(self):
         for count in (5, 6, 23, 24, 25, 32, 33, 40, 90, 901):
@@ -52,7 +58,7 @@ class SynthesisFormatTests(unittest.TestCase):
         for count in (0, 1, 4):
             model = Mock()
             with self.assertRaisesRegex(ValueError, '^deferred_chunk_without_evidence_span$'):
-                reading.read_chunk(model, {'id':'C0001','text':'word '*count}, 'scholarly', 'Title')
+                read_prescribed_chunk(model, {'id':'C0001','text':'word '*count}, 'scholarly', 'Title')
             model.create_chat_completion.assert_not_called()
 
     def test_unknown_or_cross_chunk_span_cannot_be_used(self):
@@ -60,20 +66,20 @@ class SynthesisFormatTests(unittest.TestCase):
             bad = {'claims':[dict(PROPOSAL, source_span=ident)],'no_claim_reason':''}
             model = model_with(bad, ANSWER, CHECK)
             with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
-                reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
             self.assertEqual(model.create_chat_completion.call_count, 1)
             with patch.object(reading, 'model_json', return_value=bad):
                 with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
-                    reading.read_chunk(Mock(), CHUNK, 'scholarly', 'Title')
+                    read_prescribed_chunk(Mock(), CHUNK, 'scholarly', 'Title')
         missing = {'claims':[{'field':PROPOSAL['field'],'text':PROPOSAL['text']}], 'no_claim_reason':''}
         model = model_with(missing, ANSWER, CHECK)
         with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 1)
         model = Mock()
         model.create_chat_completion.side_effect = [completion(missing, 'length'), completion(ANSWER), completion(CHECK)]
         with self.assertRaisesRegex(ValueError, '^unknown_source_span$'):
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 1)
 
     def test_valid_span_id_is_not_treated_as_claim_support(self):
@@ -86,7 +92,7 @@ class SynthesisFormatTests(unittest.TestCase):
                     'source_span':spans[0]['id']}
         model = model_with({'claims':[proposal],'no_claim_reason':''}, {'supported':[],'rejected':[0]})
         with self.assertRaisesRegex(ValueError, '^claim_verification_failed$'):
-            reading.read_chunk(model, chunk, 'scholarly', 'Title')
+            read_prescribed_chunk(model, chunk, 'scholarly', 'Title')
         calls = model.create_chat_completion.call_args_list
         for span in spans:
             self.assertIn(span['text'], calls[0].kwargs['messages'][-1]['content'])
@@ -120,7 +126,7 @@ class SynthesisFormatTests(unittest.TestCase):
 
     def test_generation_and_verification_are_schema_constrained(self):
         model = model_with(ANSWER, CHECK)
-        self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+        self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         calls = model.create_chat_completion.call_args_list
         self.assertEqual(calls[0].kwargs['response_format']['schema'], reading.claim_schema('scholarly', reading.source_spans(CHUNK)))
         self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema(1))
@@ -130,7 +136,7 @@ class SynthesisFormatTests(unittest.TestCase):
 
     def test_malformed_json_can_recover_once_before_all_evidence_checks(self):
         model = model_with('{"claims":[', ANSWER, CHECK)
-        self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+        self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         retry = model.create_chat_completion.call_args_list[1].kwargs['messages'][-1]['content']
         self.assertIn('FORMAT RETRY: model_json_invalid', retry)
         self.assertIn(SOURCE, retry)
@@ -143,13 +149,13 @@ class SynthesisFormatTests(unittest.TestCase):
                     {'claims': [PROPOSAL] * 7, 'no_claim_reason': ''}):
             with self.subTest(bad=bad):
                 model = model_with(bad, ANSWER, CHECK)
-                self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+                self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
                 self.assertEqual(model.create_chat_completion.call_count, 3)
 
     def test_valid_json_marked_truncated_is_not_accepted(self):
         model = Mock()
         model.create_chat_completion.side_effect = [completion(ANSWER, 'length'), completion(ANSWER), completion(CHECK)]
-        self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+        self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         self.assertIn('model_output_truncated', model.create_chat_completion.call_args_list[1].kwargs['messages'][-1]['content'])
         self.assertEqual(model.create_chat_completion.call_count, 3)
 
@@ -157,13 +163,13 @@ class SynthesisFormatTests(unittest.TestCase):
         model = Mock()
         model.create_chat_completion.return_value = completion(ANSWER, 'length')
         with self.assertRaisesRegex(ValueError, '^model_output_truncated$'):
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_malformed_json_stops_after_two_calls(self):
         model = model_with('{', '{')
         with self.assertRaisesRegex(ValueError, '^model_json_invalid$'):
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_numeric_and_length_rejections_do_not_retry(self):
@@ -175,30 +181,30 @@ class SynthesisFormatTests(unittest.TestCase):
             with self.subTest(reason=reason):
                 model = model_with({'claims': [claim], 'no_claim_reason': ''})
                 with self.assertRaisesRegex(ValueError, reason):
-                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                    read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
                 self.assertEqual(model.create_chat_completion.call_count, 1)
 
     def test_copy_repair_is_once_source_locked_and_checked_again(self):
         draft = {"claims":[dict(PROPOSAL,text=SOURCE)],"no_claim_reason":""}
         fresh = "The task involving 47 students did not establish whether they could transfer learning independently."
         model = model_with(draft, {"0":fresh}, CHECK)
-        self.assertEqual(reading.read_chunk(model, CHUNK, "scholarly", "Transfer")[0]["text"], fresh)
+        self.assertEqual(read_prescribed_chunk(model, CHUNK, "scholarly", "Transfer")[0]["text"], fresh)
         self.assertEqual(model.create_chat_completion.call_count, 3)
         for answer, reason in (({"0":SOURCE}, "copied_source_passage"),
                                ({"0":fresh.replace("47","50")}, "unsupported_numeric_claim")):
             model = model_with(draft, answer, CHECK)
             with self.assertRaisesRegex(ValueError, reason):
-                reading.read_chunk(model, CHUNK, "scholarly", "Transfer")
+                read_prescribed_chunk(model, CHUNK, "scholarly", "Transfer")
             self.assertEqual(model.create_chat_completion.call_count, 2)
         model = model_with(draft, {"0":fresh}, {"supported":[], "rejected":[0]})
         with self.assertRaisesRegex(ValueError, "claim_verification_failed"):
-            reading.read_chunk(model, CHUNK, "scholarly", "Transfer")
+            read_prescribed_chunk(model, CHUNK, "scholarly", "Transfer")
 
     def test_repaired_format_does_not_bypass_evidence_validation(self):
         bad = {'claims': [dict(PROPOSAL, text='The comparison established learning gains in 500 students.')], 'no_claim_reason': ''}
         model = model_with('{', bad)
         with self.assertRaisesRegex(ValueError, 'unsupported_numeric_claim'):
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_second_pass_rejection_and_missing_indexes_do_not_retry(self):
@@ -208,13 +214,13 @@ class SynthesisFormatTests(unittest.TestCase):
             with self.subTest(verdict=verdict):
                 model = model_with(ANSWER, verdict, CHECK)
                 with self.assertRaisesRegex(ValueError, '^'+reason+'$') as raised:
-                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                    read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
                 self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
                 self.assertEqual(model.create_chat_completion.call_count, 2)
 
     def test_second_pass_format_repair_still_requires_all_indexes(self):
         model = model_with(ANSWER, {'supported': [True], 'rejected': []}, CHECK)
-        self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+        self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         self.assertEqual(model.create_chat_completion.call_count, 3)
 
     def test_explicit_verifier_rejection_cannot_be_retried_as_malformed(self):
@@ -230,7 +236,7 @@ class SynthesisFormatTests(unittest.TestCase):
             with self.subTest(verdict=verdict):
                 model = model_with(ANSWER, verdict, CHECK)
                 with self.assertRaisesRegex(ValueError, '^verifier_schema_invalid$') as raised:
-                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                    read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
                 self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
                 self.assertEqual(model.create_chat_completion.call_count, 2)
 
@@ -247,7 +253,7 @@ class SynthesisFormatTests(unittest.TestCase):
                     model.create_chat_completion.side_effect = [completion(ANSWER),
                         completion(verdict, finish), completion(CHECK)]
                     with self.assertRaisesRegex(ValueError, '^'+reason+'$') as raised:
-                        reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                        read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
                     self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
                     self.assertEqual(model.create_chat_completion.call_count, 2)
 
@@ -296,7 +302,7 @@ class SynthesisFormatTests(unittest.TestCase):
             with self.subTest(verdict=verdict):
                 with patch.object(reading, 'model_json', side_effect=[ANSWER, verdict]):
                     with self.assertRaisesRegex(ValueError, '^'+reason+'$'):
-                        reading.read_chunk(Mock(), CHUNK, 'scholarly', 'Title')
+                        read_prescribed_chunk(Mock(), CHUNK, 'scholarly', 'Title')
 
     def test_every_complete_partition_accepts_only_unanimous_support(self):
         for count in range(1, 7):
@@ -325,13 +331,13 @@ class SynthesisFormatTests(unittest.TestCase):
                 # Undecodable JSON is never mined for a partial verdict, even
                 # when its prefix contains text resembling rejected indexes.
                 model = model_with(ANSWER, verdict, CHECK)
-                self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+                self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
                 self.assertEqual(model.create_chat_completion.call_count, 3)
                 self.assertIn('FORMAT RETRY: '+reason,
                               model.create_chat_completion.call_args_list[2].kwargs['messages'][-1]['content'])
                 model = model_with(ANSWER, verdict, verdict, CHECK)
                 with self.assertRaisesRegex(reading.ModelFormatError, '^'+reason+'$'):
-                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                    read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
                 self.assertEqual(model.create_chat_completion.call_count, 3)
 
     def test_pure_verifier_truncation_or_incomplete_output_keeps_bounded_retry(self):
@@ -341,41 +347,41 @@ class SynthesisFormatTests(unittest.TestCase):
                 model = Mock()
                 model.create_chat_completion.side_effect = [completion(ANSWER),
                     completion(CHECK, finish), completion(CHECK)]
-                self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
+                self.assertEqual(read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
                 self.assertEqual(model.create_chat_completion.call_count, 3)
                 model = Mock()
                 model.create_chat_completion.side_effect = [completion(ANSWER),
                     completion(CHECK, finish), completion(CHECK, finish), completion(CHECK)]
                 with self.assertRaisesRegex(reading.ModelFormatError, '^'+reason+'$'):
-                    reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+                    read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
                 self.assertEqual(model.create_chat_completion.call_count, 3)
 
     def test_verifier_format_retry_cannot_retry_a_later_invalid_partition(self):
         model = model_with(ANSWER, {'supported': [True], 'rejected': []},
                            {'supported': [0], 'rejected': [0]}, CHECK)
         with self.assertRaisesRegex(ValueError, '^verifier_indices_invalid$') as raised:
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertNotIsInstance(raised.exception, reading.ModelFormatError)
         self.assertEqual(model.create_chat_completion.call_count, 3)
 
     def test_empty_claims_need_a_substantive_explanation(self):
         model = model_with({'claims': [], 'no_claim_reason': ''})
         with self.assertRaisesRegex(ValueError, 'unexplained_empty_segment'):
-            reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
+            read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 1)
 
     def test_document_deadline_blocks_a_format_retry(self):
         model = model_with('{')
         with patch.object(reading.time, 'monotonic', side_effect=[1, 11]):
             with self.assertRaisesRegex(ValueError, 'deferred_document_time_budget'):
-                reading.read_chunk(model, CHUNK, 'scholarly', 'Title', deadline=10)
+                read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title', deadline=10)
         self.assertEqual(model.create_chat_completion.call_count, 1)
 
     def test_document_deadline_blocks_second_pass_and_publication(self):
         model = model_with(ANSWER)
         with patch.object(reading.time, 'monotonic', side_effect=[1, 2, 11]):
             with self.assertRaisesRegex(ValueError, 'deferred_document_time_budget'):
-                reading.read_chunk(model, CHUNK, 'scholarly', 'Title', deadline=10)
+                read_prescribed_chunk(model, CHUNK, 'scholarly', 'Title', deadline=10)
         self.assertEqual(model.create_chat_completion.call_count, 1)
 
     def test_failed_synthesis_preserves_previous_reading_and_saves_no_source(self):
@@ -424,7 +430,7 @@ class SynthesisFormatTests(unittest.TestCase):
     def test_completed_synthesis_still_saves_anchors_as_hashes_only(self):
         doc = Document([{'location': 'page:1', 'text': SOURCE}], 'https://www.econstor.eu/paper.pdf',
                        coverage={'evidence_status': 'full_document_retrieved'})
-        result = reading.synthesize(doc, model_with('{', ANSWER, CHECK), 'scholarly', 'Title')
+        result = reading.synthesize(doc, model_with('{', ANSWER, {'claim_0':'supported'}), 'scholarly', 'Title')
         self.assertTrue(result['coverage']['all_retrieved_text_processed'])
         self.assertEqual(result['coverage']['chunks_processed'], result['coverage']['chunks_total'])
         self.assertEqual(result['coverage']['claims_checked'], 1)

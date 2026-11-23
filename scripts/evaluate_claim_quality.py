@@ -435,7 +435,7 @@ def evaluate(fixtures, model, *, deadline, emit=None, variant='baseline'):
                 if emit:
                     emit(copy.deepcopy(row))
                 claims = reading.read_chunk(wrapper, {'id': 'C0001', 'text': source['text']},
-                                            'scholarly', source['title'], deadline=deadline, repair_draft=False)
+                                            'scholarly', source['title'], deadline=deadline, repair_draft=False, prescribed_verifier=True)
                 expected = [{key: case[key] for key in ('field', 'text', 'quote')}]
                 code = 'gate_pass' if claims == expected else 'fixture_proposal_changed'
                 code = diagnostic_code(code, wrapper)
