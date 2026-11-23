@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import article_art as art
 import build_public
+import stage_article_art
 from build_visuals import visual_spec
 
 
@@ -34,6 +35,45 @@ def png(width=12, height=8):
         return struct.pack(">I", len(value)) + kind + value + struct.pack(">I", zlib.crc32(kind + value))
     return (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)) +
             chunk(b"IDAT", zlib.compress((b"\x00" + b"\xe0\x01\x22" * width) * height)) + chunk(b"IEND", b""))
+
+
+class PagesCoverStagingTests(unittest.TestCase):
+    def test_all_curated_collection_needs_no_generated_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            src = "assets/editorial-covers/tutor.webp"
+            thumb = "assets/editorial-covers/tutor-320.webp"
+            (root / src).parent.mkdir(parents=True)
+            (root / src).write_bytes(b"cover")
+            (root / thumb).write_bytes(b"thumbnail")
+            (root / "data").mkdir()
+            records = [{"title": "Tutor", "editorial_art": {"status": "ready", "src": src, "thumbnail_src": thumb}},
+                       {"title": "Pending cover", "editorial_art": {"status": "needs_review"}}]
+            (root / "data/public-library.json").write_text(json.dumps(records))
+            destination = root / "_site"
+            stage_article_art.stage(root, destination)
+            self.assertEqual((destination / src).read_bytes(), b"cover")
+            self.assertEqual((destination / thumb).read_bytes(), b"thumbnail")
+            self.assertFalse((destination / "assets/article-art").exists())
+
+    def test_generated_cover_stages_and_a_referenced_missing_thumbnail_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            src = "assets/article-art/generated.svg"
+            thumb = "assets/article-art/generated-small.svg"
+            (root / src).parent.mkdir(parents=True)
+            (root / src).write_text("<svg/>")
+            (root / "data").mkdir()
+            record = {"title": "Generated", "editorial_art": {"status": "ready", "src": src}}
+            manifest = root / "data/public-library.json"
+            manifest.write_text(json.dumps([record]))
+            destination = root / "_site"
+            stage_article_art.stage(root, destination)
+            self.assertEqual((destination / src).read_text(), "<svg/>")
+            record["editorial_art"]["thumbnail_src"] = thumb
+            manifest.write_text(json.dumps([record]))
+            with self.assertRaisesRegex(FileNotFoundError, "generated-small"):
+                stage_article_art.stage(root, destination)
 
 
 class ArticleArtTests(unittest.TestCase):
