@@ -150,6 +150,7 @@ def resolve_section_references(section, sources):
 def draft_passages(draft):
     sections = draft.get('signals', []) + [draft.get('tension', {})]
     fields = [draft.get(key, '') for key in ('headline', 'deck', 'letter', 'closer')]
+    fields += [draft.get('experiment', {}).get(key, '') for key in ('title', 'text')]
     fields += [section.get(key, '') for section in sections for key in ('title', 'text')]
     passages = list(dict.fromkeys(
         sentence.strip() for field in fields
@@ -179,10 +180,19 @@ def source_claims(draft, source):
         if source['key'] not in {a['key'] for a in section['evidence']}:
             continue
         text = section.get('text', '')
-        phrases = [c['text'] for c in section.get('citations', [])
-                   if c.get('key') == source['key'] or c.get('source') == source['title']]
-        paragraphs = [p for p in text.split('\n\n') if any(c in p for c in phrases)]
-        claims.extend(paragraphs or [text])
+        citations = [c for c in section.get('citations', []) if c.get('text')]
+        own = [c['text'] for c in citations if c.get('key') == source['key']
+               or c.get('source') == source['title']]
+        if not any(phrase in text for phrase in own):
+            claims.append(text)
+            continue
+        # A paragraph with no citation label carries the writer's comparison
+        # or closing question. Each contributing source must be checked against
+        # that passage as well as the paragraph explicitly attributed to it.
+        for paragraph in text.split('\n\n'):
+            if (any(phrase in paragraph for phrase in own)
+                    or not any(c['text'] in paragraph for c in citations)):
+                claims.append(paragraph)
     return '\n\n'.join(dict.fromkeys(claims))
 
 
@@ -242,9 +252,12 @@ def frame_response_schema(sources):
     prose = QUALITATIVE_PROSE
     return strict_object({
         'headline': prose_words(5, 15), 'deck': prose_words(20, 45), 'letter': prose_words(75, 120),
-        'tension': strict_object({'title':prose,
-            'source_notes': strict_object({s['key']: prose_words(20, 35) for s in sources}),
-            'question': prose_words(35, 60)}),
+        'tension': strict_object({'title': prose,
+            'source_notes': {'type': 'array', 'minItems': 1, 'maxItems': min(3, len(sources)),
+                'items': strict_object({'key': {'type': 'string', 'enum': [s['key'] for s in sources]},
+                                        'note': prose_words(28, 40)})},
+            'question': prose_words(42, 60)}),
+        'experiment': strict_object({'title': prose_words(3, 12), 'text': prose_words(20, 50)}),
         'closer':prose_words(10, 35),
         'glossary':{'type':'array', 'maxItems':5,
                     'items':strict_object({'term':prose,'definition':prose})},
@@ -260,7 +273,23 @@ def resolve_frame_references(frame, sources):
     if 'source_notes' in tension:
         notes = tension.pop('source_notes')
         question = tension.pop('question')
-        exact_keys(notes, list(labels), 'Frame source notes')
+        if isinstance(notes, list):
+            if not 1 <= len(notes) <= 3:
+                raise ValueError('Select one to three sources that actually motivate this question')
+            selected = {}
+            for entry in notes:
+                if not isinstance(entry, dict) or set(entry) != {'key', 'note'}:
+                    raise ValueError('Each selected frame source needs a key and a note')
+                key = entry['key']
+                if not isinstance(key, str) or key not in labels or key in selected:
+                    raise ValueError('Frame source keys must be eligible and distinct')
+                selected[key] = entry['note']
+            notes = selected
+        else:
+            # Existing stored frames used a required note for every source.
+            if not isinstance(notes, dict):
+                raise ValueError('Invalid frame source notes')
+            exact_keys(notes, list(labels), 'Frame source notes')
         if 'text' in tension or 'citations' in tension:
             raise ValueError('Do not mix assigned frame notes with free-form citations')
         if any(not isinstance(note, str) or len(note.split()) < 15 for note in notes.values()):
@@ -269,9 +298,11 @@ def resolve_frame_references(frame, sources):
             raise ValueError('Frame needs a substantive unresolved question')
         if re.search(r'\bS\d+\b', question+' '.join(notes.values())):
             raise ValueError('Use source keys only as field names, never in the public frame prose')
-        tension['text'] = '\n\n'.join(labels[s['key']] + ': ' + depth_label(s) + normalize_digits(notes[s['key']]) for s in sources)
+        by_key = {source['key']: source for source in sources}
+        tension['text'] = '\n\n'.join(labels[key] + ': ' + depth_label(by_key[key]) + normalize_digits(note)
+                                      for key, note in notes.items())
         tension['text'] += '\n\n' + normalize_digits(question)
-        tension['citations'] = [{'key':key, 'text':label+':'} for key,label in labels.items()]
+        tension['citations'] = [{'key': key, 'text': labels[key] + ':'} for key in notes]
         return result
     text = tension.get('text', '')
     selected = {}
