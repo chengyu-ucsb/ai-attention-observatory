@@ -168,7 +168,7 @@ class CompleteSourceTests(unittest.TestCase):
                'quote':'students who discussed their decisions after completing'}
         proposal={k:v for k,v in claim.items() if k!='quote'}
         proposal['source_span']='C0001:S001'
-        with patch.object(reading,'model_json',side_effect=[{'claims':[proposal]}, {'supported':[],'rejected':[0]}]):
+        with patch.object(reading,'model_json',side_effect=[{'claims':[proposal]}, {'claim_0':'rejected'}]):
             with self.assertRaisesRegex(ValueError,'verification'):
                 reading.read_chunk(Mock(),chunk,'scholarly','A title')
 

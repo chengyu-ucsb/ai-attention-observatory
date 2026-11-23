@@ -36,7 +36,7 @@ class EditorialClaimTests(unittest.TestCase):
                         self.assertNotIn("C0001:S003", kwargs["source_span_ids"])
                         return {"claims": claims, "no_claim_reason": ""}
                     if len(calls) == 2:
-                        return {"supported": [0, 1], "rejected": []}
+                        return {"claim_0":"supported","claim_1":"supported"}
                     return {"order": [1, 0]}
                 with patch.object(reader, "model_json", side_effect=model):
                     got = reader.synthesize(document, object(), "scholarly", label)
@@ -75,7 +75,7 @@ class EditorialClaimTests(unittest.TestCase):
         with patch.object(reader,"model_json",side_effect=[
             {"claims":[proposed],"no_claim_reason":""},
             {"0":"Researchers used an online questionnaire to ask about usual study habits."},
-            {"supported":[0],"rejected":[]}]):
+            {"claim_0":"supported"}]):
             notes=reader.read_chunk(object(),chunk,"scholarly","Study habits")
         self.assertEqual(notes[0]["field"],"study_design")
         self.assertEqual(notes[0]["source_span"],"C0001:S001")

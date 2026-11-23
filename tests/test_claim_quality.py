@@ -250,13 +250,14 @@ class EvaluationTests(unittest.TestCase):
         self.assertTrue(all(call['seed'] == 7 for call in model.calls))
         self.assertTrue(model.calls[1]['messages'][-1]['content'].startswith(model.calls[0]['messages'][-1]['content']))
 
-    def test_production_verifier_prompt_and_every_parameter_unchanged_except_seed(self):
+    def test_prescribed_verifier_prompt_and_every_parameter_unchanged_except_seed(self):
         data = fixtures()
         source = data['sources'][0]
         case = source['cases'][0]
         proposal = {'claims': [{key: case[key] for key in ('field', 'text', 'source_span')}], 'no_claim_reason': ''}
         reference = Model([proposal, CHECK])
-        reading.read_chunk(reference, {'id': 'C0001', 'text': SOURCE}, 'scholarly', source['title'])
+        reading.read_chunk(reference, {'id': 'C0001', 'text': SOURCE}, 'scholarly', source['title'],
+                           prescribed_verifier=True)
         model = Model([CHECK, CHECK])
         self.evaluate(model, data)
         self.assertEqual(len(model.calls), 2)
