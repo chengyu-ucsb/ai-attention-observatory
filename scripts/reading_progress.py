@@ -24,7 +24,9 @@ def cloud_progress(model_path):
     scripts=Path(__file__).resolve().parent
     revision=fingerprint({'model_sha256':model_hash,**{
         name:sha256((scripts/name).read_bytes()).hexdigest() for name in
-        ('comprehensive_readings.py','full_document_access.py','prepared_reading_schema.py','reading_progress.py')}})
+        ('comprehensive_readings.py','full_document_access.py','prepared_reading_schema.py','reading_progress.py',
+         'reading_evidence_context.py','nonacademic_reading_voice.py','article_body_parser.py',
+         'structured_article_access.py','reading_headlines.py')}})
     def factory_for(store):
         def factory(record):
             ident,_=store.put_source(record)
@@ -50,7 +52,7 @@ class ReadingProgress:
         self.reader_version=reader_version
 
     def key(self, document, chunk, kind, title):
-        return fingerprint({'policy':1,'reader':self.reader_version,
+        return fingerprint({'policy':2,'reader':self.reader_version,
             'source_id':self.source_id,'source_hash':document.manifest()['source_sha256'],
             'document_version':document.manifest()['document_version'],
             'kind':kind,'title':title,'chunk':chunk})
@@ -71,7 +73,7 @@ class ReadingProgress:
             quote=' '.join(spans[claim['source_span']]['text'].split())
             if sha256(normalize(quote).encode()).hexdigest()!=claim['anchor_sha256']:
                 raise ValueError('invalid_reading_progress')
-            restored={'field':claim['field'],'text':claim['text'],'quote':quote}
+            restored={'field':claim['field'],'text':claim['text'],'quote':quote,'source_span':claim['source_span']}
             validate_claim(restored,chunk,kind);result.append(restored)
         return result
 
@@ -83,7 +85,7 @@ class ReadingProgress:
             anchor=normalize(claim['quote'])
             if anchor not in spans:raise ValueError('progress_anchor_not_in_source')
             safe.append({'field':claim['field'],'text':claim['text'],
-                         'source_span':spans[anchor],'anchor_sha256':sha256(anchor.encode()).hexdigest()})
+                         'source_span':claim.get('source_span',spans[anchor]),'anchor_sha256':sha256(anchor.encode()).hexdigest()})
         self.store.save_checkpoint(self.key(document,chunk,kind,title),self.source_id,
             document.manifest()['source_sha256'],self.reader_version,chunk['id'],
             {'claims':safe,'checked':True})

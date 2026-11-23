@@ -325,7 +325,14 @@ def validate_stage_report(stage, report):
     elif stage == "review":
         counts = {"attempted", "summaries_completed", "failed"}
         queue.shape(report, counts | {"skipped_no_model"},
-                    {"documents_retrieved", "partial_inputs", "failure_reasons", "failure_stages", "source_text_saved", "selection"})
+                    {"documents_retrieved", "partial_inputs", "failure_reasons", "failure_stages", "source_text_saved", "selection",
+                     "article_accounts", "evidence_only_readings"})
+        outcomes = {"article_accounts", "evidence_only_readings"}
+        if outcomes & set(report):
+            queue.require(outcomes <= set(report))
+            for key in outcomes:
+                queue.integer(report[key])
+            queue.require(sum(report[key] for key in outcomes) == report["summaries_completed"])
         for key in counts | ({"documents_retrieved", "partial_inputs"} & set(report)):
             queue.integer(report[key])
         queue.require(report["skipped_no_model"] is False

@@ -112,11 +112,37 @@ class PreparedReadingSchemaTests(unittest.TestCase):
         self.reject(lambda row: row["deep_analysis"]["claim_evidence"][0].update(quote="Unlawful raw copied source"))
 
     def test_version_kind_depth_status_and_labels_are_exact(self):
-        for field, value in (("version", True), ("version", 2), ("version", 4), ("kind", "nonacademic"),
+        for field, value in (("version", True), ("version", 2), ("version", 5), ("kind", "nonacademic"),
                               ("review_status", "approved"), ("source_depth", "read_article"),
                               ("basis", "Independently approved full source review")):
             with self.subTest(field=field, value=value):
                 self.reject(lambda row: row["deep_analysis"].update({field: value}))
+
+    def test_legacy_notes_and_new_selection_are_distinct_closed_schemas(self):
+        deep = deepcopy(self.record["deep_analysis"])
+        old = deepcopy(deep)
+        old["version"] = 3
+        old.pop("narrative_order")
+        old.pop("account_status")
+        for claim in old["claim_evidence"]:
+            claim.pop("source_span")
+        self.assertIs(schema.validate_analysis(old), old)
+        for order in ([], [True], [0, 0], [8]):
+            self.reject(lambda row: row["deep_analysis"].update(narrative_order=order))
+        self.reject(lambda row: row["deep_analysis"]["claim_evidence"][0].update(source_span="C9999:S001"))
+
+    def test_concrete_source_basis_for_plain_text_and_html(self):
+        for fmt in ("text", "html"):
+            deep = deepcopy(self.record["deep_analysis"])
+            for key in ("pages_total", "pages_processed", "pages_with_text"):
+                deep["coverage"].pop(key)
+            deep["coverage"]["document_format"] = fmt
+            original = deep["basis"]
+            deep["basis"] = original[:original.rfind("Whole PDF")] + reading.coverage_basis(deep["coverage"])
+            self.assertIs(schema.validate_analysis(deep), deep)
+            deep["basis"] = original
+            with self.assertRaises(ValueError):
+                schema.validate_analysis(deep)
 
     def test_source_hash_and_url_must_match_coverage(self):
         self.reject(lambda row: row["deep_analysis"].update(source_hash="b"*64))
