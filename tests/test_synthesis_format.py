@@ -123,7 +123,7 @@ class SynthesisFormatTests(unittest.TestCase):
         self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         calls = model.create_chat_completion.call_args_list
         self.assertEqual(calls[0].kwargs['response_format']['schema'], reading.claim_schema('scholarly', reading.source_spans(CHUNK)))
-        self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema())
+        self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema(1))
         self.assertEqual(calls[0].kwargs['max_tokens'], 2200)
         self.assertEqual(calls[1].kwargs['max_tokens'], 500)
         self.assertIn('limitations', calls[0].kwargs['response_format']['schema']['properties']['claims']['items']['properties']['field']['enum'])
@@ -166,10 +166,9 @@ class SynthesisFormatTests(unittest.TestCase):
             reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
         self.assertEqual(model.create_chat_completion.call_count, 2)
 
-    def test_numeric_copy_and_length_rejections_do_not_retry(self):
+    def test_numeric_and_length_rejections_do_not_retry(self):
         invalid = [
             (dict(PROPOSAL, text='The comparison established learning gains in 500 students.'), 'numeric'),
-            (dict(PROPOSAL, text=SOURCE), 'copied'),
             (dict(PROPOSAL, text='Too short.'), 'length'),
         ]
         for claim, reason in invalid:
@@ -178,6 +177,22 @@ class SynthesisFormatTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, reason):
                     reading.read_chunk(model, CHUNK, 'scholarly', 'Title')
                 self.assertEqual(model.create_chat_completion.call_count, 1)
+
+    def test_copy_repair_is_once_source_locked_and_checked_again(self):
+        draft = {"claims":[dict(PROPOSAL,text=SOURCE)],"no_claim_reason":""}
+        fresh = "The task involving 47 students did not establish whether they could transfer learning independently."
+        model = model_with(draft, {"0":fresh}, CHECK)
+        self.assertEqual(reading.read_chunk(model, CHUNK, "scholarly", "Transfer")[0]["text"], fresh)
+        self.assertEqual(model.create_chat_completion.call_count, 3)
+        for answer, reason in (({"0":SOURCE}, "copied_source_passage"),
+                               ({"0":fresh.replace("47","50")}, "unsupported_numeric_claim")):
+            model = model_with(draft, answer, CHECK)
+            with self.assertRaisesRegex(ValueError, reason):
+                reading.read_chunk(model, CHUNK, "scholarly", "Transfer")
+            self.assertEqual(model.create_chat_completion.call_count, 2)
+        model = model_with(draft, {"0":fresh}, {"supported":[], "rejected":[0]})
+        with self.assertRaisesRegex(ValueError, "claim_verification_failed"):
+            reading.read_chunk(model, CHUNK, "scholarly", "Transfer")
 
     def test_repaired_format_does_not_bypass_evidence_validation(self):
         bad = {'claims': [dict(PROPOSAL, text='The comparison established learning gains in 500 students.')], 'no_claim_reason': ''}

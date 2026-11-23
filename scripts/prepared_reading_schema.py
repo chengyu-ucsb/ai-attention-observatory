@@ -154,11 +154,13 @@ def validate_coverage(value):
         if value["evidence_status"] == "full_document_retrieved":
             require(value["pages_total"] == value["pages_with_text"])
     if "document_format" in value:
-        require(value["document_format"] in {"jats", "tei"}
-                and value.get("structured_text_coverage") == "all_text_in_supplied_article_xml"
-                and value.get("source_document_equivalence") == "not_verified")
+        require(value["document_format"] in {"jats", "tei", "xml", "html", "xhtml", "pdf",
+                                             "text", "plain_text", "txt"})
+        if value["document_format"] in {"jats", "tei", "xml"}:
+            require(value.get("structured_text_coverage") == "all_text_in_supplied_article_xml"
+                    and value.get("source_document_equivalence") == "not_verified")
     if "structured_text_coverage" in value:
-        require(value.get("document_format") in {"jats", "tei"})
+        require(value.get("document_format") in {"jats", "tei", "xml"})
     if "rights_basis" in value:
         require(value["rights_basis"] in {"article_metadata_permissive_license",
                                            "provider_reported_oa_transient_reading_only"})
@@ -208,8 +210,11 @@ def validate_analysis(value, *, kind=None, now=None):
     require(kind is None or actual_kind == kind)
     required = set(FIELDS[actual_kind]) | {"claim_evidence", "coverage", "version", "kind",
         "source_depth", "source_url", "source_hash", "model", "basis", "review_status", "created_at"}
+    version = value.get("version")
+    require(type(version) is int and version in {3, 4} and value["review_status"] == REVIEW)
+    if version == 4:
+        required.update({"narrative_order", "account_status"})
     shape(value, required, {"preparation_provenance"})
-    require(type(value["version"]) is int and value["version"] == 3 and value["review_status"] == REVIEW)
     coverage = validate_coverage(value["coverage"])
     require(value["source_url"] == coverage["source_url"] and value["source_hash"] == coverage["source_sha256"])
     complete = coverage["evidence_status"] == "full_document_retrieved"
@@ -217,11 +222,10 @@ def validate_analysis(value, *, kind=None, now=None):
              else ("source_html" if complete else "partial_source_html"))
     require(value["source_depth"] == depth and day(value["created_at"]) <= now.date())
     require(value["model"] == "Qwen2.5-1.5B-Instruct (on-runner; chunked with claim checking)")
+    from comprehensive_readings import coverage_basis
     basis = ("Every retrieved text chunk processed; claim-level machine checks. "
              "Not independently reviewed. Figures, tables and supplements not visually verified. "
-             + (("All supplied article XML text retrieved; equivalence to the original PDF is not verified."
-                if coverage.get("document_format") in ("jats", "tei") else "Whole PDF text retrieved.")
-                if complete else "Partial source coverage; not a whole-article review."))
+             + coverage_basis(coverage))
     require(value["basis"] == basis)
     claims = value["claim_evidence"]
     require(type(claims) is list and 0 < len(claims) <= 10000 and len(claims) == coverage["claims_checked"])
@@ -229,12 +233,20 @@ def validate_analysis(value, *, kind=None, now=None):
     known_chunks = {f"C{number:04d}" for number in range(1, coverage["chunks_total"] + 1)}
     seen = set(); ranges_by_chunk = {}
     for claim in claims:
-        shape(claim, {"field", "text", "chunk_id", "locations", "evidence_anchor_sha256"})
+        required_claim = {"field", "text", "chunk_id", "locations", "evidence_anchor_sha256"}
+        if version == 4:
+            required_claim.add("source_span")
+        shape(claim, required_claim)
+        if version == 4:
+            ident = claim["source_span"]
+            require(type(ident) is str and re.fullmatch(r"C\d{4}:S\d{3,5}", ident)
+                    and ident.split(":")[0] == claim["chunk_id"] and int(ident.split("S")[1]) > 0)
         require(claim["field"] in fields and claim["chunk_id"] in known_chunks
                 and claim["chunk_id"] not in coverage["empty_claim_chunks"])
         text(claim["text"], 20000)
         require(6 <= len(claim["text"].split()) <= 90)
-        identity = (claim["field"], " ".join(claim["text"].lower().split()))
+        identity = ((claim["field"], " ".join(claim["text"].lower().split())) if version == 3
+                    else tuple(re.findall(r"\w+", claim["text"].casefold())))
         require(identity not in seen); seen.add(identity)
         hashed(claim["evidence_anchor_sha256"])
         locations = claim["locations"]
@@ -250,10 +262,21 @@ def validate_analysis(value, *, kind=None, now=None):
             location_ends[span["location"]] = span["end"]
             size += span["end"] - span["start"]
         require(size + len(locations) - 1 <= 5500 and len(location_ends) <= coverage["units_retrieved"])
-        if claim["chunk_id"] in ranges_by_chunk:
-            require(ranges_by_chunk[claim["chunk_id"]] == locations)
-        ranges_by_chunk[claim["chunk_id"]] = locations
-        fields[claim["field"]].append(claim["text"])
+        key = claim["chunk_id"] if version == 3 else (claim["chunk_id"], int(ident.split("S")[1]))
+        if key in ranges_by_chunk:
+            require(ranges_by_chunk[key] == locations)
+        ranges_by_chunk[key] = locations
+        if version == 3:
+            fields[claim["field"]].append(claim["text"])
+    if version == 4:
+        order = value["narrative_order"]
+        require(type(order) is list and 1 <= len(order) <= 10
+                and all(type(i) is int and 0 <= i < len(claims) for i in order)
+                and len(set(order)) == len(order))
+        from reading_evidence_context import account_status
+        require(value["account_status"] == account_status(actual_kind, [claims[i]["field"] for i in order]))
+        for i in order:
+            fields[claims[i]["field"]].append(claims[i]["text"])
     # Claims may omit empty/deduplicated chunks. Do not invent full interval
     # evidence absent from the saved reader output, but reject overlapping ones.
     ends = {}

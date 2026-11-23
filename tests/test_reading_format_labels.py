@@ -132,7 +132,7 @@ class ReadingFormatLabelTests(unittest.TestCase):
         self.assertEqual(stats['partial_inputs'], int(not complete))
         saved = row.get('partial_reading_candidate', row['deep_analysis'])
         self.assertEqual(saved['basis'], PREFIX + expected)
-        self.assertEqual(saved['version'], 3)
+        self.assertEqual(saved['version'], reading.READER_VERSION)
         self.assertEqual(saved['coverage']['document_version'], VERSION)
         self.assertEqual(saved['source_hash'], sha256('\n'.join(u['text'] for u in units).encode()).hexdigest())
         self.assertEqual(saved['source_hash'], saved['coverage']['source_sha256'])
