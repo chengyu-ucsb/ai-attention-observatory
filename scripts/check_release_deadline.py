@@ -36,7 +36,7 @@ def check(root=ROOT, now=None, reader=fetch):
                     'edition_sha256': sha256(encoded(issue)).hexdigest(),
                     'reader_sha256': sha256(encoded(feed_snapshot(issue))).hexdigest(),
                     'index_url': manifest.get('index_url')}
-        verified = verify(expected, reader=reader)
+        verified = verify(expected, reader=reader, approved_issue=issue)
     except Exception as error:
         return dict(result, status='live_verification_failed',
                     reason=type(error).__name__ + ': ' + str(error)[:240])
