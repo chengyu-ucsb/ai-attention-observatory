@@ -32,6 +32,44 @@ def tei(legacy=False):
     return ('<html><body>'+paper+'</body></html>' if legacy else paper).encode()
 
 class XMLParsingTests(unittest.TestCase):
+    def test_jats_and_tei_tables_and_reference_roles_reach_the_reading_document(self):
+        for format, source in (('jats', jats()), ('tei', tei())):
+            if format == 'jats':
+                original = b'<table><tr><td>42</td></tr></table>'
+                table = (b'<table><thead><tr><th>Group</th><th>Score</th></tr></thead>'
+                         b'<tbody><tr><th scope="row">Unassisted</th><td>42</td></tr></tbody></table>')
+                source = source.replace(original, table)
+            else:
+                table = (b'<figure><head>Comparison table</head><table><row role="label"><cell>Group</cell>'
+                         b'<cell>Score</cell></row><row><cell>Unassisted</cell><cell>42</cell></row></table></figure>')
+                source = source.replace(b'<head>Limitations</head>', b'<head>Limitations</head>' + table)
+                source = source.replace(b'END_REFERENCE', b'<listBibl><bibl>END_REFERENCE</bibl></listBibl>')
+            with self.subTest(format=format):
+                doc = xml.document_from_xml(source, RECORD, 'https://www.ebi.ac.uk/test', format=format)
+                row = next(unit for unit in doc.units if unit['role'] == 'table_row')
+                self.assertEqual(row['text'], 'Unassisted | 42')
+                self.assertEqual(row['columns'], ['Group', 'Score'])
+                self.assertIn(row['headings'][-1], ('Results', 'Limitations'))
+                reference = next(unit for unit in doc.units if 'END_REFERENCE' in unit['text'])
+                self.assertEqual(reference['role'], 'references')
+                self.assertNotIn('Unassisted', json.dumps(doc.manifest()))
+                self.assertTrue(reading.coverage_is_complete(doc, reading.chunk_document(doc)))
+
+    def test_pdf_page_folios_do_not_complete_an_image_only_interior_page(self):
+        title = RECORD['title']
+        page_text = [title + '\n' + PARA * 24 + '\nJournal 12 | Page 1',
+                     'Journal 12 | Page 2',
+                     PARA * 8 + '\nJournal 12 | Page 3']
+        pages = [Mock() for _ in page_text]
+        for page, text in zip(pages, page_text):
+            page.extract_text.return_value = text
+        fake_reader = Mock(return_value=Mock(pages=pages))
+        with patch.dict(sys.modules, {'pypdf': Mock(PdfReader=fake_reader)}):
+            doc = access.document_from_pdf(b'%PDF-original-bytes', RECORD, 'https://arxiv.org/source')
+        self.assertEqual(doc.coverage['pages_with_text'], 3)
+        self.assertEqual(doc.coverage['evidence_status'], 'partial_full_text')
+        self.assertEqual([unit['text'] for unit in doc.units], page_text)
+
     def test_complete_jats_includes_intro_tables_tail_and_references_without_duplicate_text(self):
         doc=xml.document_from_xml(jats(),RECORD,'https://www.ebi.ac.uk/test',format='jats')
         text=' '.join(u['text'] for u in doc.units)

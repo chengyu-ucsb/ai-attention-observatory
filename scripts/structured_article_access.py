@@ -52,26 +52,89 @@ def decoded_xml(raw):
 
 
 def xml_units(root):
-    """Emit disjoint blocks, including introductions, captions and references."""
+    """Retain every supplied text block with its source role and section ancestry."""
+    from article_body_parser import section_role, table_rows
     containers = {'article', 'front', 'article-meta', 'body', 'back', 'sec',
-                  'tei', 'teiheader', 'text', 'div', 'group'}
+                  'tei', 'teiheader', 'filedesc', 'profiledesc', 'text', 'div', 'group',
+                  'abstract', 'table', 'table-wrap', 'thead', 'tbody', 'tfoot',
+                  'figure', 'fig', 'caption', 'table-wrap-foot'}
     units = []
-    def add(text, location):
-        text = ' '.join((text or '').split())
-        if text:
-            units.append({'location': location, 'text': text})
-    def walk(node, path):
-        if local(node.tag) not in containers:
-            add(content(node), path)
+
+    def add(text, location, role, headings, columns=None):
+        value = ' '.join((text or '').split())
+        if value:
+            unit = {'location': location, 'text': value, 'role': role, 'headings': list(headings)}
+            if columns:
+                unit['columns'] = list(columns)
+            units.append(unit)
+
+    def annotated_rows(table):
+        rows = []
+        structure = []
+        nested = False
+        def collect(node):
+            nonlocal nested
+            for child in node:
+                tag = local(child.tag)
+                if tag == 'table':
+                    nested = True
+                elif tag in {'tr', 'row'}:
+                    rows.append(child)
+                else:
+                    collect(child)
+        collect(table)
+        for row in rows:
+            cells = [cell for cell in row if local(cell.tag) in {'td', 'th', 'cell'}]
+            is_header = (row.get('role', '').lower() in {'label', 'header'} or
+                         bool(cells) and all(local(cell.tag) == 'th' for cell in cells))
+            merged = any(cell.get(key, '1') != '1' for cell in cells
+                         for key in ('rowspan', 'colspan', 'rows', 'cols'))
+            # Non-cell content cannot be paired with a header. Retain its text.
+            irregular = (len(cells) != len(row) or (row.text or '').strip() or
+                         any((cell.tail or '').strip() for cell in cells))
+            if irregular:
+                structure.append((False, [content(row)], True))
+            else:
+                nested = nested or any(local(node.tag) == 'table' for cell in cells for node in cell.iter())
+                structure.append((is_header, [content(cell) for cell in cells], merged))
+        return dict(zip(rows, table_rows(structure, ambiguous=nested)))
+
+    def walk(node, path, role='body', headings=(), rows=None):
+        tag = local(node.tag)
+        if rows is not None and node in rows:
+            block = rows[node]
+            add(block['text'], path, block['role'], headings, block.get('columns'))
             return
-        add(node.text, path + '/text')
+        if tag in {'sec','div'}:
+            heading = next((content(child) for child in node if local(child.tag) in {'title','head'}), '')
+            if heading:
+                headings = (*headings, heading)
+                role = section_role(headings, role)
+        if tag in {'front', 'teiheader', 'article-meta', 'back'}:
+            role = 'metadata'
+        elif tag in {'ref-list', 'listbibl', 'biblstruct'}:
+            role = 'references' if role != 'metadata' or tag != 'biblstruct' else role
+        elif tag == 'abstract':
+            role = 'abstract'
+        elif tag in {'caption', 'figdesc', 'label', 'table-wrap-foot'}:
+            role = 'caption'
+        elif tag in {'head','title'} and headings:
+            role = 'heading'
+        elif tag == 'body':
+            role = 'body'
+        if tag == 'table':
+            rows = annotated_rows(node)
+        if tag not in containers:
+            add(content(node), path, role, headings)
+            return
+        add(node.text, path + '/text', role, headings)
         counts = {}
         for child in node:
-            tag = local(child.tag)
-            counts[tag] = counts.get(tag, 0) + 1
-            target = path + '/' + tag + ':' + str(counts[tag])
-            walk(child, target)
-            add(child.tail, target + '/tail')
+            child_tag = local(child.tag)
+            counts[child_tag] = counts.get(child_tag, 0) + 1
+            target = path + '/' + child_tag + ':' + str(counts[child_tag])
+            walk(child, target, role, headings, rows)
+            add(child.tail, target + '/tail', role, headings)
     walk(root, 'xml:' + local(root.tag))
     return units
 
