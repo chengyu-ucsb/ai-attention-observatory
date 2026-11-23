@@ -2,6 +2,12 @@
 
 Every eligible public reading receives an `editorial_art` object, but not every reading receives an image. Artwork is a downstream presentation layer. Reading depth, publication eligibility, article counts, citations, source provenance and `build_visuals.visual_spec` remain unchanged, including when artwork needs review.
 
+## Preparing artwork for new readings
+
+During weekly preparation, give each newly checked reading an original OpenAI-generated illustration. Read the checked article notes and choose a particular action, object or setting a reader would recognize from that article. A student turning an exam card beside a timer fits a reading about starting and completing practice sessions. Give the scene a clear focal point, a considered color palette and enough space around the subject to survive the mobile card crop.
+
+Review the cover and thumbnail at their displayed sizes alongside the other covers. Save the approved images under `assets/editorial-covers/` and register the reading’s canonical key, actual dimensions, descriptive alt text, concept and OpenAI image-generation provenance in `data/article-art-overrides.json`. Until that illustration is ready, the existing build can use a source-grounded procedural scene that passes its checks. If no such scene passes, the reading can publish while its artwork awaits review.
+
 ## Publication and review states
 
 Run the ordinary publication build:
@@ -49,7 +55,7 @@ Identity hashes no longer change the scene, colors, rotation or small marks. Ide
 
 These checks do **not** establish perceptual pixel uniqueness. The coarse renderer approximates curves, strokes and rasterization; it is not the browser's rendering engine. Different scenes can still look similar at card size. Curated raster overrides receive the byte-level checks, not this SVG approximation; different raster encodings can contain the same pixels. A successful automated report means the stated automated checks passed, not that a person has reviewed every cover.
 
-Generated SVGs use a closed vocabulary of paths, groups, circles and rectangles with no embedded text, script, fonts, external references or source figures. The hard per-file limit is 32 KB. Generated files under `assets/article-art/` are not checked in and must be copied with the other assets at deployment.
+Generated SVGs use a closed vocabulary of paths, groups, circles and rectangles with no embedded text, script, fonts, external references or source figures. The hard per-file limit is 32 KB. The build creates `assets/article-art/` when it writes procedural covers. Pages stages each available cover directory and checks the published cover and thumbnail paths. A collection made entirely from curated covers needs only `assets/editorial-covers/`.
 
 ## Determinism and caching
 

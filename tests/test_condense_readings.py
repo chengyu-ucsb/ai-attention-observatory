@@ -111,7 +111,7 @@ class CondensedReadingTests(unittest.TestCase):
   result=readable_excerpt("The authors found that AI usage was positively associated with reported task-switching.",limit=150)
   self.assertEqual(result,"AI usage was positively associated with reported task-switching.")
   interpret=readable_excerpt("The authors suggest that AI may help workers manage interruptions.",role="interpretation")
-  self.assertIn("A possible explanation is that",interpret)
+  self.assertIn("The authors suggest that",interpret)
   self.assertIn("may help",interpret)
  def test_automatic_digest_preserves_uncertain_language(self):
   paper={"kind":"scholarly","doi":"10.0000/example","title":"Attention and AI",
@@ -169,9 +169,9 @@ class HeadlinePolicyTests(unittest.TestCase):
 
  def test_machine_thesis_is_not_split_into_a_benefit_only_headline(self):
   thesis="AI makes assignments easier. However, independent learning may suffer."
-  paper={"kind":"nonacademic","title":"The tradeoffs of AI in education",
-         "reading":{"level":"full_text"},
-         "deep_analysis":{"kind":"nonacademic","source_depth":"source_html","thesis":thesis}}
+  from test_prepared_reading_schema import generated
+  paper=generated(kind="nonacademic",claim_field="thesis",claim_text=thesis)
+  paper.update(title="The tradeoffs of AI in education",reading={"level":"curated"})
   digest=annotate(paper)["reading"]["digest"]
   self.assertEqual(digest["idea"],paper["title"])
   self.assertEqual(digest["explain"],thesis)
@@ -254,4 +254,43 @@ class ReadingCompletenessTests(unittest.TestCase):
    "Experiment 1 showed that higher AI assistance significantly increased metacognitive disengageme",
    "The results showed that AI use predicted a higher score, and the"]:
    self.assertEqual(reported_result(fragment,maxlen=600),"")
+
+class EvidenceRoleTests(unittest.TestCase):
+ def test_concrete_result_after_figure_reference_keeps_hedge(self):
+  from condense_readings import reported_result_bundle, source_sentences
+  method="We collected gender and education level for each participant (Fig. S1)."
+  result="Results suggest that the students made more revisions after the workshop."
+  self.assertEqual(list(source_sentences(method+" "+result)), [method, result])
+  self.assertEqual(reported_result_bundle(method+" "+result), result)
+  self.assertEqual(reported_result_bundle("The analysis showed that the condition differed (Fig."), "")
+
+ def test_source_counts_and_qualitative_accounts_survive_without_significance(self):
+  from condense_readings import reported_result_bundle
+  for observed in ("91 of 224 sessions submitted an answer to the final case.",
+                   "Interviewees described how checking each suggestion interrupted their drafting.",
+                   "There was no difference in recall between conditions."):
+   self.assertEqual(reported_result_bundle(observed), observed)
+
+ def test_result_from_abstract_keeps_its_basis_with_full_text_methods(self):
+  from condense_readings import annotate
+  paper={"kind":"scholarly","title":"Recall after revision",
+         "abstract_text":"There was no difference in recall between conditions.",
+         "analysis":{"methods":"Students completed the same task twice."},
+         "reading":{"level":"full_text","findings":"A leftover draft predicted lasting improvements in all outcomes."}}
+  d=annotate(paper)["reading"]["digest"]
+  self.assertEqual(d["finding"], paper["abstract_text"])
+  self.assertEqual(d["finding_source"], "abstract")
+
+ def test_duplicate_roles_and_source_excerpts_stay_in_the_right_queue(self):
+  from reading_depth import depth_audit, distinct_summary_roles
+  self.assertFalse(distinct_summary_roles(["The same sentence.", "THE SAME SENTENCE"]))
+  self.assertTrue(distinct_summary_roles(["The drawing task.", "", "Students erased more lines."]))
+  row={"kind":"scholarly","doi":"10.9999/archive","reading":{"level":"abstract","digest":{
+       "status":"automatically_condensed_source_text","finding_source":"none"}}}
+  report=depth_audit([row])
+  self.assertEqual(report["summary_review"][0]["id"],row["doi"])
+  self.assertIn("no_result_or_source_context",report["summary_review"][0]["reasons"])
+  row["verified_article_review"]={"methods":"Checked against published source."}
+  self.assertFalse(depth_audit([row])["summary_review"])
+
 if __name__=="__main__":unittest.main()

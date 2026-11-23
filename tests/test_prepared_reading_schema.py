@@ -12,7 +12,7 @@ from full_document_access import Document
 import prepared_reading_schema as schema
 
 
-def generated(kind="scholarly", complete=True, structured=False, previous=None, claim_field=None):
+def generated(kind="scholarly", complete=True, structured=False, previous=None, claim_field=None, claim_text=None):
     now = datetime.now(timezone.utc)
     record = deepcopy(previous) if previous else {
         "kind": kind, "title": "Attention and generative artificial intelligence",
@@ -36,7 +36,7 @@ def generated(kind="scholarly", complete=True, structured=False, previous=None, 
                          for loc in locations], record["url"], "publishedVersion", coverage,
                         b"%PDF-fixture" if complete and not structured else None)
     field = claim_field or ("limitations" if kind == "scholarly" else "qualification")
-    example = ("Two groups practiced the same task with different instructions." if field == "study_design"
+    example = claim_text or ("Two groups practiced the same task with different instructions." if field == "study_design"
                else "These observations leave longer term independent learning outcomes unresolved in this comparison.")
     def chunk_notes(model, chunk, *args, **kwargs):
         return [{"field": field,

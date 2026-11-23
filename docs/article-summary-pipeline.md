@@ -151,3 +151,20 @@ existing provider limits and retry cooldowns.
 `tests/test_source_depth_integrity.py` covers review withdrawal and reapplication,
 machine/reviewed-source counts, stale labels, numbered section boundaries,
 conceptual-result separation, and the canonical tutoring reading.
+
+## Following up on public excerpts
+
+The public build lists scholarly readings that still have only automatically
+selected excerpts under `reading_depth.summary_review` in
+`data/source-quality-audit.json`. Here an accessible full article can still
+need editorial work. The existing acquisition list, `reading_depth.records`,
+tracks different problems. Work from the article's stable ID and exact source,
+then save the checked reading through the existing review or original-summary
+path. The next rebuild removes records with a completed checked reading.
+
+Give readers the actual task or setting, what the researchers compared or
+the author argued, and the observation that answers that question. Explain
+the denominator of a rate, distinguish a self-report from observed behavior,
+and retain important null and mixed outcomes. A short field can capture an
+article's headline. The bounded full reading has room for a concrete example
+and the reason a qualification changes the interpretation.

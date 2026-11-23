@@ -25,6 +25,7 @@ on:
       - 'scripts/build_visuals.py'
       - 'scripts/article_art.py'
       - 'scripts/article_art_queue.py'
+      - 'scripts/stage_article_art.py'
       - 'scripts/art_similarity.py'
       - 'tests/test_article_art.py'
       - 'tests/test_article_art_candidates.py'
@@ -158,7 +159,7 @@ jobs:
           cp assets/typography.css _site/assets/
           cp assets/article-layers.css _site/assets/
           cp -R assets/fonts _site/assets/
-          cp -R assets/article-art assets/editorial-covers _site/assets/
+          python scripts/stage_article_art.py _site
           mkdir -p _site/exports
           cp exports/zotero-fulltext-backlog.ris _site/exports/
           mkdir -p _site/issues

@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import article_art as art
 import build_public
+import stage_article_art
 from build_visuals import visual_spec
 
 
@@ -36,7 +37,94 @@ def png(width=12, height=8):
             chunk(b"IDAT", zlib.compress((b"\x00" + b"\xe0\x01\x22" * width) * height)) + chunk(b"IEND", b""))
 
 
+class PagesCoverStagingTests(unittest.TestCase):
+    def test_all_curated_collection_needs_no_generated_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            src = "assets/editorial-covers/tutor.webp"
+            thumb = "assets/editorial-covers/tutor-320.webp"
+            (root / src).parent.mkdir(parents=True)
+            (root / src).write_bytes(b"cover")
+            (root / thumb).write_bytes(b"thumbnail")
+            (root / "data").mkdir()
+            records = [{"title": "Tutor", "editorial_art": {"status": "ready", "src": src, "thumbnail_src": thumb}},
+                       {"title": "Pending cover", "editorial_art": {"status": "needs_review"}}]
+            (root / "data/public-library.json").write_text(json.dumps(records))
+            destination = root / "_site"
+            stage_article_art.stage(root, destination)
+            self.assertEqual((destination / src).read_bytes(), b"cover")
+            self.assertEqual((destination / thumb).read_bytes(), b"thumbnail")
+            self.assertFalse((destination / "assets/article-art").exists())
+
+    def test_generated_cover_stages_and_a_referenced_missing_thumbnail_fails(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            src = "assets/article-art/generated.svg"
+            thumb = "assets/article-art/generated-small.svg"
+            (root / src).parent.mkdir(parents=True)
+            (root / src).write_text("<svg/>")
+            (root / "data").mkdir()
+            record = {"title": "Generated", "editorial_art": {"status": "ready", "src": src}}
+            manifest = root / "data/public-library.json"
+            manifest.write_text(json.dumps([record]))
+            destination = root / "_site"
+            stage_article_art.stage(root, destination)
+            self.assertEqual((destination / src).read_text(), "<svg/>")
+            record["editorial_art"]["thumbnail_src"] = thumb
+            manifest.write_text(json.dumps([record]))
+            with self.assertRaisesRegex(FileNotFoundError, "generated-small"):
+                stage_article_art.stage(root, destination)
+
+
 class ArticleArtTests(unittest.TestCase):
+    def test_source_settings_change_the_drawn_scene_on_both_render_paths(self):
+        def fixture(*subjects):
+            return {"visual_subjects": list(subjects), "motif": "learning",
+                    "arrangement": "side_by_side"}
+
+        # Dashboard gets a custom scene; the workshop uses the motif renderer.
+        custom = fixture("dashboard", "writing")
+        general = fixture("craft", "writing")
+        self.assertIsNotNone(art.render_contextual_scene(custom))
+        self.assertIsNone(art.render_contextual_scene(general))
+        for spec in (custom, general):
+            svg = art.render_svg("one", {}, spec)
+            self.assertEqual(svg, art.render_svg("another", {}, spec, microvariation=False))
+            palette = art.PRINT_PALETTES[art.SUBJECTS[spec["visual_subjects"][0]][2]]
+            self.assertTrue(all(color.encode() in svg for color in
+                                (palette.ink, palette.paper, palette.wall, palette.accent, palette.second)))
+            self.assertNotIn(art.RED.encode(), svg)
+        # A new setting has its own light and surfaces even without the spot inks.
+        def geometry(spec):
+            nodes = ET.fromstring("<svg>" + "".join(art.scene_canvas(spec).parts) + "</svg>")
+            return [(node.tag, node.get("d"), node.get("cx"), node.get("cy")) for node in nodes]
+
+        rooms = {}
+        for subject, (_, _, setting) in art.SUBJECTS.items():
+            rooms.setdefault(setting, geometry(fixture(subject, "writing")))
+        self.assertEqual(set(rooms), set(art.PRINT_PALETTES))
+        self.assertEqual(len({tuple(shapes) for shapes in rooms.values()}), len(rooms))
+
+    def test_distinct_tasks_remain_legible_in_shared_settings_at_card_size(self):
+        import art_similarity
+        # The papers in each pair share a physical setting and primary object.
+        cases = (
+            ("stress", "wellbeing", "music", "effort"),
+            ("teacher", "reflection", "metacognition", "writing"),
+            ("undergraduate", "learning", "practice", "stress"),
+            ("network", "autonomy", "agency", "ballot"),
+        )
+        for primary, motif, left, right in cases:
+            specs = [{"visual_subjects": [primary, subject], "motif": motif,
+                      "arrangement": "side_by_side"} for subject in (left, right)]
+            for width, height in ((120, 76), (76, 58)):
+                with self.subTest(subjects=(left, right), size=(width, height)):
+                    images = [art.render_svg("", {}, spec) for spec in specs]
+                    metrics = art_similarity.compare(*(art_similarity.rasterize(image, width, height)
+                                                       for image in images))
+                    self.assertFalse(metrics["full_mean_difference"] < .025 and
+                                     metrics["foreground_mean_difference"] < .12, metrics)
+
     def test_k12_evidence_review_is_distinct_from_scale_measurement(self):
         import art_similarity
         rows = public_records()
