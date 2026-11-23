@@ -1362,7 +1362,7 @@ function showPaper(x){
    if(!conceptual&&!proposal)paragraph(account,review?"What the studies showed":"Reported results",machine.reported_results);
    paragraph(account,conceptual||proposal?"The authors’ proposal":"The authors’ interpretation",machine.authors_interpretation);
    paragraph(account,"Study limitations",machine.limitations);
-   paragraph(analysis,"Evidence and context",machine.critical_context);
+   paragraph(conceptual||proposal?account:analysis,"Evidence and context",machine.critical_context);
    paragraph(analysis,"Open question",machine.open_question);
    body.append(account);
   }else if(reviewedAccount){

@@ -549,21 +549,41 @@ def checked_machine_document(record):
  return machine
 
 
+def substantive_machine_account(machine, genre):
+ """Coverage establishes what was read. The public account also needs an answer and supporting detail."""
+ if not machine or machine.get("account_status","article_account")!="article_account":
+  return False
+ if genre in ("research","review"):
+  main=("reported_results",)
+  support=("study_design",)
+ elif genre=="proposal":
+  main=("study_design",)
+  support=("authors_interpretation","critical_context")
+ elif genre=="conceptual":
+  main=("authors_interpretation",)
+  support=("study_design","critical_context")
+ else:
+  main=("thesis",)
+  support=("reasoning","examples")
+ def sentences(fields):
+  return {tuple(re.findall(r"\w+",machine[key].casefold())) for key in fields if machine.get(key)}
+ return any(claim!=detail for claim in sentences(main) for detail in sentences(support))
+
+
 def machine_research_account(record):
  if record.get("kind")!="scholarly" or record.get("verified_article_review") or record.get("original_reading"):
   return {}
  from reading_headlines import reader_genre
- if reader_genre(record) not in ("research","review","proposal","conceptual"):
+ genre=reader_genre(record)
+ if genre not in ("research","review","proposal","conceptual"):
   return {}
  machine=checked_machine_document(record)
- if not any(machine.get(k) for k in ("research_question","study_design","reported_results","authors_interpretation")):
+ if not substantive_machine_account(machine,genre):
   return {}
  account={key:machine[key] for key in ("research_question","study_design","reported_results",
   "authors_interpretation","critical_context","limitations","open_question") if machine[key]}
- if reader_genre(record) in ("conceptual","proposal"):
+ if genre in ("conceptual","proposal"):
   account.pop("reported_results",None)
- if not any(account.get(k) for k in ("research_question","study_design","reported_results","authors_interpretation")):
-  return {}
  return {**account,"source_url":machine["source_url"],"source_version":machine["coverage"]["document_version"],
          "review_status":machine["review_status"]}
 
@@ -583,7 +603,7 @@ def deep_perspective(record,notes):
  key=((record.get("url") or "")+" "+(record.get("title") or "")).lower()
  extra=next((v for token,v in DEEP_PERSPECTIVES.items() if token in key),{})
  machine=checked_machine_document(record) if not extra.get("basis","").startswith("Editorial analysis") else {}
- if machine and machine["kind"]=="nonacademic":
+ if substantive_machine_account(machine,"nonacademic"):
   return {
    **{field:machine.get(field,"") for field in ("thesis","reasoning","examples","tension","implications","open_question","qualification")},
    "basis":machine.get("basis","AI-assisted source analysis"),
@@ -645,6 +665,10 @@ def annotate(record):
  if account:
   base["reading"]["machine_account"]=account
   base["reading"]["level"]="full_text"
+ elif r.get("machine_account") and r.get("level")=="full_text":
+  from reading_depth import has_article_sections
+  if not has_article_sections(record):
+   base["reading"]["level"]="abstract" if len(record.get("abstract_text") or "")>=90 else "citation_only"
  level=base["reading"].get("level")
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
