@@ -53,7 +53,9 @@ class CoverageWorkflowTests(unittest.TestCase):
             text=(ROOT/'.github/workflows'/name).read_text()
             self.assertIn('observatory-edition' if name=='weekly-edition.yml' else 'observatory-index',text)
             if name=='weekly-edition.yml':
-                self.assertIn('git diff --quiet "$publication_base" origin/main',text)
+                self.assertIn('git worktree add --detach "$checkout" origin/main',text)
+                self.assertIn('replay_weekly_edition.py "$GITHUB_WORKSPACE" "$policy"',text)
+                self.assertNotIn('git push --force',text)
                 self.assertIn('compose_issue.py --verify-release',text)
             self.assertIn('  queue: max',text)
             self.assertIn('  cancel-in-progress: false',text)
