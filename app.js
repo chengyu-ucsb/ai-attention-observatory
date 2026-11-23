@@ -1003,16 +1003,20 @@ function automaticEvidenceArtwork(x){
  const figure=make("figure","article-concept-art article-data-visual automatic-evidence");
  figure.setAttribute("aria-label","Study details");
  const board=make("div","auto-evidence-board");
+ const sources=blocks.map(block=>{
+  const basis=block.source||(block.label==="Reported finding"?spec.finding_source:spec.basis);
+  return ({abstract:"Source: abstract",editorial:"Source: editorial note",full_text:"Source: full text"})[basis]||"";
+ });
+ const shared=sources.every(source=>source===sources[0]);
  blocks.forEach((block,i)=>{
   const item=make("div","auto-evidence-item");
-  add(item,make("span","auto-evidence-n",String(i+1).padStart(2,"0")),
-    make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
-  const source=block.source||(block.label==="Reported finding"?spec.finding_source:spec.basis);
-  item.append(make("small","auto-evidence-source",source==="abstract"?"Source: abstract":source==="editorial"?"Source: editorial note":"Source: full text"));
+  add(item,make("strong","auto-evidence-label",block.label),make("p","auto-evidence-text",block.text));
+  if(!shared&&sources[i])item.append(make("small","auto-evidence-source",sources[i]));
   if(block.text.length>240)item.className+=" auto-evidence-wide";
   board.append(item);
  });
  figure.append(board);
+ if(shared&&sources[0])figure.append(make("figcaption","auto-evidence-source",sources[0]));
  return figure;
 }
 function conceptArtwork(x){
@@ -1234,6 +1238,11 @@ function showPaper(x){
  const conceptual=genre==="conceptual",proposal=genre==="proposal",review=genre==="review";
  const journalEditorial=genre==="editorial",reporting=genre==="reporting",product=genre==="guide";
  const edited=d.status==="editorially_written_from_indexed_sections";
+ // These four fields come from the checked article. Other full-text fields
+ // can be licensed extracts, so depth alone cannot identify editorial prose.
+ const reviewedAccount=research&&!original&&!proposal&&r.level==="full_text"&&
+  d.editorial_basis==="publisher_full_article_paraphrased"&&r.methods&&r.limitations&&
+  (conceptual?r.interpretation:r.findings);
  const abstractPreview=d.status==="journal_abstract_preview"||(journalEditorial&&!deep.thesis&&Boolean(x.abstract_text));
  // Backward compatibility for previously cached article payloads that mixed
  // an intake notice into the public digest. Current exports supply clean text.
@@ -1261,7 +1270,8 @@ function showPaper(x){
   ?add(make("div","rv-summary-idea"),make("span","rv-source-meta","From the abstract"),make("p","",lead))
   :make("p","rv-summary-idea",lead);
  if(leadParagraph)intro.append(leadParagraph);
- if(research&&(original||edited||conceptual)){
+ if(research&&(original||edited||conceptual)&&
+    !(reviewedAccount&&[r.methods,r.findings,r.interpretation,r.limitations].includes(d.explain))){
   const overview=fresh(d.explain);
   if(overview)intro.append(layerButton("More context","Overview",readingProse(overview),"rv-overview"));
  }
@@ -1269,7 +1279,7 @@ function showPaper(x){
  const byline=[author,x.venue,date(x.published)].filter((v,i,a)=>v&&v!=="Undated"&&a.indexOf(v)===i);
  const sourceRow=make("div","rv-source-row");
  if(byline.length)sourceRow.append(make("span","",byline.join(" · ")));
- const basis=research?(original&&r.source_version?checkedSourceLabel(r):readingBasisName(x)):"";
+ const basis=reviewedAccount?"Based on the full article":research?(original&&r.source_version?checkedSourceLabel(r):readingBasisName(x)):"";
  if(basis)sourceRow.append(make("span","",basis));
  const primaryUrl=httpsSourceUrl(original?r.source_url:x.url);
  if(primaryUrl)sourceRow.append(link("Read original",primaryUrl,"rv-byline-link"));
@@ -1291,23 +1301,30 @@ function showPaper(x){
  }
  if(research){
   const graphic=proposal?null:reviewedEvidenceArtwork(x)||(original?null:conceptArtwork(x));
-  const art=conceptual&&graphic?.className.includes("automatic-evidence")?null:graphic;
+  const art=(conceptual||reviewedAccount)&&graphic?.className.includes("automatic-evidence")?null:graphic;
   const auto=Boolean(art?.className.includes("automatic-evidence"));
-  if(!auto){
+  if(reviewedAccount){
+   const account=make("div","rv-longform rv-study-account");
+   paragraph(account,conceptual?"How the authors developed the framework":review?"What the authors reviewed":"How the study worked",r.methods);
+   if(!conceptual)paragraph(account,review?"What the studies showed":"What the researchers observed",r.findings);
+   paragraph(account,conceptual?"What the framework proposes":"How the authors interpret it",r.interpretation);
+   paragraph(account,conceptual?"What still needs testing":review?"Limits of the evidence":"What the design leaves open",r.limitations);
+   body.append(account);
+  }else if(!auto){
    const result=proposal?"":conceptual?(d.interpretation||d.explain||d.idea):d.finding;
    const claim=fresh(result);
    if(claim)body.append(add(make("div","rv-claim"),readingBullets(claim)));
   }
   if(art)body.append(add(make("div","rv-artwork"),art));
   const context=make("div","rv-context-grid");
-  if(!auto){
+  if(!auto&&!reviewedAccount){
    paragraph(context,proposal?"Proposed design":conceptual?"How the authors developed it":review?"What the authors reviewed":"How it was studied",d.approach,"rv-context");
    paragraph(context,proposal||conceptual?"What still needs testing":"Study limitations",limitText(d.limitation,"limitation"),"rv-context");
    if(context.children.length)body.append(context);
   }
   // The overview already carries the concrete result. A Discussion chapter is
   // for an identifiable explanation or proposal from the authors.
-  if(conceptual||/\b(?:authors?|researchers?)\s+(?:also\s+)?(?:suggest|propos|argu|interpret|hypothes|speculat|attribut|explain|recommend)/i.test(d.interpretation||"")){
+  if(!reviewedAccount&&(conceptual||/\b(?:authors?|researchers?)\s+(?:also\s+)?(?:suggest|propos|argu|interpret|hypothes|speculat|attribut|explain|recommend)/i.test(d.interpretation||""))){
    paragraph(analysis,conceptual?"Applying the framework":"The authors’ explanation",d.interpretation,"rv-take");
   }
   if(!original&&conceptual){
@@ -1315,7 +1332,7 @@ function showPaper(x){
     const cutAt=phase.indexOf(":");paragraph(analysis,cutAt>0?phase.slice(0,cutAt):"",cutAt>0?phase.slice(cutAt+1):phase);
    }
   }
-  if(!original&&deep.research_question&&!proposal){
+  if(!original&&!reviewedAccount&&deep.research_question&&!proposal){
    for(const [label,value] of [["Research question",deep.research_question],["Study design",deep.study_design],["Reported results",deep.reported_results],["The authors’ explanation",deep.authors_interpretation],["Study limitations",deep.limitations]])paragraph(analysis,label,value);
   }
   const reader=sourceReader(x);if(reader)evidencePanel.append(reader);

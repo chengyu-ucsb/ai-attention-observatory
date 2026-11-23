@@ -185,8 +185,30 @@ assert(!match(paperContainer,"story-visual-reading"),"New articles must not add 
 const automatic=match(paperContainer,"automatic-evidence");
 assert(automatic,"A new unrecognized DOI must receive a data-grounded evidence graphic");
 assert.equal(matching(automatic,"auto-evidence-item").length,3,"Evidence figure needs three supported sections");
+assert.equal(matching(automatic,"auto-evidence-source").length,1,"A shared source belongs on the figure once");
+assert(!match(automatic,"auto-evidence-n"),"Evidence headings should read without decorative numbers");
 assert(!match(paperContainer,"rv-context-grid"),"Do not repeat all the visual evidence as text cards");
 assert(textContent(automatic).includes("cannot establish a causal mechanism"));
+// A future checked article can have older licensed extracts and a terse legacy snapshot.
+const checkedReading={...future,title:"Two practice formats in one class",reading:{...future.reading,level:"full_text",
+ methods:"One class tried two activities in consecutive weeks. Students used a tutor first and a quiz second.",
+ findings:"The log counted practice sessions. Half the sessions included an answer to the opening question.",
+ interpretation:"The authors suggest that some students opened the activity to look at the questions.",
+ limitations:"Every student tried the tutor first, so practice and topic could explain the difference.",
+ digest:{...future.reading.digest,status:"editorially_written_from_indexed_sections",editorial_basis:"publisher_full_article_paraphrased",finding_source:"editorial"}},
+ analysis:{fulltext_url:"https://example.org/study",methods:"Older indexed paper section."}};
+ctx.selected=checkedReading;vm.runInContext("TEST.showPaper(selected)",ctx);
+const studyOverview=match(paperContainer,"rv-panel-overview"),account=match(studyOverview,"rv-study-account");
+assert(account&&!hiddenBySection(account),"Full study account must be available on the first view");
+for(const field of ["methods","findings","interpretation","limitations"])assert(proseText(account).includes(checkedReading.reading[field]),field);
+assert(!match(studyOverview,"automatic-evidence")&&!proseText(account).includes("Older indexed paper section."));
+assert(proseText(match(paperContainer,"rv-source-row")).includes("Based on the full article"));
+const framework={...checkedReading,reader_genre:"conceptual",reading:{...checkedReading.reading,findings:"",
+ digest:{...checkedReading.reading.digest,status:"conceptual_framework",finding:"",finding_source:"none"}}};
+ctx.selected=framework;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(match(paperContainer,"rv-study-account"));
+assert(!proseText(match(paperContainer,"rv-panel-overview")).includes("What the researchers observed"));
+assert(proseText(match(paperContainer,"rv-panel-overview")).includes("What the framework proposes"));
 const unknown={...future,doi:"10.9999/unknown-2027",
  reading:{level:"abstract",digest:{idea:"What helps people manage attention?",status:"automatically_condensed_source_text",finding:"",finding_source:"none"}},
  visual:{kind:"illustration_only",reason:"insufficient_indexed_evidence"}};
@@ -485,7 +507,7 @@ for(const doi of visualDoi){
 const idea=db.find(x=>x.doi==="10.58304/ijts.260930");
 if(idea){
  ctx.selected=idea;vm.runInContext("TEST.showPaper(selected)",ctx);
- assert(match(paperContainer,"rv-claim"),"Important specific findings should be immediately readable");
+ assert(match(paperContainer,"rv-claim")||match(paperContainer,"rv-study-account"),"Important specific findings should be immediately readable");
  assert(match(paperContainer,"article-data-visual"),"Specific source-grounded method graphic missing");
 } // Journals still awaiting venue screening must not be forced into the public library.
 const adjacent=db.find(x=>x.doi==="10.3389/fpsyg.2026.1930030");
