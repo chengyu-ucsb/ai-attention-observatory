@@ -45,10 +45,13 @@ def claim_schema(kind,spans):
             'no_claim_reason':{'type':'string'}}}
 
 
-def verification_schema():
+def verification_schema(claim_count=None):
+    item={'type':'integer'}
+    if claim_count is not None:
+        item['enum']=list(range(claim_count))
     return {'type':'object','additionalProperties':False,
         'required':['supported','rejected'],'properties':{
-            key:{'type':'array','maxItems':6,'items':{'type':'integer'}}
+            key:{'type':'array','maxItems':6 if claim_count is None else claim_count,'items':item}
             for key in ('supported','rejected')}}
 
 
@@ -347,9 +350,10 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
             '"rejected":[zero-based indexes]}. Support only claims whose entire text is justified. '
             'The selected quote must be relevant evidence for that claim, not an unrelated '
             'passage. Check its meaning against the full original context and caveats. '
+            'Use only these IDs, exactly once across both arrays: '+str(list(range(len(claims))))+'. '
             '\nCLAIMS:\n'+json.dumps(claims,ensure_ascii=False)+
             '\nORIGINAL SOURCE:\n'+(labelled if chunk.get('unit_context') else chunk['text']),500,
-            schema=verification_schema(),deadline=deadline,claim_count=len(claims))
+            schema=verification_schema(len(claims)),deadline=deadline,claim_count=len(claims))
         validate_verdict(check,len(claims))
     return claims
 
@@ -426,7 +430,7 @@ def format_retry_exhausted(record):
 
 
 def due(record,today,now=None):
-    if record.get('source_review') or (record.get('analysis') or {}).get('original_paraphrases_only'):
+    if record.get('source_review') or record.get('original_reading') or (record.get('analysis') or {}).get('original_paraphrases_only'):
         return False
     deep=record.get('deep_analysis') or {}
     coverage=deep.get('coverage',{})
@@ -435,6 +439,9 @@ def due(record,today,now=None):
         return False
     # A complete pass over partial input must remain eligible for fuller access.
     attempt=record.get('complete_reading_attempt') or {}
+    if (deep.get('version')==3 and coverage.get('all_retrieved_text_processed')
+            and attempt.get('status')=='summarized'):
+        return True
     if format_retry_exhausted(record): return False
     if now is not None and attempt.get('retry_after'):
         return datetime.fromisoformat(attempt['retry_after'])<=now

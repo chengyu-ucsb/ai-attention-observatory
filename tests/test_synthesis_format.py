@@ -123,7 +123,7 @@ class SynthesisFormatTests(unittest.TestCase):
         self.assertEqual(reading.read_chunk(model, CHUNK, 'scholarly', 'Title'), [CLAIM])
         calls = model.create_chat_completion.call_args_list
         self.assertEqual(calls[0].kwargs['response_format']['schema'], reading.claim_schema('scholarly', reading.source_spans(CHUNK)))
-        self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema())
+        self.assertEqual(calls[1].kwargs['response_format']['schema'], reading.verification_schema(1))
         self.assertEqual(calls[0].kwargs['max_tokens'], 2200)
         self.assertEqual(calls[1].kwargs['max_tokens'], 500)
         self.assertIn('limitations', calls[0].kwargs['response_format']['schema']['properties']['claims']['items']['properties']['field']['enum'])

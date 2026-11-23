@@ -16,13 +16,18 @@ SCHOLARLY_WRITING = (
     "and its variation. For conceptual work explain the authors' proposal and reasoning without "
     "inventing participants or results. Preserve material nulls, reversals and qualifications. "
     "Distinguish the authors' interpretation from observed findings. Explain the particular "
-    "inference a design limit leaves open. Put an idea in its most informative field once."
+    "inference a design limit leaves open. A scale reliability check is not the main finding "
+    "of a study about the relationship between reported tool use and achievement. If only "
+    "instrument checks appear, leave the substantive result absent. Give at most three "
+    "high-value statements unless further distinct results or limits are essential."
 )
 SCHOLARLY_VERIFICATION = (
     "Check who did or said what, the comparison, direction, units, and whether this was "
     "self-report, recorded performance or transfer. Reject an estimate without its outcome, "
     "methods as findings, hypothesis or cited prior work as this paper's result, or a proposal "
-    "rewritten as a measured effect. Reject generic prose that could describe an unrelated paper. "
+    "rewritten as a measured effect. A measurement-validation statistic, manipulation check "
+    "or ancillary model fit is not a substantive study outcome unless evaluating that measure "
+    "or fit was the stated question. Reject generic prose that could describe an unrelated paper. "
     "For tables verify the row, column, measure, group and unit; an isolated caption or "
     "unresolved cell alignment cannot establish a comparative finding."
 )
