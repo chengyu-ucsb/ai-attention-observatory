@@ -57,7 +57,7 @@ def xml_units(root):
     containers = {'article', 'front', 'article-meta', 'body', 'back', 'sec',
                   'tei', 'teiheader', 'filedesc', 'profiledesc', 'text', 'div', 'group',
                   'abstract', 'table', 'table-wrap', 'thead', 'tbody', 'tfoot',
-                  'figure', 'fig', 'caption', 'table-wrap-foot'}
+                  'figure', 'fig', 'caption', 'table-wrap-foot', 'app-group', 'app'}
     units = []
 
     def add(text, location, role, headings, columns=None):
@@ -71,8 +71,9 @@ def xml_units(root):
     def annotated_rows(table):
         rows = []
         structure = []
+        header_rows = set()
         nested = False
-        def collect(node):
+        def collect(node, in_header=False):
             nonlocal nested
             for child in node:
                 tag = local(child.tag)
@@ -80,13 +81,16 @@ def xml_units(root):
                     nested = True
                 elif tag in {'tr', 'row'}:
                     rows.append(child)
+                    if in_header:
+                        header_rows.add(child)
                 else:
-                    collect(child)
+                    collect(child, in_header or tag == 'thead')
         collect(table)
         for row in rows:
             cells = [cell for cell in row if local(cell.tag) in {'td', 'th', 'cell'}]
-            is_header = (row.get('role', '').lower() in {'label', 'header'} or
-                         bool(cells) and all(local(cell.tag) == 'th' for cell in cells))
+            is_header = (row in header_rows or row.get('role', '').lower() in {'label', 'header'} or
+                         bool(cells) and all(local(cell.tag) == 'th' and cell.get('scope') != 'row'
+                                             for cell in cells))
             merged = any(cell.get(key, '1') != '1' for cell in cells
                          for key in ('rowspan', 'colspan', 'rows', 'cols'))
             # Non-cell content cannot be paired with a header. Retain its text.
@@ -110,15 +114,15 @@ def xml_units(root):
             if heading:
                 headings = (*headings, heading)
                 role = section_role(headings, role)
-        if tag in {'front', 'teiheader', 'article-meta', 'back'}:
+        if tag in {'front', 'teiheader', 'article-meta', 'ack', 'funding-group', 'fn-group'}:
             role = 'metadata'
-        elif tag in {'ref-list', 'listbibl', 'biblstruct'}:
-            role = 'references' if role != 'metadata' or tag != 'biblstruct' else role
+        elif tag in {'ref-list', 'listbibl'}:
+            role = 'references'
         elif tag == 'abstract':
             role = 'abstract'
-        elif tag in {'caption', 'figdesc', 'label', 'table-wrap-foot'}:
+        elif tag in {'figure', 'fig', 'caption', 'figdesc', 'label', 'table-wrap-foot'}:
             role = 'caption'
-        elif tag in {'head','title'} and headings:
+        elif tag in {'head','title'} and headings and role != 'caption':
             role = 'heading'
         elif tag == 'body':
             role = 'body'

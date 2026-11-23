@@ -64,7 +64,7 @@ def section_role(headings, default='body'):
     role = default
     for heading in headings:
         title = re.sub(r'^\s*\d+(?:\.\d+)*[.\s]*', '', heading).strip(' :.').casefold()
-        if role in {'references', 'metadata', 'prior_work', 'hypotheses'}:
+        if role in {'references', 'metadata', 'abstract', 'prior_work', 'hypotheses'}:
             continue
         if title in {'references', 'bibliography', 'literature cited', 'works cited'}:
             role = 'references'
@@ -231,7 +231,12 @@ class ArticleParser(HTMLParser):
         rows = []
         for row in (item for item in elements if item.tag == 'tr'):
             cells = list(table_elements(row, {'td', 'th'}))
-            header = bool(cells) and all(cell.tag == 'th' for cell in cells)
+            parent = row.parent
+            while parent is not None and parent.tag not in {'thead', 'table'}:
+                parent = parent.parent
+            header = (parent is not None and parent.tag == 'thead' or
+                      bool(cells) and all(cell.tag == 'th' and cell.attrs.get('scope') != 'row'
+                                          for cell in cells))
             merged = any(str(cell.attrs.get(key, '1')) != '1'
                          for cell in cells for key in ('rowspan', 'colspan'))
             rows.append((header, [cell_text(cell) for cell in cells], merged))

@@ -69,6 +69,15 @@ class XMLParsingTests(unittest.TestCase):
         self.assertEqual(doc.coverage['pages_with_text'], 3)
         self.assertEqual(doc.coverage['evidence_status'], 'partial_full_text')
         self.assertEqual([unit['text'] for unit in doc.units], page_text)
+        xml_url = 'https://www.ebi.ac.uk/europepmc/webservices/rest/PMC123/fullTextXML'
+        alternative = xml.document_from_xml(jats(), RECORD, xml_url, format='jats')
+        candidates = [access.candidate(doc.url, 'known_pdf', DOI),
+                      {**access.candidate(xml_url, 'europe_pmc', DOI), 'structured_format': 'jats'}]
+        with patch.object(access, 'fetch_candidate', side_effect=[doc, alternative]):
+            selected, diagnostics = access.retrieve(RECORD, providers=[], known_sources=candidates)
+        self.assertIs(selected, alternative)
+        self.assertEqual([item['status'] for item in diagnostics],
+                         ['partial_full_text', 'full_document_retrieved'])
 
     def test_complete_jats_includes_intro_tables_tail_and_references_without_duplicate_text(self):
         doc=xml.document_from_xml(jats(),RECORD,'https://www.ebi.ac.uk/test',format='jats')
