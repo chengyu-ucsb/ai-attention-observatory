@@ -37,6 +37,34 @@ def png(width=12, height=8):
 
 
 class ArticleArtTests(unittest.TestCase):
+    def test_source_settings_change_the_drawn_scene_on_both_render_paths(self):
+        def fixture(*subjects):
+            return {"visual_subjects": list(subjects), "motif": "learning",
+                    "arrangement": "side_by_side"}
+
+        # Dashboard gets a custom scene; the workshop uses the motif renderer.
+        custom = fixture("dashboard", "writing")
+        general = fixture("craft", "music")
+        self.assertIsNotNone(art.render_contextual_scene(custom))
+        self.assertIsNone(art.render_contextual_scene(general))
+        for spec in (custom, general):
+            svg = art.render_svg("one", {}, spec)
+            self.assertEqual(svg, art.render_svg("another", {}, spec, microvariation=False))
+            palette = art.PRINT_PALETTES[art.SUBJECTS[spec["visual_subjects"][0]][2]]
+            self.assertTrue(all(color.encode() in svg for color in
+                                (palette.ink, palette.paper, palette.wall, palette.accent, palette.second)))
+            self.assertNotIn(art.RED.encode(), svg)
+        # A new setting has its own light and surfaces even without the spot inks.
+        def geometry(spec):
+            nodes = ET.fromstring("<svg>" + "".join(art.scene_canvas(spec).parts) + "</svg>")
+            return [(node.tag, node.get("d"), node.get("cx"), node.get("cy")) for node in nodes]
+
+        rooms = {}
+        for subject, (_, _, setting) in art.SUBJECTS.items():
+            rooms.setdefault(setting, geometry(fixture(subject, "writing")))
+        self.assertEqual(set(rooms), set(art.PRINT_PALETTES))
+        self.assertEqual(len({tuple(shapes) for shapes in rooms.values()}), len(rooms))
+
     def test_k12_evidence_review_is_distinct_from_scale_measurement(self):
         import art_similarity
         rows = public_records()

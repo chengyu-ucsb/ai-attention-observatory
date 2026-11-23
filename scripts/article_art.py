@@ -37,10 +37,11 @@ from pathlib import Path, PurePosixPath
 import re
 import unicodedata
 import struct
+from typing import NamedTuple
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit, unquote
 
 ROOT = Path(__file__).resolve().parents[1]
-RENDERER_VERSION = "editorial-svg-2"
+RENDERER_VERSION = "editorial-svg-3"
 CANDIDATE_POLICY_VERSION = "grounded-pairs-1"
 MAX_ART_CANDIDATES = 6
 RED, INK, PAPER, MUTED = "#E00122", "#171714", "#F4F0E8", "#D8D1C5"
@@ -458,13 +459,20 @@ class Canvas:
     """A tiny closed SVG vocabulary: no user markup, fonts, refs, or embedded assets."""
     def __init__(self):
         self.parts = []
+        self.paints = {}
+        self.second_ink = RED
 
     def tag(self, name, **attrs):
+        for key in ("fill", "stroke"):
+            if key in attrs:
+                attrs[key] = self.paints.get(attrs[key], attrs[key])
         safe = " ".join(f'{k.replace("_", "-")}="{html.escape(str(v), quote=True)}"' for k, v in attrs.items())
         self.parts.append(f"<{name} {safe}/>")
 
     def path(self, d, fill=INK, stroke="none", width=3, **attrs):
-        self.tag("path", d=d, fill=fill, stroke=stroke, stroke_width=width, **attrs)
+        if stroke != "none":
+            attrs.update(stroke=stroke, stroke_width=width)
+        self.tag("path", d=d, fill=fill, **attrs)
 
     def line(self, x1, y1, x2, y2, color=INK, width=4, **attrs):
         self.tag("path", d=f"M{x1} {y1} L{x2} {y2}", fill="none", stroke=color, stroke_width=width,
@@ -477,7 +485,12 @@ class Canvas:
         self.tag("circle", cx=x, cy=y, r=r, fill=fill, **attrs)
 
     def group(self, x=0, y=0, scale=1, rotate=0):
-        self.parts.append(f'<g transform="translate({x} {y}) rotate({rotate}) scale({scale})">')
+        transforms = [f"translate({x} {y})"]
+        if rotate:
+            transforms.append(f"rotate({rotate})")
+        if scale != 1:
+            transforms.append(f"scale({scale})")
+        self.parts.append(f'<g transform="{" ".join(transforms)}">')
 
     def end(self):
         self.parts.append("</g>")
@@ -486,7 +499,8 @@ class Canvas:
 def page(c, x, y, scale=1, angle=0, color=PAPER):
     c.group(x, y, scale, angle)
     c.path("M0 0 H116 L150 34 V182 H0 Z", color, INK, 4)
-    c.path("M116 0 V34 H150", "none", INK, 3)
+    c.path("M116 0 L150 34 H116 Z", MUTED, INK, 3)
+    c.path("M7 12 V174 H139", "none", MUTED, 4)
     # Fold and blank margins are visual objects, not fake text or data rows.
     c.line(18, 151, 127, 151, MUTED, 3)
     c.end()
@@ -497,6 +511,7 @@ def book(c, x, y, scale=1, angle=0):
     c.path("M0 22 Q70 -2 140 27 Q210 -2 280 22 V160 Q211 139 140 163 Q70 139 0 160 Z", INK)
     c.path("M8 12 Q75 -9 140 18 Q205 -9 272 12 V148 Q205 125 140 151 Q75 125 8 148 Z", PAPER, INK, 4)
     c.path("M140 18 V151 M25 29 Q75 15 121 32 M159 32 Q207 16 254 29", "none", INK, 3)
+    c.path("M9 135 Q76 113 136 139 L140 150 Q68 126 9 148 Z M150 143 Q214 117 269 135 V145 Q209 124 150 150 Z", MUTED)
     c.path("M217 6 V71 L230 58 L243 72 V9 Z", RED)
     c.end()
 
@@ -509,6 +524,7 @@ def screen(c, x, y, scale=1, angle=0, closed=False):
     else:
         c.rect(0, 0, 210, 145, INK, rx=9)
         c.rect(13, 13, 184, 116, PAPER, rx=2)
+        c.path("M15 15 H102 L16 98 Z", MUTED)
         c.path("M-18 146 H228 L242 166 H-30 Z", INK)
         c.path("M70 48 L47 70 L70 92 M140 48 L163 70 L140 92 M113 40 L97 100", "none", RED, 7)
     c.end()
@@ -518,6 +534,7 @@ def phone(c, x, y, scale=1, angle=0):
     c.group(x, y, scale, angle)
     c.rect(0, 0, 95, 165, INK, rx=16)
     c.rect(8, 15, 79, 129, PAPER, rx=5)
+    c.path("M10 17 H74 L10 86 Z", MUTED)
     c.rect(32, 6, 31, 5, PAPER, rx=2)
     c.circle(48, 154, 4, PAPER)
     c.path("M34 52 L62 52 L62 92 L34 92 Z", RED)
@@ -534,13 +551,15 @@ def hand(c, x, y, scale=1, angle=0, color=INK):
 def envelope(c, x, y, scale=1, angle=0, color=PAPER):
     c.group(x, y, scale, angle)
     c.rect(0, 0, 102, 68, color, stroke=INK, stroke_width=3)
-    c.path("M0 0 L51 37 L102 0 M0 68 L35 29 M102 68 L67 29", "none", INK, 3)
+    c.path("M1 1 H101 L51 38 Z", MUTED, INK, 3)
+    c.path("M0 68 L35 29 M102 68 L67 29", "none", INK, 3)
     c.end()
 
 
 def lens(c, x, y, scale=1, angle=0):
     c.group(x, y, scale, angle)
     c.circle(0, 0, 90, PAPER, stroke=INK, stroke_width=13)
+    c.path("M-64 -12 Q-56 -66 5 -68 Q-34 -42 -57 -1 Z", MUTED)
     c.circle(0, 0, 72, "none", stroke=RED, stroke_width=4)
     c.path("M59 67 L146 162", "none", INK, 29, stroke_linecap="round")
     c.path("M-46 -31 Q-32 -56 -6 -58", "none", MUTED, 8, stroke_linecap="round")
@@ -550,66 +569,112 @@ def lens(c, x, y, scale=1, angle=0):
 def plant(c, x, y, scale=1):
     c.group(x, y, scale)
     c.path("M0 0 L16 83 H95 L111 0 Z", RED)
+    c.path("M11 7 H102 L99 21 H16 Z", PAPER)
     c.path("M54 0 Q30 -52 61 -130 M56 -37 Q5 -41 4 -85 Q50 -88 56 -37 M55 -70 Q100 -122 123 -88 Q108 -52 55 -70", "none", INK, 7)
     c.end()
 
 
-def draw_setting(c: Canvas, spec: dict):
-    """Semantic settings use different negative space, framing, and surfaces."""
-    setting = spec["setting"]
+# The first source-grounded object chooses the physical setting. Desk surfaces,
+# window light, book cloth and cut paper each have their own print separations.
+class PrintPalette(NamedTuple):
+    ink: str
+    paper: str
+    wall: str
+    surface: str
+    accent: str
+    second: str
+    light: str
+
+
+PRINT_PALETTES = {
+    "library": PrintPalette("#30374E", "#FFF0CC", "#E6BA87", "#928BB0", "#BC4C39", "#47776F", "#F4D9A6"),
+    "studio": PrintPalette("#402846", "#FFF0CB", "#F5B1A0", "#B88BC0", "#B94152", "#306B8A", "#F8D576"),
+    "workbench": PrintPalette("#193E42", "#FFF0C7", "#A9CAC0", "#68A399", "#C25334", "#306D86", "#E4C779"),
+    "folded_paper": PrintPalette("#382E53", "#FFEDC8", "#D1ADD5", "#9C83B3", "#AD4554", "#336392", "#F4C185"),
+    "night_window": PrintPalette("#2A304F", "#FDEAC3", "#A2A8D1", "#737BA9", "#AE4D55", "#387782", "#F5CB7C"),
+    "digital_window": PrintPalette("#263853", "#EFF8E6", "#B0D6DC", "#85ADC7", "#AA495B", "#197886", "#D4CEAD"),
+    "threshold": PrintPalette("#482E36", "#FFF0D1", "#ECC29E", "#CA8E7D", "#AD403F", "#366E70", "#F5D594"),
+    "classroom": PrintPalette("#253F41", "#FFF2D2", "#AFCCC0", "#77A6A3", "#B34C42", "#5F668B", "#E8D7A7"),
+    "quiet_room": PrintPalette("#34453E", "#FFF1D2", "#CDD0AA", "#98B299", "#A7494E", "#536F91", "#F0CD98"),
+}
+
+
+def scene_canvas(spec: dict) -> Canvas:
+    """Light the scene and establish depth before placing either subject."""
+    setting = SUBJECTS[spec["visual_subjects"][0]][2]
+    p = PRINT_PALETTES[setting]
+    c = Canvas()
+    c.rect(0, 0, 1200, 760, p.wall)
     if setting == "library":
-        c.path("M0 0 H1200 V122 H166 V760 H0 Z", RED)
-        c.path("M878 159 H1154 V654 H878 Z", MUTED)
-        c.line(872, 650, 1166, 650, INK, 9)
+        # Cloth bindings, a visible shelf lip and a pool of reading light.
+        c.path("M0 0 H1200 V126 H0 Z", p.surface)
+        c.path("M44 0 H83 V104 H44 Z M92 0 H144 V104 H92 Z M161 0 L214 8 L194 105 L144 95 Z M938 0 H978 V105 H938 Z M991 0 H1041 V105 H991 Z M1058 0 L1098 0 L1124 100 L1082 108 Z", p.ink)
+        c.path("M0 106 H1200 V121 H0 Z M0 640 L1200 577 V760 H0 Z", p.accent)
+        c.path("M0 645 L1200 582 V612 L0 679 Z", p.light)
+        c.path("M118 641 Q465 490 953 590 L783 612 Z", p.surface)
     elif setting == "studio":
-        c.path("M54 54 H1147 V706 H54 Z", "none", RED, 21)
-        c.path("M857 55 L1145 55 L1145 705 L1021 705 Z", RED)
-    elif setting == "folded_paper":
-        c.path("M0 0 H883 L1062 183 L939 760 H0 Z", PAPER)
-        c.path("M883 0 L1062 183 L940 760 H1200 V0 Z", RED)
-        c.path("M883 0 V193 L1062 183", "none", INK, 3)
-        c.line(74, 687, 847, 687, INK, 3)
-    elif setting == "night_window":
-        c.rect(0, 0, 1200, 760, INK)
-        c.rect(58, 63, 1084, 634, PAPER)
-        c.path("M789 64 H1142 V440 H789 Z", RED)
-        c.circle(1008, 191, 85, PAPER)
-        c.circle(1048, 162, 79, RED)
-        c.line(793, 344, 1143, 344, INK, 8)
-    elif setting == "digital_window":
-        c.rect(57, 60, 1086, 635, PAPER, stroke=INK, stroke_width=8, rx=18)
-        c.rect(62, 65, 1076, 48, INK)
-        for x in (87, 110, 133):
-            c.circle(x, 89, 5, PAPER)
-        c.path("M900 117 H1137 V690 H900 Z", RED)
-    elif setting == "threshold":
-        c.path("M814 0 H1200 V760 H814 V614 H1087 V144 H814 Z", INK)
-        c.path("M1079 144 L939 229 V760 H1079 Z", RED)
-        c.path("M0 683 H815 L940 760 H0 Z", MUTED)
-    elif setting == "classroom":
-        c.path("M0 0 H1200 V129 H0 Z", INK)
-        c.path("M0 129 H166 V760 H0 Z", RED)
-        c.path("M869 185 H1125 V642 H869 Z", "none", INK, 6)
-        c.line(849, 655, 1144, 655, INK, 10)
-    elif setting == "quiet_room":
-        c.path("M822 0 H1200 V760 H1100 V113 H822 Z", RED)
-        c.path("M843 144 H1100 V507 H843 Z", MUTED)
-        c.line(971, 145, 971, 506, PAPER, 7)
-        c.line(844, 316, 1098, 316, PAPER, 7)
-        c.path("M0 648 H1200 V760 H0 Z", MUTED)
+        # Overlapping sheets with a curled corner and a torn deckle edge.
+        c.path("M0 50 L555 0 H1154 L1073 680 L98 751 L0 507 Z", p.surface)
+        c.path("M0 34 L540 0 H1132 L1040 655 L86 727 L0 494 Z", p.light)
+        c.path("M0 423 L77 714 L192 703 L175 712 L125 725 L83 742 L60 724 Z", p.second)
+        c.path("M936 0 H1132 L1110 159 Q1041 104 936 0 Z", p.paper)
+        c.path("M0 751 L169 726 L187 730 L315 709 L336 713 L487 695 L498 702 L728 672 L758 677 L1045 643 L1200 613 V760 H0 Z", p.accent)
     elif setting == "workbench":
-        c.path("M0 0 H1200 V95 H0 Z", RED)
-        c.path("M0 642 L1200 603 V760 H0 Z", INK)
-        c.path("M828 187 L1114 151 L1157 530 L870 567 Z", MUTED)
-    else:
-        c.path("M0 0 H137 V760 H0 Z", RED)
-        c.path("M0 664 H1200 V760 H0 Z", MUTED)
-    if spec["arrangement"] == "facing_panels":
-        c.line(823, 163, 823, 599, RED, 7)
-    elif spec["arrangement"] == "shared_table":
-        c.path("M94 603 Q550 556 1126 606 V630 H94 Z", MUTED)
-    elif spec["arrangement"] == "separated_support":
-        c.path("M818 566 H873 M1014 566 H1122", "none", RED, 14)
+        # The bevel on the near edge and ruled cuts describe a cutting mat.
+        c.path("M0 123 L993 30 L1200 157 V639 L171 760 H0 Z", p.surface)
+        c.path("M0 134 L990 54 L1200 180 V605 L164 732 L0 700 Z", p.wall)
+        c.path("M0 701 L162 735 L1200 607 V647 L164 760 H0 Z", p.ink)
+        c.path("M5 135 L990 56 L1200 181 M984 56 L1014 77 M929 62 L949 78 M873 69 L894 85 M816 73 L837 90 M0 647 L168 681 L1199 559", "none", p.second, 4)
+        c.path("M0 0 H505 L169 58 L0 66 Z M1042 760 L1200 687 V760 Z", p.light)
+    elif setting == "folded_paper":
+        c.path("M0 0 H762 L349 214 L0 641 Z", p.light)
+        c.path("M762 0 L349 214 L0 641 L58 760 H0 V590 Z", p.paper)
+        c.path("M1200 29 L857 467 L685 760 H1200 Z", p.surface)
+        c.path("M857 467 L1200 29 V195 Z", p.second)
+        c.path("M0 641 L349 214 L762 0 M685 760 L857 467 L1200 195", "none", p.ink, 3)
+    elif setting == "night_window":
+        c.path("M0 0 H1200 V503 Q892 368 687 174 Q307 22 0 116 Z", p.surface)
+        c.circle(1028, 83, 125, p.light)
+        c.path("M0 51 Q420 -28 693 144 Q937 320 1200 367 V404 Q877 315 681 166 Q400 21 0 84 Z", p.paper)
+        c.path("M0 641 L1200 566 V760 H0 Z", p.ink)
+        c.path("M0 632 L1200 557 V575 L0 653 Z", p.second)
+    elif setting == "digital_window":
+        # Broad reflected panes extend beyond the frame, leaving the tools legible.
+        c.path("M0 0 H398 L0 387 Z M938 0 H1200 V106 L623 760 H302 Z", p.surface)
+        c.path("M0 0 H271 L0 275 Z M1028 0 H1100 L428 760 H355 Z", p.paper)
+        c.path("M0 681 L1200 594 V760 H0 Z", p.second)
+        c.path("M0 704 L1200 617 M961 633 L1055 702 H1200 M0 735 H196 L260 697", "none", p.light, 5)
+    elif setting == "threshold":
+        c.path("M0 0 H1200 V760 H1137 V79 H141 V760 H0 Z", p.surface)
+        c.path("M0 0 H1200 L1137 79 H141 Z", p.light)
+        c.path("M0 0 L141 79 V760 H62 Z M1137 79 L1200 0 V760 H1137 Z", p.accent)
+        c.path("M141 573 L1137 535 V611 L141 681 Z", p.paper)
+        c.path("M0 701 L1200 613 V760 H0 Z", p.surface)
+        c.path("M0 715 L1200 626 M251 760 L445 681 M894 760 L826 654", "none", p.ink, 4)
+    elif setting == "classroom":
+        c.path("M0 0 H1200 V134 L0 223 Z", p.surface)
+        c.path("M0 156 L1200 69 V113 L0 202 Z", p.ink)
+        c.path("M0 202 L1200 113 V135 L0 228 Z", p.light)
+        c.path("M0 661 L973 578 L1200 625 V760 H0 Z", p.light)
+        c.path("M0 704 L977 611 L1200 654 M0 726 L977 633 L1200 673", "none", p.accent, 4)
+    else:  # quiet room, with soft window light falling across a wide sill
+        c.path("M0 0 H675 L213 760 H0 Z", p.light)
+        c.path("M0 0 H219 L0 340 Z M246 0 H294 L0 460 V400 Z", p.paper)
+        c.path("M693 0 H755 L279 760 H226 Z", p.surface)
+        c.path("M0 671 Q499 620 1200 596 V760 H0 Z", p.surface)
+        c.path("M0 680 Q480 634 1200 604", "none", p.second, 7)
+    c.paints = {INK: p.ink, PAPER: p.paper, RED: p.accent, MUTED: p.surface}
+    c.second_ink = p.second
+    return c
+
+
+def place_subject(c: Canvas, spec: dict, subject: str, x, y, scale):
+    """A second spot ink distinguishes the supporting object from its companion."""
+    first_ink = c.paints[RED]
+    if subject == spec["visual_subjects"][1]:
+        c.paints[RED] = c.second_ink
+    draw_subject(c, {**spec, "secondary_subject": subject}, x=x, y=y, scale=scale)
+    c.paints[RED] = first_ink
 
 
 def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
@@ -929,14 +994,13 @@ def render_svg(identity: str, inputs: dict, spec: dict, *, microvariation: bool 
     same concept produces the same image, so collision checks cannot be gamed by
     a filename or a negligible shift. microvariation is retained for compatibility.
     """
-    c = Canvas()
-    c.rect(0, 0, 1200, 760, PAPER)
     subjects = spec.get("visual_subjects", [])
     if len(subjects) < 2:
         raise ValueError("Contextual illustration needs two grounded subjects")
     contextual = render_contextual_scene(spec)
     if contextual:
         return contextual
+    c = scene_canvas(spec)
     motif = spec["motif"]
     # Layout is a visible conceptual relationship, never a random arrangement.
     x1,y1,z1,x2,y2,z2 = 330,350,1.45,870,350,1.45
@@ -1022,7 +1086,7 @@ def render_svg(identity: str, inputs: dict, spec: dict, *, microvariation: bool 
         c.path("M74 646 H531 V591 H718 V537 H1111", "none", RED, 21)
         x1,y1,z1,x2,y2,z2=326,318,1.4,887,318,1.4
     for subject,x,y,z in ((subjects[0],x1,y1,z1),(subjects[1],x2,y2,z2)):
-        draw_subject(c,{**spec,"secondary_subject":subject},x=x,y=y,scale=z)
+        place_subject(c, spec, subject, x, y, z)
     body="".join(c.parts)
     result=('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" width="1200" height="760" role="img">'+body+'</svg>\n').encode()
     if len(result)>MAX_SVG_BYTES:
@@ -1038,9 +1102,9 @@ def render_contextual_scene(spec: dict) -> bytes | None:
     """
     subjects = spec["visual_subjects"]
     pair = set(subjects)
-    c = Canvas(); c.rect(0,0,1200,760,PAPER)
+    c = scene_canvas(spec)
     def object_at(name,x,y,z=1.4):
-        draw_subject(c,{**spec,"secondary_subject":name},x=x,y=y,scale=z)
+        place_subject(c, spec, name, x, y, z)
     def other(name):
         return next(s for s in subjects if s != name)
     if "apps" in pair and "blocking" in pair:
