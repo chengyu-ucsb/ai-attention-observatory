@@ -73,12 +73,15 @@ def section_role(headings, default='body'):
             role = 'prior_work'
         elif re.match(r'^(?:research )?hypothes(?:is|es)\b', title):
             role = 'hypotheses'
+        elif title in {'future work', 'future research', 'future directions', 'suggestions for further research'}:
+            role = 'discussion'
         elif title in {'abstract', 'structured abstract'}:
             role = 'abstract'
         else:
             category = section_name(title)
             if category in {'methods', 'results', 'discussion', 'limitations'}:
-                role = 'discussion' if role == 'discussion' and category == 'results' else category
+                if role not in {'limitations', 'discussion'} or category != 'results':
+                    role = category
             elif category == 'stop':
                 role = 'metadata'
     return role

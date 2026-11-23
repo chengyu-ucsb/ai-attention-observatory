@@ -46,6 +46,14 @@ class BodyTests(unittest.TestCase):
         self.assertEqual([block['role'] for block in parser.blocks if block['kind'] == 'p'],
                          ['prior_work', 'hypotheses', 'results'])
 
+    def test_limitations_and_future_work_do_not_become_own_observations(self):
+        parser, _ = parse('<article><h2>Results</h2><p>Observed comparison.</p>'
+                          '<h2>Limitations and future research</h2><p>Self-report limits the comparison.</p>'
+                          '<h3>Results</h3><p>How the limitation qualifies these results.</p>'
+                          '<h2>Future work</h2><p>A proposed follow-up study.</p></article>')
+        self.assertEqual([block['role'] for block in parser.blocks if block['kind'] == 'p'],
+                         ['results', 'limitations', 'limitations', 'discussion'])
+
     def test_drupal_full_body_not_ten_teasers_with_same_body_class(self):
         body='<div class="field field--name-body"><p>Main source introduction.</p><ol>'+''.join(f'<li>Recommendation {n} with required context.</li>' for n in range(10))+'</ol><p>End qualification.</p></div>'
         teaser='<article class="node-teaser node--teaser"><div class="field field--name-body"><p>Other story cannot be evidence.</p></div></article>'
