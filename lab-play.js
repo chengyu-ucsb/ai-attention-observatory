@@ -309,7 +309,7 @@
     if(r.stage==="ready")recoveryDistract();
   });
   recoveryPreview();
-  // 3 / Assistance Dial: five fictional research-interpretation decisions.
+  // 3 / Assistance Dial: scripted research-interpretation decisions.
   // Source-informed update: 2026-11-09; sources support context, not Lab validity.
   const scenarios=[
     {prompt:"A survey finds that students using AI summaries report spending less time reading. Can we conclude AI caused weaker comprehension?",
@@ -349,13 +349,36 @@
       feedback:"Match the conclusion to the people and activity studied. Qualitative feedback can identify useful design tensions without establishing an effect for intended users.",
       context:{note:"Seven adult researchers tried an AI peer prototype while role-playing as students. Lin and colleagues interviewed them about its design. Their preprint did not test student learning.",
                source:"https://arxiv.org/pdf/2610.38990v1#page=6",
-               issue:"https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-02.html"}}
+               issue:"https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-02.html",
+               sourceLabel:"Original study (v1, PDF)",issueLabel:"November 2 brief"}},
+    {prompt:"A reviewer sees this fictional manuscript excerpt and an editing disclosure. Switch who did the copyedit; the excerpt and the reported work stay identical. What should the disclosure change?",
+      comparison:{excerpt:"The authors coded the interviews independently, then reconciled disagreements.",labels:["AI copyedited the prose. The authors verified the edits.","A human editor copyedited the prose. The authors verified the edits."]},
+      options:["The AI label is enough reason to discount the interview findings.","Check what the editor changed if it matters, and judge the findings from the same methodological evidence.","Ignore every disclosure, even if the editor helped code the interviews."],
+      correct:1,
+      modes:{reflect:"What changed between the two cards? Which details would matter for evaluating the interview analysis?",
+             hint:"The labels describe the same kind of copyediting. Neither says who coded the interviews or verifies how the coding was done.",
+             answer:"Treat the label as information about the edit, not a verdict on the analysis. Both versions need the same checks on how the interviews were coded."},
+      feedback:"It can be useful to check whether the edits changed the meaning. But the label alone does not establish a difference in the analysis. If an editor helped develop or apply the codes, that would be material to the methods.",
+      context:{note:"The November 23 shelf links a conceptual paper proposing that AI disclosures can shift how readers allocate attention, including a proposed comparison with equivalent human help. The paper does not report an experiment showing this effect. This fictional contrast is for reflection, not a test or measurement of your attention.",
+               source:"https://doi.org/10.1007/s44163-026-02808-6",
+               issue:"https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-23.html",
+               sourceLabel:"Original conceptual paper",issueLabel:"November 23 reading list"}}
   ];
   function assistDraw(){
     const r=practice.assist,data=scenarios[r.scenario];r.chosen=false;
     $("#assist-scenario").value=String(r.scenario);
     $("#assist-counter").textContent="SCENARIO "+(r.scenario+1)+" / "+scenarios.length;
     $("#assist-prompt").textContent=data.prompt;
+    const comparison=$("#assist-comparison");comparison.replaceChildren();comparison.hidden=!data.comparison;
+    if(data.comparison){
+      let labelIndex=0;
+      const excerpt=E("blockquote","",data.comparison.excerpt);
+      const disclosure=E("p","",data.comparison.labels[labelIndex]);disclosure.setAttribute("aria-live","polite");
+      const swap=button("Switch editing disclosure",()=>{
+        labelIndex=1-labelIndex;disclosure.textContent=data.comparison.labels[labelIndex];
+      },"play-secondary");
+      add(comparison,E("strong","","Fictional manuscript excerpt"),excerpt,disclosure,swap);
+    }
     const reply=$("#assist-reply");reply.replaceChildren();
     const box=E("div","assist-bubble");
     add(box,E("span","assist-bubble-label",r.mode==="reflect"?"REFLECTION FIRST":r.mode==="hint"?"JUST A HINT":"FULL ANSWER"),E("p","",data.modes[r.mode]));
@@ -374,7 +397,7 @@
       const details=E("details","assist-source"),summary=E("summary","","Source and limits");
       add(details,summary,E("p","",data.context.note));
       const sources=E("div","assist-source-links");
-      [["Original study (v1, PDF)",data.context.source],["November 2 brief",data.context.issue]].forEach(([label,url])=>{
+      [[data.context.sourceLabel,data.context.source],[data.context.issueLabel,data.context.issue]].forEach(([label,url])=>{
         const a=E("a","",label);a.setAttribute("href",url);a.setAttribute("target","_blank");a.setAttribute("rel","noopener noreferrer");sources.append(a);
       });
       add(details,sources);root.append(details);
@@ -426,7 +449,7 @@
     {id:"notification-studio",title:"Notification Studio",status:"new",version:"1.1.0",released:"2026-11-13",updated:"2026-11-16",duration:"2 minutes",topic:"Designing interruptions",evidenceBasis:"Explicit arithmetic simulation",description:"Remix a stream of messages. See the trade-off between alerts and waiting.",glyph:"▥"},
     {id:"switch",title:"Switch Lab",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"2 minutes",topic:"Task switching",evidenceBasis:"Exploratory task demonstration",description:"Try a stable rule, then a changing rule. Timed and untimed play.",glyph:"⇄"},
     {id:"recovery",title:"Return Point",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-06",duration:"3 minutes",topic:"Returning to a task",evidenceBasis:"Fictional task comparison",description:"Leave a task and find your way back, with or without a checkpoint.",glyph:"↩"},
-    {id:"assist",title:"Assistance Dial",status:"classic",version:"2026.11",released:"2026-11-05",updated:"2026-11-09",duration:"3 minutes",topic:"Choosing AI help",evidenceBasis:"Scripted reasoning scenarios",description:"Choose reflection, a hint, or an answer. Keep the judgment yours.",glyph:"◐"}
+    {id:"assist",title:"Assistance Dial",status:"classic",version:"2026.11.2",released:"2026-11-05",updated:"2026-11-23",duration:"3 minutes",topic:"Choosing AI help",evidenceBasis:"Scripted reasoning scenarios",description:"Choose reflection, a hint, or an answer. Keep the judgment yours.",glyph:"◐"}
   ];
   const CASES = [
     {title:"The confident headline",claim:"An AI coach improves concentration at work.",cards:[

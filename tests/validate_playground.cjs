@@ -240,16 +240,27 @@ assert.equal(doc.activeElement,by("play-reset"));
 by("tab-assist").click();
 for(const mode of ["reflect","hint","answer"]){
  doc.querySelectorAll("[data-assist-mode]").find(x=>x.dataset.assistMode===mode).click();
- for(let i=0;i<5;i++){
-  assert.equal(by("assist-counter").textContent,`SCENARIO ${i+1} / 5`);
+ for(let i=0;i<6;i++){
+  assert.equal(by("assist-counter").textContent,`SCENARIO ${i+1} / 6`);
   assert.equal(by("assist-feedback").children.length,0,"New prompt must clear prior source notes and feedback");
+  const compare=by("assist-comparison");
+  assert.equal(compare.hidden,i!==5);
+  if(i===5){
+   const excerpt=compare.children[1],label=compare.children[2],swap=compare.children[3];
+   const before=excerpt.textContent,initial=label.textContent,choices=by("assist-choices").children.slice();
+   assert.match(initial,/AI copyedited/);assert.equal(label.getAttribute("aria-live"),"polite");
+   swap.focus();swap.click();
+   assert.equal(excerpt.textContent,before);assert.match(label.textContent,/human editor/);
+   assert.equal(doc.activeElement,swap);assert.deepEqual(by("assist-choices").children,choices);
+   swap.click();assert.equal(label.textContent,initial);
+  }
   const options=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
-  assert.equal(options.length,3);options[[1,0,1,2,1][i]].click();
+  assert.equal(options.length,3);options[[1,0,1,2,1,1][i]].click();
   assert.equal(by("assist-feedback").hidden,false);
   assert.equal(doc.activeElement,by("assist-feedback"));
   assert.match(by("assist-feedback").children[0].textContent,/Supported conclusion/);
   const details=descendants(by("assist-feedback")).filter(x=>x.className==="assist-source");
-  assert.equal(details.length,i===4?1:0);
+  assert.equal(details.length,i>=4?1:0);
   if(i===4){
    assert.equal(details[0].tagName,"DETAILS");
    const content=descendants(details[0]);
@@ -259,23 +270,29 @@ for(const mode of ["reflect","hint","answer"]){
    assert.deepEqual(links.map(x=>x.getAttribute("href")),["https://arxiv.org/pdf/2610.38990v1#page=6","https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-02.html"]);
    assert(links.every(x=>x.getAttribute("rel")==="noopener noreferrer"));
   }
-  assert.equal(by("assist-next").textContent,i===4?"Replay the first scenario":"Try another scenario");
+  if(i===5){
+   const content=descendants(details[0]);
+   assert(content.some(x=>x.textContent.includes("does not report an experiment")));
+   const links=content.filter(x=>x.tagName==="A");
+   assert.deepEqual(links.map(x=>x.getAttribute("href")),["https://doi.org/10.1007/s44163-026-02808-6","https://chengyu-ucsb.github.io/ai-attention-observatory/issues/2026-11-23.html"]);
+  }
+  assert.equal(by("assist-next").textContent,i===5?"Replay the first scenario":"Try another scenario");
   by("assist-next").click();assert.equal(doc.activeElement,by("assist-prompt"));
  }
 }
 // Direct question selection keeps help level and clears stale answers/source notes.
 by("assist-scenario").focus();by("assist-scenario").value="4";by("assist-scenario").handlers.change[0]();
-assert.equal(by("assist-counter").textContent,"SCENARIO 5 / 5");assert.equal(doc.activeElement,by("assist-scenario"));
+assert.equal(by("assist-counter").textContent,"SCENARIO 5 / 6");assert.equal(doc.activeElement,by("assist-scenario"));
 let directOptions=descendants(by("assist-choices")).filter(x=>x.classes.has("assist-option"));
 directOptions[0].click();assert.match(by("assist-feedback").children[0].textContent,/Another interpretation/);
 assert(descendants(by("assist-feedback")).some(x=>x.className==="assist-source"));
 by("assist-scenario").value="1";by("assist-scenario").handlers.change[0]();
-assert.equal(by("assist-counter").textContent,"SCENARIO 2 / 5");assert.equal(by("assist-feedback").children.length,0);
+assert.equal(by("assist-counter").textContent,"SCENARIO 2 / 6");assert.equal(by("assist-feedback").children.length,0);
 assert.equal(by("assist-next").hidden,true);assert(descendants(by("assist-reply")).some(x=>x.textContent==="FULL ANSWER"));
-for(const invalid of ["-1","5","bad"]){by("assist-scenario").value=invalid;by("assist-scenario").handlers.change[0]();assert.equal(by("assist-counter").textContent,"SCENARIO 2 / 5")}
+for(const invalid of ["-1","6","bad"]){by("assist-scenario").value=invalid;by("assist-scenario").handlers.change[0]();assert.equal(by("assist-counter").textContent,"SCENARIO 2 / 6")}
 // Reset clears all activities while retaining explicit mode choices and focus.
 by("play-reset").click();assert.equal(by("recovery-history").children.length,0);
-assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 5");
+assert.equal(by("recovery-interaction").children.length,0);assert.equal(by("assist-counter").textContent,"SCENARIO 1 / 6");
 assert.equal(by("switch-results").hidden,true);assert.equal(by("switch-timing").value,"timed");
 assert.equal(doc.activeElement,by("play-reset"));assert.match(by("play-session-status").textContent,/results are cleared/);
 // The Lab's section menu can hide the whole activities region without changing
@@ -307,7 +324,7 @@ assert(html.includes('datetime="2026-11-13"'));
 assert(html.includes('id="lab-catalog"')&&html.includes('id="lab-workbench"'),"Versioned collection hosts must remain in the page");
 assert(html.includes('Official guides · Checked <time datetime="2026-11-06">6 Nov 2026</time>'));
 assert(html.includes("Fictional scenarios and scripted assistance"));
-console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 5 scenarios at all 3 assistance levels with source/limit disclosures.");
+console.log("Attention Playground regressions passed: paired comparisons, randomized condition/material orders and answer positions, separate histories, interruption/cancel/reset, reset/stale callback isolation, untimed snapshots, separate practice, task announcements, focus transitions, switching timers, visibility/route pauses, keyboard bubbling/repeats, readable replay, 4 recovery tasks in both modes, and 6 scenarios at all 3 assistance levels, including matched attribution with source/limit disclosures.");
 
 
 

@@ -98,12 +98,12 @@ Keep these checks green on future changes.
 
 ### P2 · Extend the scenario bank with a weekly source-informed question
 
-Status: five scenarios prepared, including the 9 November source-informed
-question about expert role-play versus intended-user outcomes. A question picker
-makes each scenario directly reachable. The final PR checks and Pages deployment
-determine which revision is published. Next: use a genuinely different question
-from a later published issue, rather than adding another version of speed versus
-learning or expert feedback versus learner outcomes.
+Status: six scenarios. The November 23 reading shelf prompted a matched
+disclosure contrast: visitors change AI versus human copyediting attribution
+while the fictional excerpt, methods and answer choices stay identical. The
+linked conceptual paper proposes a mechanism; it does not establish an effect.
+Next: audit the disclosure control with a screen reader and avoid adding more
+questions without a distinct reasoning goal.
 
 - Review the current published issue for a meaningful task-design tension.
 - Add one concise scenario with reflection, hint, full answer and feedback, or

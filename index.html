@@ -9,11 +9,11 @@
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="assets/typography.css">
   <link rel="stylesheet" href="styles.css?v=15ea8d4667f7">
-  <link rel="stylesheet" href="lab-play.css?v=a87c25173d37">
+  <link rel="stylesheet" href="lab-play.css?v=562f000408ab">
   <link rel="stylesheet" href="assets/article-layers.css">
   <link rel="alternate" type="application/rss+xml" title="The Attention Brief weekly synthesis" href="issue-feed.xml">
   <script src="app.js?v=3e0181fe1af2" defer></script>
-  <script src="lab-play.js?v=6a6fad6447f8" defer></script>
+  <script src="lab-play.js?v=9308c80c4e59" defer></script>
 </head>
 <body>
   <svg xmlns="http://www.w3.org/2000/svg" class="icon-sprite" aria-hidden="true" focusable="false"><defs><symbol id="icon-focus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></symbol>
@@ -341,6 +341,7 @@
               <option value="2">3 · Confidence or evidence?</option>
               <option value="3">4 · Performance or learning?</option>
               <option value="4">5 · Whose experience was tested?</option>
+              <option value="5">6 · What does a disclosure tell us?</option>
             </select>
             <p id="assist-scenario-help" class="play-small">Jump to any question. Changing it clears the current answer and keeps your help level.</p>
             <div class="assist-modes" role="group" aria-label="Choose assistance level">
@@ -352,8 +353,9 @@
           </div>
           <div class="play-stage-main">
             <div class="play-screen assist-screen">
-              <div class="play-screen-top"><span>REASONING CHALLENGE</span><span id="assist-counter">SCENARIO 1 / 5</span></div>
+              <div class="play-screen-top"><span>REASONING CHALLENGE</span><span id="assist-counter">SCENARIO 1 / 6</span></div>
               <h4 class="assist-prompt" id="assist-prompt" tabindex="-1" aria-live="polite" aria-describedby="assist-counter assist-reply"></h4>
+              <div class="assist-bubble" id="assist-comparison" hidden></div>
               <div class="assist-reply" id="assist-reply" aria-live="polite"></div>
               <p class="assist-pick-label">What do you conclude?</p>
               <div class="assist-choices" id="assist-choices"></div>
