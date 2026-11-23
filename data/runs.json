@@ -1814589,16 +1814589,19 @@
       "scope": "original_publication_date_previous_completed_week"
     },
     "selection_basis": "original_publication_date_previous_completed_week",
-    "preparation_observation_at": "2026-11-23T10:40:57.901018+00:00",
+    "preparation_observation_at": "2026-11-23T10:55:03.264120+00:00",
     "stats": {
       "discovery_status": "partial",
       "preparation_coverage": {
         "configured_query_status": "partial",
         "closeout_required": false,
-        "closeout_pass": "initial",
+        "closeout_pass": "late_index",
         "closeout_passes": {
           "initial": {
             "started_at": "2026-11-23T10:40:57.901018+00:00"
+          },
+          "late_index": {
+            "started_at": "2026-11-23T10:55:03.264120+00:00"
           }
         },
         "closeout_started_at": "2026-11-23T10:40:57.901018+00:00",
@@ -1814611,7 +1814614,7 @@
               "to": "2026-11-22"
             },
             "checkpoint": {
-              "window_id": "closeout:2026-11-16:2026-11-22",
+              "window_id": "closeout_late_index:2026-11-16:2026-11-22",
               "active_queries": 32,
               "completed_queries": 4,
               "pending_queries": 28,
@@ -1814787,18 +1814790,27 @@
                   },
                   "pending_queries": 26,
                   "action": "retained for explicit historical recovery; excluded from current week"
+                },
+                {
+                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window": {
+                    "from": "2026-11-16",
+                    "to": "2026-11-22"
+                  },
+                  "pending_queries": 28,
+                  "action": "retained for explicit historical recovery; excluded from current week"
                 }
               ],
               "query_plan_drift": false,
               "superseded_queries": 0,
               "provider_state": {
                 "OpenAlex": {
-                  "last_request_at": 1795430457.901018,
+                  "last_request_at": 1795431303.26412,
                   "consecutive_failures": 0,
                   "next_retry_at": 0
                 },
                 "Crossref": {
-                  "last_request_at": 1795430457.901018,
+                  "last_request_at": 1795431303.26412,
                   "consecutive_failures": 0,
                   "next_retry_at": 0
                 },
@@ -1814833,11 +1814845,11 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "complete_for_configured_query",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": false,
                   "theme": "AI & cognition",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1814859,11 +1814871,11 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "complete_for_configured_query",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": false,
                   "theme": "AI & cognition",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1814886,10 +1814898,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Fragmentation",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1814912,10 +1814924,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Fragmentation",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1814938,10 +1814950,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Fragmentation",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1814964,10 +1814976,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Interventions",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1814990,10 +1815002,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Interventions",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1815016,10 +1815028,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1815042,10 +1815054,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1815068,10 +1815080,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1815094,10 +1815106,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "OpenAlex",
@@ -1815120,10 +1815132,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815145,11 +1815157,11 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "AI & cognition",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815171,11 +1815183,11 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "AI & cognition",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815198,10 +1815210,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Fragmentation",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815224,10 +1815236,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Fragmentation",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815250,10 +1815262,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Fragmentation",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815276,10 +1815288,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Interventions",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815302,10 +1815314,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Interventions",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815328,10 +1815340,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815354,10 +1815366,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815380,10 +1815392,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815406,10 +1815418,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 },
                 {
                   "provider": "Crossref",
@@ -1815432,10 +1815444,10 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
-                  "scope": "closeout"
+                  "scope": "closeout_late_index"
                 }
               ],
               "publication_date_rejected": 63,
@@ -1815445,84 +1815457,84 @@
               "search_scopes": [
                 {
                   "theme": "AI & cognition",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "generative AI cognitive offloading critical thinking"
                 },
                 {
                   "theme": "AI & cognition",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "ChatGPT metacognition memory cognitive effort"
                 },
                 {
                   "theme": "Fragmentation",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "generative AI sustained attention task switching"
                 },
                 {
                   "theme": "Fragmentation",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "AI assistant interruptions distraction multitasking"
                 },
                 {
                   "theme": "Fragmentation",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "digital distraction notification fatigue attention"
                 },
                 {
                   "theme": "Interventions",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "AI attention management intervention focus assistant"
                 },
                 {
                   "theme": "Interventions",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "generative AI self regulation learning intervention"
                 },
                 {
                   "theme": "Technology & society",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "artificial intelligence attention economy cognitive autonomy"
                 },
                 {
                   "theme": "Technology & society",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "generative AI interface attention design human agency"
                 },
                 {
                   "theme": "Technology & society",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "AI information overload algorithmic mediation"
                 },
                 {
                   "theme": "Emerging topics",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "generative AI everyday life"
                 },
                 {
                   "theme": "Emerging topics",
-                  "period": "closeout",
+                  "period": "closeout_late_index",
                   "from": "2026-11-16",
                   "to": "2026-11-22",
                   "query": "artificial intelligence human attention"
@@ -1815547,7 +1815559,7 @@
               "discovery_status": "partial",
               "configured_query_status": "partial",
               "checkpoint": {
-                "window_id": "closeout:2026-11-16:2026-11-22",
+                "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                 "active_queries": 32,
                 "completed_queries": 4,
                 "pending_queries": 28,
@@ -1815723,18 +1815735,27 @@
                     },
                     "pending_queries": 26,
                     "action": "retained for explicit historical recovery; excluded from current week"
+                  },
+                  {
+                    "window_id": "closeout:2026-11-16:2026-11-22",
+                    "window": {
+                      "from": "2026-11-16",
+                      "to": "2026-11-22"
+                    },
+                    "pending_queries": 28,
+                    "action": "retained for explicit historical recovery; excluded from current week"
                   }
                 ],
                 "query_plan_drift": false,
                 "superseded_queries": 0,
                 "provider_state": {
                   "OpenAlex": {
-                    "last_request_at": 1795430457.901018,
+                    "last_request_at": 1795431303.26412,
                     "consecutive_failures": 0,
                     "next_retry_at": 0
                   },
                   "Crossref": {
-                    "last_request_at": 1795430457.901018,
+                    "last_request_at": 1795431303.26412,
                     "consecutive_failures": 0,
                     "next_retry_at": 0
                   },
@@ -1815776,8 +1815797,8 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "venue": "Computers & Education"
                 },
@@ -1815801,8 +1815822,8 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "complete_for_configured_query",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": false,
                   "venue": "Computers in Human Behavior"
                 },
@@ -1815826,8 +1815847,8 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "complete_for_configured_query",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": false,
                   "venue": "Journal of Computer-Mediated Communication"
                 },
@@ -1815851,8 +1815872,8 @@
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795430457.901018,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "observed_at": 1795431303.26412,
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "venue": "Human Communication Research"
                 },
@@ -1815877,7 +1815898,7 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "venue": "Journal of the Learning Sciences"
                 },
@@ -1815902,7 +1815923,7 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "venue": "Psychological Science"
                 },
@@ -1815927,7 +1815948,7 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "venue": "Information Systems Research"
                 },
@@ -1815952,7 +1815973,7 @@
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
                   "observed_at": null,
-                  "window_id": "closeout:2026-11-16:2026-11-22",
+                  "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "venue": "Computers in Human Behavior Reports"
                 }
@@ -1815966,56 +1815987,13 @@
           }
         ],
         "publisher_snapshots": {
-          "checked_at": "2026-11-23T10:40:57.901018+00:00",
-          "requests": 5,
+          "checked_at": "2026-11-23T10:55:03.264120+00:00",
+          "requests": 0,
           "sources": [
             {
               "source_id": "nielsen-norman",
               "status": "deferred_provider_pause",
               "next_retry_at": null
-            },
-            {
-              "source_id": "guardian-ai",
-              "status": "ok",
-              "pages": 1,
-              "retained_candidates": 8,
-              "next_retry_at": null
-            },
-            {
-              "source_id": "guardian-opinion",
-              "status": "ok",
-              "pages": 1,
-              "retained_candidates": 2,
-              "next_retry_at": null
-            },
-            {
-              "source_id": "nieman-lab",
-              "status": "ok",
-              "pages": 1,
-              "retained_candidates": 0,
-              "next_retry_at": null
-            },
-            {
-              "source_id": "eff",
-              "status": "ok",
-              "pages": 1,
-              "retained_candidates": 12,
-              "next_retry_at": null
-            },
-            {
-              "source_id": "ai-now",
-              "status": "ok",
-              "pages": 1,
-              "retained_candidates": 0,
-              "next_retry_at": null
-            },
-            {
-              "source_id": "mit-tech-review",
-              "status": "deferred_budget"
-            },
-            {
-              "source_id": "the-markup",
-              "status": "deferred_budget"
             },
             {
               "source_id": "conversation-ai",
@@ -1816032,6 +1816010,34 @@
             {
               "source_id": "tech-policy-press",
               "status": "deferred_budget"
+            },
+            {
+              "source_id": "guardian-ai",
+              "status": "deferred_budget"
+            },
+            {
+              "source_id": "guardian-opinion",
+              "status": "deferred_budget"
+            },
+            {
+              "source_id": "nieman-lab",
+              "status": "deferred_budget"
+            },
+            {
+              "source_id": "eff",
+              "status": "deferred_budget"
+            },
+            {
+              "source_id": "ai-now",
+              "status": "deferred_budget"
+            },
+            {
+              "source_id": "mit-tech-review",
+              "status": "deferred_budget"
+            },
+            {
+              "source_id": "the-markup",
+              "status": "deferred_budget"
             }
           ],
           "scope": "Rolling publisher-feed metadata only. No current-week articles retrieved or published; coverage is not exhaustive."
@@ -1816043,7 +1816049,7 @@
             "from": "2026-11-16",
             "to": "2026-11-22",
             "timezone": "UTC",
-            "scope": "closeout"
+            "scope": "closeout_late_index"
           },
           "date_policy": "Publisher original publication field only; never modified, indexed, Google News or first-seen dates.",
           "scope": "Configured feeds and explicit search queries, not exhaustive coverage of online publishing.",
@@ -1877538,10 +1877544,10 @@
           ]
         }
       },
-      "publication_date_quarantine_records": 46
+      "publication_date_quarantine_records": 92
     },
     "total": 1064,
-    "new": 150,
+    "new": 0,
     "candidates": 104,
     "last_seven_days": 104
   }
