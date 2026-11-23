@@ -58,3 +58,14 @@ class EditionReplayTests(unittest.TestCase):
                 release.replay(self.original, self.current, self.policy)
         self.assertNotIn(self.monday, release.read(self.current / self.drafts))
         self.assertEqual(release.read(self.archive)["edition_format"], "coverage")
+
+    def test_saved_main_editions_directly_dispatch_pages(self):
+        workflows = Path(__file__).resolve().parents[1] / ".github/workflows"
+        compose = (workflows / "weekly-edition.yml").read_text()
+        dispatch = compose.split("  deploy-saved-edition:", 1)[1]
+        self.assertIn("needs.edition.outputs.saved == 'true'", dispatch)
+        self.assertIn("github.event_name != 'pull_request'", dispatch)
+        self.assertIn("github.ref == 'refs/heads/main'", dispatch)
+        self.assertIn("actions/workflows/publish.yml/dispatches", dispatch)
+        self.assertNotIn("actions/checkout", dispatch)
+        self.assertNotIn('"Publish weekly edition"', (workflows / "publish.yml").read_text())

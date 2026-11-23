@@ -43,7 +43,7 @@ on:
       - 'tests/validate_article_ui.cjs'
       - '.github/workflows/publish.yml'
   workflow_run:
-    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Publish weekly edition", "Deepen source readings"]
+    workflows: ["Update research library", "Resume weekly source discovery", "Catch up full-text research backlog", "Deepen source readings"]
     types: [completed]
     branches: [main]
   # Refresh the honest publication-status payload even when an edition is held.

@@ -48,6 +48,8 @@ concurrency:
 jobs:
   edition:
     if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
+    outputs:
+      saved: ${{ steps.save.outcome == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -99,6 +101,7 @@ jobs:
           node tests/validate_weekly_issue.cjs
           python -m unittest discover -s tests -v
       - name: Save the edition and RSS together
+        id: save
         if: steps.edition.outputs.needed == 'true'
         run: |
           git config user.name "github-actions[bot]"
@@ -149,3 +152,16 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+
+  deploy-saved-edition:
+    needs: edition
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.edition.outputs.saved == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch Pages for the saved synthesis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/$GITHUB_REPOSITORY/actions/workflows/publish.yml/dispatches" -f ref=main
