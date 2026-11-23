@@ -41,6 +41,10 @@ def publication_timestamp(issue):
     """Feed clocks record release time; Monday is an edition identity, not a claim of timely release."""
     value=issue.get('feed_published_at') or issue.get('published_at')
     if not value:return published_on(issue['edition_date'])
+    return utc_timestamp(value)
+
+
+def utc_timestamp(value):
     stamp=datetime.fromisoformat(value.replace('Z','+00:00'))
     if stamp.tzinfo is None:raise ValueError('Publication timestamp must include a timezone')
     return stamp.astimezone(timezone.utc)
@@ -467,6 +471,22 @@ def rss_content(issue):
     return ''.join(parts)
 
 
+def rss_item(issue):
+    permalink=BASE+"issues/"+issue["edition_date"]+".html"
+    item=ET.Element("item")
+    ET.SubElement(item,"title").text=brief_title(issue["subject"])
+    ET.SubElement(item,"link").text=permalink
+    ET.SubElement(item,"guid",{"isPermaLink":"true"}).text=feed_identity(issue)
+    ET.SubElement(item,"pubDate").text=rss_date(publication_timestamp(issue))
+    if issue.get("updated_at"):
+        ET.SubElement(item,"{"+ATOM+"}updated").text=utc_timestamp(issue["updated_at"]).isoformat()
+    summary=issue.get("deck","")+" "+issue.get("closer","")
+    ET.SubElement(item,"description").text=summary.strip()
+    ET.SubElement(item,"{"+CONTENT+"}encoded").text=rss_content(issue)
+    ET.SubElement(item,"category").text="AI and attention"
+    return item
+
+
 def build_rss(issues):
     rss=ET.Element("rss",{"version":"2.0"})
     channel=ET.SubElement(rss,"channel")
@@ -482,19 +502,11 @@ def build_rss(issues):
     })
     if issues:
         latest=max(publication_timestamp(issue) for issue in issues)
-        ET.SubElement(channel,"lastBuildDate").text=rss_date(latest)
+        updates=[utc_timestamp(issue['updated_at']) for issue in issues if issue.get('updated_at')]
+        ET.SubElement(channel,"lastBuildDate").text=rss_date(max([latest, *updates]))
         ET.SubElement(channel,"pubDate").text=rss_date(latest)
     for issue in issues[:50]:
-        permalink=BASE+"issues/"+issue["edition_date"]+".html"
-        item=ET.SubElement(channel,"item")
-        ET.SubElement(item,"title").text=brief_title(issue["subject"])
-        ET.SubElement(item,"link").text=permalink
-        ET.SubElement(item,"guid",{"isPermaLink":"true"}).text=feed_identity(issue)
-        ET.SubElement(item,"pubDate").text=rss_date(publication_timestamp(issue))
-        summary=issue.get("deck","")+" "+issue.get("closer","")
-        ET.SubElement(item,"description").text=summary.strip()
-        ET.SubElement(item,"{"+CONTENT+"}encoded").text=rss_content(issue)
-        ET.SubElement(item,"category").text="AI and attention"
+        channel.append(rss_item(issue))
     ET.indent(rss)
     xml=ET.tostring(rss,encoding="utf-8",xml_declaration=True)
     xml=xml.replace(b"?>",b"?>\n<?xml-stylesheet type=\"text/xsl\" href=\"assets/feed.xsl\"?>",1)
@@ -510,6 +522,7 @@ def json_feed(issues):
             'items':[{'id':feed_identity(i),
                       'url':BASE+'issues/'+i['edition_date']+'.html',
                       'title':brief_title(i['subject']), 'date_published':publication_timestamp(i).isoformat(),
+                      **({'date_modified': utc_timestamp(i['updated_at']).isoformat()} if i.get('updated_at') else {}),
                       'summary':i.get('deck',''), 'content_html':rss_content(i),
                       '_observatory':feed_snapshot(i)} for i in issues[:50] if i.get('status')=='published']}
 

@@ -6,9 +6,11 @@ import re
 import sys
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
+from build_newsletter import json_feed, rss_item
 from build_reader import encoded
 from check_release_deadline import check
 from verify_publication import BASE
@@ -17,18 +19,20 @@ from verify_publication import BASE
 class ReleaseDeadlineTests(unittest.TestCase):
     now = dt.datetime(2026, 11, 23, 16, 30, tzinfo=dt.timezone.utc)
 
-    def fixture(self, tmp, format='compact'):
+    def fixture(self, tmp):
         root=Path(tmp); folder=root/'data/approved-issues'; folder.mkdir(parents=True)
-        issue={'edition_date':'2026-11-23','status':'published','edition_format':format,
-               'headline':'A checked synthesis','publication_window':{}}
+        issue={'edition_date':'2026-11-23','status':'published','edition_format':'compact',
+               'subject':'A checked synthesis','headline':'A checked synthesis','publication_window':{}}
         (folder/'2026-11-23.json').write_text(json.dumps(issue))
         digest=sha256(encoded(issue)).hexdigest()
         url=BASE+'issues/2026-11-23.html'
         manifest={'edition_id':'2026-11-23','edition_sha256':digest,'reader_sha256':digest,'issue':issue,'index_url':'data/reader/index.json'}
+        rss=ET.fromstring('<rss><channel/></rss>')
+        rss.find('channel').append(rss_item(issue))
         responses={BASE+'data/reader-manifest.json':encoded(manifest),
             url:('<meta name="observatory-edition-sha256" content="'+digest+'">A checked synthesis').encode(),
-            BASE+'issue-feed.xml':('<rss><channel><item><guid>'+url+'</guid><link>'+url+'</link></item></channel></rss>').encode(),
-            BASE+'data/issue-feed.json':encoded({'items':[{'id':url,'url':url,'_observatory':issue}]})}
+            BASE+'issue-feed.xml':ET.tostring(rss),
+            BASE+'data/issue-feed.json':encoded(json_feed([issue]))}
         return root,responses
 
     def test_matching_live_archive_and_both_feeds_are_required(self):
@@ -43,7 +47,10 @@ class ReleaseDeadlineTests(unittest.TestCase):
 
     def test_coverage_is_failure_even_when_marked_published(self):
         with tempfile.TemporaryDirectory() as tmp:
-            root,responses=self.fixture(tmp,'coverage')
+            root,responses=self.fixture(tmp)
+            path=root/'data/approved-issues/2026-11-23.json'
+            issue=json.loads(path.read_text()); issue['edition_format']='coverage'
+            path.write_text(json.dumps(issue))
             self.assertEqual(check(root,self.now,responses.__getitem__)['status'],
                              'coverage_only_not_a_newsletter')
 
