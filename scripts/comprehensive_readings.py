@@ -610,7 +610,7 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
                 'provider_diagnostics':diagnostics}
             stats['summaries_completed']+=1
             if result.get('account_status')=='article_account': stats['article_accounts']+=1
-            elif result.get('account_status')=='checked_evidence_only': stats['evidence_only_readings']+=1
+            else: stats['evidence_only_readings']+=1
         except Exception as exc:
             reason=str(exc) if isinstance(exc,ValueError) and re.fullmatch(r'[a-z_]+',str(exc)) else type(exc).__name__
             stats['failed']+=1

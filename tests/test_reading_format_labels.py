@@ -118,7 +118,7 @@ class ReadingFormatLabelTests(unittest.TestCase):
         model = Mock()
         diagnostics = [{'stage': 'article', 'status': coverage['evidence_status']}]
         result = {'coverage': {**document.manifest(), 'all_retrieved_text_processed': True},
-                  'claim_evidence': [], **{field: '' for field in reading.FIELDS[kind]}}
+                  'account_status': 'checked_evidence_only', 'claim_evidence': [], **{field: '' for field in reading.FIELDS[kind]}}
         with patch.object(reading, 'synthesize', return_value=result) as synthesize:
             stats = reading.process([row], model, retriever=lambda _: (document, diagnostics),
                                     run_date=TODAY)
@@ -145,7 +145,8 @@ class ReadingFormatLabelTests(unittest.TestCase):
                  else ('source_html' if complete else 'partial_source_html'))
         self.assertEqual(saved['source_depth'], depth)
         self.assertEqual(row['complete_reading_attempt']['status'], 'summarized' if complete else 'partial_summary')
-        self.assertEqual(row['complete_reading_attempt']['next_at'], '2026-12-09' if complete else '2026-11-16')
+        self.assertEqual(row['complete_reading_attempt']['next_at'], '2026-11-16')
+        self.assertEqual(stats['evidence_only_readings'], 1)
         self.assertEqual(row['complete_reading_attempt']['provider_diagnostics'], diagnostics)
         self.assertEqual(document.coverage, coverage)
         self.assertEqual(document.units, units)
