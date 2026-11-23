@@ -184,6 +184,25 @@ class FlattenedSectionTests(unittest.TestCase):
     def section(self, number, title, marker):
         return f'<div><head n="{number}">{title}</head>{self.paragraph(marker)}</div>'
 
+    def test_explicit_limitations_and_future_work_stay_separate_from_observed_results(self):
+        title = 'Limitations and future research'
+        html = publisher_sections.ArticleHTML()
+        html.feed('<article><h2>Results</h2>' + self.paragraph('OBSERVED') +
+                  '<h2>' + title + '</h2>' + self.paragraph('CAUSAL_LIMIT') +
+                  '<h3>Results</h3>' + self.paragraph('UNCERTAIN') +
+                  '<h3>Future work</h3>' + self.paragraph('PROPOSAL') + '</article>')
+        flattened = self.extract(self.section('3', 'Results', 'OBSERVED') +
+                                 self.section('4', title, 'CAUSAL_LIMIT') +
+                                 self.section('4.1', 'Results', 'UNCERTAIN') +
+                                 self.section('4.2', 'Future work', 'PROPOSAL'))
+        for sections in (html.secs, flattened):
+            self.assertIn('OBSERVED', sections['results'])
+            self.assertIn('CAUSAL_LIMIT', sections['limitations'])
+            self.assertIn('UNCERTAIN', sections['limitations'])
+            self.assertNotIn('PROPOSAL', sections['results'])
+            self.assertNotIn('UNCERTAIN', sections['results'])
+        self.assertEqual(publisher_sections.section_name('Limitations and future research in oncology'), '')
+
     def test_numbered_siblings_inherit_only_their_real_ancestor(self):
         sections = (self.section("3", "Results", "RESULT_PARENT") +
                     self.section("3.1", "Task performance", "RESULT_CHILD") +

@@ -21,6 +21,10 @@ NAMES = {
     'results & discussion': 'discussion', 'discussion and conclusions': 'discussion',
     'limitations': 'limitations', 'study limitations': 'limitations',
     'limitations of the study': 'limitations',
+    'limitations and future research': 'limitations',
+    'limitations and future work': 'limitations',
+    'limitations and future directions': 'limitations',
+    'study limitations and future directions': 'limitations',
 }
 STOP = {'references', 'bibliography', 'statements', 'declarations',
         'data availability', 'data availability statement', 'ethics statement',
@@ -29,7 +33,7 @@ STOP = {'references', 'bibliography', 'statements', 'declarations',
         'generative ai statement', "publisher’s note", "publisher's note"}
 # These are not empirical results even when nested within a Results section.
 EXCLUDE = {'results of previous studies', 'previous research results',
-           'suggestions for further research', 'future research', 'future directions',
+           'suggestions for further research', 'future research', 'future directions', 'future work',
            'hypotheses', 'hypothesis development', 'hypotheses development',
            'literature review', 'literature review and hypotheses development'}
 
@@ -82,8 +86,8 @@ def xml_sections(root, section_tag, title_tag, max_chars):
                     name = 'methods'
             if name in ('stop', 'exclude'):
                 return
-            if inherited == 'discussion' and name == 'results':
-                name = 'discussion'
+            if inherited in {'limitations', 'discussion'} and name == 'results':
+                name = inherited
             key = name or inherited
         if tag == 'p':
             value = words(element)
@@ -112,8 +116,8 @@ def xml_sections(root, section_tag, title_tag, max_chars):
                     effective = category or child_key
                     if child_key in ('stop', 'exclude'):
                         effective = child_key
-                    elif child_key == 'discussion' and effective == 'results':
-                        effective = 'discussion'
+                    elif child_key in {'limitations', 'discussion'} and effective == 'results':
+                        effective = child_key
                     siblings.append((number, effective))
                 else:
                     siblings.clear()
@@ -151,8 +155,9 @@ class ArticleHTML(HTMLParser):
             if key:
                 # A Results subheading inside author interpretation cannot
                 # establish a separate observed-findings section.
-                if key == 'results' and any(k == 'discussion' for _, _, k in self.stack):
-                    return 'discussion'
+                if key == 'results':
+                    return next((ancestor for _, _, ancestor in reversed(self.stack)
+                                 if ancestor in {'limitations', 'discussion'}), key)
                 return key
         return ''
 
