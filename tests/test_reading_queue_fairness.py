@@ -153,7 +153,8 @@ class ReadingQueueFairnessTests(unittest.TestCase):
         # Stub successful synthesis only; exercise retrieval fallback, coverage,
         # checkpoints, eligibility, and replacement in the real processing path.
         def accepted(document, *args, **kwargs):
-            return {'coverage': {**document.manifest(), 'all_retrieved_text_processed': True}}
+            return {'coverage': {**document.manifest(), 'all_retrieved_text_processed': True},
+                    'account_status':'article_account'}
         with patch.object(reading, 'synthesize', side_effect=accepted):
             stats, _ = self.run_at([record], scheduled_day(0))
             self.assertEqual(stats['partial_inputs'], 1)
