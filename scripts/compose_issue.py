@@ -109,6 +109,7 @@ REVIEW_CRITERIA = ('source_fidelity', 'source_identification', 'concrete_detail'
 def review_text(draft):
     sections = draft.get('signals', []) + [draft.get('tension', {})]
     return '\n'.join([str(draft.get(k, '')) for k in ('headline', 'deck', 'letter', 'closer')]
+                     + [str(draft.get('experiment', {}).get(k, '')) for k in ('title', 'text')]
                      + [str(s.get(k, '')) for s in sections for k in ('title', 'text')])
 
 
@@ -177,11 +178,16 @@ def editorial_review(model, draft, packet, audit, progress, stage='final review'
         'Discussion is author interpretation. Commentary is an attributed argument. '
         'Do not demand causal proof for a qualified observational claim. Preprint and AI-review '
         'limits are disclosed once in the source note. A focused single-source theme may explain '
-        'why a finding matters without claiming cross-source agreement. Review glossary accuracy. '
+        'why a finding matters without claiming cross-source agreement. For each comparison, '
+        'check whether each cited source supports its part of the stated connection. A shared topic '
+        'alone does not support a shared outcome. For the reader activity, look for one concrete '
+        'action taken from a checked example, and reject promises of a benefit. Review glossary accuracy. '
         'Return decision pass or revise, each required criterion with pass, reason of at least '
         'eight words and example_id, and EVERY cited source with anchor_id, supported and reason. '
-        'Use review_protocol 2. Each source judgment covers ALL its ASSIGNED CLAIMS, including '
-        'every limitation, not just the selected anchor. Its reason must use at least twelve '
+        'Use review_protocol 2. Check all assigned source-specific claims, including every limitation. '
+        'For shared passages, check the contribution attributed to this source and whether the '
+        'connection respects its scope. Other sources may supply the other side of a comparison. '
+        'A source judgment cannot rest only on the selected anchor. Its reason must use at least twelve '
         'words and explain a specific population, measurement, direction or qualification '
         'from that source. Never use blanket reasons such as all claims are supported. '
         'A high reverse-coded physical-strain score does not establish improved physical health. '
@@ -360,13 +366,21 @@ def validate(draft, packet):
     if len(cited) < (2 if compact else 3):
         raise ValueError('Edition needs at least two distinct sources in compact mode and three in full mode')
     frame_text = ' '.join(draft[k] for k in ('headline', 'deck', 'letter', 'closer'))
+    if 'experiment' in draft:
+        activity = draft['experiment']
+        if not isinstance(activity, dict) or any(not isinstance(activity.get(k), str)
+                                                 for k in ('title', 'text')):
+            raise ValueError('Reader activity needs a title and instructions')
+        if len(activity['title'].split()) < 3 or len(activity['text'].split()) < 20:
+            raise ValueError('Give the reader a concrete activity drawn from a checked example')
+        frame_text += ' ' + activity['title'] + ' ' + activity['text']
     reject_preprint_overclaims(frame_text, packet)
     validate_title(draft['headline'], packet)
     public = ' '.join([frame_text] + [s['text'] for s in sections])
     if not (260 if compact else 400) <= len(public.split()) <= 1600:
         raise ValueError('Edition length is outside its format budget')
     # No invented quantitative claims in the uncited introduction/conclusion.
-    if re.search(r'\d', ' '.join(draft[k] for k in ('headline', 'deck', 'letter', 'closer'))):
+    if re.search(r'\d', frame_text):
         raise ValueError('Keep quantitative claims in cited themes')
     validate_original_prose(public, packet)
     glossary = draft.get('glossary', [])
@@ -724,9 +738,10 @@ Use ONLY the claims in these paragraphs; introduce no new factual claims or stat
 Keep concrete evidence limitations without repeating the common preprint/AI-review source note.
 The tension should propose a specific next comparison or decision; do not just say more research
 is needed or that the sources differ. Cite named sources where you use their observations.
-In the tension, supply source_notes for every source key, twenty to thirty-five words
-per source summarizing its already-checked contribution. Then supply a question of
-thirty-five to sixty words proposing the unresolved comparison. Software adds named
+Select only the one to three sources whose specific observations motivate that question.
+In the tension, give each selected source key one note of twenty-eight to forty words
+summarizing its already-checked contribution. Keep the rest in their own themes. Then
+supply forty-two to sixty words proposing the unresolved comparison. Software adds named
 links and depth labels. No source keys, author names or publication titles in prose.
 Do not equate engagement, learning and sustained attention, or imply enhanced skills in a headline.
 Paraphrase all public prose, including caveats; never copy sixteen consecutive source words.
@@ -736,9 +751,13 @@ Do not mention omitted themes, findings or sources.
 Keep each limitation attached to its own study, rather than claiming all sources share it.
 The tension must be an explicitly unresolved research/design question, not an extra finding.
 Use plain, specific prose, not "delve", "multifaceted", "nuanced" or generic benefits/risks language.
+Turn one example from a checked theme into a small activity the reader can try. Name the task,
+what to do and what to look for afterwards. Use fictional material if the task involves
+personal information. Offer a reflection, without promising a result or improved performance.
 Return {"headline":"at least five words", "deck":"30–45 words", "letter":"90–120 words",
-"tension":{"title":"an unresolved question", "source_notes":{"S1":"checked contribution", ...},
+"tension":{"title":"an unresolved question", "source_notes":[{"key":"S1","note":"checked contribution"}],
 "question":"the proposed comparison; no new factual claims"},
+"experiment":{"title":"the specific activity", "text":"20–50 words of practical instructions"},
 "closer":"one specific research question",
 "glossary":[{"term":"an actually used technical term","definition":"plain-language explanation"}]}.
 The glossary is optional: use zero to five terms a general reader may not know. Prefer
@@ -839,9 +858,10 @@ def compose(root=ROOT, model=None, today=None, *, store=None, now=None):
     data = root / 'data'
     drafts = json.loads((data / 'issue-editorial.json').read_text(encoding='utf-8'))
     number = weekly['run'].get('edition_number') or f'{len(drafts)+1:02d}'
+    # Old checked frames can supply the already-reviewed closing question.
+    activity = draft.get('experiment') or {'title': 'A question to consider', 'text': draft['closer']}
     draft.update(number=number, subject=f'The Attention Edit #{number} — '+draft['headline'],
-        experiment={'title':'Keep one decision visible', 'text':'Before using AI on a task, write down one judgment you want to make yourself. Afterwards, note what evidence changed that judgment.',
-                    'caution':'A reflection prompt, not a tested intervention.'},
+        experiment={**activity, 'caution': 'A reflection exercise.'},
         publication_window=weekly['run']['publication_window'],
         editorial_note=(
             ('Short edition using the checked material available at publication. ' if draft.get('edition_format') == 'compact' else '') +

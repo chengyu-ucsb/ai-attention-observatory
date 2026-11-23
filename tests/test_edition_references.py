@@ -90,6 +90,33 @@ class ReferenceSelectionTests(unittest.TestCase):
         composer.validate_section(resolved, sources)
         composer.resolve_inline_citations(resolved, sources)
 
+    def test_reviewer_receives_the_shared_conclusion_and_only_its_own_attributed_notes(self):
+        sources = self.packet[:2]
+        first = 'The class answered questions about how willing students were to use the tutor.'
+        second = 'Participants completed a separate assessment alone after working with the tutor.'
+        bridge = 'Together these studies establish that enthusiastic students retained more material.'
+        draft = {'signals': [{'text': '\n\n'.join(['Source 1: ' + first, 'Source 2: ' + second, bridge]),
+                              'citations': [{'key': 'S1', 'text': 'Source 1:'}, {'key': 'S2', 'text': 'Source 2:'}],
+                              'evidence': [{'key': 'S1'}, {'key': 'S2'}]}], 'tension': {'evidence': []}}
+        for source, own, other in ((sources[0], first, second), (sources[1], second, first)):
+            with self.subTest(key=source['key']):
+                claims = refs.source_claims(draft, source)
+                self.assertIn(own, claims)
+                self.assertIn(bridge, claims)
+                self.assertNotIn(other, claims)
+
+    def test_focused_frame_rejects_invalid_selections_and_reads_older_complete_maps(self):
+        note = ' '.join(self.draft['letter'].split()[:30])
+        question = ' '.join(self.draft['letter'].split()[30:75])
+        def frame(notes):
+            return {'tension': {'source_notes': notes, 'question': question}}
+        for keys in ([], ['S1', 'S1'], ['S99'], ['S1', 'S2', 'S3', 'S4']):
+            with self.subTest(keys=keys), self.assertRaises(ValueError):
+                refs.resolve_frame_references(frame([{'key': k, 'note': note} for k in keys]), self.packet)
+        legacy = refs.resolve_frame_references(frame({s['key']: note for s in self.packet}), self.packet)
+        self.assertEqual([c['key'] for c in legacy['tension']['citations']], ['S1', 'S2', 'S3', 'S4'])
+        self.assertIn(question, legacy['tension']['text'])
+
     def test_missing_cross_source_or_fabricated_choices_are_never_repaired(self):
         section, sources = self.selected_section()
         for mutation in ('missing', 'foreign', 'invented', 'missing_citation'):
@@ -117,7 +144,11 @@ class ReferenceSelectionTests(unittest.TestCase):
             section['comparison'] = ' '.join(prose.split()[42:80])
             section.pop('text'); section.pop('citations')
         frame = {key: value for key, value in copy.deepcopy(self.draft).items() if key != 'signals'}
-        frame['tension'].pop('evidence')
+        frame['tension'] = {'title': 'Which judgment could the learner repeat alone?',
+                            'source_notes': [{'key': 'S1', 'note': ' '.join(frame['letter'].split()[:30])}],
+                            'question': ' '.join(frame['letter'].split()[30:75])}
+        frame['experiment'] = {'title': 'Return to the original draft',
+            'text': 'Choose a paragraph you revised with help. Put that help away, then explain in your own words why you kept one suggestion and rejected another.'}
         model = Mock()
         model.create_chat_completion.side_effect = [
             {'choices': [{'message': {'content': json.dumps(value)}}]} for value in [plan, *sections, frame]]
@@ -128,6 +159,14 @@ class ReferenceSelectionTests(unittest.TestCase):
         self.assertNotIn('S2-A01', schema['properties']['evidence']['properties']['S1']['enum'])
         self.assertEqual(set(schema['properties']['source_notes']['required']), {'S1', 'S2'})
         self.assertTrue(all(anchor['quote'] for section in result['signals'] for anchor in section['evidence']))
+        self.assertEqual([c['key'] for c in result['tension']['citations']], ['S1'])
+        self.assertEqual({a['key'] for a in result['tension']['evidence']}, {'S1'})
+        self.assertEqual(result['experiment'], frame['experiment'])
+        self.assertIn(frame['experiment']['title'], refs.draft_passages(result).values())
+        self.assertIn(frame['experiment']['text'], composer.review_text(result))
+        with self.assertRaisesRegex(ValueError, 'quantitative'):
+            composer.validate({**result, 'experiment': {**frame['experiment'],
+                                'text': frame['experiment']['text'] + ' It raises scores by 98 percent.'}}, self.packet)
 
     def test_review_resolves_real_passages_but_cannot_override_an_unsupported_judgment(self):
         review = self.selected_review()
