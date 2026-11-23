@@ -169,9 +169,9 @@ class HeadlinePolicyTests(unittest.TestCase):
 
  def test_machine_thesis_is_not_split_into_a_benefit_only_headline(self):
   thesis="AI makes assignments easier. However, independent learning may suffer."
-  paper={"kind":"nonacademic","title":"The tradeoffs of AI in education",
-         "reading":{"level":"full_text"},
-         "deep_analysis":{"kind":"nonacademic","source_depth":"source_html","thesis":thesis}}
+  from test_prepared_reading_schema import generated
+  paper=generated(kind="nonacademic",claim_field="thesis",claim_text=thesis)
+  paper.update(title="The tradeoffs of AI in education",reading={"level":"curated"})
   digest=annotate(paper)["reading"]["digest"]
   self.assertEqual(digest["idea"],paper["title"])
   self.assertEqual(digest["explain"],thesis)

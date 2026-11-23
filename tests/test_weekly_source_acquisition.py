@@ -1146,8 +1146,16 @@ class HtmlRevisionQueueTests(unittest.TestCase):
                 self.assertEqual([a['version'] for a in prior['html_refresh_attempts']],
                                  ['article-body-v2', 'article-body-v3'])
 
+    def test_older_worker_does_not_replace_a_new_source_stamp(self):
+        state = self.revision_run(None, 'article-body-v3')
+        before = copy.deepcopy(rows(state)[0])
+        fetch = Mock(side_effect=AssertionError('older parser cannot replace newer extraction'))
+        state = self.revision_run(state, 'article-body-v2', attempt=fetch)
+        fetch.assert_not_called()
+        self.assertEqual(rows(state)[0], before)
+
     def test_rollback_to_initial_stamped_extraction_does_not_fetch(self):
-        state = run(self.payload, attempt=lambda *args: result_for(self.html()))
+        state = self.revision_run(None, 'article-body-v2')
         state = self.revision_run(state, 'article-body-v3')
         fetch = Mock(side_effect=AssertionError('initial extraction already retained'))
         state = self.revision_run(state, 'article-body-v2', attempt=fetch)

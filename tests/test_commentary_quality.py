@@ -117,6 +117,32 @@ class EditorialIntegrityTests(unittest.TestCase):
             article["thesis"] = subject
             self.assertIsNone(news_quality.commentary_topic(family))
 
+    def test_checked_explanation_can_clarify_the_buyers_role(self):
+        url = "https://www.techpolicy.press/when-an-ai-agent-says-i-agree-whos-consenting/"
+        rows = json.loads((ROOT / "data/library.json").read_text())
+        record = next(row for row in rows if row.get("url") == url)
+        reviewed = editorial_source_reviews.apply([record])[0]
+        reviewed["source_review"]["thesis"] = (
+            "An AI shopping assistant clicks to buy something. What shows that the buyer "
+            "authorized that particular purchase and what can the merchant check?")
+        published = annotate(reviewed)
+        self.assertEqual(news_quality.commentary_topic(published), "direct")
+        published["source_review"]["reasoning"] = "Companies build commercial platforms for online sales."
+        self.assertIsNone(news_quality.commentary_topic(published))
+        published["source_review"]["reasoning"] = "A buyer delegates a spending decision to the software."
+        published["reading"]["digest"]["longform"]["thesis"] = (
+            "The AI chip manufacturer announced new quarterly revenue targets.")
+        self.assertIsNone(news_quality.commentary_topic(published))
+
+    def test_official_feature_name_supports_a_plain_language_guide(self):
+        rows = json.loads((ROOT / "data/library.json").read_text())
+        apple = next(row for row in rows if row.get("url") ==
+                     "https://developer.apple.com/documentation/appintents/focus/")
+        published = annotate(apple)
+        self.assertEqual(news_quality.commentary_topic(published), "adjacent")
+        published["source"] = "Publisher RSS / Google News RSS"
+        self.assertIsNone(news_quality.commentary_topic(published))
+
     def test_real_family_article_stays_private_on_rebuild_and_in_stale_issue_input(self):
         publication = json.loads((ROOT / 'data/original-readings.json').read_text())['articles']
         notes = {n['id']: n for n in publication if n['id'].startswith('checked-eff-')}

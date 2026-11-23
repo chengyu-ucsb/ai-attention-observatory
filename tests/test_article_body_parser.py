@@ -13,6 +13,39 @@ def parse(html):
 
 
 class BodyTests(unittest.TestCase):
+    def test_results_tables_keep_cell_boundaries_and_explicit_header_associations(self):
+        title = 'Source measurement across two study conditions'
+        body = '<p>' + 'The study explains how its original comparison was measured. ' * 6 + '</p>'
+        html = ('<article><h1>' + title + '</h1>' + body * 8 + '<h2>Results</h2>'
+                '<table><caption>Observed responses</caption><thead><tr><th>Group</th>'
+                '<th>Baseline</th><th>Follow-up</th></tr></thead><tbody><tr><th scope="row">Control</th>'
+                '<td>42</td><td>18</td></tr><tr><th scope="row">Treatment</th><td>41</td><td>24</td></tr>'
+                '</tbody></table><h2>References</h2><p>A cited study reported different outcomes.</p></article>')
+        doc = document_from_html(html.encode(), {'title': title}, 'https://www.eff.org/test')
+        rows = [unit for unit in doc.units if unit['role'] == 'table_row']
+        self.assertEqual([row['text'] for row in rows], ['Control | 42 | 18', 'Treatment | 41 | 24'])
+        self.assertEqual(rows[0]['columns'], ['Group', 'Baseline', 'Follow-up'])
+        self.assertEqual(rows[0]['headings'][-1], 'Results')
+        self.assertEqual(doc.units[-1]['role'], 'references')
+        self.assertEqual(doc.coverage['evidence_status'], 'partial_full_text')
+        self.assertNotIn('Baseline', str(doc.manifest()))
+
+    def test_unaligned_rows_are_preserved_without_invented_column_assignments(self):
+        parser, values = parse('<main><h2>Results</h2><table><caption>Summary</caption>'
+                               '<tr><th>Outcome<th colspan="2">Both groups'
+                               '<tr><td>First<td>1<td>2</table><p>End of results.</p></main>')
+        self.assertIn('First | 1 | 2', values)
+        row = next(block for block in parser.blocks if block['role'] == 'table_unaligned')
+        self.assertNotIn('columns', row)
+        self.assertEqual(parser.blocks[-1]['role'], 'results')
+
+    def test_subsections_keep_prior_work_and_hypotheses_out_of_study_results(self):
+        parser, _ = parse('<article><h2>Related work</h2><h3>Results</h3><p>Earlier comparison.</p>'
+                          '<h2>Research hypotheses</h2><p>Proposed difference.</p>'
+                          '<h2>Results</h2><p>This study comparison.</p></article>')
+        self.assertEqual([block['role'] for block in parser.blocks if block['kind'] == 'p'],
+                         ['prior_work', 'hypotheses', 'results'])
+
     def test_drupal_full_body_not_ten_teasers_with_same_body_class(self):
         body='<div class="field field--name-body"><p>Main source introduction.</p><ol>'+''.join(f'<li>Recommendation {n} with required context.</li>' for n in range(10))+'</ol><p>End qualification.</p></div>'
         teaser='<article class="node-teaser node--teaser"><div class="field field--name-body"><p>Other story cannot be evidence.</p></div></article>'

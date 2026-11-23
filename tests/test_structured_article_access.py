@@ -32,6 +32,70 @@ def tei(legacy=False):
     return ('<html><body>'+paper+'</body></html>' if legacy else paper).encode()
 
 class XMLParsingTests(unittest.TestCase):
+    def test_jats_and_tei_tables_and_reference_roles_reach_the_reading_document(self):
+        for format, source in (('jats', jats()), ('tei', tei())):
+            if format == 'jats':
+                original = b'<table><tr><td>42</td></tr></table>'
+                table = (b'<table><thead><tr><th>Group</th><th>Score</th></tr></thead>'
+                         b'<tbody><tr><th scope="row">Unassisted</th><td>42</td></tr></tbody></table>')
+                source = source.replace(original, table)
+            else:
+                table = (b'<figure><head>Comparison table</head><table><row role="label"><cell>Group</cell>'
+                         b'<cell>Score</cell></row><row><cell>Unassisted</cell><cell>42</cell></row></table></figure>')
+                source = source.replace(b'<head>Limitations</head>', b'<head>Limitations</head>' + table)
+                source = source.replace(b'END_REFERENCE', b'<listBibl><bibl>END_REFERENCE</bibl></listBibl>')
+            with self.subTest(format=format):
+                doc = xml.document_from_xml(source, RECORD, 'https://www.ebi.ac.uk/test', format=format)
+                row = next(unit for unit in doc.units if unit['role'] == 'table_row')
+                self.assertEqual(row['text'], 'Unassisted | 42')
+                self.assertEqual(row['columns'], ['Group', 'Score'])
+                self.assertIn(row['headings'][-1], ('Results', 'Limitations'))
+                reference = next(unit for unit in doc.units if 'END_REFERENCE' in unit['text'])
+                self.assertEqual(reference['role'], 'references')
+                self.assertNotIn('Unassisted', json.dumps(doc.manifest()))
+                self.assertTrue(reading.coverage_is_complete(doc, reading.chunk_document(doc)))
+
+    def test_pdf_explicit_section_boundaries_continue_across_pages(self):
+        units = [
+            {'location': 'page:1', 'text': 'A paper title\n2. Methods\nAllocation was random.\n3. Results\nScores differed.'},
+            {'location': 'page:2', 'text': 'More observations.\nReferences\nEarlier author and title.'},
+            {'location': 'page:3', 'text': 'Another reference.\nAppendix A\nProtocol checklist.'},
+        ]
+        access.label_pdf_sections(units)
+        for unit, roles in zip(units, (
+                ['page','heading','methods','heading','results'],
+                ['results','heading','references'], ['references','heading','body'])):
+            spans = unit['sections']
+            self.assertEqual([span['role'] for span in spans], roles)
+            self.assertEqual([span['start'] for span in spans], [0] + [span['end'] for span in spans[:-1]])
+            self.assertEqual(spans[-1]['end'], len(unit['text']))
+        self.assertEqual(units[1]['sections'][0]['headings'], ['3. Results'])
+        self.assertEqual(units[1]['sections'][-1]['headings'], ['References'])
+
+    def test_pdf_page_folios_do_not_complete_an_image_only_interior_page(self):
+        title = RECORD['title']
+        page_text = [title + '\n' + PARA * 24 + '\nJournal 12 | Page 1',
+                     'Journal 12 | Page 2',
+                     PARA * 8 + '\nJournal 12 | Page 3']
+        pages = [Mock() for _ in page_text]
+        for page, text in zip(pages, page_text):
+            page.extract_text.return_value = text
+        fake_reader = Mock(return_value=Mock(pages=pages))
+        with patch.dict(sys.modules, {'pypdf': Mock(PdfReader=fake_reader)}):
+            doc = access.document_from_pdf(b'%PDF-original-bytes', RECORD, 'https://arxiv.org/source')
+        self.assertEqual(doc.coverage['pages_with_text'], 3)
+        self.assertEqual(doc.coverage['evidence_status'], 'partial_full_text')
+        self.assertEqual([unit['text'] for unit in doc.units], page_text)
+        xml_url = 'https://www.ebi.ac.uk/europepmc/webservices/rest/PMC123/fullTextXML'
+        alternative = xml.document_from_xml(jats(), RECORD, xml_url, format='jats')
+        candidates = [access.candidate(doc.url, 'known_pdf', DOI),
+                      {**access.candidate(xml_url, 'europe_pmc', DOI), 'structured_format': 'jats'}]
+        with patch.object(access, 'fetch_candidate', side_effect=[doc, alternative]):
+            selected, diagnostics = access.retrieve(RECORD, providers=[], known_sources=candidates)
+        self.assertIs(selected, alternative)
+        self.assertEqual([item['status'] for item in diagnostics],
+                         ['partial_full_text', 'full_document_retrieved'])
+
     def test_complete_jats_includes_intro_tables_tail_and_references_without_duplicate_text(self):
         doc=xml.document_from_xml(jats(),RECORD,'https://www.ebi.ac.uk/test',format='jats')
         text=' '.join(u['text'] for u in doc.units)

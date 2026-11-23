@@ -532,9 +532,44 @@ DEEP_PERSPECTIVES = {
   "basis": "Analysis of published product documentation"
  }
 }
+def checked_machine_document(record):
+ """Only the document reader's validated, fully covered output can become reader prose."""
+ machine=record.get("deep_analysis")
+ if not isinstance(machine,dict) or machine.get("source_depth") not in ("full_text","source_html"):
+  return {}
+ from prepared_reading_schema import validate_analysis
+ try:
+  validate_analysis(machine,kind=record.get("kind"))
+ except ValueError:
+  return {}
+ record_doi=str(record.get("doi") or "").lower()
+ source_record_doi=str(machine["coverage"].get("record_doi") or "").lower()
+ if source_record_doi and record_doi!=source_record_doi:
+  return {}
+ return machine
+
+
+def machine_research_account(record):
+ if record.get("kind")!="scholarly" or record.get("verified_article_review") or record.get("original_reading"):
+  return {}
+ from reading_headlines import reader_genre
+ if reader_genre(record) not in ("research","review","proposal","conceptual"):
+  return {}
+ machine=checked_machine_document(record)
+ if not any(machine.get(k) for k in ("research_question","study_design","reported_results","authors_interpretation")):
+  return {}
+ account={key:machine[key] for key in ("research_question","study_design","reported_results",
+  "authors_interpretation","critical_context","limitations","open_question") if machine[key]}
+ if reader_genre(record) in ("conceptual","proposal"):
+  account.pop("reported_results",None)
+ if not any(account.get(k) for k in ("research_question","study_design","reported_results","authors_interpretation")):
+  return {}
+ return {**account,"source_url":machine["source_url"],"source_version":machine["coverage"]["document_version"],
+         "review_status":machine["review_status"]}
+
+
 def deep_perspective(record,notes):
  """Only add interpretive depth when an original source has been examined."""
- machine=record.get("deep_analysis") or {}
  reviewed=record.get("source_review") or {}
  if reviewed:
   return {
@@ -547,11 +582,12 @@ def deep_perspective(record,notes):
  # Prefer a source-checked, editorially authored reading when available.
  key=((record.get("url") or "")+" "+(record.get("title") or "")).lower()
  extra=next((v for token,v in DEEP_PERSPECTIVES.items() if token in key),{})
- if machine.get("kind")=="nonacademic" and machine.get("source_depth")=="source_html" and not extra.get("basis","").startswith("Editorial analysis"):
+ machine=checked_machine_document(record) if not extra.get("basis","").startswith("Editorial analysis") else {}
+ if machine and machine["kind"]=="nonacademic":
   return {
    **{field:machine.get(field,"") for field in ("thesis","reasoning","examples","tension","implications","open_question","qualification")},
    "basis":machine.get("basis","AI-assisted source analysis"),
-   "source_depth":"machine_read_full_article"
+   "source_depth":"machine_read_full_article","source_url":machine["source_url"],"review_status":machine["review_status"]
   }
  argument=notes.get("argument") or ""
  overview=(record.get("reading") or {}).get("overview") or ""
@@ -604,7 +640,12 @@ def annotate(record):
   return {**record,"reading":original}
  r=record.get("reading") or {}
  base=dict(record);base["reading"]=dict(r)
- level=r.get("level")
+ base["reading"].pop("machine_account",None)
+ account=machine_research_account(record)
+ if account:
+  base["reading"]["machine_account"]=account
+  base["reading"]["level"]="full_text"
+ level=base["reading"].get("level")
  if record.get("kind")!="scholarly":
   notes=record.get("editorial_notes") or {}
   rewritten=public_commentary_idea(record)
@@ -714,13 +755,5 @@ def annotate(record):
   }
   if context:
    digest["explain_source"]="abstract_paraphrase" if paraphrase else "abstract_excerpt"
- machine=record.get("deep_analysis") or {}
- if (level=="full_text" and machine.get("kind")=="scholarly" and
-     machine.get("source_depth")=="full_text"):
-  digest["longform"]={key:machine.get(key,"") for key in (
-   "research_question","study_design","reported_results","authors_interpretation",
-   "critical_context","limitations","open_question")}
-  digest["longform"]["basis"]=machine.get("basis","AI-assisted analysis of indexed full text")
-  digest["longform"]["review_status"]=machine.get("review_status","automatic_unreviewed")
  base["reading"]["digest"]=digest
  return base
