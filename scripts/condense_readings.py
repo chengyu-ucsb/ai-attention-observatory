@@ -95,7 +95,7 @@ CURATED={
 CURATED.update(MORE_EDITORIAL)
 
 HEAD=re.compile(r"(?:^|\s)(?:\d+(?:\.\d+)*\.?\s+)*(?:results?|discussion|methods?|materials and methods|conclusions?|limitations(?: and future research)?|introduction|abstract)\s*(?=(?:\d|[A-Z]))",re.I)
-SEC=re.compile(r"^\s*(?:\d+(?:\.\d+)*\.?\s+){1,3}(?=[A-Za-z])")
+SEC=re.compile(r"^\s*(?:\d+\.(?:\d+\.?)*\s+){1,3}(?=[A-Za-z])")
 CITATIONS=re.compile(r"\s*\(\s*(?:Table|Fig(?:ure)?|Section)\s+\d+[a-zA-Z]?\s*\)",re.I)
 BRACKETS=re.compile(r"\s*\[(?:\d+[\s,;–-]*)+\]")
 def clean(source):
@@ -153,7 +153,7 @@ DIAGNOSTIC = re.compile(
  r"hypothesis testing outcomes|software version)\b",re.I)
 FINDING_VERBS = re.compile(
  r"\b(?:associat(?:ed|ion|ions)|correlat(?:ed|ion|ions)|predict(?:ed|or|ors|s)?|"
- r"identif(?:ied|ies|y)|observed|found|show(?:ed|s)?|reveal(?:ed|s)?|"
+ r"identif(?:ied|ies|y)|observed|found|suggest(?:ed|s)?|show(?:ed|s)?|reveal(?:ed|s)?|"
  r"indicat(?:ed|es)?|increas(?:ed|es)?|decreas(?:ed|es)?|"
  r"higher|lower|stronger|weaker|significant(?:ly)?|"
  r"mediati(?:on|ng)|moderati(?:on|ng)|"
@@ -225,13 +225,7 @@ def reported_result(source,title="",maxlen=300):
   if re.search(r"\b(?:we (?:find|found)|results? (?:showed|indicated)|"
                r"findings? (?:show|indicate)|analysis (?:revealed|identified))\b",s,re.I):score+=2
   candidates.append((score,-position,s))
- if not candidates:return ""
- s=max(candidates)[2]
- if len(s)>maxlen:
-  clip=s[:maxlen]
-  stop=max(clip.rfind(";"),clip.rfind(","),clip.rfind(" and "))
-  s=(clip[:stop].strip() if stop>maxlen//2 else clip.rsplit(" ",1)[0])+"…"
- return s
+ return max(candidates)[2] if candidates else ""
 
 def condensed(text,role,maxlen=295):
  items=sentence_list(text)
