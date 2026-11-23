@@ -5,22 +5,33 @@ import re
 
 UNCITABLE = {"references", "metadata", "heading", "table_header", "table_unaligned"}
 RESULT_EXCLUDED = {"methods", "hypotheses", "prior_work", "caption"}
-SCHOLARLY_WRITING = (
-    "Write complete, self-contained sentences for a person trying to understand this particular "
-    "paper. Name the actor, task and actual outcome or argument. Skip headings, statistical "
-    "fragments, field labels, generic advice and background repeated under new labels. For an "
-    "experiment tie the comparison to a named measure and time point; assisted performance is "
-    "different from later independent performance. For a survey name the respondents and the "
-    "construct they reported; a causal title cannot turn an association into an effect. For "
-    "interviews attribute themes to participants. For reviews describe the included evidence "
-    "and its variation. For conceptual work explain the authors' proposal and reasoning without "
-    "inventing participants or results. Preserve material nulls, reversals and qualifications. "
-    "Distinguish the authors' interpretation from observed findings. Explain the particular "
-    "inference a design limit leaves open. A scale reliability check is not the main finding "
-    "of a study about the relationship between reported tool use and achievement. If only "
-    "instrument checks appear, leave the substantive result absent. Give at most three "
-    "high-value statements unless further distinct results or limits are essential."
+DESIGN_CUES = (
+    (r"systematic review|scoping review|meta-analysis", "For a review say which studies were included and how their findings agree or differ."),
+    (r"time[- ]lag(?:ged)? survey|cross[- ]sectional|self[- ]report|questionnaires?", "For a survey state who reported what. A relationship between two survey measures cannot establish that one caused the other."),
+    (r"random(?:ly assigned|i[sz]ed)|control group|intervention group", "For a comparison give the groups, their task, outcome and time point. Preserve a null endpoint beside a positive one."),
+    (r"semi[- ]structured interviews?|thematic analysis", "Attribute themes to the interviewed people and include the experience they described."),
+    (r"conceptual framework|position paper|we propose a framework", "Explain the authors' proposal and the reasoning behind it without inventing tested effects."),
 )
+
+
+def scholarly_guidance(chunk):
+    """Give a small model the relevant reading task, guided by the supplied text."""
+    role_set = {item.get("role") for item in chunk.get("unit_context", [])}
+    focus = next((tip for cue, tip in DESIGN_CUES if re.search(cue, chunk["text"], re.I)),
+                 "Distinguish what people actually did, saw or proposed from what the authors infer.")
+    text = ("Write concise, complete original sentences for a reader of this particular paper. "
+            "What did these people do or report? What changed, or stayed the same? " + focus +
+            " Keep material qualifications; name the specific outcome instead of calling it an impact. "
+            "Explain unfamiliar abbreviations, or use plain-language names. State each point only once.")
+    if role_set & {"abstract", "results", "table_row"}:
+        text += (" Read the stated comparison and every reported outcome. Distinguish the paper's "
+                 "answer from instrument checks, scale reliability or model fitting. Preserve mixed results.")
+    if role_set & {"methods", "limitations"}:
+        text += (" Use the specific task or measure for study design, and explain exactly which "
+                 "inference a documented limit prevents.")
+    return text
+
+
 SCHOLARLY_VERIFICATION = (
     "Check who did or said what, the comparison, direction, units, and whether this was "
     "self-report, recorded performance or transfer. Reject an estimate without its outcome, "
