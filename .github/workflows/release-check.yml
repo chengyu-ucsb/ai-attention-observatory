@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
-# Read-only checks must never queue behind acquisition or model inference.
+# Release checks must never queue behind acquisition or model inference.
 concurrency:
   group: release-check-${{ github.ref }}
   cancel-in-progress: false
@@ -33,6 +33,20 @@ jobs:
           persist-credentials: false
       - name: Check release-deadline behavior offline
         run: python -m unittest discover -s tests -p 'test_release_deadline.py' -v
-      - name: Require this Monday's synthesis on the actual website and feeds
-        if: github.event_name != 'pull_request'
-        run: python scripts/check_release_deadline.py
+  release:
+    needs: verify
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Verify live synthesis and recover a confirmed stale deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/check_release_deadline.py --recover

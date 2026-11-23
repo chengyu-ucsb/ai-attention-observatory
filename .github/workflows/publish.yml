@@ -1,4 +1,5 @@
 name: Publish observatory website
+run-name: ${{ inputs.recovery_for && format('Restore edition {0}', inputs.recovery_for) || '' }}
 on:
   push:
     branches: [main]
@@ -53,6 +54,11 @@ on:
     - cron: '47 12 * * 0,2-6'
       timezone: America/New_York
   workflow_dispatch:
+    inputs:
+      recovery_for:
+        description: 'Approved edition date and SHA-256 to recheck before recovery deployment'
+        type: string
+        required: false
 permissions:
   contents: read
   actions: read
@@ -176,8 +182,16 @@ jobs:
         # Use the runner's read-only Actions access, not a shared anonymous IP
         # quota. HTTP errors still fail closed without retrying denied requests.
         run: python scripts/wait_pages_artifact.py --repository "$GITHUB_REPOSITORY" --run-id "$GITHUB_RUN_ID" --artifact-id "$PAGES_ARTIFACT_ID"
+      - name: Recheck recovery under the Pages concurrency lock
+        id: recovery
+        if: github.event_name == 'workflow_dispatch' && inputs.recovery_for != ''
+        env:
+          RECOVERY_KEY: ${{ inputs.recovery_for }}
+        run: python scripts/check_release_deadline.py --before-deploy "$RECOVERY_KEY"
       - id: deployment
+        if: steps.recovery.outcome == 'skipped' || steps.recovery.outputs.needed == 'true'
         uses: actions/deploy-pages@v5.0.1
 
       - name: Verify live edition and RSS against the deployed artifact
+        if: steps.deployment.outcome == 'success'
         run: python scripts/verify_publication.py --manifest _site/data/reader-manifest.json

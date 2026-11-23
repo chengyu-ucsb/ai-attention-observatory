@@ -15,6 +15,10 @@ from build_newsletter import ATOM, CONTENT, json_feed, rss_item
 BASE='https://chengyu-ucsb.github.io/ai-attention-observatory/'
 
 
+class LiveContentMismatch(ValueError):
+    """A retrieved publication artifact differs from the expected edition."""
+
+
 def fetch(url):
     request=Request(url,headers={'Cache-Control':'no-cache','User-Agent':'ObservatoryPublicationVerifier/1.0'})
     with urlopen(request,timeout=20) as response:return response.read(4_000_000)
@@ -22,20 +26,24 @@ def fetch(url):
 
 def verify(expected,base=BASE,reader=fetch,*,approved_issue=None):
     live=json.loads(reader(urljoin(base,'data/reader-manifest.json')))
+    if not isinstance(live, dict) or not all(live.get(key) for key in ('edition_id', 'edition_sha256', 'reader_sha256', 'index_url')):
+        raise ValueError('unrecognized_live_manifest')
     if live.get('edition_id')!=expected.get('edition_id') or live.get('edition_sha256')!=expected.get('edition_sha256') or live.get('index_url')!=expected.get('index_url'):
-        raise ValueError('deployed_manifest_mismatch')
+        raise LiveContentMismatch('deployed_manifest_mismatch')
     reader_hash = sha256(encoded(live.get('issue', {}))).hexdigest()
     if (reader_hash != live.get('reader_sha256') or reader_hash != expected.get('reader_sha256')):
-        raise ValueError('deployed_reader_hash_invalid')
+        raise LiveContentMismatch('deployed_reader_hash_invalid')
     edition=live.get('edition_id')
     if not edition:raise ValueError('no_published_edition')
     permanent=urljoin(base,'issues/'+edition+'.html')
     html=reader(permanent).decode('utf-8')
+    if '<meta name="observatory-edition-sha256" content="' not in html:
+        raise ValueError('unrecognized_live_edition_page')
     import html as html_tools
     if live['issue'].get('headline','') not in html_tools.unescape(html):
-        raise ValueError('permanent_edition_mismatch')
+        raise LiveContentMismatch('permanent_edition_mismatch')
     if '<meta name="observatory-edition-sha256" content="'+live['edition_sha256']+'">' not in html:
-        raise ValueError('permanent_edition_hash_mismatch')
+        raise LiveContentMismatch('permanent_edition_hash_mismatch')
     if approved_issue is None:
         archive = Path(__file__).resolve().parents[1] / 'data' / 'approved-issues'
         approved_issue = json.loads((archive / (date.fromisoformat(edition).isoformat()+'.json')).read_text())
@@ -44,18 +52,22 @@ def verify(expected,base=BASE,reader=fetch,*,approved_issue=None):
 
     expected_rss = rss_item(approved_issue)
     feed = ET.fromstring(reader(urljoin(base, 'issue-feed.xml')))
+    if feed.tag != 'rss' or feed.find('channel') is None:
+        raise ValueError('unrecognized_live_rss_feed')
     first = feed.find('./channel/item')
     if first is None or any(first.findtext(key) != expected_rss.findtext(key) for key in ('guid', 'link')):
-        raise ValueError('published_feed_entry_missing_or_not_first')
+        raise LiveContentMismatch('published_feed_entry_missing_or_not_first')
     fields = ('title', 'description', 'pubDate', f'{{{ATOM}}}updated', f'{{{CONTENT}}}encoded')
     if any(first.findtext(key) != expected_rss.findtext(key) for key in fields):
-        raise ValueError('published_rss_feed_content_mismatch')
+        raise LiveContentMismatch('published_rss_feed_content_mismatch')
 
     structured = json.loads(reader(urljoin(base, 'data/issue-feed.json')))
-    items = structured.get('items') or []
+    if not isinstance(structured, dict) or not isinstance(structured.get('items'), list):
+        raise ValueError('unrecognized_live_json_feed')
+    items = structured['items']
     expected_json = json_feed([approved_issue])['items'][0]
     if not items or items[0] != expected_json or expected_json['_observatory'] != live['issue']:
-        raise ValueError('published_feed_content_mismatch')
+        raise LiveContentMismatch('published_feed_content_mismatch')
     return {'status':'live_verified','edition_id':edition,'permanent_url':permanent,
             'edition_sha256':live['edition_sha256'],
             'publication_window':live['issue'].get('publication_window')}
