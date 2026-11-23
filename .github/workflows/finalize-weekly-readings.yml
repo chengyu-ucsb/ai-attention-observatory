@@ -2,7 +2,14 @@ name: Finalize weekly source readings
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/finalize-weekly-readings.yml', 'scripts/worker_run.py']
+    # Reviewed source screening and display metadata can change the public
+    # weekly shelf; regenerate a source-bound final-reading receipt first.
+    paths:
+      - '.github/workflows/finalize-weekly-readings.yml'
+      - 'scripts/worker_run.py'
+      - 'data/venue-standards.json'
+      - 'data/reading-headlines.json'
+      - 'data/reading-genres.json'
   pull_request:
     branches: [main]
     paths:
