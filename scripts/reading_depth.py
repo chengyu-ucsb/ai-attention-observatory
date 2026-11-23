@@ -46,15 +46,23 @@ def identity(record):
 
 
 def depth_audit(records):
+    from condense_readings import checked_machine_document, substantive_machine_account
+    from reading_headlines import reader_genre
     findings = Counter()
     gaps = []
     editorial_queue = []
     counts = Counter()
     for record in records:
-        if record.get("kind") != "scholarly":
-            continue
         reading = record.get("reading") or {}
         digest = reading.get("digest") or {}
+        if record.get("kind") != "scholarly":
+            if (digest.get("status") == "publisher_or_editorial_synopsis" and record.get("deep_analysis")
+                    and not reading.get("original_summary") and not record.get("source_review")):
+                evidence = checked_machine_document(record)
+                if evidence and not substantive_machine_account(evidence, "nonacademic"):
+                    editorial_queue.append({"id": identity(record), "title": record.get("title", ""),
+                        "reading_level": reading.get("level"), "reasons": ["checked_evidence_needs_elaboration"]})
+            continue
         level = reading.get("level")
         basis = digest.get("finding_source") or "none"
         counts["scholarly_readings"] += 1
@@ -64,11 +72,16 @@ def depth_audit(records):
         # A source may be fully accessible yet still expose only selected sentences.
         machine = reading.get("machine_account") or {}
         has_checked_machine_account = (machine.get("review_status") == "machine_checked_not_independently_reviewed"
-                                       and bool(machine.get("source_url")))
-        if (digest.get("status") == "automatically_condensed_source_text"
-                and not reading.get("original_summary") and not record.get("verified_article_review")
-                and not has_checked_machine_account):
-            reasons = ["extracts_only"]
+                                       and bool(machine.get("source_url"))
+                                       and substantive_machine_account(machine, reader_genre(record)))
+        if has_checked_machine_account:
+            continue
+        evidence = (record.get("deep_analysis") and not reading.get("original_summary")
+                    and not record.get("verified_article_review") and checked_machine_document(record))
+        thin_machine = bool(evidence and not substantive_machine_account(evidence, reader_genre(record)))
+        if (not reading.get("original_summary") and not record.get("verified_article_review")
+                and (thin_machine or digest.get("status") == "automatically_condensed_source_text")):
+            reasons = ["checked_evidence_needs_elaboration"] if thin_machine else ["extracts_only"]
             if not digest.get("finding") and not digest.get("explain"):
                 reasons.append("no_result_or_source_context")
             if not digest.get("approach"):

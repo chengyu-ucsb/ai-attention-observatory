@@ -49,10 +49,18 @@ class DeepReadingTests(unittest.TestCase):
   self.assertEqual(d["longform"]["source_depth"],"publisher_synopsis")
   self.assertEqual(d["longform"]["reasoning"],"")
   from test_prepared_reading_schema import generated
-  verified=generated(kind="nonacademic")
+  from reading_depth import depth_audit
+  thesis="Some instructors ask students to review every automated correction."
+  example="The article follows one class that compared edited drafts with their original wording."
+  verified=generated(kind="nonacademic",claim_field="thesis",claim_text=thesis)
+  verified["reading"]={"level":"curated","overview":"The publisher describes a classroom exercise with automated feedback."}
+  fallback=annotate(verified)
+  self.assertEqual(fallback["reading"]["digest"]["longform"]["thesis"],verified["reading"]["overview"])
+  self.assertIn("checked_evidence_needs_elaboration",depth_audit([fallback])["summary_review"][0]["reasons"])
+  verified=generated(kind="nonacademic",claim_field="thesis",claim_text=thesis,support={"examples":example})
   d=annotate(verified)["reading"]["digest"]
   self.assertEqual(d["longform"]["source_depth"],"machine_read_full_article")
-  self.assertEqual(d["longform"]["qualification"],verified["deep_analysis"]["qualification"])
+  self.assertEqual(d["longform"]["examples"],example)
 
  def test_scholarly_longform_is_only_published_for_fulltext(self):
   record={"kind":"scholarly","title":"Attention and AI","doi":"10.5555/new",
@@ -66,17 +74,45 @@ class DeepReadingTests(unittest.TestCase):
   from test_prepared_reading_schema import generated
   from build_public import readable
   from build_reader import article
+  from reading_depth import depth_audit
   record=generated(claim_field="study_design")
+  record["abstract_text"]=("One group used paper feedback and the other group used online feedback. "
+                           "Participants reported how often they revised their original responses.")
+  record["reading"]={"level":"full_text","machine_account":{"source_url":record["url"]}}
+  fallback=annotate(record)
+  self.assertEqual(fallback["reading"]["level"],"abstract")
+  self.assertNotIn("machine_account",fallback["reading"])
+  self.assertTrue(readable(fallback))
+  self.assertIn("checked_evidence_needs_elaboration",depth_audit([fallback])["summary_review"][0]["reasons"])
+  self.assertIn("study_design",fallback["deep_analysis"])
+  result="The group receiving online feedback revised more of their original responses."
+  record=generated(claim_field="study_design",support={"reported_results":result})
   record["reading"]={"level":"citation_only"}
   published=annotate(record)
   account=published["reading"]["machine_account"]
   self.assertEqual(account["study_design"],record["deep_analysis"]["study_design"])
   self.assertTrue(readable(published))
+  self.assertFalse(depth_audit([published])["summary_review"])
   self.assertEqual(article(published)["reading"]["machine_account"],account)
   self.assertFalse({"coverage","claim_evidence","source_hash"}&set(account))
   record["deep_analysis"]["coverage"]["chunks_processed"]=0
   self.assertNotIn("machine_account",annotate(record)["reading"])
   self.assertFalse(readable(annotate(record)))
+
+ def test_argument_support_depends_on_genre(self):
+  from condense_readings import substantive_machine_account
+  design="Students would compare their initial answers with revised answers."
+  argument="The authors propose that explaining a revision reveals a learner’s judgment."
+  example="Teachers could examine which recommendations a student accepted and why."
+  self.assertFalse(substantive_machine_account({"research_question":argument},"research"))
+  self.assertFalse(substantive_machine_account({"reported_results":design,"study_design":design},"review"))
+  self.assertFalse(substantive_machine_account({"study_design":design},"proposal"))
+  self.assertTrue(substantive_machine_account({"study_design":design,"critical_context":example},"proposal"))
+  self.assertFalse(substantive_machine_account({"authors_interpretation":argument},"conceptual"))
+  self.assertTrue(substantive_machine_account({"authors_interpretation":argument,"critical_context":example},"conceptual"))
+  self.assertFalse(substantive_machine_account({"thesis":argument,"qualification":example},"nonacademic"))
+  self.assertFalse(substantive_machine_account({"reported_results":argument,"study_design":design,
+                    "account_status":"checked_evidence_only"},"research"))
 
  def test_parser_discards_navigation(self):
   parser=ArticleParser()
