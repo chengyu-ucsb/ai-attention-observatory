@@ -308,15 +308,14 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
         verifying=verification_guidance(genre)
     instruction=(
         'Read the whole source segment, including qualifications. '+writing+' '
-        'Return {"claims":[{"field":"one allowed field","text":"original paraphrase",'
-        '"source_span":"one supporting source-span ID shown below"}],'
-        '"no_claim_reason":"explain empty claims, otherwise an empty string"}. '
-        'Use at most six claims, each 6-90 words. Choose the ID of a span that '
-        'actually supports the claim; do not generate a quotation or cite an '
-        'irrelevant span. Labels partition the entire source segment without '
-        'omitting text: read across their boundaries for context and caveats. '
-        'Do not paraphrase references as findings. '
-        'Every claim must be supported by THIS segment. Leave unsupported fields absent. '
+        'Usually one or two sentences are enough for a segment. Each must say one '
+        'new thing a general reader can understand, in 6-90 words. Spell out unfamiliar '
+        'abbreviations in your own language. Read the full segment, then look away from '
+        'the source wording: do not copy phrases of 13 words. Do not fill every field. '
+        'Use the return schema. Set no_claim_reason to an empty string when there are '
+        'claims. If a section only lists references, section labels or validation '
+        'procedures without a new substantive point, return no claims and explain why. '
+        'Choose one supporting source-span ID per original sentence. No generic synopsis. '
         'Allowed fields: '+fields+'\nTitle: '+title+'\nSegment '+chunk['id']+':\n'+labelled)
     answer=model_json(model,instruction,2200,schema=claim_schema(kind,list(by_id.values())),
                       deadline=deadline,source_span_ids=set(by_id))
@@ -391,6 +390,7 @@ def synthesize(document,model,kind,title,max_chunks=80,deadline=None,checkpoint=
     def choose(instruction,schema):
         return model_json(model,instruction,200,schema=schema,deadline=deadline)
     order=evidence.edit_article(public_claims,kind,title,choose)
+    status=evidence.account_status(kind,[public_claims[i]['field'] for i in order])
     for idx in order:
         claim=public_claims[idx]
         output[claim['field']].append(claim['text'])
@@ -400,7 +400,7 @@ def synthesize(document,model,kind,title,max_chunks=80,deadline=None,checkpoint=
         claims_checked=len(public_claims),claim_check='anchor_numeric_copy_and_second_model_pass',
         review_status='machine_checked_not_independently_reviewed')
     return {**{key:' '.join(value) for key,value in output.items()},
-            'claim_evidence':public_claims,'narrative_order':order,'coverage':manifest}
+            'claim_evidence':public_claims,'narrative_order':order,'account_status':status,'coverage':manifest}
 
 
 def indexed_sections(record):
@@ -527,7 +527,7 @@ def reading_candidates(records, today, observed_at, limit=2):
 
 def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,checkpoint_factory=None,public_gaps=None):
     stats={'attempted':0,'documents_retrieved':0,'partial_inputs':0,'summaries_completed':0,
-           'failed':0,'failure_reasons':{},'failure_stages':{},
+           'failed':0,'failure_reasons':{},'failure_stages':{},'article_accounts':0,'evidence_only_readings':0,
            'source_text_saved':False,'skipped_no_model':model is None}
     if model is None: return stats
     if retriever is None:
@@ -577,6 +577,8 @@ def process(records,model,limit=2,retriever=None,run_date=None,run_at=None,check
                 'last_at':today,'next_at':(run_date+timedelta(days=30 if complete else 7)).isoformat(),
                 'provider_diagnostics':diagnostics}
             stats['summaries_completed']+=1
+            if result.get('account_status')=='article_account': stats['article_accounts']+=1
+            elif result.get('account_status')=='checked_evidence_only': stats['evidence_only_readings']+=1
         except Exception as exc:
             reason=str(exc) if isinstance(exc,ValueError) and re.fullmatch(r'[a-z_]+',str(exc)) else type(exc).__name__
             stats['failed']+=1

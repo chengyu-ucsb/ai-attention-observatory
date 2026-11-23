@@ -213,7 +213,7 @@ def validate_analysis(value, *, kind=None, now=None):
     version = value.get("version")
     require(type(version) is int and version in {3, 4} and value["review_status"] == REVIEW)
     if version == 4:
-        required.add("narrative_order")
+        required.update({"narrative_order", "account_status"})
     shape(value, required, {"preparation_provenance"})
     coverage = validate_coverage(value["coverage"])
     require(value["source_url"] == coverage["source_url"] and value["source_hash"] == coverage["source_sha256"])
@@ -273,6 +273,8 @@ def validate_analysis(value, *, kind=None, now=None):
         require(type(order) is list and 1 <= len(order) <= 10
                 and all(type(i) is int and 0 <= i < len(claims) for i in order)
                 and len(set(order)) == len(order))
+        from reading_evidence_context import account_status
+        require(value["account_status"] == account_status(actual_kind, [claims[i]["field"] for i in order]))
         for i in order:
             fields[claims[i]["field"]].append(claims[i]["text"])
     # Claims may omit empty/deduplicated chunks. Do not invent full interval

@@ -70,6 +70,14 @@ class EditorialClaimTests(unittest.TestCase):
         self.assertEqual([s["citable"] for s in spans], [True,False])
         self.assertEqual(chunk["ranges"][1]["start"], len(paper))
 
+    def test_retained_evidence_is_not_a_substantive_account_by_default(self):
+        from reading_evidence_context import account_status
+        self.assertEqual(account_status("scholarly", ["study_design"]), "checked_evidence_only")
+        self.assertEqual(account_status("scholarly", ["study_design", "reported_results"]), "article_account")
+        self.assertEqual(account_status("scholarly", ["research_question", "authors_interpretation"]), "article_account")
+        self.assertEqual(account_status("nonacademic", ["thesis"]), "checked_evidence_only")
+        self.assertEqual(account_status("nonacademic", ["thesis", "examples"]), "article_account")
+
     def test_editor_cannot_replace_the_outcome_with_setup(self):
         claims = [{"field": "study_design", "text": "The team compared an assisted and an independent writing task."},
                   {"field": "reported_results", "text": "Only the participants' assisted task scores improved after training."}]

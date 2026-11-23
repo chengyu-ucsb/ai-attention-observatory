@@ -99,6 +99,18 @@ def locate_claim(claim, chunk, spans):
     return span["id"], anchor_locations(chunk, match.start(), match.end())
 
 
+def account_status(kind, selected_fields):
+    """Separate checked material from an account of what the article actually says."""
+    fields = set(selected_fields)
+    if kind == "scholarly":
+        answered = ("reported_results" in fields or "authors_interpretation" in fields)
+        grounded = bool(fields & {"study_design", "research_question", "limitations", "critical_context"})
+    else:
+        answered = "thesis" in fields
+        grounded = bool(fields & {"reasoning", "examples", "tension", "qualification"})
+    return "article_account" if answered and grounded else "checked_evidence_only"
+
+
 def edit_article(claims, kind, title, choose):
     """The article editor selects checked sentences; the complete ledger remains available."""
     def choose_group(ids):

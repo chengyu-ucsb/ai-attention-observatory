@@ -123,6 +123,7 @@ class PreparedReadingSchemaTests(unittest.TestCase):
         old = deepcopy(deep)
         old["version"] = 3
         old.pop("narrative_order")
+        old.pop("account_status")
         for claim in old["claim_evidence"]:
             claim.pop("source_span")
         self.assertIs(schema.validate_analysis(old), old)
