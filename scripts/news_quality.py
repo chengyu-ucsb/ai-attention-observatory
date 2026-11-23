@@ -147,7 +147,9 @@ def commentary_topic(record):
     longform = (reading.get('digest') or {}).get('longform') or {}
     argument = (note.get('summary') or {}).get('thesis') or longform.get('thesis') or ''
     if record.get('source') == 'Official product documentation':
-        argument += ' ' + (reading.get('overview') or '')
+        # The official feature name can state the attention mechanism more precisely
+        # than a plain-language description of what people see on screen.
+        argument += ' ' + str(record.get('title') or '') + ' ' + (reading.get('overview') or '')
     # A verified explainer links to its source and is never an independent
     # publication. Its checked synopsis can describe the source's subject.
     if record.get('companion_to'):
@@ -162,6 +164,15 @@ def commentary_topic(record):
                  or HUMAN_PRACTICE.search(argument)
                  or (HUMAN_AI_ACCESS.search(argument) and BEHAVIOR_CONTEXT.search(argument)))
     central_ai = AI.search(argument) or (AI.search(title) and AI_ARGUMENT_ALIAS.search(argument))
+    reviewed = record.get('source_review') or {}
+    if central_ai and not human_use and reviewed.get('thesis') == longform.get('thesis') and reviewed.get('source_url'):
+        # Let a checked explanation disambiguate which decisions a person keeps.
+        # The central thesis must already describe people's use of AI. Incidental
+        # examples or suggested applications cannot supply that missing topic.
+        human_role = re.search(r"\b(?:buyers?|shoppers?|consumers?|people|users?|students?|teachers?|workers?|readers?)\b", argument, re.I)
+        if human_role and commentary_reading_depth(record):
+            reasoning = TECHNICAL_OR_FIGURATIVE.sub(' ', reviewed.get('reasoning') or '')
+            human_use = HUMAN_AI_USE.search(reasoning) or HUMAN_PRACTICE.search(reasoning)
     if central_ai and (human_use or attention):
         return 'direct'
     if attention:
