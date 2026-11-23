@@ -48,6 +48,14 @@ class EditorialClaimTests(unittest.TestCase):
                 self.assertEqual(got["claim_evidence"][1]["locations"], [
                     {"location": "paragraph:2", "start": 0, "end": len(finding)}])
 
+    def test_generation_focus_changes_with_the_actual_study_design(self):
+        from reading_evidence_context import scholarly_guidance
+        survey=scholarly_guidance({"text":"This was a time-lag survey of student teachers."})
+        trial=scholarly_guidance({"text":"Students were randomly assigned to receive feedback on a task."})
+        self.assertIn("who reported what",survey)
+        self.assertNotIn("who reported what",trial)
+        self.assertIn("groups, their task",trial)
+
     def test_prior_work_and_methods_cannot_establish_the_current_papers_result(self):
         for role in ("prior_work", "hypotheses", "caption"):
             doc = Document([{"location": "page:1", "role": role,

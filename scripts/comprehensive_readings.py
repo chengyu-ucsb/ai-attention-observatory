@@ -300,7 +300,7 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre='',repair_draft=True
         return []
     labelled=evidence.labelled_spans(chunk,spans)
     if kind=='scholarly':
-        writing=evidence.SCHOLARLY_WRITING
+        writing=evidence.scholarly_guidance(chunk)
         verifying=evidence.SCHOLARLY_VERIFICATION
     else:
         from nonacademic_reading_voice import writing_guidance,verification_guidance
@@ -308,14 +308,12 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre='',repair_draft=True
         verifying=verification_guidance(genre)
     instruction=(
         'Read the whole source segment, including qualifications. '+writing+' '
-        'Usually one or two sentences are enough for a segment. Each must say one '
-        'new thing a general reader can understand, in 6-90 words. Spell out unfamiliar '
-        'abbreviations in your own language. Read the full segment, then look away from '
-        'the source wording: do not copy phrases of 13 words. Do not fill every field. '
-        'Use the return schema. Set no_claim_reason to an empty string when there are '
-        'claims. If a section only lists references, section labels or validation '
-        'procedures without a new substantive point, return no claims and explain why. '
-        'Choose one supporting source-span ID per original sentence. No generic synopsis. '
+        'Return the one or two most informative facts or arguments here, with more '
+        'only for distinct material results. Use each allowed field only when needed. '
+        'Write 6-90 words per claim, using a fresh sentence and one supporting span ID. '
+        'For a segment with a study method or outcome, capture the specific method '
+        'or outcome even when other information is missing. Give an empty list only '
+        'when no substantive point appears. Use no_claim_reason only for an empty list. '
         'Allowed fields: '+fields+'\nTitle: '+title+'\nSegment '+chunk['id']+':\n'+labelled)
     answer=model_json(model,instruction,2200,schema=claim_schema(kind,list(by_id.values())),
                       deadline=deadline,source_span_ids=set(by_id))
