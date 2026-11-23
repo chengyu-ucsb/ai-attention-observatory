@@ -292,7 +292,7 @@ def model_json(model,instruction,max_tokens=900,*,schema=None,deadline=None,
             if attempt+1==attempts: raise
 
 
-def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
+def read_chunk(model,chunk,kind,title,deadline=None,*,genre='',repair_draft=True):
     fields=', '.join(FIELDS[kind])
     spans=source_spans(chunk)
     by_id={s['id']:s for s in spans if s.get('citable',True)}
@@ -343,6 +343,8 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
             raise ValueError('claim_source_role_mismatch')
         copied=has_copied_sequence({'text':claim['text']},chunk['text'],span=13)
         if wrong_role or copied:
+            if not repair_draft:
+                raise ValueError('claim_source_role_mismatch' if wrong_role else 'copied_source_passage')
             repair[index]={'reason':'claim_source_role_mismatch' if wrong_role else 'copied_source_passage',
                            'field':'study_design' if wrong_role else field,'span':ident}
         claims.append(claim)
