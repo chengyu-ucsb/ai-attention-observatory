@@ -163,11 +163,7 @@ jobs:
           fi
           for attempt in 1 2 3; do
             git fetch origin main
-            if ! git rebase origin/main; then
-              git rebase --abort || true
-              echo 'Checkpoint conflict; preserved validated artifacts require reconciliation.'
-              exit 1
-            fi
+            python scripts/preparation_pipeline.py checkpoint-rebase
             if git push origin HEAD:main; then
               printf 'commit=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
               exit 0

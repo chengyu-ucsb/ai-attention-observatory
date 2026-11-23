@@ -146,6 +146,24 @@ class WeeklyQueueTests(unittest.TestCase):
         self.assertEqual(first['run']['stop_reason'], 'record_limit')
         self.assertTrue(all(row['attempts'] == 1 for row in rows(third)))
 
+    def test_changing_inputs_preserve_next_record_and_removed_anchor_advances(self):
+        records = sorted((item(i) for i in range(8)), key=queue.record_key)
+        start = [records[i] for i in (1, 3, 5, 7)]
+        # Each record still has a usable second route after its initial attempt.
+        def with_routes(record):
+            return dict(record, fulltext_candidates=[{"url": record["url"] + "?edition=1"}])
+        start = [with_routes(r) for r in start]
+        deny = Mock(return_value={"diagnostics": [{"stage": "article",
+                    "status": "article_http_403", "retryable": False}]})
+        first = run(weekly(*start), limit=1, attempt=deny)
+        for remove_next, expected in ((False, records[3]), (True, records[4])):
+            changed = [with_routes(records[0]), *start, with_routes(records[4])]
+            if remove_next:
+                changed.remove(start[1])
+            distinct = Mock(side_effect=success)
+            run(weekly(*changed), first, limit=1, attempt=distinct)
+            self.assertEqual(distinct.call_args.args[0]["doi"], expected["doi"])
+
     def test_candidate_cursor_does_not_repeat_permanent_known_route_failure(self):
         record = item(fulltext_candidates=[{'url': 'https://www.econstor.eu/first.pdf'}])
         failed = Mock(return_value={'diagnostics': [{'stage': 'article', 'status': 'article_http_403', 'retryable': False}]})

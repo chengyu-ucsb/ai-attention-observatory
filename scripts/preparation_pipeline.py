@@ -633,7 +633,21 @@ def pending_readings(packet, state, bundle, now):
 
 def worker_plan(root=ROOT, now=None):
     """A valid bounded-pass receipt cannot hide remaining due reading work."""
-    return edition_ready(root, utc(now))
+    now = utc(now)
+    result = edition_ready(root, now)
+    if result["ready"]:
+        state = read(folder_for(root, now, "closed") / "acquisition.json")
+        # Reading selection only sees documents already retrieved. A valid
+        # publication receipt can coexist with a large unfinished source queue.
+        # Resume on the next normal worker trigger; automatic redispatch stays
+        # reserved for sources that are already available to read.
+        due = sum(not row["complete"] and
+                  (not row.get("next_retry_at") or utc(row["next_retry_at"]) <= now)
+                  for row in state["records"].values())
+        if due:
+            return dict(result, ready=False, status="more_acquisition_due",
+                        next_action="readings", due_acquisitions=due)
+    return result
 
 
 def checkpoint(root, destination, now=None, phase="closed", week=None):
@@ -742,6 +756,29 @@ def checkpoint_commit(root, snapshot, worktree):
             "commit": git("rev-parse", "HEAD", cwd=worktree).stdout.strip()}
 
 
+def rebase_checkpoint(root, upstream="origin/main"):
+    """Recover a generated status conflict without merging independent source edits."""
+    def git(*args, **options):
+        return subprocess.run(["git", *args], cwd=root, **options)
+
+    result = git("rebase", upstream)
+    if result.returncode == 0:
+        return
+    conflicts = git("diff", "--name-only", "--diff-filter=U", capture_output=True,
+                    text=True, check=True).stdout.splitlines()
+    try:
+        if conflicts != ["data/pipeline-status.json"]:
+            raise ValueError("checkpoint_source_conflict")
+        # Both sides use this file as a projection. Rebuild from the rebased
+        # source and archive, including the queue file the builder maintains.
+        subprocess.run([sys.executable, "scripts/pipeline_status.py"], cwd=root, check=True)
+        git("add", "--", "data/pipeline-status.json", "data/editorial-queue", check=True)
+        git("-c", "core.editor=true", "rebase", "--continue", check=True)
+    except BaseException:
+        git("rebase", "--abort")
+        raise
+
+
 def lead_time():
     return {"measured_schedule_delay_hours": [4, 8], "measured_synthesis_minutes": [12, 18],
         "measured_pages_minutes": 1, "known_downstream_minutes_excluding_review": [253, 499],
@@ -753,7 +790,7 @@ def lead_time():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "rolling-retry-plan", "readings", "finalize", "edition-check", "worker-plan", "checkpoint", "checkpoint-commit", "scope", "lead-time"))
+    parser.add_argument("action", choices=("prepare", "closeout-plan", "closeout", "reading-plan", "rolling-retry-plan", "readings", "finalize", "edition-check", "worker-plan", "checkpoint", "checkpoint-commit", "checkpoint-rebase", "scope", "lead-time"))
     parser.add_argument("--reconcile-legacy-library", action="store_true",
         help="Opt-in read-only proof against exact local Git history; edition-check only")
     parser.add_argument("--retry-only", action="store_true", help="Resume acquired rolling readings without discovery or acquisition")
@@ -784,6 +821,9 @@ def main():
     elif args.action == "worker-plan": result = worker_plan(args.root)
     elif args.action == "lead-time": result = lead_time()
     elif args.action == "scope": result = {"week": target_window(utc(), args.phase)["from"], "phase": args.phase}
+    elif args.action == "checkpoint-rebase":
+        rebase_checkpoint(args.root)
+        result = {"status": "rebased"}
     elif args.action == "checkpoint-commit":
         if not args.destination or not args.worktree: parser.error("checkpoint-commit needs --destination and --worktree")
         result = checkpoint_commit(args.root, args.destination, args.worktree)
