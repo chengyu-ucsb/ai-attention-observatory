@@ -329,20 +329,76 @@ def identity_matches(record,front,candidate_doi='',metadata=None):
     return bool(title_match or (doi_match and meta_doi==expected))
 
 
+def label_pdf_sections(units):
+    """Keep literal heading intervals on the original pages, without layout inference."""
+    from article_body_parser import section_role
+    headings = []
+    role = 'page'
+    for unit in units:
+        text = unit['text']
+        sections = []
+        cursor = 0
+        for line in re.finditer(r'[^\r\n]+(?:\r\n|[\r\n]|$)', text):
+            heading = line.group().strip()
+            if not heading or len(heading) > 90:
+                continue
+            name = re.sub(r'^\d+(?:\.\d+)*[.\s]+', '', heading).strip(' .:').casefold()
+            if re.fullmatch(r'appendi(?:x|ces)(?: [a-z]| \d+)?', name):
+                next_role = 'body'
+            else:
+                next_role = section_role([heading])
+                if next_role == 'body':
+                    continue
+                if next_role == 'hypotheses' and not re.fullmatch(
+                        r'(?:research )?hypothes(?:is|es)(?: formulation| development)?', name):
+                    continue
+            if cursor < line.start():
+                sections.append({'start': cursor, 'end': line.start(), 'role': role,
+                                 'headings': list(headings)})
+            headings = [heading]
+            sections.append({'start': line.start(), 'end': line.end(), 'role': 'heading',
+                             'headings': list(headings)})
+            cursor = line.end()
+            role = next_role
+        if cursor < len(text) and (sections or headings):
+            sections.append({'start': cursor, 'end': len(text), 'role': role,
+                             'headings': list(headings)})
+        if sections:
+            unit['sections'] = sections
+
+
+def pdf_body_pages(units):
+    """Distinguish article text from a PDF's repeated running heads and folios."""
+    lines = [[line.strip() for line in unit['text'].splitlines() if line.strip()] for unit in units]
+    def running_key(line):
+        return re.sub(r'\d+', '#', ' '.join(line.casefold().split())) if len(line) <= 140 else ''
+    counts = {}
+    for page in lines:
+        for key in {running_key(line) for line in page[:2] + page[-2:]} - {''}:
+            counts[key] = counts.get(key, 0) + 1
+    repeated = {key for key, count in counts.items() if count >= max(2, math.ceil(len(lines)/2))}
+    folio = re.compile(r'(?:page\s+)?(?:\d+|[ivxlcdm]+)(?:\s*(?:of|/)\s*\d+)?', re.I)
+    return sum(any(not folio.fullmatch(line) and
+                   not ((i < 2 or i >= len(page)-2) and running_key(line) in repeated)
+                   for i, line in enumerate(page)) for page in lines)
+
+
 def document_from_pdf(raw,record,url,version='unspecified',candidate_doi=''):
     if not raw.startswith(b'%PDF'): raise ValueError('not_pdf')
     from pypdf import PdfReader
     reader=PdfReader(io.BytesIO(raw))
     if len(reader.pages)>300: raise ValueError('document_exceeds_page_budget')
-    units=[{'location':f'page:{n+1}','text':page.extract_text() or ''}
+    units=[{'location':f'page:{n+1}','text':page.extract_text() or '', 'role':'page', 'headings':[]}
            for n,page in enumerate(reader.pages)]
+    label_pdf_sections(units)
     front='\n'.join(x['text'] for x in units[:3])
     if not identity_matches(record,front,candidate_doi):
         raise ValueError('document_identity_unverified')
     text_pages=sum(bool(x['text'].strip()) for x in units)
-    if sum(len(x['text']) for x in units)<1600: raise ValueError('insufficient_document_text')
+    body_pages = pdf_body_pages(units)
+    if not body_pages or sum(len(x['text']) for x in units)<1600: raise ValueError('insufficient_document_text')
     return Document(units,url,version,{
-        'evidence_status':'full_document_retrieved' if text_pages==len(units) else 'partial_full_text',
+        'evidence_status':'full_document_retrieved' if body_pages==len(units) else 'partial_full_text',
         'pages_total':len(units),'pages_processed':len(units),'pages_with_text':text_pages,
         'layout_fidelity':'not_verified','semantic_completeness':'not_verified'},raw)
 
@@ -355,8 +411,11 @@ def document_from_html(raw,record,url,version='unspecified',candidate_doi=''):
     if not identity_matches(record,page[:60000],candidate_doi,meta.values):
         raise ValueError('document_identity_unverified')
     parser=ArticleParser(); parser.feed(page)
-    units=[{'location':f'paragraph:{n+1}','text':p} for n,p in enumerate(parser.paragraphs)]
-    if len(units)<7 or sum(len(x['text']) for x in units)<1600:
+    units=[{'location':f'paragraph:{n+1}', **{key: value for key, value in block.items()
+            if key != 'kind'}} for n,block in enumerate(parser.article_blocks())]
+    prose = [unit for unit in units if unit['role'] not in {
+        'table_header','table_row','table_unaligned','heading','caption','metadata','references'}]
+    if len(units)<7 or sum(len(unit['text']) for unit in prose)<1600:
         raise ValueError('insufficient_article_body')
     # Large HTML is NOT silently sampled or truncated. Completeness is not
     # inferred from body length, section names, or the presence of an abstract.

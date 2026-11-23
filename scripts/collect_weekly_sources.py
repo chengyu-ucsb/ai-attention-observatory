@@ -1146,8 +1146,12 @@ def html_refresh_plan(row, routes, record, window):
     is eligible. Locator-only and redirect-only sources require separate review.
     """
     meta = row.get('document', {})
+    retained_revision = meta.get('html_extraction_version', 'article-body-v0')
+    # A worker running an older parser must not replace a newer extraction,
+    # even when this source has never been read by that older revision.
+    if int(retained_revision.removeprefix('article-body-v')) >= int(HTML_EXTRACTION_VERSION.removeprefix('article-body-v')):
+        return None
     if (row.get('source_refreshes') or row.get('source_refresh_hold') or not row['complete'] or not is_html_document(meta)
-            or meta.get('html_extraction_version') == HTML_EXTRACTION_VERSION
             or len(row.get('html_refresh_attempts', [])) >= MAX_HTML_REFRESH_ATTEMPTS
             or any(attempt['version'] == HTML_EXTRACTION_VERSION
                    for attempt in row.get('html_refresh_attempts', []))
