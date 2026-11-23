@@ -546,6 +546,53 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(plan['status'],'more_readings_due')
         self.assertTrue(pipeline.edition_ready(self.root,NOW)['ready'])
 
+    def test_worker_resumes_due_acquisition_independently_of_publication(self):
+        plan = {"ready": True, "status": "bounded_stage_completed"}
+        state = {"records": {"done": {"complete": True},
+                  "cooling": {"complete": False, "next_retry_at": "2026-11-09T11:00:00+00:00"}}}
+        with patch.object(pipeline, "edition_ready", return_value=plan), patch.object(pipeline, "read", return_value=state):
+            self.assertTrue(pipeline.worker_plan(self.root, NOW)["ready"])
+            state["records"]["untouched"] = {"complete": False}
+            result = pipeline.worker_plan(self.root, NOW)
+            self.assertEqual((result["status"], result["due_acquisitions"]), ("more_acquisition_due", 1))
+            self.assertTrue(plan["ready"])
+            self.assertEqual(pipeline.worker_plan(self.root, NOW.replace(hour=12))["due_acquisitions"], 2)
+
+    def test_rebase_rebuilds_generated_status_and_refuses_source_conflicts(self):
+        root = self.root
+        def git(*args):
+            return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True, text=True).stdout.strip()
+        git("init", "-b", "main")
+        git("config", "user.name", "test")
+        git("config", "user.email", "test@example.invalid")
+        (root / "scripts").mkdir()
+        (root / "scripts/pipeline_status.py").write_text(
+            "from pathlib import Path\nPath('data/pipeline-status.json').write_text("
+            "Path('data/source.json').read_text() + Path('data/edition.json').read_text())\n")
+        (root / "data/editorial-queue").mkdir()
+        (root / "data/editorial-queue/current.json").write_text("{}")
+        for name in ("pipeline-status", "source", "edition"):
+            (root / "data" / (name + ".json")).write_text("base")
+        git("add", "."); git("commit", "-m", "base"); git("switch", "-c", "reading")
+        (root / "data/source.json").write_text("checked")
+        (root / "data/pipeline-status.json").write_text("reading summary")
+        git("commit", "-am", "reading")
+        git("switch", "main")
+        (root / "data/edition.json").write_text("published")
+        (root / "data/pipeline-status.json").write_text("published summary")
+        git("commit", "-am", "edition"); git("switch", "reading")
+        pipeline.rebase_checkpoint(root, "main")
+        self.assertEqual((root / "data/pipeline-status.json").read_text(), "checkedpublished")
+        self.assertEqual(git("status", "--porcelain"), "")
+        saved = git("rev-parse", "HEAD")
+        git("switch", "main")
+        (root / "data/source.json").write_text("changed independently")
+        git("commit", "-am", "changed evidence"); git("switch", "reading")
+        with self.assertRaisesRegex(ValueError, "checkpoint_source_conflict"):
+            pipeline.rebase_checkpoint(root, "main")
+        self.assertEqual(git("rev-parse", "HEAD"), saved)
+        self.assertEqual(git("status", "--porcelain"), "")
+
     def test_publication_waits_for_due_readings_rather_than_freezing_early(self):
         self.receipt(); pipeline.finalize(self.root,NOW)
         with patch('comprehensive_readings.reading_candidates',return_value=([{'id':'pending'}],{'eligible':1})):

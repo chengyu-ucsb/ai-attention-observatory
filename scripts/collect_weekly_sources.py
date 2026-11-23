@@ -6,6 +6,7 @@ transient; complete text coverage is not semantic review or reuse permission.
 from __future__ import annotations
 
 import argparse
+from bisect import bisect_left
 from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timedelta, timezone
@@ -1314,8 +1315,17 @@ def _run_window(payload, state=None, *, window, now=None, limit=10, time_budget=
                                else 'replaced_input_version'), 'observed_at': now.isoformat()})
     order = sorted(selected)
     state['input_fingerprint'] = digest([(key, state['records'][key]['fingerprint']) for key in order])
-    if state['input_fingerprint'] != previous.get('input_fingerprint'):
+    if previous.get('publication_window') != window or not order:
         state['cursor'] = 0
+    elif state['input_fingerprint'] != previous.get('input_fingerprint'):
+        # The cursor names the next record in the previous sorted queue. New
+        # or revised search results must not restart acquisition at the front.
+        old_order = sorted(previous['records'])
+        if old_order:
+            next_key = old_order[previous['cursor'] % len(old_order)]
+            state['cursor'] = bisect_left(order, next_key) % len(order)
+        else:
+            state['cursor'] = 0
     attempted = 0; attempted_records = set(); stop = 'queue_checked'
     # Rotate through every eligible input, including records later held by
     # publication quality screening. Quality is not an acquisition gate.
