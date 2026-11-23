@@ -14,6 +14,7 @@ import json
 from pathlib import Path
 import re
 from urllib.parse import urlsplit
+from reading_depth import distinct_summary_roles
 from checked_reading_types import (COMMENTARY_FIELDS, COMMENTARY_NOTICE, PREPRINT_NOTICE,
                                    is_preprint, valid_extension, temporal_notice, record_context)
 
@@ -112,7 +113,10 @@ def eligible(note, record):
         if not commentary and record.get('research_type') == 'conceptual_framework' and summary['finding'] != '': return False
         if not commentary and not text(summary['finding']) and not (summary['finding'] == '' and record.get('research_type') == 'conceptual_framework'): return False
         if commentary and any(len(summary[k].split()) < 8 for k in fields): return False
-        if sum(len(summary[k].split()) for k in fields) > (320 if commentary else 220): return False
+        if not distinct_summary_roles(summary.values()): return False
+        # Allow a concrete example, denominators and mixed outcomes alongside the
+        # short shelf copy. Individual fields and the complete article stay bounded.
+        if sum(len(summary[k].split()) for k in fields) > 450: return False
         evidence = note['evidence']
         if not isinstance(evidence, dict) or set(evidence) != set(fields): return False
         for key, locations in evidence.items():

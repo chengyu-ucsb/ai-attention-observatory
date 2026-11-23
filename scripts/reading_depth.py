@@ -8,6 +8,14 @@ import re
 SECTION_KEYS = ("methods", "results", "discussion", "limitations")
 
 
+def distinct_summary_roles(values):
+    """An empty optional role is fine; pasted fields and pending notes are not prose."""
+    roles = [" ".join(value.casefold().split()).rstrip(".!? ") for value in values
+             if isinstance(value, str) and value.strip()]
+    placeholders = {"editorial note", "source: editorial note", "tbd", "pending", "not provided"}
+    return len(roles) == len(set(roles)) and not placeholders.intersection(roles)
+
+
 def has_article_sections(record):
     """A source locator alone is not a reading of article text.
 
@@ -40,6 +48,7 @@ def identity(record):
 def depth_audit(records):
     findings = Counter()
     gaps = []
+    editorial_queue = []
     counts = Counter()
     for record in records:
         if record.get("kind") != "scholarly":
@@ -51,6 +60,23 @@ def depth_audit(records):
         counts["scholarly_readings"] += 1
         findings[basis] += 1
         open_link = record.get("open_access_url") or ""
+        # Editorial reconstruction and document acquisition are different work.
+        # A source may be fully accessible yet still expose only selected sentences.
+        machine = reading.get("machine_account") or {}
+        has_checked_machine_account = (machine.get("review_status") == "machine_checked_not_independently_reviewed"
+                                       and bool(machine.get("source_url")))
+        if (digest.get("status") == "automatically_condensed_source_text"
+                and not reading.get("original_summary") and not record.get("verified_article_review")
+                and not has_checked_machine_account):
+            reasons = ["extracts_only"]
+            if not digest.get("finding") and not digest.get("explain"):
+                reasons.append("no_result_or_source_context")
+            if not digest.get("approach"):
+                reasons.append("no_selected_approach")
+            if level == "full_text" and basis == "abstract":
+                reasons.append("result_only_in_abstract")
+            editorial_queue.append({"id": identity(record), "title": record.get("title", ""),
+                                    "reading_level": level, "reasons": reasons})
         if level == "abstract":
             reason = "abstract_only_open_link" if open_link else "abstract_only"
         elif level == "full_text" and not reading.get("original_summary") and not has_article_sections(record):
@@ -67,6 +93,7 @@ def depth_audit(records):
                      "open_access_url": open_link, "reading_level": level,
                      "finding_source": basis})
     return {"counts": dict(sorted(counts.items())), "finding_basis": dict(sorted(findings.items())),
+            "summary_review": sorted(editorial_queue, key=lambda row: (-len(row["reasons"]), row["id"])),
             "records": sorted(gaps, key=lambda x: (x["reason"], x["id"]))}
 
 

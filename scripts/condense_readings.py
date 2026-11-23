@@ -95,7 +95,7 @@ CURATED={
 CURATED.update(MORE_EDITORIAL)
 
 HEAD=re.compile(r"(?:^|\s)(?:\d+(?:\.\d+)*\.?\s+)*(?:results?|discussion|methods?|materials and methods|conclusions?|limitations(?: and future research)?|introduction|abstract)\s*(?=(?:\d|[A-Z]))",re.I)
-SEC=re.compile(r"^\s*(?:\d+(?:\.\d+)*\.?\s+){1,3}(?=[A-Za-z])")
+SEC=re.compile(r"^\s*(?:\d+\.(?:\d+\.?)*\s+){1,3}(?=[A-Za-z])")
 CITATIONS=re.compile(r"\s*\(\s*(?:Table|Fig(?:ure)?|Section)\s+\d+[a-zA-Z]?\s*\)",re.I)
 BRACKETS=re.compile(r"\s*\[(?:\d+[\s,;–-]*)+\]")
 def clean(source):
@@ -103,15 +103,42 @@ def clean(source):
  s=re.sub(r"https?://\S+","",s)
  s=CITATIONS.sub("",s);s=BRACKETS.sub("",s)
  s=re.sub(r"\s+"," ",s).strip()
- s=re.sub(r"^(?:\d+(?:\.\d+)*\.?\s+)?(?:Results|Discussion|Methods|Introduction|Abstract|Conclusion|Limitations)(?:\s+and\s+(?:future\s+research|directions))?(?:\s+\d+(?:\.\d+)*\.?)?(?:\s+[\w -]{0,50})?(?=\s+(?:The|This|These|We|Our|Data|Participants|In|First|To)\b)", "", s, flags=re.I).strip()
+ # Only strip structural labels. "Results suggest that the students…" is prose.
+ s=re.sub(r"^(?:\d+(?:\.\d+)*\.?\s+)?(?i:results?|discussion|methods?|introduction|abstract|conclusions?|limitations?)\b"
+          r"(?:\s*[:|]\s*|\s+(?=\d+(?:\.\d+)*\.?\s)|\s+(?=(?:The|This|These|We|Our|Data|Participants|In|First|To)\b))",
+          "",s).strip()
  for _ in range(3):
   new=SEC.sub("",s).strip()
   if new==s:break
   s=new
  return s
+def source_sentences(text):
+ """Split prose without cutting figure references, initials or decimal values."""
+ source = clean(text)
+ start = 0
+ for boundary in re.finditer(r"(?<=[.!?])\s+(?=[A-Z0-9“(])", source):
+  prefix = source[start:boundary.start()]
+  if (re.search(r"\b(?:figs?|eqs?|refs?|e\.g|i\.e|et al|dr|prof|vs|no)\.$", prefix, re.I)
+      or re.search(r"\b[A-Z]\.$", prefix)):
+   continue
+  yield prefix.strip()
+  start = boundary.end()
+ if source[start:].strip():
+  yield source[start:].strip()
+
+
 def sentence_list(text):
- s=clean(text)
- return [p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",s) if len(p.strip())>=35]
+ return [part for part in source_sentences(text) if len(part) >= 35]
+
+
+def complete_statement(sentence):
+ """Reject broken references and cut-off selections even if they end in a period."""
+ return (bool(re.search(r'[.!?]["”’)\]]*$', sentence))
+         and not sentence.endswith(("…", "..."))
+         and sentence.count("(") == sentence.count(")")
+         and sentence.count("[") == sentence.count("]")
+         and not re.search(r"\b(?:figs?|eqs?|e\.g|i\.e|et al)\.$", sentence, re.I))
+
 # Research findings are different from checks on the measurement instruments.
 # Fail closed when neither the extracted Results nor the source abstract
 # contains a clearly stated substantive result.
@@ -126,7 +153,7 @@ DIAGNOSTIC = re.compile(
  r"hypothesis testing outcomes|software version)\b",re.I)
 FINDING_VERBS = re.compile(
  r"\b(?:associat(?:ed|ion|ions)|correlat(?:ed|ion|ions)|predict(?:ed|or|ors|s)?|"
- r"identif(?:ied|ies|y)|observed|found|show(?:ed|s)?|reveal(?:ed|s)?|"
+ r"identif(?:ied|ies|y)|observed|found|suggest(?:ed|s)?|show(?:ed|s)?|reveal(?:ed|s)?|"
  r"indicat(?:ed|es)?|increas(?:ed|es)?|decreas(?:ed|es)?|"
  r"higher|lower|stronger|weaker|significant(?:ly)?|"
  r"mediati(?:on|ng)|moderati(?:on|ng)|"
@@ -156,6 +183,16 @@ UNTESTED = re.compile(
  r"(?:to|we) (?:examine|investigate|explore|test)|"
  r"(?:study|paper) (?:employed|examined|investigated|explored)|"
  r"will (?:examine|test|explore))\b",re.I)
+# Explicit nulls, observed actions and participant accounts may be the main
+# result even when the author never uses "significant" or "we found".
+OBSERVED_OUTCOME = re.compile(
+ r"\b(?:there (?:was|were) no (?:statistically )?(?:significant )?(?:difference|effect|association)s? (?:in|on|between)|"
+ r"(?:groups|conditions) did not differ (?:in|on)|"
+ r"(?:\d+(?:\.\d+)?%? (?:of (?:the )?\d+ )?(?:sessions|students|participants|respondents|workers|teachers|patients)) "
+ r"(?:submitted|answered|completed|recalled|chose|selected|returned|reported)|"
+ r"(?:participants|interviewees|teachers|workers|students) (?:described|reported) (?:how|that|feeling|having|using|difficulty)|"
+ r"(?:the )?(?:observed|between.group) difference was)\b", re.I)
+
 STOPWORDS = {"the","and","with","from","into","among","through","between",
              "about","under","using","used","study","studies","analysis",
              "effects","effect","model","models","role","research","findings"}
@@ -171,11 +208,10 @@ def reported_result(source,title="",maxlen=300):
         if x not in STOPWORDS}
  candidates=[]
  for position,s in enumerate(sentence_list(source or "")):
-  if len(s)<45 or len(s)>maxlen or s.endswith(("…", "...")) or not re.search(r'[.!?]["”’\)\]]*$',s) or DIAGNOSTIC.search(s) or UNTESTED.search(s):continue
-  if not FINDING_VERBS.search(s):continue
+  if len(s)>maxlen or not complete_statement(s) or DIAGNOSTIC.search(s) or UNTESTED.search(s):continue
   # Context words alone ("associated", "effects") are insufficient if the
   # sentence is merely introducing the research question.
-  if not RESULT_CLAIM.search(s):continue
+  if not ((FINDING_VERBS.search(s) and RESULT_CLAIM.search(s)) or OBSERVED_OUTCOME.search(s)):continue
   shared=len(words.intersection(re.findall(r"[a-z]{4,}",s.lower())))
   # Prefer findings that name the question's constructs, not generic model
   # statistics or statements about analysis procedures.
@@ -189,13 +225,7 @@ def reported_result(source,title="",maxlen=300):
   if re.search(r"\b(?:we (?:find|found)|results? (?:showed|indicated)|"
                r"findings? (?:show|indicate)|analysis (?:revealed|identified))\b",s,re.I):score+=2
   candidates.append((score,-position,s))
- if not candidates:return ""
- s=max(candidates)[2]
- if len(s)>maxlen:
-  clip=s[:maxlen]
-  stop=max(clip.rfind(";"),clip.rfind(","),clip.rfind(" and "))
-  s=(clip[:stop].strip() if stop>maxlen//2 else clip.rsplit(" ",1)[0])+"…"
- return s
+ return max(candidates)[2] if candidates else ""
 
 def condensed(text,role,maxlen=295):
  items=sentence_list(text)
@@ -228,21 +258,15 @@ def readable_excerpt(text,role="finding",limit=195):
  substitutions=[
   (r"^(?:the authors|the researchers|we) (?:found|observed|reported|showed) that\s+",""),
   (r"^(?:the study|this study|the research) (?:found|reports|reported|showed) that\s+",""),
-  (r"^(?:our )?(?:results|findings) (?:show|showed|indicate|indicated|suggest|suggested) that\s+",""),
+  (r"^(?:our )?(?:results|findings) (?:show|showed) that\s+",""),
  ]
  for pattern,replacement in substitutions:
   updated=re.sub(pattern,replacement,s,flags=re.I)
   if updated!=s:
    s=updated
    break
- # Argument and interpretation are not facts; keep attribution/uncertainty.
- # Keep hedging without starting the sentence with the author or paper.
- # Where a claim lacks uncertainty language, preserve attribution as an
- # argument rather than converting it into a verified fact.
- s=re.sub(r"^(?:the authors|the researchers) (?:suggest|suggested|propose|proposed|argue|argued) that\s+",
-          "A possible explanation is that ",s,flags=re.I)
- s=re.sub(r"^(?:the authors|the researchers) (?:describe|described)\s+",
-          "",s,flags=re.I)
+ # "Suggest", "argue", and "may" carry the authors' degree of certainty.
+ # Preserve those clauses verbatim, including who proposed the interpretation.
  s=s[0].upper()+s[1:] if s else ""
  # Prefer an intact first sentence when it communicates a full thought.
  parts=sentence_list(s)
@@ -291,7 +315,7 @@ def source_snippet(text, role, limit=600):
  if role=="approach":
   candidates=sorted(candidates,key=method_specificity,reverse=True)
  for line in candidates:
-  if line.endswith(("…", "...")) or len(line)>limit or not re.search(r'[.!?]["”’\)\]]*$',line):continue
+  if len(line)>limit or not complete_statement(line):continue
   if role=="approach" and (not (METHOD.search(line) or re.search(r"\b(?:interviews|surveys|experiments|randomly assigned|randomi[sz]ed (?:controlled|trial|experiment|study|comparison))\b",line,re.I)) or re.search(r"\b(?:future research|prior studies|previous research|one study|another study|(?:studies|research)[^.]{0,100}(?:needed|required)|should be|could be)\b",line,re.I)):continue
   if role=="limitations" and (not LIMITATION_CONTENT.search(line) or not (LIMIT.search(line) or re.search(
       r"\b(?:(?:cannot|could not) (?:establish|infer|determine|conclude|disentangle|rule out|exclude|generaliz\w*)|limited to|self.report\w*|cross.sectional|generalizability|generalisation|generalization|selection bias|convenience sampl\w*|absence of|limits? the|not representatively)\b",line,re.I))):continue
@@ -311,13 +335,12 @@ def reported_result_bundle(source, title="", limit=600):
  primary=reported_result(source,title,maxlen=limit)
  if not primary:return ""
  # Do not filter short sentences: an intervening caveat breaks adjacency.
- parts=[p.strip() for p in re.split(r"(?<=[.!?])\s+(?=[A-Z“])",clean(source)) if p.strip()]
+ parts=list(source_sentences(source))
  if primary not in parts:return ""
  start=parts.index(primary)
  selected=[readable_excerpt(primary,"finding",limit)]
  for line in parts[start+1:start+3]:
-  if (UNTESTED.search(line) or DIAGNOSTIC.search(line) or line.endswith(("…","..."))
-      or not re.search(r'[.!?]["”’\)\]]*$',line)):break
+  if UNTESTED.search(line) or DIAGNOSTIC.search(line) or not complete_statement(line):break
   if re.search(r"\b(?:it is possible|perhaps|might|may|could|would|"
       r"we (?:believe|argue|suggest)|the authors (?:believe|argue|suggest)|"
       r"their sample|another sample|et al\.)|\b[A-Z][a-z]+(?: and [A-Z][a-z]+)? \(\d{4}\)",line):break
@@ -635,9 +658,13 @@ def annotate(record):
   # to an editorial insight. The repository provides a traceable source note.
   fulltext=level=="full_text"
   results=(record.get("analysis") or {}).get("results") if fulltext else ""
-  if not results:results=r.get("findings") or ""
+  # A row can have full-text methods and only an abstract result. The selected
+  # sentence, not the article's best available section, determines its basis.
+  result_basis="full_text" if results else "abstract"
+  if not results:
+   results=(r.get("findings") if not fulltext else "") or record.get("abstract_text") or ""
   finding=reported_result_bundle(results,record.get("title",""))
-  finding_source="full_text" if finding and fulltext else "abstract" if finding else "none"
+  finding_source=result_basis if finding else "none"
   if not finding and level in ("abstract","full_text"):
    finding=reported_result_bundle(record.get("abstract_text") or "",record.get("title",""))
    finding_source="abstract" if finding else "none"
@@ -683,4 +710,3 @@ def annotate(record):
   digest["longform"]["review_status"]=machine.get("review_status","automatic_unreviewed")
  base["reading"]["digest"]=digest
  return base
-
