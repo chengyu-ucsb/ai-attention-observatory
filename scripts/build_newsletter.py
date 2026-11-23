@@ -344,12 +344,17 @@ def long_copy(text,label='Read the full analysis',issue=None,section=None,layer=
     text=str(text or '')
     full=render_text(text,issue,section)
     if len(text)<260:return full
-    end=len(text)
-    for match in re.finditer(r'[.!?][”’"\']?(?=\s|$)',text):
-        prefix=text[:match.end()]
-        if re.search(r'\b(?:e\.g|i\.e|et al|Dr|Mr|Ms|Prof|Fig|vs)\.$',prefix,re.I):continue
-        if re.search(r'\b[A-Z]\.$',prefix):continue
-        end=match.end();break
+    paragraph_break=re.search(r'\n\s*\n',text)
+    end=paragraph_break.start() if paragraph_break else len(text)
+    if not paragraph_break:
+        sentences=0
+        for match in re.finditer(r'[.!?][”’"\']?(?=\s|$)',text):
+            prefix=text[:match.end()]
+            if re.search(r'\b(?:e\.g|i\.e|et al|Dr|Mr|Ms|Prof|Fig|vs)\.$',prefix,re.I):continue
+            if re.search(r'\b[A-Z]\.$',prefix):continue
+            sentences+=1
+            if sentences==3:
+                end=match.end();break
     # Do not cut a source phrase in half at a sentence boundary.
     for start,stop,*_ in text_spans(text,issue,section):
         if start<end<stop:end=stop

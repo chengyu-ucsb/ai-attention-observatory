@@ -57,10 +57,12 @@ def article(record):
     detail = pick(reading, READING_FIELDS + ('original_summary_id', 'source_sha256', 'overview',
                   'methods', 'findings', 'interpretation', 'limitations', 'reported_findings'))
     digest = reading.get('digest') or {}
+    if reading.get('machine_account'):
+        detail['machine_account'] = reading['machine_account']
     detail['digest'] = pick(digest, DIGEST_FIELDS + ('approach', 'finding', 'interpretation',
                               'limitation', 'approach_source', 'limitation_source', 'tags'))
     if digest.get('longform'):
-        fields = ('source_depth', 'thesis', 'reasoning', 'examples', 'tension', 'qualification',
+        fields = ('source_depth', 'source_url', 'review_status', 'thesis', 'reasoning', 'examples', 'tension', 'qualification',
                   'research_question', 'study_design', 'reported_results', 'authors_interpretation',
                   'limitations')
         detail['digest']['longform'] = pick(digest['longform'], fields)
@@ -73,6 +75,9 @@ def card(record, article_url):
     digest = reading.get('digest') or {}
     result = pick(record, CARD_FIELDS + ('editorial_art',))
     result['reading'] = {key: reading[key] for key in READING_FIELDS if key in reading}
+    if reading.get('machine_account'):
+        result['reading']['machine_account'] = {k: v for k, v in reading['machine_account'].items()
+            if k in ('research_question', 'study_design', 'review_status') and len(v) <= 430}
     result['reading']['digest'] = {key: digest[key] for key in DIGEST_FIELDS if key in digest}
     # Presence is sufficient for collection statistics/ranking; no findings are
     # shortened into a new public assertion in the index.
@@ -85,6 +90,9 @@ def card(record, article_url):
     longform = digest.get('longform') or {}
     if longform.get('source_depth'):
         result['reading']['digest']['longform'] = {'source_depth': longform['source_depth']}
+    if digest.get('status') == 'automatically_condensed_source_text' and record.get('abstract_text'):
+        # The card displays only complete opening sentences from the public excerpt.
+        result['card_abstract'] = record['abstract_text'][:520]
     # Preserve phrase-search order using only already screened public fields.
     search_values = [record.get('abstract_text', ''), record.get('preview', ''),
                      reading.get('findings', ''), reading.get('methods', '')]
