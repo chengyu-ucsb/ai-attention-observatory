@@ -91,6 +91,13 @@ class QualityScreenTests(unittest.TestCase):
   x["abstract_text"]="The proposed model improves classification accuracy on an image dataset."
   self.assertEqual(source_quality.screen(x)["reason"],"computational_attention_not_human_attention")
 
+ def test_gpt_based_practice_and_learner_engagement(self):
+  record={"kind":"scholarly","venue":"Educational Technology Research and Development",
+          "title":"Utilizing a GPT-based exam assistant to support practice and assessment in higher education: an exploratory study on learner engagement and perceptions"}
+  self.assertEqual(source_quality.topic_class(record),"direct")
+  architecture={**record,"title":"A GPT-based transformer architecture with cross-attention and an engagement benchmark"}
+  self.assertEqual(source_quality.topic_class(architecture),"off_topic")
+
  def test_venue_alone_does_not_override_weak_topic_match(self):
   x=self.study("Journal of Communication","A history of local radio policy")
   x["abstract_text"]="This piece examines public broadcasting licensing and regulatory institutions."
