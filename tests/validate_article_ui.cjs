@@ -129,7 +129,10 @@ for(const r of db){
  if(digest.status==="journal_abstract_preview"){
   assert(!match(page,"rv-ai-notice"),"A publisher’s abstract must not be labeled as an AI summary");
   assert.equal(match(page,"rv-section-title").textContent,"From the published abstract");
- }else assert.equal(match(page,"rv-ai-notice").textContent,"AI-generated summary. AI can make mistakes.");
+ }else if(match(page,"rv-abstract-account")){
+  assert(!match(page,"rv-ai-notice")&&!match(page,"automatic-evidence"));
+  assert.equal(match(page,"rv-section-title").textContent,"From the abstract");
+ }else if(!match(page,"rv-machine-account"))assert.equal(match(page,"rv-ai-notice").textContent,"AI-generated summary. AI can make mistakes.");
  assert.equal(page.getAttribute("data-reading-view"),"overview");
  assert(!match(page,"rv-panel-overview").hidden,"The finding and material limits must be available without a click");
  assert(!/\[object (?:HTML\w+Element|Object)\]/.test(textContent(page)),"Broken object rendering: "+r.title);
@@ -677,9 +680,23 @@ const excerptLead="Researchers examined how workers use chatbots to plan their t
 ctx.selected={kind:"scholarly",title:"Chatbots at work",abstract_text:excerptLead,reading:{level:"abstract",digest:{
  status:"automatically_condensed_source_text",explain:excerptLead,explain_source:"abstract_excerpt"}}};
 vm.runInContext("TEST.showPaper(selected)",ctx);
-const leadSection=match(paperContainer,"rv-summary-idea");
-assert.equal(leadSection.children[0].textContent,"From the abstract");
-assert.equal(leadSection.children[1].textContent,excerptLead);
+assert.equal(match(paperContainer,"rv-section-title").textContent,"From the abstract");
+assert.equal(proseText(match(paperContainer,"rv-abstract-account")),excerptLead);
+ctx.selected.abstract_text+=" The students practiced with a tutor on a different topic. A clipped finding reported 61";
+vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(proseText(match(paperContainer,"rv-abstract-account")).endsWith("different topic."));
+assert(!proseText(match(paperContainer,"rv-panel-overview")).includes("61"));
+ctx.selected.reading.machine_account={source_url:"https://example.org/checked-source",source_version:"publishedVersion",
+ review_status:"machine_checked_not_independently_reviewed",study_design:"Students took turns using two tools.",
+ reported_results:"The authors counted individual practice sessions.",limitations:"The topics changed between tasks."};
+vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(!match(paperContainer,"rv-abstract-account"));
+for(const k of ["study_design","reported_results","limitations"])assert(proseText(match(paperContainer,"rv-machine-account")).includes(ctx.selected.reading.machine_account[k]));
+assert.equal(match(paperContainer,"rv-byline-link").href,"https://example.org/checked-source");
+assert(proseText(match(paperContainer,"rv-ai-notice")).includes("No independent review"));
+ctx.selected.reading.machine_account.review_status="partial";
+vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(!match(paperContainer,"rv-machine-account")&&match(paperContainer,"rv-abstract-account"));
 // Older signed records may contain a clean summary and a second audit-prefixed
 // digest. Preserve the source-specific limit while excluding internal notes.
 const qualifiedOriginal=JSON.parse(JSON.stringify(original));

@@ -419,7 +419,8 @@ def check(page, url, width, out):
     expect(page.locator('.rv-source-title')).to_be_visible()
     expect(page.locator('.rv-coverage-table')).to_have_count(0)
     expect(page.locator('.rv-content')).to_contain_text('n = 47')
-    expect(page.locator('.automatic-evidence')).to_contain_text('Source: abstract')
+    expect(page.locator('.rv-abstract-account')).to_have_count(1)
+    expect(page.locator('.rv-source-row')).to_contain_text('Abstract excerpt')
     overflow(); screenshot('source-reading')
     choose_section(page, 'article-section', 'overview')
     # A full-width long card must not leave other paragraphs in a narrow,
@@ -1236,6 +1237,13 @@ def check_collection_boundaries(page, url, width):
                     assert ' '.join(reading[field].split()) in content + ' ' + ' '.join(
                         paper.locator('.rv-intro-copy').inner_text().split()), (identifier, width, field)
             expect(paper.locator('.rv-source-row')).to_contain_text('Based on the full article')
+        if (family == 'research' and reading.get('digest', {}).get('status') == 'automatically_condensed_source_text'
+                and row.get('abstract_text') and not reading.get('machine_account')):
+            account = paper.locator('#article-overview .rv-abstract-account')
+            expect(account).to_be_visible()
+            expect(paper.locator('.rv-ai-notice')).to_have_count(0)
+            assert len(account.inner_text().split()) > 3, (identifier, width)
+            assert account.inner_text().rstrip().endswith(('.', '!', '?', '”', '"', "'", ')', ']')), (identifier, width)
         if row['reader_genre'] in media:
             headline = paper.locator('.rv-headline').inner_text()
             assert len(headline) <= 55 and len(headline.split()) <= 10, (identifier, headline)

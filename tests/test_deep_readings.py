@@ -34,7 +34,7 @@ class DeepReadingTests(unittest.TestCase):
   self.assertIn("company",note["longform"]["thesis"])
   self.assertEqual(note["finding"],"")
 
- def test_machine_synthesis_keeps_status_explicit(self):
+ def test_unverified_media_prose_stays_out_of_the_article(self):
   record={"kind":"nonacademic","title":"Digital attention and AI",
     "url":"https://theverge.com/attention-and-ai",
     "reading":{"level":"curated","overview":"Publisher blurb."},
@@ -46,8 +46,13 @@ class DeepReadingTests(unittest.TestCase):
      "open_question":"Who sets its priorities?", "qualification":"A design argument.",
      "basis":"AI-assisted analysis of accessible article text"}}
   d=annotate(record)["reading"]["digest"]
+  self.assertEqual(d["longform"]["source_depth"],"publisher_synopsis")
+  self.assertEqual(d["longform"]["reasoning"],"")
+  from test_prepared_reading_schema import generated
+  verified=generated(kind="nonacademic")
+  d=annotate(verified)["reading"]["digest"]
   self.assertEqual(d["longform"]["source_depth"],"machine_read_full_article")
-  self.assertEqual(d["longform"]["reasoning"],record["deep_analysis"]["reasoning"])
+  self.assertEqual(d["longform"]["qualification"],verified["deep_analysis"]["qualification"])
 
  def test_scholarly_longform_is_only_published_for_fulltext(self):
   record={"kind":"scholarly","title":"Attention and AI","doi":"10.5555/new",
@@ -56,9 +61,22 @@ class DeepReadingTests(unittest.TestCase):
       "research_question":"What changes?","study_design":"An interview study.",
       "reported_results":"People described different attention habits."}}
   d=annotate(record)["reading"]["digest"]
-  self.assertIn("longform",d)
-  record["reading"]["level"]="abstract"
-  self.assertNotIn("longform",annotate(record)["reading"]["digest"])
+  self.assertNotIn("longform",d)
+  self.assertNotIn("machine_account",annotate(record)["reading"])
+  from test_prepared_reading_schema import generated
+  from build_public import readable
+  from build_reader import article
+  record=generated(claim_field="study_design")
+  record["reading"]={"level":"citation_only"}
+  published=annotate(record)
+  account=published["reading"]["machine_account"]
+  self.assertEqual(account["study_design"],record["deep_analysis"]["study_design"])
+  self.assertTrue(readable(published))
+  self.assertEqual(article(published)["reading"]["machine_account"],account)
+  self.assertFalse({"coverage","claim_evidence","source_hash"}&set(account))
+  record["deep_analysis"]["coverage"]["chunks_processed"]=0
+  self.assertNotIn("machine_account",annotate(record)["reading"])
+  self.assertFalse(readable(annotate(record)))
 
  def test_parser_discards_navigation(self):
   parser=ArticleParser()

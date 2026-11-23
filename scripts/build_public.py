@@ -8,7 +8,7 @@ import datetime as dt
 import json
 from collections import Counter
 from pathlib import Path
-from condense_readings import annotate
+from condense_readings import annotate, machine_research_account
 from build_visuals import visual_spec
 from article_art_queue import attach_persistent_art as attach_art
 from search_plan import source_class
@@ -33,7 +33,9 @@ def readable(record):
     level=reading.get("level")
     if level=="citation_only":return False
     if record.get("kind")=="scholarly":
-        if level=="full_text":return has_article_sections(record)
+        if level=="full_text":
+            return has_article_sections(record) or bool(reading.get("machine_account")
+                and reading["machine_account"]==machine_research_account(record))
         # Scholarly sources must contain real abstract text, not title-based synopsis.
         return level=="abstract" and len(record.get("abstract_text") or "")>=90
     # Nonacademic descriptions and editorial annotations can be used if attributable
