@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "kind": "preparation_reading_run",
+  "phase": "closed",
+  "reading_policy_version": 2,
+  "started_at": "2026-11-23T11:10:07.257368+00:00",
+  "finished_at": "2026-11-23T11:14:20.419739+00:00",
+  "publication_window": {
+    "from": "2026-11-16",
+    "to": "2026-11-22",
+    "timezone": "UTC"
+  },
+  "bindings": {
+    "packet.json": "fcbac6b2161a2b3a9fcb7e17f9cdbd102801cc973da818c7561963c32db0f3b0",
+    "acquisition.json": "3da72408522a0a2628252b392c259943027b2d847b3725502bcbd69512fcf6ed",
+    "readings.json": "5c0dbb81d88feff9165b9422beb3792c791ef96745768f7f5a2b0e82bcf88940"
+  },
+  "stages": {
+    "acquire": {
+      "checked_at": "2026-11-23T11:10:07.668998+00:00",
+      "selected_records": 104,
+      "attempted_records": 12,
+      "attempted_stages": 12,
+      "completed_records": 18,
+      "pending_records": 86,
+      "deferred_retry_records": 21,
+      "statuses": {
+        "access_blocked": 4,
+        "full_document_retrieved_not_reviewed": 2,
+        "partial_full_text_not_reviewed": 3,
+        "pending": 55,
+        "pending_routes": 10,
+        "rate_limited": 11,
+        "source_unavailable": 9,
+        "temporarily_unavailable": 10
+      },
+      "excluded": {},
+      "duplicate_records": 0,
+      "stop_reason": "record_limit",
+      "known_sources_only": false,
+      "limit": 12,
+      "time_budget_seconds": 480,
+      "item_time_budget_seconds": 60,
+      "max_candidates_per_provider_stage": 8,
+      "active_provider_pauses": {
+        "provider:CORE": "2026-11-23T12:11:51.272125+00:00"
+      },
+      "scope": "Selected previous-week records only; not comprehensive web coverage.",
+      "model_used": false,
+      "publication_or_review_performed": false
+    },
+    "review": {
+      "attempted": 2,
+      "documents_retrieved": 2,
+      "partial_inputs": 1,
+      "summaries_completed": 0,
+      "failed": 2,
+      "failure_reasons": {
+        "copied_source_passage": 2
+      },
+      "failure_stages": {
+        "synthesis": 2
+      },
+      "source_text_saved": false,
+      "skipped_no_model": false,
+      "selection": {
+        "considered": 5,
+        "eligible": 2,
+        "deferred_by_limit": 0,
+        "skipped": {
+          "unverified_venue": 1,
+          "format_retry_exhausted": 1,
+          "retry_cooldown": 1
+        }
+      }
+    },
+    "revalidate": {
+      "attempted": 0,
+      "source_text_saved": false,
+      "approved": false
+    },
+    "apply": {
+      "machine_checked_readings_applied": 0,
+      "approved": false,
+      "source_text_saved": false,
+      "publication_window": {
+        "from": "2026-11-16",
+        "to": "2026-11-22",
+        "timezone": "UTC"
+      }
+    }
+  },
+  "approved": false,
+  "source_text_saved": false,
+  "note": "Bounded source acquisition and machine checking are not independent or expert approval. Missing, partial, deferred and failed readings remain gaps. The edition may use explicitly labelled substantive abstracts under its existing evidence policy."
+}
