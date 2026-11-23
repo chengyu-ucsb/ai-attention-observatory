@@ -512,6 +512,10 @@ def book(c, x, y, scale=1, angle=0):
     c.path("M8 12 Q75 -9 140 18 Q205 -9 272 12 V148 Q205 125 140 151 Q75 125 8 148 Z", PAPER, INK, 4)
     c.path("M140 18 V151 M25 29 Q75 15 121 32 M159 32 Q207 16 254 29", "none", INK, 3)
     c.path("M9 135 Q76 113 136 139 L140 150 Q68 126 9 148 Z M150 143 Q214 117 269 135 V145 Q209 124 150 150 Z", MUTED)
+    # The gutter and short curved strokes follow the leaf, so the spread stays
+    # legible on small cards without inventing text or reported measurements.
+    c.path("M133 19 Q142 45 138 144 L150 141 Q145 70 149 17 Z", MUTED)
+    c.path("M28 112 Q66 102 95 108 M183 118 Q210 109 246 111", "none", INK, 2)
     c.path("M217 6 V71 L230 58 L243 72 V9 Z", RED)
     c.end()
 
@@ -560,6 +564,7 @@ def lens(c, x, y, scale=1, angle=0):
     c.group(x, y, scale, angle)
     c.circle(0, 0, 90, PAPER, stroke=INK, stroke_width=13)
     c.path("M-64 -12 Q-56 -66 5 -68 Q-34 -42 -57 -1 Z", MUTED)
+    c.path("M-74 21 Q-56 71 9 72 M27 66 Q46 62 58 47", "none", MUTED, 5)
     c.circle(0, 0, 72, "none", stroke=RED, stroke_width=4)
     c.path("M59 67 L146 162", "none", INK, 29, stroke_linecap="round")
     c.path("M-46 -31 Q-32 -56 -6 -58", "none", MUTED, 8, stroke_linecap="round")
@@ -570,7 +575,10 @@ def plant(c, x, y, scale=1):
     c.group(x, y, scale)
     c.path("M0 0 L16 83 H95 L111 0 Z", RED)
     c.path("M11 7 H102 L99 21 H16 Z", PAPER)
-    c.path("M54 0 Q30 -52 61 -130 M56 -37 Q5 -41 4 -85 Q50 -88 56 -37 M55 -70 Q100 -122 123 -88 Q108 -52 55 -70", "none", INK, 7)
+    c.path("M54 0 Q30 -52 61 -130", "none", INK, 6)
+    c.path("M56 -37 Q5 -41 4 -85 Q50 -88 56 -37 Z", MUTED, INK, 4)
+    c.path("M55 -70 Q91 -122 123 -88 Q108 -52 55 -70 Z", PAPER, INK, 4)
+    c.path("M13 -77 L54 -41 M61 -73 L110 -91 M25 31 L32 66 M38 31 L43 62", "none", INK, 3)
     c.end()
 
 
@@ -730,14 +738,21 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
     elif subject == "framework":
         c.path("M-130 -140 V181 M131 -140 V181 M-149 -100 H152 M-149 119 H152", "none", INK, 12)
         c.path("M-130 -100 L131 119 M131 -100 L-130 119", "none", MUTED, 9)
-        c.path("M-73 121 V-35 H75 V121", "none", RED, 20)
+        c.path("M-80 122 V-44 H81 L95 -30 H-65 V121 Z", PAPER, INK, 4)
+        c.path("M-73 121 V-35 H75 V121", "none", RED, 16)
+        c.path("M-140 -108 H-119 V-92 H-140 Z M121 -108 H142 V-92 H121 Z M-140 111 H-119 V127 H-140 Z M121 111 H142 V127 H121 Z", RED, INK, 3)
+        c.path("M-145 181 H-112 M117 181 H146", "none", INK, 7)
     elif subject == "undergraduate":
         book(c,-133,40,.96)
         c.path("M-129 -88 L7 -145 L146 -88 L7 -32 Z", RED, INK, 5)
-        c.path("M-69 -56 V-7 Q5 32 83 -7 V-56", INK)
+        c.path("M-69 -56 V-7 Q5 32 83 -7 V-56 L7 -30 Z", INK)
+        c.path("M-112 -87 L6 -134 L119 -87 M9 -88 L116 -71 V-6", "none", PAPER, 4)
+        c.path("M116 -12 L106 17 H126 Z", RED, INK, 3)
     elif subject == "chatbot":
         screen(c,-125,-86,1.05)
+        c.path("M-31 -5 H87 V49 H62 V67 L34 49 H-31 Z", MUTED, INK, 4)
         c.path("M-74 -45 H55 V20 H4 L-18 42 V20 H-74 Z", RED, PAPER, 4)
+        c.path("M-60 -33 H-27 M-60 -22 H-42", "none", PAPER, 3)
     elif subject == "routes":
         c.path("M-16 187 V64 Q-16 -54 -133 -123 M24 187 V64 Q24 -54 141 -123", "none", INK, 12)
         c.path("M-34 132 H43 M-34 87 H43 M-40 36 L43 25 M-64 -13 L12 -43 M30 -10 L95 21", "none", RED, 10)
@@ -804,6 +819,8 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
     elif subject == "physical":
         c.path("M-102 -68 H65 V-13 Q136 7 109 93 Q75 145 -3 109 L-102 29 Z", RED, INK, 8)
         c.circle(59, 54, 29, PAPER, stroke=INK, stroke_width=7)
+        c.path("M-99 -63 H58 V-38 H-72 L-99 -15 Z", MUTED, INK, 4)
+        c.path("M-89 -51 H-55 M-45 -51 H-1 M75 91 Q48 109 17 92", "none", PAPER, 4)
         c.path("M-100 -63 Q-167 -167 -205 -80", "none", INK, 9)
     elif subject == "eap":
         book(c,-145,-10,1)
@@ -863,15 +880,24 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
     elif subject == "writing":
         page(c, -85, -99, 1.08, -5)
         c.path("M90 -123 L116 -109 L-9 124 L-39 143 L-36 107 Z", RED, INK, 4)
+        c.path("M-36 107 L-9 124 L-39 143 Z", PAPER, INK, 3)
+        c.path("M95 -110 L-24 105 M78 -112 L95 -144 L116 -133", "none", INK, 4)
     elif subject == "interview":
-        c.circle(-96,-95,30,INK);c.circle(96,-95,30,RED)
-        c.path("M-132 -49 Q-94 -74 -56 -49 L-43 57 H-135 Z",INK)
-        c.path("M132 -49 Q94 -74 56 -49 L43 57 H135 Z",RED)
-        c.path("M-112 54 V158 M111 54 V158", "none", INK, 17)
+        # Opposed profiles and angled sleeves make this a conversation.
+        c.path("M-124 -99 Q-126 -132 -92 -132 Q-65 -132 -68 -106 L-58 -89 L-69 -86 Q-72 -63 -90 -69 L-89 -44 H-117 L-107 -77 Q-122 -82 -124 -99 Z", PAPER, INK, 4)
+        c.path("M-125 -101 Q-127 -139 -90 -134 Q-66 -134 -65 -111 L-94 -109 L-103 -87 L-116 -81 Z", INK)
+        c.path("M125 -101 Q125 -131 96 -130 Q75 -131 69 -111 L59 -91 L69 -87 Q70 -69 88 -68 L85 -44 H118 L108 -78 Q126 -83 125 -101 Z", PAPER, INK, 4)
+        c.path("M68 -111 Q74 -139 105 -134 Q131 -132 132 -105 L127 -76 L108 -79 L108 -108 L91 -114 Z", RED, INK, 3)
+        c.path("M-135 57 L-127 -38 Q-121 -59 -96 -58 Q-64 -62 -55 -34 L-37 -13 L-15 -4 L-22 10 L-65 -3 L-77 -16 L-71 55 Z", INK)
+        c.path("M130 56 L127 -33 Q125 -57 98 -58 Q75 -61 64 -40 L46 -19 L20 -11 L25 5 L65 -5 L77 -20 L70 56 Z", RED, INK, 3)
+        c.path("M-112 54 V158 M111 54 V158", "none", INK, 15)
+        c.path("M-147 62 H-85 V74 H-147 Z M82 62 H143 V74 H82 Z", MUTED, INK, 4)
         book(c,-72,18,.51)
     elif subject == "language":
         c.path("M-134 -101 H57 V17 H-53 L-103 59 V17 H-134 Z", PAPER, INK, 6)
         c.path("M-36 53 H151 V167 H121 V201 L79 167 H-36 Z", RED, INK, 5)
+        c.path("M13 -99 H55 V-57 Z M-35 124 L7 165 H-35 Z", MUTED, INK, 3)
+        c.path("M-120 -84 H-72 M-120 -74 H-94 M100 66 H137 V93", "none", INK, 3)
     elif subject == "music":
         c.path("M-91 -112 V11 Q-91 67 -51 67 Q-11 67 -11 11 V-112 M-51 68 V174", "none", INK, 13)
         c.path("M40 70 V21 Q40 -35 103 -35 Q167 -35 167 21 V70", "none", INK, 15)
@@ -909,11 +935,14 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
     elif subject in ("teacher", "practice", "literacy"):
         book(c, -127, -68, .94, -3)
         if subject == "teacher":
-            c.path("M-118 98 H149 M12 97 V193 M-54 193 H78", "none", INK, 12)
+            c.path("M-122 90 L132 75 L149 99 L-118 107 Z", MUTED, INK, 5)
+            c.path("M2 104 V184 L-54 197 H78 L22 184 V103 Z", RED, INK, 5)
         elif subject == "literacy":
             lens(c, 105, 106, .42, 20)
         else:
             c.path("M135 -86 L153 -76 L54 136 L36 150 L37 126 Z", RED, INK, 3)
+            c.path("M37 126 L54 136 L36 150 Z M128 -69 L146 -60 L142 -50 L123 -58 Z", PAPER, INK, 3)
+            c.path("M127 -49 L51 114", "none", PAPER, 3)
     elif subject == "medical":
         c.rect(-91, -93, 167, 224, PAPER, stroke=INK, stroke_width=7, rx=5)
         c.rect(-48, -113, 81, 37, INK, rx=8)
@@ -948,10 +977,14 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
         envelope(c, -141, 60, .76, -22)
         envelope(c, 67, 119, .65, 16)
     elif subject == "review":
-        for x, h in ((-117, 179), (-61, 226), (-5, 199), (51, 238)):
-            c.rect(x, 128-h, 44, h, PAPER, stroke=INK, stroke_width=5)
-            c.rect(x+5, 100-h, 34, 14, RED)
-        c.line(-142, 133, 124, 133, INK, 10)
+        # Rounded bindings, headcaps and gilded bands read as books at card size.
+        for x, top, cloth in ((-120, -77, RED), (-65, -114, MUTED), (-8, -94, PAPER)):
+            c.rect(x, top, 50, 128-top, cloth, stroke=INK, stroke_width=5, rx=5)
+            c.path(f"M{x+6} {top+11} H{x+44} M{x+6} {top+21} H{x+44} M{x+6} 107 H{x+44}", "none", INK, 3)
+            c.rect(x+12, top+46, 26, 45, PAPER, stroke=INK, stroke_width=2, rx=3)
+        c.path("M45 -90 L91 -104 L152 111 L106 125 Z", RED, INK, 5)
+        c.path("M53 -78 L91 -90 M58 -62 L97 -74 M106 100 L143 89", "none", PAPER, 4)
+        c.path("M-141 128 H157 L147 144 H-141 Z", INK)
     elif subject == "measurement":
         page(c, -104, -45, .87, -7)
         c.path("M35 -115 L-39 137 M35 -115 L126 121 M-19 61 Q54 94 108 55", "none", INK, 11)
@@ -967,7 +1000,9 @@ def draw_subject(c: Canvas, spec: dict, *, x=966, y=None, scale=.77):
     elif subject == "metacognition":
         c.path("M-54 -101 Q-54 -143 11 -143 Q78 -143 78 -101 V77 H-54 Z", PAPER, INK, 9)
         c.path("M-26 -67 L51 -115 M-26 -26 L51 -74", "none", MUTED, 8)
+        c.path("M-43 -82 Q-43 -119 -8 -130 L-43 -49 Z M9 66 L67 -1 V25 L30 66 Z", MUTED)
         c.path("M-36 78 L-74 168 H102 L61 78", "none", INK, 10)
+        c.path("M-73 164 H100 V173 H-73 Z", RED, INK, 3)
     elif subject == "effort":
         c.path("M-69 -35 V-79 Q-69 -126 13 -126 Q94 -126 94 -79 V-35", "none", INK, 13)
         for y, angle in ((-35, -6), (-11, 3), (12, -2)):
