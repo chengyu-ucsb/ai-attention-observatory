@@ -43,6 +43,7 @@ def generated(kind="scholarly", complete=True, structured=False, previous=None, 
                 for key, text in [(field, example), *(support or {}).items()]]
     with patch.object(reading, "screen_source", return_value={"decision": "include"}), \
          patch.object(reading, "read_chunk", side_effect=chunk_notes), \
+         patch.object(reading, "model_json", return_value={"order": list(range(1+len(support or {})))}), \
          patch.object(reading, "due", return_value=True):
         stats = reading.process([record], Mock(), limit=1, retriever=lambda row: (document, [
             {"stage": "article", "provider": "original_article", "status": coverage["evidence_status"],
