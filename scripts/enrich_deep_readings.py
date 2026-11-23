@@ -14,6 +14,8 @@ import os
 from pathlib import Path
 from editorial_corrections import apply as apply_editorial_corrections
 from editorial_source_reviews import apply as apply_source_reviews
+from nonacademic_reading_voice import distinct_support, writing_guidance
+from reading_headlines import reader_genre
 import re
 import time
 from urllib.parse import urlsplit
@@ -104,9 +106,7 @@ def model_json(content, record, kind, model):
     if kind == "nonacademic":
         instruction = (
           "Produce an original, concrete 230-350 word analytical reading of the article. "
-          "Trace the central thesis, the steps of the argument, actual examples, a tension "
-          "or objection and context for the implications. Do not imply an argument is experimental "
-          "evidence. If the article has no tradeoff or examples, leave those fields empty.")
+          + writing_guidance(reader_genre(record)))
     else:
         instruction = (
           "Write an original 230-350 word analytical reading of the STUDY. "
@@ -144,6 +144,7 @@ def acceptable(answer, content, kind):
     if any(not isinstance(answer.get(f, ""), str) for f in FIELDS[kind]): return False
     required = ("thesis", "reasoning") if kind == "nonacademic" else ("study_design", "reported_results")
     if any(len(answer.get(k, "").strip()) < 60 for k in required): return False
+    if kind == "nonacademic" and not distinct_support(answer): return False
     if kind=="nonacademic" and any(len(answer.get(k,"").strip())<limit for k,limit in (
         ("thesis",70),("reasoning",150),("examples",100),("tension",90),
         ("qualification",60))): return False

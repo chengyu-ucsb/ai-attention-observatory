@@ -8,6 +8,7 @@ import json
 import re
 from functools import lru_cache
 from pathlib import Path
+from nonacademic_reading_voice import distinct_support
 from source_quality import AI, emerging_human_topic
 from urllib.parse import urlsplit
 
@@ -51,6 +52,8 @@ def commentary_reading_depth(record):
         return False
     if not record.get("source_review") and source_depth=="read_article" and not (
         (longform.get("basis") or "").startswith("Editorial analysis")):
+        return False
+    if source_depth == "machine_read_full_article" and not distinct_support(longform):
         return False
     lengths={name:len(str(longform.get(name) or "").strip())
              for name in ("thesis","reasoning","examples","tension","qualification")}
