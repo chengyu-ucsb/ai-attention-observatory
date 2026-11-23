@@ -503,6 +503,20 @@ DEEP_PERSPECTIVES = {
   "open_question": "How can an attention-support tool help people reflect on their goals without turning inferred cognitive or emotional states into scores for others?",
   "basis": "Editorial analysis of the public essay"
  },
+ "https://developer.apple.com/documentation/appintents/focus/": {
+  "thesis": "Apple lets people choose which parts of a participating app belong in a particular Focus, such as which email account can send alerts during work.",
+  "reasoning": "When someone turns on a Focus, the system calls the filter the developer has built into the app. The app uses the configuration for that Focus to change its behavior and decide which incoming notifications to show.",
+  "examples": "Apple gives the example of personal email or messages during a Work Focus. Account-specific filtering lets work communications still get through while alerts from a personal account stay quiet.",
+  "qualification": "The developer has to implement the filter. The available choices depend on what the particular app exposes when someone configures a Focus.",
+  "basis": "Analysis of published product documentation"
+ },
+ "https://www.android.com/productivity/": {
+  "thesis": "Android users can pause selected apps during a focused period. They can also see which apps use the most time or send the most notifications before deciding where to set a limit.",
+  "reasoning": "Focus Mode changes what is available on the phone while it is active. Digital Wellbeing also shows how time and notifications are distributed across apps, so a person can choose which apps warrant a daily limit.",
+  "examples": "Android lists games, social media and communication apps as things a person can pause. Someone who wants to understand repeated interruptions can instead check which app sends the most notifications before choosing a limit.",
+  "qualification": "Time spent in an app and the number of alerts describe phone activity. The guide gives no measure of how well a person concentrated during that time.",
+  "basis": "Analysis of published product documentation"
+ },
  "intention-tracking": {
   "reasoning": "The product introduces a small decision point before an app opens. Its mechanism is deliberate friction and self-reflection, rather than continuous measurement of attention.",
   "examples": "The described intention picker asks what a person wants to do before entering a distracting app. A design comparison would need to distinguish noticing an intention from actually changing subsequent behavior.",
@@ -542,13 +556,13 @@ def deep_perspective(record,notes):
  argument=notes.get("argument") or ""
  overview=(record.get("reading") or {}).get("overview") or ""
  return {
-  "thesis":argument or overview,
+  "thesis":extra.get("thesis") or argument or overview,
   "reasoning":extra.get("reasoning",""),
   "examples":extra.get("examples",""),
   "tension":extra.get("tension",""),
   "implications":notes.get("design_relevance") or "",
   "open_question":extra.get("open_question",""),
-  "qualification":notes.get("caveat") or "",
+  "qualification":extra.get("qualification") or notes.get("caveat") or "",
   "basis":extra.get("basis") or ("Editorially prepared synopsis" if argument else "Publisher description only"),
   "source_depth":"read_article" if extra.get("basis","").startswith("Editorial analysis") else
                  "product_documentation" if extra.get("basis","").startswith("Analysis of published product") else
