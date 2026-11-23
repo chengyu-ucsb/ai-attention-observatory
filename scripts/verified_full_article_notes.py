@@ -11,6 +11,7 @@ from datetime import date
 from pathlib import Path
 import re
 from urllib.parse import urlsplit
+from reading_depth import distinct_summary_roles
 ROOT=Path(__file__).resolve().parents[1]
 MANIFEST=ROOT/"data/verified-full-article-notes.json"
 LIB=ROOT/"data/library.json"
@@ -38,7 +39,8 @@ def valid_source(source):
             return False
     except ValueError:
         return False
-    return isinstance(source.get("digest", {}), dict)
+    roles = [source.get(key) for key in ("method", "results", "discussion", "limitations")]
+    return isinstance(source.get("digest", {}), dict) and distinct_summary_roles(roles)
 
 def clear_previous_review(row):
     """Remove only this register's projection, preserving actual source extracts."""
