@@ -62,9 +62,12 @@ def depth_audit(records):
         open_link = record.get("open_access_url") or ""
         # Editorial reconstruction and document acquisition are different work.
         # A source may be fully accessible yet still expose only selected sentences.
+        machine = reading.get("machine_account") or {}
+        has_checked_machine_account = (machine.get("review_status") == "machine_checked_not_independently_reviewed"
+                                       and bool(machine.get("source_url")))
         if (digest.get("status") == "automatically_condensed_source_text"
                 and not reading.get("original_summary") and not record.get("verified_article_review")
-                and not (reading.get("machine_summary") or {}).get("verified")):
+                and not has_checked_machine_account):
             reasons = ["extracts_only"]
             if not digest.get("finding") and not digest.get("explain"):
                 reasons.append("no_result_or_source_context")
