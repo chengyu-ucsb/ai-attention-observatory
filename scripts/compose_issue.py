@@ -906,6 +906,8 @@ def check(root=ROOT, today=None, *, store=None):
                 out.write('Unchanged inputs remain held; saved sections and retry counts are retained. No model is downloaded.\n')
             if result['status'] == 'awaiting_substantive_sources':
                 out.write('No inference or new edition is scheduled by this run. The last published edition remains visible.\n')
+                out.write('Investigate the current closed-week reading receipt in data/weekly-preparation/ and the public source-quality audit. An indexed citation or incomplete source is not a verified reading.\n')
+                out.write('This successful workflow check is not evidence that a new issue has been published.\n')
     print(json.dumps(result))
     return result
 
