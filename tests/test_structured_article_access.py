@@ -55,6 +55,23 @@ class XMLParsingTests(unittest.TestCase):
                 self.assertNotIn('Unassisted', json.dumps(doc.manifest()))
                 self.assertTrue(reading.coverage_is_complete(doc, reading.chunk_document(doc)))
 
+    def test_pdf_explicit_section_boundaries_continue_across_pages(self):
+        units = [
+            {'location': 'page:1', 'text': 'A paper title\n2. Methods\nAllocation was random.\n3. Results\nScores differed.'},
+            {'location': 'page:2', 'text': 'More observations.\nReferences\nEarlier author and title.'},
+            {'location': 'page:3', 'text': 'Another reference.\nAppendix A\nProtocol checklist.'},
+        ]
+        access.label_pdf_sections(units)
+        for unit, roles in zip(units, (
+                ['page','heading','methods','heading','results'],
+                ['results','heading','references'], ['references','heading','body'])):
+            spans = unit['sections']
+            self.assertEqual([span['role'] for span in spans], roles)
+            self.assertEqual([span['start'] for span in spans], [0] + [span['end'] for span in spans[:-1]])
+            self.assertEqual(spans[-1]['end'], len(unit['text']))
+        self.assertEqual(units[1]['sections'][0]['headings'], ['3. Results'])
+        self.assertEqual(units[1]['sections'][-1]['headings'], ['References'])
+
     def test_pdf_page_folios_do_not_complete_an_image_only_interior_page(self):
         title = RECORD['title']
         page_text = [title + '\n' + PARA * 24 + '\nJournal 12 | Page 1',

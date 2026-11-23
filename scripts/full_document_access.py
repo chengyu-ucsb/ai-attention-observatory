@@ -329,6 +329,44 @@ def identity_matches(record,front,candidate_doi='',metadata=None):
     return bool(title_match or (doi_match and meta_doi==expected))
 
 
+def label_pdf_sections(units):
+    """Keep literal heading intervals on the original pages, without layout inference."""
+    from article_body_parser import section_role
+    headings = []
+    role = 'page'
+    for unit in units:
+        text = unit['text']
+        sections = []
+        cursor = 0
+        for line in re.finditer(r'[^\r\n]+(?:\r\n|[\r\n]|$)', text):
+            heading = line.group().strip()
+            if not heading or len(heading) > 90:
+                continue
+            name = re.sub(r'^\d+(?:\.\d+)*[.\s]+', '', heading).strip(' .:').casefold()
+            if re.fullmatch(r'appendi(?:x|ces)(?: [a-z]| \d+)?', name):
+                next_role = 'body'
+            else:
+                next_role = section_role([heading])
+                if next_role == 'body':
+                    continue
+                if next_role == 'hypotheses' and not re.fullmatch(
+                        r'(?:research )?hypothes(?:is|es)(?: formulation| development)?', name):
+                    continue
+            if cursor < line.start():
+                sections.append({'start': cursor, 'end': line.start(), 'role': role,
+                                 'headings': list(headings)})
+            headings = [heading]
+            sections.append({'start': line.start(), 'end': line.end(), 'role': 'heading',
+                             'headings': list(headings)})
+            cursor = line.end()
+            role = next_role
+        if cursor < len(text) and (sections or headings):
+            sections.append({'start': cursor, 'end': len(text), 'role': role,
+                             'headings': list(headings)})
+        if sections:
+            unit['sections'] = sections
+
+
 def pdf_body_pages(units):
     """Distinguish article text from a PDF's repeated running heads and folios."""
     lines = [[line.strip() for line in unit['text'].splitlines() if line.strip()] for unit in units]
@@ -352,6 +390,7 @@ def document_from_pdf(raw,record,url,version='unspecified',candidate_doi=''):
     if len(reader.pages)>300: raise ValueError('document_exceeds_page_budget')
     units=[{'location':f'page:{n+1}','text':page.extract_text() or '', 'role':'page', 'headings':[]}
            for n,page in enumerate(reader.pages)]
+    label_pdf_sections(units)
     front='\n'.join(x['text'] for x in units[:3])
     if not identity_matches(record,front,candidate_doi):
         raise ValueError('document_identity_unverified')
