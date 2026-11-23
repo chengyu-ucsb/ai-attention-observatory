@@ -1221,6 +1221,21 @@ def check_collection_boundaries(page, url, width):
             expect(paper.locator('.rv-headline')).to_have_text(row['display_headline'])
         family = 'research' if row['reader_genre'] in research else 'product' if row['reader_genre'] == 'guide' else 'media'
         expect(paper.locator('.rv-article')).to_have_attribute('data-source-family', family)
+        reading = row.get('reading') or {}
+        if (family == 'research' and row['reader_genre'] != 'proposal' and not reading.get('original_summary')
+                and reading.get('level') == 'full_text'
+                and reading.get('digest', {}).get('editorial_basis') == 'publisher_full_article_paraphrased'):
+            overview = paper.locator('#article-overview')
+            account = overview.locator('.rv-study-account')
+            expect(account).to_be_visible()
+            expect(overview.locator('.automatic-evidence')).to_have_count(0)
+            content = ' '.join(account.inner_text().split())
+            for field in ['methods', 'findings', 'interpretation', 'limitations']:
+                if reading.get(field):
+                    # An identical passage may already serve as the opening sentence.
+                    assert ' '.join(reading[field].split()) in content + ' ' + ' '.join(
+                        paper.locator('.rv-intro-copy').inner_text().split()), (identifier, width, field)
+            expect(paper.locator('.rv-source-row')).to_contain_text('Based on the full article')
         if row['reader_genre'] in media:
             headline = paper.locator('.rv-headline').inner_text()
             assert len(headline) <= 55 and len(headline.split()) <= 10, (identifier, headline)

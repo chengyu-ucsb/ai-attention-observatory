@@ -64,12 +64,15 @@ def make_note(r):
     framework=r.get("framework_notes") or {}
     licensed=has_article_sections(r)
     if licensed:
-        approach=clean(full.get("methods"))[:1500]
+        def section(name, excerpt_limit):
+            text=clean(full.get(name))
+            return text if full.get("original_paraphrases_only") else text[:excerpt_limit]
+        approach=section("methods",1500)
         # Only the Results/Findings section can populate the reported-results field.
         # Discussion is interpretation and is kept separate to prevent overstating claims.
-        results=clean(full.get("results"))[:3000]
-        interpretation=clean(full.get("discussion"))[:1800]
-        caveat=clean(full.get("limitations"))[:1000]
+        results=section("results",3000)
+        interpretation=section("discussion",1800)
+        caveat=section("limitations",1000)
         abstract=src or clean(r.get("preview"))
         introduction=first_two(sentences(abstract),410) if abstract else ""
         kind="Original full-article editorial reading" if full.get("original_paraphrases_only") else "Licensed full-text excerpts"
