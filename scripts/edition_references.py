@@ -186,12 +186,12 @@ def source_claims(draft, source):
         if not any(phrase in text for phrase in own):
             claims.append(text)
             continue
-        # A paragraph with no citation label carries the writer's comparison
-        # or closing question. Each contributing source must be checked against
-        # that passage as well as the paragraph explicitly attributed to it.
+        # Assign a multi-source section's shared comparison to each source,
+        # while keeping single-source discussion prompts distinct from findings.
+        shared = len({a['key'] for a in section['evidence']}) > 1
         for paragraph in text.split('\n\n'):
             if (any(phrase in paragraph for phrase in own)
-                    or not any(c['text'] in paragraph for c in citations)):
+                    or (shared and not any(c['text'] in paragraph for c in citations))):
                 claims.append(paragraph)
     return '\n\n'.join(dict.fromkeys(claims))
 

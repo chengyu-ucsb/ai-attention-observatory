@@ -125,7 +125,10 @@ class MondayEditionTests(unittest.TestCase):
         weekly = {'run': {'date': '2026-11-13', 'publication_window': window_metadata('2026-11-13'),
                           'edition_number': '04'}, 'items': []}
         packet = [{'key': f'S{i}', 'title': f'Original {i}', 'level': 'full_text'} for i in range(3)]
-        draft = {'headline': 'A source-backed weekly synthesis', 'signals': [], 'tension': {}}
+        activity = {'title': 'Compare the two requests', 'text': 'Read each request and mark the decision it asks you to make.'}
+        draft = {'headline': 'A source-backed weekly synthesis', 'signals': [], 'tension': {},
+                 'closer': 'Which version of the request made the decision easier to identify?',
+                 'experiment': activity}
         with tempfile.TemporaryDirectory() as tmp:
             root = self.root(tmp); data = root / 'data'
             (data / 'issue-editorial.json').write_text('{}')
@@ -136,6 +139,7 @@ class MondayEditionTests(unittest.TestCase):
             written = json.loads((data / 'issue-editorial.json').read_text())
             self.assertEqual(list(written), ['2026-11-09'])
             self.assertEqual(written['2026-11-09']['number'], '04')
+            self.assertEqual(written['2026-11-09']['experiment']['text'], activity['text'])
             audit = json.loads((data / 'edition-audits/2026-11-09.json').read_text())
             self.assertEqual(audit['edition_date'], '2026-11-09')
             self.assertFalse((data / 'edition-audits/2026-11-13.json').exists())
