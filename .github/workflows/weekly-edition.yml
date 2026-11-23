@@ -8,6 +8,8 @@ on:
     branches: [main]
     paths:
       - 'scripts/compose_issue.py'
+      - 'scripts/replay_weekly_edition.py'
+      - 'scripts/download_issue_model.py'
       - 'scripts/edition_references.py'
       - 'scripts/edition_progress.py'
       - 'scripts/edition_schedule.py'
@@ -17,11 +19,15 @@ on:
     branches: [main]
     paths:
       - 'scripts/compose_issue.py'
+      - 'scripts/replay_weekly_edition.py'
+      - 'scripts/download_issue_model.py'
       - 'scripts/edition_references.py'
       - 'scripts/edition_progress.py'
       - 'scripts/edition_schedule.py'
       - 'data/original-readings.json'
       - 'tests/test_compose_issue.py'
+      - 'tests/test_replay_weekly_edition.py'
+      - 'tests/test_download_issue_model.py'
       - 'tests/test_edition_references.py'
       - '.github/workflows/weekly-edition.yml'
   # Recovery if an upstream run fails before dispatching its successor.
@@ -42,6 +48,8 @@ concurrency:
 jobs:
   edition:
     if: github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event != 'pull_request' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main')
+    outputs:
+      saved: ${{ steps.save.outcome == 'success' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -79,14 +87,7 @@ jobs:
             'llama-cpp-python==0.3.36'
       - name: Download official open model weights
         if: steps.edition.outputs.needs_model == 'true'
-        run: |
-          for part in 00001 00002; do
-            curl --fail --location --retry 2 --connect-timeout 15 --max-time 900 \
-              "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/bb5d59e/qwen2.5-7b-instruct-q4_k_m-${part}-of-00002.gguf" \
-              --output "/tmp/qwen2.5-7b-instruct-q4_k_m-${part}-of-00002.gguf"
-          done
-          test "$(stat -c '%s' /tmp/qwen2.5-7b-instruct-q4_k_m-00001-of-00002.gguf)" -gt 3900000000
-          test "$(stat -c '%s' /tmp/qwen2.5-7b-instruct-q4_k_m-00002-of-00002.gguf)" -gt 680000000
+        run: python scripts/download_issue_model.py /tmp
       - name: Compose and validate the canonical website edition
         if: steps.edition.outputs.needed == 'true'
         env:
@@ -100,34 +101,36 @@ jobs:
           node tests/validate_weekly_issue.cjs
           python -m unittest discover -s tests -v
       - name: Save the edition and RSS together
+        id: save
         if: steps.edition.outputs.needed == 'true'
         run: |
-          # Research can continue during inference. Refuse a stale source/policy
-          # snapshot instead of rebasing an old editorial onto new evidence.
-          publication_base=$(git rev-parse HEAD)
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/ issue-feed.xml newsletter.html issues/
-          if ! git diff --cached --quiet; then
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Publish source-grounded weekly edition and RSS"
+          if git push origin HEAD:main; then exit 0; fi
+
+          # Keep the original checkout intact for the recovery artifact. Rebuild
+          # on current main from the checked draft without repeating inference.
+          policy=$(PYTHONPATH=scripts python -c 'from edition_progress import policy_signature; print(policy_signature())')
+          for attempt in 1 2 3; do
             git fetch origin main
-            git diff --quiet "$publication_base" origin/main -- scripts/ data/library.json data/weekly.json data/original-readings.json data/issue-editorial.json data/weekly-preparation/ data/approved-issues/
-            git commit -m "Publish source-grounded weekly edition and RSS"
-            for attempt in 1 2 3; do
-              if git push; then exit 0; fi
-              git fetch origin main
-              if ! git diff --quiet "$publication_base" origin/main -- scripts/ data/library.json data/weekly.json data/original-readings.json data/issue-editorial.json data/weekly-preparation/ data/approved-issues/; then
-                echo "::error::Sources or policy changed during drafting. Checked stages remain in the private database."
-                exit 1
+            checkout="$RUNNER_TEMP/weekly-release-$attempt"
+            git worktree add --detach "$checkout" origin/main
+            (
+              cd "$checkout"
+              python scripts/replay_weekly_edition.py "$GITHUB_WORKSPACE" "$policy"
+              git add data/ issue-feed.xml newsletter.html issues/
+              if ! git diff --cached --quiet; then
+                git commit -m "Publish checked weekly edition on current sources"
               fi
-              if ! git rebase origin/main; then
-                git rebase --abort || true
-                echo "::error::Edition retained in recovery artifact; source conflicts require reconciliation."
-                exit 1
-              fi
-              python scripts/compose_issue.py --verify-release
-            done
-            exit 1
-          fi
+            )
+            if git -C "$checkout" push origin HEAD:main; then exit 0; fi
+            git worktree remove "$checkout"
+          done
+          echo "::error::Concurrent updates prevented publication after three verified retries."
+          exit 1
       - name: Preserve draft and evidence if publication fails
         if: failure() && github.event_name != 'pull_request'
         uses: actions/upload-artifact@v7.0.2
@@ -149,3 +152,16 @@ jobs:
           retention-days: 7
           if-no-files-found: warn
 
+
+  deploy-saved-edition:
+    needs: edition
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && needs.edition.outputs.saved == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      actions: write
+    steps:
+      - name: Dispatch Pages for the saved synthesis
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/$GITHUB_REPOSITORY/actions/workflows/publish.yml/dispatches" -f ref=main
