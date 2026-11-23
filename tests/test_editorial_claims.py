@@ -49,7 +49,7 @@ class EditorialClaimTests(unittest.TestCase):
                     {"location": "paragraph:2", "start": 0, "end": len(finding)}])
 
     def test_prior_work_and_methods_cannot_establish_the_current_papers_result(self):
-        for role in ("prior_work", "methods", "hypotheses", "caption"):
+        for role in ("prior_work", "hypotheses", "caption"):
             doc = Document([{"location": "page:1", "role": role,
                              "text": "An earlier cohort reported better attention after completing the assigned writing task."}],
                            "https://example.org/note")
@@ -58,6 +58,19 @@ class EditorialClaimTests(unittest.TestCase):
             with patch.object(reader, "model_json", return_value={"claims": [claim], "no_claim_reason": ""}):
                 with self.assertRaisesRegex(ValueError, "claim_source_role_mismatch"):
                     reader.read_chunk(object(), chunk, "scholarly", "A review")
+
+    def test_method_can_be_reclassified_once_but_never_be_published_as_a_result(self):
+        doc = Document([{"location":"page:1","role":"methods",
+            "text":"Respondents described their everyday study habits using online questionnaires."}],"https://example.org/paper")
+        chunk=reader.chunk_document(doc)[0]
+        proposed={"field":"reported_results","text":"Respondents provided online accounts of their usual study habits.","source_span":"C0001:S001"}
+        with patch.object(reader,"model_json",side_effect=[
+            {"claims":[proposed],"no_claim_reason":""},
+            {"0":"Researchers used an online questionnaire to ask about usual study habits."},
+            {"supported":[0],"rejected":[]}]):
+            notes=reader.read_chunk(object(),chunk,"scholarly","Study habits")
+        self.assertEqual(notes[0]["field"],"study_design")
+        self.assertEqual(notes[0]["source_span"],"C0001:S001")
 
     def test_page_offsets_preserve_reference_and_hypothesis_boundaries(self):
         paper = "Respondents answered a survey about their confidence. "

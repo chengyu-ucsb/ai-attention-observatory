@@ -282,7 +282,7 @@ def exact_partition_schema(claim_count):
     """
     if type(claim_count) is not int or not 1 <= claim_count <= 6:
         raise ValueError('claim_count_must_be_between_one_and_six')
-    schema = copy.deepcopy(reading.verification_schema())
+    schema = copy.deepcopy(reading.verification_schema(claim_count))
     schema['enum'] = [
         {'supported': [index for index in range(claim_count) if mask & (1 << index)],
          'rejected': [index for index in range(claim_count) if not mask & (1 << index)]}

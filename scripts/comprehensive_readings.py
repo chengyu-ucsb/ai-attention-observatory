@@ -229,7 +229,7 @@ def coverage_is_complete(document,chunks):
     return True
 
 
-def validate_claim(claim,chunk,kind):
+def validate_claim(claim,chunk,kind,*,check_copy=True):
     if not isinstance(claim,dict): raise ValueError('claim_not_object')
     if claim.get('field') not in FIELDS[kind]: raise ValueError('unsupported_claim_field')
     text=claim.get('text',''); anchor=claim.get('quote','')
@@ -241,16 +241,16 @@ def validate_claim(claim,chunk,kind):
         raise ValueError('claim_anchor_absent')
     if not set(NUMBERS.findall(text))<=set(NUMBERS.findall(chunk['text'])):
         raise ValueError('unsupported_numeric_claim')
-    if has_copied_sequence({'text':text},chunk['text'],span=13):
+    if check_copy and has_copied_sequence({'text':text},chunk['text'],span=13):
         raise ValueError('copied_source_passage')
     return claim
 
 
 def model_json(model,instruction,max_tokens=900,*,schema=None,deadline=None,
-               claim_count=None,source_span_ids=None):
+               claim_count=None,source_span_ids=None,attempts=2):
     """Allow one bounded format retry; never salvage an incomplete JSON prefix."""
     failure=None
-    for attempt in range(2):
+    for attempt in range(attempts):
         check_deadline(deadline)
         prompt=instruction
         if failure:
@@ -289,7 +289,7 @@ def model_json(model,instruction,max_tokens=900,*,schema=None,deadline=None,
             return answer
         except ModelFormatError as exc:
             failure=exc
-            if attempt==1: raise
+            if attempt+1==attempts: raise
 
 
 def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
@@ -323,23 +323,54 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre=''):
     if not isinstance(proposed,list) or len(proposed)>6: raise ValueError('invalid_claim_list')
     if not proposed and not str(answer.get('no_claim_reason','')).strip():
         raise ValueError('unexplained_empty_segment')
-    claims=[]
-    for proposal in proposed:
+    claims=[]; repair={}
+    for index,proposal in enumerate(proposed):
         ident=proposal.get('source_span')
         if not isinstance(ident,str) or ident not in by_id:
             raise ValueError('unknown_source_span')
         span=by_id[ident]
-        if proposal.get('field')=='reported_results' and span.get('role') in evidence.RESULT_EXCLUDED:
-            raise ValueError('claim_source_role_mismatch')
-        claim={'field':proposal.get('field'),'text':proposal.get('text'),
-               'quote':' '.join(by_id[ident]['text'].split())}
-        validate_claim(claim,chunk,kind)
+        role=span.get('role')
+        field=proposal.get('field')
+        claim={'field':field,'text':proposal.get('text'),'quote':' '.join(span['text'].split())}
+        validate_claim(claim,chunk,kind,check_copy=False)
         if 'unit_index' in span:
             claim['source_span']=ident
             columns=(chunk.get('unit_context') or [{}]*len(chunk['ranges']))[span['unit_index']].get('columns',[])
             if not set(NUMBERS.findall(claim['text']))<=set(NUMBERS.findall(span['text']+' '+' '.join(columns))):
                 raise ValueError('unsupported_numeric_claim')
+        wrong_role=field=='reported_results' and role in evidence.RESULT_EXCLUDED
+        if wrong_role and role!='methods':
+            raise ValueError('claim_source_role_mismatch')
+        copied=has_copied_sequence({'text':claim['text']},chunk['text'],span=13)
+        if wrong_role or copied:
+            repair[index]={'reason':'claim_source_role_mismatch' if wrong_role else 'copied_source_passage',
+                           'field':'study_design' if wrong_role else field,'span':ident}
         claims.append(claim)
+    if repair:
+        # A single pre-verification edit on the same evidence. No new number,
+        # source span, or result can be introduced to get around a failed check.
+        fields={str(i):{'type':'string'} for i in repair}
+        schema={'type':'object','required':list(fields),'properties':fields,'additionalProperties':False}
+        drafts=[{'index':i,'reason':rule['reason'],'required_field':rule['field'],
+                 'source_span':rule['span'],'checked_against':claims[i]['quote'],
+                 'draft':claims[i]['text']} for i,rule in repair.items()]
+        revised=model_json(model,
+            'Rewrite only these flagged drafts for a general reader. Use the original '
+            'source and same numbered anchor. Say what the people actually did, found or '
+            'proposed in natural new words. Preserve quantities, direction, null effects '
+            'and limits. If a method was mislabeled, describe only the procedure. '
+            'Use each string index as a key with just its revised sentence as the value. '
+            'Do not move a claim to another source or invent compensating detail.\n'
+            +json.dumps(drafts,ensure_ascii=False)+'\nSOURCE DATA:\n'+labelled,
+            700,schema=schema,deadline=deadline,attempts=1)
+        validate_response_shape(revised,schema)
+        for i,rule in repair.items():
+            old=claims[i]; replacement=revised[str(i)]
+            if sorted(NUMBERS.findall(replacement))!=sorted(NUMBERS.findall(old['text'])):
+                raise ValueError('unsupported_numeric_claim')
+            claims[i]={**old,'field':rule['field'],'text':replacement}
+    for claim in claims:
+        validate_claim(claim,chunk,kind)
     if claims:
         check=model_json(model,
             'Check each claim against the supplied original source segment. '+verifying+' '
