@@ -3,34 +3,34 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-23T20:29:19.964221+00:00",
-  "finished_at": "2026-11-23T20:31:18.827352+00:00",
+  "started_at": "2026-11-24T12:40:04.203273+00:00",
+  "finished_at": "2026-11-24T12:42:27.731188+00:00",
   "publication_window": {
     "from": "2026-11-16",
     "to": "2026-11-22",
     "timezone": "UTC"
   },
   "bindings": {
-    "packet.json": "dfa74d3ed7da51ddec0cbb34739a3d237157e8c8a2b15dfae37af4c5c94a2b7b",
-    "acquisition.json": "0bcdedc7f41972fa918e3f002d53b38143a05dbbd80ae5d73f4b5934dcbfd92f",
-    "readings.json": "9d5dc51e535007710749c26e85473fb40226e1416b34d7bdfd0efdbbefb67842"
+    "packet.json": "6e5f2941d1d3fbc05f75f6b9714af23b9a422851b7594cbb8157242412771753",
+    "acquisition.json": "b514f928639c275e3d04c4d399114fa23a86960dee9f246adb14e6bb011119ca",
+    "readings.json": "71d1113c384181231e70189ecc438461d0199a59001ff43dd5635f0b9d078f6f"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-23T20:29:20.333167+00:00",
-      "selected_records": 109,
+      "checked_at": "2026-11-24T12:40:04.655122+00:00",
+      "selected_records": 123,
       "attempted_records": 12,
       "attempted_stages": 12,
-      "completed_records": 19,
-      "pending_records": 90,
-      "deferred_retry_records": 33,
+      "completed_records": 20,
+      "pending_records": 103,
+      "deferred_retry_records": 29,
       "statuses": {
-        "access_blocked": 4,
+        "access_blocked": 5,
         "full_document_retrieved_not_reviewed": 2,
         "partial_full_text_not_reviewed": 3,
-        "pending": 50,
-        "pending_routes": 7,
-        "rate_limited": 14,
+        "pending": 62,
+        "pending_routes": 12,
+        "rate_limited": 10,
         "source_unavailable": 10,
         "temporarily_unavailable": 19
       },
@@ -42,31 +42,34 @@
       "time_budget_seconds": 480,
       "item_time_budget_seconds": 60,
       "max_candidates_per_provider_stage": 8,
-      "active_provider_pauses": {
-        "provider:CORE": "2026-11-23T20:30:15.757462+00:00"
-      },
+      "active_provider_pauses": {},
       "scope": "Selected previous-week records only; not comprehensive web coverage.",
       "model_used": false,
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 0,
+      "attempted": 2,
       "documents_retrieved": 0,
       "partial_inputs": 0,
       "summaries_completed": 0,
-      "failed": 0,
-      "failure_reasons": {},
-      "failure_stages": {},
+      "failed": 2,
+      "failure_reasons": {
+        "acquisition_receipt_content_changed": 2
+      },
+      "failure_stages": {
+        "retrieval": 2
+      },
+      "article_accounts": 0,
+      "evidence_only_readings": 0,
       "source_text_saved": false,
       "skipped_no_model": false,
       "selection": {
         "considered": 5,
-        "eligible": 0,
+        "eligible": 2,
         "deferred_by_limit": 0,
         "skipped": {
-          "retry_cooldown": 3,
-          "unverified_venue": 1,
-          "format_retry_exhausted": 1
+          "retry_cooldown": 2,
+          "unverified_venue": 1
         }
       }
     },
