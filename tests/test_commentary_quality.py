@@ -9,6 +9,7 @@ from unittest.mock import patch
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import build_public
+from publication_fixtures import article_covers_ready
 import editorial_source_reviews
 import news_quality
 from condense_readings import annotate
@@ -67,7 +68,7 @@ class EditorialIntegrityTests(unittest.TestCase):
             root=Path(d)
             (root/"library.json").write_text(json.dumps(rows))
             (root/"weekly.json").write_text(json.dumps({"run":{},"items":rows}))
-            with patch.object(build_public,"DATA",root):
+            with patch.object(build_public,"DATA",root), article_covers_ready():
                 selected,week=build_public.build()
             pending=json.loads((root/"public-pending-sources.json").read_text())
             audit=json.loads((root/"source-quality-audit.json").read_text())
@@ -153,7 +154,7 @@ class EditorialIntegrityTests(unittest.TestCase):
             root=Path(d)
             (root/"library.json").write_text(json.dumps(rows))
             (root/"weekly.json").write_text(json.dumps({"run":{},"items":rows}))
-            with patch.object(build_public,"DATA",root):
+            with patch.object(build_public,"DATA",root), article_covers_ready():
                 selected,week=build_public.build()
             audit=json.loads((root/"source-quality-audit.json").read_text())
             pending=json.loads((root/"public-pending-sources.json").read_text())
@@ -216,7 +217,7 @@ class EditorialIntegrityTests(unittest.TestCase):
                 (data / folder).mkdir()
                 (data / folder / (date + '.json')).write_text((ROOT / 'data' / folder / (date + '.json')).read_text())
             (data / 'issue-editorial.json').write_text((ROOT / 'data/issue-editorial.json').read_text())
-            with patch.object(build_public, 'DATA', data), patch.object(build_public, 'attach_art'):
+            with patch.object(build_public, 'DATA', data), article_covers_ready():
                 selected, _ = build_public.build()
             public_ids = {build_public.record_id(row) for row in selected}
             self.assertTrue(additions <= public_ids, additions - public_ids)

@@ -12,6 +12,7 @@ from unittest.mock import patch
 ROOT=pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"scripts"))
 import build_public
+from publication_fixtures import article_covers_ready
 import enrich_openalex_fulltext as fulltext
 
 class PublicReadingTests(unittest.TestCase):
@@ -35,7 +36,7 @@ class PublicReadingTests(unittest.TestCase):
     {"kind":"scholarly","title":"Citation","doi":"10.1/cite","reading":{"level":"citation_only"}}]
    (folder/"library.json").write_text(json.dumps(rows))
    (folder/"weekly.json").write_text(json.dumps({"run":{"total":2},"items":rows}))
-   with patch.object(build_public,"DATA",folder):
+   with patch.object(build_public,"DATA",folder), article_covers_ready():
     public,weekly=build_public.build()
    self.assertEqual(len(public),1)
    self.assertEqual(len(weekly["items"]),1)

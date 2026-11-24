@@ -11,6 +11,7 @@ sys.path.insert(0,str(ROOT/"scripts"))
 import source_lineage
 import build_readings
 import build_public
+from publication_fixtures import article_covers_ready
 import condense_readings
 from collection_window import window_metadata
 
@@ -73,7 +74,7 @@ class SourceLineageTests(unittest.TestCase):
             (folder/"library.json").write_text(json.dumps([explainer()]))
             (folder/"weekly.json").write_text(json.dumps({
                 "run":{"date":"2026-10-22","total":1}, "items":[explainer()]}))
-            with patch.object(build_public,"DATA",folder):
+            with patch.object(build_public,"DATA",folder), article_covers_ready():
                 library,week=build_public.build()
             primary=next(x for x in library if x.get("doi")==DOI)
             companion=next(x for x in library if x.get("url")==ARTICLE)
@@ -92,7 +93,7 @@ class SourceLineageTests(unittest.TestCase):
             source = dict(explainer(), title="A detailed discussion of handling AI study aids in a classroom while maintaining student autonomy")
             (folder / "library.json").write_text(json.dumps([source]))
             (folder / "weekly.json").write_text(json.dumps({"run": {}, "items": [source]}))
-            with patch.object(build_public, "DATA", folder), patch.object(build_public, "attach_art"):
+            with patch.object(build_public, "DATA", folder), article_covers_ready():
                 public, weekly = build_public.build()
             companion = next(x for x in public if x.get("companion_to") == DOI)
             self.assertEqual(companion["title"], source["title"])
@@ -112,7 +113,7 @@ class SourceLineageTests(unittest.TestCase):
             (folder / 'library.json').write_text(json.dumps([explainer()]))
             (folder / 'weekly.json').write_text(json.dumps({
                 'run': {'date': '2026-10-26'}, 'items': [explainer()]}))
-            with patch.object(build_public, 'DATA', folder), patch.object(source_lineage, 'load', return_value=config):
+            with patch.object(build_public, 'DATA', folder), patch.object(source_lineage, 'load', return_value=config), article_covers_ready():
                 library, week = build_public.build()
         self.assertEqual(week['run']['total'], 1)
         self.assertEqual(week['run']['companion_count'], 1)

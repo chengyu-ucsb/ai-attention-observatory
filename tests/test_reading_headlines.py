@@ -14,6 +14,7 @@ from reading_headlines import (accepted_heading, genre_label, headline_decision,
                               reader_genre, reader_headline, review_item, source_id)
 import original_readings
 import build_public
+from publication_fixtures import article_covers_ready
 from test_original_readings import accepted, approve, record
 
 
@@ -77,7 +78,7 @@ class ReadingHeadlineTests(unittest.TestCase):
             data = Path(directory)
             (data / "library.json").write_text(json.dumps(rows))
             (data / "weekly.json").write_text(json.dumps({"run": {}, "items": rows}))
-            with patch.object(build_public, "DATA", data), patch.object(build_public, "attach_art"):
+            with patch.object(build_public, "DATA", data), article_covers_ready():
                 public, weekly = build_public.build()
                 self.assertEqual([source_id(row) for row in public], [short["doi"]])
                 self.assertEqual([source_id(row) for row in weekly["items"]], [short["doi"]])
