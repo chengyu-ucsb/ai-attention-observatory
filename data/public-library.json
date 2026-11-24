@@ -355,7 +355,7 @@
     "discovery_scope": "closeout",
     "discovery_query": "ChatGPT metacognition memory cognitive effort",
     "historical_backfill": false,
-    "metadata_observed_at": "2026-11-24T12:25:29.506481+00:00",
+    "metadata_observed_at": "2026-11-24T23:29:03.916508+00:00",
     "preparation_first_seen_at": "2026-11-23T10:40:57.901018+00:00",
     "oa_checked": "2026-11-23",
     "oa_pass_version": 3,
@@ -901,7 +901,7 @@
     "discovery_scope": "closeout",
     "discovery_query": "ChatGPT metacognition memory cognitive effort",
     "historical_backfill": false,
-    "metadata_observed_at": "2026-11-23T10:55:03.264120+00:00",
+    "metadata_observed_at": "2026-11-24T23:29:03.916508+00:00",
     "preparation_first_seen_at": "2026-11-23T10:40:57.901018+00:00",
     "oa_checked": "2026-11-23",
     "oa_pass_version": 3,
@@ -1910,6 +1910,7 @@
       "next_at": "2026-12-14",
       "attempts": 1
     },
+    "metadata_observed_at": "2026-11-24T23:29:03.916508+00:00",
     "verified_article_review": {
       "provenance": "Original paraphrases from the checked PDF article",
       "fulltext_url": "https://link.springer.com/content/pdf/10.1186/s40561-026-00477-7_reference.pdf",
@@ -20484,6 +20485,22 @@
       "next_at": "2026-12-08",
       "attempts": 2
     },
+    "complete_reading_attempt": {
+      "status": "no_article_text_available",
+      "stage": "retrieval",
+      "last_at": "2026-11-24",
+      "next_at": "2026-11-26",
+      "provider_diagnostics": [
+        {
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://openalex.org/W7161620989",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        }
+      ]
+    },
     "reader_genre": "proposal",
     "visual": {
       "kind": "research_design",
@@ -24295,6 +24312,138 @@
     "abstract_source": "Crossref abstract",
     "oa_checked": "2026-11-21",
     "oa_pass_version": 3,
+    "complete_reading_attempt": {
+      "status": "claim_length_invalid",
+      "stage": "synthesis",
+      "last_at": "2026-11-24",
+      "next_at": "2026-11-26",
+      "provider_diagnostics": [
+        {
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://europepmc.org/articles/PMC12075473",
+          "retryable": false,
+          "failure_url": "https://europepmc.org/articles/PMC12075473",
+          "status": "article_http_403"
+        },
+        {
+          "stage": "article",
+          "provider": "known_open_access_source",
+          "url": "https://www.nature.com/articles/s41598-025-01676-x",
+          "retryable": false,
+          "status": "document_identity_unverified"
+        },
+        {
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "status": "candidates",
+          "candidates": 1,
+          "candidates_retained": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Europe PMC full-text API",
+          "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12075473/fullTextXML",
+          "retryable": true,
+          "status": "TimeoutError",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "status": "candidates",
+          "candidates": 2,
+          "candidates_retained": 2,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "Crossref publisher deposit",
+          "url": "https://www.nature.com/articles/s41598-025-01676-x.pdf",
+          "retryable": false,
+          "status": "document_identity_unverified"
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAlex XML and OA locations",
+          "status": "candidates",
+          "candidates": 4,
+          "candidates_retained": 4,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12075473/",
+          "status": "partial_full_text",
+          "final_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12075473/",
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex OA location",
+          "url": "https://doi.org/10.1038/s41598-025-01676-x",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "status": "candidates",
+          "candidates": 3,
+          "candidates_retained": 3,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://pubmed.ncbi.nlm.nih.gov/40360573",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAIRE",
+          "url": "https://doaj.org/article/4d35a7874dc24676861868c7d00db7d3",
+          "status": "host_requires_review",
+          "retryable": false,
+          "network_attempted": false
+        },
+        {
+          "stage": "discovery",
+          "provider": "Unpaywall",
+          "retryable": false,
+          "status": "contact_not_configured"
+        },
+        {
+          "stage": "discovery",
+          "provider": "CORE",
+          "retryable": true,
+          "failure_url": "https://api.core.ac.uk/v3/search/works",
+          "status": "http_429",
+          "retry_after_seconds": 3600
+        },
+        {
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "status": "candidates",
+          "candidates": 1,
+          "candidates_retained": 1,
+          "retryable": false
+        },
+        {
+          "stage": "article",
+          "provider": "OpenAlex content API",
+          "url": "https://content.openalex.org/works/W4410319159.grobid-xml",
+          "status": "full_document_retrieved",
+          "final_url": "https://content.openalex.org/works/W4410319159.grobid-xml",
+          "retryable": false
+        }
+      ]
+    },
     "verified_article_review": {
       "provenance": "Original paraphrases from the checked HTML article",
       "fulltext_url": "https://www.nature.com/articles/s41598-025-01676-x",
