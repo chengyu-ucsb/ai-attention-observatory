@@ -200,9 +200,9 @@
       "kind": "scholarly",
       "published": "2026-11-21",
       "source_url": "https://doi.org/10.38124/ijisrt/26oct1098",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -216,8 +216,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-24T13:57:36.699034+00:00"
     },
     "0c06037823bac022ae269217cd5901ab772c94cf659b331cc136ce1859157720": {
       "fingerprint": "36a38d0283ad4eae7f23850d2ba8b8c9bad7aad9c9c0565e1e4d58f0a9375318",
@@ -390,15 +403,17 @@
       "kind": "scholarly",
       "published": "2026-11-18",
       "source_url": "https://doi.org/10.3389/feduc.2026.1983378",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "24683dffc1000e39d1acaf6f6cabe1d34284b364b6d154e1e3c090eadf5b9215"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -408,8 +423,606 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1983378/full",
+          "final_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1983378/pdf"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "document": {
+        "source_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1983378/pdf",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 19,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 4462,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 7040,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 6888,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 6328,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 6884,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 1504,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 6544,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 6865,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 3387,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 3220,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 5455,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 6359,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 5579,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 6989,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 5839,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 8858,
+            "has_text": true
+          },
+          {
+            "unit": 17,
+            "characters": 8598,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 4462
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 1022
+              },
+              {
+                "unit": 2,
+                "start": 1022,
+                "end": 1036
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 1036,
+                "end": 6484
+              },
+              {
+                "unit": 2,
+                "start": 6484,
+                "end": 6535
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 6535,
+                "end": 7040
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 4933
+              },
+              {
+                "unit": 3,
+                "start": 4933,
+                "end": 4993
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 3,
+                "start": 4993,
+                "end": 6428
+              },
+              {
+                "unit": 3,
+                "start": 6428,
+                "end": 6452
+              },
+              {
+                "unit": 3,
+                "start": 6452,
+                "end": 6469
+              },
+              {
+                "unit": 3,
+                "start": 6469,
+                "end": 6888
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 3585
+              },
+              {
+                "unit": 4,
+                "start": 3585,
+                "end": 3600
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 3600,
+                "end": 6328
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 2737
+              },
+              {
+                "unit": 5,
+                "start": 2737,
+                "end": 2770
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 5,
+                "start": 2770,
+                "end": 6884
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 1288
+              },
+              {
+                "unit": 6,
+                "start": 1288,
+                "end": 1384
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 1384,
+                "end": 1504
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 5375
+              },
+              {
+                "unit": 7,
+                "start": 5375,
+                "end": 5378
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 7,
+                "start": 5378,
+                "end": 6544
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 4302
+              },
+              {
+                "unit": 8,
+                "start": 4302,
+                "end": 4332
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 8,
+                "start": 4332,
+                "end": 4495
+              },
+              {
+                "unit": 8,
+                "start": 4495,
+                "end": 4505
+              },
+              {
+                "unit": 8,
+                "start": 4505,
+                "end": 6865
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 2926
+              },
+              {
+                "unit": 9,
+                "start": 2926,
+                "end": 2963
+              }
+            ]
+          },
+          {
+            "chunk": "C0010",
+            "ranges": [
+              {
+                "unit": 9,
+                "start": 2963,
+                "end": 3387
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 3220
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 1853
+              }
+            ]
+          },
+          {
+            "chunk": "C0011",
+            "ranges": [
+              {
+                "unit": 11,
+                "start": 1853,
+                "end": 5455
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 1842
+              },
+              {
+                "unit": 12,
+                "start": 1842,
+                "end": 1896
+              }
+            ]
+          },
+          {
+            "chunk": "C0012",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 1896,
+                "end": 6359
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 994
+              },
+              {
+                "unit": 13,
+                "start": 994,
+                "end": 1035
+              }
+            ]
+          },
+          {
+            "chunk": "C0013",
+            "ranges": [
+              {
+                "unit": 13,
+                "start": 1035,
+                "end": 1260
+              },
+              {
+                "unit": 13,
+                "start": 1260,
+                "end": 1273
+              },
+              {
+                "unit": 13,
+                "start": 1273,
+                "end": 5579
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 940
+              },
+              {
+                "unit": 14,
+                "start": 940,
+                "end": 952
+              }
+            ]
+          },
+          {
+            "chunk": "C0014",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 952,
+                "end": 5003
+              },
+              {
+                "unit": 14,
+                "start": 5003,
+                "end": 5019
+              },
+              {
+                "unit": 14,
+                "start": 5019,
+                "end": 6427
+              },
+              {
+                "unit": 14,
+                "start": 6427,
+                "end": 6449
+              }
+            ]
+          },
+          {
+            "chunk": "C0015",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 6449,
+                "end": 6989
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 1553
+              },
+              {
+                "unit": 15,
+                "start": 1553,
+                "end": 1569
+              },
+              {
+                "unit": 15,
+                "start": 1569,
+                "end": 2636
+              },
+              {
+                "unit": 15,
+                "start": 2636,
+                "end": 2664
+              },
+              {
+                "unit": 15,
+                "start": 2664,
+                "end": 3587
+              },
+              {
+                "unit": 15,
+                "start": 3587,
+                "end": 3608
+              },
+              {
+                "unit": 15,
+                "start": 3608,
+                "end": 4075
+              },
+              {
+                "unit": 15,
+                "start": 4075,
+                "end": 4083
+              },
+              {
+                "unit": 15,
+                "start": 4083,
+                "end": 4360
+              },
+              {
+                "unit": 15,
+                "start": 4360,
+                "end": 4381
+              },
+              {
+                "unit": 15,
+                "start": 4381,
+                "end": 4556
+              },
+              {
+                "unit": 15,
+                "start": 4556,
+                "end": 4580
+              },
+              {
+                "unit": 15,
+                "start": 4580,
+                "end": 4901
+              },
+              {
+                "unit": 15,
+                "start": 4901,
+                "end": 4946
+              }
+            ]
+          },
+          {
+            "chunk": "C0016",
+            "ranges": [
+              {
+                "unit": 15,
+                "start": 4946,
+                "end": 5839
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 17
+              },
+              {
+                "unit": 16,
+                "start": 17,
+                "end": 1964
+              },
+              {
+                "unit": 16,
+                "start": 1964,
+                "end": 1975
+              },
+              {
+                "unit": 16,
+                "start": 1975,
+                "end": 4602
+              }
+            ]
+          },
+          {
+            "chunk": "C0017",
+            "ranges": [
+              {
+                "unit": 16,
+                "start": 4602,
+                "end": 8858
+              },
+              {
+                "unit": 17,
+                "start": 0,
+                "end": 1236
+              },
+              {
+                "unit": 17,
+                "start": 1236,
+                "end": 1242
+              }
+            ]
+          },
+          {
+            "chunk": "C0018",
+            "ranges": [
+              {
+                "unit": 17,
+                "start": 1242,
+                "end": 6740
+              },
+              {
+                "unit": 17,
+                "start": 6740,
+                "end": 6741
+              }
+            ]
+          },
+          {
+            "chunk": "C0019",
+            "ranges": [
+              {
+                "unit": 17,
+                "start": 6741,
+                "end": 8598
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "layout_fidelity": "not_verified",
+        "characters_retrieved": 100815,
+        "units_retrieved": 17,
+        "source_byte_count": 1566611,
+        "pages_total": 17,
+        "pages_processed": 17,
+        "pages_with_text": 17,
+        "source_sha256": "2c905b92eec2da2f9812d69829b463246c806d12fd1bc976901de996d5d70bd7",
+        "source_bytes_sha256": "fbd91a86bd6b84291f8d027302e3aaf30307bcaf3bcdac37bc18378ae8dc3c0c"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "existing_source",
+        "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1983378/full",
+        "final_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1983378/pdf"
+      },
+      "last_outcome": "full_document_retrieved"
     },
     "db951d281633cf17416f3d988e7467c3983afa81199c38c4ee72070d786cb2b6": {
       "fingerprint": "3cc690aa0317f3f4e89ad8e6faef190a0f0deac8bb6c16b8f8c86a479a471849",
@@ -1208,15 +1821,17 @@
       "kind": "nonacademic",
       "published": "2026-11-19",
       "source_url": "https://www.theguardian.com/education/2026/nov/19/academic-integrity-matters-but-students-shouldnt-be-penalised-for-using-ai",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "access_blocked",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "b86720ec25ee2c62a8769a0ccef29c9a789c91e600cfaa943255e5418a026d26"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -1226,8 +1841,18 @@
         "doi_lookup_permitted": false
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "source_access_denied_this_run",
+          "retryable": false,
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.theguardian.com/education/2026/nov/19/academic-integrity-matters-but-students-shouldnt-be-penalised-for-using-ai"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "access_blocked"
     },
     "7183063c7f54a1352a664b42c7caa0deb1aa13f1a3625530842f22a02b88e560": {
       "fingerprint": "36c65a1377a036e3726adc1bf40e2c2d394f43acce56dfcb32ea369d23027290",
@@ -5982,15 +6607,17 @@
       "kind": "scholarly",
       "published": "2026-11-19",
       "source_url": "https://doi.org/10.1007/s44163-026-02808-6",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "611374dbdbbbd19fd8a727a41eeb7a63cff78037a5a45e59b624024fecb61de3"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -6000,8 +6627,24 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "document_identity_unverified",
+          "retryable": false,
+          "stage": "article",
+          "provider": "known_open_access_source",
+          "url": "https://link.springer.com/article/10.1007/s44163-026-02808-6"
+        },
+        {
+          "status": "candidate_budget_exhausted",
+          "retryable": false,
+          "stage": "retrieval",
+          "candidates_attempted": 1
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "source_unavailable"
     },
     "c4816ec401d0cf89980467ebb64757504ab51871e44ddaeca2790c5322a41a32": {
       "fingerprint": "58f8d0ecd72d462bba422387eccc9bd3341427e3520b8626b28cfcd43949b447",
@@ -7095,12 +7738,12 @@
       "kind": "scholarly",
       "published": "2026-11-19",
       "source_url": "https://doi.org/10.1108/imds-05-2026-0991",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -7111,8 +7754,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "source_unavailable"
     },
     "cfadd418041f21751c5fe96e54b02b1829902496a8e237d2aee45150fefbc7b9": {
       "fingerprint": "b07719f725c5da0b53b042106870c1e3d788ee14da9ca155888c0285b4136fa7",
@@ -7889,15 +8542,17 @@
       "kind": "scholarly",
       "published": "2026-11-17",
       "source_url": "https://doi.org/10.1177/21522715261509248",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "8e0ad2fa2a307224c64ef1d8a203b004f73c5ec018779e3089b16a0d8f610922"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -7908,8 +8563,361 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://arxiv.org/pdf/2610.38647",
+          "final_url": "https://arxiv.org/pdf/2610.38647"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "document": {
+        "source_url": "https://arxiv.org/pdf/2610.38647",
+        "document_version": "arxiv_preprint_unversioned_url",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 9,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 2747,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 3592,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 3802,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 3177,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 2182,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 4057,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 4394,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 2038,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 1653,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 1767,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 1815,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 3081,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 3628,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 3552,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 3506,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 3157,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 676
+              },
+              {
+                "unit": 1,
+                "start": 676,
+                "end": 686
+              },
+              {
+                "unit": 1,
+                "start": 686,
+                "end": 2747
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 2672
+              },
+              {
+                "unit": 2,
+                "start": 2672,
+                "end": 2749
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 2749,
+                "end": 3592
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 3802
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 847
+              },
+              {
+                "unit": 4,
+                "start": 847,
+                "end": 852
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 852,
+                "end": 3177
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 2182
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 914
+              },
+              {
+                "unit": 6,
+                "start": 914,
+                "end": 990
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 990,
+                "end": 4057
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 2409
+              },
+              {
+                "unit": 7,
+                "start": 2409,
+                "end": 2431
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 7,
+                "start": 2431,
+                "end": 4394
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 2038
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 1489
+              },
+              {
+                "unit": 9,
+                "start": 1489,
+                "end": 1496
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 9,
+                "start": 1496,
+                "end": 1653
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 1767
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 1815
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 1757
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 1757,
+                "end": 3081
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 3628
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 14,
+                "start": 13,
+                "end": 544
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 544,
+                "end": 2918
+              },
+              {
+                "unit": 14,
+                "start": 2918,
+                "end": 2936
+              },
+              {
+                "unit": 14,
+                "start": 2936,
+                "end": 3232
+              },
+              {
+                "unit": 14,
+                "start": 3232,
+                "end": 3244
+              },
+              {
+                "unit": 14,
+                "start": 3244,
+                "end": 3552
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 2477
+              },
+              {
+                "unit": 15,
+                "start": 2477,
+                "end": 2486
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 15,
+                "start": 2486,
+                "end": 3506
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 3157
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "layout_fidelity": "not_verified",
+        "characters_retrieved": 48163,
+        "units_retrieved": 16,
+        "source_byte_count": 2379464,
+        "pages_total": 16,
+        "pages_processed": 16,
+        "pages_with_text": 16,
+        "source_sha256": "0a8257810c6696a72c62d9c94175740d443e309551c3cf70ce45d7a2f2e9563c",
+        "source_bytes_sha256": "b650bea2fff010fc5633d3661414f7270fae98499331e29d532c1d513d939d23"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "existing_source",
+        "url": "https://arxiv.org/pdf/2610.38647",
+        "final_url": "https://arxiv.org/pdf/2610.38647"
+      },
+      "last_outcome": "full_document_retrieved"
     },
     "cdb51a20cfb988f78fdf7993bde81b9f42f12361a2abc4d1d8b8d898f37e6582": {
       "fingerprint": "e4d5d7d61089c5b7d55b9cfbf32e0d513ff24cb4aae498e880c855a272106989",
@@ -9167,12 +10175,12 @@
       "kind": "scholarly",
       "published": "2026-11-17",
       "source_url": "https://doi.org/10.1145/3840282",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -9183,8 +10191,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "source_unavailable"
     },
     "17c6b87312f45e5b2c68cf3de2ebeb529b7536c38dae18f073ca854931cbe48f": {
       "fingerprint": "9eb0f496a1b25abd41756d5a29a7251e533835c35da1f94c3842eb3cccfd055e",
@@ -9251,9 +10269,9 @@
       "kind": "scholarly",
       "published": "2026-11-17",
       "source_url": "https://doi.org/10.1145/3856802",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -9267,8 +10285,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-24T13:57:14.170097+00:00"
     },
     "506246a2cd34bfafcbec466b6e5b6313e40a384db987d0a974347387ed5db01b": {
       "fingerprint": "6a4c681ee0d2a0b5b0f9def7295e5a1fd773554dd0b10018d21236955aa2c385",
@@ -9455,12 +10486,12 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.1108/jbim-12-2025-1262",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -9471,8 +10502,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "source_unavailable"
     },
     "e5c38c50655b39d5223493c8203364e461fb14a4f2696ecebee40db67cfee4da": {
       "fingerprint": "9c345ad097548ad2d90bfcabbf2883f538a7fd508d149959b628d1ed9b3d614a",
@@ -9697,15 +10738,17 @@
       "kind": "nonacademic",
       "published": "2026-11-16",
       "source_url": "https://www.theguardian.com/business/nils-pratley-on-finance/2026/nov/16/anthropic-claude-risks-to-humanity-governance-ai",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "access_blocked",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "474edcdb3e1cd2b38e58ed8d2277fac823516017869ecd7dab86fb354aafb6d7"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -9715,20 +10758,30 @@
         "doi_lookup_permitted": false
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "source_access_denied_this_run",
+          "retryable": false,
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.theguardian.com/business/nils-pratley-on-finance/2026/nov/16/anthropic-claude-risks-to-humanity-governance-ai"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "access_blocked"
     },
     "a40cdb35800849a908e6b35ab2a31fb31302ca62675b6e73f1e0ae464afc05e5": {
       "fingerprint": "80e0b5371062ce78135e504add357323b453d4e1267578df8c832c5383d13e55",
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.21203/rs.3.rs-11727541/v1",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -9739,8 +10792,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_outcome": "source_unavailable"
     },
     "2b775c36f4331e992fe834e2bc29c617dd0231097a5d9397d457f2d087c17f55": {
       "fingerprint": "36e55c09395c95ee94cc050055fbf94f0c16f5d7d3d6e39df319684855d40850",
@@ -10204,15 +11267,17 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.3389/fpubh.2026.2016499",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "b2c4c8cce0578cf1b124bca450db73616d5f8ac133f00f7fd999f81bc69eb42c"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -10222,8 +11287,571 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2016499/full",
+          "final_url": "https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2016499/pdf"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "document": {
+        "source_url": "https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2016499/pdf",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 16,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 4143,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 7201,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 7256,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 6197,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 7298,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 4523,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 3779,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 4627,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 5817,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 5980,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 6434,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 7345,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 5908,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 6785,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 921,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 4143
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 1352
+              },
+              {
+                "unit": 2,
+                "start": 1352,
+                "end": 1355
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 1355,
+                "end": 6828
+              },
+              {
+                "unit": 2,
+                "start": 6828,
+                "end": 6854
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 6854,
+                "end": 7036
+              },
+              {
+                "unit": 2,
+                "start": 7036,
+                "end": 7046
+              },
+              {
+                "unit": 2,
+                "start": 7046,
+                "end": 7063
+              },
+              {
+                "unit": 2,
+                "start": 7063,
+                "end": 7201
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 5092
+              },
+              {
+                "unit": 3,
+                "start": 5092,
+                "end": 5148
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 3,
+                "start": 5148,
+                "end": 7256
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 3341
+              },
+              {
+                "unit": 4,
+                "start": 3341,
+                "end": 3390
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 3390,
+                "end": 6197
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 2658
+              },
+              {
+                "unit": 5,
+                "start": 2658,
+                "end": 2691
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 5,
+                "start": 2691,
+                "end": 7298
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 870
+              },
+              {
+                "unit": 6,
+                "start": 870,
+                "end": 891
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 891,
+                "end": 1169
+              },
+              {
+                "unit": 6,
+                "start": 1169,
+                "end": 1179
+              },
+              {
+                "unit": 6,
+                "start": 1179,
+                "end": 4523
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 1839
+              },
+              {
+                "unit": 7,
+                "start": 1839,
+                "end": 1864
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 7,
+                "start": 1864,
+                "end": 3779
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 3579
+              },
+              {
+                "unit": 8,
+                "start": 3579,
+                "end": 3583
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 8,
+                "start": 3583,
+                "end": 4627
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 4442
+              },
+              {
+                "unit": 9,
+                "start": 4442,
+                "end": 4454
+              }
+            ]
+          },
+          {
+            "chunk": "C0010",
+            "ranges": [
+              {
+                "unit": 9,
+                "start": 4454,
+                "end": 5817
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 4125
+              },
+              {
+                "unit": 10,
+                "start": 4125,
+                "end": 4135
+              }
+            ]
+          },
+          {
+            "chunk": "C0011",
+            "ranges": [
+              {
+                "unit": 10,
+                "start": 4135,
+                "end": 5980
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 3353
+              },
+              {
+                "unit": 11,
+                "start": 3353,
+                "end": 3366
+              },
+              {
+                "unit": 11,
+                "start": 3366,
+                "end": 3624
+              },
+              {
+                "unit": 11,
+                "start": 3624,
+                "end": 3651
+              }
+            ]
+          },
+          {
+            "chunk": "C0012",
+            "ranges": [
+              {
+                "unit": 11,
+                "start": 3651,
+                "end": 6434
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 2660
+              },
+              {
+                "unit": 12,
+                "start": 2660,
+                "end": 2715
+              }
+            ]
+          },
+          {
+            "chunk": "C0013",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 2715,
+                "end": 7345
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 832
+              },
+              {
+                "unit": 13,
+                "start": 832,
+                "end": 868
+              }
+            ]
+          },
+          {
+            "chunk": "C0014",
+            "ranges": [
+              {
+                "unit": 13,
+                "start": 868,
+                "end": 2760
+              },
+              {
+                "unit": 13,
+                "start": 2760,
+                "end": 2774
+              },
+              {
+                "unit": 13,
+                "start": 2774,
+                "end": 4050
+              },
+              {
+                "unit": 13,
+                "start": 4050,
+                "end": 4063
+              },
+              {
+                "unit": 13,
+                "start": 4063,
+                "end": 5255
+              },
+              {
+                "unit": 13,
+                "start": 5255,
+                "end": 5283
+              },
+              {
+                "unit": 13,
+                "start": 5283,
+                "end": 5450
+              },
+              {
+                "unit": 13,
+                "start": 5450,
+                "end": 5467
+              },
+              {
+                "unit": 13,
+                "start": 5467,
+                "end": 5908
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 192
+              },
+              {
+                "unit": 14,
+                "start": 192,
+                "end": 213
+              },
+              {
+                "unit": 14,
+                "start": 213,
+                "end": 433
+              },
+              {
+                "unit": 14,
+                "start": 433,
+                "end": 448
+              }
+            ]
+          },
+          {
+            "chunk": "C0015",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 448,
+                "end": 512
+              },
+              {
+                "unit": 14,
+                "start": 512,
+                "end": 520
+              },
+              {
+                "unit": 14,
+                "start": 520,
+                "end": 759
+              },
+              {
+                "unit": 14,
+                "start": 759,
+                "end": 775
+              },
+              {
+                "unit": 14,
+                "start": 775,
+                "end": 931
+              },
+              {
+                "unit": 14,
+                "start": 931,
+                "end": 952
+              },
+              {
+                "unit": 14,
+                "start": 952,
+                "end": 1127
+              },
+              {
+                "unit": 14,
+                "start": 1127,
+                "end": 1151
+              },
+              {
+                "unit": 14,
+                "start": 1151,
+                "end": 1554
+              },
+              {
+                "unit": 14,
+                "start": 1554,
+                "end": 1571
+              },
+              {
+                "unit": 14,
+                "start": 1571,
+                "end": 1925
+              },
+              {
+                "unit": 14,
+                "start": 1925,
+                "end": 1936
+              },
+              {
+                "unit": 14,
+                "start": 1936,
+                "end": 5936
+              }
+            ]
+          },
+          {
+            "chunk": "C0016",
+            "ranges": [
+              {
+                "unit": 14,
+                "start": 5936,
+                "end": 6785
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 921
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "layout_fidelity": "not_verified",
+        "characters_retrieved": 84228,
+        "units_retrieved": 15,
+        "source_byte_count": 350255,
+        "pages_total": 15,
+        "pages_processed": 15,
+        "pages_with_text": 15,
+        "source_sha256": "edb901ebecbe6218280ea07c589380ab31b17583223fad950ce1b6eb46da82c3",
+        "source_bytes_sha256": "917b98ab73843a5e6ba89f85387e5aa95ebb1abdfbc9bf386814efba99ce730a"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "existing_source",
+        "url": "https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2016499/full",
+        "final_url": "https://www.frontiersin.org/journals/public-health/articles/10.3389/fpubh.2026.2016499/pdf"
+      },
+      "last_outcome": "full_document_retrieved"
     },
     "ab9ea4544b2fde020f03d8f76da1c3375b316abb799e48701c72220b8f9ff3a7": {
       "fingerprint": "3e8530f8429c3331364752c23d418977cbb2416118a8f869e201648d15fd99cd",
@@ -10996,7 +12624,7 @@
       "last_outcome": "full_document_retrieved"
     }
   },
-  "cursor": 60,
+  "cursor": 72,
   "provider_pauses": {
     "provider:CORE": "2026-11-23T20:30:15.757462+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
@@ -37218,22 +38846,22 @@
     }
   ],
   "input_fingerprint": "7bab099e8363a089473f24533bb9966028812604e4d8bb8a60ad43bc22a36970",
-  "state_sha256": "de7a5d89a990dd03333bd40038531f745899a1358fcb7bc3caf3cab9ed7f72a6",
+  "state_sha256": "b12df6c4e213e157b3f3fcfab20082ed0f43ad217b352cedee9cb8cc2b4c20aa",
   "run": {
-    "checked_at": "2026-11-24T12:45:17.572050+00:00",
+    "checked_at": "2026-11-24T12:56:15.674550+00:00",
     "selected_records": 130,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 9,
-    "pending_records": 121,
-    "deferred_retry_records": 22,
+    "completed_records": 14,
+    "pending_records": 116,
+    "deferred_retry_records": 24,
     "statuses": {
-      "access_blocked": 2,
-      "full_document_retrieved_not_reviewed": 3,
+      "access_blocked": 4,
+      "full_document_retrieved_not_reviewed": 6,
       "partial_full_text_not_reviewed": 4,
-      "pending": 82,
-      "pending_routes": 17,
-      "temporarily_unavailable": 22
+      "pending": 70,
+      "pending_routes": 22,
+      "temporarily_unavailable": 24
     },
     "excluded": {},
     "duplicate_records": 0,
