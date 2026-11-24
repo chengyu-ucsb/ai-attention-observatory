@@ -588,7 +588,15 @@ function abstractSentences(value){
  }
  return parts;
 }
+function preparedLead(x){
+ const reading=x.plain_reading;
+ if(!["prepared","reviewed"].includes(reading?.status)||typeof reading.lead!=="string")return null;
+ const text=reading.lead.trim();
+ if(!text||text===readingHeadline(x))return null;
+ return {text,label:reading.basis==="Abstract"?"Based on the abstract":""};
+}
 function cardContext(x){
+ if(x.plain_reading)return preparedLead(x);
  const d=x.reading?.digest||{},machine=x.reading?.machine_account;
  if(machine?.review_status==="machine_checked_not_independently_reviewed"){
   const text=[machine.research_question,machine.study_design].find(s=>s&&s.length<=430);
@@ -603,6 +611,13 @@ function cardContext(x){
  }
  const text=[d.explain,d.idea].find(s=>s&&s!==x.title&&s!==readingHeadline(x)&&s.length<=430);
  return text?{text,label:""}:null;
+}
+function cardSummary(preview){
+ if(!preview)return null;
+ const summary=make("div","library-summary");
+ if(preview.label)summary.append(make("small","",preview.label));
+ summary.append(make("p","",preview.text));
+ return summary;
 }
 function compactReading(value,label="Read the full context"){
  const parts=textSentences(value),box=make("div","compact-reading");
@@ -735,7 +750,7 @@ function renderEditorial(){
   const articleTitle=make("h3");articleTitle.append(btn(shortIdea(x),()=>goto("paper",id(x))));
   const foot=make("div","editorial-foot");
   add(foot,make("span","",x.venue||"Original source"),btn("Explore",()=>goto("paper",id(x)),"editorial-cta"));
-  add(card,editorialMedia(x,"editorial"),label,articleTitle,foot);root.append(card)
+  add(card,editorialMedia(x,"editorial"),label,articleTitle,cardSummary(preparedLead(x)),foot);root.append(card)
  }
 }
 
@@ -757,7 +772,7 @@ function renderPerspectives(){
     const title=make("h3");title.append(btn(shortIdea(x),()=>goto("paper",id(x))));
     const bottom=make("div","perspective-bottom");
     add(bottom,make("span","",x.venue||"Original source"),btn("Read summary",()=>goto("paper",id(x)),"editorial-cta"));
-    add(item,editorialMedia(x,"perspective"),icon,label,title,bottom);container.append(item);
+    add(item,editorialMedia(x,"perspective"),icon,label,title,cardSummary(preparedLead(x)),bottom);container.append(item);
   }
  }
 }
@@ -813,13 +828,7 @@ function showLibrary(requestedPage){
   if(metadata.length)foot.append(make("span","card-source-meta",metadata.join(" · ")));
   if(/^(Earlier|Historical)/.test(x.source_group||""))foot.append(make("span","", "Earlier foundation"));
   add(body,make("span","card-type",readingKind(x)),h);
-  const preview=cardContext(x);
-  if(preview){
-   const summary=make("div","library-summary");
-   if(preview.label)summary.append(make("small","",preview.label));
-   summary.append(make("p","",preview.text));body.append(summary);
-  }
-  body.append(foot);
+  add(body,cardSummary(cardContext(x)),foot);
   const colorIndex=themes.findIndex(theme=>theme[0]===x.lane);
   if(colorIndex>=0)c.setAttribute("data-theme",String(colorIndex));
   add(c,image,body);box.append(c);
@@ -1013,30 +1022,55 @@ function additionalArtwork(x){
 
 function reviewedEvidenceArtwork(x){
  const spec=x.visual||{},reading=x.reading||{},source=spec.source||{};
- if(spec.kind!=="reviewed_comparison"||!reading.original_summary||
-    spec.reading_id!==reading.original_summary_id||spec.doi!==x.doi||
-    source.url!==reading.source_url||source.version!==reading.source_version||
-    source.sha256!==reading.source_sha256||!httpsSourceUrl(source.url)||
+ const notes=x.verified_article_review||{};
+ const sameArticle=spec.doi?spec.doi===x.doi:spec.record_url&&spec.record_url===x.url;
+ const checkedNotes=spec.reading_id==="verified-notes"&&!reading.original_summary&&
+  notes.original_paraphrases_only===true&&notes.source_checked&&
+  source.url===notes.fulltext_url&&source.version===notes.source_version&&
+  /^[a-f0-9]{64}$/.test(source.notes_sha256)&&source.notes_sha256===notes.note_sha256;
+ const mediaNotes=x.source_review||{};
+ const checkedMedia=spec.reading_id==="editorial-notes"&&x.kind==="nonacademic"&&
+  spec.record_url===x.url&&source.version==="checked_editorial_notes"&&
+  source.url===mediaNotes.source_url&&mediaNotes.source_checked&&
+  /^[a-f0-9]{64}$/.test(source.notes_sha256)&&source.notes_sha256===mediaNotes.note_sha256;
+ const checkedReading=reading.original_summary&&spec.reading_id&&spec.reading_id===reading.original_summary_id&&
+  source.url===reading.source_url&&source.version===reading.source_version&&
+  /^[a-f0-9]{64}$/.test(source.sha256)&&source.sha256===reading.source_sha256;
+ if(spec.kind!=="reviewed_comparison"||!sameArticle||!source.version||!httpsSourceUrl(source.url)||
+    !(checkedNotes||checkedReading||checkedMedia)||
     !Array.isArray(spec.headers)||!Array.isArray(spec.rows)||
     spec.headers.length<2||spec.headers.length>4||spec.rows.length>6||
     !spec.rows.every(row=>Array.isArray(row)&&row.length===spec.headers.length))return null;
  const figure=make("figure","article-concept-art article-data-visual evidence-graphic reviewed-evidence");
- add(figure,make("p","eyebrow","Source table, simplified"),make("h3","figure-insight-title",spec.title));
+ add(figure,make("h3","figure-insight-title",spec.title),make("p","figure-intro",spec.description));
  const table=make("table","matrix-table reviewed-comparison-table");
  table.setAttribute("aria-label",spec.description);
  const thead=make("thead",""),heading=make("tr","");
  for(const label of spec.headers){const th=make("th","",label);th.setAttribute("scope","col");heading.append(th);}
  thead.append(heading);table.append(thead);
  const tbody=make("tbody","");
+ const chart=spec.chart;
+ const bars=chart?.kind==="bar"&&spec.headers.length===2&&Number.isFinite(chart.maximum)&&chart.maximum>0&&
+  spec.rows.every(row=>typeof row[1]==="string"&&/^\d+(?:\.\d+)?$/.test(row[1])&&Number(row[1])<=chart.maximum);
  for(const row of spec.rows){
   const tr=make("tr","");
-  row.forEach((value,index)=>{const cell=make(index?"td":"th","",value);if(!index)cell.setAttribute("scope","row");tr.append(cell);});
+  row.forEach((value,index)=>{
+   const cell=make(index?"td":"th","",value);
+   if(!index)cell.setAttribute("scope","row");
+   else if(bars){
+    const track=make("span","evidence-bar-track"),fill=make("span","evidence-bar-fill");
+    track.setAttribute("aria-hidden","true");
+    fill.style.width=(100*Number(value)/chart.maximum)+"%";
+    track.append(fill);cell.append(track);
+   }
+   tr.append(cell);
+  });
   tbody.append(tr);
  }
  table.append(tbody);
  const caption=make("figcaption","concept-note",spec.caption);
  caption.append(link(source.attribution+" · "+source.locator,source.url,"rv-secondary-link"));
- const tableScroll=make("div","reviewed-table-scroll");
+ const tableScroll=make("div","reviewed-table-scroll"+(spec.headers.length===2?" reviewed-table-compact":""));
  tableScroll.setAttribute("role","region");
  tableScroll.setAttribute("aria-label",spec.title+" comparison table");
  tableScroll.setAttribute("tabindex","0");
@@ -1317,9 +1351,14 @@ function showPaper(x){
  }
  const leadText=abstractPreview||abstract||machine?"":research?((original||edited||d.status==="conceptual_framework")?d.idea:d.explain):
   (deep.thesis||(x.kind==="scholarly"?"":d.explain)||d.idea);
- const lead=fresh(leadText);
- const leadParagraph=!lead?null:d.explain_source==="abstract_excerpt"
-  ?add(make("div","rv-summary-idea"),make("span","rv-source-meta","From the abstract"),make("p","",lead))
+ const plain=preparedLead(x);
+ // The full abstract already appears below. Avoid quoting its opening twice.
+ const displayedAbstract=abstract||(abstractPreview?x.abstract_text:"")||"";
+ const plainInAbstract=plain&&displayedAbstract.includes(plain.text);
+ const lead=fresh(plain&&!plainInAbstract?plain.text:leadText);
+ const leadLabel=plain?plain.label:d.explain_source==="abstract_excerpt"?"From the abstract":"";
+ const leadParagraph=!lead?null:leadLabel
+  ?add(make("div","rv-summary-idea"),make("span","rv-source-meta",leadLabel),make("p","",lead))
   :make("p","rv-summary-idea",lead);
  if(leadParagraph)intro.append(leadParagraph);
  if(research&&!abstract&&!machine&&(original||edited||conceptual)&&
@@ -1354,8 +1393,17 @@ function showPaper(x){
   if(label)section.append(make("h3","",label));
   section.append(readingProse(text));parent.append(section);
  }
+ if(plain){
+  const context=make("div","rv-plain-context");
+  for(const key of ["detail","limit"]){
+   const value=x.plain_reading[key];
+   if(typeof value==="string")paragraph(context,"",value);
+  }
+  if(context.children.length)body.append(context);
+ }
+ const reviewedVisual=reviewedEvidenceArtwork(x);
  if(research){
-  const graphic=proposal||machine?null:reviewedEvidenceArtwork(x)||(original?null:conceptArtwork(x));
+  const graphic=reviewedVisual||(proposal||machine||original?null:conceptArtwork(x));
   const art=(conceptual||reviewedAccount||abstract||machine)&&graphic?.className.includes("automatic-evidence")?null:graphic;
   const auto=Boolean(art?.className.includes("automatic-evidence"));
   if(abstract){
@@ -1402,6 +1450,7 @@ function showPaper(x){
   const reader=sourceReader(x);if(reader)evidencePanel.append(reader);
  }else{
   const article=make("div","rv-longform");
+  if(plain&&!abstractPreview)paragraph(article,"",deep.thesis);
   if(abstractPreview){
    const abstract=String(x.abstract_text||"").trim();
    if(abstract)article.append(compactReading(abstract,"Read the full abstract"));
@@ -1419,6 +1468,7 @@ function showPaper(x){
    }
   }
   if(article.children.length)body.append(article);
+  if(reviewedVisual)body.append(add(make("div","rv-artwork"),reviewedVisual));
   if(!article.children.length&&analysis.children.length){for(const part of Array.from(analysis.children))article.append(part);body.append(article);}
 
  }
@@ -1481,7 +1531,7 @@ function showPaper(x){
   for(const companion of companions){
    const article=make("div","rv-excerpt");
    add(article,add(make("h3"),link(readingHeadline(companion),readingPath(companion),"rv-related-item")),
-    make("p","",readingKind(companion)));
+    make("p","",readingKind(companion)),cardSummary(preparedLead(companion)));
    const originalUrl=httpsSourceUrl(companion.reading?.source_url)||httpsSourceUrl(companion.url);
    if(originalUrl)article.append(link("Read the original story",originalUrl,"rv-secondary-link"));
    coverage.append(article);
@@ -1503,7 +1553,7 @@ function showPaper(x){
 let libraryPromise=null;
 const articlePromises=new Map();
 function matchesSearch(x,q){
- const text=[x.title,x.display_headline,readingKind(x),x.venue,x.search_text,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
+ const text=[x.title,x.display_headline,x.plain_reading?.lead,readingKind(x),x.venue,x.search_text,x.abstract_text,x.preview,x.reading?.findings,x.reading?.methods,...Object.values(x.reading?.digest||{}).filter(v=>typeof v==="string"),(x.authors||[]).join(" ")].join(" ").toLowerCase();
  return text.includes(String(q).toLowerCase());
 }
 async function jsonPayload(path,immutable=false){

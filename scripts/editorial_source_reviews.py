@@ -6,12 +6,20 @@ was actually read (including an attributed republication) is recorded.
 """
 from __future__ import annotations
 import json
+import hashlib
 from pathlib import Path
 
 ROOT=Path(__file__).resolve().parents[1]
 PATH=ROOT/"data/editorial-source-readings.json"
 REQUIRED=("thesis","reasoning","examples","tension","implications","open_question",
           "qualification","reading_basis","source_url","source_checked")
+
+def editorial_note_digest(review):
+    fields = REQUIRED + ("source_relation", "secondary_verification_url", "evidence_scope")
+    body = {key: review.get(key) for key in fields}
+    return hashlib.sha256(json.dumps(body, sort_keys=True, ensure_ascii=False,
+                                    separators=(",", ":")).encode()).hexdigest()
+
 
 def apply(records,config=None):
     config=config if config is not None else json.loads(PATH.read_text(encoding="utf-8"))
@@ -30,6 +38,7 @@ def apply(records,config=None):
         record["source_review"]["source_relation"]=source.get("source_relation","")
         record["source_review"]["secondary_verification_url"]=source.get("secondary_verification_url","")
         record["source_review"]["evidence_scope"]=source.get("evidence_scope","")
+        record["source_review"]["note_sha256"] = editorial_note_digest(record["source_review"])
         record["editorial_takeaway"]=source.get("takeaway") or source.get("thesis") or ""
         if record.get("reading") and (record["reading"].get("level")=="source_preview"):
             record["reading"]["level"]="curated"

@@ -181,7 +181,11 @@ def editorial_review(model, draft, packet, audit, progress, stage='final review'
         'why a finding matters without claiming cross-source agreement. For each comparison, '
         'check whether each cited source supports its part of the stated connection. A shared topic '
         'alone does not support a shared outcome. For the reader activity, look for one concrete '
-        'action taken from a checked example, and reject promises of a benefit. Review glossary accuracy. '
+        'action taken from a checked example, and reject promises of a benefit. For plain_language, '
+        'state the takeaway a first-time reader would draw from the quoted passage. Compare that '
+        'takeaway to what the source counted, observed, asked people to report, or proposed. '
+        'Flag wording that could turn sessions into people or self-reports into measured behavior. '
+        'Request a concrete rewrite when a reader needs specialist vocabulary. Review glossary accuracy. '
         'Return decision pass or revise, each required criterion with pass, reason of at least '
         'eight words and example_id, and EVERY cited source with anchor_id, supported and reason. '
         'Use review_protocol 2. Check all assigned source-specific claims, including every limitation. '
@@ -318,14 +322,21 @@ def pending(root=ROOT, today=None):
 
     if any(same_window(issue_date, issue) and issue.get('edition_format') != 'coverage' for issue_date, issue in drafts.items()):
         return None
+    recent_headlines = []
     for path in (data / 'approved-issues').glob('????-??-??.json'):
         issue = json.loads(path.read_text(encoding='utf-8'))
-        if issue.get('status') == 'published' and same_window(issue.get('edition_date') or path.stem, issue):
+        if issue.get('status') != 'published':
+            continue
+        issue_date = issue.get('edition_date') or path.stem
+        if same_window(issue_date, issue):
             if issue.get('edition_format') != 'coverage':
                 return None
             # A coverage upgrade retains its Monday identity and issue number.
             if issue.get('number'):
                 weekly['run']['edition_number'] = issue['number']
+        elif (isinstance(issue_date, str) and issue_date < weekly['run']['edition_date']
+              and issue.get('edition_format') != 'coverage' and isinstance(issue.get('headline'), str)):
+            recent_headlines.append((issue_date, issue['headline']))
     current_items = []
     for item in weekly.get('items', []):
         current = public_record(item, require_current=True)
@@ -333,6 +344,7 @@ def pending(root=ROOT, today=None):
             raise ValueError('Original reading changed or was revoked; rebuild the public source shelf before synthesis')
         current_items.append(current)
     weekly['items'] = current_items
+    weekly['recent_headlines'] = [title for _, title in sorted(recent_headlines)[-6:]]
     if any(not weekly_eligible(item, *previous_week(date)) for item in weekly.get('items', [])):
         raise ValueError('Weekly source lacks verified previous-week original publication evidence; rebuild the source shelf')
     weekly['run']['publication_window'] = window
@@ -581,12 +593,18 @@ def repair_feedback(error, repeated=False):
                'instead of repeating it.' if repeated else ''))
 
 
-def draft_in_stages(model, packet, audit, *, progress=None, compact=False, review_sections=True):
+def draft_in_stages(model, packet, audit, *, progress=None, compact=False, review_sections=True, recent_headlines=()):
     """Keep each comparison's evidence separate to prevent cross-paper leakage."""
     lookup = {p['key']: p for p in packet}
     disclosure = source_disclosure(packet)
     progress = progress or Progress(MemoryStore(), MODEL)
     audit.setdefault('stages', [])
+    angle_context = ''
+    if recent_headlines:
+        angle_context = ('\nPrevious published headlines (for wording and topic selection only): '
+                         + json.dumps(recent_headlines, ensure_ascii=False)
+                         + '\nWhen returning to a past question, name the specific task, comparison or '
+                           'decision this week adds. Base all claims on the current sources.\n')
 
     def generate(stage, instruction, check, max_tokens=1100, response_schema=None, correction=None):
         return progress.generate(model, stage, instruction, check, audit, max_tokens=max_tokens,
@@ -632,7 +650,7 @@ Attribute news to the reporter, policy analysis to the analyst, and opinions to 
 A journal editorial may introduce research but does not itself supply new results. Adjacent attention research does not establish effects of AI.
 All sources must be originally published in the previous completed UTC week; do not add older context sources.
 Return {"themes":[{"short":"brief label","title":"specific comparison","keys":["S1","S2"]}, ...]}.
-Do not write the article yet. Sources:\n'''+json.dumps(overview,ensure_ascii=False, sort_keys=True),check_plan,600)
+Do not write the article yet.''' + angle_context + '\nSources:\n' + json.dumps(overview,ensure_ascii=False, sort_keys=True),check_plan,600)
 
     signals=[]
     held=[]
@@ -667,8 +685,9 @@ Return short (two to five words), title (five to twelve words), source_notes,
 comparison, and evidence. You may improve the planned heading; use an observation
 or an open question, never a claim of established learning gains.
 For EACH source, write one original paragraph of forty to sixty-five words:
-what was examined, the specific observation or author interpretation, and its
-supported boundary. No author names, source keys, years, statistics or digits.
+who did what, what the authors counted or asked, and the detail that helps a reader
+understand the result. Use an everyday action before any necessary technical term.
+Keep the unit and comparison clear, including who reported a feeling or belief. No author names, source keys, years, statistics or digits.
 Software adds source links and genre labels. Describe reported events, attributed arguments,
 and study results in their own terms. A news story about a paper does not conduct that study.
 Use ordinary terms: expected usefulness, expected ease, willingness to use,
@@ -747,6 +766,9 @@ Do not equate engagement, learning and sustained attention, or imply enhanced sk
 Paraphrase all public prose, including caveats; never copy sixteen consecutive source words.
 The themes may mix studies and essays; do not call the whole collection studies.
 Keep extraction steps, source locators, review logs and repeated scope notices out of the prose.
+The library card gives a single takeaway and the reading page explains the evidence.
+Give the week its own job: open with a recognizable decision, then explain what the
+checked sources together help a reader understand about it.
 Do not mention omitted themes, findings or sources.
 Keep each limitation attached to its own study, rather than claiming all sources share it.
 The tension must be an explicitly unresolved research/design question, not an extra finding.
@@ -761,7 +783,7 @@ Return {"headline":"at least five words", "deck":"30â€“45 words", "letter":"90â€
 "closer":"one specific research question",
 "glossary":[{"term":"an actually used technical term","definition":"plain-language explanation"}]}.
 The glossary is optional: use zero to five terms a general reader may not know. Prefer
-ordinary language in the prose; do not add jargon just to define it. No digits. Comparisons:\n'''+json.dumps(
+ordinary language in the prose; do not add jargon just to define it. No digits.''' + angle_context + '\nComparisons:\n' + json.dumps(
         [{'title':s['title'],'text':s['text'],
           'citations':[{'key':c['key'],'text':c['text'].removesuffix(':')} for c in s['citations']]}
          for s in signals],ensure_ascii=False, sort_keys=True)
@@ -795,6 +817,7 @@ ordinary language in the prose; do not add jargon just to define it. No digits. 
 def edition_key(weekly, packet, compact):
     # The run date can advance during recovery; the publication window cannot.
     return fingerprint({'window':weekly['run']['publication_window'], 'packet':packet,
+                        'recent_headlines':weekly.get('recent_headlines', []),
                         'policy':policy_signature(), 'model':MODEL, 'compact':compact})
 
 
@@ -843,7 +866,8 @@ def compose(root=ROOT, model=None, today=None, *, store=None, now=None):
     progress = Progress(store, MODEL)
     errors = []
     try:
-        draft = draft_in_stages(model, packet, audit, progress=progress, compact=compact)
+        draft = draft_in_stages(model, packet, audit, progress=progress, compact=compact,
+                                recent_headlines=weekly.get('recent_headlines', []))
     except Exception as exc:
         errors.append(str(exc))
         resumable = not isinstance(exc, (ValueError, KeyError, TypeError)) or 'time_budget' in str(exc) or audit.get('budget_deferred', False)

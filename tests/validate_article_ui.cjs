@@ -36,7 +36,7 @@ const doc={createElement:tag=>new Element(tag),createElementNS:(_ns,tag)=>new El
 const prefix=app.slice(0,app.lastIndexOf('$("[data-route]").forEach('));
 assert(prefix.length>10000,"Unable to load application functions");
 const ctx=vm.createContext({document:doc,URL,console,window:{scrollTo(){}}});
-vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,matchesSourceType,renderBacklog,issueSourceShelfItem,readableSourceTitle,readingHeadline,readingKind,readingBasisName,editorialImage,make,S,readingParagraphs,sourceFields,readingBullets,sourceFamily,compactReading};",ctx);
+vm.runInContext(prefix+"\nconst TEST={showPaper,showLibrary,shortIdea,ideaInfo,processedIdea,matchesSourceType,renderBacklog,issueSourceShelfItem,readableSourceTitle,readingHeadline,readingKind,readingBasisName,editorialImage,make,S,readingParagraphs,sourceFields,readingBullets,sourceFamily,compactReading,cardContext,matchesSearch};",ctx);
 const nodes=root=>[root,...root.children.flatMap(nodes)];
 const match=(root,cls)=>nodes(root).find(n=>n.className.split(" ").includes(cls));
 const matching=(root,cls)=>nodes(root).filter(n=>n.className.split(" ").includes(cls));
@@ -116,8 +116,9 @@ for(const r of db){
    }
  }
  if(family!=="research"){
-  for(const cls of ["automatic-evidence","rv-original-figure","rv-context-grid","rv-source-excerpts","reviewed-evidence"])
+  for(const cls of ["automatic-evidence","rv-original-figure","rv-context-grid","rv-source-excerpts"])
    assert(!match(page,cls),"Unrelated research context leaked into "+r.title);
+  if(r.visual?.kind!=="reviewed_comparison")assert(!match(page,"reviewed-evidence"));
   assert(!pageText.includes("How it was studied"));
  }
  if(digest.status==="editorially_written_from_indexed_sections")edited++;else sourceOnly++;
@@ -161,6 +162,13 @@ assert(workflow.includes("cp assets/reading-*.svg assets/feed.xsl _site/assets/"
 vm.runInContext("TEST.showLibrary()",ctx);
 const cards=matching(libraryContainer,"library-story");
 assert.equal(cards.length,db.length,"All searchable readings must use the visual library card");
+const cardLeads=new Set(matching(libraryContainer,"library-summary").flatMap(summary=>
+ summary.children.filter(node=>node.tag==="p").map(node=>node.textContent)));
+for(const row of db){
+ const plain=row.plain_reading;
+ if(plain?.lead&&["reviewed","prepared"].includes(plain.status)&&plain.lead!==row.display_headline)
+  assert(cardLeads.has(plain.lead),"Missing prepared card text: "+row.title);
+}
 assert.equal(matching(libraryContainer,"story-visual-card").length,db.filter(row=>row.editorial_art?.src&&row.editorial_art.status!=="needs_review").length,"Show every accepted card illustration and withhold unapproved ones");
 for(const r of db.filter(x=>/^[^a-z]*[A-Z][^a-z]*$/.test(x.title)&&x.title.length>25)){
  const label=vm.runInContext("TEST.readableSourceTitle(database.find(x=>x.title===selectedTitle))",
@@ -192,6 +200,21 @@ assert.equal(matching(automatic,"auto-evidence-source").length,1,"A shared sourc
 assert(!match(automatic,"auto-evidence-n"),"Evidence headings should read without decorative numbers");
 assert(!match(paperContainer,"rv-context-grid"),"Do not repeat all the visual evidence as text cards");
 assert(textContent(automatic).includes("cannot establish a causal mechanism"));
+// The same prepared wording reaches the archive and detail page. An empty work
+// item never promotes a stale or overly technical preview to a finished lead.
+const plainLead="Students described how they checked a suggestion before using it.";
+const plainFixture={...future,plain_reading:{status:"reviewed",lead:plainLead,basis:"Abstract",
+ detail:"Participants answered questions about yesterday’s task.",limit:"Participants described their own behavior."}};
+ctx.selected=plainFixture;vm.runInContext("TEST.showPaper(selected)",ctx);
+assert(proseText(match(paperContainer,"rv-summary-idea")).includes(plainLead));
+assert.equal(vm.runInContext("TEST.cardContext(selected).label",ctx),"Based on the abstract");
+assert(vm.runInContext("TEST.matchesSearch(selected,'checked a suggestion')",ctx));
+const plainOverview=match(paperContainer,"rv-plain-context");
+assert(proseText(plainOverview).includes(plainFixture.plain_reading.detail));
+assert(proseText(plainOverview).includes(plainFixture.plain_reading.limit));
+assert(!vm.runInContext("TEST.cardContext(selected).text",ctx).includes(plainFixture.plain_reading.limit));
+ctx.selected={...plainFixture,plain_reading:{status:"needs_review",lead:""}};
+assert.equal(vm.runInContext("TEST.cardContext(selected)",ctx),null);
 // A future checked article can have older licensed extracts and a terse legacy snapshot.
 const checkedReading={...future,title:"Two practice formats in one class",reading:{...future.reading,level:"full_text",
  methods:"One class tried two activities in consecutive weeks. Students used a tutor first and a quiz second.",
@@ -398,6 +421,40 @@ for(const key of ['source_url','source_version','source_sha256','original_summar
  ctx.selected=changed;vm.runInContext('TEST.showPaper(selected)',ctx);
  assert(!match(paperContainer,'rv-artwork'),'Changed source cannot inherit an old comparison: '+key);
 }
+
+// A factual bar chart retains real table headings, unrounded visible values
+// and a zero-based scale. Stale source versions are handled above.
+const chartFixture=JSON.parse(JSON.stringify(withComparison));
+Object.assign(chartFixture.visual,{headers:["Tool","Score (out of 7)"],rows:[["A","1.20"],["B","1.87"]],
+ chart:{kind:"bar",unit:"points",maximum:7}});
+ctx.selected=chartFixture;vm.runInContext('TEST.showPaper(selected)',ctx);
+let bars=matching(paperContainer,"evidence-bar-fill");
+assert.equal(bars.length,2);
+assert.equal(parseFloat(bars[0].style.width),100*1.20/7);
+assert.equal(bars[0].parentNode.getAttribute("aria-hidden"),"true");
+assert(proseText(match(paperContainer,"reviewed-comparison-table")).includes("1.20"));
+ctx.selected.visual.chart.maximum=1;vm.runInContext('TEST.showPaper(selected)',ctx);
+assert.equal(matching(paperContainer,"evidence-bar-fill").length,0);
+assert(match(paperContainer,"reviewed-comparison-table"));
+const noteComparison=JSON.parse(JSON.stringify(chartFixture));
+noteComparison.reading.original_summary=false;
+noteComparison.visual.reading_id="verified-notes";
+noteComparison.visual.source.notes_sha256="5".repeat(64);
+noteComparison.verified_article_review={source_checked:"2026-11-23",original_paraphrases_only:true,
+ fulltext_url:noteComparison.visual.source.url,source_version:noteComparison.visual.source.version,
+ note_sha256:noteComparison.visual.source.notes_sha256};
+ctx.selected=noteComparison;vm.runInContext('TEST.showPaper(selected)',ctx);
+assert(match(paperContainer,"reviewed-evidence"),"Current checked article notes can support a table");
+ctx.selected.verified_article_review.note_sha256="4".repeat(64);vm.runInContext('TEST.showPaper(selected)',ctx);
+assert(!match(paperContainer,"reviewed-evidence"),"An earlier set of notes cannot support the table");
+const sourceComparison=JSON.parse(JSON.stringify(withComparison));
+sourceComparison.kind="nonacademic";sourceComparison.reader_genre="reporting";
+delete sourceComparison.doi;delete sourceComparison.visual.doi;
+sourceComparison.visual.record_url=sourceComparison.url;
+ctx.selected=sourceComparison;vm.runInContext('TEST.showPaper(selected)',ctx);
+assert(match(paperContainer,"reviewed-evidence"),"Source-bound reporting comparison should render");
+ctx.selected.url+="-other";vm.runInContext('TEST.showPaper(selected)',ctx);
+assert(!match(paperContainer,"reviewed-evidence"),"A different URL cannot inherit the comparison");
 
 const conceptualOriginal={...original,research_type:"conceptual_framework"};
 ctx.selected=conceptualOriginal;vm.runInContext("TEST.showPaper(selected)",ctx);

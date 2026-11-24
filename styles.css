@@ -1615,3 +1615,31 @@ summary,.theme-browser button,.nav-toggle {
     border-top: 1px solid #b78182;
   }
 }
+
+.editorial-card .library-summary,
+.perspective-item .library-summary {
+  grid-column: 2;
+  grid-row: 3;
+}
+#paper-content .reviewed-table-compact .reviewed-comparison-table {
+  min-width: 0;
+  width: 100%;
+}
+#paper-content .reviewed-comparison-table .evidence-bar-track {
+  display: block;
+  width: 100%;
+  margin-top: .3rem;
+  height: .55rem;
+  background: var(--line);
+}
+#paper-content .reviewed-comparison-table .evidence-bar-fill {
+  display: block;
+  height: 100%;
+  background: var(--red);
+}
+@media (max-width: 600px) {
+  .editorial-card .library-summary,
+  .perspective-item .library-summary { grid-column: 1 / -1; }
+  .editorial-card .story-visual-editorial,
+  .perspective-item .story-visual-perspective { grid-row: 1 / 3; }
+}

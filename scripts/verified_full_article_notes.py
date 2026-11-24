@@ -5,6 +5,7 @@ They coexist with the automatic licensed-XML/PDF path. License restrictions on
 republication do not automatically prohibit careful, attributed factual analysis.
 """
 from __future__ import annotations
+import hashlib
 import json
 from copy import deepcopy
 from datetime import date
@@ -41,6 +42,15 @@ def valid_source(source):
         return False
     roles = [source.get(key) for key in ("method", "results", "discussion", "limitations")]
     return isinstance(source.get("digest", {}), dict) and distinct_summary_roles(roles)
+
+def note_digest(note):
+    """Bind adaptations to the exact checked notes, version and source location."""
+    fields = ("fulltext_url", "source_version", "source_checked", "source_sections",
+              "methods", "results", "discussion", "limitations", "review_scope")
+    payload = {key: note.get(key) for key in fields}
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, ensure_ascii=False,
+                                    separators=(",", ":")).encode()).hexdigest()
+
 
 def clear_previous_review(row):
     """Remove only this register's projection, preserving actual source extracts."""
@@ -107,6 +117,7 @@ def apply(rows, manifest=None):
             "source_sections": deepcopy(source.get("source_sections") or []),
             "previous_metadata": previous_metadata,
         }
+        checked["note_sha256"] = note_digest(checked)
         if source.get("research_type"):
             row["research_type"] = source["research_type"]
         row["verified_article_review"] = checked

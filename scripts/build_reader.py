@@ -47,8 +47,16 @@ def article(record):
     # fingerprints and per-field evidence receipts stay in the editorial index.
     page = pick(record, CARD_FIELDS + ('abstract_text', 'abstract_source', 'preview',
                                       'framework_notes', 'visual'))
+    if record.get('plain_reading'):
+        page['plain_reading'] = pick(record['plain_reading'], ('status', 'lead', 'basis', 'detail', 'limit'))
+    if (record.get('visual') or {}).get('reading_id') == 'verified-notes':
+        page['verified_article_review'] = pick(record.get('verified_article_review') or {},
+            ('fulltext_url', 'source_version', 'note_sha256', 'source_checked', 'original_paraphrases_only'))
     if record.get('source_review'):
-        page['source_review'] = pick(record['source_review'], ('source_url',))
+        fields = ('source_url',)
+        if (record.get('visual') or {}).get('reading_id') == 'editorial-notes':
+            fields += ('source_checked', 'note_sha256')
+        page['source_review'] = pick(record['source_review'], fields)
     if record.get('analysis'):
         page['analysis'] = pick(record['analysis'], ('fulltext_url', 'methods', 'results',
                                 'discussion', 'limitations', 'original_paraphrases_only', 'figures'))
@@ -76,6 +84,8 @@ def card(record, article_url):
     reading = record.get('reading') or {}
     digest = reading.get('digest') or {}
     result = pick(record, CARD_FIELDS + ('editorial_art',))
+    if record.get('plain_reading'):
+        result['plain_reading'] = pick(record['plain_reading'], ('status', 'lead', 'basis'))
     result['reading'] = {key: reading[key] for key in READING_FIELDS if key in reading}
     if reading.get('machine_account'):
         result['reading']['machine_account'] = {k: v for k, v in reading['machine_account'].items()
