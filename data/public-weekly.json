@@ -68978,7 +68978,9 @@
         "basis": "Checked article notes",
         "basis_sha256": "84cca0e996e0a81515dda3cb2a130c46c0c971b03393c88024546e8ff703725f",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "Students would inspect a plan for measuring an enzyme reaction. Asking why temperature matters could reveal which conditions they understand well enough to check themselves.",
+        "limit": "The authors describe a lesson a teacher could try. They have yet to observe students doing it."
       },
       "display_headline": "What an AI-made assignment can hide",
       "source_quality": {
@@ -69248,7 +69250,9 @@
         "basis": "Checked article notes",
         "basis_sha256": "cae7bfdbadaeaaa4cd7424d797057a4163fa904883ae3e144dc6c6f3d522caa4",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "Someone reading about AI-assisted data analysis might check the code. Someone reading about AI-assisted proofreading might look for traces of the tool in the wording. Matsui suggests tracking what readers flag and remember.",
+        "limit": "The paper describes how to test those possibilities. Readers’ actual responses remain unknown."
       },
       "display_headline": "What an AI disclosure can tell a reader",
       "source_quality": {
@@ -69536,29 +69540,51 @@
       },
       "reader_genre": "conceptual",
       "visual": {
-        "kind": "research_design",
-        "basis": "full_text",
-        "status": "indexed",
-        "finding_source": "none",
-        "blocks": [
-          {
-            "label": "Research approach",
-            "text": "Kearney compares four hypothetical submissions for a 2,000-word case analysis. In one, a complete chat log shows a student accepting every AI suggestion. In another, only the final reasoning is visible.",
-            "source": "full_text"
-          },
-          {
-            "label": "What remains uncertain",
-            "text": "The worked examples leave open how much these changes help teachers judge understanding and how much marking time they require.",
-            "source": "full_text"
-          }
-        ]
+        "id": "case-assignment-reasoning",
+        "kind": "reviewed_comparison",
+        "title": "What can a teacher see in a case assignment?",
+        "description": "Two examples from Kearney’s proposed assessment framework.",
+        "headers": [
+          "What the student submits",
+          "What the teacher still needs to know"
+        ],
+        "rows": [
+          [
+            "The full AI chat",
+            "A student can keep a detailed record while accepting every suggestion. Which ideas did the student actually judge?"
+          ],
+          [
+            "Only the finished essay",
+            "A student can weigh competing explanations and submit only a conclusion. Why did they choose it?"
+          ]
+        ],
+        "caption": "Kearney proposes asking students to explain two decisions. These are imagined classroom cases. Their effect on learning has yet to be tested.",
+        "doi": "10.1080/02602938.2026.2764204",
+        "reading_id": "verified-notes",
+        "source": {
+          "url": "https://srhe.tandfonline.com/doi/pdf/10.1080/02602938.2026.2764204",
+          "version": "publisher_version_of_record",
+          "notes_sha256": "d71b5b6ca63f24e7dd446c04e748981ed426c8a92776fd5f8e9570625edcc22d",
+          "locator": "Illustrative cases and worked example, pp. 8–10",
+          "attribution": "Sean Kearney (2026)"
+        },
+        "rights": "original_factual_display_no_source_image",
+        "review": {
+          "kind": "ai_source_check",
+          "status": "checked",
+          "checked_on": "2026-11-23",
+          "scope": "Compared both cases with the checked publisher-version notes and indexed primary PDF passages. Preserved the distinction between a hypothetical design and a tested classroom intervention.",
+          "payload_sha256": "c11590e634bc5ced4813494a27f45fa783ad3cd0d8ca4f904c71faf1a94ac2e2"
+        }
       },
       "plain_reading": {
         "lead": "Kearney imagines grading four versions of the same assignment. Even a complete chat history might show a student accepting every suggestion without revealing whether they could explain the final answer.",
         "basis": "Checked article notes",
         "basis_sha256": "093f51d334bce60510a046fbfb760787fd3fa1ba07b8871324eedca93b849424",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "One option in the paper is to ask a student to defend two choices aloud after handing in a 2,000-word case analysis. A teacher could then ask why a specific objection changed the answer.",
+        "limit": "The examples leave open how accurately teachers could judge understanding and how much extra marking time the conversation would take."
       },
       "display_headline": "How to see the reasoning behind an assignment",
       "source_quality": {
@@ -69808,34 +69834,64 @@
       },
       "reader_genre": "review",
       "visual": {
-        "kind": "evidence_snapshot",
-        "basis": "full_text",
-        "status": "edited",
-        "finding_source": "editorial",
-        "blocks": [
-          {
-            "label": "Research approach",
-            "text": "Reviewers asked what work students handed to AI in 93 higher-education studies. They also looked for evidence of what students did with its answer and what they could do later without AI.",
-            "source": "editorial"
-          },
-          {
-            "label": "Reported finding",
-            "text": "Eighty-five studies identified a task students handed to AI. Only four documented both how students handled its answer and how they performed without it.",
-            "source": "editorial"
-          },
-          {
-            "label": "What remains uncertain",
-            "text": "Of the 44 studies describing a response to AI, 22 relied on students’ recollections or the researchers’ account. Longer-term changes in independent reasoning remain unknown.",
-            "source": "editorial"
-          }
-        ]
+        "id": "review-measures-of-learning",
+        "kind": "reviewed_comparison",
+        "title": "What did 93 studies actually track?",
+        "description": "Number of higher-education studies in Li and colleagues’ review that documented each kind of evidence.",
+        "headers": [
+          "Evidence recorded",
+          "Studies out of 93"
+        ],
+        "rows": [
+          [
+            "Tasks students handed to AI",
+            "85"
+          ],
+          [
+            "How students responded to AI output",
+            "44"
+          ],
+          [
+            "Learning on a task without AI",
+            "24"
+          ],
+          [
+            "Both the response to AI and learning without it",
+            "4"
+          ]
+        ],
+        "caption": "A study can appear in several rows. In 22 of the 44 studies describing responses to AI, the evidence came from student reports or author statements.",
+        "doi": "10.1186/s41239-026-00644-3",
+        "reading_id": "verified-notes",
+        "source": {
+          "url": "https://link.springer.com/article/10.1186/s41239-026-00644-3",
+          "version": "publisher_version_of_record",
+          "notes_sha256": "51406e2d86a4a269cde923f0420eb0844201b5e697dfce7eaa88e7cf1102128c",
+          "locator": "Results on processing evidence; Discussion, principal findings",
+          "attribution": "Li, Hanid and Zhang (2026)"
+        },
+        "rights": "original_factual_display_no_source_image",
+        "chart": {
+          "kind": "bar",
+          "unit": "studies",
+          "maximum": 93
+        },
+        "review": {
+          "kind": "ai_source_check",
+          "status": "checked",
+          "checked_on": "2026-11-23",
+          "scope": "Verified the denominator, all four overlapping counts and the self-report qualification in the publisher’s results and discussion.",
+          "payload_sha256": "118de6095e06b376f7a8f41d6a7a336135331772a5645b7062eb4b6951c0522d"
+        }
       },
       "plain_reading": {
         "lead": "Of 93 studies in a review, only four documented both how students responded to AI suggestions and how they performed without AI. That leaves a gap between seeing who used the tool and knowing what they learned.",
         "basis": "Checked article notes",
         "basis_sha256": "9ed190b86ef3b07708388ec34cbda3ce3235300c571d8e375071814fd3e89ca5",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "Eighty-five studies could identify something a student handed over to AI. A more revealing example followed a student who looked at an AI edit and decided to restore their own terminology.",
+        "limit": "Of 44 studies describing a student’s response to AI, half relied on recollections or the researchers’ account. Longer-term changes in what students could do alone remain uncertain."
       },
       "display_headline": "Which decisions do students keep when they use AI?",
       "source_quality": {
@@ -69975,14 +70031,53 @@
         "source_checked": "2026-11-23",
         "source_relation": "Original report published November 18, 2026 by Colorado Public Radio",
         "secondary_verification_url": "",
-        "evidence_scope": "Interviews with Colorado students and educators describe how they use AI in writing and assessment."
+        "evidence_scope": "Interviews with Colorado students and educators describe how they use AI in writing and assessment.",
+        "note_sha256": "ed522e8ceb975d84726a117437bede556a09ee3b34d403562f03f7e5af8b72df"
       },
       "editorial_takeaway": "The stage at which students consult AI matters to what their writing can show.",
       "source_checked": "2026-11-23",
       "reader_genre": "reporting",
       "visual": {
-        "kind": "illustration_only",
-        "reason": "nonempirical_or_commentary"
+        "id": "colorado-revision-practices",
+        "kind": "reviewed_comparison",
+        "title": "Where did AI enter the writing process?",
+        "description": "Colorado Public Radio interviewed two high school seniors and a university instructor about writing.",
+        "headers": [
+          "Who spoke",
+          "How they described the work"
+        ],
+        "rows": [
+          [
+            "Marissa Donjuan, high school senior",
+            "She wrote her own literature essay, then gave AI her draft, the grading rubric and her teacher’s comments to get revision ideas."
+          ],
+          [
+            "Logan Arviso, high school senior",
+            "He used AI to check punctuation and grammar in his college application essay."
+          ],
+          [
+            "Josh Wilson, university instructor",
+            "He moved long writing assignments into class to watch students develop their work. That left less class time for other teaching."
+          ]
+        ],
+        "caption": "These are interview accounts of particular assignments. The reporting gives no comparison of how much students learned.",
+        "record_url": "https://www.cpr.org/2026/11/18/students-teachers-navigate-artificial-intelligence-in-education/",
+        "reading_id": "editorial-notes",
+        "source": {
+          "url": "https://www.cpr.org/2026/11/18/students-teachers-navigate-artificial-intelligence-in-education/",
+          "version": "checked_editorial_notes",
+          "notes_sha256": "ed522e8ceb975d84726a117437bede556a09ee3b34d403562f03f7e5af8b72df",
+          "locator": "Students and AI; Teachers and AI",
+          "attribution": "Andrea Dukakis and Hayley Sanchez, CPR News (2026)"
+        },
+        "rights": "original_factual_display_no_source_image",
+        "review": {
+          "kind": "ai_source_check",
+          "status": "checked",
+          "checked_on": "2026-11-23",
+          "scope": "Checked names, roles, actions and the time trade-off against the two sections in the original report.",
+          "payload_sha256": "1673cc3a65d3c5266426635795d704e9828398c3226f45d4b012a9115d18745a"
+        }
       },
       "plain_reading": {
         "lead": "One Colorado student asked AI to help revise an essay using a teacher’s feedback. Another used it to check mechanics while keeping the voice of a college essay.",
@@ -70129,7 +70224,8 @@
         "source_checked": "2026-11-23",
         "source_relation": "Original educator essay published November 18, 2026 by EdSurge",
         "secondary_verification_url": "",
-        "evidence_scope": "A seventh-grade literacy teacher describes instructional choices and observations from one classroom."
+        "evidence_scope": "A seventh-grade literacy teacher describes instructional choices and observations from one classroom.",
+        "note_sha256": "1edf20800d3f643851f2e7010bf4bef2cc714345d0b24f82390e4a27993fbc5a"
       },
       "editorial_takeaway": "One teacher sees uninterrupted time with a text as a prerequisite for later judging what AI says about it.",
       "source_checked": "2026-11-23",
@@ -70143,7 +70239,9 @@
         "basis": "Attributed source account",
         "basis_sha256": "8dd62ea26a4e981abb2b97dd2d34ac4b9617a797243a4ba053548c5fdef5a81d",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "Shuller considered having students compare vocabulary maps with AI-generated versions. That lesson stayed on paper, while shared annotation gave the class time to discuss the meaning of a particular passage.",
+        "limit": "The teacher changed laptop use more broadly. The account cannot separate the effects of removing AI from the effects of removing other screen distractions."
       },
       "display_headline": "Why a teacher keeps first drafts on paper",
       "source_quality": {
@@ -70402,34 +70500,51 @@
       },
       "reader_genre": "research",
       "visual": {
-        "kind": "evidence_snapshot",
-        "basis": "full_text",
-        "status": "edited",
-        "finding_source": "editorial",
-        "blocks": [
-          {
-            "label": "Research approach",
-            "text": "Jia asked 1,050 university students what they delegated to AI and how much effort they spent checking outputs or understanding material. Tasks included looking up facts and making outlines.",
-            "source": "editorial"
-          },
-          {
-            "label": "Reported finding",
-            "text": "How much work students said they delegated did not clearly predict engagement. The model linked the burden of checking outputs with lower engagement and effort spent understanding ideas with higher engagement.",
-            "source": "editorial"
-          },
-          {
-            "label": "What remains uncertain",
-            "text": "Students described their effort in a one-time survey. The researchers did not observe them checking answers or test what they could recall.",
-            "source": "editorial"
-          }
-        ]
+        "id": "checking-and-understanding",
+        "kind": "reviewed_comparison",
+        "title": "What kind of effort did students report?",
+        "description": "Jia surveyed 1,050 university students about their experience with AI and their engagement in coursework.",
+        "headers": [
+          "Effort students described",
+          "How it related to engagement"
+        ],
+        "rows": [
+          [
+            "Operating the tool and checking its answers",
+            "Students reporting more of this effort tended to report lower engagement."
+          ],
+          [
+            "Working through ideas with AI feedback",
+            "Students reporting more of this effort tended to report higher engagement."
+          ]
+        ],
+        "caption": "Students answered the questions once. The survey cannot tell which experience came first or show how much anyone learned.",
+        "doi": "10.3389/fpsyg.2026.2041306",
+        "reading_id": "verified-notes",
+        "source": {
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.2041306/full",
+          "version": "publisher_version_of_record",
+          "notes_sha256": "9e9d2064d553d5b36ce1984b45271d4c5b47ede42b67b5a241687d3a3ca595d6",
+          "locator": "Sections 3.2, 4.3 (Table 6) and 5.2",
+          "attribution": "Jinyue Jia (2026)"
+        },
+        "rights": "original_factual_display_no_source_image",
+        "review": {
+          "kind": "ai_source_check",
+          "status": "checked",
+          "checked_on": "2026-11-23",
+          "scope": "Checked the definitions of the two measures, the signs in the regression model and the one-time survey design in the primary article.",
+          "payload_sha256": "4620af65bafdcb8b529b74bd97e44a1a1afab06f78e1499402a4b7352925c9f1"
+        }
       },
       "plain_reading": {
         "lead": "A survey of 1,050 students asked what work they handed to AI. Students who found checking its answers burdensome also reported feeling less engaged in their studies.",
         "basis": "Checked article notes",
         "basis_sha256": "d9d26fe7fca33879e9ddadabb8a69f564eb97314a6ae8a3bd2aaca6ceaf7f940",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "Looking up facts and making outlines were among the tasks students handed over. Those who described putting effort into understanding ideas also reported greater engagement, a different pattern from the burden of checking AI output.",
+        "limit": "The researchers did not watch students verify answers or test what they could remember."
       },
       "display_headline": "When handing off work creates more checking",
       "source_quality": {
@@ -70702,34 +70817,59 @@
       },
       "reader_genre": "review",
       "visual": {
-        "kind": "evidence_snapshot",
-        "basis": "full_text",
-        "status": "edited",
-        "finding_source": "editorial",
-        "blocks": [
-          {
-            "label": "Research approach",
-            "text": "The authors combined correlations from 31 studies involving 16,357 people. They asked how motivation to learn and reliance on AI each related to critical thinking.",
-            "source": "editorial"
-          },
-          {
-            "label": "Reported finding",
-            "text": "AI use was linked to stronger critical thinking through motivation and to weaker critical thinking through dependence. These two estimates were nearly equal in size.",
-            "source": "editorial"
-          },
-          {
-            "label": "What remains uncertain",
-            "text": "Most studies took measurements only once. They cannot tell us whether using AI changed motivation or whether already motivated learners used AI more.",
-            "source": "editorial"
-          }
-        ]
+        "id": "motivation-and-reliance",
+        "kind": "reviewed_comparison",
+        "title": "Why did two estimates nearly cancel out?",
+        "description": "Wang and colleagues combined data from 31 studies and estimated two links between AI use and critical thinking.",
+        "headers": [
+          "Part of the model",
+          "Estimated link",
+          "95% interval"
+        ],
+        "rows": [
+          [
+            "Through motivation to learn",
+            "+0.217",
+            "+0.204 to +0.230"
+          ],
+          [
+            "Through reliance on AI",
+            "−0.212",
+            "−0.225 to −0.199"
+          ],
+          [
+            "The two links combined",
+            "+0.004",
+            "−0.014 to +0.023"
+          ]
+        ],
+        "caption": "These numbers describe the direction and strength of relationships in a statistical model. The interval for the combined link includes zero. Most studies measured people only once.",
+        "doi": "10.1186/s40561-026-00477-7",
+        "reading_id": "verified-notes",
+        "source": {
+          "url": "https://link.springer.com/content/pdf/10.1186/s40561-026-00477-7_reference.pdf",
+          "version": "publisher_article_in_press",
+          "notes_sha256": "d05ca8066be5f8d413343e1571bf4a353bcafdb75375d9fd2e021435b223ac2a",
+          "locator": "Accepted manuscript, Figure 15 and accompanying results, pp. 19–20",
+          "attribution": "Wang, Guo and Gong (2026)"
+        },
+        "rights": "original_factual_display_no_source_image",
+        "review": {
+          "kind": "ai_source_check",
+          "status": "checked",
+          "checked_on": "2026-11-23",
+          "scope": "Checked each published standardized estimate and confidence interval against the accepted manuscript. The combined estimate is the value reported by the authors.",
+          "payload_sha256": "a8876300452653812215e1a2d5aef35c2ff9f7b2b24dfc69d7c660c3e6f95129"
+        }
       },
       "plain_reading": {
         "lead": "A review of 31 studies linked AI use with both a stronger desire to learn and greater dependence on the tool. The two patterns pointed in opposite directions for critical thinking.",
         "basis": "Checked article notes",
         "basis_sha256": "28fa1dd804f639a61a51f402ee973bfb2c2d13a014db684816b02e8496501982",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "The review pooled studies covering 16,357 people. The estimated links through motivation and through dependence were close in size, so an overall figure can hide two different patterns.",
+        "limit": "Most studies measured people once. Students already keen to learn may reach for AI more often, and the results cannot tell us which came first."
       },
       "display_headline": "Motivation and dependence pull in different directions",
       "source_quality": {
@@ -70866,7 +71006,8 @@
         "source_checked": "2026-11-23",
         "source_relation": "Full APA report and official publication announcement, November 16, 2026",
         "secondary_verification_url": "https://www.apa.org/news/press/releases/2026/11/artificial-intelligence-work-guidance",
-        "evidence_scope": "An expert-informed guide applies research on human judgment, learning and work design to AI adoption."
+        "evidence_scope": "An expert-informed guide applies research on human judgment, learning and work design to AI adoption.",
+        "note_sha256": "9b82964b2856cc53d0e4464b49204e537db4c8c60cb52f36cc801ee911e12f2e"
       },
       "editorial_takeaway": "Budget for the attention AI oversight requires, including practice for the people who will do the reviewing.",
       "source_checked": "2026-11-23",
@@ -71169,7 +71310,9 @@
         "basis": "Checked article notes",
         "basis_sha256": "e2e816535019e1620fce27aa6a18a99dc78506c2ab7e7080a94439459c9df5c4",
         "status": "reviewed",
-        "reason": "source_bound_edit"
+        "reason": "source_bound_edit",
+        "detail": "The team combined 1,461 teenagers’ questionnaires with physical fitness tests and marks in Chinese, math and English. Attention came from the students’ answers, while school marks came from exams.",
+        "limit": "Students who already struggled to concentrate or with schoolwork may have turned to AI more often."
       },
       "display_headline": "AI dependence and the ability to direct attention",
       "source_quality": {

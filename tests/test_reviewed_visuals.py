@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from build_visuals import reviewed_visual, reviewed_visuals, visual_assessment, visual_digest, visual_spec
 from verified_full_article_notes import apply
+from editorial_source_reviews import apply as apply_editorial
 
 
 class ReviewedVisualTests(unittest.TestCase):
@@ -98,6 +99,23 @@ class ReviewedVisualTests(unittest.TestCase):
         self.assertEqual(reviewed_visual(record), visual)
         record["url"] += "-another-article"
         self.assertIsNone(reviewed_visual(record))
+
+    def test_edited_reporting_notes_invalidate_adapted_interview_table(self):
+        visual = next(v for v in reviewed_visuals() if v["reading_id"] == "editorial-notes")
+        record = {"kind": "nonacademic", "url": visual["record_url"]}
+        apply_editorial([record])
+        self.assertEqual(reviewed_visual(record), visual)
+        record["source_review"]["examples"] += " Corrected interview attribution."
+        self.assertIsNone(reviewed_visual(record))
+        self.assertEqual(visual_assessment(record)["reason"], "recheck_registered_adaptation")
+
+    def test_longform_examples_have_specific_nonacademic_review_locators(self):
+        source_url = "https://example.org/classroom"
+        record = {"kind": "nonacademic", "url": source_url, "reader_genre": "reporting",
+                  "reading": {"evidence": {"examples": [{"section": "Second interview"}]},
+                              "digest": {"longform": {"examples": "A teacher describes the activity."}}}}
+        self.assertEqual(visual_assessment(record)["locators"], ["Second interview"])
+        self.assertEqual(visual_assessment(record)["reason"], "checked_examples")
 
     def test_chart_cannot_draw_values_beyond_checked_common_scale(self):
         visual = deepcopy(next(v for v in reviewed_visuals() if v.get("chart")))

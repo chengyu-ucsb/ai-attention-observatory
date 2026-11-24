@@ -27,6 +27,17 @@ class TestPlainReading(unittest.TestCase):
         self.assertEqual(result["lead"], paper["reading"]["digest"]["idea"])
         self.assertEqual(result["status"], "prepared")
 
+    def test_prepared_context_preserves_complete_measure_and_boundary(self):
+        paper = source()
+        digest = paper["reading"]["digest"]
+        digest.update(approach="Students rated the difficulty of each practice set.",
+                      limitation="Researchers counted attempts during a single class session.")
+        prepared = prepare_plain_reading(paper)
+        self.assertEqual(prepared["detail"], digest["approach"])
+        self.assertEqual(prepared["limit"], digest["limitation"])
+        digest["approach"] = digest["idea"]
+        self.assertNotIn("detail", prepare_plain_reading(paper))
+
     def test_revision_holds_previous_lead_and_context(self):
         paper = source()
         override = {canonical_identity(paper): {

@@ -53,7 +53,10 @@ def article(record):
         page['verified_article_review'] = pick(record.get('verified_article_review') or {},
             ('fulltext_url', 'source_version', 'note_sha256', 'source_checked', 'original_paraphrases_only'))
     if record.get('source_review'):
-        page['source_review'] = pick(record['source_review'], ('source_url',))
+        fields = ('source_url',)
+        if (record.get('visual') or {}).get('reading_id') == 'editorial-notes':
+            fields += ('source_checked', 'note_sha256')
+        page['source_review'] = pick(record['source_review'], fields)
     if record.get('analysis'):
         page['analysis'] = pick(record['analysis'], ('fulltext_url', 'methods', 'results',
                                 'discussion', 'limitations', 'original_paraphrases_only', 'figures'))

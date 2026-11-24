@@ -171,6 +171,7 @@ def build():
         published["plain_reading"] = plain
         reading_reviews[canonical_identity(published)] = {
             "title": published.get("title", ""),
+            "source_date": published.get("published") or "",
             "summary": {key: plain[key] for key in ("status", "reason", "basis_sha256")},
             "visual": visual_assessment(published),
         }
@@ -190,11 +191,6 @@ def build():
         published["source_quality"]=quality
         published["source_group"]=source_class(source, editorial_topic=quality.get("topic") if source.get("kind")=="nonacademic" else None)
         selected.append(published)
-    counts = {field: dict(sorted(Counter(row[field]["status"] for row in reading_reviews.values()).items()))
-              for field in ("summary", "visual")}
-    review_report = {"version": 1, "total": len(reading_reviews), "counts": counts,
-                     "articles": dict(sorted(reading_reviews.items()))}
-    (DATA / "reading-review.json").write_text(json.dumps(review_report, ensure_ascii=False, indent=2) + "\n")
     (DATA/"headline-review-queue.json").write_text(json.dumps(
         {"version":1,"items":headline_queue},ensure_ascii=False,indent=2)+"\n")
     # Evaluate every otherwise-admitted record before filtering the public card
@@ -244,6 +240,19 @@ def build():
     run.pop("candidates",None)
     run["last_seven_days"]=len(items)
     projected={"run":run,"items":items}
+    public_ids = {canonical_identity(record) for record in selected}
+    weekly_ids = {canonical_identity(record) for record in items}
+    for key, review in reading_reviews.items():
+        review["published"] = key in public_ids
+    counts = {field: dict(sorted(Counter(row[field]["status"] for row in reading_reviews.values()).items()))
+              for field in ("summary", "visual")}
+    ordered = sorted(sorted(reading_reviews), key=lambda key: (
+        key in weekly_ids, reading_reviews[key]["source_date"]), reverse=True)
+    review_report = {"version": 1, "total": len(reading_reviews), "counts": counts,
+                     "pending": {field: [key for key in ordered if reading_reviews[key][field]["status"] == "needs_review"]
+                                 for field in ("summary", "visual")},
+                     "articles": dict(sorted(reading_reviews.items()))}
+    (DATA / "reading-review.json").write_text(json.dumps(review_report, ensure_ascii=False, indent=2) + "\n")
     (DATA/"source-quality-audit.json").write_text(json.dumps({
         "version":1,
         "internal_scholarly_total":sum(x.get("kind")=="scholarly" for x in all_records),

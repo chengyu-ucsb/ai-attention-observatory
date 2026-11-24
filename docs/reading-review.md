@@ -12,7 +12,7 @@ To save an edit, use the article's canonical ID in [plain-reading-leads.json](..
 
 ## Choose a visual
 
-Ask which comparison or sequence the reader would understand more easily by seeing it. Start with the readings in the next issue and continue through the archive. Each register entry records a visual outcome. A pending candidate includes a source or locator to check. An existing accepted adaptation is marked ready. An article with no suitable material can use prose.
+Ask which comparison or sequence the reader would understand more easily by seeing it. The register lists pending IDs for each task, with current-week readings first and the rest ordered by publication date. Each register entry records a visual outcome. A pending candidate includes a source or locator to check. An existing accepted adaptation is marked ready. An article with no suitable material can use prose.
 
 Read the identified table, figure or passage. For counts, check the group, unit, denominator and time point. For interviews or argument maps, retain who said what. The Observatory can draw its own clearly attributed table or bar graphic from checked facts. Each chart keeps labels and values in an accessible table and links to its source. A caption by itself can identify a candidate but cannot supply unseen values.
 

@@ -142,12 +142,28 @@ def prepare_plain_reading(paper: dict, overrides: dict | None = None) -> dict:
     if digest.get("explain_source") == "abstract_paraphrase":
         candidates.append((digest.get("explain"), "abstract_paraphrase"))
     account = reading.get("machine_account") or {}
-    candidates.extend((account.get(field), f"machine_account.{field}")
-                      for field in ("research_question", "study_design"))
+    if account.get("review_status") == "machine_checked_not_independently_reviewed":
+        candidates.extend((account.get(field), f"machine_account.{field}")
+                          for field in ("research_question", "study_design"))
     for candidate, field in candidates:
         lead = usable_sentence(candidate, paper)
         if lead:
             if field == "abstract_paraphrase":
                 result["basis"] = "Abstract"
-            return {**result, "lead": lead, "status": "prepared", "reason": field}
+            prepared = {**result, "lead": lead, "status": "prepared", "reason": field}
+            if field.startswith("machine_account."):
+                context = {"detail": account.get("study_design"), "limit": account.get("limitations")}
+            elif status in DIGEST_TYPES:
+                longform = digest.get("longform") or {}
+                context = {"detail": digest.get("approach") or longform.get("examples"),
+                           "limit": digest.get("limitation") or longform.get("qualification")}
+            else:
+                context = {}
+            used = {lead}
+            for role, value in context.items():
+                sentence = usable_sentence(value, paper)
+                if sentence and sentence not in used:
+                    prepared[role] = sentence
+                    used.add(sentence)
+            return prepared
     return result

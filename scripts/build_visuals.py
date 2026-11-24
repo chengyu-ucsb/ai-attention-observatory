@@ -13,6 +13,7 @@ import math
 from pathlib import Path
 import re
 from article_art import canonical_identity
+from editorial_source_reviews import editorial_note_digest
 from verified_full_article_notes import note_digest
 
 REVIEWED_VISUALS = Path(__file__).resolve().parents[1] / "data/reviewed-visuals.json"
@@ -53,6 +54,12 @@ def matches_reading(record: dict, visual: dict) -> bool:
                 and bool(re.fullmatch(r"[0-9a-f]{64}", source.get("sha256", "")))
                 and all(source[key] == reading.get("source_" + key)
                         for key in ("url", "version", "sha256")))
+    if visual["reading_id"] == "editorial-notes":
+        editorial = record.get("source_review") or {}
+        return (record.get("kind") == "nonacademic" and visual.get("record_url") == record.get("url")
+                and editorial.get("source_checked") and source["url"] == editorial.get("source_url")
+                and source["version"] == "checked_editorial_notes"
+                and source.get("notes_sha256") == editorial.get("note_sha256") == editorial_note_digest(editorial))
     notes = record.get("verified_article_review") or {}
     return (visual["reading_id"] == "verified-notes" and notes.get("original_paraphrases_only")
             and notes.get("source_checked") and source["url"] == notes.get("fulltext_url")
@@ -197,6 +204,9 @@ def find_adaptation(record: dict) -> dict:
                     "source_url": source_url, "locators": [entry["source"]["locator"]]}
 
     sections = list(notes.get("source_sections") or [])
+    editorial = record.get("source_review") or {}
+    if editorial.get("source_checked") and editorial.get("reading_basis"):
+        sections.append(editorial["reading_basis"])
     for field in (reading.get("evidence") or {}).values():
         if isinstance(field, list):
             sections.extend(entry.get("section") for entry in field if isinstance(entry, dict))
@@ -220,9 +230,12 @@ def find_adaptation(record: dict) -> dict:
             return {"status": "needs_review", "reason": "checked_explanation",
                     "format": "process_or_concept", "source_url": source_url,
                     "locators": sections[:3]}
-        if genre in ("reporting", "opinion", "analysis") and (reading.get("digest") or {}).get("examples"):
+        example_locs = [e["section"] for e in (reading.get("evidence") or {}).get("examples", [])
+                        if isinstance(e, dict) and isinstance(e.get("section"), str)]
+        example_text = ((reading.get("digest") or {}).get("longform") or {}).get("examples") or editorial.get("examples")
+        if genre in ("reporting", "opinion", "analysis") and example_text:
             return {"status": "needs_review", "reason": "checked_examples", "format": "side_by_side",
-                    "source_url": source_url, "locators": sections[:3]}
+                    "source_url": source_url, "locators": (example_locs or sections)[:3]}
         if (reading.get("reported_findings") or notes.get("results")) and re.search(
                 r"\b(?:compar\w+|differ\w+|groups?|versus|whereas)\b",
                 reading.get("findings") or notes.get("results") or "", re.I):

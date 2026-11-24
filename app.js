@@ -1028,11 +1028,16 @@ function reviewedEvidenceArtwork(x){
   notes.original_paraphrases_only===true&&notes.source_checked&&
   source.url===notes.fulltext_url&&source.version===notes.source_version&&
   /^[a-f0-9]{64}$/.test(source.notes_sha256)&&source.notes_sha256===notes.note_sha256;
+ const mediaNotes=x.source_review||{};
+ const checkedMedia=spec.reading_id==="editorial-notes"&&x.kind==="nonacademic"&&
+  spec.record_url===x.url&&source.version==="checked_editorial_notes"&&
+  source.url===mediaNotes.source_url&&mediaNotes.source_checked&&
+  /^[a-f0-9]{64}$/.test(source.notes_sha256)&&source.notes_sha256===mediaNotes.note_sha256;
  const checkedReading=reading.original_summary&&spec.reading_id&&spec.reading_id===reading.original_summary_id&&
   source.url===reading.source_url&&source.version===reading.source_version&&
   /^[a-f0-9]{64}$/.test(source.sha256)&&source.sha256===reading.source_sha256;
  if(spec.kind!=="reviewed_comparison"||!sameArticle||!source.version||!httpsSourceUrl(source.url)||
-    !(checkedNotes||checkedReading)||
+    !(checkedNotes||checkedReading||checkedMedia)||
     !Array.isArray(spec.headers)||!Array.isArray(spec.rows)||
     spec.headers.length<2||spec.headers.length>4||spec.rows.length>6||
     !spec.rows.every(row=>Array.isArray(row)&&row.length===spec.headers.length))return null;
