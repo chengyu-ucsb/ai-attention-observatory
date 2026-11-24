@@ -536,6 +536,18 @@ def check(page, url, width, out):
     expect(page.locator('#topic-filter')).to_have_value('Joint attention fixture')
     expect(page.locator('.library-story')).to_have_count(1)
     check_nested_cards(page)
+    navigate('library')
+    page.get_by_role('link', name='How articles are added').click()
+    process = page.locator('.process-map')
+    expect(page.locator('#article-process')).to_be_focused()
+    expect(process).to_be_visible()
+    expect(process.locator('.process-stage')).to_have_count(3)
+    expect(process.locator('.process-example img')).to_have_attribute('alt', re.compile('timer'))
+    expect(process.locator('.process-weekly a')).to_have_attribute('href', '#issue')
+    overflow()
+    screenshot('article-process')
+    process.locator('.process-example').click()
+    expect(page.locator('#paper-content .rv-headline')).to_have_text('Who finishes an AI practice exam?')
     assert not errors, errors
 
 
