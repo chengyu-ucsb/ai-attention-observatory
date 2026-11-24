@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import article_art as art
 import build_public
+from publication_fixtures import article_covers_ready
 import stage_article_art
 from build_visuals import visual_spec
 
@@ -542,9 +543,8 @@ class ArticleArtTests(unittest.TestCase):
         self.assertIn(row["title"], spec["concept"])
 
     def test_newly_admitted_readings_have_valid_art_after_real_rebuild(self):
-        # Test the current registry, not only the last checked-in projection.
-        # Newly admitted commentary may need review rather than topic fallback
-        # artwork. Keep the real build-before-validation production order.
+        # Rebuild from the editorial inputs to exercise every source kind and
+        # companion before inspecting the actual assets in the public selection.
         import original_readings
         with tempfile.TemporaryDirectory() as d:
             root = Path(d)
@@ -556,16 +556,10 @@ class ArticleArtTests(unittest.TestCase):
             self.assertTrue(rebuilt)
             for row in rebuilt:
                 illustration = row["editorial_art"]
-                if illustration["status"] == "ready":
-                    self.assertTrue((root / illustration["src"]).is_file())
-                else:
-                    self.assertEqual(illustration["status"], "needs_review")
-                    self.assertTrue(illustration["review_reasons"])
-                    self.assertNotIn("src", illustration)
-                    self.assertNotIn("thumbnail_src", illustration)
-                if illustration["semantic_basis"] != "editor_selected":
-                    self.assertIn(row["title"], illustration["concept"])
-                    self.assertIn("Not a depiction of study results", illustration["alt"])
+                self.assertEqual(illustration["status"], "ready")
+                self.assertEqual(illustration["semantic_basis"], "editor_selected")
+                self.assertTrue((root / illustration["src"]).is_file())
+                self.assertTrue((root / illustration["thumbnail_src"]).is_file())
 
     def test_canonical_identity_normalizes_doi_tracking_but_not_meaningful_urls(self):
         variants = ({"doi": "10.1234/ABC"}, {"doi": "https://doi.org/10.1234/abc"},
@@ -764,17 +758,23 @@ class PublicationBoundaryTests(unittest.TestCase):
     def test_full_build_preserves_all_evidence_when_art_is_enabled(self):
         with tempfile.TemporaryDirectory() as d:
             data = Path(d) / "data"
-            data.mkdir()
-            for name in ("library.json", "weekly.json"):
-                (data / name).write_bytes((ROOT / "data" / name).read_bytes())
+            shutil.copytree(ROOT / "data", data)
+            shutil.copytree(ROOT / "assets/editorial-covers", Path(d) / "assets/editorial-covers")
             with patch.object(build_public, "DATA", data):
-                with patch.object(build_public, "attach_art", lambda *args, **kwargs: None):
+                with article_covers_ready():
                     baseline, baseline_week = build_public.build()
                 decorated, decorated_week = build_public.build()
-            for row in decorated:
-                row.pop("editorial_art", None)
-            self.assertEqual(baseline, decorated)
-            self.assertEqual(baseline_week, decorated_week)
+            # Newly eligible records can legitimately await original art. For
+            # every published identity, adding its art must preserve evidence.
+            def evidence(record):
+                return {key: value for key, value in record.items() if key != "editorial_art"}
+
+            self.assertTrue(decorated)
+            for original, published in ((baseline, decorated), (baseline_week["items"], decorated_week["items"])):
+                before = {art.canonical_identity(row): evidence(row) for row in original}
+                for row in published:
+                    self.assertEqual(row["editorial_art"]["semantic_basis"], "editor_selected")
+                    self.assertEqual(evidence(row), before[art.canonical_identity(row)])
 
     def test_checked_in_featured_overrides_resolve_to_real_assets(self):
         overrides = art.load_overrides(ROOT)
@@ -803,13 +803,23 @@ class PublicationBoundaryTests(unittest.TestCase):
             # Keep the accepted heading for this real source so the fixture
             # reaches the artwork gate rather than the editorial heading queue.
             (data / "reading-headlines.json").write_bytes((ROOT / "data/reading-headlines.json").read_bytes())
+            # This is a genuinely commissioned source from the public corpus.
+            identity = art.canonical_identity(valid)
+            register = json.loads((ROOT / "data/article-art-overrides.json").read_text())
+            cover = register["overrides"][identity]
+            (data / "article-art-overrides.json").write_text(json.dumps({
+                **register, "overrides": {identity: cover}}))
+            for path in (cover["src"], cover["thumbnail_src"]):
+                target = Path(d) / path
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(ROOT / path, target)
             with patch.object(build_public, "DATA", data):
                 selected, week = build_public.build()
-            self.assertEqual(len(selected), 1)
-            self.assertEqual(len(week["items"]), 1)
+            self.assertEqual([art.canonical_identity(row) for row in selected], [identity])
+            self.assertEqual([art.canonical_identity(row) for row in week["items"]], [identity])
             a = selected[0]["editorial_art"]
-            self.assertTrue((Path(d) / a["src"]).is_file())
-            self.assertEqual(len(list((Path(d) / "assets/article-art").glob("*.svg"))), 1)
+            self.assertEqual(a["src"], cover["src"])
+            self.assertEqual(a["thumbnail_src"], cover["thumbnail_src"])
             self.assertEqual(selected[0]["visual"], visual_spec(selected[0]))
             hidden = json.loads((data / "public-pending-sources.json").read_text())
             self.assertTrue(hidden)

@@ -1,24 +1,29 @@
 # Contextual article illustrations
 
-Every eligible public reading receives an `editorial_art` object, but not every reading receives an image. Artwork is a downstream presentation layer. Reading depth, publication eligibility, article counts, citations, source provenance and `build_visuals.visual_spec` remain unchanged, including when artwork needs review.
+Every separately published Observatory reading, including companion and manually added articles, needs its own reviewed original illustration. A build first screens the source and written reading. It then puts each otherwise eligible canonical article without approved art in a commissioning queue. An item can enter the current library, article pages and current-week list only after both checks pass. Frozen edition citations continue to point to their published sources.
 
 ## Preparing artwork for new readings
 
-During weekly preparation, give each newly checked reading an original OpenAI-generated illustration. Read the checked article notes and choose a particular action, object or setting a reader would recognize from that article. A student turning an exam card beside a timer fits a reading about starting and completing practice sessions. Give the scene a clear focal point, a considered color palette and enough space around the subject to survive the mobile card crop.
+Read the checked article notes and choose a particular action, object or setting a reader would recognize from the article. A student turning an exam card beside a timer fits a reading about starting and completing practice sessions. Use OpenAI image generation for a fresh composition with a clear focal point, a considered color palette and enough space for its subject to remain readable at mobile sizes. Treat the illustration as editorial art. Use separately verified factual displays for measured results.
 
-Review the cover and thumbnail at their displayed sizes alongside the other covers. Save the approved images under `assets/editorial-covers/` and register the reading’s canonical key, actual dimensions, descriptive alt text, concept and OpenAI image-generation provenance in `data/article-art-overrides.json`. Until that illustration is ready, the existing build can use a source-grounded procedural scene that passes its checks. If no such scene passes, the reading can publish while its artwork awaits review.
-
-## Publication and review states
-
-Run the ordinary publication build:
+Export the approved composition as a 1200 × 800 WebP cover and a 320 × 213 WebP thumbnail. Save both in `assets/editorial-covers/`. Register the canonical article ID, paths, actual dimensions, descriptive alt text, concept and OpenAI creation provenance in `data/article-art-overrides.json`. Use fresh filenames for replacements so the last approved pair remains available. Inspect both images alongside neighboring covers at full size and at card size. After checking the source match, composition and thumbnail, run the following, substituting the actual ID. The sign-off command uses Pillow to decode both files and compare their composition.
 
 ```sh
+python scripts/article_art_queue.py --approve-reviewed 'doi:10.1234/example'
 python scripts/build_public.py
 ```
 
-The existing build attaches art only after its source-quality and reading-depth gates. No source acquisition, external image service, paid API, new schedule or graphics dependency is added. The caller must use `attach_art` on the complete admitted collection: `create_art` constructs one candidate and cannot independently enforce collection-wide uniqueness.
+The command records `commission_review` in the manifest. It binds the article ID, both files, their paths, alt text, concept and provenance to the review. Re-run the check after any of those inputs changes. Pure text corrections to the article keep its already reviewed cover. Build and review the change through the normal publication route.
 
-An accepted image has `status: "ready"`, a local `src`, descriptive `alt`, `concept`, provenance and content fingerprints. If source context is insufficient or a candidate duplicates already accepted artwork, it has `status: "needs_review"`, explicit `review_reasons`, and **no `src` or `thumbnail_src`**. The article remains published with its evidence intact. Consumers must not replace missing editorial art with a shared topic cover or repurpose an evidence graphic as decoration.
+## Publication and commissioning
+
+`data/article-art-state.json` contains the current approved receipt by canonical ID and the `commissioning.pending` mapping of IDs to reason codes. A fresh build derives the queue from all otherwise eligible source records, including companions. Articles with a missing original, invalid file, missing or wrong-size thumbnail, unreviewed edit, missing generation provenance, or a rejected duplicate wait here. The website exports only the pending IDs in `data/art-commissions.json`. The artist can look up source evidence by ID in the repository's screened inputs. The public endpoint is also refreshed by a Pages-only rebuild.
+
+Source screening still determines whether an article may be considered at all. Past art receipts cannot restore ineligible readings. A previously published, eligible reading can serve its previous signed cover while a proposed replacement awaits review. If that pair was removed or corrupted too, restore it or provide a fully reviewed replacement before deploying a new build. Unrelated valid additions can publish while new commissions wait. A normal build uses no image-service credentials.
+
+## Procedural artwork tools
+
+The standalone artwork allocator can still evaluate source-based sketches for editorial development. Its candidate status describes a sketch; a generated SVG or a generic `ready` flag cannot satisfy the public commission gate.
 
 Review reasons include:
 
@@ -35,13 +40,13 @@ Collision metadata identifies the accepted article responsible for each conflict
 
 ## Bounded replacement attempts
 
-The publication build tries the preferred concept first. If it collides with an accepted cover, it can try up to five further concepts, for **at most six candidates per article**. Alternatives use different subject pairs explicitly supported by the article's title or substantive source context. Every candidate must pass the same context, semantic, geometry, byte and visual-similarity checks. A new color, rotation, filename or tiny decoration is not a new concept.
+The procedural allocator tries the preferred concept first. If it collides with an accepted cover, it can try up to five further concepts, for **at most six candidates per article**. Alternatives use different subject pairs explicitly supported by the article's title or substantive source context. Every candidate must pass the same context, semantic, geometry, byte and visual-similarity checks. A new color, rotation, filename or tiny decoration is not a new concept.
 
-A successful alternative produces a new illustration in the same build. If all supported alternatives fail, the article stays visible without a cover. A curated illustration rejected for duplication is held for editorial review rather than silently replaced with procedural art. Missing context cannot be repaired by inventing a setting or a finding.
+A successful alternative produces a source-grounded sketch. If all supported alternatives fail, an editor can return to the checked article for a new concept. A curated illustration rejected for duplication is held for editorial review rather than silently replaced with procedural art. Missing context cannot be repaired by inventing a setting or a finding.
 
 `data/article-art-state.json` retains accepted allocations and unresolved attempts using identifiers, fingerprints and bounded attempt metadata, without copying source prose. An accepted alternative is revalidated and kept on later builds. An exhausted unchanged candidate pool and collection are not retried indefinitely or reported as new progress. Changes to source context, the rendering/candidate policy, overrides or the admitted collection allow reconsideration. Removed or no-longer-eligible articles are pruned from this state; state cannot admit a paper for publication.
 
-The existing refresh, full-text backfill, discovery-resume and weekly-edition workflows commit this state with their other data outputs. The read-only publication workflow also archives its exact state for 90 days as an Actions artifact; it does not commit that artifact back or automatically restore artifacts into future builds. The queue is excluded from the website's public data allowlist. There is no new timer, paid image API or unlimited generation loop: replacement attempts happen during existing publication builds. Some articles will still require more source context or a reviewed original cover.
+The existing refresh, full-text backfill, discovery-resume and weekly-edition workflows commit this state with their other data outputs. The read-only publication workflow also archives its exact state for 90 days as an Actions artifact; it does not commit that artifact back or automatically restore artifacts into future builds. The full state stays outside the website's public data. The Pages export contains a separate ID-only commissioning list.
 
 ## Context and geometry
 
@@ -80,17 +85,17 @@ For individually reviewed original artwork, create `data/article-art-overrides.j
       "height": 800,
       "alt": "A hand rebuilding a bridge beside a closed screen.",
       "concept": "Reconstructing a skill after assistance is removed.",
-      "provenance": "Original editorial illustration; not a source figure."
+      "provenance": "Original editorial illustration created with OpenAI image generation."
     }
   }
 }
 ```
 
-Required fields are `src`, `alt`, `concept` and `provenance`. Keys must use the canonical `doi:`, `url:` or title-hash identity. Optional dimensions must match the actual raster. Thumbnails must preserve aspect ratio and be no larger than the cover.
+Public commissions require both WebPs, alt text, concept, generation provenance and the receipt created after visual review. Keys use canonical `doi:`, `url:` or title-hash identity. Any declared dimensions must match the actual files.
 
 Overrides are explicitly editor-declared concepts, not automatically verified source interpretations. Their metadata preserves the declared concept and provenance rather than claiming that a procedural noun pair produced their pixels. A valid override can supply specific art when keyword matching is insufficient. Different original overrides are not rejected merely because their articles would have selected the same procedural pair.
 
-Paths must be flat lowercase letters, digits and hyphens under `assets/editorial-covers/` or `assets/article-art/`, ending in `.webp`, `.png` or `.jpg`. URLs, traversal, nested folders, SVG overrides and external symlinks are forbidden. Assets must exist, have supported raster headers and fit the 2 MB limit. The loader calculates hashes from actual bytes, including thumbnails. Reusing a path or renaming identical bytes cannot bypass the collection collision gate. A duplicate candidate becomes review-needed; malformed manifests and invalid assets still raise before publication.
+Paths must be flat lowercase letters, digits and hyphens under `assets/editorial-covers/` or `assets/article-art/`, ending in `.webp`, `.png` or `.jpg`. URLs, traversal, nested folders, SVG overrides and external symlinks are forbidden. Assets must exist, have supported raster headers and fit the 2 MB limit. The loader calculates hashes from actual bytes, including thumbnails. Reusing a path or renaming identical bytes cannot bypass the collection collision gate. The publication gate queues an invalid individual registration and continues with other articles. A malformed manifest as a whole must be repaired before rebuilding.
 
 Use only original or appropriately licensed artwork. A provenance declaration is not proof of permission and grants no rights to publisher figures or copyrighted research content.
 
@@ -106,7 +111,7 @@ python -m unittest discover -s tests -p test_article_art.py -v
 
 The standalone command rechecks publication eligibility and refuses an internal `library.json` input. `--root` selects another checkout. The contact sheet shows accepted images and explicit review notices without broken image tags. The report lists ready/review counts, reasons, source-grounding phrases, collision groups and accepted asset bytes. `distinct_generated_compositions` counts accepted generated compositions; collision groups also retain held candidates so rejection is visible rather than hidden by a success counter.
 
-Tests cover real public records, realistic repeated research concepts, repeated foreground pairs with different frames, independent geometry checks, tiny-decoration visual twins, changed dominant scenes, unsupported coarse-renderer handling, insufficient context, renamed identical rasters, repeated thumbnails, canonical-paper reuse, stable ordering, retained acceptance, content-addressed caching, safe SVG/path handling and honest review reports. Publication tests compare the full build with art disabled and verify that evidence, provenance, weekly membership and quarantine are unchanged. Run `python -m unittest discover -s tests -p test_art_similarity.py -v` for the coarse rasterizer's own geometry and metric tests.
+Tests cover real public records, realistic repeated research concepts, repeated foreground pairs with different frames, independent geometry checks, tiny-decoration visual twins, changed dominant scenes, unsupported coarse-renderer handling, insufficient context, renamed identical rasters, repeated thumbnails, canonical-paper reuse, stable ordering, retained acceptance, content-addressed caching, safe SVG/path handling and honest review reports. Publication tests exercise a pending article through approval, weekly inclusion, replacement and source quarantine. Run `python -m unittest discover -s tests -p test_art_similarity.py -v` for the coarse rasterizer's own geometry and metric tests.
 
 ### Source tables and figure candidates
 

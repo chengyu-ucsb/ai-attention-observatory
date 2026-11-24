@@ -29,6 +29,22 @@ def png():
             chunk(b"IDAT", zlib.compress((b"\x00" + b"\xe0\x01\x22" * 12) * 8)) + chunk(b"IEND", b""))
 
 
+def approved_pair(root, identity, registry):
+    """Register an actual previously inspected issue cover under the test identity."""
+    import shutil
+    cover = dict(next(iter(json.loads((ROOT / "data/article-art-overrides.json").read_text())["overrides"].values())))
+    for key in ("src", "thumbnail_src"):
+        target = root / cover[key]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(ROOT / cover[key], target)
+    validated = art.validated_override(root.resolve(), identity, cover)
+    cover["commission_review"] = {"method": queue.COMMISSION_METHOD,
+                                  "sha256": queue.review_fingerprint(identity, validated)}
+    registry.parent.mkdir(parents=True, exist_ok=True)
+    registry.write_text(json.dumps({"version": 1, "overrides": {identity: cover}}))
+    return cover
+
+
 class ArticleArtQueueTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -226,6 +242,8 @@ class ArtQueuePublicationTests(unittest.TestCase):
                 (data / "library.json").write_text(json.dumps([public, citation]))
                 (data / "weekly.json").write_text(json.dumps({"run": {}, "items": [public, citation]}))
                 source_bytes = (data / "library.json").read_bytes()
+                art_root = root if dirname == "data" else data
+                approved_pair(art_root, art.canonical_identity(public), data / "article-art-overrides.json")
                 # Previously accepted art is not authority to re-admit a citation.
                 queue.attach_persistent_art([article("10.1234/citation")], root,
                                             state_path=data / queue.STATE_FILENAME)
@@ -243,6 +261,80 @@ class ArtQueuePublicationTests(unittest.TestCase):
                     text = (data / name).read_text()
                     self.assertNotIn('"corpus_fingerprint"', text)
                     self.assertNotIn(queue.STATE_FILENAME, text)
+
+    def test_new_card_is_queued_before_publication_and_released_on_review(self):
+        from build_reader import build as build_reader
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data = root / "data"
+            data.mkdir()
+            source = article()
+            source.update(venue="Computers in Human Behavior", abstract_text="A study of generative AI use and cognitive offloading, critical thinking and metacognition among university students. The research examines how thinking changes with repeated AI assistance.")
+            identity = art.canonical_identity(source)
+            (data / "library.json").write_text(json.dumps([source]))
+            (data / "weekly.json").write_text(json.dumps({"run": {}, "items": [source]}))
+            for name in ("public-issue.json", "public-featured-issue.json"):
+                (data / name).write_text('{"status":"awaiting_publication"}')
+            def build():
+                with patch.object(build_public, "DATA", data):
+                    return build_public.build()
+            selected, weekly = build()
+            self.assertFalse(selected)
+            self.assertFalse(weekly["items"])
+            self.assertEqual(json.loads((data / queue.STATE_FILENAME).read_text())["commissioning"]["pending"],
+                             {identity: "needs_original"})
+            destination = root / "website"
+            build_reader(root, pages_data=destination)
+            self.assertEqual(json.loads((destination / "art-commissions.json").read_text()),
+                             {"pending": [identity]})
+            manifest = data / "article-art-overrides.json"
+            approved_pair(root, identity, manifest)
+            selected, weekly = build()
+            self.assertEqual([r["doi"] for r in selected], [source["doi"]])
+            self.assertEqual([r["doi"] for r in weekly["items"]], [source["doi"]])
+            self.assertFalse(json.loads((data / queue.STATE_FILENAME).read_text())["commissioning"]["pending"])
+            build_reader(root, pages_data=destination)
+            self.assertEqual(json.loads((destination / "art-commissions.json").read_text()), {"pending": []})
+            # A changed description needs review. Retain the previously reviewed
+            # public file/description during that replacement and while text is corrected.
+            edited = json.loads(manifest.read_text())
+            previous_alt = edited["overrides"][identity]["alt"]
+            edited["overrides"][identity]["alt"] = "Changed artwork description."
+            manifest.write_text(json.dumps(edited))
+            source["abstract_text"] += " This paper includes an additional classroom practice task."
+            (data / "library.json").write_text(json.dumps([source]))
+            selected, _ = build()
+            self.assertEqual(selected[0]["editorial_art"]["alt"], previous_alt)
+            self.assertIn("additional classroom", selected[0]["abstract_text"])
+            self.assertEqual(json.loads((data / queue.STATE_FILENAME).read_text())["commissioning"]["pending"],
+                             {identity: "needs_visual_review"})
+
+    def test_missing_invalid_or_transplanted_pair_never_admits_a_companion(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = root / "data/article-art-overrides.json"
+            record = article()
+            record["companion_to"] = "10.1234/original"
+            identity = art.canonical_identity(record)
+            good = approved_pair(root, identity, manifest)
+            cases = [(dict(good, thumbnail_src="assets/editorial-covers/absent.webp"), "invalid_registered_art"),
+                     (dict(good, width=50), "invalid_registered_art"),
+                     ({k: v for k, v in good.items() if k != "thumbnail_src"}, "needs_card_thumbnail"),
+                     (dict(good, provenance="Source figure", commission_review={}), "needs_generation_provenance"),
+                     (dict(good, commission_review={"method": queue.COMMISSION_METHOD, "sha256": "1"*64}), "needs_visual_review")]
+            for override, reason in cases:
+                with self.subTest(reason=reason):
+                    manifest.write_text(json.dumps({"version": 1, "overrides": {identity: override}}))
+                    rows = queue.attach_persistent_art([copy.deepcopy(record)], root, commissioned_only=True)
+                    self.assertFalse(rows)
+                    self.assertEqual(json.loads((root / "data" / queue.STATE_FILENAME).read_text())
+                                     ["commissioning"]["pending"], {identity: reason})
+            foreign = "doi:10.1234/different"
+            manifest.write_text(json.dumps({"version": 1, "overrides": {foreign: good}}))
+            other = article(doi=foreign.removeprefix("doi:"))
+            self.assertFalse(queue.attach_persistent_art([other], root, commissioned_only=True))
+            self.assertEqual(json.loads((root / "data" / queue.STATE_FILENAME).read_text())
+                             ["commissioning"]["pending"], {foreign: "needs_visual_review"})
 
     def test_workflows_persist_after_build_and_keep_queue_out_of_static_payload(self):
         workflows = ROOT / ".github/workflows"
