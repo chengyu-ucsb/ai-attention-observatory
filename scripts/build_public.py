@@ -177,14 +177,15 @@ def build():
         selected.append(published)
     (DATA/"headline-review-queue.json").write_text(json.dumps(
         {"version":1,"items":headline_queue},ensure_ascii=False,indent=2)+"\n")
-    # Editorial illustrations are a separate presentation layer, created only
-    # after every source-depth and publication gate above has passed. They never
-    # alter evidence graphics, source provenance, eligibility, or public counts.
+    # Evaluate every otherwise-admitted record before filtering the public card
+    # and weekly projections. A pending artwork job cannot admit its own source.
     art_root=DATA.parent if DATA.name=="data" else DATA
-    attach_art(selected,root=art_root,manifest=DATA/"article-art-overrides.json",
-               state_path=DATA/"article-art-state.json",previous_public=DATA/"public-library.json")
-    print(json.dumps({"article_art_retry_status": dict(sorted(Counter(
-        (item.get("editorial_art") or {}).get("retry_status", "unknown") for item in selected).items()))}))
+    eligible_count=len(selected)
+    selected=attach_art(selected,root=art_root,manifest=DATA/"article-art-overrides.json",
+                        state_path=DATA/"article-art-state.json",previous_public=DATA/"public-library.json",
+                        commissioned_only=True)
+    if len(selected)<eligible_count:
+        held["awaiting_commissioned_cover"]=eligible_count-len(selected)
     selection_ids={record_id(x) for x in selected}
     canonical=[x for x in selected if not x.get("companion_to")]
     by_id={record_id(x):x for x in canonical}

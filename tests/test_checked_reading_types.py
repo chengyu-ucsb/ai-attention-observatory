@@ -13,6 +13,7 @@ from build_readings import make_note
 from condense_readings import annotate
 from collection_window import weekly_eligible, previous_week
 import build_public
+from publication_fixtures import article_covers_ready
 import compose_issue
 import build_issue
 import feed
@@ -288,7 +289,7 @@ class CheckedTypesTests(unittest.TestCase):
             data=Path(tmp);manifest=data/'manifest.json';manifest.write_text(json.dumps({'articles':[n]}))
             (data/'library.json').write_text(json.dumps([row]))
             (data/'weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
-            with patch.object(original,'MANIFEST',manifest),patch.object(build_public,'DATA',data):
+            with patch.object(original,'MANIFEST',manifest),patch.object(build_public,'DATA',data), article_covers_ready():
                 public,weekly=build_public.build();self.assertEqual(len(public),1);self.assertEqual(len(weekly['items']),1)
                 self.assertTrue(weekly_eligible(public[0],*previous_week('2026-11-02')))
                 self.assertFalse(weekly_eligible(public[0],*previous_week('2026-11-09')))

@@ -438,7 +438,7 @@ def _candidate_plan(record: dict, overrides: dict | None = None) -> dict:
         "renderer_version": RENDERER_VERSION, "candidate_policy_version": CANDIDATE_POLICY_VERSION,
         "max_candidates": MAX_ART_CANDIDATES,
         "coarse_screen": [RASTERIZER_VERSION, NEAR_TWIN_LIMITS],
-        "candidates": [override] if override is not None else specs})
+        "candidates": [{k: v for k, v in override.items() if k != "commission_review"}] if override is not None else specs})
     return {"identity": identity, "inputs": inputs, "specs": specs, "override": override,
             "pool": pool, "input_fingerprint": _fingerprint({"identity": identity, "inputs": inputs,
                                                            "renderer_version": RENDERER_VERSION})}
@@ -1364,7 +1364,7 @@ def validate_raster(root: Path, src: str) -> tuple[str, int, int]:
     return hashlib.sha256(data).hexdigest(), width, height
 
 
-def load_overrides(root: Path, manifest: Path | None = None) -> dict:
+def load_overrides(root: Path, manifest: Path | None = None, *, invalid: dict | None = None) -> dict:
     """Validate every override before use. A mistake cannot publish a broken image."""
     root = Path(root).resolve()
     manifest = manifest or root / "data/article-art-overrides.json"
@@ -1374,35 +1374,43 @@ def load_overrides(root: Path, manifest: Path | None = None) -> dict:
     if not isinstance(payload, dict) or payload.get("version") != 1 or not isinstance(payload.get("overrides"), dict):
         raise ValueError("Article art overrides require version 1 and an overrides object")
     result = {}
-    seen_assets = set()
     for identity, value in payload["overrides"].items():
-        if not isinstance(identity, str) or not identity.startswith(("doi:", "url:", "title:")):
-            raise ValueError("Override keys must be canonical doi:, url:, or title: identities")
-        if identity.startswith("doi:") and canonical_identity({"doi": identity}) != identity:
-            raise ValueError("Override DOI keys must be canonical lower-case identities")
-        if identity.startswith("url:") and canonical_identity({"url": identity[4:]}) != identity:
-            raise ValueError("Override URL keys must be canonical identities without tracking or fragments")
-        if not isinstance(value, dict):
-            raise ValueError("Each article art override must be an object")
-        for key in ("src", "alt", "concept", "provenance"):
-            if not isinstance(value.get(key), str) or not value[key].strip():
-                raise ValueError("Article art overrides require explicit src, alt, concept, and provenance")
-        src = value["src"]
-        seen_assets.add(src)
-        asset_hash, width, height = validate_raster(root, src)
-        for key, actual in (("width", width), ("height", height)):
-            if key in value and (type(value[key]) is not int or value[key] != actual):
-                raise ValueError("Override dimensions must match the actual image")
-        resolved = {**value, "asset_fingerprint": asset_hash, "width": width, "height": height}
-        if "thumbnail_src" in value:
-            if not isinstance(value["thumbnail_src"], str):
-                raise ValueError("Override thumbnail_src must be a local raster path")
-            thash, twidth, theight = validate_raster(root, value["thumbnail_src"])
-            if twidth > width or theight > height or abs(twidth / theight - width / height) > .02:
-                raise ValueError("Override thumbnail must be no larger than its cover and preserve its aspect ratio")
-            resolved.update(thumbnail_fingerprint=thash, thumbnail_width=twidth, thumbnail_height=theight)
-        result[identity] = resolved
+        try:
+            result[identity] = validated_override(root, identity, value)
+        except (OSError, ValueError, TypeError):
+            if invalid is None:
+                raise
+            invalid[identity] = "invalid_registered_art"
     return result
+
+
+def validated_override(root: Path, identity: str, value: dict) -> dict:
+    """Recompute file fingerprints and dimensions; never trust a stored measurement."""
+    if not isinstance(identity, str) or not identity.startswith(("doi:", "url:", "title:")):
+        raise ValueError("Override keys must be canonical doi:, url:, or title: identities")
+    if identity.startswith("doi:") and canonical_identity({"doi": identity}) != identity:
+        raise ValueError("Override DOI keys must be canonical lower-case identities")
+    if identity.startswith("url:") and canonical_identity({"url": identity[4:]}) != identity:
+        raise ValueError("Override URL keys must be canonical identities without tracking or fragments")
+    if not isinstance(value, dict):
+        raise ValueError("Each article art override must be an object")
+    for key in ("src", "alt", "concept", "provenance"):
+        if not isinstance(value.get(key), str) or not value[key].strip():
+            raise ValueError("Article art overrides require explicit src, alt, concept, and provenance")
+    src = value["src"]
+    asset_hash, width, height = validate_raster(root, src)
+    for key, actual in (("width", width), ("height", height)):
+        if key in value and (type(value[key]) is not int or value[key] != actual):
+            raise ValueError("Override dimensions must match the actual image")
+    resolved = {**value, "asset_fingerprint": asset_hash, "width": width, "height": height}
+    if "thumbnail_src" in value:
+        if not isinstance(value["thumbnail_src"], str):
+            raise ValueError("Override thumbnail_src must be a local raster path")
+        thash, twidth, theight = validate_raster(root, value["thumbnail_src"])
+        if twidth > width or theight > height or abs(twidth / theight - width / height) > .02:
+            raise ValueError("Override thumbnail must be no larger than its cover and preserve its aspect ratio")
+        resolved.update(thumbnail_fingerprint=thash, thumbnail_width=twidth, thumbnail_height=theight)
+    return resolved
 
 
 def _candidate_metadata(record: dict, overrides: dict | None, candidate_index: int, *,
@@ -1570,7 +1578,8 @@ def _valid_retry_history(record: dict, overrides: dict, prior: dict, *, plan: di
 
 
 def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = None, *,
-               reuse_exhausted: bool = False) -> list[dict]:
+               reuse_exhausted: bool = False, validated_overrides: dict | None = None,
+               protected_ids: set[str] | None = None) -> list[dict]:
     """Allocate bounded contextual candidates ONLY to already-public records.
 
     Hydrated editorial_art can preserve a prior accepted alternative. Callers may
@@ -1580,7 +1589,7 @@ def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = N
     article is promoted, and a rejected curated cover never gets auto-replaced.
     attempt_count counts distinct tried candidates, never the number of builds.
     """
-    overrides = load_overrides(Path(root), manifest)
+    overrides = load_overrides(Path(root), manifest) if validated_overrides is None else validated_overrides
     from art_similarity import compare, decode_signature, is_near_twin
     candidates = []
     for record in records:
@@ -1617,7 +1626,11 @@ def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = N
     accepted_rasters = []
     accepted_identities = set()
     can_reuse_holds = reuse_exhausted and all(item[0] in (False, 2) for item in candidates)
-    for not_retained, identity, first, record, prior, plan in sorted(candidates, key=lambda item: (item[0], item[1], item[2]["input_fingerprint"])):
+    # A checked-in commission keeps its place when source text is corrected at
+    # the same time another article proposes identical art.
+    protected_ids = protected_ids or set()
+    for not_retained, identity, first, record, prior, plan in sorted(
+            candidates, key=lambda item: (item[1] not in protected_ids, item[0], item[1], item[2]["input_fingerprint"])):
         if not_retained == 2:
             blockers_exist = all(collision["identity"] in accepted_identities and collision["identity"] != identity
                                  for attempt in prior["retry_attempts"] for collision in attempt.get("review_collisions", []))

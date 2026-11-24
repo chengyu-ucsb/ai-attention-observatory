@@ -10,6 +10,7 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from collection_window import window_metadata
 import build_public
+from publication_fixtures import article_covers_ready
 import build_issue
 import build_newsletter
 
@@ -45,7 +46,7 @@ class WeeklyPublicationBoundaryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data=Path(tmp);(data/'library.json').write_text(json.dumps([row]))
             (data/'weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02','publication_window':window_metadata('2026-11-02')},'items':[incoming]}))
-            with patch.object(build_public,'DATA',data),patch.object(build_public,'prepare',side_effect=lambda rows:rows):
+            with patch.object(build_public,'DATA',data),patch.object(build_public,'prepare',side_effect=lambda rows:rows), article_covers_ready():
                 selected,weekly=build_public.build()
             self.assertEqual(len(selected),1) # Historical library remains accessible.
             self.assertEqual(weekly['items'],[])
@@ -59,7 +60,7 @@ class WeeklyPublicationBoundaryTests(unittest.TestCase):
             (data / 'library.json').write_text(json.dumps([current, old]))
             (data / 'weekly.json').write_text(json.dumps({
                 'run': {'date': '2026-11-02'}, 'items': [current, old]}))
-            with patch.object(build_public, 'DATA', data), patch.object(build_public, 'prepare', side_effect=lambda rows: rows):
+            with patch.object(build_public, 'DATA', data), patch.object(build_public, 'prepare', side_effect=lambda rows: rows), article_covers_ready():
                 selected, weekly = build_public.build()
             shelf = json.loads((data / 'editorial-weekly.json').read_text())
         self.assertEqual({x['doi'] for x in selected}, {current['doi'], old['doi']})

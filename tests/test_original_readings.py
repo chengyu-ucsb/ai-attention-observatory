@@ -14,6 +14,7 @@ import original_readings as original
 from build_readings import make_note
 from condense_readings import annotate
 import build_public
+from publication_fixtures import article_covers_ready
 import compose_issue
 import feed
 import source_audit
@@ -204,7 +205,7 @@ class OriginalSummaryTests(unittest.TestCase):
             (data/'library.json').write_text(json.dumps([row]))
             (data/'weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
             manifest=data/'original-readings.json';manifest.write_text(json.dumps({'articles':[accepted()]}))
-            with patch.object(build_public,'DATA',data),patch.object(original,'MANIFEST',manifest):
+            with patch.object(build_public,'DATA',data),patch.object(original,'MANIFEST',manifest), article_covers_ready():
                 selected,weekly=build_public.build()
                 self.assertEqual(len(selected),1)
                 self.assertEqual(selected[0]['analysis'],row['analysis'])
@@ -229,7 +230,7 @@ class OriginalSummaryTests(unittest.TestCase):
             data=Path(tmp);row=record();row['venue']='Unverified venue'
             (data/'library.json').write_text(json.dumps([row]))
             (data/'weekly.json').write_text(json.dumps({'run':{},'items':[row]}))
-            with patch.object(build_public,'DATA',data),patch.object(original,'MANIFEST',data/'notes.json'):
+            with patch.object(build_public,'DATA',data),patch.object(original,'MANIFEST',data/'notes.json'), article_covers_ready():
                 (data/'notes.json').write_text(json.dumps({'articles':[accepted()]}))
                 selected,_=build_public.build()
             self.assertEqual(selected,[])

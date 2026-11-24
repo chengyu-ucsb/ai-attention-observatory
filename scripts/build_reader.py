@@ -12,6 +12,8 @@ from pathlib import Path
 
 from reading_headlines import reader_genre, reader_headline
 from reader_issue import feed_snapshot
+from article_art import canonical_identity, validated_override
+from article_art_queue import review_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 CARD_FIELDS = ('title', 'display_headline', 'authors', 'published', 'venue', 'doi', 'url', 'kind',
@@ -114,10 +116,28 @@ def build(root=ROOT, *, pages_data=None):
     if pages_data and destination.resolve() == data.resolve():
         raise ValueError('Pages compatibility files need a separate destination from editorial inputs')
     destination.mkdir(parents=True, exist_ok=True)
+    weekly = json.loads((data / 'public-weekly.json').read_text())
+    commission_state = data / 'article-art-state.json'
+    commissioning = {}
+    if commission_state.is_file():
+        commissioning = json.loads(commission_state.read_text(encoding='utf-8')).get('commissioning', {})
+    if commissioning or (data / 'article-art-overrides.json').is_file() or Path(root).resolve() == ROOT.resolve():
+        approved = commissioning.get('approved', {})
+        validated = set()
+        for record in [*records, *weekly.get('items', [])]:
+            identity = canonical_identity(record)
+            cover = record.get('editorial_art') or {}
+            receipt = review_fingerprint(identity, cover)
+            if approved.get(identity) != receipt:
+                raise ValueError(f'reader_requires_reviewed_commission: {identity}')
+            if receipt not in validated:
+                actual = validated_override(Path(root).resolve(), identity, cover)
+                if review_fingerprint(identity, actual) != receipt:
+                    raise ValueError(f'reader_requires_intact_commission_files: {identity}')
+                validated.add(receipt)
     pages = [article(record) for record in records]
     cards = [card(page, immutable(destination, 'articles', page)) for page in pages]
     index_url = immutable(destination, 'indexes', cards)
-    weekly = json.loads((data / 'public-weekly.json').read_text())
     run = weekly.get('run') or {}
     backlog_path = data / 'fulltext-backfill-state.json'
     backlog = json.loads(backlog_path.read_text()) if backlog_path.exists() else {}
@@ -144,6 +164,11 @@ def build(root=ROOT, *, pages_data=None):
                 'library_count': sum(not r.get('companion_to') for r in records)}
     (destination / 'reader-manifest.json').write_bytes(encoded(manifest))
     if pages_data:
+        # Publish only the pending canonical IDs from this build. Acquisition,
+        # review notes and the internal state never enter this public handoff.
+        if commissioning:
+            pending = commissioning["pending"]
+            (destination / "art-commissions.json").write_bytes(encoded({"pending": sorted(pending)}))
         current = json.loads((data / 'public-issue.json').read_text())
         if current.get('status') == 'published':
             public_issue = feed_snapshot(current)

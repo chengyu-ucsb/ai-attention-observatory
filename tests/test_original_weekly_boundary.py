@@ -14,6 +14,7 @@ sys.path.insert(0,str(ROOT/'scripts'))
 from test_original_readings import record, accepted, approve, article_screen
 import original_readings as original
 import build_public
+from publication_fixtures import article_covers_ready
 import build_issue
 import compose_issue
 import feed
@@ -93,7 +94,7 @@ class OriginalWeeklyBoundaryTests(unittest.TestCase):
             manifest.write_text(json.dumps({'articles':[note]}))
             (data/'library.json').write_text(json.dumps([row]))
             (data/'weekly.json').write_text(json.dumps({'run':{'date':'2026-11-02'},'items':[row]}))
-            with patch.object(original,'MANIFEST',manifest),patch.object(build_public,'DATA',data):
+            with patch.object(original,'MANIFEST',manifest),patch.object(build_public,'DATA',data), article_covers_ready():
                 library,weekly=build_public.build()
                 self.assertTrue(library[0]['reading']['original_summary'])
                 self.assertEqual(weekly['items'],[])
