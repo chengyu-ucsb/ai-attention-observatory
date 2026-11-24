@@ -397,6 +397,11 @@ function route(event){
   closeNavigation();
   const heading=$("#"+page+" h1");if(heading){heading.tabIndex=-1;heading.focus({preventScroll:true})}
  }
+ if(page==="about" && new URLSearchParams(raw.split("?")[1]||"").get("section")==="article-process"){
+  const heading=$("#article-process");
+  if(event?.type==="hashchange")heading.focus({preventScroll:true});
+  heading.scrollIntoView({block:"start",behavior:"instant"});
+ }
  if(page==="issue"){
   focusIssueTerm(raw);
   const source=new URLSearchParams(raw.split("?")[1]||"").get("source");
