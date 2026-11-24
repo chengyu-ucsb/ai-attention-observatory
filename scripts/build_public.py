@@ -9,7 +9,9 @@ import json
 from collections import Counter
 from pathlib import Path
 from condense_readings import annotate, machine_research_account
-from build_visuals import visual_spec
+from build_visuals import visual_spec, visual_assessment
+from article_art import canonical_identity
+from plain_reading import prepare_plain_reading
 from article_art_queue import attach_persistent_art as attach_art
 from search_plan import source_class
 from verified_full_article_notes import apply as apply_checked_sections
@@ -114,6 +116,9 @@ def build():
     apply_original_readings(all_records)
     headlines_path = DATA / "reading-headlines.json"
     headlines = json.loads(headlines_path.read_text()) if headlines_path.exists() else headline_register()
+    leads_path = DATA / "plain-reading-leads.json"
+    leads = json.loads(leads_path.read_text()) if leads_path.is_file() else {}
+    reading_reviews = {}
     selected=[]
     pending=[]
     headline_queue=[]
@@ -157,6 +162,18 @@ def build():
         if not readable(published):
             held["insufficient_source_text"]+=1
             continue
+        # Archive, companions, hand-checked notes and weekly additions all enter
+        # here. Review only source-eligible text, including readings awaiting a
+        # headline or cover. These presentation passes cannot admit a record.
+        published["reader_genre"] = reader_genre(published)
+        published["visual"] = visual_spec(published)
+        plain = prepare_plain_reading(published, leads)
+        published["plain_reading"] = plain
+        reading_reviews[canonical_identity(published)] = {
+            "title": published.get("title", ""),
+            "summary": {key: plain[key] for key in ("status", "reason", "basis_sha256")},
+            "visual": visual_assessment(published),
+        }
         heading = headline_decision(published, headlines)
         if heading["status"] == "review_needed":
             headline_queue.append(review_item(published, heading))
@@ -170,11 +187,14 @@ def build():
                 held["heading_awaiting_editorial_review"] += 1
                 continue
         published["display_headline"] = heading["headline"]
-        published["reader_genre"] = reader_genre(published)
         published["source_quality"]=quality
         published["source_group"]=source_class(source, editorial_topic=quality.get("topic") if source.get("kind")=="nonacademic" else None)
-        published["visual"]=visual_spec(published)
         selected.append(published)
+    counts = {field: dict(sorted(Counter(row[field]["status"] for row in reading_reviews.values()).items()))
+              for field in ("summary", "visual")}
+    review_report = {"version": 1, "total": len(reading_reviews), "counts": counts,
+                     "articles": dict(sorted(reading_reviews.items()))}
+    (DATA / "reading-review.json").write_text(json.dumps(review_report, ensure_ascii=False, indent=2) + "\n")
     (DATA/"headline-review-queue.json").write_text(json.dumps(
         {"version":1,"items":headline_queue},ensure_ascii=False,indent=2)+"\n")
     # Evaluate every otherwise-admitted record before filtering the public card

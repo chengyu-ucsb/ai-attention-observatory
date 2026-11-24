@@ -1235,6 +1235,25 @@ def check_collection_boundaries(page, url, width):
         family = 'research' if row['reader_genre'] in research else 'product' if row['reader_genre'] == 'guide' else 'media'
         expect(paper.locator('.rv-article')).to_have_attribute('data-source-family', family)
         reading = row.get('reading') or {}
+        plain = row.get('plain_reading') or {}
+        if plain.get('status') in ('reviewed', 'prepared') and plain.get('lead'):
+            expect(paper).to_contain_text(plain['lead'])
+            for key in ('detail', 'limit'):
+                if plain.get(key):
+                    expect(paper).to_contain_text(plain[key])
+        visual = row.get('visual') or {}
+        if visual.get('kind') == 'reviewed_comparison':
+            figure = paper.locator('.reviewed-evidence')
+            expect(figure).to_be_visible()
+            expect(figure.locator('figcaption a')).to_have_attribute('href', visual['source']['url'])
+            chart = visual.get('chart') or {}
+            if chart.get('kind') == 'bar':
+                tracks = figure.locator('.evidence-bar-track')
+                expect(tracks).to_have_count(len(visual['rows']))
+                for i, (_, score) in enumerate(visual['rows']):
+                    ratio = tracks.nth(i).evaluate(
+                        '(el) => el.firstElementChild.getBoundingClientRect().width / el.getBoundingClientRect().width')
+                    assert abs(ratio - float(score) / chart['maximum']) < 0.01, (identifier, width, score)
         if (family == 'research' and row['reader_genre'] != 'proposal' and not reading.get('original_summary')
                 and reading.get('level') == 'full_text'
                 and reading.get('digest', {}).get('editorial_basis') == 'publisher_full_article_paraphrased'):
@@ -1245,9 +1264,10 @@ def check_collection_boundaries(page, url, width):
             content = ' '.join(account.inner_text().split())
             for field in ['methods', 'findings', 'interpretation', 'limitations']:
                 if reading.get(field):
-                    # An identical passage may already serve as the opening sentence.
+                    # A passage already visible in the introduction is shown only once.
+                    intro = paper.locator('.rv-intro-copy, .rv-plain-context').all_inner_texts()
                     assert ' '.join(reading[field].split()) in content + ' ' + ' '.join(
-                        paper.locator('.rv-intro-copy').inner_text().split()), (identifier, width, field)
+                        ' '.join(intro).split()), (identifier, width, field)
             expect(paper.locator('.rv-source-row')).to_contain_text('Based on the full article')
         if (family == 'research' and reading.get('digest', {}).get('status') == 'automatically_condensed_source_text'
                 and row.get('abstract_text') and not reading.get('machine_account')):

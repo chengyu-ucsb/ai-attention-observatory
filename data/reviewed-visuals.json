@@ -46,6 +46,211 @@
         "scope": "Compared every displayed direction with Table 2 and retained exploratory, multiple-comparison and measurement limits. This is an AI-assisted check, not independent replication.",
         "payload_sha256": "5181fa9a032485dd78b2560feb6e02df1b6b0e381bd41176f13f5931ea512077"
       }
+    },
+    {
+      "id": "sunscreen-reasons",
+      "kind": "reviewed_comparison",
+      "doi": "10.1016/j.chb.2024.108386",
+      "reading_id": "checked-cognitive-ease-108386-published",
+      "title": "How many reasons made it into the recommendation?",
+      "description": "Students researched sunscreen ingredients, then wrote advice from memory. Researchers counted how many of seven relevant points appeared in each response.",
+      "headers": [
+        "Research tool",
+        "Average points mentioned (out of 7)"
+      ],
+      "rows": [
+        [
+          "ChatGPT 3.5 (44 students)",
+          "1.20"
+        ],
+        [
+          "Google (47 students)",
+          "1.87"
+        ]
+      ],
+      "caption": "Each bar shows a group average. The score counts reasons students gave for their advice on this one topic. It tells us little about how they would reason on a different topic.",
+      "source": {
+        "url": "https://epub.ub.uni-muenchen.de/125262/1/1-s2.0-S0747563224002541-main.pdf",
+        "version": "publishedVersion",
+        "sha256": "fc48d2f5cfdfca039e8225ae91e9c3db5b10a1a78f0e38c32166ca4e3a779daa",
+        "locator": "Table 2, p. 3; sections 5.1.1, 5.2, 5.3.2 and 6.1, pp. 3–4",
+        "attribution": "Stadler, Bannert & Sailer (2024)"
+      },
+      "rights": "original_factual_display_no_source_image",
+      "chart": {
+        "kind": "bar",
+        "unit": "points",
+        "maximum": 7
+      },
+      "review": {
+        "kind": "ai_source_check",
+        "status": "checked",
+        "checked_on": "2026-11-23",
+        "scope": "Checked the two group sizes, tool names, unadjusted means, seven-point maximum and writing task against the published PDF.",
+        "payload_sha256": "cd916877faa23f0cc2f13432cdf91ec693da5d78a540811d21bd585e617e6a21"
+      }
+    },
+    {
+      "id": "discussion-test-predictions",
+      "kind": "reviewed_comparison",
+      "doi": "10.3389/fpsyg.2026.2007654",
+      "reading_id": "week-nov16-zhang",
+      "title": "What score did students expect, and how did they do?",
+      "description": "Students discussed a case in groups. Then each student predicted their score and took a four-question test on their own.",
+      "headers": [
+        "During group discussion",
+        "Expected score (out of 10)",
+        "Test score (out of 10)"
+      ],
+      "rows": [
+        [
+          "AI allowed (62 students)",
+          "8.00",
+          "8.84"
+        ],
+        [
+          "Asked to work without AI (64 students)",
+          "7.44",
+          "8.64"
+        ]
+      ],
+      "caption": "These are group averages. After accounting for class and discussion group, the study found a difference in test scores. The difference in predicted scores was inconclusive. Both groups took the test immediately after discussion.",
+      "source": {
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.2007654/full",
+        "version": "publishedVersion",
+        "sha256": "fb579f2b818ab1c762857d6aee6aa15b39c2a4499d10c68327c2aee707c02490",
+        "locator": "Sections 3, 4.1 and 4.2, Tables 1 and 2",
+        "attribution": "Zhang and colleagues (2026)"
+      },
+      "rights": "original_factual_display_no_source_image",
+      "review": {
+        "kind": "ai_source_check",
+        "status": "checked",
+        "checked_on": "2026-11-23",
+        "scope": "Checked both sets of reported means, group sizes, scoring range and timing against the publisher’s methods and Table 1. Checked the distinction between the two outcomes against Table 2.",
+        "payload_sha256": "5698dec42c3e44e809e3d2df151c4b5d96fecaa4c6259b88369254bfdbf6c746"
+      }
+    },
+    {
+      "id": "review-tutoring-comparisons",
+      "kind": "reviewed_comparison",
+      "doi": "10.26300/80wn-ca81",
+      "reading_id": "week-nov16-stanford",
+      "title": "Do hints help students learn more?",
+      "description": "Stanford’s review describes three comparisons of AI tutoring. Students used different tools, in different settings.",
+      "headers": [
+        "Who took part",
+        "What the review reports"
+      ],
+      "rows": [
+        [
+          "U.S. college students",
+          "Students given an answer and explanation right away scored higher on a later test than those who got hints and encouragement first."
+        ],
+        [
+          "Turkish high school students",
+          "Students who practiced with a hint-based tutor scored higher on an exam than those who used a general-purpose chatbot."
+        ],
+        [
+          "German middle school students",
+          "The study found no clear improvement in what students knew when the chatbot added prompts about motivation or how to study."
+        ]
+      ],
+      "caption": "These are findings from separate studies, as reported by the review. The groups also differed in age, task and tool design. The comparisons leave open which features work best for a particular class.",
+      "source": {
+        "url": "https://scale.stanford.edu/ai/evidence-base-review/evidence-base-ai-k12-november-review",
+        "version": "published_institutional_report",
+        "sha256": "14e119559cd45aed8ceb19560f5c45a2cae79c3b741acfcfdaaa539b5f26f3f4",
+        "locator": "Key Findings on Students, “General-purpose AI vs. educational AI tools”; Appendix A",
+        "attribution": "Walker and colleagues, Stanford SCALE (2026)"
+      },
+      "rights": "original_factual_display_no_source_image",
+      "review": {
+        "kind": "ai_source_check",
+        "status": "checked",
+        "checked_on": "2026-11-23",
+        "scope": "Read the review’s comparison of Cao, Bastani and Fütterer and checked the setting, tool comparison and reported direction for each row. The three underlying studies were not independently reanalyzed.",
+        "payload_sha256": "6525ecbcc710c0bc231dbb5f8c2919c46d623ae758f6d73e77476c34fa534161"
+      }
+    },
+    {
+      "id": "practice-exam-prompts",
+      "kind": "reviewed_comparison",
+      "doi": "10.1007/s11423-026-10749-1",
+      "reading_id": "verified-notes",
+      "title": "What happened after students opened the practice exam?",
+      "description": "Chatbot logs show how many practice sessions displayed a prompt and how many recorded a response.",
+      "headers": [
+        "Prompt",
+        "Sessions showing the prompt",
+        "Sessions with an answer"
+      ],
+      "rows": [
+        [
+          "First question",
+          "224",
+          "118"
+        ],
+        [
+          "Final case",
+          "146",
+          "91"
+        ]
+      ],
+      "caption": "A student could open the exam several times. These counts describe sessions, and the answers were not a test of how much students learned.",
+      "source": {
+        "url": "https://link.springer.com/article/10.1007/s11423-026-10749-1",
+        "version": "publisher_version_of_record",
+        "notes_sha256": "e6e97c5db23ab939ea01fed34e5ae68e7cee5f10c66039a25889ad92b699abf7",
+        "locator": "Results, Practice intensity, Table 2 (Total column)",
+        "attribution": "Frosch, Lindauer & Winkel (2026)"
+      },
+      "rights": "original_factual_display_no_source_image",
+      "review": {
+        "kind": "ai_source_check",
+        "status": "checked",
+        "checked_on": "2026-11-23",
+        "scope": "Checked the four counts against the Total column of the publisher’s Table 2 and checked the session definition in Practice intensity. Values are session counts, not percentages of individual students.",
+        "payload_sha256": "81da602deb12e28f4e5a8733b58e79cd03a07e60ab1f85ba9a8e3cc6e1b3eec1"
+      }
+    },
+    {
+      "id": "writing-and-handling-complaints",
+      "kind": "reviewed_comparison",
+      "record_url": "https://www.theguardian.com/technology/2026/nov/13/how-it-feels-to-battle-with-a-flood-of-ai-generated-complaints",
+      "reading_id": "week-nov16-guardian",
+      "title": "Who does the work when AI helps write a complaint?",
+      "description": "Two perspectives from letters published in the Guardian.",
+      "headers": [
+        "Letter writer",
+        "What the writer sees"
+      ],
+      "rows": [
+        [
+          "Housing association investigator",
+          "Long letters can make it harder to find the problem a tenant wants fixed."
+        ],
+        [
+          "Pete Bibby",
+          "Writing help may give someone a way to raise a grievance they struggled to put into words."
+        ]
+      ],
+      "caption": "These are individual perspectives. The letters give no count of how often either experience occurs.",
+      "source": {
+        "url": "https://www.theguardian.com/technology/2026/nov/13/how-it-feels-to-battle-with-a-flood-of-ai-generated-complaints",
+        "version": "publisher_article",
+        "sha256": "7ed3fe76de213f53beba185855553a940ad8c33c5958bfb31d1886d729b3f8ce",
+        "locator": "First and third letters",
+        "attribution": "Letters to the Guardian (2026)"
+      },
+      "rights": "original_factual_display_no_source_image",
+      "review": {
+        "kind": "ai_source_check",
+        "status": "checked",
+        "checked_on": "2026-11-23",
+        "scope": "Checked speaker attribution and each position against the first and third letters. The two rows are paraphrased perspectives, not observations representative of all complaints.",
+        "payload_sha256": "6fce69b570948256c6f97fca4850074933975668eedadc3ffa425b6608181135"
+      }
     }
   ]
 }

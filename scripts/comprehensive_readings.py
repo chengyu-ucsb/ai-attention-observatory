@@ -363,6 +363,8 @@ def read_chunk(model,chunk,kind,title,deadline=None,*,genre='',repair_draft=True
         'Read the whole source segment, including qualifications. '+writing+' '
         'Return the one or two most informative facts or arguments here, with more '
         'only for distinct material results. Use each allowed field only when needed. '
+        'Lead with a person, task or concrete question. Use everyday words and explain necessary terms. '
+        'Keep who reported, counted, or tested the outcome clear in the same sentence. '
         'Write 6-90 words per claim, using a fresh sentence and one supporting span ID. '
         'For a segment with a study method or outcome, capture the specific method '
         'or outcome even when other information is missing. Give an empty list only '

@@ -74,8 +74,13 @@ class CompositionTests(unittest.TestCase):
         replies=[plan,bad]+draft['signals']+[frame]
         model=Mock()
         model.create_chat_completion.side_effect=[{'choices':[{'message':{'content':json.dumps(x)}}]} for x in replies]
-        result=composer.draft_in_stages(model,packet,{},review_sections=False)
+        previous_title = "Last week's question about writing"
+        result=composer.draft_in_stages(model,packet,{},review_sections=False, recent_headlines=[previous_title])
         self.assertEqual(len(result['signals']),3)
+        instructions = [call.kwargs['messages'][1]['content'] for call in model.create_chat_completion.call_args_list]
+        self.assertIn(previous_title, instructions[0])  # plan
+        self.assertIn(previous_title, instructions[-1])  # frame
+        self.assertFalse(any(previous_title in prompt for prompt in instructions[1:-1]))
         first=model.create_chat_completion.call_args_list[1].kwargs['messages'][1]['content']
         self.assertIn('Source 1',first)
         self.assertIn('Source 2',first)
@@ -151,8 +156,13 @@ class CompositionTests(unittest.TestCase):
             # Neither a different week nor an unapproved archive suppresses work.
             archive.write_text(json.dumps({'edition_date': '2026-11-09', 'status': 'awaiting_publication'}))
             self.assertIsNotNone(composer.pending(root, today=date(2026, 11, 10)))
-            archive.write_text(json.dumps({'edition_date': '2026-11-02', 'status': 'published'}))
-            self.assertIsNotNone(composer.pending(root, today=date(2026, 11, 10)))
+            archive.write_text(json.dumps({'edition_date': '2026-11-02', 'status': 'published',
+                                           'headline': 'A past question'}))
+            for day, status, kind in [('2026-11-16', 'published', 'full'), ('2026-10-26', 'published', 'coverage'),
+                                      ('2026-10-19', 'awaiting_publication', 'full')]:
+                (archive.parent / (day + '.json')).write_text(json.dumps(
+                    {'edition_date': day, 'status': status, 'edition_format': kind, 'headline': 'Excluded'}))
+            self.assertEqual(composer.pending(root, today=date(2026, 11, 10))['recent_headlines'], ['A past question'])
             # Invalid current windows still fail even if a matching draft exists.
             (data / 'issue-editorial.json').write_text(json.dumps(drafts))
             weekly['run']['publication_window']['from'] = '2026-11-03'

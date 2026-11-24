@@ -526,3 +526,7 @@ section navigation, card/dialog behavior, concise notices, and accessibility
 checks. It also defines a versioned Lab catalog that makes room for new
 experiments while keeping earlier activities available. The
 [Lab backlog](docs/lab-backlog.md) tracks substantive updates and future work.
+
+### Plain-language summaries and evidence visuals
+
+The public build reviews every source-eligible reading, including archive additions, companion pieces and items awaiting a headline or cover. Cards and reading pages share a short introduction. Article pages can also show verified comparisons with source links. The same pass runs after source corrections. See the [editorial workflow](docs/reading-review.md) and [current review register](data/reading-review.json).
