@@ -38,13 +38,17 @@
       "source_url": "https://doi.org/10.1002/dhe.70234",
       "status": "rate_limited",
       "complete": false,
-      "attempts": 3,
+      "attempts": 4,
       "cursor": {
         "known": 0,
         "provider": 2,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "a6b6f4b7b7a85d04eb681f7c63f1f30741239b254baad7be4061115c0c02fbf3",
+        "aa9b9faca6defbd6eb112481f70f832514f8f716764c1fe0415029872aabe076",
+        "ca45715ecffdff2a72724110681e03be7d4e71ffe5e9ea477b8547d5293f7754"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -74,11 +78,39 @@
           "provider": "Semantic Scholar",
           "failure_url": "https://api.semanticscholar.org/graph/v1/paper/DOI:10.1002/dhe.70234",
           "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Crossref publisher locations",
+          "candidates": 3
+        },
+        {
+          "status": "host_access_denied_this_run",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://onlinelibrary.wiley.com/doi/pdf/10.1002/dhe.70234"
+        },
+        {
+          "status": "host_access_denied_this_run",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://onlinelibrary.wiley.com/doi/10.1002/dhe.70234"
+        },
+        {
+          "status": "host_access_denied_this_run",
+          "retryable": false,
+          "stage": "article",
+          "provider": "source_route",
+          "url": "https://onlinelibrary.wiley.com/doi/full-xml/10.1002/dhe.70234"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T04:36:02.049665+00:00",
-      "last_outcome": "source_unavailable",
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "access_blocked",
       "next_retry_at": "2026-11-18T05:36:04.002949+00:00",
       "provider_attempted_at": "2026-11-17T05:18:25.915554+00:00",
       "provider_fallbacks": {
@@ -87,6 +119,16 @@
           "tried_sources": [],
           "status": "exhausted",
           "attempted_at": "2026-11-18T04:36:02.049665+00:00"
+        },
+        "4": {
+          "complete": true,
+          "tried_sources": [
+            "a6b6f4b7b7a85d04eb681f7c63f1f30741239b254baad7be4061115c0c02fbf3",
+            "aa9b9faca6defbd6eb112481f70f832514f8f716764c1fe0415029872aabe076",
+            "ca45715ecffdff2a72724110681e03be7d4e71ffe5e9ea477b8547d5293f7754"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-24T13:51:37.414922+00:00"
         }
       }
     },
@@ -199,12 +241,12 @@
       "kind": "scholarly",
       "published": "2026-11-19",
       "source_url": "https://doi.org/10.1007/s42438-026-00721-w",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -215,8 +257,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "8b60796462e66eca0ba4a89062a6ab0851bf392815cd52e1caf62183d763e531": {
       "fingerprint": "69db6cf43c872f81b5d5d8cbc31b3e5bd5a2aedd68674044e05c678a58fa58dd",
@@ -494,12 +546,12 @@
       "kind": "scholarly",
       "published": "2026-11-19",
       "source_url": "https://doi.org/10.1080/10447318.2026.2762689",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -510,8 +562,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "e28a6d95d3231a5b50cb31f33e9a76a4bdaa71709e35cdd98cd57ec07c0fccb0": {
       "fingerprint": "28cca3d29b116e3a1265d808d6723743618a1be86d55e474feaabbdab72ddb26",
@@ -566,12 +628,12 @@
       "kind": "scholarly",
       "published": "2026-11-17",
       "source_url": "https://doi.org/10.1108/apjml-05-2026-1311",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -582,8 +644,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "617faa2dfc4a2b2c46df5ea94e9694f6d4d1ab5cb263265282f9c2bf4a67d875": {
       "fingerprint": "2d6d2995516650f8da6afac481c5e2da2cf3dc5e2031de2a95dd86cd0259ceea",
@@ -2235,12 +2307,12 @@
       "kind": "scholarly",
       "published": "2026-11-18",
       "source_url": "https://doi.org/10.1287/isre.2024.1282",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -2251,8 +2323,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "cb31c609e11ac10d787db987b737e02347e852def2ff519d47ef56d681070aa8": {
       "fingerprint": "c78579529200d42e858bc9af2292ba66be7bc6f43f6ec2a0ba4aa25d7ed3413b",
@@ -2283,12 +2365,12 @@
       "kind": "scholarly",
       "published": "2026-11-19",
       "source_url": "https://doi.org/10.1542/hpeds.2026-009673",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -2299,17 +2381,27 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "b66c60bc6765b5a695c5bfec39ec7d7d3dbe02ca0193375d4755145fc102723e": {
       "fingerprint": "926b47bdd0602c61c0329b7148dd8a57b3193102f1ab4ce556b70c654745c9ab",
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.1680/jensu.26.00012",
-      "status": "pending_routes",
+      "status": "rate_limited",
       "complete": false,
-      "attempts": 2,
+      "attempts": 3,
       "cursor": {
         "known": 0,
         "provider": 2,
@@ -2337,11 +2429,22 @@
           "stage": "discovery",
           "provider": "OpenAIRE",
           "candidates": 0
+        },
+        {
+          "status": "http_429",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "CORE",
+          "failure_url": "https://api.core.ac.uk/v3/search/works",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-18T04:36:02.049665+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "rate_limited",
+      "provider_attempted_at": "2026-11-24T13:51:37.414922+00:00",
+      "next_retry_at": "2026-11-24T14:52:18.012127+00:00"
     },
     "698a22dc5dd2c833a4cfea21f74827219a0f566b1be8a737dcc948b8ff3a5656": {
       "fingerprint": "18cc30e6a105133efe4484147b14ce192e87467403ec381f53a1a09cd54e2421",
@@ -2708,15 +2811,19 @@
       "kind": "scholarly",
       "published": "2026-11-17",
       "source_url": "https://doi.org/10.2196/93991",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
-        "provider_tried": []
+        "provider_tried": [
+          "8634ce84de489955fe7a5a825a00451f06d9bf4fb0194dd269cbb2d6e70ca19b"
+        ]
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "8634ce84de489955fe7a5a825a00451f06d9bf4fb0194dd269cbb2d6e70ca19b"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -2724,8 +2831,1683 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 1
+        },
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Europe PMC full-text API",
+          "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13777222/fullTextXML",
+          "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13777222/fullTextXML"
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "document": {
+        "source_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13777222/fullTextXML",
+        "document_version": "repository_article_xml",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 11,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 3,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 130,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 5,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 1,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 336,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 135,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 930,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 182,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 17,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 18,
+            "characters": 2,
+            "has_text": true
+          },
+          {
+            "unit": 19,
+            "characters": 6,
+            "has_text": true
+          },
+          {
+            "unit": 20,
+            "characters": 6,
+            "has_text": true
+          },
+          {
+            "unit": 21,
+            "characters": 29,
+            "has_text": true
+          },
+          {
+            "unit": 22,
+            "characters": 32,
+            "has_text": true
+          },
+          {
+            "unit": 23,
+            "characters": 742,
+            "has_text": true
+          },
+          {
+            "unit": 24,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 25,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 26,
+            "characters": 595,
+            "has_text": true
+          },
+          {
+            "unit": 27,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 28,
+            "characters": 248,
+            "has_text": true
+          },
+          {
+            "unit": 29,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 30,
+            "characters": 713,
+            "has_text": true
+          },
+          {
+            "unit": 31,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 32,
+            "characters": 843,
+            "has_text": true
+          },
+          {
+            "unit": 33,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 34,
+            "characters": 758,
+            "has_text": true
+          },
+          {
+            "unit": 35,
+            "characters": 145,
+            "has_text": true
+          },
+          {
+            "unit": 36,
+            "characters": 406,
+            "has_text": true
+          },
+          {
+            "unit": 37,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 38,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 39,
+            "characters": 790,
+            "has_text": true
+          },
+          {
+            "unit": 40,
+            "characters": 1880,
+            "has_text": true
+          },
+          {
+            "unit": 41,
+            "characters": 1405,
+            "has_text": true
+          },
+          {
+            "unit": 42,
+            "characters": 646,
+            "has_text": true
+          },
+          {
+            "unit": 43,
+            "characters": 32,
+            "has_text": true
+          },
+          {
+            "unit": 44,
+            "characters": 284,
+            "has_text": true
+          },
+          {
+            "unit": 45,
+            "characters": 457,
+            "has_text": true
+          },
+          {
+            "unit": 46,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 47,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 48,
+            "characters": 477,
+            "has_text": true
+          },
+          {
+            "unit": 49,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 50,
+            "characters": 672,
+            "has_text": true
+          },
+          {
+            "unit": 51,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 52,
+            "characters": 565,
+            "has_text": true
+          },
+          {
+            "unit": 53,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 54,
+            "characters": 515,
+            "has_text": true
+          },
+          {
+            "unit": 55,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 56,
+            "characters": 335,
+            "has_text": true
+          },
+          {
+            "unit": 57,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 58,
+            "characters": 949,
+            "has_text": true
+          },
+          {
+            "unit": 59,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 60,
+            "characters": 1135,
+            "has_text": true
+          },
+          {
+            "unit": 61,
+            "characters": 298,
+            "has_text": true
+          },
+          {
+            "unit": 62,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 63,
+            "characters": 763,
+            "has_text": true
+          },
+          {
+            "unit": 64,
+            "characters": 534,
+            "has_text": true
+          },
+          {
+            "unit": 65,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 66,
+            "characters": 269,
+            "has_text": true
+          },
+          {
+            "unit": 67,
+            "characters": 68,
+            "has_text": true
+          },
+          {
+            "unit": 68,
+            "characters": 249,
+            "has_text": true
+          },
+          {
+            "unit": 69,
+            "characters": 263,
+            "has_text": true
+          },
+          {
+            "unit": 70,
+            "characters": 345,
+            "has_text": true
+          },
+          {
+            "unit": 71,
+            "characters": 330,
+            "has_text": true
+          },
+          {
+            "unit": 72,
+            "characters": 300,
+            "has_text": true
+          },
+          {
+            "unit": 73,
+            "characters": 71,
+            "has_text": true
+          },
+          {
+            "unit": 74,
+            "characters": 19,
+            "has_text": true
+          },
+          {
+            "unit": 75,
+            "characters": 644,
+            "has_text": true
+          },
+          {
+            "unit": 76,
+            "characters": 937,
+            "has_text": true
+          },
+          {
+            "unit": 77,
+            "characters": 627,
+            "has_text": true
+          },
+          {
+            "unit": 78,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 79,
+            "characters": 406,
+            "has_text": true
+          },
+          {
+            "unit": 80,
+            "characters": 25,
+            "has_text": true
+          },
+          {
+            "unit": 81,
+            "characters": 74,
+            "has_text": true
+          },
+          {
+            "unit": 82,
+            "characters": 249,
+            "has_text": true
+          },
+          {
+            "unit": 83,
+            "characters": 323,
+            "has_text": true
+          },
+          {
+            "unit": 84,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 85,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 86,
+            "characters": 163,
+            "has_text": true
+          },
+          {
+            "unit": 87,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 88,
+            "characters": 279,
+            "has_text": true
+          },
+          {
+            "unit": 89,
+            "characters": 385,
+            "has_text": true
+          },
+          {
+            "unit": 90,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 91,
+            "characters": 395,
+            "has_text": true
+          },
+          {
+            "unit": 92,
+            "characters": 61,
+            "has_text": true
+          },
+          {
+            "unit": 93,
+            "characters": 39,
+            "has_text": true
+          },
+          {
+            "unit": 94,
+            "characters": 684,
+            "has_text": true
+          },
+          {
+            "unit": 95,
+            "characters": 105,
+            "has_text": true
+          },
+          {
+            "unit": 96,
+            "characters": 738,
+            "has_text": true
+          },
+          {
+            "unit": 97,
+            "characters": 467,
+            "has_text": true
+          },
+          {
+            "unit": 98,
+            "characters": 353,
+            "has_text": true
+          },
+          {
+            "unit": 99,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 100,
+            "characters": 254,
+            "has_text": true
+          },
+          {
+            "unit": 101,
+            "characters": 126,
+            "has_text": true
+          },
+          {
+            "unit": 102,
+            "characters": 62,
+            "has_text": true
+          },
+          {
+            "unit": 103,
+            "characters": 62,
+            "has_text": true
+          },
+          {
+            "unit": 104,
+            "characters": 66,
+            "has_text": true
+          },
+          {
+            "unit": 105,
+            "characters": 64,
+            "has_text": true
+          },
+          {
+            "unit": 106,
+            "characters": 59,
+            "has_text": true
+          },
+          {
+            "unit": 107,
+            "characters": 62,
+            "has_text": true
+          },
+          {
+            "unit": 108,
+            "characters": 68,
+            "has_text": true
+          },
+          {
+            "unit": 109,
+            "characters": 68,
+            "has_text": true
+          },
+          {
+            "unit": 110,
+            "characters": 79,
+            "has_text": true
+          },
+          {
+            "unit": 111,
+            "characters": 168,
+            "has_text": true
+          },
+          {
+            "unit": 112,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 113,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 114,
+            "characters": 455,
+            "has_text": true
+          },
+          {
+            "unit": 115,
+            "characters": 1040,
+            "has_text": true
+          },
+          {
+            "unit": 116,
+            "characters": 74,
+            "has_text": true
+          },
+          {
+            "unit": 117,
+            "characters": 55,
+            "has_text": true
+          },
+          {
+            "unit": 118,
+            "characters": 528,
+            "has_text": true
+          },
+          {
+            "unit": 119,
+            "characters": 45,
+            "has_text": true
+          },
+          {
+            "unit": 120,
+            "characters": 1166,
+            "has_text": true
+          },
+          {
+            "unit": 121,
+            "characters": 74,
+            "has_text": true
+          },
+          {
+            "unit": 122,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 123,
+            "characters": 259,
+            "has_text": true
+          },
+          {
+            "unit": 124,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 125,
+            "characters": 18,
+            "has_text": true
+          },
+          {
+            "unit": 126,
+            "characters": 1794,
+            "has_text": true
+          },
+          {
+            "unit": 127,
+            "characters": 1499,
+            "has_text": true
+          },
+          {
+            "unit": 128,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 129,
+            "characters": 1336,
+            "has_text": true
+          },
+          {
+            "unit": 130,
+            "characters": 25,
+            "has_text": true
+          },
+          {
+            "unit": 131,
+            "characters": 939,
+            "has_text": true
+          },
+          {
+            "unit": 132,
+            "characters": 466,
+            "has_text": true
+          },
+          {
+            "unit": 133,
+            "characters": 2226,
+            "has_text": true
+          },
+          {
+            "unit": 134,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 135,
+            "characters": 931,
+            "has_text": true
+          },
+          {
+            "unit": 136,
+            "characters": 22,
+            "has_text": true
+          },
+          {
+            "unit": 137,
+            "characters": 84,
+            "has_text": true
+          },
+          {
+            "unit": 138,
+            "characters": 65,
+            "has_text": true
+          },
+          {
+            "unit": 139,
+            "characters": 75,
+            "has_text": true
+          },
+          {
+            "unit": 140,
+            "characters": 75,
+            "has_text": true
+          },
+          {
+            "unit": 141,
+            "characters": 73,
+            "has_text": true
+          },
+          {
+            "unit": 142,
+            "characters": 153,
+            "has_text": true
+          },
+          {
+            "unit": 143,
+            "characters": 120,
+            "has_text": true
+          },
+          {
+            "unit": 144,
+            "characters": 52,
+            "has_text": true
+          },
+          {
+            "unit": 145,
+            "characters": 345,
+            "has_text": true
+          },
+          {
+            "unit": 146,
+            "characters": 1569,
+            "has_text": true
+          },
+          {
+            "unit": 147,
+            "characters": 360,
+            "has_text": true
+          },
+          {
+            "unit": 148,
+            "characters": 14138,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 3
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 130
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 5
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 1
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 336
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 135
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 930
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 182
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 17,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 18,
+                "start": 0,
+                "end": 2
+              },
+              {
+                "unit": 19,
+                "start": 0,
+                "end": 6
+              },
+              {
+                "unit": 20,
+                "start": 0,
+                "end": 6
+              },
+              {
+                "unit": 21,
+                "start": 0,
+                "end": 29
+              },
+              {
+                "unit": 22,
+                "start": 0,
+                "end": 32
+              },
+              {
+                "unit": 23,
+                "start": 0,
+                "end": 742
+              },
+              {
+                "unit": 24,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 25,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 26,
+                "start": 0,
+                "end": 595
+              },
+              {
+                "unit": 27,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 28,
+                "start": 0,
+                "end": 248
+              },
+              {
+                "unit": 29,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 30,
+                "start": 0,
+                "end": 713
+              },
+              {
+                "unit": 31,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 32,
+                "start": 0,
+                "end": 843
+              },
+              {
+                "unit": 33,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 34,
+                "start": 0,
+                "end": 348
+              },
+              {
+                "unit": 34,
+                "start": 348,
+                "end": 388
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 34,
+                "start": 388,
+                "end": 758
+              },
+              {
+                "unit": 35,
+                "start": 0,
+                "end": 145
+              },
+              {
+                "unit": 36,
+                "start": 0,
+                "end": 406
+              },
+              {
+                "unit": 37,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 38,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 39,
+                "start": 0,
+                "end": 790
+              },
+              {
+                "unit": 40,
+                "start": 0,
+                "end": 1880
+              },
+              {
+                "unit": 41,
+                "start": 0,
+                "end": 1405
+              },
+              {
+                "unit": 42,
+                "start": 0,
+                "end": 412
+              },
+              {
+                "unit": 42,
+                "start": 412,
+                "end": 473
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 42,
+                "start": 473,
+                "end": 646
+              },
+              {
+                "unit": 43,
+                "start": 0,
+                "end": 32
+              },
+              {
+                "unit": 44,
+                "start": 0,
+                "end": 284
+              },
+              {
+                "unit": 45,
+                "start": 0,
+                "end": 457
+              },
+              {
+                "unit": 46,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 47,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 48,
+                "start": 0,
+                "end": 477
+              },
+              {
+                "unit": 49,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 50,
+                "start": 0,
+                "end": 672
+              },
+              {
+                "unit": 51,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 52,
+                "start": 0,
+                "end": 565
+              },
+              {
+                "unit": 53,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 54,
+                "start": 0,
+                "end": 515
+              },
+              {
+                "unit": 55,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 56,
+                "start": 0,
+                "end": 335
+              },
+              {
+                "unit": 57,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 58,
+                "start": 0,
+                "end": 949
+              },
+              {
+                "unit": 59,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 60,
+                "start": 0,
+                "end": 919
+              },
+              {
+                "unit": 60,
+                "start": 919,
+                "end": 934
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 60,
+                "start": 934,
+                "end": 1135
+              },
+              {
+                "unit": 61,
+                "start": 0,
+                "end": 298
+              },
+              {
+                "unit": 62,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 63,
+                "start": 0,
+                "end": 763
+              },
+              {
+                "unit": 64,
+                "start": 0,
+                "end": 534
+              },
+              {
+                "unit": 65,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 66,
+                "start": 0,
+                "end": 269
+              },
+              {
+                "unit": 67,
+                "start": 0,
+                "end": 68
+              },
+              {
+                "unit": 68,
+                "start": 0,
+                "end": 249
+              },
+              {
+                "unit": 69,
+                "start": 0,
+                "end": 263
+              },
+              {
+                "unit": 70,
+                "start": 0,
+                "end": 345
+              },
+              {
+                "unit": 71,
+                "start": 0,
+                "end": 330
+              },
+              {
+                "unit": 72,
+                "start": 0,
+                "end": 300
+              },
+              {
+                "unit": 73,
+                "start": 0,
+                "end": 71
+              },
+              {
+                "unit": 74,
+                "start": 0,
+                "end": 19
+              },
+              {
+                "unit": 75,
+                "start": 0,
+                "end": 644
+              },
+              {
+                "unit": 76,
+                "start": 0,
+                "end": 937
+              },
+              {
+                "unit": 77,
+                "start": 0,
+                "end": 176
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 77,
+                "start": 176,
+                "end": 627
+              },
+              {
+                "unit": 78,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 79,
+                "start": 0,
+                "end": 406
+              },
+              {
+                "unit": 80,
+                "start": 0,
+                "end": 25
+              },
+              {
+                "unit": 81,
+                "start": 0,
+                "end": 74
+              },
+              {
+                "unit": 82,
+                "start": 0,
+                "end": 249
+              },
+              {
+                "unit": 83,
+                "start": 0,
+                "end": 323
+              },
+              {
+                "unit": 84,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 85,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 86,
+                "start": 0,
+                "end": 163
+              },
+              {
+                "unit": 87,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 88,
+                "start": 0,
+                "end": 279
+              },
+              {
+                "unit": 89,
+                "start": 0,
+                "end": 385
+              },
+              {
+                "unit": 90,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 91,
+                "start": 0,
+                "end": 395
+              },
+              {
+                "unit": 92,
+                "start": 0,
+                "end": 61
+              },
+              {
+                "unit": 93,
+                "start": 0,
+                "end": 39
+              },
+              {
+                "unit": 94,
+                "start": 0,
+                "end": 684
+              },
+              {
+                "unit": 95,
+                "start": 0,
+                "end": 105
+              },
+              {
+                "unit": 96,
+                "start": 0,
+                "end": 738
+              },
+              {
+                "unit": 97,
+                "start": 0,
+                "end": 467
+              },
+              {
+                "unit": 98,
+                "start": 0,
+                "end": 353
+              },
+              {
+                "unit": 99,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 100,
+                "start": 0,
+                "end": 207
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 100,
+                "start": 207,
+                "end": 254
+              },
+              {
+                "unit": 101,
+                "start": 0,
+                "end": 126
+              },
+              {
+                "unit": 102,
+                "start": 0,
+                "end": 62
+              },
+              {
+                "unit": 103,
+                "start": 0,
+                "end": 62
+              },
+              {
+                "unit": 104,
+                "start": 0,
+                "end": 66
+              },
+              {
+                "unit": 105,
+                "start": 0,
+                "end": 64
+              },
+              {
+                "unit": 106,
+                "start": 0,
+                "end": 59
+              },
+              {
+                "unit": 107,
+                "start": 0,
+                "end": 62
+              },
+              {
+                "unit": 108,
+                "start": 0,
+                "end": 68
+              },
+              {
+                "unit": 109,
+                "start": 0,
+                "end": 68
+              },
+              {
+                "unit": 110,
+                "start": 0,
+                "end": 79
+              },
+              {
+                "unit": 111,
+                "start": 0,
+                "end": 168
+              },
+              {
+                "unit": 112,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 113,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 114,
+                "start": 0,
+                "end": 455
+              },
+              {
+                "unit": 115,
+                "start": 0,
+                "end": 1040
+              },
+              {
+                "unit": 116,
+                "start": 0,
+                "end": 74
+              },
+              {
+                "unit": 117,
+                "start": 0,
+                "end": 55
+              },
+              {
+                "unit": 118,
+                "start": 0,
+                "end": 528
+              },
+              {
+                "unit": 119,
+                "start": 0,
+                "end": 45
+              },
+              {
+                "unit": 120,
+                "start": 0,
+                "end": 1166
+              },
+              {
+                "unit": 121,
+                "start": 0,
+                "end": 74
+              },
+              {
+                "unit": 122,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 123,
+                "start": 0,
+                "end": 259
+              },
+              {
+                "unit": 124,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 125,
+                "start": 0,
+                "end": 18
+              },
+              {
+                "unit": 126,
+                "start": 0,
+                "end": 644
+              },
+              {
+                "unit": 126,
+                "start": 644,
+                "end": 781
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 126,
+                "start": 781,
+                "end": 1794
+              },
+              {
+                "unit": 127,
+                "start": 0,
+                "end": 1499
+              },
+              {
+                "unit": 128,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 129,
+                "start": 0,
+                "end": 1336
+              },
+              {
+                "unit": 130,
+                "start": 0,
+                "end": 25
+              },
+              {
+                "unit": 131,
+                "start": 0,
+                "end": 939
+              },
+              {
+                "unit": 132,
+                "start": 0,
+                "end": 466
+              },
+              {
+                "unit": 133,
+                "start": 0,
+                "end": 184
+              },
+              {
+                "unit": 133,
+                "start": 184,
+                "end": 192
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 133,
+                "start": 192,
+                "end": 2226
+              },
+              {
+                "unit": 134,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 135,
+                "start": 0,
+                "end": 931
+              },
+              {
+                "unit": 136,
+                "start": 0,
+                "end": 22
+              },
+              {
+                "unit": 137,
+                "start": 0,
+                "end": 84
+              },
+              {
+                "unit": 138,
+                "start": 0,
+                "end": 65
+              },
+              {
+                "unit": 139,
+                "start": 0,
+                "end": 75
+              },
+              {
+                "unit": 140,
+                "start": 0,
+                "end": 75
+              },
+              {
+                "unit": 141,
+                "start": 0,
+                "end": 73
+              },
+              {
+                "unit": 142,
+                "start": 0,
+                "end": 153
+              },
+              {
+                "unit": 143,
+                "start": 0,
+                "end": 120
+              },
+              {
+                "unit": 144,
+                "start": 0,
+                "end": 52
+              },
+              {
+                "unit": 145,
+                "start": 0,
+                "end": 345
+              },
+              {
+                "unit": 146,
+                "start": 0,
+                "end": 1339
+              },
+              {
+                "unit": 146,
+                "start": 1339,
+                "end": 1446
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 146,
+                "start": 1446,
+                "end": 1569
+              },
+              {
+                "unit": 147,
+                "start": 0,
+                "end": 360
+              },
+              {
+                "unit": 148,
+                "start": 0,
+                "end": 4765
+              },
+              {
+                "unit": 148,
+                "start": 4765,
+                "end": 5014
+              }
+            ]
+          },
+          {
+            "chunk": "C0010",
+            "ranges": [
+              {
+                "unit": 148,
+                "start": 5014,
+                "end": 10454
+              },
+              {
+                "unit": 148,
+                "start": 10454,
+                "end": 10513
+              }
+            ]
+          },
+          {
+            "chunk": "C0011",
+            "ranges": [
+              {
+                "unit": 148,
+                "start": 10513,
+                "end": 14138
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "document_format": "jats",
+        "structured_text_coverage": "all_text_in_supplied_article_xml",
+        "source_document_equivalence": "not_verified",
+        "layout_fidelity": "not_verified",
+        "rights_basis": "article_metadata_permissive_license",
+        "characters_retrieved": 58617,
+        "units_retrieved": 148,
+        "source_sha256": "81c32de1ff2b8e0ebfae12b589a4a9bb55cbb43da536fd2b27c26a0b8be9bad3"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "Europe PMC full-text API",
+        "url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13777222/fullTextXML",
+        "final_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13777222/fullTextXML"
+      },
+      "last_outcome": "full_document_retrieved"
     },
     "4014b3d032d83de302985c4e517a67e71a1a0b7a5beef039d7dba64be37d3123": {
       "fingerprint": "6711dc82f9503c809259d486f317a51c23355d43b20f0b2b17f267650378b4ef",
@@ -2880,12 +4662,12 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.29011/2577-1442.100188",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -2896,8 +4678,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "0854c183d5874b4aac8c5c22030376d1a3ef74b08a4d54b490245ad18b052944": {
       "fingerprint": "33c055eef4406a07720ab5181a88430eae2a5cf7f9aa8dabde4b1fb3a5ad01b1",
@@ -2928,12 +4720,12 @@
       "kind": "scholarly",
       "published": "2026-11-22",
       "source_url": "https://doi.org/10.30971/pje.v42i2.3651",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -2944,8 +4736,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "d77fccdc00bb04c8be29b98d980958b2db66961120c78296528412e4c6eed8f5": {
       "fingerprint": "13d86bfe84615feb7c0233579c763cb80d60f5ec1811dd33963f3a008166fdbf",
@@ -4392,9 +6194,9 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.4253/wjge.126153",
-      "status": "pending_routes",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 1,
@@ -4415,11 +6217,21 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-16T21:13:41.870205+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "provider_attempted_at": "2026-11-24T13:51:37.414922+00:00",
+      "next_retry_at": "2026-11-24T14:52:53.092155+00:00"
     },
     "7aaa8957ff2a17018d530cb1ad2e292569e2e37de7b71f6491762bc26e76c5f0": {
       "fingerprint": "04063d1667efaae57ddbdff0acb84eef6bfe7a1d8011b0ecc3f410391115a5dc",
@@ -5021,12 +6833,12 @@
       "kind": "scholarly",
       "published": "2026-11-22",
       "source_url": "https://doi.org/10.5861/ijrse.2026.26399",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -5037,8 +6849,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T13:51:37.414922+00:00",
+      "last_outcome": "source_unavailable"
     },
     "d36bda53a8f984adf5ff692d3bbc7ecde0e08699c58ac233b6bb77e7450dab74": {
       "fingerprint": "d867db34373e57f25be8d30dea69432007e1505ad43f28cc7ffb85019278fdc0",
@@ -8398,9 +10220,9 @@
       "source_text_saved": false
     }
   },
-  "cursor": 73,
+  "cursor": 85,
   "provider_pauses": {
-    "provider:CORE": "2026-11-23T20:30:15.757462+00:00",
+    "provider:CORE": "2026-11-24T14:52:18.012127+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
   },
   "access_controls": {
@@ -8415,12 +10237,15 @@
       "https://arxiv.org/pdf/2508.19708",
       "https://bera-journals.onlinelibrary.wiley.com/doi/10.1111/bjet.70100",
       "https://core.ac.uk/download/699456932.pdf",
+      "https://onlinelibrary.wiley.com/doi/10.1002/dhe.70234",
       "https://onlinelibrary.wiley.com/doi/10.1002/jcal.70366",
       "https://onlinelibrary.wiley.com/doi/10.1002/jcal.70371",
       "https://onlinelibrary.wiley.com/doi/10.1111/ejed.70926",
+      "https://onlinelibrary.wiley.com/doi/full-xml/10.1002/dhe.70234",
       "https://onlinelibrary.wiley.com/doi/full-xml/10.1002/jcal.70366",
       "https://onlinelibrary.wiley.com/doi/full-xml/10.1002/jcal.70371",
       "https://onlinelibrary.wiley.com/doi/full-xml/10.1111/ejed.70926",
+      "https://onlinelibrary.wiley.com/doi/pdf/10.1002/dhe.70234",
       "https://onlinelibrary.wiley.com/doi/pdf/10.1002/jcal.70366",
       "https://onlinelibrary.wiley.com/doi/pdf/10.1002/jcal.70371",
       "https://onlinelibrary.wiley.com/doi/pdf/10.1111/ejed.70926",
@@ -8477,7 +10302,7 @@
     ],
     "denied_providers": [],
     "provider_pauses": {
-      "provider:CORE": "2026-11-23T20:30:15.757462+00:00",
+      "provider:CORE": "2026-11-24T14:52:18.012127+00:00",
       "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
     }
   },
@@ -10031,24 +11856,24 @@
     }
   ],
   "input_fingerprint": "ab9a1f47d27f9b417052c2618bf49b0a641d00b322465e14654f76e0657537a0",
-  "state_sha256": "c06205096f16508fecfc041b8edaf3259eff4319926dbe8bc4fce2e2f66a8f0f",
+  "state_sha256": "ad230c51d22111a9f8e63c8fb4f525f95301849c6f0e484783d4ee37b36d8971",
   "run": {
-    "checked_at": "2026-11-24T12:40:04.655122+00:00",
+    "checked_at": "2026-11-24T13:51:37.414922+00:00",
     "selected_records": 123,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 20,
-    "pending_records": 103,
-    "deferred_retry_records": 29,
+    "completed_records": 21,
+    "pending_records": 102,
+    "deferred_retry_records": 31,
     "statuses": {
       "access_blocked": 5,
-      "full_document_retrieved_not_reviewed": 2,
+      "full_document_retrieved_not_reviewed": 3,
       "partial_full_text_not_reviewed": 3,
-      "pending": 62,
-      "pending_routes": 12,
-      "rate_limited": 10,
+      "pending": 53,
+      "pending_routes": 18,
+      "rate_limited": 11,
       "source_unavailable": 10,
-      "temporarily_unavailable": 19
+      "temporarily_unavailable": 20
     },
     "excluded": {},
     "duplicate_records": 0,
@@ -10058,7 +11883,9 @@
     "time_budget_seconds": 480,
     "item_time_budget_seconds": 60,
     "max_candidates_per_provider_stage": 8,
-    "active_provider_pauses": {},
+    "active_provider_pauses": {
+      "provider:CORE": "2026-11-24T14:52:18.012127+00:00"
+    },
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
     "publication_or_review_performed": false
