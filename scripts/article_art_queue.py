@@ -228,9 +228,9 @@ def _seed_previous_public(path: Path | None, admitted: set[str]) -> dict:
     return result
 
 
-def write_state(path: Path, payload: dict) -> bool:
+def write_state(path: Path, payload: dict, *, sort_keys=True) -> bool:
     """Replace atomically; unchanged results preserve bytes and modification time."""
-    content = (json.dumps(payload, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False) + "\n").encode()
+    content = (json.dumps(payload, sort_keys=sort_keys, indent=2, ensure_ascii=False, allow_nan=False) + "\n").encode()
     try:
         if path.read_bytes() == content:
             return False
@@ -328,7 +328,7 @@ def approve_reviewed_cover(identity, root=art.ROOT):
             raise ValueError("Card thumbnail differs from the full cover; export it from the approved original")
     if override.get("commission_review") != proof:
         override["commission_review"] = proof
-        write_state(manifest, payload)
+        write_state(manifest, payload, sort_keys=False)
 
 
 def attach_persistent_art(records: list[dict], root: Path = art.ROOT, manifest: Path | None = None, *,
@@ -348,13 +348,18 @@ def attach_persistent_art(records: list[dict], root: Path = art.ROOT, manifest: 
     pending = {}
     receipts = state.get("approved", {})
     if commissioned_only:
-        for record in records:
-            identity = art.canonical_identity(record)
+        identities = [art.canonical_identity(record) for record in records]
+        if len(set(identities)) != len(identities):
+            raise ValueError("Article art allocation requires unique canonical public identities")
+        for identity in identities:
             reason = invalid.get(identity) or commission_problem(identity, overrides.get(identity))
             if reason:
                 pending[identity] = reason
                 overrides.pop(identity, None)
         overrides.update(previous_commissions(root, previous_public, pending.keys() & receipts.keys(), receipts))
+        # Waiting readings already have a durable commissioning entry. Only
+        # commissioned pairs should consume the renderer or produce public assets.
+        records = [record for record in records if art.canonical_identity(record) in overrides]
     pools = {art.canonical_identity(record): art.candidate_pool_fingerprint(record, overrides) for record in records}
     if len(pools) != len(records):
         raise ValueError("Article art allocation requires unique canonical public identities")
@@ -370,18 +375,26 @@ def attach_persistent_art(records: list[dict], root: Path = art.ROOT, manifest: 
         value = prior.get(identity) or seeds.get(identity)
         if value:
             record["editorial_art"] = value
-    art.attach_art(records, root, manifest, reuse_exhausted=reuse_exhausted, validated_overrides=overrides)
+    protected = {identity for identity, proof in receipts.items()
+                 if commissioned_only and identity in overrides and review_fingerprint(identity, overrides[identity]) == proof}
+    art.attach_art(records, root, manifest, reuse_exhausted=reuse_exhausted,
+                   validated_overrides=overrides, protected_ids=protected)
     approved = {}
     if commissioned_only:
-        # A proposed replacement can lose the collection-wide duplicate check.
-        # Keep the known-good published pair while the new commission is repaired.
-        held = {art.canonical_identity(record) for record in records
-                if record["editorial_art"].get("status") != "ready"}
-        fallback = (held & receipts.keys()) - pending.keys()
-        if fallback:
+        # Restoring one old pair can displace another proposed replacement.
+        # Each pass restores a previously published ID at most once.
+        while True:
+            held = {art.canonical_identity(record) for record in records
+                    if record["editorial_art"].get("status") != "ready"}
+            fallback = (held & receipts.keys()) - pending.keys()
+            if not fallback:
+                break
             pending.update({identity: "cover_rejected" for identity in fallback})
             overrides.update(previous_commissions(root, previous_public, fallback, receipts))
-            art.attach_art(records, root, manifest, validated_overrides=overrides)
+            protected.update(fallback)
+            art.attach_art(records, root, manifest, validated_overrides=overrides, protected_ids=protected)
+            pools = {art.canonical_identity(record): art.candidate_pool_fingerprint(record, overrides) for record in records}
+            corpus = digest({"state_version": STATE_VERSION, "candidate_pools": pools})
         for record in records:
             identity = art.canonical_identity(record)
             result = record["editorial_art"]

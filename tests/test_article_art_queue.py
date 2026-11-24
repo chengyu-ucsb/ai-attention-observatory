@@ -281,6 +281,7 @@ class ArtQueuePublicationTests(unittest.TestCase):
             selected, weekly = build()
             self.assertFalse(selected)
             self.assertFalse(weekly["items"])
+            self.assertFalse((root / "assets/article-art").exists())
             self.assertEqual(json.loads((data / queue.STATE_FILENAME).read_text())["commissioning"]["pending"],
                              {identity: "needs_original"})
             destination = root / "website"
@@ -295,6 +296,14 @@ class ArtQueuePublicationTests(unittest.TestCase):
             self.assertFalse(json.loads((data / queue.STATE_FILENAME).read_text())["commissioning"]["pending"])
             build_reader(root, pages_data=destination)
             self.assertEqual(json.loads((destination / "art-commissions.json").read_text()), {"pending": []})
+            tracked_library = data / "public-library.json"
+            good_content = tracked_library.read_bytes()
+            tampered = json.loads(good_content)
+            tampered[0]["editorial_art"]["concept"] = "Different picture."
+            tracked_library.write_text(json.dumps(tampered))
+            with self.assertRaisesRegex(ValueError, "reader_requires_reviewed_commission"):
+                build_reader(root, pages_data=destination)
+            tracked_library.write_bytes(good_content)
             # A changed description needs review. Retain the previously reviewed
             # public file/description during that replacement and while text is corrected.
             edited = json.loads(manifest.read_text())
@@ -335,6 +344,29 @@ class ArtQueuePublicationTests(unittest.TestCase):
             self.assertFalse(queue.attach_persistent_art([other], root, commissioned_only=True))
             self.assertEqual(json.loads((root / "data" / queue.STATE_FILENAME).read_text())
                              ["commissioning"]["pending"], {foreign: "needs_visual_review"})
+
+    def test_accepted_art_keeps_priority_after_source_correction(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            manifest = root / "data/article-art-overrides.json"
+            old = article("10.1234/z")
+            new = article("10.1234/a")
+            old_id, new_id = map(art.canonical_identity, (old, new))
+            override = approved_pair(root, old_id, manifest)
+            output = root / "data/public-library.json"
+            rows = queue.attach_persistent_art([copy.deepcopy(old)], root, commissioned_only=True)
+            output.write_text(json.dumps(rows))
+            prior_source = rows[0]["editorial_art"]["src"]
+            new_override = copy.deepcopy(override)
+            new_override["commission_review"]["sha256"] = queue.review_fingerprint(
+                new_id, art.validated_override(root, new_id, new_override))
+            manifest.write_text(json.dumps({"version": 1, "overrides": {old_id: override, new_id: new_override}}))
+            old["abstract_text"] = "Newly corrected editorial context about doctoral work."
+            rows = queue.attach_persistent_art([new, old], root, previous_public=output, commissioned_only=True)
+            self.assertEqual([art.canonical_identity(row) for row in rows], [old_id])
+            self.assertEqual(rows[0]["editorial_art"]["src"], prior_source)
+            self.assertEqual(json.loads((root / "data" / queue.STATE_FILENAME).read_text())
+                             ["commissioning"]["pending"], {new_id: "cover_rejected"})
 
     def test_workflows_persist_after_build_and_keep_queue_out_of_static_payload(self):
         workflows = ROOT / ".github/workflows"

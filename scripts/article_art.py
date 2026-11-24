@@ -1578,7 +1578,8 @@ def _valid_retry_history(record: dict, overrides: dict, prior: dict, *, plan: di
 
 
 def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = None, *,
-               reuse_exhausted: bool = False, validated_overrides: dict | None = None) -> list[dict]:
+               reuse_exhausted: bool = False, validated_overrides: dict | None = None,
+               protected_ids: set[str] | None = None) -> list[dict]:
     """Allocate bounded contextual candidates ONLY to already-public records.
 
     Hydrated editorial_art can preserve a prior accepted alternative. Callers may
@@ -1625,7 +1626,11 @@ def attach_art(records: list[dict], root: Path = ROOT, manifest: Path | None = N
     accepted_rasters = []
     accepted_identities = set()
     can_reuse_holds = reuse_exhausted and all(item[0] in (False, 2) for item in candidates)
-    for not_retained, identity, first, record, prior, plan in sorted(candidates, key=lambda item: (item[0], item[1], item[2]["input_fingerprint"])):
+    # A checked-in commission keeps its place when source text is corrected at
+    # the same time another article proposes identical art.
+    protected_ids = protected_ids or set()
+    for not_retained, identity, first, record, prior, plan in sorted(
+            candidates, key=lambda item: (item[1] not in protected_ids, item[0], item[1], item[2]["input_fingerprint"])):
         if not_retained == 2:
             blockers_exist = all(collision["identity"] in accepted_identities and collision["identity"] != identity
                                  for attempt in prior["retry_attempts"] for collision in attempt.get("review_collisions", []))
