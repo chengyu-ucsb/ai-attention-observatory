@@ -41,7 +41,18 @@
       "outcome": "no_rolling_readings_due",
       "detail": "Two records were considered and both remained in retry cooldown; successful checkpoints were preserved and no model or publication step ran."
     },
-    "recent_failures": "No failed or cancelled run appeared among the 100 most recent workflow runs checked on November 25. Green status is treated as workflow health, not proof of coverage or synthesis quality.",
+    "recent_failures": "Two Pages runs failed on November 25 after their github-pages artifacts uploaded and became list-visible, but deploy-pages could not yet resolve the artifact metadata. The failures were deployment handoff races, not source, synthesis or release-gate failures. They were resolved without bypassing validation.",
+    "deployment_recovery": {
+      "status": "resolved",
+      "repair": "The artifact guard now requires two successful metadata reads separated by a polling interval, and changes to the guard and its test are included in the Pages workflow path trigger.",
+      "successful_run": {
+        "id": 45721585942,
+        "head_sha": "3756a0ebed4f6c4b6de3c459b44b54b086c7b333",
+        "conclusion": "success",
+        "completed_at": "2026-11-25T23:30:30Z"
+      },
+      "production_check": "The live reader displayed the repaired task-switching account for 10.1016/j.cognition.2026.106458 with the four experiment sample sizes, both voluntary-choice comparisons, the nonsignificant response-time transfer result and the laboratory-task limit. The homepage still showed the accepted November 23 issue; the November 30 edition remained staged."
+    },
     "scheduled_margin_eastern": [
       "Sunday 4:17 p.m. collection and 6:00 p.m. coverage audit",
       "Sunday 9:07 p.m. closeout after the UTC source window ends",
