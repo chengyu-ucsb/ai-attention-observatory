@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-24T23:45:28.760752+00:00",
+  "observation_at": "2026-11-24T23:58:31.484166+00:00",
   "packet_sha256": "f0b0ce4d2ec71c2b4bb548322d1a507845b2f069770ad72bd3871d390fd39543",
-  "acquisition_state_sha256": "ef292098fddb28ed70a170035877eb2e2da0372b84d29755b85113531ce3cbb9",
+  "acquisition_state_sha256": "25bddbc5666c2eea98c0c06f0f25fdb470821b118be1713dcc1734b09666e068",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -9416,8 +9416,32 @@
         "first_seen": "2026-11-18",
         "content_access": "headline_only",
         "metadata_observed_at": "2026-11-18T19:24:14.225611+00:00",
-        "preparation_first_seen_at": "2026-11-18T19:24:14.225611+00:00"
-      }
+        "preparation_first_seen_at": "2026-11-18T19:24:14.225611+00:00",
+        "complete_reading_attempt": {
+          "status": "unsupported_numeric_claim",
+          "stage": "synthesis",
+          "last_at": "2026-11-24",
+          "next_at": "2026-11-26",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition",
+              "status": "partial_full_text",
+              "final_url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition"
+            }
+          ]
+        }
+      },
+      "acquisition_receipt_sha256": "48baae4a60a7772ee79dc504100ebf1c58d47f64c5fa7a7fd934ee172c6c10e8"
     }
   },
   "revalidation_run": {
@@ -9425,5 +9449,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "899b8d8002a31926373f516676438742fc3131ad51ace66b9ca6f8de4eef6222"
+  "metadata_sha256": "088ba23d66bba4aeaaccdef7d4c5f8f63cff342c91b550c90be59822247f3056"
 }

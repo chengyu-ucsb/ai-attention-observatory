@@ -522,12 +522,12 @@
       "kind": "scholarly",
       "published": "2026-11-18",
       "source_url": "https://doi.org/10.1080/02602938.2026.2764204",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -538,8 +538,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "source_unavailable"
     },
     "b6cea36ea9d42711cf3a982eaf6f231c6da90670b0ea466a709a91b5adffc26b": {
       "fingerprint": "8267e1b51d0364dadc06fe9873c965c998146a6dd2596290428b3055afa99078",
@@ -1142,12 +1152,12 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.1108/jbs-02-2026-0045",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -1158,17 +1168,27 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "source_unavailable"
     },
     "d86e6de2230b8081e7b7f7e1c65899144f93eea52ffae31105b5961c046e9fde": {
       "fingerprint": "184072f00bcacbf2c546ed568e6e2f4031417f140d578fb4f3fa7c16da6c2f4d",
       "kind": "scholarly",
       "published": "2026-11-17",
       "source_url": "https://doi.org/10.1108/jcm-01-2026-8734",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -1182,8 +1202,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:55:13.816248+00:00"
     },
     "6d38278245a6229646e76ddc31eb351f2447ba22e631488a43c835361a15e5d2": {
       "fingerprint": "4550324048bdafeeb59c6337e35193d10f334497a0b68a87b9bc4835c3b9afda",
@@ -5050,9 +5083,9 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.31966/jabminternational.v33i2.1676",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -5066,8 +5099,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:54:25.032149+00:00"
     },
     "46ec54588323310514bfc2ab7405bf5b9e91d063f60a8b67a4f73cd2d0ea46af": {
       "fingerprint": "02612f257811fd498e5efacae2c596112086833bcd16c23e8c4f122370fe65ce",
@@ -6791,9 +6837,9 @@
       "kind": "scholarly",
       "published": "2026-11-22",
       "source_url": "https://doi.org/10.46328/ijemst.7502",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -6807,8 +6853,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:54:51.325045+00:00"
     },
     "5f0886a1df2ce03428d90e9069d0c303d26ea118004cecaa1a9e4852f5d9fa4f": {
       "fingerprint": "ebb16ea923bf8bfdfe394103b68dbbc994a79fec97fcb81b921cddcccfdd1d4f",
@@ -6941,9 +7000,9 @@
       "kind": "scholarly",
       "published": "2026-11-18",
       "source_url": "https://doi.org/10.4995/jclr.2026.26388",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -6957,8 +7016,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:56:29.554758+00:00"
     },
     "14beb816bc9cd6b54c87b3eb213d282b6521251d26d6d26dc459f14938c1e2cc": {
       "fingerprint": "499edb7e02fd78f4397bf4dcda9ee73e078d7a3e735b5c428e3a450abc00df21",
@@ -7043,12 +7115,12 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.53761/2gwdn219",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -7059,8 +7131,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "source_unavailable"
     },
     "ab9ea4544b2fde020f03d8f76da1c3375b316abb799e48701c72220b8f9ff3a7": {
       "fingerprint": "3e8530f8429c3331364752c23d418977cbb2416118a8f869e201648d15fd99cd",
@@ -7125,9 +7207,9 @@
       "kind": "scholarly",
       "published": "2026-11-19",
       "source_url": "https://doi.org/10.5498/wjp.122781",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -7141,8 +7223,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:56:07.077030+00:00"
     },
     "3ccc284769f1ea287b2a3d99ab38a018e0f7a5b49f097ef56e06cac16c0f2240": {
       "fingerprint": "e58b60e6a05c70d3f4ce88747d5fce8b1fdf31af3ed6bb3c8a1d87c1eb637190",
@@ -7271,9 +7366,9 @@
       "kind": "scholarly",
       "published": "2026-11-20",
       "source_url": "https://doi.org/10.56345/ijrdv13n319",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -7287,8 +7382,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:55:36.218762+00:00"
     },
     "1b3d02f7c0677b45f9736c0cacb035019e9d8f1826c2f7c5cbda3aa05c9ec284": {
       "fingerprint": "6d3f31b74412d13d6e8980365719dac4e4d5517186d42370caa49bbdaef4dc43",
@@ -7852,9 +7960,9 @@
       "kind": "scholarly",
       "published": "2026-11-21",
       "source_url": "https://doi.org/10.67317/ijmsrt26nov105",
-      "status": "pending",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -7868,8 +7976,21 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-25T00:54:02.652934+00:00"
     },
     "ff3c1da5b06318681d45afbf6dc8359027bf6828197319aa8521b097cd12f183": {
       "fingerprint": "ea0156520515bb6e187b0a9e23513bfed9037b3d8a0d451d87d3fb510e936117",
@@ -8013,12 +8134,12 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.68700/ijsshp.v1i2.7",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -8029,8 +8150,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "last_outcome": "source_unavailable"
     },
     "3819c49d0de7b9aab4ce4411dc65df6ff2ab4f3e9b3a4540a986316847ff5c82": {
       "fingerprint": "4bc7becc6332ad74640a24422d50fbfaea2175d5aa26413b843f6410af7bad0a",
@@ -10893,15 +11024,17 @@
       "kind": "nonacademic",
       "published": "2026-11-18",
       "source_url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "partial_full_text_not_reviewed",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
-        "known": 0,
+        "known": 1,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "212dd4aa57ad53a9d7774a6f4d1462779355adea3346b7ac8bd940b6359d4a77"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -10911,11 +11044,651 @@
         "doi_lookup_permitted": false
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "partial_full_text",
+          "retryable": false,
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition",
+          "final_url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition"
+        },
+        {
+          "status": "candidate_budget_exhausted",
+          "retryable": false,
+          "stage": "retrieval",
+          "candidates_attempted": 1
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:53:40.110723+00:00",
+      "document": {
+        "source_url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 3,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 50,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 56,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 25,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 127,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 39,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 50,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 56,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 25,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 51,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 15,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 174,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 490,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 679,
+            "has_text": true
+          },
+          {
+            "unit": 17,
+            "characters": 89,
+            "has_text": true
+          },
+          {
+            "unit": 18,
+            "characters": 823,
+            "has_text": true
+          },
+          {
+            "unit": 19,
+            "characters": 407,
+            "has_text": true
+          },
+          {
+            "unit": 20,
+            "characters": 96,
+            "has_text": true
+          },
+          {
+            "unit": 21,
+            "characters": 722,
+            "has_text": true
+          },
+          {
+            "unit": 22,
+            "characters": 558,
+            "has_text": true
+          },
+          {
+            "unit": 23,
+            "characters": 92,
+            "has_text": true
+          },
+          {
+            "unit": 24,
+            "characters": 693,
+            "has_text": true
+          },
+          {
+            "unit": 25,
+            "characters": 559,
+            "has_text": true
+          },
+          {
+            "unit": 26,
+            "characters": 57,
+            "has_text": true
+          },
+          {
+            "unit": 27,
+            "characters": 988,
+            "has_text": true
+          },
+          {
+            "unit": 28,
+            "characters": 675,
+            "has_text": true
+          },
+          {
+            "unit": 29,
+            "characters": 352,
+            "has_text": true
+          },
+          {
+            "unit": 30,
+            "characters": 84,
+            "has_text": true
+          },
+          {
+            "unit": 31,
+            "characters": 606,
+            "has_text": true
+          },
+          {
+            "unit": 32,
+            "characters": 405,
+            "has_text": true
+          },
+          {
+            "unit": 33,
+            "characters": 798,
+            "has_text": true
+          },
+          {
+            "unit": 34,
+            "characters": 79,
+            "has_text": true
+          },
+          {
+            "unit": 35,
+            "characters": 765,
+            "has_text": true
+          },
+          {
+            "unit": 36,
+            "characters": 1052,
+            "has_text": true
+          },
+          {
+            "unit": 37,
+            "characters": 111,
+            "has_text": true
+          },
+          {
+            "unit": 38,
+            "characters": 128,
+            "has_text": true
+          },
+          {
+            "unit": 39,
+            "characters": 17,
+            "has_text": true
+          },
+          {
+            "unit": 40,
+            "characters": 32,
+            "has_text": true
+          },
+          {
+            "unit": 41,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 42,
+            "characters": 53,
+            "has_text": true
+          },
+          {
+            "unit": 43,
+            "characters": 18,
+            "has_text": true
+          },
+          {
+            "unit": 44,
+            "characters": 25,
+            "has_text": true
+          },
+          {
+            "unit": 45,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 46,
+            "characters": 59,
+            "has_text": true
+          },
+          {
+            "unit": 47,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 48,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 49,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 50,
+            "characters": 39,
+            "has_text": true
+          },
+          {
+            "unit": 51,
+            "characters": 61,
+            "has_text": true
+          },
+          {
+            "unit": 52,
+            "characters": 49,
+            "has_text": true
+          },
+          {
+            "unit": 53,
+            "characters": 73,
+            "has_text": true
+          },
+          {
+            "unit": 54,
+            "characters": 75,
+            "has_text": true
+          },
+          {
+            "unit": 55,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 56,
+            "characters": 35,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 50
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 56
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 25
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 127
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 39
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 50
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 56
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 25
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 51
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 15
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 174
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 490
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 679
+              },
+              {
+                "unit": 17,
+                "start": 0,
+                "end": 89
+              },
+              {
+                "unit": 18,
+                "start": 0,
+                "end": 823
+              },
+              {
+                "unit": 19,
+                "start": 0,
+                "end": 407
+              },
+              {
+                "unit": 20,
+                "start": 0,
+                "end": 96
+              },
+              {
+                "unit": 21,
+                "start": 0,
+                "end": 722
+              },
+              {
+                "unit": 22,
+                "start": 0,
+                "end": 558
+              },
+              {
+                "unit": 23,
+                "start": 0,
+                "end": 92
+              },
+              {
+                "unit": 24,
+                "start": 0,
+                "end": 693
+              },
+              {
+                "unit": 25,
+                "start": 0,
+                "end": 105
+              },
+              {
+                "unit": 25,
+                "start": 105,
+                "end": 111
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 25,
+                "start": 111,
+                "end": 559
+              },
+              {
+                "unit": 26,
+                "start": 0,
+                "end": 57
+              },
+              {
+                "unit": 27,
+                "start": 0,
+                "end": 988
+              },
+              {
+                "unit": 28,
+                "start": 0,
+                "end": 675
+              },
+              {
+                "unit": 29,
+                "start": 0,
+                "end": 352
+              },
+              {
+                "unit": 30,
+                "start": 0,
+                "end": 84
+              },
+              {
+                "unit": 31,
+                "start": 0,
+                "end": 606
+              },
+              {
+                "unit": 32,
+                "start": 0,
+                "end": 405
+              },
+              {
+                "unit": 33,
+                "start": 0,
+                "end": 798
+              },
+              {
+                "unit": 34,
+                "start": 0,
+                "end": 79
+              },
+              {
+                "unit": 35,
+                "start": 0,
+                "end": 765
+              },
+              {
+                "unit": 36,
+                "start": 0,
+                "end": 226
+              },
+              {
+                "unit": 36,
+                "start": 226,
+                "end": 231
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 36,
+                "start": 231,
+                "end": 1052
+              },
+              {
+                "unit": 37,
+                "start": 0,
+                "end": 111
+              },
+              {
+                "unit": 38,
+                "start": 0,
+                "end": 128
+              },
+              {
+                "unit": 39,
+                "start": 0,
+                "end": 17
+              },
+              {
+                "unit": 40,
+                "start": 0,
+                "end": 32
+              },
+              {
+                "unit": 41,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 42,
+                "start": 0,
+                "end": 53
+              },
+              {
+                "unit": 43,
+                "start": 0,
+                "end": 18
+              },
+              {
+                "unit": 44,
+                "start": 0,
+                "end": 25
+              },
+              {
+                "unit": 45,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 46,
+                "start": 0,
+                "end": 59
+              },
+              {
+                "unit": 47,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 48,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 49,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 50,
+                "start": 0,
+                "end": 39
+              },
+              {
+                "unit": 51,
+                "start": 0,
+                "end": 61
+              },
+              {
+                "unit": 52,
+                "start": 0,
+                "end": 49
+              },
+              {
+                "unit": 53,
+                "start": 0,
+                "end": 73
+              },
+              {
+                "unit": 54,
+                "start": 0,
+                "end": 75
+              },
+              {
+                "unit": 55,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 56,
+                "start": 0,
+                "end": 35
+              }
+            ]
+          }
+        ],
+        "evidence_status": "partial_full_text",
+        "html_completeness": "not_verified",
+        "characters_retrieved": 12704,
+        "units_retrieved": 56,
+        "source_sha256": "2eccb9939bc37908e7a5423a7d36ce19a46a3a39a14fcd90989bf0c84c85caf1",
+        "html_extraction_version": "article-body-v3"
+      },
+      "document_evidence": {
+        "status": "partial_full_text",
+        "retryable": false,
+        "stage": "article",
+        "provider": "original_article",
+        "url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition",
+        "final_url": "https://www.theverge.com/ai-artificial-intelligence/1036776/nvidia-earnings-kress-jensen-huang-petition"
+      },
+      "last_outcome": "partial_full_text"
     }
   },
-  "cursor": 114,
+  "cursor": 126,
   "provider_pauses": {
     "provider:CORE": "2026-11-24T22:30:18.355884+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
@@ -12551,24 +13324,24 @@
     }
   ],
   "input_fingerprint": "db638fb6b47cddf6ce9eaa2a3e088618686b8e351fc64bcd4c0faa809293146f",
-  "state_sha256": "ef292098fddb28ed70a170035877eb2e2da0372b84d29755b85113531ce3cbb9",
+  "state_sha256": "25bddbc5666c2eea98c0c06f0f25fdb470821b118be1713dcc1734b09666e068",
   "run": {
-    "checked_at": "2026-11-24T23:43:27.279932+00:00",
+    "checked_at": "2026-11-24T23:53:40.110723+00:00",
     "selected_records": 144,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 21,
-    "pending_records": 123,
-    "deferred_retry_records": 33,
+    "completed_records": 22,
+    "pending_records": 122,
+    "deferred_retry_records": 40,
     "statuses": {
       "access_blocked": 5,
       "full_document_retrieved_not_reviewed": 3,
-      "partial_full_text_not_reviewed": 3,
-      "pending": 61,
-      "pending_routes": 29,
+      "partial_full_text_not_reviewed": 4,
+      "pending": 49,
+      "pending_routes": 33,
       "rate_limited": 12,
       "source_unavailable": 10,
-      "temporarily_unavailable": 21
+      "temporarily_unavailable": 28
     },
     "excluded": {},
     "duplicate_records": 0,
