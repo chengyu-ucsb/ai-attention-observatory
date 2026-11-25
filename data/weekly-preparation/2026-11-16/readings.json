@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-25T11:32:03.390880+00:00",
+  "observation_at": "2026-11-25T13:07:50.582905+00:00",
   "packet_sha256": "64e5e444266999dfdceed709d11148e9208ef24f0dad8cfdc2122d0fbb03607b",
-  "acquisition_state_sha256": "7a7c4e8b906e743422f4116eb51c013f999a47b67c7356b0546b84417b488ae6",
+  "acquisition_state_sha256": "30404afc06585695dbef1d5755c08b8f274dbd6ae0c94ddc111d9d06fd0ddac3",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -9305,14 +9305,30 @@
         "metadata_observed_at": "2026-11-20T09:57:14.480797+00:00",
         "preparation_first_seen_at": "2026-11-20T19:06:08.776441+00:00",
         "complete_reading_attempt": {
-          "status": "acquisition_receipt_content_changed",
-          "stage": "retrieval",
-          "last_at": "2026-11-24",
-          "next_at": "2026-11-26",
-          "provider_diagnostics": []
+          "status": "no_supported_substantive_claims",
+          "stage": "synthesis",
+          "last_at": "2026-11-25",
+          "next_at": "2026-11-27",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer",
+              "status": "partial_full_text",
+              "final_url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.eff.org/deeplinks/2026/11/outage-chaos-who-turned-all-computer"
+            }
+          ]
         }
       },
-      "acquisition_receipt_sha256": "7af1d29c60542dfa022a75ac8e79f923203c65111943bef8d48734e86b190e36"
+      "acquisition_receipt_sha256": "04b9c2d8c27d781108fb60accde2356805bf3aef7769df6338c0fe09c3a4a971"
     },
     "3a54925ebbd02e40173976c78297e1732ba35e608eef4435bbfe773256090ad5": {
       "input_fingerprint": "f517e9297fa01a66aa8bb68cf40ccb7aeacbdf5720d1e037255550a3ec87e4c4",
@@ -9355,14 +9371,30 @@
         "metadata_observed_at": "2026-11-18T21:52:23.432298+00:00",
         "preparation_first_seen_at": "2026-11-19T04:11:00.566960+00:00",
         "complete_reading_attempt": {
-          "status": "acquisition_receipt_content_changed",
-          "stage": "retrieval",
-          "last_at": "2026-11-24",
-          "next_at": "2026-11-26",
-          "provider_diagnostics": []
+          "status": "copied_source_passage",
+          "stage": "synthesis",
+          "last_at": "2026-11-25",
+          "next_at": "2026-11-27",
+          "provider_diagnostics": [
+            {
+              "stage": "article",
+              "provider": "validated_acquisition_checkpoint",
+              "url": "https://www.eff.org/deeplinks/2026/11/surveillance-isnt-safety-comic-about-organizing-against-surveillance",
+              "status": "partial_full_text",
+              "final_url": "https://www.eff.org/deeplinks/2026/11/surveillance-isnt-safety-comic-about-organizing-against-surveillance",
+              "retryable": false
+            },
+            {
+              "stage": "handoff",
+              "provider": "validated_acquisition_checkpoint",
+              "status": "acquisition_receipt_revalidated",
+              "retryable": false,
+              "url": "https://www.eff.org/deeplinks/2026/11/surveillance-isnt-safety-comic-about-organizing-against-surveillance"
+            }
+          ]
         }
       },
-      "acquisition_receipt_sha256": "1ea6af86272906dee2684c5a4eebe020a84e96dd35c4fcd3563eb8177c4d90fd"
+      "acquisition_receipt_sha256": "b27454739bee66f952cb319f38f07841fc3d848615a9f48fe4239a392a8b354c"
     },
     "4a09a1315d24e1de96decb19481a2309838d868e79b5161f64f420fc5deca682": {
       "input_fingerprint": "f55d2db7f0baed05aea2aafd56ba5fbe212f3f7c7261143e6d771accc42a4b02",
@@ -9640,5 +9672,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "c8b6037196f25c8f6948c216239572d7e9fe6a904123d5b667c48ad85942586b"
+  "metadata_sha256": "c907306f30ebe099e4cfccc342b6742c29447d1da5b63c8e47a46c030678b8d0"
 }

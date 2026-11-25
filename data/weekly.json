@@ -95934,6 +95934,40 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-25",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-23",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-25T12:59:49+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-09T12:59:50+00:00"
+      },
+      "open_access_url": "https://doi.org/10.55493/5051.v11i2.6370",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-16",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -97918,19 +97952,50 @@
       "metadata_observed_at": "2026-11-25T11:14:00.344142+00:00",
       "preparation_first_seen_at": "2026-11-25T11:14:00.344142+00:00",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
+        "level": "full_text",
+        "provenance": "NCBI PMC OAI-PMH JATS (automatic source-section extraction)",
         "overview": "Unlabelled: Clinical AI is moving from systems that generate discrete predictions and recommendations toward agents capable of pursuing clinical objectives through repeated tool use, communication, planning, and state-changing actions. Emerging systems support multistep electronic health record workflows, and increasingly envision longitudinal care across repeated encounters.",
-        "methods": "Emerging systems support multistep electronic health record workflows, and increasingly envision longitudinal care across repeated encounters.",
+        "methods": "",
         "findings": "",
-        "interpretation": "",
-        "limitations": "",
+        "interpretation": "Long-horizon clinical AI combines temporal extension, action depth, and causal coupling: earlier actions alter the conditions governing later decisions. Individually defensible actions can therefore create obligations, narrow corrective options, and reduce recovery capacity before harm becomes apparent. We propose recoverability-centered trajectory governance as a clinical synthesis linking patient-specific corrective capacity to continued delegated authority. It combines persistent obligation tracking, explicit reauthorization, dynamic authority contraction, graceful degradation, independent escalation, and verified human takeover. Recovery margin should be assessed through domain-specific indicators, with authority restricted before clinically acceptable corrective pathways are exhausted. Ending delegation requires a clinical handoff that preserves outstanding obligations and transfers responsibility. Whether this synthesis improves safety beyond established safeguards remains an empirical question.",
+        "limitations": "This framework is conceptual and has not undergone prospective empirical validation. The predictive value of trajectory-state indicators and the comparative safety benefits of the proposed governance mechanisms remain hypotheses. Prespecified tests and criteria for reassessment are described in the trajectory stress testing section. The additional trajectory-governance mechanisms may offer limited benefit for bounded tasks that culminate in clinician review. The framework is most relevant when delegated actions persist over time, alter subsequent decision conditions, create obligations, or constrain corrective options. It complements pointwise evaluation, clinical validation, cybersecurity, privacy, provenance, and established risk management. Recovery margin has not been validated as a clinical measure; its biological, operational, and epistemic dimensions require domain-specific operationalization and validation. Implementation requires technical infrastructure, clinician attention, ",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "discussion",
+          "limitations"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-25",
+      "oa_pass_version": 3,
+      "pmcid": "PMC13784775",
+      "analysis": {
+        "provenance": "NCBI PMC OAI-PMH JATS (automatic source-section extraction)",
+        "license": "https://creativecommons.org/licenses/by/4.0/ this is an open-access article distributed under the terms of the creative commons attribution license ( https://creativecommons.org/licenses/by/",
+        "license_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13784775/",
+        "methods": "",
+        "results": "",
+        "discussion": "Long-horizon clinical AI combines temporal extension, action depth, and causal coupling: earlier actions alter the conditions governing later decisions. Individually defensible actions can therefore create obligations, narrow corrective options, and reduce recovery capacity before harm becomes apparent. We propose recoverability-centered trajectory governance as a clinical synthesis linking patient-specific corrective capacity to continued delegated authority. It combines persistent obligation tracking, explicit reauthorization, dynamic authority contraction, graceful degradation, independent escalation, and verified human takeover. Recovery margin should be assessed through domain-specific indicators, with authority restricted before clinically acceptable corrective pathways are exhausted. Ending delegation requires a clinical handoff that preserves outstanding obligations and transfers responsibility. Whether this synthesis improves safety beyond established safeguards remains an empirical question.",
+        "limitations": "This framework is conceptual and has not undergone prospective empirical validation. The predictive value of trajectory-state indicators and the comparative safety benefits of the proposed governance mechanisms remain hypotheses. Prespecified tests and criteria for reassessment are described in the trajectory stress testing section. The additional trajectory-governance mechanisms may offer limited benefit for bounded tasks that culminate in clinician review. The framework is most relevant when delegated actions persist over time, alter subsequent decision conditions, create obligations, or constrain corrective options. It complements pointwise evaluation, clinical validation, cybersecurity, privacy, provenance, and established risk management. Recovery margin has not been validated as a clinical measure; its biological, operational, and epistemic dimensions require domain-specific operationalization and validation. Implementation requires technical infrastructure, clinician attention, and organizational resources and may introduce overescalation, interruption burden, or approval habituation. Effective handoff assumes an identifiable receiving clinician or service, which may be unavailable in fragmented or cross-institutional care. Shared infrastructure failures can compromise monitoring independence, and backup pathways may be difficult to maintain in resource-constrained settings. Safe delegation is therefore context-dependent and should be assessed locally. Assigning an operational owner for an obligation does not itself establish legal liability or determine professional, institutional, or regulatory accountability.",
+        "figures": [],
+        "fulltext_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13784775/",
+        "key_idea": "Long-horizon clinical AI combines temporal extension, action depth, and causal coupling: earlier actions alter the conditions governing later decisions. Individually defensible actions can therefore create obligations, narrow corrective options, and reduce recovery capacity befor",
+        "extraction_date": "2026-11-25",
+        "extraction_version": 3,
+        "sections_available": [
+          "limitations",
+          "discussion"
+        ]
+      },
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "full_text",
+        "last_at": "2026-11-25",
+        "next_at": "2027-11-25",
+        "attempts": 1
       }
     },
     {
@@ -98152,6 +98217,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -98251,6 +98326,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -98465,6 +98550,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -99129,6 +99224,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -99231,6 +99336,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -100037,6 +100152,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -102168,7 +102293,17 @@
         "status": "waiting_for_license",
         "next_at": "2026-12-09T00:10:12+00:00"
       },
-      "open_access_url": "https://doi.org/10.5861/ijrse.2026.26460"
+      "open_access_url": "https://doi.org/10.5861/ijrse.2026.26460",
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
+      }
     },
     {
       "title": "Cyberbiosecurity of Fermentation: Agentic AI and Brewing Resilience",
@@ -102272,6 +102407,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -102650,6 +102795,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -103060,6 +103215,16 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -104550,7 +104715,14 @@
         "status": "waiting_for_license",
         "next_at": "2026-12-09T00:10:12+00:00"
       },
-      "open_access_url": "https://doi.org/10.68033/ijaimda.1.2.43-48"
+      "open_access_url": "https://doi.org/10.68033/ijaimda.1.2.43-48",
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
+        "attempts": 1
+      }
     },
     {
       "title": "Performance without capability: generative AI and the validity of assessment in higher education",
@@ -105536,6 +105708,16 @@
         "last_at": "2026-11-23",
         "next_at": "2026-12-14",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-25",
+        "next_at": "2026-12-25",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -107999,6 +108181,13 @@
         "last_at": "2026-11-25",
         "next_at": "2026-12-16",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
+        "attempts": 1
       }
     },
     {
@@ -108233,6 +108422,13 @@
         "last_at": "2026-11-25",
         "next_at": "2027-01-09",
         "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
+        "attempts": 1
       }
     },
     {
@@ -108459,6 +108655,13 @@
         "status": "publisher_access_denied",
         "last_at": "2026-11-25",
         "next_at": "2027-01-09",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-25",
+        "next_at": "2026-11-27",
         "attempts": 1
       }
     },

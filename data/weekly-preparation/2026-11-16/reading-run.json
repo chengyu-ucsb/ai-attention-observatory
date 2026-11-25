@@ -3,8 +3,8 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-25T11:28:02.903041+00:00",
-  "finished_at": "2026-11-25T11:32:06.436431+00:00",
+  "started_at": "2026-11-25T13:03:55.413471+00:00",
+  "finished_at": "2026-11-25T13:07:52.221344+00:00",
   "publication_window": {
     "from": "2026-11-16",
     "to": "2026-11-22",
@@ -12,27 +12,27 @@
   },
   "bindings": {
     "packet.json": "64e5e444266999dfdceed709d11148e9208ef24f0dad8cfdc2122d0fbb03607b",
-    "acquisition.json": "c2d922de3a2c2927469f890472ea2538236513895e1384c3085187fdaa097695",
-    "readings.json": "78b95975700e4ad701977da9c637b4d533ce2f2052dd8e5210bfceaa9ac73e6e"
+    "acquisition.json": "c04989c75f88b6e275e7cdbdc9d9289ef9749afdb5273ead06b2c03f6553057a",
+    "readings.json": "7fff5796e69459b0cb16b58414f189cf7b955faa4b98f2331a8d636f8bdfc9f7"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-25T11:28:03.584085+00:00",
+      "checked_at": "2026-11-25T13:03:55.779885+00:00",
       "selected_records": 147,
       "attempted_records": 12,
       "attempted_stages": 12,
       "completed_records": 23,
       "pending_records": 124,
-      "deferred_retry_records": 45,
+      "deferred_retry_records": 49,
       "statuses": {
         "access_blocked": 6,
         "full_document_retrieved_not_reviewed": 3,
         "partial_full_text_not_reviewed": 4,
-        "pending": 22,
-        "pending_routes": 57,
-        "rate_limited": 14,
+        "pending": 15,
+        "pending_routes": 60,
+        "rate_limited": 15,
         "source_unavailable": 10,
-        "temporarily_unavailable": 31
+        "temporarily_unavailable": 34
       },
       "excluded": {},
       "duplicate_records": 0,
@@ -43,23 +43,24 @@
       "item_time_budget_seconds": 60,
       "max_candidates_per_provider_stage": 8,
       "active_provider_pauses": {
-        "provider:CORE": "2026-11-25T12:30:20.503797+00:00"
+        "provider:CORE": "2026-11-25T14:03:56.287053+00:00"
       },
       "scope": "Selected previous-week records only; not comprehensive web coverage.",
       "model_used": false,
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 1,
-      "documents_retrieved": 1,
-      "partial_inputs": 1,
+      "attempted": 2,
+      "documents_retrieved": 2,
+      "partial_inputs": 2,
       "summaries_completed": 0,
-      "failed": 1,
+      "failed": 2,
       "failure_reasons": {
-        "claim_verification_failed": 1
+        "copied_source_passage": 1,
+        "no_supported_substantive_claims": 1
       },
       "failure_stages": {
-        "synthesis": 1
+        "synthesis": 2
       },
       "article_accounts": 0,
       "evidence_only_readings": 0,
@@ -67,11 +68,11 @@
       "skipped_no_model": false,
       "selection": {
         "considered": 7,
-        "eligible": 1,
+        "eligible": 2,
         "deferred_by_limit": 0,
         "skipped": {
           "unverified_venue": 2,
-          "retry_cooldown": 4
+          "retry_cooldown": 3
         }
       }
     },
