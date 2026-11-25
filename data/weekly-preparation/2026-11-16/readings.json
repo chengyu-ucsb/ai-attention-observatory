@@ -6,9 +6,9 @@
     "to": "2026-11-22",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-24T23:58:31.484166+00:00",
+  "observation_at": "2026-11-25T00:15:09.314706+00:00",
   "packet_sha256": "f0b0ce4d2ec71c2b4bb548322d1a507845b2f069770ad72bd3871d390fd39543",
-  "acquisition_state_sha256": "25bddbc5666c2eea98c0c06f0f25fdb470821b118be1713dcc1734b09666e068",
+  "acquisition_state_sha256": "1b87607e5cabcd47555721160ce4a87e531141126b02d4de5d8c6030351f0afc",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -5375,27 +5375,11 @@
         "metadata_observed_at": "2026-11-24T23:29:03.916508+00:00",
         "preparation_first_seen_at": "2026-11-18T19:24:14.225611+00:00",
         "complete_reading_attempt": {
-          "status": "copied_source_passage",
-          "stage": "synthesis",
-          "last_at": "2026-11-23",
-          "next_at": "2026-11-25",
-          "provider_diagnostics": [
-            {
-              "stage": "article",
-              "provider": "validated_acquisition_checkpoint",
-              "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1949276/pdf",
-              "status": "full_document_retrieved",
-              "final_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1949276/pdf",
-              "retryable": false
-            },
-            {
-              "stage": "handoff",
-              "provider": "validated_acquisition_checkpoint",
-              "status": "acquisition_receipt_revalidated",
-              "retryable": false,
-              "url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1949276/pdf"
-            }
-          ]
+          "status": "prepared_acquisition_receipt_mismatch",
+          "stage": "retrieval",
+          "last_at": "2026-11-25",
+          "next_at": "2026-11-27",
+          "provider_diagnostics": []
         }
       },
       "acquisition_receipt_sha256": "51648073c8fe655dcc34e982dbc71f8ec8916b56cd676be4d5f838bab3b23fd7"
@@ -9048,27 +9032,11 @@
         "metadata_observed_at": "2026-11-17T05:07:04.280433+00:00",
         "preparation_first_seen_at": "2026-11-17T05:07:04.280433+00:00",
         "complete_reading_attempt": {
-          "status": "copied_source_passage",
-          "stage": "synthesis",
-          "last_at": "2026-11-23",
-          "next_at": "2026-11-25",
-          "provider_diagnostics": [
-            {
-              "stage": "article",
-              "provider": "validated_acquisition_checkpoint",
-              "url": "https://www.eff.org/deeplinks/2026/11/effs-ai-cybersecurity-policy-framework",
-              "status": "partial_full_text",
-              "final_url": "https://www.eff.org/deeplinks/2026/11/effs-ai-cybersecurity-policy-framework",
-              "retryable": false
-            },
-            {
-              "stage": "handoff",
-              "provider": "validated_acquisition_checkpoint",
-              "status": "acquisition_receipt_revalidated",
-              "retryable": false,
-              "url": "https://www.eff.org/deeplinks/2026/11/effs-ai-cybersecurity-policy-framework"
-            }
-          ]
+          "status": "acquisition_receipt_content_changed",
+          "stage": "retrieval",
+          "last_at": "2026-11-25",
+          "next_at": "2026-11-27",
+          "provider_diagnostics": []
         }
       },
       "acquisition_receipt_sha256": "c790a366f899121d1caf9b956f38f9668e00be9a803188242d4e0cd555867d5a"
@@ -9449,5 +9417,5 @@
     "source_text_saved": false,
     "approved": false
   },
-  "metadata_sha256": "088ba23d66bba4aeaaccdef7d4c5f8f63cff342c91b550c90be59822247f3056"
+  "metadata_sha256": "f49ba9fd82b1d13451f9c9bcceda6010398000fe3102c554b580eb2beb223c22"
 }
