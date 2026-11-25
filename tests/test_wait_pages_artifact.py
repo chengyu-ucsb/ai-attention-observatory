@@ -20,16 +20,24 @@ class PagesArtifactVisibilityTests(unittest.TestCase):
         self.payload = {"artifacts": [{"id": 22, "name": "github-pages",
             "expired": False, "size_in_bytes": 100, "workflow_run": {"id": 11}}]}
 
-    def test_immediately_visible_never_sleeps(self):
+    def test_immediately_visible_requires_stable_second_read(self):
         waits = []
         wait_for_artifact(lambda: self.payload, 22, 11, sleep=waits.append)
-        self.assertEqual(waits, [])
+        self.assertEqual(waits, [5])
 
     def test_delayed_list_retries_only_reads(self):
-        replies = iter([{"artifacts": []}, {"artifacts": []}, self.payload])
+        replies = iter([{"artifacts": []}, {"artifacts": []}, self.payload,
+                        self.payload])
         waits = []
         wait_for_artifact(lambda: next(replies), 22, 11, sleep=waits.append)
-        self.assertEqual(waits, [5, 5])
+        self.assertEqual(waits, [5, 5, 5])
+
+    def test_visibility_must_remain_stable(self):
+        replies = iter([self.payload, {"artifacts": []}, self.payload,
+                        self.payload])
+        waits = []
+        wait_for_artifact(lambda: next(replies), 22, 11, sleep=waits.append)
+        self.assertEqual(waits, [5, 5, 5])
 
     def test_requires_exact_run_id_name_and_unexpired_nonempty_artifact(self):
         for key, value in [("id", 23), ("name", "article-art-state"),

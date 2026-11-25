@@ -36,11 +36,20 @@ def artifact_visible(payload, artifact_id, run_id):
 def wait_for_artifact(fetch, artifact_id, run_id, *, attempts=6, sleep=time.sleep):
     if not 1 <= attempts <= 6 or artifact_id <= 0 or run_id <= 0:
         raise ValueError("invalid artifact visibility bounds")
+    visible_once = False
     for attempt in range(attempts):
         # HTTP errors (including quotas) fail immediately, rather than retrying
         # denied requests. Only a successful but not-yet-visible list is retried.
         if artifact_visible(fetch(), artifact_id, run_id):
-            return
+            # The Actions list endpoint can expose a newly finalized artifact
+            # a fraction of a second before deploy-pages can resolve its
+            # metadata. Require a second successful read after one polling
+            # interval so deployment does not race that replication window.
+            if visible_once:
+                return
+            visible_once = True
+        else:
+            visible_once = False
         if attempt + 1 < attempts:
             sleep(5)
     raise RuntimeError("Uploaded Pages artifact is not list-visible; deployment not attempted")
