@@ -346,32 +346,49 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     page.locator("#tab-assist").click()
     for mode in ("reflect", "hint", "answer"):
         page.locator(f'[data-assist-mode="{mode}"]').click()
-        for i, correct_index in enumerate((1, 0, 1, 2, 1), 1):
-            assert page.locator("#assist-counter").inner_text() == f"SCENARIO {i} / 5"
+        for i, correct_index in enumerate((1, 0, 1, 2, 1, 1), 1):
+            assert page.locator("#assist-counter").inner_text() == f"SCENARIO {i} / 6"
+            if i == 6:
+                comparison = page.locator("#assist-comparison")
+                swap = comparison.get_by_role("button", name="Switch editing disclosure")
+                excerpt = comparison.locator("blockquote").inner_text()
+                choices = page.locator(".assist-option").all_text_contents()
+                swap.focus()
+                page.keyboard.press("Space")
+                expect(swap).to_be_focused()
+                assert "human editor" in comparison.inner_text()
+                assert comparison.locator("blockquote").inner_text() == excerpt
+                assert page.locator(".assist-option").all_text_contents() == choices
+                page.keyboard.press("Enter")
+                assert "AI copyedited" in comparison.inner_text()
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
+            else:
+                assert page.locator("#assist-comparison").is_hidden()
             page.locator(".assist-option").nth(correct_index).focus()
             page.keyboard.press("Enter")
             assert page.evaluate("document.activeElement.id") == "assist-feedback"
             assert "Supported conclusion" in page.locator("#assist-feedback").inner_text()
             page.keyboard.press("Tab")
-            if i == 5:
+            if i in (5, 6):
                 details = page.locator(".assist-source")
                 summary = details.locator("summary")
                 assert summary.evaluate("el => el === document.activeElement")
                 assert not details.evaluate("el => el.open")
                 page.keyboard.press("Enter")
                 assert details.evaluate("el => el.open")
-                assert "did not test student learning" in details.inner_text()
+                assert ("did not test student learning" if i == 5 else "does not report an experiment") in details.inner_text()
                 links = details.locator("a")
                 assert links.count() == 2
-                assert links.nth(0).get_attribute("href") == "https://arxiv.org/pdf/2610.38990v1#page=6"
-                assert links.nth(1).get_attribute("href").endswith("/issues/2026-11-02.html")
+                assert links.nth(0).get_attribute("href") == ("https://arxiv.org/pdf/2610.38990v1#page=6" if i == 5 else "https://doi.org/10.1007/s44163-026-02808-6")
+                assert links.nth(1).get_attribute("href").endswith("/issues/2026-11-02.html" if i == 5 else "/issues/2026-11-23.html")
                 for link in links.all():
                     page.keyboard.press("Tab")
                     assert link.evaluate("el => el === document.activeElement")
                     box = link.bounding_box()
-                    assert box["height"] >= 44
+                    assert box["height"] >= 44, f"Scenario {i} link {link.inner_text()!r} at {width // zoom}px is {box['height']}px tall"
                 if screenshots and mode == "reflect":
-                    page.screenshot(path=str(screenshots / f"lab-study-context-{width}-zoom{zoom}.png"), full_page=True)
+                    capture = "study-context" if i == 5 else "disclosure-contrast"
+                    page.screenshot(path=str(screenshots / f"lab-{capture}-{width}-zoom{zoom}.png"), full_page=True)
                 summary.focus()
                 page.keyboard.press("Space")
                 assert not details.evaluate("el => el.open")
@@ -388,24 +405,24 @@ def check(page, url, width, screenshots, zoom=1, browser_name="chromium"):
     page.keyboard.press("ArrowDown")
     page.keyboard.press("Enter")
     assert picker.input_value() == "2"
-    assert page.locator("#assist-counter").inner_text() == "SCENARIO 3 / 5"
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 3 / 6"
     assert page.evaluate("document.activeElement.id") == "assist-scenario"
     # Jump directly to the new question, then leave an answered question safely.
     picker.select_option("4")
-    assert page.locator("#assist-counter").inner_text() == "SCENARIO 5 / 5"
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 5 / 6"
     assert page.evaluate("document.activeElement.id") == "assist-scenario"
     page.locator(".assist-option").nth(0).click()
     assert "Another interpretation" in page.locator("#assist-feedback").inner_text()
     assert page.locator(".assist-source").is_visible()
     page.locator("#assist-scenario").select_option("1")
-    assert page.locator("#assist-counter").inner_text() == "SCENARIO 2 / 5"
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 2 / 6"
     assert page.locator("#assist-feedback").is_hidden()
     assert page.locator(".assist-source").count() == 0
     assert "FULL ANSWER" in page.locator("#assist-reply").inner_text()
     assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
     page.locator("#play-reset").click()
     assert page.locator("#recovery-history").inner_text() == ""
-    assert page.locator("#assist-counter").inner_text() == "SCENARIO 1 / 5"
+    assert page.locator("#assist-counter").inner_text() == "SCENARIO 1 / 6"
     if screenshots:
         page.screenshot(path=str(screenshots / f"lab-assist-{width}-zoom{zoom}.png"), full_page=True)
     # New activities live in the same versioned catalog; classics remain reachable.

@@ -98,12 +98,12 @@ Keep these checks green on future changes.
 
 ### P2 · Extend the scenario bank with a weekly source-informed question
 
-Status: five scenarios prepared, including the 9 November source-informed
-question about expert role-play versus intended-user outcomes. A question picker
-makes each scenario directly reachable. The final PR checks and Pages deployment
-determine which revision is published. Next: use a genuinely different question
-from a later published issue, rather than adding another version of speed versus
-learning or expert feedback versus learner outcomes.
+Status: six scenarios. The November 23 reading shelf prompted a matched
+disclosure contrast: visitors change AI versus human copyediting attribution
+while the fictional excerpt, methods and answer choices stay identical. The
+linked conceptual paper proposes a mechanism; it does not establish an effect.
+Next: audit the disclosure control with a screen reader and avoid adding more
+questions without a distinct reasoning goal.
 
 - Review the current published issue for a meaningful task-design tension.
 - Add one concise scenario with reflection, hint, full answer and feedback, or
@@ -150,6 +150,18 @@ Status: needs a concrete use case before implementation.
   information merely to create a richer demo.
 
 ## November 2026 change record
+
+### November 23 · Matched editing disclosures
+
+- Add the sixth Assistance Dial question, based on a conceptual hypothesis
+  linked from the November 23 coverage update. Visitors swap only the
+  provenance label, not the text or methods. Distinguish checking provenance
+  from assuming the strength of the evidence has changed.
+- Keep keyboard focus on the disclosure switch and announce just the changed
+  label. Give source links extra tap-target room. Closing a Lab dialog no
+  longer reclaims focus from a control reached before the native close event.
+- Verify across all three hosted engines before release. Native browser zoom
+  and real assistive-technology review remain open.
 
 ### November 18
 
