@@ -1,6 +1,6 @@
 {
   "run": {
-    "date": "2026-11-25",
+    "date": "2026-11-26",
     "mode": "weekly",
     "publication_window": {
       "from": "2026-11-16",
@@ -11,7 +11,7 @@
       "scope": "original_publication_date_previous_completed_week"
     },
     "selection_basis": "original_publication_date_previous_completed_week",
-    "preparation_observation_at": "2026-11-25T23:04:30.564727+00:00",
+    "preparation_observation_at": "2026-11-26T10:49:56.993480+00:00",
     "stats": {
       "discovery_status": "partial",
       "preparation_coverage": {
@@ -28,7 +28,7 @@
         },
         "closeout_started_at": "2026-11-23T10:40:57.901018+00:00",
         "coverage_note": "Bounded configured provider queries and publisher snapshots only. Delayed indexing, unavailable sources and unresolved dates can remain partial; calendar closure is not exhaustive coverage, source review or approval.",
-        "academic_requests_this_run": 5,
+        "academic_requests_this_run": 6,
         "academic": [
           {
             "window": {
@@ -239,18 +239,27 @@
                   },
                   "pending_queries": 25,
                   "action": "retained for explicit historical recovery; excluded from current week"
+                },
+                {
+                  "window_id": "preparation:2026-11-26:2026-11-26",
+                  "window": {
+                    "from": "2026-11-26",
+                    "to": "2026-11-26"
+                  },
+                  "pending_queries": 28,
+                  "action": "retained for explicit historical recovery; excluded from current week"
                 }
               ],
               "query_plan_drift": false,
               "superseded_queries": 0,
               "provider_state": {
                 "OpenAlex": {
-                  "last_request_at": 1795647870.564727,
+                  "last_request_at": 1795690196.99348,
                   "consecutive_failures": 0,
                   "next_retry_at": 0
                 },
                 "Crossref": {
-                  "last_request_at": 1795647870.564727,
+                  "last_request_at": 1795690196.99348,
                   "consecutive_failures": 0,
                   "next_retry_at": 0
                 },
@@ -262,8 +271,8 @@
               }
             },
             "general": {
-              "openalex": 1317,
-              "crossref": 2100,
+              "openalex": 1515,
+              "crossref": 2400,
               "provider_windows": [
                 {
                   "provider": "OpenAlex",
@@ -453,17 +462,17 @@
                   "query": "artificial intelligence attention economy cognitive autonomy",
                   "filter": "from_publication_date:2026-11-16,to_publication_date:2026-11-22",
                   "pages": 2,
-                  "pages_this_run": 1,
-                  "cached_pages": 1,
-                  "requests_this_run": 1,
+                  "pages_this_run": 0,
+                  "cached_pages": 2,
+                  "requests_this_run": 0,
                   "records_seen": 102,
                   "records_unique": 101,
                   "provider_total": 116,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "truncated",
+                  "status": "error",
                   "truncated": true,
-                  "reason": "provider did not supply a new cursor",
+                  "reason": "Preparation request/time budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -479,17 +488,17 @@
                   "query": "generative AI interface attention design human agency",
                   "filter": "from_publication_date:2026-11-16,to_publication_date:2026-11-22",
                   "pages": 2,
-                  "pages_this_run": 1,
-                  "cached_pages": 1,
-                  "requests_this_run": 1,
+                  "pages_this_run": 0,
+                  "cached_pages": 2,
+                  "requests_this_run": 0,
                   "records_seen": 200,
                   "records_unique": 200,
                   "provider_total": 336,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "truncated",
+                  "status": "error",
                   "truncated": true,
-                  "reason": "page budget reached",
+                  "reason": "Preparation request/time budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -504,22 +513,22 @@
                   "query_id": "3794c74bf863193c9989b90d7147aa12c1405522e4bce1475cf76550c3e76e3f",
                   "query": "AI information overload algorithmic mediation",
                   "filter": "from_publication_date:2026-11-16,to_publication_date:2026-11-22",
-                  "pages": 1,
-                  "pages_this_run": 0,
+                  "pages": 2,
+                  "pages_this_run": 1,
                   "cached_pages": 1,
-                  "requests_this_run": 0,
-                  "records_seen": 100,
-                  "records_unique": 100,
-                  "provider_total": 102,
+                  "requests_this_run": 1,
+                  "records_seen": 103,
+                  "records_unique": 102,
+                  "provider_total": 113,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "error",
+                  "status": "truncated",
                   "truncated": true,
-                  "reason": "Preparation request/time budget reached",
+                  "reason": "provider did not supply a new cursor",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795523129.506481,
+                  "observed_at": 1795690196.99348,
                   "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
@@ -530,22 +539,22 @@
                   "query_id": "f5ed6382d6e9f894d3423e1570daac00c23d152bec24d912834426af5559c52e",
                   "query": "generative AI everyday life",
                   "filter": "from_publication_date:2026-11-16,to_publication_date:2026-11-22",
-                  "pages": 1,
-                  "pages_this_run": 0,
+                  "pages": 2,
+                  "pages_this_run": 1,
                   "cached_pages": 1,
-                  "requests_this_run": 0,
-                  "records_seen": 100,
-                  "records_unique": 100,
-                  "provider_total": 570,
+                  "requests_this_run": 1,
+                  "records_seen": 200,
+                  "records_unique": 198,
+                  "provider_total": 637,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "error",
+                  "status": "truncated",
                   "truncated": true,
-                  "reason": "Preparation request/time budget reached",
+                  "reason": "page budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795523129.506481,
+                  "observed_at": 1795690196.99348,
                   "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
@@ -556,22 +565,22 @@
                   "query_id": "4a25cbb8dba1be444539767193b3b1058667e18d49d916279e9e4d0524bdc053",
                   "query": "artificial intelligence human attention",
                   "filter": "from_publication_date:2026-11-16,to_publication_date:2026-11-22",
-                  "pages": 1,
-                  "pages_this_run": 0,
+                  "pages": 2,
+                  "pages_this_run": 1,
                   "cached_pages": 1,
-                  "requests_this_run": 0,
-                  "records_seen": 100,
-                  "records_unique": 100,
-                  "provider_total": 4053,
+                  "requests_this_run": 1,
+                  "records_seen": 200,
+                  "records_unique": 196,
+                  "provider_total": 4507,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "error",
+                  "status": "truncated",
                   "truncated": true,
-                  "reason": "Preparation request/time budget reached",
+                  "reason": "page budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795523129.506481,
+                  "observed_at": 1795690196.99348,
                   "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
@@ -739,17 +748,17 @@
                   "query": "generative AI self regulation learning intervention",
                   "filter": "from-pub-date:2026-11-16,until-pub-date:2026-11-22",
                   "pages": 2,
-                  "pages_this_run": 1,
-                  "cached_pages": 1,
-                  "requests_this_run": 1,
+                  "pages_this_run": 0,
+                  "cached_pages": 2,
+                  "requests_this_run": 0,
                   "records_seen": 200,
                   "records_unique": 200,
                   "provider_total": 7960,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "truncated",
+                  "status": "error",
                   "truncated": true,
-                  "reason": "page budget reached",
+                  "reason": "Preparation request/time budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -765,17 +774,17 @@
                   "query": "artificial intelligence attention economy cognitive autonomy",
                   "filter": "from-pub-date:2026-11-16,until-pub-date:2026-11-22",
                   "pages": 2,
-                  "pages_this_run": 1,
-                  "cached_pages": 1,
-                  "requests_this_run": 1,
+                  "pages_this_run": 0,
+                  "cached_pages": 2,
+                  "requests_this_run": 0,
                   "records_seen": 200,
                   "records_unique": 200,
                   "provider_total": 4150,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "truncated",
+                  "status": "error",
                   "truncated": true,
-                  "reason": "page budget reached",
+                  "reason": "Preparation request/time budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -791,17 +800,17 @@
                   "query": "generative AI interface attention design human agency",
                   "filter": "from-pub-date:2026-11-16,until-pub-date:2026-11-22",
                   "pages": 2,
-                  "pages_this_run": 1,
-                  "cached_pages": 1,
-                  "requests_this_run": 1,
+                  "pages_this_run": 0,
+                  "cached_pages": 2,
+                  "requests_this_run": 0,
                   "records_seen": 200,
                   "records_unique": 200,
                   "provider_total": 6749,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "truncated",
+                  "status": "error",
                   "truncated": true,
-                  "reason": "page budget reached",
+                  "reason": "Preparation request/time budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
@@ -816,22 +825,22 @@
                   "query_id": "95c1d7ff176fec109378a59207e2c34bb87240623aa533a844b21f41113e95d1",
                   "query": "AI information overload algorithmic mediation",
                   "filter": "from-pub-date:2026-11-16,until-pub-date:2026-11-22",
-                  "pages": 1,
-                  "pages_this_run": 0,
+                  "pages": 2,
+                  "pages_this_run": 1,
                   "cached_pages": 1,
-                  "requests_this_run": 0,
-                  "records_seen": 100,
-                  "records_unique": 100,
-                  "provider_total": 4275,
+                  "requests_this_run": 1,
+                  "records_seen": 200,
+                  "records_unique": 200,
+                  "provider_total": 4381,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "error",
+                  "status": "truncated",
                   "truncated": true,
-                  "reason": "Preparation request/time budget reached",
+                  "reason": "page budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795523129.506481,
+                  "observed_at": 1795690196.99348,
                   "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Technology & society",
@@ -842,22 +851,22 @@
                   "query_id": "b3287f555c4d2474c831d5de37194f987c426720bcb67f6728878a9f16872e8c",
                   "query": "generative AI everyday life",
                   "filter": "from-pub-date:2026-11-16,until-pub-date:2026-11-22",
-                  "pages": 1,
-                  "pages_this_run": 0,
+                  "pages": 2,
+                  "pages_this_run": 1,
                   "cached_pages": 1,
-                  "requests_this_run": 0,
-                  "records_seen": 100,
-                  "records_unique": 100,
-                  "provider_total": 4033,
+                  "requests_this_run": 1,
+                  "records_seen": 200,
+                  "records_unique": 200,
+                  "provider_total": 4145,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "error",
+                  "status": "truncated",
                   "truncated": true,
-                  "reason": "Preparation request/time budget reached",
+                  "reason": "page budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795523129.506481,
+                  "observed_at": 1795690196.99348,
                   "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
@@ -868,32 +877,32 @@
                   "query_id": "4f4c60c28d294581ac5807fb6717074c1334da756814d172c146ab1bd44f3e6d",
                   "query": "artificial intelligence human attention",
                   "filter": "from-pub-date:2026-11-16,until-pub-date:2026-11-22",
-                  "pages": 1,
-                  "pages_this_run": 0,
+                  "pages": 2,
+                  "pages_this_run": 1,
                   "cached_pages": 1,
-                  "requests_this_run": 0,
-                  "records_seen": 100,
-                  "records_unique": 100,
-                  "provider_total": 4756,
+                  "requests_this_run": 1,
+                  "records_seen": 200,
+                  "records_unique": 200,
+                  "provider_total": 4921,
                   "max_pages": 1,
                   "page_size": 100,
-                  "status": "error",
+                  "status": "truncated",
                   "truncated": true,
-                  "reason": "Preparation request/time budget reached",
+                  "reason": "page budget reached",
                   "completion_scope": "configured provider query and original publication window only",
                   "query_status": "partial",
                   "index_note": "Provider indexes can change during traversal; this is not a frozen snapshot or exhaustive literature coverage",
-                  "observed_at": 1795523129.506481,
+                  "observed_at": 1795690196.99348,
                   "window_id": "closeout_late_index:2026-11-16:2026-11-22",
                   "resumable": true,
                   "theme": "Emerging topics",
                   "scope": "closeout_late_index"
                 }
               ],
-              "publication_date_rejected": 918,
-              "publication_date_unverified": 582,
+              "publication_date_rejected": 1087,
+              "publication_date_unverified": 666,
               "date_lookups": 1,
-              "date_lookups_deferred": 523,
+              "date_lookups_deferred": 599,
               "search_scopes": [
                 {
                   "theme": "AI & cognition",
@@ -981,7 +990,7 @@
                 }
               ],
               "queries_planned": 24,
-              "queries_attempted": 5,
+              "queries_attempted": 6,
               "arxiv_publication_verification": {
                 "provider": "arXiv",
                 "purpose": "v1 original publication date",
@@ -995,7 +1004,7 @@
               },
               "crossref_provider_paused": true,
               "queries_completed": 4,
-              "queries_deferred": 15,
+              "queries_deferred": 14,
               "discovery_status": "partial",
               "configured_query_status": "partial",
               "checkpoint": {
@@ -1202,18 +1211,27 @@
                     },
                     "pending_queries": 25,
                     "action": "retained for explicit historical recovery; excluded from current week"
+                  },
+                  {
+                    "window_id": "preparation:2026-11-26:2026-11-26",
+                    "window": {
+                      "from": "2026-11-26",
+                      "to": "2026-11-26"
+                    },
+                    "pending_queries": 28,
+                    "action": "retained for explicit historical recovery; excluded from current week"
                   }
                 ],
                 "query_plan_drift": false,
                 "superseded_queries": 0,
                 "provider_state": {
                   "OpenAlex": {
-                    "last_request_at": 1795647870.564727,
+                    "last_request_at": 1795690196.99348,
                     "consecutive_failures": 0,
                     "next_retry_at": 0
                   },
                   "Crossref": {
-                    "last_request_at": 1795647870.564727,
+                    "last_request_at": 1795690196.99348,
                     "consecutive_failures": 0,
                     "next_retry_at": 0
                   },
@@ -1445,7 +1463,7 @@
           }
         ],
         "publisher_snapshots": {
-          "checked_at": "2026-11-25T23:04:30.564727+00:00",
+          "checked_at": "2026-11-26T10:49:56.993480+00:00",
           "requests": 0,
           "sources": [
             {
@@ -1502,7 +1520,7 @@
         },
         "editorial": {
           "schema_version": 1,
-          "checked_on": "2026-11-25",
+          "checked_on": "2026-11-26",
           "publication_window": {
             "from": "2026-11-16",
             "to": "2026-11-22",
@@ -1532,7 +1550,7 @@
                 "method": "publisher_feed",
                 "feed_id": "conversation-ai",
                 "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-16T23:22:03.144184+00:00"
               }
             },
@@ -1551,7 +1569,7 @@
                 "method": "publisher_feed",
                 "feed_id": "verge",
                 "feed_url": "https://www.theverge.com/rss/index.xml",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-18T19:24:14.225611+00:00"
               }
             },
@@ -1570,7 +1588,7 @@
                 "method": "publisher_feed",
                 "feed_id": "guardian-ai",
                 "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-16T21:05:56.138909+00:00"
               }
             },
@@ -1589,7 +1607,7 @@
                 "method": "publisher_feed",
                 "feed_id": "guardian-ai",
                 "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-18T10:03:43.683056+00:00"
               }
             },
@@ -1608,7 +1626,7 @@
                 "method": "publisher_feed",
                 "feed_id": "guardian-ai",
                 "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-19T22:07:22.657141+00:00"
               }
             },
@@ -1627,7 +1645,7 @@
                 "method": "publisher_feed",
                 "feed_id": "guardian-ai",
                 "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-20T21:46:27.503507+00:00"
               }
             },
@@ -1646,7 +1664,7 @@
                 "method": "publisher_feed",
                 "feed_id": "guardian-opinion",
                 "feed_url": "https://www.theguardian.com/commentisfree/rss",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-20T21:46:27.503507+00:00"
               }
             },
@@ -1665,7 +1683,7 @@
                 "method": "publisher_feed",
                 "feed_id": "eff",
                 "feed_url": "https://www.eff.org/rss/updates.xml",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-17T05:07:04.280433+00:00"
               }
             },
@@ -1684,7 +1702,7 @@
                 "method": "publisher_feed",
                 "feed_id": "eff",
                 "feed_url": "https://www.eff.org/rss/updates.xml",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-18T21:52:23.432298+00:00"
               }
             },
@@ -1703,7 +1721,7 @@
                 "method": "publisher_feed",
                 "feed_id": "eff",
                 "feed_url": "https://www.eff.org/rss/updates.xml",
-                "checked_at": "2026-11-25",
+                "checked_at": "2026-11-26",
                 "metadata_snapshot_observed_at": "2026-11-20T09:57:14.480797+00:00"
               }
             }
@@ -2000,7 +2018,6 @@
           "conflicting_new_records": 0
         },
         "errors": [
-          "OpenAlex search unavailable: Preparation request/time budget reached",
           "OpenAlex search unavailable: Preparation request/time budget reached",
           "OpenAlex search unavailable: Preparation request/time budget reached",
           "OpenAlex search unavailable: Preparation request/time budget reached",
@@ -99052,13 +99069,3988 @@
               "status": "unresolved",
               "reason": "arXiv verification budget or provider pause"
             }
+          ],
+          "10.1103/bb1n-5gky": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.62574/6x95r6rf": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.62574/vtpu8sxj": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.62574/u5da7af7": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.2196/102386": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.1287/isre.2024.1104": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.1287/isre.2025.2332": [
+            "2026-11-17",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-17"
+            }
+          ],
+          "10.1103/c9kq-kqbv": [
+            "2026-11-17",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-17"
+            }
+          ],
+          "10.1103/yb4m-8jb9": [
+            "2026-11-17",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-17"
+            }
+          ],
+          "10.1287/isre.2024.0917": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.1287/isre.2025.1970": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.1142/s0219622026500914": [
+            "2026-11-17",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-17"
+            }
+          ],
+          "10.1103/v9p8-v97c": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.1142/s0218843026400046": [
+            "2026-11-19",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    19
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    19
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    19
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-19"
+            }
+          ],
+          "10.1142/s0219622026500963": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1287/isre.2024.1230": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.1093/jaenfo/jnag022": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.1145/3842721": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849633": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849634": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849635": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849636": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849637": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849639": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849640": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849641": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1145/3842721.3849642": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1515/9783112247068-008": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-009": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-010": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-011": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-012": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-013": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-014": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-015": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-016": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-017": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-018": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-019": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-020": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-021": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-022": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-023": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-024": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-fm": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783112247068-toc": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-001": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-002": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-003": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-004": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-005": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-006": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-007": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-008": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-010": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-011": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-012": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-013": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-014": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-015": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-016": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-017": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-018": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-019": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-020": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-022": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-023": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-024": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-026": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-027": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-028": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-029": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-030": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-031": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-032": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-033": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-034": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-035": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-036": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-037": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-038": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-039": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-202": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-fm": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1515/9783110591439-toc": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1103/b6tm-8q3d": [
+            "2026-11-17",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    17
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-17"
+            }
+          ],
+          "10.12659/ajcr.954113": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.5312/wjo.125372": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.1145/3849875": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    30
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1093/humrep/deag176": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.1128/aem.01278-26": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.1145/3842721.3849653": [
+            "2026-11-22",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    23
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    22
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-22"
+            }
+          ],
+          "10.1088/2631-7990/aebc1c": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2027,
+                    4,
+                    1
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-20"
+            }
+          ],
+          "10.70962/jhi.20260177": [
+            "2026-11-16",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2027,
+                    2,
+                    1
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    16
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-16"
+            }
+          ],
+          "10.1088/1361-6560/aebdfc": [
+            "2026-11-18",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    28
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    18
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-18"
+            }
+          ],
+          "10.1080/22221751.2026.2760649": [
+            "2026-11-19",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-online",
+                  "date_parts": [
+                    2026,
+                    11,
+                    19
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    12,
+                    31
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    19
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    19
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-online",
+              "value": "2026-11-19"
+            }
+          ],
+          "10.5458/jag.7304104": [
+            "2026-11-20",
+            {
+              "source": "Crossref publisher metadata",
+              "evidence": [
+                {
+                  "field": "published-print",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "published",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                },
+                {
+                  "field": "issued",
+                  "date_parts": [
+                    2026,
+                    11,
+                    20
+                  ],
+                  "precision": "day"
+                }
+              ],
+              "policy": "earliest precise publication event; no registry timestamp fallback",
+              "status": "day_known",
+              "field": "published-print",
+              "value": "2026-11-20"
+            }
           ]
         }
       },
-      "publication_date_quarantine_records": 560,
+      "publication_date_quarantine_records": 690,
       "editorial_feeds": {
         "schema_version": 1,
-        "checked_on": "2026-11-25",
+        "checked_on": "2026-11-26",
         "publication_window": {
           "from": "2026-11-16",
           "to": "2026-11-22",
@@ -99090,7 +103082,7 @@
               "method": "publisher_feed",
               "feed_id": "conversation-ai",
               "feed_url": "https://theconversation.com/topics/artificial-intelligence-ai-90/articles.atom",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-16T23:22:03.144184+00:00"
             }
           },
@@ -99109,7 +103101,7 @@
               "method": "publisher_feed",
               "feed_id": "verge",
               "feed_url": "https://www.theverge.com/rss/index.xml",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-18T19:24:14.225611+00:00"
             }
           },
@@ -99128,7 +103120,7 @@
               "method": "publisher_feed",
               "feed_id": "guardian-ai",
               "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-16T21:05:56.138909+00:00"
             }
           },
@@ -99147,7 +103139,7 @@
               "method": "publisher_feed",
               "feed_id": "guardian-ai",
               "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-18T10:03:43.683056+00:00"
             }
           },
@@ -99166,7 +103158,7 @@
               "method": "publisher_feed",
               "feed_id": "guardian-ai",
               "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-19T22:07:22.657141+00:00"
             }
           },
@@ -99185,7 +103177,7 @@
               "method": "publisher_feed",
               "feed_id": "guardian-ai",
               "feed_url": "https://www.theguardian.com/technology/artificialintelligenceai/rss",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-20T21:46:27.503507+00:00"
             }
           },
@@ -99204,7 +103196,7 @@
               "method": "publisher_feed",
               "feed_id": "guardian-opinion",
               "feed_url": "https://www.theguardian.com/commentisfree/rss",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-20T21:46:27.503507+00:00"
             }
           },
@@ -99223,7 +103215,7 @@
               "method": "publisher_feed",
               "feed_id": "eff",
               "feed_url": "https://www.eff.org/rss/updates.xml",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-17T05:07:04.280433+00:00"
             }
           },
@@ -99242,7 +103234,7 @@
               "method": "publisher_feed",
               "feed_id": "eff",
               "feed_url": "https://www.eff.org/rss/updates.xml",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-18T21:52:23.432298+00:00"
             }
           },
@@ -99261,7 +103253,7 @@
               "method": "publisher_feed",
               "feed_id": "eff",
               "feed_url": "https://www.eff.org/rss/updates.xml",
-              "checked_at": "2026-11-25",
+              "checked_at": "2026-11-26",
               "metadata_snapshot_observed_at": "2026-11-20T09:57:14.480797+00:00"
             }
           }
@@ -99559,7 +103551,7 @@
       }
     },
     "total": 130,
-    "new": 8,
+    "new": 41,
     "last_seven_days": 10,
     "nonacademic_added": 0,
     "nonacademic_total": 44,
@@ -99929,7 +103921,7 @@
       "discovery_scope": "closeout",
       "discovery_query": "ChatGPT metacognition memory cognitive effort",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-24T23:29:03.916508+00:00",
+      "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
       "preparation_first_seen_at": "2026-11-23T10:40:57.901018+00:00",
       "oa_checked": "2026-11-23",
       "oa_pass_version": 3,
@@ -101917,7 +105909,7 @@
       "discovery_scope": "preparation",
       "discovery_query": "generative AI sustained attention task switching",
       "historical_backfill": false,
-      "metadata_observed_at": "2026-11-25T11:14:00.344142+00:00",
+      "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
       "preparation_first_seen_at": "2026-11-16T21:05:56.138909+00:00",
       "pmc_oai_attempt": {
         "version": 1,
