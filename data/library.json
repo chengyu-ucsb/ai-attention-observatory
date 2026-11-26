@@ -84,6 +84,39 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:51+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:52+00:00"
+    },
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -147,20 +180,61 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This study presents a bibliometric mapping and trend analysis of 2,439 journal articles published between 2016 and 2026 (data collected as of October 24, 2026) that combine AI-related, urban planning/smart city, and review-focused terms.",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "The increasing presence of artificial intelligence (AI) is evident as a fundamental infrastructure of urban planning and smart cities management. This study presents a bibliometric mapping and trend analysis of 2,439 journal articles published between 2016 and 2026 (data collected as of October 24, 2026) that combine AI-related, urban planning/smart city, and review-focused terms.",
       "methods": "",
-      "findings": "",
-      "interpretation": "",
-      "limitations": "",
+      "findings": "The corpus comprises 2,439 articles published in 845 sources between 2016 and 2026 by 7,133 authors (Table 2 ). Articles have on average 4.3 co-authors, 37.23 % involve international co-authorship, and 148 authors have written single-authored documents. The corpus is very young-the average document age is 2.54 years, and 92.9 % of articles appeared in 2020 or later-and each article cites about 65 references on average (158,323 references in total). The 2,439 articles have accumulated an estimated 101,404 citations, an average of 41.58 per article. Annual output rose from 11 articles in 2016 to 548 in 2026 (Table 3 , Figure 1 ). Only 173 articles (7.1 %) were published in 2016-2019, whereas 2,266 (92.9 %) appeared from 2020 onwards and 1,079 (44.2 %) in 2025-2026 alone. Growth was not uniform: year-on-year increases exceeded 66 % until 2019, fell to 40.8 % in 2021 and 17.4 % in 2022, almost stalled in 2023 (+4.9 %), and then rebounded (+31.4 % in 2024 and +58.5 % in 2025). By 24 October 2026 the 548 articles already exceed the 2025 total by 3.2 %. As the 2026 figure covers about 81 % of the calendar year, and indexing is typically delayed, it is best read as a lower bound for full-year output. The rebound after 2023 coincides with the rapid public diffusion of generative AI, but the keyword evidence does not support attributing it to that technology: \"generative AI\", although part of the search string, is not among the 50 most frequent terms (Section 4.9). A log-linear regression on the ten complete years 2016-2025 estimates average growth of 47.7 % per year (95 % CI 34.9-61.7 %; R² = 0.925, p < 0.001), in line with the compound rate of 47.82 % reported by bibliometrix for 2016-2026. The correlation between year and output is r = 0.952 (95 % CI 0.805-0.989; p < 0.001; n = 10). Figures 2 and 3 show a logistic life-cycle model fitted to annual output. The model (R² = 0.969) estimates a saturation level of about 8,040 cumulative articles (K = 8,043), a growth rate of 0.348 per year and an inflection point at 2028.7, when annual output peaks at about 700 articles. A re-estimation of the annual series from Table 3 reproduces these values. The curve implies that half of the eventual cumulative output is reached at the inflection point, 90 % around 2035 and 99 % around 2042; the corpus as of October 2026 would represent about 30 % of the projected total. The fit should be interpreted with care: it rests on eleven observations, the last of which is incomplete; the 2025 observation (531) lies 12 % above the fitted value (473); and a logistic curve imposes saturation by construction. Therefore, the model can be interpreted not as a prediction of decline in the sector, but as a stylized indicator showing that it is in a phase of rapid growth. Mean total citations fall steadily with recency, from 152.51 for the 2018 cohort to 1.67 for 2026 (Table 4 ), a pattern that mainly reflects exposure time (Spearman ρ between cohort year and mean total citations = -0.94",
+      "interpretation": "In other words, the current research is a map of 2,439 scientific articles covering artificial intelligence in urban planning and smart cities from 2016 to 2026 and using the language of reviews. Output has grown at about 48 % per year, with 92.9 % of articles published since 2020, and a logistic model places the field before its inflection point (about 2028.7). Knowledge production takes place through 845 sources, where there is leadership in engineering and open access publishing, and geographical focus on Greater China. The collection shows the presence of many sporadic authors, and although Bradford and Lotka patterns serve as good approximations, they do not stand statistical test. Impact is concentrated in a small set of technology-specific surveys, and the conceptual structure is technology-first, with planning, sustainability and governance vocabulary in comparatively peripheral positions. A shift from IoT and big-data terms towards urban planning, AI and learning systems is detectable in recent years. The principal contribution is an updated, reproducible and statistically annotated map of the field that links its technical strands to planning concerns and translates the patterns into a research agenda. The agenda emphasizes urban digital twins as planning-support systems, explainability and accountability, data governance, generative AI, integration of learning-based methods into decision processes, and geographic diversification.",
+      "limitations": "Several limitations qualify the findings. First, a single database (Scopus) was used; studies indexed elsewhere, in other languages or in grey literature are missing. Second, only journal articles were retained, so conference papers-an important venue for computer science-and records classified as review articles are excluded; the corpus therefore represents review-oriented articles rather than all reviews. Third, the third query block captures review-oriented vocabulary rather than a document type, and individual records were not screened manually, so some may be peripheral (for example the unexpected presence of a geopolitics journal among the leading sources). Fourth, several leading keywords echo the search string, and no thesaurus was applied, so variants fragment frequencies and generic index terms add noise. Fifth, 2026 is a partial year and recent cohorts have had little time to accumulate citations, which affects growth, citation and life-cycle estimates; the logistic model re",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
-      "reported_findings": false
-    }
+      "reported_findings": true
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:52+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.65069/ara31202751",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "",
+      "results": "The corpus comprises 2,439 articles published in 845 sources between 2016 and 2026 by 7,133 authors (Table 2 ). Articles have on average 4.3 co-authors, 37.23 % involve international co-authorship, and 148 authors have written single-authored documents. The corpus is very young-the average document age is 2.54 years, and 92.9 % of articles appeared in 2020 or later-and each article cites about 65 references on average (158,323 references in total). The 2,439 articles have accumulated an estimated 101,404 citations, an average of 41.58 per article. Annual output rose from 11 articles in 2016 to 548 in 2026 (Table 3 , Figure 1 ). Only 173 articles (7.1 %) were published in 2016-2019, whereas 2,266 (92.9 %) appeared from 2020 onwards and 1,079 (44.2 %) in 2025-2026 alone. Growth was not uniform: year-on-year increases exceeded 66 % until 2019, fell to 40.8 % in 2021 and 17.4 % in 2022, almost stalled in 2023 (+4.9 %), and then rebounded (+31.4 % in 2024 and +58.5 % in 2025). By 24 October 2026 the 548 articles already exceed the 2025 total by 3.2 %. As the 2026 figure covers about 81 % of the calendar year, and indexing is typically delayed, it is best read as a lower bound for full-year output. The rebound after 2023 coincides with the rapid public diffusion of generative AI, but the keyword evidence does not support attributing it to that technology: \"generative AI\", although part of the search string, is not among the 50 most frequent terms (Section 4.9). A log-linear regression on the ten complete years 2016-2025 estimates average growth of 47.7 % per year (95 % CI 34.9-61.7 %; R² = 0.925, p < 0.001), in line with the compound rate of 47.82 % reported by bibliometrix for 2016-2026. The correlation between year and output is r = 0.952 (95 % CI 0.805-0.989; p < 0.001; n = 10). Figures 2 and 3 show a logistic life-cycle model fitted to annual output. The model (R² = 0.969) estimates a saturation level of about 8,040 cumulative articles (K = 8,043), a growth rate of 0.348 per year and an inflection point at 2028.7, when annual output peaks at about 700 articles. A re-estimation of the annual series from Table 3 reproduces these values. The curve implies that half of the eventual cumulative output is reached at the inflection point, 90 % around 2035 and 99 % around 2042; the corpus as of October 2026 would represent about 30 % of the projected total. The fit should be interpreted with care: it rests on eleven observations, the last of which is incomplete; the 2025 observation (531) lies 12 % above the fitted value (473); and a logistic curve imposes saturation by construction. Therefore, the model can be interpreted not as a prediction of decline in the sector, but as a stylized indicator showing that it is in a phase of rapid growth. Mean total citations fall steadily with recency, from 152.51 for the 2018 cohort to 1.67 for 2026 (Table 4 ), a pattern that mainly reflects exposure time (Spearman ρ between cohort year and mean total citations = -0.94, p < 0.001, 2016-2025). Dividing by citable years removes most of this age effect. Annualised rates lie between 11.7 and 17.0 for the 2016-2022 cohorts and between 9.6 and 12.3 for 2023-2024, before dropping to 6.04 for 2025 and 1.67 for 2026, cohorts that have had little time to accumulate citations. The annualised rate is negatively associated with cohort year over 2016-2025 (ρ = -0.68, p = 0.029), but the association is weaker and not significant when the 2025 cohort is also excluded (ρ = -0.57, p = 0.112). We therefore find no evidence that more recent articles are cited more per year, and no robust evidence of a decline among cohorts with a longer record. The annualisation also assumes uniform citation accrual, which understates young cohorts if citations build up gradually. IEEE Access is the leading outlet (106 articles; 4.3 %), followed by Remote Sensing (74) and Sustainability (65) (Table 5 , Figure 4a ). Table 5 Continued # Source Articles Share of corpus (%) 9 IEEE Transactions on Geoscience and Remote Sensing 40 1.6 10 Applied Sciences (Switzerland) 34 1.4 11 IEEE Transactions on Intelligent Transportation Systems 30 1.2 12 Smart Cities 28 1.1 13 Scientific Reports 27 1.1 14 Buildings 24 1.0 15 ISPRS International Journal of Geo-Information 23 0.9 16 Computers, Environment and Urban Systems 22 0.9 17 Multimedia Tools and Applications 22 0.9 18 Geopolitics, History, and International Relations 21 0.9 19 ACM Computing Surveys 16 0.7 20 Expert Systems with Applications 16 0.7 Note: Share = articles ÷ 2,439. Bradford's model fits the cumulative distribution of articles over source ranks very closely (C(r) = -550.53 + 429.02•ln r; R² = 0.9858) and yields a multiplier of k = 5.51 (Tables 6 and 7 , Figure 5 ). The 23 core sources (2.7 % of sources) account for 827 articles (33.9 %), the 153 sources of Zone 2 for 800 (32.8 %) and the 669 sources of Zone 3 for 812 (33.3 %). The ratio of source counts across zones is 1 : 6.65 : 29.1, which brackets the idealised 1 : k : k² (1 : 5.51 : 30.4). The KS test nevertheless rejects exact conformity (D = 0.1172, p = 1.84 × 10-5). Due to the high number of sources (845), any discrepancy is statistically detectable, yet the effect size is still small, and thus the practical result is that the law of Bradford is a rather accurate approximation leading to the wide and quite even core as a consequence of multi-disciplinarity of the domain. The estimated Lotka exponent is β = 2.1934 (C = 0.262; R² = 0.9072), slightly above the classical value of 2 (Table 7 , Figure 6 ). Note: H0: the empirical distribution follows the theoretical distribution. A steeper exponent means that single-article authors make up an even larger share, and highly productive authors a smaller share, than the classical law predicts. In the empirical distribution roughly four in five authors (about 84 %, read from Figure 6 ) have written one article, and the tail extends to authors with about 50 documents. The KS tests reject conformity both with the theoretical law (β = 2: D = 0.5143, p = 0.000191) and with the fitted model (β = 2.19: D = 0.3714, p = 0.016). With 7,133 authors, 4.3 co-authors per article and a very young corpus, the picture is of a field with many occasional entrants and a thin, still-forming core of repeat contributors, consistent with rapid growth. Wuhan University is the most productive institution (80 articles), followed by Tsinghua University (53) and the National University of Singapore (37) (Table 8 , Figure 4b ). Thirteen of the 20 leading institutions are in Greater China (eleven in mainland China and two in Hong Kong SAR); two are in Singapore and two in Saudi Arabia (King Abdulaziz and King Saud Universities, 57 articles together), with South Korea, the United Kingdom and Iran represented once each. The leading position of Wuhan University and the China University of Geosciences is consistent with the weight of the remote-sensing strand in the corpus (Section 4.11). The 20 institutions account for 622 institution-article affiliations; Wuhan University alone contributes 12.9 % of these. China dominates scientific production with 1,983 author-country occurrences, followed by India (655) and the USA (512) (Table 9 , Figures 7 and 8a ). Because the frequency counts every authorcountry occurrence, the values exceed the number of articles and shares are computed relative to the top 20 total (5,360): China accounts for 37.0 %, India for 12.2 % and the USA for 9.6 %, so the top three repr",
+      "discussion": "In other words, the current research is a map of 2,439 scientific articles covering artificial intelligence in urban planning and smart cities from 2016 to 2026 and using the language of reviews. Output has grown at about 48 % per year, with 92.9 % of articles published since 2020, and a logistic model places the field before its inflection point (about 2028.7). Knowledge production takes place through 845 sources, where there is leadership in engineering and open access publishing, and geographical focus on Greater China. The collection shows the presence of many sporadic authors, and although Bradford and Lotka patterns serve as good approximations, they do not stand statistical test. Impact is concentrated in a small set of technology-specific surveys, and the conceptual structure is technology-first, with planning, sustainability and governance vocabulary in comparatively peripheral positions. A shift from IoT and big-data terms towards urban planning, AI and learning systems is detectable in recent years. The principal contribution is an updated, reproducible and statistically annotated map of the field that links its technical strands to planning concerns and translates the patterns into a research agenda. The agenda emphasizes urban digital twins as planning-support systems, explainability and accountability, data governance, generative AI, integration of learning-based methods into decision processes, and geographic diversification.",
+      "limitations": "Several limitations qualify the findings. First, a single database (Scopus) was used; studies indexed elsewhere, in other languages or in grey literature are missing. Second, only journal articles were retained, so conference papers-an important venue for computer science-and records classified as review articles are excluded; the corpus therefore represents review-oriented articles rather than all reviews. Third, the third query block captures review-oriented vocabulary rather than a document type, and individual records were not screened manually, so some may be peripheral (for example the unexpected presence of a geopolitics journal among the leading sources). Fourth, several leading keywords echo the search string, and no thesaurus was applied, so variants fragment frequencies and generic index terms add noise. Fifth, 2026 is a partial year and recent cohorts have had little time to accumulate citations, which affects growth, citation and life-cycle estimates; the logistic model rests on eleven observations. Sixth, the thresholds of the science-mapping procedures were not subjected to sensitivity analysis, and clusters and axes were interpreted by the authors. Seventh, mean-based citation indicators are sensitive to outliers, and country-level citation figures depend on corresponding-author attribution. Future work should combine several databases, add conference literature, apply a thesaurus, screen records for relevance, and complement bibliometric mapping with content analysis of a sample of key studies. urban planning 605 convolutional neural network 100 machine learning 532 antennas 99 artificial intelligence 427 internet of things (iot) 96 internet of things 352 learning algorithms 94 learning systems 345 feature extraction 92 smart cities 309 remote sensing images 92 remote sensing 297 semantic segmentation 92 big data 225 satellite imagery 91 machine-learning 171 digital twin 90 decision making 158 object detection 89 semantics 152 intelligent systems 88 sustainable development 150 artificial neural network 87 convolutional neural networks 135 information management 87 Table 16 Continued Keyword Frequency Keyword Frequency Article 134 motor transportation 86 forecasting 131 deep neural networks 85 remote sensing 124 edge computing 83 urban transportation 121 urban growth 82 computer vision 120 data mining 81 urban area 120 image enhancement 80 sustainability 114 benchmarking 78 china 110 intelligent transportation systems 78 network security 108 data set 77 human 107 extraction 77",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.65069/ara31202751",
+      "key_idea": "The corpus comprises 2,439 articles published in 845 sources between 2016 and 2026 by 7,133 authors (Table 2 ). Articles have on average 4.3 co-authors, 37.23 % involve international co-authorship, and 148 authors have written single-authored documents. The corpus is very young-t",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "results",
+        "discussion",
+        "limitations"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "ChatGPT in Pakistani Higher Education:  Transforming Teaching, Learning, Assessment,  Research, and Academic Ethics",
@@ -1445,6 +1519,30 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:52+00:00",
+      "pipeline_version": 3,
+      "status": "missing_sections",
+      "next_at": "2026-12-10T12:39:53+00:00"
+    },
+    "open_access_url": "https://doi.org/10.36074/logos-20.11.2026.016",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "pdf_has_no_recognized_sections",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
     }
   },
   {
@@ -3615,6 +3713,40 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:53+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:53+00:00"
+    },
+    "open_access_url": "https://doi.org/10.59075/jsrd.v7i9.673",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -6171,6 +6303,22 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
     }
   },
   {
@@ -6247,6 +6395,40 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:53+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:53+00:00"
+    },
+    "open_access_url": "https://doi.org/10.34190/icair.7.1.5694",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -6323,6 +6505,40 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:53+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:53+00:00"
+    },
+    "open_access_url": "https://doi.org/10.48175/ijarsct-40829",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -9817,20 +10033,61 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This scoping review examines studies in which a generative system acts as a pedagogical agent that directly mediates learning about sustainability.",
-      "methods": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Generative artificial intelligence (GenAI) is being rapidly adopted in education, prompting growing interest in its application to Education for Sustainable Development (ESD). This scoping review examines studies in which a generative system acts as a pedagogical agent that directly mediates learning about sustainability.",
+      "methods": "This scoping review was conducted in accordance with the Joanna Briggs Institute (JBI) methodology for scoping reviews (Peters et al., 2020) and reported following the PRISMA extension for Scoping Reviews (PRISMA-ScR) (Tricco et al., 2018) . A scoping review was considered appropriate, rather than a systematic review, because the objective was to map the extent, range, and gaps of an emerging and methodologically heterogeneous body of evidence rather than to aggregate effect sizes (Munn et al., 2018) . The identification of potential studies was carried out on 8 July 2026 through searches in three electronic databases, Scopus, Web of Science (Core Collection) and ERIC, all of which were searched on that date. Scopus and Web of Science were selected for their broad multidisciplinary coverage, which is necessary given that research at the intersection of generative artificial intelligence and sustainability education is dispersed across educational research, environmental science, and computing. ERIC was added to ensure adequate coverage of the specialist educational literature, including practitioner-oriented journals that are unevenly indexed in the two multidisciplinary databases. Records published between 1 January 2023 and 30 June 2026 were considered, with the publication date taken as indexed by each database, so that online-first articles were included when their indexed date fell within the window. Searches were run after the close of the window so that records publish",
       "findings": "",
-      "interpretation": "",
-      "limitations": "",
+      "interpretation": "The finding that 19 of 25 studies invoke no sustainability competency framework, and that only one of the twelve studies targeting GreenComp-related constructs assessed them with a corresponding instrument, is more than a reporting matter. It suggests that research on generative AI in sustainability education has so far adopted the evaluative apparatus of educational technology, namely engagement, satisfaction and knowledge gain, while the evaluative apparatus of ESD remains to be incorporated. The consequence is that the results reported across the corpus, which are largely positive but rest mostly on designs without a comparison condition and include one comparison in which the generative-AI group performed worse (Membrillo-Hernández et al., 2026) , currently speak mainly to engagement, perceived benefit and content knowledge rather than to sustainability competencies as assessed. Systems thinking, anticipatory competence and normative competence are the capabilities ESD exists to develop (Brundiers et al., 2021; Bianchi et al., 2022) , and although they are frequently targeted, they are rarely part of the measurement practice of this literature. Operationalising them is therefore the step that would allow the accumulating evidence to be read as evidence about ESD, and it begins with selecting a framework before designing measurement. The role distribution is informative in the same way. The dialogic tutor dominates, while the dilemma interlocutor, the configuration that most directly exercises normative competence, appears once in 25 studies. Read alongside the finding that a quarter of the corpus positions the system as an epistemic authority, this suggests that the field has so far concentrated on making sustainability content more accessible, and that the delibera",
+      "limitations": "Five limitations should be noted. First, the search was restricted to three databases and, although Scopus indexes a substantial share of computing proceedings, coverage of conference literature is incomplete. The search vocabulary was also narrower than the field: because sustainability and sustainable development were not used as standalone terms, some studies that address sustainability learning under other terminology are not captured, and the corpus should be read as a substantial but not exhaustive sample of the literature published up to June 2026. This limitation will be addressed in a full systematic review with an expanded search vocabulary, which we are planning as follow-up work. Second, the lower bound of the publication window excludes pre-2023 work on generative conversational agents; the absence of eligible 2023 studies suggests this exclusion is unlikely to have removed much, but it cannot be ruled out. Third, seven of the charted variables are reviewer judgements; alt",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
-    }
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:53+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.3389/feduc.2026.1998715",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "This scoping review was conducted in accordance with the Joanna Briggs Institute (JBI) methodology for scoping reviews (Peters et al., 2020) and reported following the PRISMA extension for Scoping Reviews (PRISMA-ScR) (Tricco et al., 2018) . A scoping review was considered appropriate, rather than a systematic review, because the objective was to map the extent, range, and gaps of an emerging and methodologically heterogeneous body of evidence rather than to aggregate effect sizes (Munn et al., 2018) . The identification of potential studies was carried out on 8 July 2026 through searches in three electronic databases, Scopus, Web of Science (Core Collection) and ERIC, all of which were searched on that date. Scopus and Web of Science were selected for their broad multidisciplinary coverage, which is necessary given that research at the intersection of generative artificial intelligence and sustainability education is dispersed across educational research, environmental science, and computing. ERIC was added to ensure adequate coverage of the specialist educational literature, including practitioner-oriented journals that are unevenly indexed in the two multidisciplinary databases. Records published between 1 January 2023 and 30 June 2026 were considered, with the publication date taken as indexed by each database, so that online-first articles were included when their indexed date fell within the window. Searches were run after the close of the window so that records published up to the cutoff could be indexed. Rather than searching from database inception, the lower bound of this window was set at the point at which large-scale conversational models became generally available, and therefore at the point at which the pedagogical configurations examined here became practically implementable. The search strategy combined terms related to generative artificial intelligence, education for sustainable development, and learning outcomes. The key terms used for each of these three concept blocks are presented in Table 1 . Search expressions were adapted to the syntax of each database, and the full expressions, together with the number of records returned per database, are provided in the Supplementary Material. The terms sustainability and sustainable development were not used as standalone terms. Combined with generative AI and education, they retrieve predominantly literature in which sustainability denotes an institutional objective, such as educational access and quality under Sustainable Development Goal 4, or the sustainability of AI systems themselves, both of which fall outside the Context criterion of this review. The sustainability block was therefore built from phrases that denote sustainability as an object of learning, complemented by environmental, climate and socio-ecological terms and by the truncated term sustainability competenc*, and was further constrained by the learning and instruction block. The eligibility criteria were informed by the Population, Concept, and Context approach (Peters et al., 2020) . Regarding the population, studies were required to include learners at any educational level, from primary schooling to continuing professional education, or, where the intervention targeted instructional design, the educators designing for them. For the concept, we focused on studies in which a generative artificial intelligence system acted as a pedagogical agent, that is, in which it directly mediated a learning experience (e.g., dialogic tutoring, deliberation over a dilemma, simulated role-play, scenario generation, formative feedback, or instructional codesign) rather than functioning as an author-side productivity tool. Regarding the context, we included studies conducted in formal, non-formal, or informal educational settings in which the learning content concerned sustainability, environmental issues, climate, or socio-ecological systems, addressed as the object of learning rather than as an institutional objective. Instructional co-design was included when the generative system was used by learners, or by educators together with learners, to produce materials or designs that formed part of the learning activity. It was excluded when the system was used by teachers or authors only to prepare materials, with no learner interaction reported, which corresponds to the excluded authorside use. No geographical restriction was applied. No language restrictions were applied, and automatic translation tools were used where necessary. Consistent with the aim of a scoping review to map the breadth of available evidence, no restrictions were placed on document type or study design, and empirical, conceptual, and design-based contributions were considered for eligibility. The full set of criteria is summarised in Table 2 . Following the removal of duplicates, the records retrieved from the database searches underwent a two-stage screening process based on the predefined eligibility criteria. Two independent reviewers first read the titles and abstracts and then assessed the full texts. Given the specificity of the search, no record within the publication window was excluded on the basis of its title and abstract alone, so all 103 records proceeded to full-text assessment, as shown in the flow diagram. In both stages, the reviewers applied the Population, Concept, and Context (PCC) framework to each record. Any discrepancies between the two reviewers were directly referred to a third reviewer, whose decision was final. Inter-rater reliability between the two independent reviewers during the full-text screening phase was assessed on all 103 records evaluated for eligibility. The reviewers agreed on 85 records (82.5% observed agreement), resulting in a Cohen's k of 0.57, which indicates moderate agreement (Landis and Koch, 1977) . The 18 records on which the reviewers diverged were resolved by the third reviewer, whose adjudication is reflected in the final sample. Detailed reliability calculations and the confusion matrix are available in Table S2 . The complete study selection process for this scoping review is illustrated in the PRISMA flow diagram (Figure 1 ). The search retrieved 172 records (Scopus, n ¼ 103; Web of Science, n ¼ 48; ERIC, n ¼ 21). Removal of duplicates left 120 records, of which 17 fell outside the publication window, leaving 103 records assessed against the eligibility criteria. Of these, 77 were excluded and 26 reports met the eligibility criteria. Two of these reports (Huang et al., 2025; Huang and Chang, 2024) describe the same intervention, sample and dataset; following PRISMA-ScR guidance on multiple reports of a single study, Data were extracted using a structured charting form developed a priori and comprising 34 variables organised in four domains: bibliographic and contextual characteristics; pedagogical configuration; competencies and outcomes; and risks and contradictions. The complete form and the charted dataset are provided in Table S3 , the study-level summary in Table S4 , and the codebook governing the interpretive variables in Table S5 . The form was piloted independently by both reviewers on a subset of studies before being applied to the full corpus, and, consistent with guidance on scoping review methodology, charting was treated as an iterative rather than a fixed procedure (Peters et al., 2020) . Two kinds of variable were distinguished. Descriptive variables were transcribed as reported. Seven further var",
+      "results": "",
+      "discussion": "The finding that 19 of 25 studies invoke no sustainability competency framework, and that only one of the twelve studies targeting GreenComp-related constructs assessed them with a corresponding instrument, is more than a reporting matter. It suggests that research on generative AI in sustainability education has so far adopted the evaluative apparatus of educational technology, namely engagement, satisfaction and knowledge gain, while the evaluative apparatus of ESD remains to be incorporated. The consequence is that the results reported across the corpus, which are largely positive but rest mostly on designs without a comparison condition and include one comparison in which the generative-AI group performed worse (Membrillo-Hernández et al., 2026) , currently speak mainly to engagement, perceived benefit and content knowledge rather than to sustainability competencies as assessed. Systems thinking, anticipatory competence and normative competence are the capabilities ESD exists to develop (Brundiers et al., 2021; Bianchi et al., 2022) , and although they are frequently targeted, they are rarely part of the measurement practice of this literature. Operationalising them is therefore the step that would allow the accumulating evidence to be read as evidence about ESD, and it begins with selecting a framework before designing measurement. The role distribution is informative in the same way. The dialogic tutor dominates, while the dilemma interlocutor, the configuration that most directly exercises normative competence, appears once in 25 studies. Read alongside the finding that a quarter of the corpus positions the system as an epistemic authority, this suggests that the field has so far concentrated on making sustainability content more accessible, and that the deliberative configurations remain a largely unexplored design space rather than one that has been tried and found wanting. This matters because efficiency and deliberation are not merely different goals in ESD; under some conditions they are opposed. A system that resolves a socio-ecological dilemma fluently on the learner's behalf removes precisely the difficulty through which normative competence develops. The exploratory cross-tabulation in Figure 4 is consistent with this concern: in none of the seven studies that treated the system as an authority did the normative position remain with the learner alone, although in four of them it was shared. The only study in the corpus that assessed sustainability competencies against a comparison condition points in the same direction: the group using generative tools scored lower on systems-thinking, anticipatory, normative and strategic competence than a control group following the same project (Membrillo-Hernández et al., 2026) . With 16 of the 18 studies that report learner outcomes introducing the generative component alongside a wider instructional redesign, one randomised controlled trial, and one measuring beyond the immediate post-test, the corpus does not yet allow observed gains to be attributed to generative AI as distinct from the pedagogical restructuring that accompanied it. Of these 18 studies, 15 embedded the generative component in curricular activity and ten introduced briefing, debriefing or guided reflection at the same time as the technology. These features are themselves plausible sources of the observed gains, independently of the generative component. The outcome distribution points the same way. All 25 studies target cognitive outcomes, but measured change in learners is evidenced in ten, against a comparison condition in five and beyond the immediate post-test in one; behavioural outcomes appear in nine studies. This reproduces the pattern documented across technology-mediated ESD and situates generative AI within, rather than beyond, the persistent knowledge-action gap (Colombo et al., 2023; Paul, 2026) . That 88.0% of studies teaching sustainability do not discuss the environmental cost of the tool they use is the clearest example of a category of analysis that the field has not yet turned on itself. Because this review relies on published reports, the finding shows that the footprint was not reported, not that educators ignored it in practice; the pattern is consistent with a disciplinary convention of treating educational technology as immaterial. We propose that this be reframed as an opportunity rather than only a criticism. The footprint of a generative system is unusually good pedagogical material for ESD: it is immediate, verifiable, and implicates the learner directly. A course that analyses the water and energy consumption of the model it is using exercises systems thinking on a case the learner is inside. No study in this corpus does this, which makes it an available avenue for innovation. Four evidence-informed design principles are proposed on the basis of the evidence assembled here. Each is anchored in a specific and quantified feature of the corpus; however, the principles extend these findings into recommendations for pedagogical design and research practice, and their effectiveness remains to be established in primary studies. The first principle is that sustainability competencies should be operationalised explicitly. The warrant is the finding that 19 of the 25 studies invoke no competency framework at all, and that, of the twelve studies targeting GreenComp-related constructs, only one assessed them with a corresponding instrument. In practice this means selecting a framework before designing the intervention rather than after it, naming the specific competencies the activity is intended to develop, and aligning at least one instrument to each named competency. The cost of not doing so is visible in this corpus: several studies report engagement, satisfaction or content knowledge and then discuss their findings in terms of sustainability competence. The second principle is that the learner's normative agency should be preserved. Three studies had the model supply the evaluative position on a value-laden question that learners were not asked to contest, and none of the seven studies positioning the system as an epistemic authority left normative judgement with the learner alone. Designs that keep this agency require learners to contest, justify or revise model outputs rather than receive them, for instance by asking students to identify whose interests a generated recommendation serves, or to argue against a position the system has produced. This is also where the corpus is thinnest in configuration terms, since the dilemma interlocutor role appeared once in 25 studies. The third principle is that studies should be designed to isolate the generative component. With 16 of the 18 studies that report learner outcomes confounding the technology with a wider instructional redesign, one randomised controlled trial, and 17 of these 18 measuring outcomes only immediately after the intervention, the field cannot presently establish what the generative system contributes over and above the pedagogy introduced alongside it. Two additions would change this substantially: a comparison condition differing only in the generative element, and at least one delayed measure. Given that many of these interventions introduced briefing, debriefing and guided reflection at the same time as the technology, and that those features may themselves account for the observed gains, the question is not rhetorical. The fourth principle is tha",
+      "limitations": "Five limitations should be noted. First, the search was restricted to three databases and, although Scopus indexes a substantial share of computing proceedings, coverage of conference literature is incomplete. The search vocabulary was also narrower than the field: because sustainability and sustainable development were not used as standalone terms, some studies that address sustainability learning under other terminology are not captured, and the corpus should be read as a substantial but not exhaustive sample of the literature published up to June 2026. This limitation will be addressed in a full systematic review with an expanded search vocabulary, which we are planning as follow-up work. Second, the lower bound of the publication window excludes pre-2023 work on generative conversational agents; the absence of eligible 2023 studies suggests this exclusion is unlikely to have removed much, but it cannot be ruled out. Third, seven of the charted variables are reviewer judgements; although each was governed by an explicit decision rule documented in the codebook and calibrated during piloting and applied independently by two reviewers, consistency was established through consensus rather than agreement statistics, interpretation is unavoidable, and the association shown in Figure 4 may partly reflect conceptual overlap between epistemic positioning and normative delegation, so it should be read as exploratory rather than as validation of either construct. Fourth, the corpus is small (n ¼ 25), which precludes subgroup analysis and means that proportions should be read as descriptions of this corpus rather than as population estimates. Fifth, two of the retrieved reports described the same intervention and were grouped as a single study; other such overlaps may exist where the reporting does not make them identifiable.",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.3389/feduc.2026.1998715",
+      "key_idea": "The finding that 19 of 25 studies invoke no sustainability competency framework, and that only one of the twelve studies targeting GreenComp-related constructs assessed them with a corresponding instrument, is more than a reporting matter. It suggests that research on generative ",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "methods",
+        "discussion",
+        "limitations"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "THE IMPACT OF GENERATIVE ARTIFICIAL INTELLIGENCE MODELS ON THE FORMATION OF SCIENTIFIC NOVELTY IN RESEARCH",
@@ -9918,6 +10175,40 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:53+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:54+00:00"
+    },
+    "open_access_url": "https://doi.org/10.36550/2415-7988-2026-1-225-72-79",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -25623,7 +25914,7 @@
       "sample": "",
       "notice": "No accessible abstract or licensed text has been indexed for this record."
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -29053,7 +29344,7 @@
       "sample": "",
       "notice": "No accessible abstract or licensed text has been indexed for this record."
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -30500,11 +30791,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-12T11:08:48+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-26T12:39:50+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-26T11:08:48+00:00"
+      "next_at": "2026-12-10T12:39:51+00:00"
     },
     "open_access_url": "https://doi.org/10.1177/10519815261491692",
     "repository_recovery": {
@@ -30615,11 +30906,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 2,
-      "last_at": "2026-11-19T11:43:28+00:00",
+      "attempts": 3,
+      "last_at": "2026-11-26T12:39:51+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-26T11:43:28+00:00"
+      "next_at": "2026-12-03T12:39:51+00:00"
     },
     "open_access_url": "https://doi.org/10.3390/app162110970",
     "pdf_fulltext_attempt": {
@@ -31353,7 +31644,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -34061,11 +34352,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-12T11:08:48+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-26T12:39:51+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-26T11:08:49+00:00"
+      "next_at": "2026-12-10T12:39:51+00:00"
     },
     "repository_recovery": {
       "version": 1,
@@ -34162,7 +34453,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -41244,11 +41535,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-12T11:08:48+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-26T12:39:51+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-26T11:08:48+00:00"
+      "next_at": "2026-12-10T12:39:51+00:00"
     },
     "open_access_url": "https://doi.org/10.2139/ssrn.6663559",
     "repository_recovery": {
@@ -41472,11 +41763,11 @@
       "attempts": 1
     },
     "fulltext_attempt": {
-      "attempts": 1,
-      "last_at": "2026-11-12T11:08:50+00:00",
+      "attempts": 2,
+      "last_at": "2026-11-26T12:39:51+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_license",
-      "next_at": "2026-11-26T11:08:50+00:00"
+      "next_at": "2026-12-10T12:39:51+00:00"
     },
     "open_access_url": "https://doi.org/10.7126/cumudj.2049044",
     "repository_recovery": {
@@ -42143,7 +42434,7 @@
       "sample": "",
       "notice": "No accessible abstract or licensed text has been indexed for this record."
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -42263,7 +42554,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -42385,7 +42676,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -42496,7 +42787,7 @@
       "research_type": "unclassified",
       "reported_findings": false
     },
-    "oa_checked": "2026-11-18",
+    "oa_checked": "2026-11-26",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
       "version": 1,
@@ -48642,11 +48933,11 @@
     "oa_checked": "2026-11-19",
     "oa_pass_version": 3,
     "fulltext_attempt": {
-      "attempts": 5,
-      "last_at": "2026-11-19T11:43:34+00:00",
+      "attempts": 6,
+      "last_at": "2026-11-26T12:39:51+00:00",
       "pipeline_version": 3,
       "status": "waiting_for_machine_text",
-      "next_at": "2026-11-26T11:43:34+00:00"
+      "next_at": "2026-12-03T12:39:51+00:00"
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -50590,7 +50881,7 @@
         "limitations"
       ]
     },
-    "figure_checked": "2026-11-05",
+    "figure_checked": "2026-11-26",
     "figure_verification_method": "pmc_aws_2026",
     "verified_article_review": {
       "provenance": "Original paraphrases from the checked HTML article",
@@ -54300,26 +54591,6 @@
     "open_access_url": "https://www.sciencedirect.com/science/article/pii/S2451958826004148",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked HTML article",
-      "overview": "This study examines how undergraduate students integrate generative AI tools into home exams and how these practices relate to self-regulated learning (SRL) and academic performance. Using a mixed-methods design, we analyzed exam responses, self-reports, and performance data from 891 students enrolled in BA-level qualitative methodology courses (2023–2024).",
-      "methods": "Hakola and colleagues examined 891 take-home exams from an undergraduate qualitative-methods course in 2023 and 2024. Students could use AI if they disclosed it; 159 reported doing so. The researchers compared exam answers, instructor-assigned scores, submission times, student accounts and course feedback, classifying disclosed use as instrumental, ideational or reflective.",
-      "findings": "AI users finished faster and, in aggregate, performed somewhat better than non-users, but the pattern depended on how students described using the tool. Instrumental users sometimes scored worse, especially when generic definitions missed course-specific criteria. Ideational users selectively used generated suggestions. Reflective users, who began with their own work and used AI for feedback or missing perspectives, showed the strongest and most consistent performance.",
-      "interpretation": "The study's useful distinction is not AI use versus non-use but whether students delegated the answer, sought ideas or used feedback to revise work they had already attempted. These modes describe naturally occurring practice; they do not establish that reflective use caused higher marks.",
-      "limitations": "AI use was not assigned. Students' disclosures varied in detail, the researchers did not have their prompts or full chat records, and self-regulated learning was inferred rather than directly measured. The categories came from one Finnish take-home-exam setting during early adoption, and the original instructor had already graded the work, so no independent grading reliability estimate was available for the full dataset.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true
-    },
     "oa_checked": "2026-10-22",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -54448,7 +54719,27 @@
         "Observed AI-use modes"
       ]
     },
-    "source_review_status": "editorially_checked_full_article"
+    "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked HTML article",
+      "overview": "This study examines how undergraduate students integrate generative AI tools into home exams and how these practices relate to self-regulated learning (SRL) and academic performance. Using a mixed-methods design, we analyzed exam responses, self-reports, and performance data from 891 students enrolled in BA-level qualitative methodology courses (2023–2024).",
+      "methods": "Hakola and colleagues examined 891 take-home exams from an undergraduate qualitative-methods course in 2023 and 2024. Students could use AI if they disclosed it; 159 reported doing so. The researchers compared exam answers, instructor-assigned scores, submission times, student accounts and course feedback, classifying disclosed use as instrumental, ideational or reflective.",
+      "findings": "AI users finished faster and, in aggregate, performed somewhat better than non-users, but the pattern depended on how students described using the tool. Instrumental users sometimes scored worse, especially when generic definitions missed course-specific criteria. Ideational users selectively used generated suggestions. Reflective users, who began with their own work and used AI for feedback or missing perspectives, showed the strongest and most consistent performance.",
+      "interpretation": "The study's useful distinction is not AI use versus non-use but whether students delegated the answer, sought ideas or used feedback to revise work they had already attempted. These modes describe naturally occurring practice; they do not establish that reflective use caused higher marks.",
+      "limitations": "AI use was not assigned. Students' disclosures varied in detail, the researchers did not have their prompts or full chat records, and self-regulated learning was inferred rather than directly measured. The categories came from one Finnish take-home-exam setting during early adoption, and the original instructor had already graded the work, so no independent grading reliability estimate was available for the full dataset.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true
+    }
   },
   {
     "title": "Critical Thinking with Generative AI: A Constraint-First Design Pilot of a Thinking-Partner Intervention",
@@ -62458,9 +62749,9 @@
     "pmc_oai_attempt": {
       "version": 1,
       "status": "transient_error",
-      "last_at": "2026-11-25",
-      "next_at": "2026-11-26",
-      "attempts": 8
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-27",
+      "attempts": 9
     },
     "pdf_fulltext_attempt": {
       "version": 1,
@@ -64286,26 +64577,6 @@
     "open_access_url": "https://www.utupub.fi/server/api/core/bitstreams/eae635d5-fcde-4e64-a16b-067b96e0005a/content",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked PDF article",
-      "overview": "ABSTRACT Research on Generative Artificial Intelligence (GenAI) in education has concentrated on user attitudes and adoption intentions but less is known about how groups actually interact with such tools while solving complex problems. The present study treats prompting as observable, time-resolved, behaviour and investigates how a group’s prompting develops and relates to task effectiveness over a…",
-      "methods": "Christopoulos and colleagues observed 171 secondary- and higher-education students in 45 self-formed teams. Each team used generative AI while solving a competitive mystery with evidence distributed through augmented-reality markers. Researchers coded the teams' logged prompts as lower-order exploration and action or higher-order creation and metacognition, then compared those patterns with a composite task-effectiveness score.",
-      "findings": "Teams averaged 5.78 higher-order prompts and 4.67 lower-order prompts. Higher-order prompts rose from 40.2% of prompts in the first half of a session to 68.2% in the second half. The share of higher-order prompts correlated with the team's effectiveness score (r = .40); the association remained positive after accounting for total prompt volume. Prior AI experience, general attitudes and self-reported verification did not show reliable associations with effectiveness.",
-      "interpretation": "The task traces suggest that teams moved from gathering information toward evaluating and organizing it as their understanding developed. This is an observed association, not evidence that teaching a particular prompt style will cause better problem solving.",
-      "limitations": "Teams chose their own tools and prompts in one competitive mystery session, so prompting style was not assigned. One game master rated each team's reasoning-quality component, preventing an inter-rater reliability check for that part of the score. The speed component may reward less deliberation, and only 22 of 171 participants supplied open-ended comments.",
-      "sample": "",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "empirical_observational",
-      "reported_findings": true
-    },
     "oa_checked": "2026-11-06",
     "oa_pass_version": 3,
     "pmc_oai_attempt": {
@@ -64402,7 +64673,27 @@
         "Observational study"
       ]
     },
-    "source_review_status": "editorially_checked_full_article"
+    "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked PDF article",
+      "overview": "ABSTRACT Research on Generative Artificial Intelligence (GenAI) in education has concentrated on user attitudes and adoption intentions but less is known about how groups actually interact with such tools while solving complex problems. The present study treats prompting as observable, time-resolved, behaviour and investigates how a group’s prompting develops and relates to task effectiveness over a…",
+      "methods": "Christopoulos and colleagues observed 171 secondary- and higher-education students in 45 self-formed teams. Each team used generative AI while solving a competitive mystery with evidence distributed through augmented-reality markers. Researchers coded the teams' logged prompts as lower-order exploration and action or higher-order creation and metacognition, then compared those patterns with a composite task-effectiveness score.",
+      "findings": "Teams averaged 5.78 higher-order prompts and 4.67 lower-order prompts. Higher-order prompts rose from 40.2% of prompts in the first half of a session to 68.2% in the second half. The share of higher-order prompts correlated with the team's effectiveness score (r = .40); the association remained positive after accounting for total prompt volume. Prior AI experience, general attitudes and self-reported verification did not show reliable associations with effectiveness.",
+      "interpretation": "The task traces suggest that teams moved from gathering information toward evaluating and organizing it as their understanding developed. This is an observed association, not evidence that teaching a particular prompt style will cause better problem solving.",
+      "limitations": "Teams chose their own tools and prompts in one competitive mystery session, so prompting style was not assigned. One game master rated each team's reasoning-quality component, preventing an inter-rater reliability check for that part of the score. The speed component may reward less deliberation, and only 22 of 171 participants supplied open-ended comments.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "empirical_observational",
+      "reported_findings": true
+    }
   },
   {
     "title": "Students’ Psychological Well-Being in The Context of Generative Artificial Intelligence: Technostress, Cognitive Offloading and Emotional Dependence",
@@ -68247,26 +68538,6 @@
     "open_access_url": "https://epub.uni-regensburg.de/78631/1/1-s2.0-S0010027726000247-main.pdf",
     "open_access_license": "cc-by",
     "open_access_version": "publishedVersion",
-    "reading": {
-      "level": "full_text",
-      "provenance": "Original paraphrases from the checked PDF article",
-      "overview": "People find it harder to switch from one task to another than to repeat a task. One common explanation is that lingering activation of the just-executed task facilitates repetitions and impairs switching.",
-      "methods": "Mendl and colleagues ran four preregistered laboratory experiments. The final sample sizes were 51, 53, 50 and 45, for 199 participants after exclusions. People completed two-task chunks separated by a self-paced break. Depending on the experiment, the next chunk forced a task or let participants choose, allowing the researchers to measure both response-time switch costs and voluntary switch rates after a previous switch or repetition.",
-      "findings": "In Experiment 1, participants voluntarily switched on 29.33% of opportunities after a switch chunk versus 18.29% after a repetition chunk. Experiment 2 replicated the pattern, 43.77% versus 33.64%, while also reducing hand- and location-repetition confounds. Switch costs were also lower after previous switches in those experiments. Transfer to a different task pair was mixed: the response-time pattern in Experiment 3 was descriptive but not statistically significant, whereas Experiment 4 found a smaller but significant voluntary-choice effect across task pairs, 27.97% versus 24.86%.",
-      "interpretation": "A recent switch briefly changed both willingness and ability to switch again. The pattern was not simply a claim that multitasking is generally beneficial: it concerned the next tightly controlled two-task chunk, and the authors could not distinguish passive carryover of a control state from active preparation.",
-      "limitations": "The four experiments used short, artificial classification tasks, mostly with psychology students, so the result does not establish benefits for everyday multitasking. Cross-task transfer was significant for voluntary choice in Experiment 4 but not for response-time costs in Experiment 3. The design cannot identify which proposed mechanism produced the sequential effect.",
-      "sample": "199",
-      "section_coverage": [
-        "methods",
-        "results",
-        "discussion",
-        "limitations"
-      ],
-      "extraction_depth": "multi_section",
-      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
-      "research_type": "unclassified",
-      "reported_findings": true
-    },
     "oa_checked": "2026-11-06",
     "oa_grobid_checked": "2026-11-06",
     "fulltext_attempt": {
@@ -68364,7 +68635,27 @@
         "Voluntary choice"
       ]
     },
-    "source_review_status": "editorially_checked_full_article"
+    "source_review_status": "editorially_checked_full_article",
+    "reading": {
+      "level": "full_text",
+      "provenance": "Original paraphrases from the checked PDF article",
+      "overview": "People find it harder to switch from one task to another than to repeat a task. One common explanation is that lingering activation of the just-executed task facilitates repetitions and impairs switching.",
+      "methods": "Mendl and colleagues ran four preregistered laboratory experiments. The final sample sizes were 51, 53, 50 and 45, for 199 participants after exclusions. People completed two-task chunks separated by a self-paced break. Depending on the experiment, the next chunk forced a task or let participants choose, allowing the researchers to measure both response-time switch costs and voluntary switch rates after a previous switch or repetition.",
+      "findings": "In Experiment 1, participants voluntarily switched on 29.33% of opportunities after a switch chunk versus 18.29% after a repetition chunk. Experiment 2 replicated the pattern, 43.77% versus 33.64%, while also reducing hand- and location-repetition confounds. Switch costs were also lower after previous switches in those experiments. Transfer to a different task pair was mixed: the response-time pattern in Experiment 3 was descriptive but not statistically significant, whereas Experiment 4 found a smaller but significant voluntary-choice effect across task pairs, 27.97% versus 24.86%.",
+      "interpretation": "A recent switch briefly changed both willingness and ability to switch again. The pattern was not simply a claim that multitasking is generally beneficial: it concerned the next tightly controlled two-task chunk, and the authors could not distinguish passive carryover of a control state from active preparation.",
+      "limitations": "The four experiments used short, artificial classification tasks, mostly with psychology students, so the result does not establish benefits for everyday multitasking. Cross-task transfer was significant for voluntary choice in Experiment 4 but not for response-time costs in Experiment 3. The design cannot identify which proposed mechanism produced the sequential effect.",
+      "sample": "199",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Full publisher article reviewed and paraphrased; no copied full-text passages are stored.",
+      "research_type": "unclassified",
+      "reported_findings": true
+    }
   },
   {
     "title": "Beyond human attention: AI-to-AI communication as the next frontier in marketing",
@@ -74862,10 +75153,10 @@
     },
     "repository_recovery": {
       "version": 1,
-      "status": "no_oa_pdf_reported",
-      "last_at": "2026-10-27",
-      "next_at": "2026-11-26",
-      "attempts": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 2,
       "providers": [
         "unpaywall_checked"
       ]
@@ -76474,12 +76765,11 @@
     "repository_recovery": {
       "version": 1,
       "status": "license_unverified",
-      "last_at": "2026-10-27",
-      "next_at": "2026-11-26",
-      "attempts": 1,
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 2,
       "providers": [
-        "unpaywall_checked",
-        "s2_candidate"
+        "unpaywall_checked"
       ]
     }
   },
@@ -80010,13 +80300,12 @@
     },
     "repository_recovery": {
       "version": 1,
-      "status": "license_unverified",
-      "last_at": "2026-10-27",
-      "next_at": "2026-11-26",
-      "attempts": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 2,
       "providers": [
-        "unpaywall_checked",
-        "s2_candidate"
+        "unpaywall_checked"
       ]
     }
   },
@@ -80676,9 +80965,9 @@
     "pmc_oai_attempt": {
       "version": 1,
       "status": "transient_error",
-      "last_at": "2026-11-25",
-      "next_at": "2026-11-26",
-      "attempts": 31
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-27",
+      "attempts": 32
     },
     "fulltext_attempt": {
       "attempts": 3,
@@ -81684,12 +81973,11 @@
     "repository_recovery": {
       "version": 1,
       "status": "license_unverified",
-      "last_at": "2026-10-27",
-      "next_at": "2026-11-26",
-      "attempts": 1,
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 2,
       "providers": [
-        "unpaywall_checked",
-        "s2_candidate"
+        "unpaywall_checked"
       ]
     }
   },
@@ -81762,10 +82050,10 @@
     },
     "repository_recovery": {
       "version": 1,
-      "status": "no_oa_pdf_reported",
-      "last_at": "2026-10-27",
-      "next_at": "2026-11-26",
-      "attempts": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 2,
       "providers": [
         "unpaywall_checked"
       ]
@@ -82520,20 +82808,59 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Theoretical framework: This study adopts Zimmerman’s theory of self-regulated learning, which examines learning through three dimensions: cognitive, motivational, and behavioral. Methods: This study employs a qualitative case study approach involving four IRE students from semesters 2, 4, and 6 at UIN Mataram.",
-      "methods": "Literature review: The literature review focuses on the use of artificial intelligence, particularly ChatGPT, in higher education and its relationship with self-regulated learning. Methods: This study employs a qualitative case study approach involving four IRE students from semesters 2, 4, and 6 at UIN Mataram.",
-      "findings": "Results: The findings reveal that ChatGPT supports assignment planning, information access, material comprehension, idea development, and classroom confidence.",
-      "interpretation": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Objective: To analyze the impact of ChatGPT use on self-regulated learning among Islamic Religious Education (IRE) students at Universitas Islam Negeri (UIN) Mataram, particularly their perceptions of its benefits, challenges, and effects on learning independence. Theoretical framework: This study adopts Zimmerman’s theory of self-regulated learning, which examines learning through three dimensions:…",
+      "methods": "This study employed a qualitative approach with a case study design. The analysis was based on Zimmerman's theory of self-regulated learning, particularly its cognitive, motivational, and behavioral dimensions. The research subjects were students of the Islamic Religious Education (IRE) program at the Faculty of Tarbiyah and Teacher Training, Mataram State Islamic University. The original manuscript reports four participants: two male students and two female students. They were drawn from semesters 2, 4, and 6 and had experience using ChatGPT in learning activities. The study used primary and secondary data. Primary data were obtained from students through individual interviews concerning their experiences, perceptions, and opinions about the impact of ChatGPT on learning independence. Secondary data consisted of reference books, relevant articles, and previous research related to the research topic. The data were analyzed through three stages: data reduction, data display, and conclusion drawing. Data validity was supported through source, technique, and time triangulation, as reported in the original manuscript. The research methodology was organized into six interconnected stages to ensure a systematic investigation of ChatGPT's impact on self-regulated learning. These stages covered research design, participant selection, data collection, data analysis, data validation, and the formulation of findings, as illustrated in Figure 1 .",
+      "findings": "",
+      "interpretation": "The findings are based on interviews with four IRE students, consisting of two male and two female participants. The analysis follows Zimmerman's three dimensions of selfregulated learning: cognition, motivation, and behavior. The results show that ChatGPT provides support in several learning activities, although its use also creates challenges related to independence and information verification. This study concludes that ChatGPT has both positive and negative implications for selfregulated learning among Islamic Religious Education students at UIN Mataram. In the cognitive dimension, ChatGPT helps students plan and organize assignments, develop ideas, and understand learning materials through additional explanations. In the motivational dimension, it can support students' confidence in expressing opinions and help them understand the relevance of academic material to everyday life. In the behavioral dimension, ChatGPT provides flexibility in managing learning activities and accessing information from different sources. Nevertheless, excessive use of ChatGPT may encourage students to take shortcuts and become dependent on AI. Such dependency may affect creativity, reasoning, and critical thinking. Students also face challenges in verifying the accuracy and sources of ChatGPT-generated answers. Therefore, ChatGPT should be used responsibly as a supporting learning tool rather than as the sole source of information or a substitute for independent thinking. Students need to maintain their learning independence, evaluate information critically, and compare AI-generated answers with credible academic references. With appropriate use, ChatGPT can support effective and ethical learning while maintaining the development of students' self-regulated learning abilities. Furthermo",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
-      "reported_findings": true
-    }
+      "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:54+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://journal.walideminstitute.com/index.php/sujiem/article/view/668",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "This study employed a qualitative approach with a case study design. The analysis was based on Zimmerman's theory of self-regulated learning, particularly its cognitive, motivational, and behavioral dimensions. The research subjects were students of the Islamic Religious Education (IRE) program at the Faculty of Tarbiyah and Teacher Training, Mataram State Islamic University. The original manuscript reports four participants: two male students and two female students. They were drawn from semesters 2, 4, and 6 and had experience using ChatGPT in learning activities. The study used primary and secondary data. Primary data were obtained from students through individual interviews concerning their experiences, perceptions, and opinions about the impact of ChatGPT on learning independence. Secondary data consisted of reference books, relevant articles, and previous research related to the research topic. The data were analyzed through three stages: data reduction, data display, and conclusion drawing. Data validity was supported through source, technique, and time triangulation, as reported in the original manuscript. The research methodology was organized into six interconnected stages to ensure a systematic investigation of ChatGPT's impact on self-regulated learning. These stages covered research design, participant selection, data collection, data analysis, data validation, and the formulation of findings, as illustrated in Figure 1 .",
+      "results": "",
+      "discussion": "The findings are based on interviews with four IRE students, consisting of two male and two female participants. The analysis follows Zimmerman's three dimensions of selfregulated learning: cognition, motivation, and behavior. The results show that ChatGPT provides support in several learning activities, although its use also creates challenges related to independence and information verification. This study concludes that ChatGPT has both positive and negative implications for selfregulated learning among Islamic Religious Education students at UIN Mataram. In the cognitive dimension, ChatGPT helps students plan and organize assignments, develop ideas, and understand learning materials through additional explanations. In the motivational dimension, it can support students' confidence in expressing opinions and help them understand the relevance of academic material to everyday life. In the behavioral dimension, ChatGPT provides flexibility in managing learning activities and accessing information from different sources. Nevertheless, excessive use of ChatGPT may encourage students to take shortcuts and become dependent on AI. Such dependency may affect creativity, reasoning, and critical thinking. Students also face challenges in verifying the accuracy and sources of ChatGPT-generated answers. Therefore, ChatGPT should be used responsibly as a supporting learning tool rather than as the sole source of information or a substitute for independent thinking. Students need to maintain their learning independence, evaluate information critically, and compare AI-generated answers with credible academic references. With appropriate use, ChatGPT can support effective and ethical learning while maintaining the development of students' self-regulated learning abilities. Furthermore, lecturers play an important role in guiding students toward responsible and purposeful AI integration in academic activities. Educational institutions should also strengthen AI literacy through appropriate guidelines, academic supervision, and learning assessments that emphasize originality, analytical reasoning, and intellectual responsibility. Future research should",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://journal.walideminstitute.com/index.php/sujiem/article/view/668",
+      "key_idea": "The findings are based on interviews with four IRE students, consisting of two male and two female participants. The analysis follows Zimmerman's three dimensions of selfregulated learning: cognition, motivation, and behavior. The results show that ChatGPT provides support in sev",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "methods",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "Carbon credits from carbon farming through artificial intelligence-driven measurement, reporting and verification in smallholder agrifood systems",
@@ -82577,20 +82904,59 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Smallholder farmers are essential for achieving global food security and reducing atmospheric carbon dioxide, yet they remain largely excluded from carbon markets. Smallholder farmers are facing issues in applying for carbon credits under conventional Monitoring, Reporting and Verification (MRV) systems since it may lead to inaccurate data, overestimation or underestimation…",
-      "methods": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Smallholder farmers are essential for achieving global food security and reducing atmospheric carbon dioxide, yet they remain largely excluded from carbon markets. Smallholder farmers are facing issues in applying for carbon credits under conventional Monitoring, Reporting and Verification (MRV) systems since it may lead to inaccurate data, overestimation or underestimation with uncertainty and process is…",
+      "methods": "This study was conducted as a structured literature search for narrative review to synthesize current knowledge on artificial intelligence (AI)-enabled Measurement, Reporting and Verification (MRV) systems for carbon farming in smallholder agrifood systems. Literature was identified through searches of Web of Science, Scopus, ScienceDirect, and Google Scholar using predefined combinations of keywords such as \"carbon farming\", \"AI-based MRV\", \"soil carbon monitoring\", \"machine learning carbon sequestration\", \"remote sensing MRV\", and \"smallholder carbon credits\". The review primarily included studies published between 2015 and 2025, with earlier foundational literature included where necessary. Eligible studies included peer-reviewed journal articles, MRV methodology studies, AI-based carbon monitoring research, and carbon market analyses relevant to smallholder agriculture. Reports and institutional publications were included when they provided technical or empirical information on MRV implementation. Studies lacking methodological detail or empirical relevance to carbon monitoring or smallholder systems were excluded. The selected literature was analyzed to synthesize information on: carbon farming practices and MRV methods; AI technologies used for carbon monitoring; case studies of AI-enabled MRV implementation; carbon market access for smallholders; and technical, economic, and ethical challenges. The review emphasizes measurable outcomes, methodological approaches, and p",
       "findings": "",
-      "interpretation": "",
+      "interpretation": "Carbon farming would be more precise with adaption of AI in sustainable agriculture. The technology could be a major game changer in developing countries particularly in India and specifically for smallholder agroecosystems. This review presents that AIbased technologies which including remote sensing, machine learning, IoT-enabled sensors, and blockchain that can facilitate the ground-level change needed to transform MRV systems. Emerging cases from India, Kenya and Latin America illustrate the potential of digital technologies to improve agricultural monitoring and facilitate participation in carbon markets, although empirical evidence on cost reductions and carbon-accounting accuracy remains limited. On the other hand, significant issues also hinder these advancements, such as data quality limitations, low digital literacy among smallholders, uneven access to technology, and ethical concerns about data privacy and algorithmic transparency. Moreover, the environmental trade-offs related to the substantial amount of energy that the AI consumes require needs careful mitigation. To address such problems, strong policy frameworks, inclusive, open-source MRV toolkits, and increased farmer participation that incorporates indigenous knowledge systems is required. Future research directions include more region-appropriate studies the development of inexpensive AI applications, and proper valuation of ecosystem services with a focus on carbon sequestration alongside metrics for biodiversity and water quality. Advancing AI-enabled MRV from pilot initiatives to operational carbon credit systems will require coordinated progress in methodological standardization, uncertainty quantification, and equitable technology access. Establishing robust and transparent MRV frameworks for sm",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
-    }
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:54+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.1007/s44187-026-01106-5",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "This study was conducted as a structured literature search for narrative review to synthesize current knowledge on artificial intelligence (AI)-enabled Measurement, Reporting and Verification (MRV) systems for carbon farming in smallholder agrifood systems. Literature was identified through searches of Web of Science, Scopus, ScienceDirect, and Google Scholar using predefined combinations of keywords such as \"carbon farming\", \"AI-based MRV\", \"soil carbon monitoring\", \"machine learning carbon sequestration\", \"remote sensing MRV\", and \"smallholder carbon credits\". The review primarily included studies published between 2015 and 2025, with earlier foundational literature included where necessary. Eligible studies included peer-reviewed journal articles, MRV methodology studies, AI-based carbon monitoring research, and carbon market analyses relevant to smallholder agriculture. Reports and institutional publications were included when they provided technical or empirical information on MRV implementation. Studies lacking methodological detail or empirical relevance to carbon monitoring or smallholder systems were excluded. The selected literature was analyzed to synthesize information on: carbon farming practices and MRV methods; AI technologies used for carbon monitoring; case studies of AI-enabled MRV implementation; carbon market access for smallholders; and technical, economic, and ethical challenges. The review emphasizes measurable outcomes, methodological approaches, and practical implementation of AI-enabled MRV systems in smallholder agroecosystems.",
+      "results": "",
+      "discussion": "Carbon farming would be more precise with adaption of AI in sustainable agriculture. The technology could be a major game changer in developing countries particularly in India and specifically for smallholder agroecosystems. This review presents that AIbased technologies which including remote sensing, machine learning, IoT-enabled sensors, and blockchain that can facilitate the ground-level change needed to transform MRV systems. Emerging cases from India, Kenya and Latin America illustrate the potential of digital technologies to improve agricultural monitoring and facilitate participation in carbon markets, although empirical evidence on cost reductions and carbon-accounting accuracy remains limited. On the other hand, significant issues also hinder these advancements, such as data quality limitations, low digital literacy among smallholders, uneven access to technology, and ethical concerns about data privacy and algorithmic transparency. Moreover, the environmental trade-offs related to the substantial amount of energy that the AI consumes require needs careful mitigation. To address such problems, strong policy frameworks, inclusive, open-source MRV toolkits, and increased farmer participation that incorporates indigenous knowledge systems is required. Future research directions include more region-appropriate studies the development of inexpensive AI applications, and proper valuation of ecosystem services with a focus on carbon sequestration alongside metrics for biodiversity and water quality. Advancing AI-enabled MRV from pilot initiatives to operational carbon credit systems will require coordinated progress in methodological standardization, uncertainty quantification, and equitable technology access. Establishing robust and transparent MRV frameworks for smallholder systems represents a critical research and policy priority for ensuring the long-term credibility of agricultural carbon markets. Hence, AI-assisted carbon farming has the potential to be a transformative approach, empowering smallholders to act as agents of climate resilience and to deploy ecologically sound technologies.",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.1007/s44187-026-01106-5",
+      "key_idea": "Carbon farming would be more precise with adaption of AI in sustainable agriculture. The technology could be a major game changer in developing countries particularly in India and specifically for smallholder agroecosystems. This review presents that AIbased technologies which in",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "methods",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "Artificial Intelligence Feedback Based Investigation of Emotional Regulation Effects in Music Learning",
@@ -82627,20 +82993,59 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This study developed a multimodal feedback system based on MIDI performance, facial expression coefficients, and interaction logs where an attention-based BiLSTM predicted valence, arousal, and need for high regulation and then used contextual Thompson sampling to select affect-adaptive feedback. This research shows that integrating affect recognition with feedback selection…",
-      "methods": "In the pilot study, the dataset consisted of 1,080 practice segments from 45 novice piano players, and the six-week experiment included 90 subjects allocated into affect-adaptive, fixed technical, and metric-only feedback conditions.",
-      "findings": "Moreover, multilevel mediation analysis revealed a significant indirect effect through emotional recovery, β = 0.16, 95% CI [0.07, 0.27].",
-      "interpretation": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "With increasing use of artificial intelligence for performance evaluation in music education, repeated mistakes may cause frustration, anxiety, and even withdrawal from practice due to lack of proper feedback mechanisms addressing such problems. This study developed a multimodal feedback system based on MIDI performance, facial expression coefficients, and interaction logs where an attention-based BiLSTM…",
+      "methods": "",
+      "findings": "The validation using five-fold participant groupings yielded notable improvements due to multimodal temporal fusion. As presented in Table 1 , the attention-BiLSTM for the entire architecture achieved the Macro-F1 score of 0.873 ± 0.019 and AUC of 0.936 ± 0.012, with valence and arousal having their mean absolute errors decrease to 0.512 ± 0.028 and 0.487 ± 0.025, respectively. Expected calibration error is 0.029 ± 0.006, reflecting the alignment between the estimated confidence and the actual results. The architecture without attention achieved the Macro-F1 score of 0.821 ± 0.024. Omitting interaction logs dropped the Macro-F1 to 0.826 ± 0.023 and caused an increase in valence MAE to 0.604 ± 0.031, implying that the interaction data contributed additional emotional information aside from MIDI and facial input data. The mean latency time is 46.7 ± 5.8 ms with the 95th percentile being 58.9 ms. All 90 participants completed the six-week intervention. As shown in Figure 1 , baseline note accuracy was comparable across the affect-adaptive, fixed-technical, and metric-only groups at 82.6%, 82.4%, and 82.5%, respectively. By posttest, accuracy increased to 93.1 ± 4.3%, 89.4 ± 5.0%, and 87.5 ± 5.5%, producing a significant group-by-time interaction, F(6,261)=8.72, p<0.001, partial η 2 =0.167. The adaptive group retained 92.4 ± 4.5% accuracy at follow-up, whereas the fixed and metric groups declined to 88.8 ± 5.2% and 86.9 ± 5.6%. Mean restart latency in the adaptive group fell from 14.7 ± 4.1 s to 7.3 ± 2.6 s, compared with 10.9 ± 3.1 s and 12.2 ± 3.5 s at posttest. Unfamiliar-piece ratings reached 4.31 ± 0.39, 3.87 ± 0.44, and 3.62 ± 0.47 out of five. Multilevel mediation identified a significant indirect effect through emotional recovery, β=0.16, 95% CI [0.07, 0.27].",
+      "interpretation": "The findings seem to imply that feedback becomes an intervention based on a particular emotional state, rather than being a report on a mistake. The biggest improvement in computation seems to happen in the case where interaction logs are maintained, which implies that frustration in practice may be shown by behavior tempo, and not facial expressions or mistakes. A student will remain fairly calm emotionally with facial expressions, but show signs of hesitation, reiteration and delays in response. The post-test and follow-up differences imply that adaptive feedback makes it possible to continue training after mistakes, while technical correction comes after recovery of attentional control. This is supported by the mediation pathway, though emotion regulation cannot be considered as the only factor in this process. Attention personalization, novelty and responsiveness of the system may play a role as well. The context-based exploration brings another compromise into the picture, since exploration of the correct feedback policy requires a trial and error approach, but can decrease pedagogical value of the training temporarily. The multimodal feedback model using the combination of MIDI information, face behavior, interaction records, attention-based BiLSTM state estimation, and context-aware Thompson sampling was examined for piano training. The model showed efficient estimation of regulation needs (Macro-F1 = 0.873) and facilitated more rapid restarting behavior, increased posttest accuracy of notes, and increased follow-up retention in the affect-adaptive group. Recovery of emotional state partially acted as an intermediary variable between the computational estimation of a state and the learning behavior. The drawbacks of this research include the usage of the sample o",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "results",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": true
-    }
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:55+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.54254/2755-2721/2026.39095",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "",
+      "results": "The validation using five-fold participant groupings yielded notable improvements due to multimodal temporal fusion. As presented in Table 1 , the attention-BiLSTM for the entire architecture achieved the Macro-F1 score of 0.873 ± 0.019 and AUC of 0.936 ± 0.012, with valence and arousal having their mean absolute errors decrease to 0.512 ± 0.028 and 0.487 ± 0.025, respectively. Expected calibration error is 0.029 ± 0.006, reflecting the alignment between the estimated confidence and the actual results. The architecture without attention achieved the Macro-F1 score of 0.821 ± 0.024. Omitting interaction logs dropped the Macro-F1 to 0.826 ± 0.023 and caused an increase in valence MAE to 0.604 ± 0.031, implying that the interaction data contributed additional emotional information aside from MIDI and facial input data. The mean latency time is 46.7 ± 5.8 ms with the 95th percentile being 58.9 ms. All 90 participants completed the six-week intervention. As shown in Figure 1 , baseline note accuracy was comparable across the affect-adaptive, fixed-technical, and metric-only groups at 82.6%, 82.4%, and 82.5%, respectively. By posttest, accuracy increased to 93.1 ± 4.3%, 89.4 ± 5.0%, and 87.5 ± 5.5%, producing a significant group-by-time interaction, F(6,261)=8.72, p<0.001, partial η 2 =0.167. The adaptive group retained 92.4 ± 4.5% accuracy at follow-up, whereas the fixed and metric groups declined to 88.8 ± 5.2% and 86.9 ± 5.6%. Mean restart latency in the adaptive group fell from 14.7 ± 4.1 s to 7.3 ± 2.6 s, compared with 10.9 ± 3.1 s and 12.2 ± 3.5 s at posttest. Unfamiliar-piece ratings reached 4.31 ± 0.39, 3.87 ± 0.44, and 3.62 ± 0.47 out of five. Multilevel mediation identified a significant indirect effect through emotional recovery, β=0.16, 95% CI [0.07, 0.27].",
+      "discussion": "The findings seem to imply that feedback becomes an intervention based on a particular emotional state, rather than being a report on a mistake. The biggest improvement in computation seems to happen in the case where interaction logs are maintained, which implies that frustration in practice may be shown by behavior tempo, and not facial expressions or mistakes. A student will remain fairly calm emotionally with facial expressions, but show signs of hesitation, reiteration and delays in response. The post-test and follow-up differences imply that adaptive feedback makes it possible to continue training after mistakes, while technical correction comes after recovery of attentional control. This is supported by the mediation pathway, though emotion regulation cannot be considered as the only factor in this process. Attention personalization, novelty and responsiveness of the system may play a role as well. The context-based exploration brings another compromise into the picture, since exploration of the correct feedback policy requires a trial and error approach, but can decrease pedagogical value of the training temporarily. The multimodal feedback model using the combination of MIDI information, face behavior, interaction records, attention-based BiLSTM state estimation, and context-aware Thompson sampling was examined for piano training. The model showed efficient estimation of regulation needs (Macro-F1 = 0.873) and facilitated more rapid restarting behavior, increased posttest accuracy of notes, and increased follow-up retention in the affect-adaptive group. Recovery of emotional state partially acted as an intermediary variable between the computational estimation of a state and the learning behavior. The drawbacks of this research include the usage of the sample of novices, a relatively short period of six weeks, dependence on the video camera to obtain the facial features, and limited feedback space.",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.54254/2755-2721/2026.39095",
+      "key_idea": "The validation using five-fold participant groupings yielded notable improvements due to multimodal temporal fusion. As presented in Table 1 , the attention-BiLSTM for the entire architecture achieved the Macro-F1 score of 0.873 ± 0.019 and AUC of 0.936 ± 0.012, with valence and ",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "results",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "Artificial Intelligence and Automation for Intelligent Travel Operations",
@@ -82690,6 +83095,40 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:55+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:55+00:00"
+    },
+    "open_access_url": "https://doi.org/10.70593/978-81-6632-256-3_4",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "license_unverified",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_checked"
+      ]
     }
   },
   {
@@ -82740,6 +83179,47 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": true
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:55+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:56+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5281/zenodo.24441063",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 1,
+      "providers": [
+        "unpaywall_no_entry"
+      ]
     }
   },
   {
@@ -82781,20 +83261,57 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This study aims to analyze the use of AI in the audit process, identify emerging ethical dilemmas, evaluate its implications for the five basic principles of the accounting professional code of ethics, and examine its impact on professional judgment and auditor ethical decision-making. This study uses a literature review method by reviewing previous research on the use of AI…",
-      "methods": "This study uses a literature review method by reviewing previous research on the use of AI in auditing, technological ethics, audit quality, and auditor behavior.",
-      "findings": "The analysis results show that AI has the potential to help auditors analyze large amounts of data, identify risks, and support transaction audits.",
-      "interpretation": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "The application of artificial intelligence (AI) in the audit process offers opportunities to improve audit efficiency and quality, but it also raises ethical dilemmas that need attention. This study aims to analyze the use of AI in the audit process, identify emerging ethical dilemmas, evaluate its implications for the five basic principles of the accounting professional code of ethics, and examine its…",
+      "methods": "",
+      "findings": "",
+      "interpretation": "The application of artificial intelligence (AI) in the audit process provides opportunities to improve audit efficiency, accelerate data analysis, and help auditors identify risks and transaction irregularities. Research by Fedyk et al. (2022) shows a relationship between increased workforce and AI skills and a relative decrease in the likelihood of",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "discussion"
+      ],
+      "extraction_depth": "limited",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
-      "reported_findings": true
-    }
+      "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:56+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://e-journal.citakonsultindo.or.id/index.php/IJBQR/article/view/7754",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by-sa",
+      "license_url": "https://openalex.org/licenses/cc-by-sa",
+      "methods": "",
+      "results": "",
+      "discussion": "The application of artificial intelligence (AI) in the audit process provides opportunities to improve audit efficiency, accelerate data analysis, and help auditors identify risks and transaction irregularities. Research by Fedyk et al. (2022) shows a relationship between increased workforce and AI skills and a relative decrease in the likelihood of",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://e-journal.citakonsultindo.or.id/index.php/IJBQR/article/view/7754",
+      "key_idea": "The application of artificial intelligence (AI) in the audit process provides opportunities to improve audit efficiency, accelerate data analysis, and help auditors identify risks and transaction irregularities. Research by Fedyk et al. (2022) shows a relationship between increas",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "GENERATIVE ARTIFICIAL INTELLIGENCE AND LEARNER MOTIVATION IN ENGLISH AS A FOREIGN LANGUAGE EDUCATION: A SELF-DETERMINATION THEORY PERSPECTIVE",
@@ -82844,6 +83361,44 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:56+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:56+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5281/zenodo.24448178",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 1
     }
   },
   {
@@ -82887,20 +83442,63 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This qualitative case study examines the outcomes of a design-led professional learning workshop with 23 higher education professionals from diverse roles across Australasia.",
-      "methods": "This qualitative case study examines the outcomes of a design-led professional learning workshop with 23 higher education professionals from diverse roles across Australasia. Workshop artifacts, including “How might we…” statements and associated memos, were analysed using reflexive thematic analysis.",
-      "findings": "The findings suggest that participants conceptualised learning spaces as assemblages where ethical commitments, institutional values and emotional experiences are inseparable from spatial and technological design.",
-      "interpretation": "",
-      "limitations": "",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Higher education is experiencing rapid and multifaceted change as artificial intelligence becomes increasingly embedded within teaching and learning. The attention of research and policy has focused on students’ perspectives and securing assessment; less is known about how staff interpret what this means for the spaces where learning occurs.",
+      "methods": "This study was conducted as a qualitative case study design to explore the research question. The case study is used to generate an in-depth, multi-faceted understanding of the complexities faced in real-life institutional learning spaces (Yin, 2009) . This study does not seek to resolve how learning spaces are evolving in response to AI, nor the ethical and relational considerations shaping connection and wellbeing. Instead, it examines how this question is collectively interpreted by those working in higher education within the context of design-led professional learning. Accordingly, we present this work as a qualitative case study, enabling rich description and interpretation (Stake & Vissie, 1995) and supporting learning from the experiences of others in higher education contexts (Eisner, 2017) . This work aims to lay the foundation for continual discussions on similar topics in the future.",
+      "findings": "The thematic analysis surfaced insights into participants' values, tensions, and priorities, expressed across five themes (see Figure 1 ): Ideological positioning of AI within learning spaces; Critical design of learning spaces in the age of AI; Guiding student-centred ecologies through access, equity, and inclusion; Co-intelligence in learning spaces; and Individual anxiety alongside a collective sense of opportunity. These demonstrate consensus regarding ethical AI use, inclusion, and human-centred values, but also different views about institutional readiness and the role of AI in learning spaces.",
+      "interpretation": "This study examined how higher education staff collectively interpret the implications of AI for learning spaces, and what these interpretations reveal about ethical, relational and affective dimensions of the assemblage of space. Taken together, the findings suggest that learning spaces are evolving from bounded and primarily physical environments into dynamic, postdigital assemblages, where human and non-human elements coconstruct the conditions for learning (Fawns, 2019; Wardak et al., 2022) . Within the assemblages of space, AI is not positioned as an external tool, but part of the sociomaterial relationships that constitute learning spaces. Therefore, AI, pedagogical practices, technologies, materials, and humans collectively influence participation, entanglements, experiences and conditions for learning. Across themes, the participants demonstrated that AI could be influencing learning spaces not as a technical agent, but as one underpinned by ideological commitments. Through the discussions of curriculum, assessment and pedagogy, they framed AI relative to the broader purpose of education, highlighting tensions between efficiency and the development of capabilities. This aligns with existing literature that foregrounds ethical concerns such as algorithmic bias, data misuse, and the displacement of human roles (Pikhart & Al-Obaydi, 2025; Slimi & Carballido, 2023) . In learning spaces, this tension aligns with discussions of postdigital classrooms, where ethics and values emerge through engagement with the elements that constitute those spaces (Wardak & Zeivots, 2025) , reinforcing the need to consider AI as having a more explicit role in influencing learning spaces, environments and contexts. While participants were concerned about the ethical use of AI, there wer",
+      "limitations": "This case study is limited to the perspectives articulated by participants in a single workshop conducted within the specific context of higher education in Australasia. As participants self-selected into the workshop, the findings reflect the views of individuals already engaged in discussion about AI and learning spaces. Additionally, the dual role of researcher and participant influenced both the workshop dynamics and the subsequent analysis. While this positionality introduces potential bias, it also provides a deeper and contextually informed understanding, which is a recognised strength in case study research (Harland, 2014) .",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": true
-    }
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:56+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.65106/apubs.2026.3091",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "This study was conducted as a qualitative case study design to explore the research question. The case study is used to generate an in-depth, multi-faceted understanding of the complexities faced in real-life institutional learning spaces (Yin, 2009) . This study does not seek to resolve how learning spaces are evolving in response to AI, nor the ethical and relational considerations shaping connection and wellbeing. Instead, it examines how this question is collectively interpreted by those working in higher education within the context of design-led professional learning. Accordingly, we present this work as a qualitative case study, enabling rich description and interpretation (Stake & Vissie, 1995) and supporting learning from the experiences of others in higher education contexts (Eisner, 2017) . This work aims to lay the foundation for continual discussions on similar topics in the future.",
+      "results": "The thematic analysis surfaced insights into participants' values, tensions, and priorities, expressed across five themes (see Figure 1 ): Ideological positioning of AI within learning spaces; Critical design of learning spaces in the age of AI; Guiding student-centred ecologies through access, equity, and inclusion; Co-intelligence in learning spaces; and Individual anxiety alongside a collective sense of opportunity. These demonstrate consensus regarding ethical AI use, inclusion, and human-centred values, but also different views about institutional readiness and the role of AI in learning spaces.",
+      "discussion": "This study examined how higher education staff collectively interpret the implications of AI for learning spaces, and what these interpretations reveal about ethical, relational and affective dimensions of the assemblage of space. Taken together, the findings suggest that learning spaces are evolving from bounded and primarily physical environments into dynamic, postdigital assemblages, where human and non-human elements coconstruct the conditions for learning (Fawns, 2019; Wardak et al., 2022) . Within the assemblages of space, AI is not positioned as an external tool, but part of the sociomaterial relationships that constitute learning spaces. Therefore, AI, pedagogical practices, technologies, materials, and humans collectively influence participation, entanglements, experiences and conditions for learning. Across themes, the participants demonstrated that AI could be influencing learning spaces not as a technical agent, but as one underpinned by ideological commitments. Through the discussions of curriculum, assessment and pedagogy, they framed AI relative to the broader purpose of education, highlighting tensions between efficiency and the development of capabilities. This aligns with existing literature that foregrounds ethical concerns such as algorithmic bias, data misuse, and the displacement of human roles (Pikhart & Al-Obaydi, 2025; Slimi & Carballido, 2023) . In learning spaces, this tension aligns with discussions of postdigital classrooms, where ethics and values emerge through engagement with the elements that constitute those spaces (Wardak & Zeivots, 2025) , reinforcing the need to consider AI as having a more explicit role in influencing learning spaces, environments and contexts. While participants were concerned about the ethical use of AI, there were differences emerging from discussions on institutional preparedness, the distribution of agency and the extent to which AI should be a collaborator within learning spaces. From collective sensemaking, these differences are expected as the participants draw on their diverse professional roles and experiences. In support of these ideologies, staff emphasised the need to critically design learning spaces in ethical and responsible ways. Participants emphasised the need for critical design approaches that anticipate potential harms, including misinformation, bias, and exclusion. Rather than focusing on specific spatial configurations, design was understood as the orientation that shapes how learning spaces support participation, trust and safety. This perspective may contribute to the discussions on how technology could influence socially equitable learning spaces (Baskara, 2024) , echoing prior work on the use of virtual simulations in supporting inclusive and participatory learning spaces (Edgar, et al., 2024b) . Some scholars have begun exploring how AI might support empowerment and justice, for instance, by extending cognitive abilities (Baskara, 2024) . This perspective exists in tension with others who highlight ethical concerns around destabilising existing pedagogical dynamics (Sarı et al., 2024) . In this sense, learning spaces become sites where ethical and design considerations are continuously negotiated. The findings also highlighted the importance of inclusion and equitable participation within learning spaces that are influenced by AI. In considering safe learning spaces, the analysis revealed tensions between the possibilities AI offers, such as reducing barriers and the ways in which it may inadvertently reinforce them. The participants' reflections related to UDL principles, emphasising the need to ensure access, representation, and expression, as AI is emerging in learning spaces in various ways. These reflections represent broader work on This study shows that AI is not simply impacting assessment and integrity in higher education with the rise of GenAI but is also being integrated into and shaping learning spaces. Exploring staff sensemaking, the findings highlight that learning spaces are evolving as postdigital assemblages in which ethical commitments, relational practices, and affective experience are inseparable from technological integrations. In this context, there arise questions of connection and well-being that are not peripheral, but central to how practice is enacted in learning spaces. This paper does not propose solutions but offers an empirically grounded account of how educators are negotiating changes in practice. It highlights the importance of collective approaches to understanding and responding to AI, positioning learning spaces as critical sites where learning comes together under tensions of efficiency and wellbeing, automation and agency, and individual versus collective experiences. Future research may build on this work to explore how these dynamics unfold and develop frameworks to support the design of learning spaces that prioritise wellbeing and innovation.",
+      "limitations": "This case study is limited to the perspectives articulated by participants in a single workshop conducted within the specific context of higher education in Australasia. As participants self-selected into the workshop, the findings reflect the views of individuals already engaged in discussion about AI and learning spaces. Additionally, the dual role of researcher and participant influenced both the workshop dynamics and the subsequent analysis. While this positionality introduces potential bias, it also provides a deeper and contextually informed understanding, which is a recognised strength in case study research (Harland, 2014) .",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.65106/apubs.2026.3091",
+      "key_idea": "The thematic analysis surfaced insights into participants' values, tensions, and priorities, expressed across five themes (see Figure 1 ): Ideological positioning of AI within learning spaces; Critical design of learning spaces in the age of AI; Guiding student-centred ecologies ",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "methods",
+        "results",
+        "discussion",
+        "limitations"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "The First Pansexuality-Informed Value Alignment Framework for General-Purpose Generative Artificial Intelligence: Conceptual Foundations and a Preliminary Blind Evaluation",
@@ -82950,6 +83548,44 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": true
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:57+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:57+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5281/zenodo.24441003",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 1
     }
   },
   {
@@ -83001,6 +83637,37 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:57+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:57+00:00"
+    },
+    "open_access_url": "https://doi.org/10.25258/ijddt.16.80s.149",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 1
     }
   },
   {
@@ -83039,20 +83706,59 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "This article presents a conceptual analysis of academic integrity in the context of generative artificial intelligence (GenAI), focusing on the tensions between established academic values and hybrid human–AI authorship. Using the framework of the International Center for Academic Integrity (ICAI), we examine how GenAI both preserves and disrupts core values such as honesty…",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "This article presents a conceptual analysis of academic integrity in the context of generative artificial intelligence (GenAI), focusing on the tensions between established academic values and hybrid human–AI authorship. Using the framework of the International Center for Academic Integrity (ICAI), we examine how GenAI both preserves and disrupts core values such as honesty, trust, fairness, and…",
       "methods": "",
       "findings": "",
-      "interpretation": "",
-      "limitations": "",
+      "interpretation": "This article examined how the fundamental values of academic integrity, as articulated by the ICAI (2021)-honesty, trust, fairness, respect, responsibility, and courage-are affected by the integration of GenAI in higher education. Through conceptual analysis grounded in existing literature and the postplagiarism framework, we investigated the conditions under which GenAI use may preserve or contravene these core values. Our analysis reveals that GenAI does not inherently undermine or uphold academic integrity; rather, GenAI's impact depends fundamentally on how such tools are used and the contexts in which they are deployed. When students disclose GenAI use transparently, when institutions provide equitable access and training, when faculty establish clear expectations, and when all stakeholders exercise courage in navigating ethical complexities, GenAI can align with and even enhance academic integrity values. Conversely, undisclosed use, inequitable access, absence of guidance, and fear-driven avoidance of GenAI conversations can significantly compromise these values. This dual potential underscores the necessity of moving beyond exclusively punitive detection-focused approaches toward pedagogically grounded, ethically engaged frameworks for GenAI integration. Translating these insights into practice requires coordinated action across multiple institutional levels. First, institutions must develop clear, comprehensive policies that articulate when and how GenAI tools may be used across different academic contexts while recognizing disciplinary variations and pedagogical goals. Second, and critically, institutions must invest in professional learning opportunities for faculty members. Educators require substantial support, including dedicated time, resources, training,",
+      "limitations": "This work is not without limitations. We have based our study on the ICAI's (2021) fundamental values of academic integrity framework, which we acknowledge is Americanfocused, Euro-centric, and to date has not been subjected to rigorous empirical testing. The framework is both limited and flawed and its use in our study may result in an incomplete and nonexhaustive discussion of the impact of GenAI on values-based education. A deeper critique of the ICAI values framework was outside the scope of our study and we also recognize this as a valuable possibility for future study. We further recognize that the delimitations of our discussion of ethical aspects of GenAI and its use in HE have omitted other important aspects of broader ethical discourse, including (but not limited to) privacy (Alrayes et al., 2024; Marquis et al., 2024; Sabharwal et al., 2023; Sarwar et al., 2024) , copyright and intellectual property concerns, GenAI's environmental impact, and gender bias. We have intentional",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "discussion",
+        "limitations"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
-    }
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:57+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://ices.library.ubc.ca/index.php/criticaled/article/view/187309",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "",
+      "results": "",
+      "discussion": "This article examined how the fundamental values of academic integrity, as articulated by the ICAI (2021)-honesty, trust, fairness, respect, responsibility, and courage-are affected by the integration of GenAI in higher education. Through conceptual analysis grounded in existing literature and the postplagiarism framework, we investigated the conditions under which GenAI use may preserve or contravene these core values. Our analysis reveals that GenAI does not inherently undermine or uphold academic integrity; rather, GenAI's impact depends fundamentally on how such tools are used and the contexts in which they are deployed. When students disclose GenAI use transparently, when institutions provide equitable access and training, when faculty establish clear expectations, and when all stakeholders exercise courage in navigating ethical complexities, GenAI can align with and even enhance academic integrity values. Conversely, undisclosed use, inequitable access, absence of guidance, and fear-driven avoidance of GenAI conversations can significantly compromise these values. This dual potential underscores the necessity of moving beyond exclusively punitive detection-focused approaches toward pedagogically grounded, ethically engaged frameworks for GenAI integration. Translating these insights into practice requires coordinated action across multiple institutional levels. First, institutions must develop clear, comprehensive policies that articulate when and how GenAI tools may be used across different academic contexts while recognizing disciplinary variations and pedagogical goals. Second, and critically, institutions must invest in professional learning opportunities for faculty members. Educators require substantial support, including dedicated time, resources, training, and ongoing professional development, to adapt their pedagogical practices, redesign assessments, and navigate the ethical complexities of GenAI integration (Anson & Straume, 2022; Peters & Déri, 2025) . Given that faculty members are already overburdened, institutional commitment to providing release time, workshops, and collaborative learning communities is essential for fostering the pedagogical innovation and ethical engagement that GenAI integration demands. Third, students need access to educational resources such as academic writing workshops, GenAI literacy programs, and clear guidance on appropriate tool use to support their development as ethical learners and users of emerging technologies. The concept of postplagiarism (Eaton, 2023b) provides a valuable framework for understanding this transitional era, recognizing that hybrid human-GenAI authorship introduces complexities that traditional plagiarism frameworks inadequately address. Future research should empirically examine how GenAI affects academic integrity across diverse educational contexts, investigate the effectiveness of various institutional responses, and explore how the six fundamental values of academic integrity can be operationalized in GenAI-integrated learning environments. By reimagining academic integrity through this values-based lens and committing to the institutional support necessary for ethical GenAI integration, higher education can foster a socially just and academically rigorous culture of integrity in the age of artificial intelligence.",
+      "limitations": "This work is not without limitations. We have based our study on the ICAI's (2021) fundamental values of academic integrity framework, which we acknowledge is Americanfocused, Euro-centric, and to date has not been subjected to rigorous empirical testing. The framework is both limited and flawed and its use in our study may result in an incomplete and nonexhaustive discussion of the impact of GenAI on values-based education. A deeper critique of the ICAI values framework was outside the scope of our study and we also recognize this as a valuable possibility for future study. We further recognize that the delimitations of our discussion of ethical aspects of GenAI and its use in HE have omitted other important aspects of broader ethical discourse, including (but not limited to) privacy (Alrayes et al., 2024; Marquis et al., 2024; Sabharwal et al., 2023; Sarwar et al., 2024) , copyright and intellectual property concerns, GenAI's environmental impact, and gender bias. We have intentionally focused our analysis on a particular framing of academic integrity as one situated aspect of broader ethical debates on GenAI use in HE.",
+      "figures": [],
+      "fulltext_url": "https://ices.library.ubc.ca/index.php/criticaled/article/view/187309",
+      "key_idea": "This article examined how the fundamental values of academic integrity, as articulated by the ICAI (2021)-honesty, trust, fairness, respect, responsibility, and courage-are affected by the integration of GenAI in higher education. Through conceptual analysis grounded in existing ",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "limitations",
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "An Exploratory Study on the Assessment of Artificial Intelligence Competence: An Empirical Research Based on a Self-Report Scale for University Students",
@@ -83104,6 +83810,37 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:57+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:57+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5772/intechopen.1018137",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "repository_recovery": {
+      "version": 1,
+      "status": "provider_incomplete",
+      "last_at": "2026-11-26",
+      "next_at": "2026-11-28",
+      "attempts": 1
     }
   },
   {
@@ -83155,6 +83892,30 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": true
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:57+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:58+00:00"
+    },
+    "open_access_url": "https://doi.org/10.46328/ijte.9309",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
     }
   },
   {
@@ -83193,20 +83954,57 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Drawing upon structural power theory, asymmetric competition, and the perspective of moral realism, this study systematically explores the strategic logic behind the U.S.-China rivalry in the field of artificial intelligence and its implications for international politics. The United States leverages its closed-source large language models and technological containment to…",
+      "level": "full_text",
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "overview": "Drawing upon structural power theory, asymmetric competition, and the perspective of moral realism, this study systematically explores the strategic logic behind the U.S.-China rivalry in the field of artificial intelligence and its implications for international politics. The research reveals that the significant divergence in the AI development trajectories of China and the United States is, at its core,…",
       "methods": "",
       "findings": "",
-      "interpretation": "",
+      "interpretation": "This study provides a systematic political-strategic framework for understanding China's open-source AI strategy, analyzing its underlying logic and international implications through the lenses of Susan Strange's structural power theory,",
       "limitations": "",
       "sample": "",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "section_coverage": [
+        "discussion"
+      ],
+      "extraction_depth": "limited",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": false
-    }
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:58+00:00",
+      "pipeline_version": 3,
+      "status": "full_text",
+      "next_at": null
+    },
+    "open_access_url": "https://doi.org/10.21203/rs.3.rs-11009773/v1",
+    "analysis": {
+      "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+      "license": "cc-by",
+      "license_url": "https://openalex.org/licenses/cc-by",
+      "methods": "",
+      "results": "",
+      "discussion": "This study provides a systematic political-strategic framework for understanding China's open-source AI strategy, analyzing its underlying logic and international implications through the lenses of Susan Strange's structural power theory,",
+      "limitations": "",
+      "figures": [],
+      "fulltext_url": "https://doi.org/10.21203/rs.3.rs-11009773/v1",
+      "key_idea": "This study provides a systematic political-strategic framework for understanding China's open-source AI strategy, analyzing its underlying logic and international implications through the lenses of Susan Strange's structural power theory,",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "sections_available": [
+        "discussion"
+      ]
+    },
+    "oa_grobid_checked": "2026-11-26"
   },
   {
     "title": "Beyond Conventional Experience Sharing: The First Universal Multi-Participant Experience Sharing Framework for Unidirectional, Bidirectional, and Multidirectional Experiential Knowledge Exchange Across Human and Artificial Intelligence Entities",
@@ -83256,6 +84054,37 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:58+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:58+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5281/zenodo.24333097",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
     }
   },
   {
@@ -83307,6 +84136,37 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:58+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:58+00:00"
+    },
+    "open_access_url": "https://doi.org/10.3390/educsci16111957",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "publisher_html_attempt": {
+      "version": 2,
+      "status": "publisher_access_denied",
+      "last_at": "2026-11-26",
+      "next_at": "2027-01-10",
+      "attempts": 1
     }
   },
   {
@@ -83357,6 +84217,29 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:58+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:58+00:00"
+    },
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
     }
   },
   {
@@ -83408,6 +84291,30 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:58+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:59+00:00"
+    },
+    "open_access_url": "https://ijtpcr.elysiansciences.com/index.php/ijtpcr/article/view/40",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
     }
   },
   {
@@ -83459,6 +84366,30 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:59+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_license",
+      "next_at": "2026-12-10T12:39:59+00:00"
+    },
+    "open_access_url": "https://doi.org/10.1016/j.neuros.2026.100085",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
     }
   },
   {
@@ -83509,6 +84440,37 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:59+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:59+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5281/zenodo.24355482",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
     }
   },
   {
@@ -83561,6 +84523,29 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": true
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:59+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:59+00:00"
+    },
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
     }
   },
   {
@@ -83611,6 +84596,37 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "fulltext_attempt": {
+      "attempts": 1,
+      "last_at": "2026-11-26T12:39:59+00:00",
+      "pipeline_version": 3,
+      "status": "waiting_for_machine_text",
+      "next_at": "2026-12-03T12:39:59+00:00"
+    },
+    "open_access_url": "https://doi.org/10.5281/zenodo.24337792",
+    "pdf_fulltext_attempt": {
+      "version": 1,
+      "status": "no_licensed_machine_pdf",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-17",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
     }
   },
   {
@@ -83662,6 +84678,15 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
     }
   },
   {
@@ -83712,6 +84737,22 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "zenodo_recovery": {
+      "version": 1,
+      "status": "record_unavailable",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-26",
+      "attempts": 1
     }
   },
   {
@@ -83750,19 +84791,94 @@
     "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
     "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
     "reading": {
-      "level": "abstract",
-      "provenance": "OpenAlex abstract index",
-      "overview": "Introduction This study examines artificial intelligence (AI) literacy and educommunication as central dimensions in educational processes related to Afro-descendant youth leadership in Ecuador.",
-      "methods": "Methods An exploratory study with an explanatory-sequential mixed-methods design was conducted. In the quantitative phase, an online survey was administered to 90 participants involved in educational, youth, and community processes, predominantly in the province of Esmeraldas (94.4% of the sample), with a small number of participants from Santo Domingo de los Tsáchilas.",
-      "findings": "Exploratory bivariate results showed positive moderate-to-strong associations among the six dimension scores, interpreted as associations rather than causal effects.",
-      "interpretation": "",
+      "level": "full_text",
+      "provenance": "Original publisher openly licensed HTML (automated section reading)",
+      "overview": "Introduction This study examines artificial intelligence (AI) literacy and educommunication as central dimensions in educational processes related to Afro-descendant youth leadership in Ecuador. Methods An exploratory study with an explanatory-sequential mixed-methods design was conducted.",
+      "methods": "We used an explanatory sequential mixed-methods design (QUAN -> qual) within an exploratory study. The survey came first and provided a descriptive picture of the main patterns in the six analytical dimensions. The focus group was then used to examine selected findings in greater depth and to understand how participants interpreted them in everyday educational and community settings ( Creswell and Plano Clark, 2018 ). The purpose was not to estimate population parameters for Esmeraldas, Santo Domingo, or Ecuador, but to explore patterns among actors who were directly involved in the processes under study. The research was situated in educational, youth, community, and pastoral processes linked to Afro-descendant populations, mainly in Esmeraldas and Santo Domingo de los Tsáchilas. Afro-descendant identity was approached as a social, territorial, historical, and political construction expressed through collective memory, orality, spirituality, music, community knowledge, struggles for recognition, and forms of youth participation.",
+      "findings": "The survey yielded 90 responses from educators, young people, youth leaders, coordinators, and facilitators. The results are presented primarily descriptively, consistent with the exploratory scope of the study. In addition, exploratory Spearman correlations were calculated between the six dimension scores to examine associations among them. These coefficients are reported as bivariate associations and are not interpreted as causal effects or as evidence of population-level generalizability. The sample was composed primarily of educators (62.2%). Women represented 65.6% of participants and men 34.4%. Most participants were located in the province of Esmeraldas: 87.8% reported the city of Esmeraldas and 6.7% the canton of San Lorenzo, which also belongs to that province, for a combined 94.4%. The remaining 5.6% were located in Santo Domingo. A total of 65 participants (72.2%) self-identified as Afro-descendant. Participant characteristics are summarized in Table 4 . Percentages may not total exactly 100 due to rounding. One participant did not report participant-group affiliation. As shown in Table 5 , the six analytical dimensions obtained high mean scores, ranging from 4.60 to 4.72 on a five-point scale. This concentration of favorable responses should be interpreted as strong agreement with the questionnaire statements rather than as evidence that the corresponding educational practices are fully consolidated or uniformly implemented. The high scores also indicate ceiling concentration, which was one reason for using Spearman rather than Pearson correlation in the exploratory bivariate analysis. Items with relatively lower mean scores are summarized in Table 6 . Dimension-level results are descriptive. The identity dimension includes a conditionally worded item with a smaller valid denominator ( n = 68), so its mean should be interpreted cautiously. Values are descriptive item means, reported in tabular form for precision. Afro-descendant identity had the highest dimension mean (M = 4.72, SD = 0.41). The pride item had M = 4.87 (valid n = 68); the items on Afro-Ecuadorian history (M = 4.79), territory/community (M = 4.78), and elders’ memory (M = 4.76) were also highly rated. The item on not reducing Afro-descendant culture to folklore or festivities had M = 4.49. These data describe participants’ evaluations and should not be read as evidence that identity itself causes outcomes in the other dimensions. Self-esteem and cultural dignity had a mean of 4.67 (SD = 0.38). Participants strongly agreed that self-esteem is built through community and culture (M = 4.78), that positive Afro-descendant role models should be present in the classroom (M = 4.77), and that schools can contribute to strengthening the self-esteem of Afro-descendant children and young people (M = 4.73). The item indicating that mockery or discrimination based on hair, skin color, or ways of speaking still exists had the lowest mean in the survey (M = 4.38), but still reflected ",
+      "interpretation": "The results point to a consistent theme: participants valued identity, ethnoeducation, youth leadership, and critical engagement with AI, but the meaning of those ratings became clearer only when the survey was read alongside the focus group. The revised analysis also includes Spearman correlations among the six dimensions. These associations help describe how the dimensions move together in this sample, but they are not treated as causal effects. The strong descriptive ratings for Afro-descendant identity, memory, territory, and cultural recognition are consistent with scholarship that frames Afro-descendant identity as a historical and political process of visibility, resistance, and re-existence ( Juárez Rodríguez, 2023 ; Walsh, 2007 ). Identity was moderately associated with self-esteem and cultural dignity (rho =.541), ethnoeducation (rho =.570), youth leadership (rho =.583), educommunication (rho =.545), and critical AI literacy (rho =.433), all p < .001. These associations indicate that higher identity-related scores tended to co-occur with higher scores in the other dimensions, but they do not establish causal direction. The focus group further illustrated how identity pride was mobilized when young people discussed experiences of digital misrepresentation. The bivariate analysis adds useful detail to the descriptive results. The strongest associations involved ethnoeducation, youth leadership, and educommunication. Ethnoeducation was associated with youth leadership (rho =.669) and educommunication (rho =.680), while youth leadership was also associated with educommunication (rho =.674). All six dimensions were positively associated, with coefficients ranging from.433 to.680 (all p < .001). Given the cross-sectional, purposive design, these coefficients show co",
       "limitations": "",
-      "sample": "90",
-      "section_coverage": [],
-      "extraction_depth": "abstract_only",
-      "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+      "sample": "",
+      "section_coverage": [
+        "methods",
+        "results",
+        "discussion"
+      ],
+      "extraction_depth": "multi_section",
+      "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
       "research_type": "unclassified",
       "reported_findings": true
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
+    },
+    "analysis": {
+      "provenance": "Original publisher openly licensed HTML (automated section reading)",
+      "license": "cc-by (source webpage verified)",
+      "license_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1910214/full",
+      "fulltext_url": "https://www.frontiersin.org/journals/education/articles/10.3389/feduc.2026.1910214/full",
+      "methods": "We used an explanatory sequential mixed-methods design (QUAN -> qual) within an exploratory study. The survey came first and provided a descriptive picture of the main patterns in the six analytical dimensions. The focus group was then used to examine selected findings in greater depth and to understand how participants interpreted them in everyday educational and community settings ( Creswell and Plano Clark, 2018 ). The purpose was not to estimate population parameters for Esmeraldas, Santo Domingo, or Ecuador, but to explore patterns among actors who were directly involved in the processes under study. The research was situated in educational, youth, community, and pastoral processes linked to Afro-descendant populations, mainly in Esmeraldas and Santo Domingo de los Tsáchilas. Afro-descendant identity was approached as a social, territorial, historical, and political construction expressed through collective memory, orality, spirituality, music, community knowledge, struggles for recognition, and forms of youth participation.",
+      "results": "The survey yielded 90 responses from educators, young people, youth leaders, coordinators, and facilitators. The results are presented primarily descriptively, consistent with the exploratory scope of the study. In addition, exploratory Spearman correlations were calculated between the six dimension scores to examine associations among them. These coefficients are reported as bivariate associations and are not interpreted as causal effects or as evidence of population-level generalizability. The sample was composed primarily of educators (62.2%). Women represented 65.6% of participants and men 34.4%. Most participants were located in the province of Esmeraldas: 87.8% reported the city of Esmeraldas and 6.7% the canton of San Lorenzo, which also belongs to that province, for a combined 94.4%. The remaining 5.6% were located in Santo Domingo. A total of 65 participants (72.2%) self-identified as Afro-descendant. Participant characteristics are summarized in Table 4 . Percentages may not total exactly 100 due to rounding. One participant did not report participant-group affiliation. As shown in Table 5 , the six analytical dimensions obtained high mean scores, ranging from 4.60 to 4.72 on a five-point scale. This concentration of favorable responses should be interpreted as strong agreement with the questionnaire statements rather than as evidence that the corresponding educational practices are fully consolidated or uniformly implemented. The high scores also indicate ceiling concentration, which was one reason for using Spearman rather than Pearson correlation in the exploratory bivariate analysis. Items with relatively lower mean scores are summarized in Table 6 . Dimension-level results are descriptive. The identity dimension includes a conditionally worded item with a smaller valid denominator ( n = 68), so its mean should be interpreted cautiously. Values are descriptive item means, reported in tabular form for precision. Afro-descendant identity had the highest dimension mean (M = 4.72, SD = 0.41). The pride item had M = 4.87 (valid n = 68); the items on Afro-Ecuadorian history (M = 4.79), territory/community (M = 4.78), and elders’ memory (M = 4.76) were also highly rated. The item on not reducing Afro-descendant culture to folklore or festivities had M = 4.49. These data describe participants’ evaluations and should not be read as evidence that identity itself causes outcomes in the other dimensions. Self-esteem and cultural dignity had a mean of 4.67 (SD = 0.38). Participants strongly agreed that self-esteem is built through community and culture (M = 4.78), that positive Afro-descendant role models should be present in the classroom (M = 4.77), and that schools can contribute to strengthening the self-esteem of Afro-descendant children and young people (M = 4.73). The item indicating that mockery or discrimination based on hair, skin color, or ways of speaking still exists had the lowest mean in the survey (M = 4.38), but still reflected substantial agreement and therefore warranted qualitative follow-up. Ethnoeducation had a mean of 4.64 (SD = 0.46). The highest-rated item concerned the need for additional educator preparation to address ethnic identity in the classroom (M = 4.71). Community participation in education (M = 4.66) and recognition of orality, music, memory, and spirituality as educational knowledge (M = 4.64) were also highly rated. Cross-curricular ethnoeducation and school dialogue with elders and territory both had M = 4.60, indicating areas that participants endorsed but that merit further investigation regarding implementation. Afro-descendant youth leadership had a dimension mean of 4.68 (SD = 0.45). Agreement was highest for the statement that cultural identity can strengthen youth leadership (M = 4.76), followed by leadership linked to community care (M = 4.71) and the need for more youth participation in educational and community decision-making (M = 4.69). The direct statement that Afro-descendant young people have the capacity to lead community processes had a mean of 4.60. Educommunication had a mean of 4.64 (SD = 0.48). Voice, listening, and dialogue were rated most highly (M = 4.81), followed by the contribution of educommunication to community participation (M = 4.69). The item on young people producing digital content about identity and territory had M = 4.61. Items on producing messages, stories, videos, or posters and using communication to challenge stereotypes both had M = 4.54. This pattern was used to guide qualitative questions about content production and public voice. Critical AI literacy had the lowest relative dimension mean (M = 4.60, SD = 0.45), although agreement remained high overall. The highest-rated item asked whether young people should learn to question who produces information, with what data, and from which perspective (M = 4.75), followed by the need to critically review AI-generated content (M = 4.70). The item stating that AI can support learning and educational content production had the lowest mean within the dimension (M = 4.42). The item indicating that AI can reproduce stereotypes had M = 4.50. These patterns motivated the qualitative exploration of actual AI use, trust, bias, representation, and training needs. Mean scores were high across participant groups, but subgroup sizes were uneven and some groups contained very few cases. For this reason, subgroup values are reported only as descriptive context. These patterns are not interpreted as statistically significant group differences, and no associations are inferred from them. Cronbach’s alpha was used as a preliminary estimate of internal consistency and was calculated with the 90-response dataset using complete cases within each scale. Internal-consistency estimates are summarized in Table 7 . The overall set of 30 scale items produced alpha =.911 (complete-case n = 62), indicating high internal consistency for the combined item set. At the dimension level, youth leadership (alpha =.836; n = 88), educommunication (alpha =.819; n = 89), and ethnoeducation (alpha =.785; n = 88) showed stronger internal consistency. Critical AI literacy (alpha =.701; n = 89) was approximately at the conventional.70 reference point, self-esteem and cultural dignity (alpha =.645; n = 89) was below that reference point, and Afro-descendant identity (alpha =.471; n = 66) showed low internal consistency. The overall alpha should therefore not be used to mask weaker dimension-level performance. Alpha estimates are sample-dependent and are not evidence of construct validity or unidimensionality. The low alpha for Afro-descendant identity may reflect heterogeneous content within",
+      "discussion": "The results point to a consistent theme: participants valued identity, ethnoeducation, youth leadership, and critical engagement with AI, but the meaning of those ratings became clearer only when the survey was read alongside the focus group. The revised analysis also includes Spearman correlations among the six dimensions. These associations help describe how the dimensions move together in this sample, but they are not treated as causal effects. The strong descriptive ratings for Afro-descendant identity, memory, territory, and cultural recognition are consistent with scholarship that frames Afro-descendant identity as a historical and political process of visibility, resistance, and re-existence ( Juárez Rodríguez, 2023 ; Walsh, 2007 ). Identity was moderately associated with self-esteem and cultural dignity (rho =.541), ethnoeducation (rho =.570), youth leadership (rho =.583), educommunication (rho =.545), and critical AI literacy (rho =.433), all p < .001. These associations indicate that higher identity-related scores tended to co-occur with higher scores in the other dimensions, but they do not establish causal direction. The focus group further illustrated how identity pride was mobilized when young people discussed experiences of digital misrepresentation. The bivariate analysis adds useful detail to the descriptive results. The strongest associations involved ethnoeducation, youth leadership, and educommunication. Ethnoeducation was associated with youth leadership (rho =.669) and educommunication (rho =.680), while youth leadership was also associated with educommunication (rho =.674). All six dimensions were positively associated, with coefficients ranging from.433 to.680 (all p < .001). Given the cross-sectional, purposive design, these coefficients show co-variation within the sample rather than evidence that one dimension produces changes in another. Recent AI-literacy research supports an interpretation that extends beyond technical tool use. Casal-Otero et al. (2023) emphasize that AI literacy in education should include critical and ethical engagement rather than only operational competencies. Almatrafi, Johri, and Lee (2024) similarly identify evaluation, ethical navigation, and critical understanding among the central constructs used to conceptualize AI literacy. These recent reviews reinforce the relevance of the present participants’ emphasis on questioning data, sources, perspectives, and bias. Teacher preparation is also central. Sperling et al. (2024) show that AI literacy in teacher education involves forms of professional knowledge that enable educators to evaluate, integrate, and critically discuss AI, rather than simply use applications. The present survey’s high rating for additional educator training in ethnoeducation and its strong emphasis on ethical AI education are compatible with this broader literature. They point to a practical need for professional development that integrates technological, pedagogical, ethical, and intercultural competencies. The theoretical framework also situates educommunication in current literature. Santos Albardía et al. (2025) report that digital technologies can remain superficially incorporated into education when teacher training, critical media literacy, ethical reflection, and participatory practices are insufficiently developed. This is closely related to the present descriptive pattern in which voice and dialogue were very highly valued, while sustained media production was rated somewhat lower. The result does not prove a deficit in practice, but it identifies communicative production as an area that participants themselves considered slightly less consolidated than dialogue and listening. From a Latin American perspective, recent work also reaffirms educommunication as a participatory and decolonial practice grounded in collaborative media production, democratic communication, and the right to communicate ( Brianezi and Tate, 2025 ). This perspective helps interpret why the production of self-defined narratives is important in the context examined here. When Afro-descendant young people create messages about identity, territory, memory, and technology, they can occupy digital environments as producers of meaning rather than only as users of platforms. The qualitative phase helps explain an apparent tension in the survey. Critical AI literacy had the lowest mean of the six dimensions, although the score was still high. In the focus group, this was not expressed as rejection of AI. Participants described selective uses of the tools and clear limits on how much intellectual work they were willing to delegate. They also described cases in which AI-generated images altered racialized features. These accounts give a concrete meaning to the survey concern about bias and show why critical AI literacy cannot be reduced to learning how to operate a platform. Across the two phases, four educational needs recur: a basic understanding of how AI works and what it can do; ethical judgment about sources, data, privacy, and dependence; attention to cultural representation and stereotyping; and the ability to create and circulate one’s own messages. These needs overlap with recent AI-literacy research that emphasizes critical and ethical engagement ( Almatrafi et al., 2024 ; Casal-Otero et al., 2023 ) and with work on teacher preparation for responsible AI use ( Sperling et al., 2024 ). In this study, however, those competencies are interpreted through an intercultural lens in which identity and cultural dignity are central rather than peripheral concerns. The contribution of the study is therefore modest but specific. It does not show that AI literacy causes stronger youth leadership. Rather, it identifies a set of relationships and experiences that can inform the design of AI-literacy initiatives in Afro-descendant educational settings. Such initiatives would need to connect technical learning with ethnoeducation, critical media practice, cultural representation, and opportunities for young people to produce their own public narratives. This exploratory study examined how critical AI literacy, ethnoeducation, educommunication, and Afro-descendant youth leadership are understood by educational and community actors connected mainly to Esmeraldas. The survey provides a descriptive picture of these perceptions, while the focus group shows how some of the quantitative patterns are experienced by young Afro-Ecuadorian participants. The findings first underscore Afro-descendant identity as the central axis of participants’ responses. The memory of elders, territory, Afro-Ecuadorian history, and identity pride stand out as es",
+      "limitations": "",
+      "figures": [],
+      "key_idea": "The survey yielded 90 responses from educators, young people, youth leaders, coordinators, and facilitators. The results are presented primarily descriptively, consistent with the exploratory scope of the study. In addition, exploratory Spearman correlations were calculated betwe",
+      "extraction_date": "2026-11-26",
+      "extraction_version": 4,
+      "extraction_coverage": {
+        "scope": "bounded_section_excerpts",
+        "full_document": false,
+        "section_character_limit": 6700,
+        "truncated_sections": [
+          "results",
+          "discussion"
+        ],
+        "encountered_section_headings": {
+          "methods": [
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 3 Methodology and objectives > 3.2 Methodology"
+          ],
+          "results": [
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.1 Overall pattern across dimensions",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.2 Afro-descendant identity: pride, memory, and territory",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.3 Self-esteem and cultural dignity: the school as a space of possibility and tension",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.4 Ethnoeducation: strong appreciation and the challenge of cross-curricular integration",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.5 Afro-descendant youth leadership: identity, voice, and community care",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.6 Educommunication: voice, dialogue, and communicative production",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.7 Critical artificial intelligence literacy: cautious acceptance and the demand for ethical training",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.8 Descriptive subgroup patterns",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.9 Internal consistency of the instrument",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.10 Exploratory bivariate associations among dimensions",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 4 Results > 4.11 Focus group results"
+          ],
+          "discussion": [
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 5 Discussion",
+            "Ethnoeducation, Afro-descendant youth leadership, and artificial intelligence literacy: an exploratory study with educational actors from Esmeraldas, Ecuador > 6 Conclusions"
+          ]
+        },
+        "tables_omitted_by_section": {
+          "results": 6
+        },
+        "table_policy": "Table cells are not extracted; prose may mention tables. Consult original source."
+      },
+      "sections_available": [
+        "methods",
+        "results",
+        "discussion"
+      ]
+    },
+    "publisher_html_attempt": {
+      "version": 2,
+      "status": "full_text",
+      "last_at": "2026-11-26",
+      "next_at": "2027-11-26",
+      "attempts": 1
     }
   },
   {
@@ -83813,6 +84929,15 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
     }
   },
   {
@@ -83863,6 +84988,15 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
     }
   },
   {
@@ -83914,6 +85048,15 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
     }
   },
   {
@@ -84120,6 +85263,15 @@
       "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
       "research_type": "unclassified",
       "reported_findings": false
+    },
+    "oa_checked": "2026-11-26",
+    "oa_pass_version": 3,
+    "pmc_oai_attempt": {
+      "version": 1,
+      "status": "no_pmc_record",
+      "last_at": "2026-11-26",
+      "next_at": "2026-12-24",
+      "attempts": 1
     }
   },
   {
