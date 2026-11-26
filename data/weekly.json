@@ -104098,6 +104098,39 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:51+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-10T12:39:52+00:00"
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-17",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "provider_incomplete",
+        "last_at": "2026-11-26",
+        "next_at": "2026-11-28",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -104773,20 +104806,61 @@
       "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
       "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This study presents a bibliometric mapping and trend analysis of 2,439 journal articles published between 2016 and 2026 (data collected as of October 24, 2026) that combine AI-related, urban planning/smart city, and review-focused terms.",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "The increasing presence of artificial intelligence (AI) is evident as a fundamental infrastructure of urban planning and smart cities management. This study presents a bibliometric mapping and trend analysis of 2,439 journal articles published between 2016 and 2026 (data collected as of October 24, 2026) that combine AI-related, urban planning/smart city, and review-focused terms.",
         "methods": "",
-        "findings": "",
-        "interpretation": "",
-        "limitations": "",
+        "findings": "The corpus comprises 2,439 articles published in 845 sources between 2016 and 2026 by 7,133 authors (Table 2 ). Articles have on average 4.3 co-authors, 37.23 % involve international co-authorship, and 148 authors have written single-authored documents. The corpus is very young-the average document age is 2.54 years, and 92.9 % of articles appeared in 2020 or later-and each article cites about 65 references on average (158,323 references in total). The 2,439 articles have accumulated an estimated 101,404 citations, an average of 41.58 per article. Annual output rose from 11 articles in 2016 to 548 in 2026 (Table 3 , Figure 1 ). Only 173 articles (7.1 %) were published in 2016-2019, whereas 2,266 (92.9 %) appeared from 2020 onwards and 1,079 (44.2 %) in 2025-2026 alone. Growth was not uniform: year-on-year increases exceeded 66 % until 2019, fell to 40.8 % in 2021 and 17.4 % in 2022, almost stalled in 2023 (+4.9 %), and then rebounded (+31.4 % in 2024 and +58.5 % in 2025). By 24 October 2026 the 548 articles already exceed the 2025 total by 3.2 %. As the 2026 figure covers about 81 % of the calendar year, and indexing is typically delayed, it is best read as a lower bound for full-year output. The rebound after 2023 coincides with the rapid public diffusion of generative AI, but the keyword evidence does not support attributing it to that technology: \"generative AI\", although part of the search string, is not among the 50 most frequent terms (Section 4.9). A log-linear regression on the ten complete years 2016-2025 estimates average growth of 47.7 % per year (95 % CI 34.9-61.7 %; R² = 0.925, p < 0.001), in line with the compound rate of 47.82 % reported by bibliometrix for 2016-2026. The correlation between year and output is r = 0.952 (95 % CI 0.805-0.989; p < 0.001; n = 10). Figures 2 and 3 show a logistic life-cycle model fitted to annual output. The model (R² = 0.969) estimates a saturation level of about 8,040 cumulative articles (K = 8,043), a growth rate of 0.348 per year and an inflection point at 2028.7, when annual output peaks at about 700 articles. A re-estimation of the annual series from Table 3 reproduces these values. The curve implies that half of the eventual cumulative output is reached at the inflection point, 90 % around 2035 and 99 % around 2042; the corpus as of October 2026 would represent about 30 % of the projected total. The fit should be interpreted with care: it rests on eleven observations, the last of which is incomplete; the 2025 observation (531) lies 12 % above the fitted value (473); and a logistic curve imposes saturation by construction. Therefore, the model can be interpreted not as a prediction of decline in the sector, but as a stylized indicator showing that it is in a phase of rapid growth. Mean total citations fall steadily with recency, from 152.51 for the 2018 cohort to 1.67 for 2026 (Table 4 ), a pattern that mainly reflects exposure time (Spearman ρ between cohort year and mean total citations = -0.94",
+        "interpretation": "In other words, the current research is a map of 2,439 scientific articles covering artificial intelligence in urban planning and smart cities from 2016 to 2026 and using the language of reviews. Output has grown at about 48 % per year, with 92.9 % of articles published since 2020, and a logistic model places the field before its inflection point (about 2028.7). Knowledge production takes place through 845 sources, where there is leadership in engineering and open access publishing, and geographical focus on Greater China. The collection shows the presence of many sporadic authors, and although Bradford and Lotka patterns serve as good approximations, they do not stand statistical test. Impact is concentrated in a small set of technology-specific surveys, and the conceptual structure is technology-first, with planning, sustainability and governance vocabulary in comparatively peripheral positions. A shift from IoT and big-data terms towards urban planning, AI and learning systems is detectable in recent years. The principal contribution is an updated, reproducible and statistically annotated map of the field that links its technical strands to planning concerns and translates the patterns into a research agenda. The agenda emphasizes urban digital twins as planning-support systems, explainability and accountability, data governance, generative AI, integration of learning-based methods into decision processes, and geographic diversification.",
+        "limitations": "Several limitations qualify the findings. First, a single database (Scopus) was used; studies indexed elsewhere, in other languages or in grey literature are missing. Second, only journal articles were retained, so conference papers-an important venue for computer science-and records classified as review articles are excluded; the corpus therefore represents review-oriented articles rather than all reviews. Third, the third query block captures review-oriented vocabulary rather than a document type, and individual records were not screened manually, so some may be peripheral (for example the unexpected presence of a geopolitics journal among the leading sources). Fourth, several leading keywords echo the search string, and no thesaurus was applied, so variants fragment frequencies and generic index terms add noise. Fifth, 2026 is a partial year and recent cohorts have had little time to accumulate citations, which affects growth, citation and life-cycle estimates; the logistic model re",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "results",
+          "discussion",
+          "limitations"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
-        "reported_findings": false
-      }
+        "reported_findings": true
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:52+00:00",
+        "pipeline_version": 3,
+        "status": "full_text",
+        "next_at": null
+      },
+      "open_access_url": "https://doi.org/10.65069/ara31202751",
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "",
+        "results": "The corpus comprises 2,439 articles published in 845 sources between 2016 and 2026 by 7,133 authors (Table 2 ). Articles have on average 4.3 co-authors, 37.23 % involve international co-authorship, and 148 authors have written single-authored documents. The corpus is very young-the average document age is 2.54 years, and 92.9 % of articles appeared in 2020 or later-and each article cites about 65 references on average (158,323 references in total). The 2,439 articles have accumulated an estimated 101,404 citations, an average of 41.58 per article. Annual output rose from 11 articles in 2016 to 548 in 2026 (Table 3 , Figure 1 ). Only 173 articles (7.1 %) were published in 2016-2019, whereas 2,266 (92.9 %) appeared from 2020 onwards and 1,079 (44.2 %) in 2025-2026 alone. Growth was not uniform: year-on-year increases exceeded 66 % until 2019, fell to 40.8 % in 2021 and 17.4 % in 2022, almost stalled in 2023 (+4.9 %), and then rebounded (+31.4 % in 2024 and +58.5 % in 2025). By 24 October 2026 the 548 articles already exceed the 2025 total by 3.2 %. As the 2026 figure covers about 81 % of the calendar year, and indexing is typically delayed, it is best read as a lower bound for full-year output. The rebound after 2023 coincides with the rapid public diffusion of generative AI, but the keyword evidence does not support attributing it to that technology: \"generative AI\", although part of the search string, is not among the 50 most frequent terms (Section 4.9). A log-linear regression on the ten complete years 2016-2025 estimates average growth of 47.7 % per year (95 % CI 34.9-61.7 %; R² = 0.925, p < 0.001), in line with the compound rate of 47.82 % reported by bibliometrix for 2016-2026. The correlation between year and output is r = 0.952 (95 % CI 0.805-0.989; p < 0.001; n = 10). Figures 2 and 3 show a logistic life-cycle model fitted to annual output. The model (R² = 0.969) estimates a saturation level of about 8,040 cumulative articles (K = 8,043), a growth rate of 0.348 per year and an inflection point at 2028.7, when annual output peaks at about 700 articles. A re-estimation of the annual series from Table 3 reproduces these values. The curve implies that half of the eventual cumulative output is reached at the inflection point, 90 % around 2035 and 99 % around 2042; the corpus as of October 2026 would represent about 30 % of the projected total. The fit should be interpreted with care: it rests on eleven observations, the last of which is incomplete; the 2025 observation (531) lies 12 % above the fitted value (473); and a logistic curve imposes saturation by construction. Therefore, the model can be interpreted not as a prediction of decline in the sector, but as a stylized indicator showing that it is in a phase of rapid growth. Mean total citations fall steadily with recency, from 152.51 for the 2018 cohort to 1.67 for 2026 (Table 4 ), a pattern that mainly reflects exposure time (Spearman ρ between cohort year and mean total citations = -0.94, p < 0.001, 2016-2025). Dividing by citable years removes most of this age effect. Annualised rates lie between 11.7 and 17.0 for the 2016-2022 cohorts and between 9.6 and 12.3 for 2023-2024, before dropping to 6.04 for 2025 and 1.67 for 2026, cohorts that have had little time to accumulate citations. The annualised rate is negatively associated with cohort year over 2016-2025 (ρ = -0.68, p = 0.029), but the association is weaker and not significant when the 2025 cohort is also excluded (ρ = -0.57, p = 0.112). We therefore find no evidence that more recent articles are cited more per year, and no robust evidence of a decline among cohorts with a longer record. The annualisation also assumes uniform citation accrual, which understates young cohorts if citations build up gradually. IEEE Access is the leading outlet (106 articles; 4.3 %), followed by Remote Sensing (74) and Sustainability (65) (Table 5 , Figure 4a ). Table 5 Continued # Source Articles Share of corpus (%) 9 IEEE Transactions on Geoscience and Remote Sensing 40 1.6 10 Applied Sciences (Switzerland) 34 1.4 11 IEEE Transactions on Intelligent Transportation Systems 30 1.2 12 Smart Cities 28 1.1 13 Scientific Reports 27 1.1 14 Buildings 24 1.0 15 ISPRS International Journal of Geo-Information 23 0.9 16 Computers, Environment and Urban Systems 22 0.9 17 Multimedia Tools and Applications 22 0.9 18 Geopolitics, History, and International Relations 21 0.9 19 ACM Computing Surveys 16 0.7 20 Expert Systems with Applications 16 0.7 Note: Share = articles ÷ 2,439. Bradford's model fits the cumulative distribution of articles over source ranks very closely (C(r) = -550.53 + 429.02•ln r; R² = 0.9858) and yields a multiplier of k = 5.51 (Tables 6 and 7 , Figure 5 ). The 23 core sources (2.7 % of sources) account for 827 articles (33.9 %), the 153 sources of Zone 2 for 800 (32.8 %) and the 669 sources of Zone 3 for 812 (33.3 %). The ratio of source counts across zones is 1 : 6.65 : 29.1, which brackets the idealised 1 : k : k² (1 : 5.51 : 30.4). The KS test nevertheless rejects exact conformity (D = 0.1172, p = 1.84 × 10-5). Due to the high number of sources (845), any discrepancy is statistically detectable, yet the effect size is still small, and thus the practical result is that the law of Bradford is a rather accurate approximation leading to the wide and quite even core as a consequence of multi-disciplinarity of the domain. The estimated Lotka exponent is β = 2.1934 (C = 0.262; R² = 0.9072), slightly above the classical value of 2 (Table 7 , Figure 6 ). Note: H0: the empirical distribution follows the theoretical distribution. A steeper exponent means that single-article authors make up an even larger share, and highly productive authors a smaller share, than the classical law predicts. In the empirical distribution roughly four in five authors (about 84 %, read from Figure 6 ) have written one article, and the tail extends to authors with about 50 documents. The KS tests reject conformity both with the theoretical law (β = 2: D = 0.5143, p = 0.000191) and with the fitted model (β = 2.19: D = 0.3714, p = 0.016). With 7,133 authors, 4.3 co-authors per article and a very young corpus, the picture is of a field with many occasional entrants and a thin, still-forming core of repeat contributors, consistent with rapid growth. Wuhan University is the most productive institution (80 articles), followed by Tsinghua University (53) and the National University of Singapore (37) (Table 8 , Figure 4b ). Thirteen of the 20 leading institutions are in Greater China (eleven in mainland China and two in Hong Kong SAR); two are in Singapore and two in Saudi Arabia (King Abdulaziz and King Saud Universities, 57 articles together), with South Korea, the United Kingdom and Iran represented once each. The leading position of Wuhan University and the China University of Geosciences is consistent with the weight of the remote-sensing strand in the corpus (Section 4.11). The 20 institutions account for 622 institution-article affiliations; Wuhan University alone contributes 12.9 % of these. China dominates scientific production with 1,983 author-country occurrences, followed by India (655) and the USA (512) (Table 9 , Figures 7 and 8a ). Because the frequency counts every authorcountry occurrence, the values exceed the number of articles and shares are computed relative to the top 20 total (5,360): China accounts for 37.0 %, India for 12.2 % and the USA for 9.6 %, so the top three repr",
+        "discussion": "In other words, the current research is a map of 2,439 scientific articles covering artificial intelligence in urban planning and smart cities from 2016 to 2026 and using the language of reviews. Output has grown at about 48 % per year, with 92.9 % of articles published since 2020, and a logistic model places the field before its inflection point (about 2028.7). Knowledge production takes place through 845 sources, where there is leadership in engineering and open access publishing, and geographical focus on Greater China. The collection shows the presence of many sporadic authors, and although Bradford and Lotka patterns serve as good approximations, they do not stand statistical test. Impact is concentrated in a small set of technology-specific surveys, and the conceptual structure is technology-first, with planning, sustainability and governance vocabulary in comparatively peripheral positions. A shift from IoT and big-data terms towards urban planning, AI and learning systems is detectable in recent years. The principal contribution is an updated, reproducible and statistically annotated map of the field that links its technical strands to planning concerns and translates the patterns into a research agenda. The agenda emphasizes urban digital twins as planning-support systems, explainability and accountability, data governance, generative AI, integration of learning-based methods into decision processes, and geographic diversification.",
+        "limitations": "Several limitations qualify the findings. First, a single database (Scopus) was used; studies indexed elsewhere, in other languages or in grey literature are missing. Second, only journal articles were retained, so conference papers-an important venue for computer science-and records classified as review articles are excluded; the corpus therefore represents review-oriented articles rather than all reviews. Third, the third query block captures review-oriented vocabulary rather than a document type, and individual records were not screened manually, so some may be peripheral (for example the unexpected presence of a geopolitics journal among the leading sources). Fourth, several leading keywords echo the search string, and no thesaurus was applied, so variants fragment frequencies and generic index terms add noise. Fifth, 2026 is a partial year and recent cohorts have had little time to accumulate citations, which affects growth, citation and life-cycle estimates; the logistic model rests on eleven observations. Sixth, the thresholds of the science-mapping procedures were not subjected to sensitivity analysis, and clusters and axes were interpreted by the authors. Seventh, mean-based citation indicators are sensitive to outliers, and country-level citation figures depend on corresponding-author attribution. Future work should combine several databases, add conference literature, apply a thesaurus, screen records for relevance, and complement bibliometric mapping with content analysis of a sample of key studies. urban planning 605 convolutional neural network 100 machine learning 532 antennas 99 artificial intelligence 427 internet of things (iot) 96 internet of things 352 learning algorithms 94 learning systems 345 feature extraction 92 smart cities 309 remote sensing images 92 remote sensing 297 semantic segmentation 92 big data 225 satellite imagery 91 machine-learning 171 digital twin 90 decision making 158 object detection 89 semantics 152 intelligent systems 88 sustainable development 150 artificial neural network 87 convolutional neural networks 135 information management 87 Table 16 Continued Keyword Frequency Keyword Frequency Article 134 motor transportation 86 forecasting 131 deep neural networks 85 remote sensing 124 edge computing 83 urban transportation 121 urban growth 82 computer vision 120 data mining 81 urban area 120 image enhancement 80 sustainability 114 benchmarking 78 china 110 intelligent transportation systems 78 network security 108 data set 77 human 107 extraction 77",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.65069/ara31202751",
+        "key_idea": "The corpus comprises 2,439 articles published in 845 sources between 2016 and 2026 by 7,133 authors (Table 2 ). Articles have on average 4.3 co-authors, 37.23 % involve international co-authorship, and 148 authors have written single-authored documents. The corpus is very young-t",
+        "extraction_date": "2026-11-26",
+        "extraction_version": 4,
+        "sections_available": [
+          "results",
+          "discussion",
+          "limitations"
+        ]
+      },
+      "oa_grobid_checked": "2026-11-26"
     },
     {
       "title": "Motivational gain trumps cognitive offloading: a MASEM study on the net positive effect of AI use on critical thinking",
@@ -106046,6 +106120,30 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:52+00:00",
+        "pipeline_version": 3,
+        "status": "missing_sections",
+        "next_at": "2026-12-10T12:39:53+00:00"
+      },
+      "open_access_url": "https://doi.org/10.36074/logos-20.11.2026.016",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "pdf_has_no_recognized_sections",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-26",
+        "attempts": 1
       }
     },
     {
@@ -106457,6 +106555,22 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-17",
+        "attempts": 1
       }
     },
     {
@@ -108189,6 +108303,40 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:53+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-10T12:39:53+00:00"
+      },
+      "open_access_url": "https://doi.org/10.59075/jsrd.v7i9.673",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-17",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-26",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -110740,6 +110888,40 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:53+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-10T12:39:53+00:00"
+      },
+      "open_access_url": "https://doi.org/10.34190/icair.7.1.5694",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-17",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-26",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -111046,6 +111228,40 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:53+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-10T12:39:53+00:00"
+      },
+      "open_access_url": "https://doi.org/10.48175/ijarsct-40829",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-17",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-26",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {
@@ -114042,20 +114258,61 @@
       "metadata_observed_at": "2026-11-26T10:49:56.993480+00:00",
       "preparation_first_seen_at": "2026-11-26T10:49:56.993480+00:00",
       "reading": {
-        "level": "abstract",
-        "provenance": "OpenAlex abstract index",
-        "overview": "This scoping review examines studies in which a generative system acts as a pedagogical agent that directly mediates learning about sustainability.",
-        "methods": "",
+        "level": "full_text",
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "overview": "Generative artificial intelligence (GenAI) is being rapidly adopted in education, prompting growing interest in its application to Education for Sustainable Development (ESD). This scoping review examines studies in which a generative system acts as a pedagogical agent that directly mediates learning about sustainability.",
+        "methods": "This scoping review was conducted in accordance with the Joanna Briggs Institute (JBI) methodology for scoping reviews (Peters et al., 2020) and reported following the PRISMA extension for Scoping Reviews (PRISMA-ScR) (Tricco et al., 2018) . A scoping review was considered appropriate, rather than a systematic review, because the objective was to map the extent, range, and gaps of an emerging and methodologically heterogeneous body of evidence rather than to aggregate effect sizes (Munn et al., 2018) . The identification of potential studies was carried out on 8 July 2026 through searches in three electronic databases, Scopus, Web of Science (Core Collection) and ERIC, all of which were searched on that date. Scopus and Web of Science were selected for their broad multidisciplinary coverage, which is necessary given that research at the intersection of generative artificial intelligence and sustainability education is dispersed across educational research, environmental science, and computing. ERIC was added to ensure adequate coverage of the specialist educational literature, including practitioner-oriented journals that are unevenly indexed in the two multidisciplinary databases. Records published between 1 January 2023 and 30 June 2026 were considered, with the publication date taken as indexed by each database, so that online-first articles were included when their indexed date fell within the window. Searches were run after the close of the window so that records publish",
         "findings": "",
-        "interpretation": "",
-        "limitations": "",
+        "interpretation": "The finding that 19 of 25 studies invoke no sustainability competency framework, and that only one of the twelve studies targeting GreenComp-related constructs assessed them with a corresponding instrument, is more than a reporting matter. It suggests that research on generative AI in sustainability education has so far adopted the evaluative apparatus of educational technology, namely engagement, satisfaction and knowledge gain, while the evaluative apparatus of ESD remains to be incorporated. The consequence is that the results reported across the corpus, which are largely positive but rest mostly on designs without a comparison condition and include one comparison in which the generative-AI group performed worse (Membrillo-Hernández et al., 2026) , currently speak mainly to engagement, perceived benefit and content knowledge rather than to sustainability competencies as assessed. Systems thinking, anticipatory competence and normative competence are the capabilities ESD exists to develop (Brundiers et al., 2021; Bianchi et al., 2022) , and although they are frequently targeted, they are rarely part of the measurement practice of this literature. Operationalising them is therefore the step that would allow the accumulating evidence to be read as evidence about ESD, and it begins with selecting a framework before designing measurement. The role distribution is informative in the same way. The dialogic tutor dominates, while the dilemma interlocutor, the configuration that most directly exercises normative competence, appears once in 25 studies. Read alongside the finding that a quarter of the corpus positions the system as an epistemic authority, this suggests that the field has so far concentrated on making sustainability content more accessible, and that the delibera",
+        "limitations": "Five limitations should be noted. First, the search was restricted to three databases and, although Scopus indexes a substantial share of computing proceedings, coverage of conference literature is incomplete. The search vocabulary was also narrower than the field: because sustainability and sustainable development were not used as standalone terms, some studies that address sustainability learning under other terminology are not captured, and the corpus should be read as a substantial but not exhaustive sample of the literature published up to June 2026. This limitation will be addressed in a full systematic review with an expanded search vocabulary, which we are planning as follow-up work. Second, the lower bound of the publication window excludes pre-2023 work on generative conversational agents; the absence of eligible 2023 studies suggests this exclusion is unlikely to have removed much, but it cannot be ruled out. Third, seven of the charted variables are reviewer judgements; alt",
         "sample": "",
-        "section_coverage": [],
-        "extraction_depth": "abstract_only",
-        "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
+        "section_coverage": [
+          "methods",
+          "discussion",
+          "limitations"
+        ],
+        "extraction_depth": "multi_section",
+        "notice": "Excerpts from licensed article sections; automatically selected, not independently reviewed.",
         "research_type": "unclassified",
         "reported_findings": false
-      }
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:53+00:00",
+        "pipeline_version": 3,
+        "status": "full_text",
+        "next_at": null
+      },
+      "open_access_url": "https://doi.org/10.3389/feduc.2026.1998715",
+      "analysis": {
+        "provenance": "OpenAlex OA GROBID XML (automatic parsing; verify source)",
+        "license": "cc-by",
+        "license_url": "https://openalex.org/licenses/cc-by",
+        "methods": "This scoping review was conducted in accordance with the Joanna Briggs Institute (JBI) methodology for scoping reviews (Peters et al., 2020) and reported following the PRISMA extension for Scoping Reviews (PRISMA-ScR) (Tricco et al., 2018) . A scoping review was considered appropriate, rather than a systematic review, because the objective was to map the extent, range, and gaps of an emerging and methodologically heterogeneous body of evidence rather than to aggregate effect sizes (Munn et al., 2018) . The identification of potential studies was carried out on 8 July 2026 through searches in three electronic databases, Scopus, Web of Science (Core Collection) and ERIC, all of which were searched on that date. Scopus and Web of Science were selected for their broad multidisciplinary coverage, which is necessary given that research at the intersection of generative artificial intelligence and sustainability education is dispersed across educational research, environmental science, and computing. ERIC was added to ensure adequate coverage of the specialist educational literature, including practitioner-oriented journals that are unevenly indexed in the two multidisciplinary databases. Records published between 1 January 2023 and 30 June 2026 were considered, with the publication date taken as indexed by each database, so that online-first articles were included when their indexed date fell within the window. Searches were run after the close of the window so that records published up to the cutoff could be indexed. Rather than searching from database inception, the lower bound of this window was set at the point at which large-scale conversational models became generally available, and therefore at the point at which the pedagogical configurations examined here became practically implementable. The search strategy combined terms related to generative artificial intelligence, education for sustainable development, and learning outcomes. The key terms used for each of these three concept blocks are presented in Table 1 . Search expressions were adapted to the syntax of each database, and the full expressions, together with the number of records returned per database, are provided in the Supplementary Material. The terms sustainability and sustainable development were not used as standalone terms. Combined with generative AI and education, they retrieve predominantly literature in which sustainability denotes an institutional objective, such as educational access and quality under Sustainable Development Goal 4, or the sustainability of AI systems themselves, both of which fall outside the Context criterion of this review. The sustainability block was therefore built from phrases that denote sustainability as an object of learning, complemented by environmental, climate and socio-ecological terms and by the truncated term sustainability competenc*, and was further constrained by the learning and instruction block. The eligibility criteria were informed by the Population, Concept, and Context approach (Peters et al., 2020) . Regarding the population, studies were required to include learners at any educational level, from primary schooling to continuing professional education, or, where the intervention targeted instructional design, the educators designing for them. For the concept, we focused on studies in which a generative artificial intelligence system acted as a pedagogical agent, that is, in which it directly mediated a learning experience (e.g., dialogic tutoring, deliberation over a dilemma, simulated role-play, scenario generation, formative feedback, or instructional codesign) rather than functioning as an author-side productivity tool. Regarding the context, we included studies conducted in formal, non-formal, or informal educational settings in which the learning content concerned sustainability, environmental issues, climate, or socio-ecological systems, addressed as the object of learning rather than as an institutional objective. Instructional co-design was included when the generative system was used by learners, or by educators together with learners, to produce materials or designs that formed part of the learning activity. It was excluded when the system was used by teachers or authors only to prepare materials, with no learner interaction reported, which corresponds to the excluded authorside use. No geographical restriction was applied. No language restrictions were applied, and automatic translation tools were used where necessary. Consistent with the aim of a scoping review to map the breadth of available evidence, no restrictions were placed on document type or study design, and empirical, conceptual, and design-based contributions were considered for eligibility. The full set of criteria is summarised in Table 2 . Following the removal of duplicates, the records retrieved from the database searches underwent a two-stage screening process based on the predefined eligibility criteria. Two independent reviewers first read the titles and abstracts and then assessed the full texts. Given the specificity of the search, no record within the publication window was excluded on the basis of its title and abstract alone, so all 103 records proceeded to full-text assessment, as shown in the flow diagram. In both stages, the reviewers applied the Population, Concept, and Context (PCC) framework to each record. Any discrepancies between the two reviewers were directly referred to a third reviewer, whose decision was final. Inter-rater reliability between the two independent reviewers during the full-text screening phase was assessed on all 103 records evaluated for eligibility. The reviewers agreed on 85 records (82.5% observed agreement), resulting in a Cohen's k of 0.57, which indicates moderate agreement (Landis and Koch, 1977) . The 18 records on which the reviewers diverged were resolved by the third reviewer, whose adjudication is reflected in the final sample. Detailed reliability calculations and the confusion matrix are available in Table S2 . The complete study selection process for this scoping review is illustrated in the PRISMA flow diagram (Figure 1 ). The search retrieved 172 records (Scopus, n ¼ 103; Web of Science, n ¼ 48; ERIC, n ¼ 21). Removal of duplicates left 120 records, of which 17 fell outside the publication window, leaving 103 records assessed against the eligibility criteria. Of these, 77 were excluded and 26 reports met the eligibility criteria. Two of these reports (Huang et al., 2025; Huang and Chang, 2024) describe the same intervention, sample and dataset; following PRISMA-ScR guidance on multiple reports of a single study, Data were extracted using a structured charting form developed a priori and comprising 34 variables organised in four domains: bibliographic and contextual characteristics; pedagogical configuration; competencies and outcomes; and risks and contradictions. The complete form and the charted dataset are provided in Table S3 , the study-level summary in Table S4 , and the codebook governing the interpretive variables in Table S5 . The form was piloted independently by both reviewers on a subset of studies before being applied to the full corpus, and, consistent with guidance on scoping review methodology, charting was treated as an iterative rather than a fixed procedure (Peters et al., 2020) . Two kinds of variable were distinguished. Descriptive variables were transcribed as reported. Seven further var",
+        "results": "",
+        "discussion": "The finding that 19 of 25 studies invoke no sustainability competency framework, and that only one of the twelve studies targeting GreenComp-related constructs assessed them with a corresponding instrument, is more than a reporting matter. It suggests that research on generative AI in sustainability education has so far adopted the evaluative apparatus of educational technology, namely engagement, satisfaction and knowledge gain, while the evaluative apparatus of ESD remains to be incorporated. The consequence is that the results reported across the corpus, which are largely positive but rest mostly on designs without a comparison condition and include one comparison in which the generative-AI group performed worse (Membrillo-Hernández et al., 2026) , currently speak mainly to engagement, perceived benefit and content knowledge rather than to sustainability competencies as assessed. Systems thinking, anticipatory competence and normative competence are the capabilities ESD exists to develop (Brundiers et al., 2021; Bianchi et al., 2022) , and although they are frequently targeted, they are rarely part of the measurement practice of this literature. Operationalising them is therefore the step that would allow the accumulating evidence to be read as evidence about ESD, and it begins with selecting a framework before designing measurement. The role distribution is informative in the same way. The dialogic tutor dominates, while the dilemma interlocutor, the configuration that most directly exercises normative competence, appears once in 25 studies. Read alongside the finding that a quarter of the corpus positions the system as an epistemic authority, this suggests that the field has so far concentrated on making sustainability content more accessible, and that the deliberative configurations remain a largely unexplored design space rather than one that has been tried and found wanting. This matters because efficiency and deliberation are not merely different goals in ESD; under some conditions they are opposed. A system that resolves a socio-ecological dilemma fluently on the learner's behalf removes precisely the difficulty through which normative competence develops. The exploratory cross-tabulation in Figure 4 is consistent with this concern: in none of the seven studies that treated the system as an authority did the normative position remain with the learner alone, although in four of them it was shared. The only study in the corpus that assessed sustainability competencies against a comparison condition points in the same direction: the group using generative tools scored lower on systems-thinking, anticipatory, normative and strategic competence than a control group following the same project (Membrillo-Hernández et al., 2026) . With 16 of the 18 studies that report learner outcomes introducing the generative component alongside a wider instructional redesign, one randomised controlled trial, and one measuring beyond the immediate post-test, the corpus does not yet allow observed gains to be attributed to generative AI as distinct from the pedagogical restructuring that accompanied it. Of these 18 studies, 15 embedded the generative component in curricular activity and ten introduced briefing, debriefing or guided reflection at the same time as the technology. These features are themselves plausible sources of the observed gains, independently of the generative component. The outcome distribution points the same way. All 25 studies target cognitive outcomes, but measured change in learners is evidenced in ten, against a comparison condition in five and beyond the immediate post-test in one; behavioural outcomes appear in nine studies. This reproduces the pattern documented across technology-mediated ESD and situates generative AI within, rather than beyond, the persistent knowledge-action gap (Colombo et al., 2023; Paul, 2026) . That 88.0% of studies teaching sustainability do not discuss the environmental cost of the tool they use is the clearest example of a category of analysis that the field has not yet turned on itself. Because this review relies on published reports, the finding shows that the footprint was not reported, not that educators ignored it in practice; the pattern is consistent with a disciplinary convention of treating educational technology as immaterial. We propose that this be reframed as an opportunity rather than only a criticism. The footprint of a generative system is unusually good pedagogical material for ESD: it is immediate, verifiable, and implicates the learner directly. A course that analyses the water and energy consumption of the model it is using exercises systems thinking on a case the learner is inside. No study in this corpus does this, which makes it an available avenue for innovation. Four evidence-informed design principles are proposed on the basis of the evidence assembled here. Each is anchored in a specific and quantified feature of the corpus; however, the principles extend these findings into recommendations for pedagogical design and research practice, and their effectiveness remains to be established in primary studies. The first principle is that sustainability competencies should be operationalised explicitly. The warrant is the finding that 19 of the 25 studies invoke no competency framework at all, and that, of the twelve studies targeting GreenComp-related constructs, only one assessed them with a corresponding instrument. In practice this means selecting a framework before designing the intervention rather than after it, naming the specific competencies the activity is intended to develop, and aligning at least one instrument to each named competency. The cost of not doing so is visible in this corpus: several studies report engagement, satisfaction or content knowledge and then discuss their findings in terms of sustainability competence. The second principle is that the learner's normative agency should be preserved. Three studies had the model supply the evaluative position on a value-laden question that learners were not asked to contest, and none of the seven studies positioning the system as an epistemic authority left normative judgement with the learner alone. Designs that keep this agency require learners to contest, justify or revise model outputs rather than receive them, for instance by asking students to identify whose interests a generated recommendation serves, or to argue against a position the system has produced. This is also where the corpus is thinnest in configuration terms, since the dilemma interlocutor role appeared once in 25 studies. The third principle is that studies should be designed to isolate the generative component. With 16 of the 18 studies that report learner outcomes confounding the technology with a wider instructional redesign, one randomised controlled trial, and 17 of these 18 measuring outcomes only immediately after the intervention, the field cannot presently establish what the generative system contributes over and above the pedagogy introduced alongside it. Two additions would change this substantially: a comparison condition differing only in the generative element, and at least one delayed measure. Given that many of these interventions introduced briefing, debriefing and guided reflection at the same time as the technology, and that those features may themselves account for the observed gains, the question is not rhetorical. The fourth principle is tha",
+        "limitations": "Five limitations should be noted. First, the search was restricted to three databases and, although Scopus indexes a substantial share of computing proceedings, coverage of conference literature is incomplete. The search vocabulary was also narrower than the field: because sustainability and sustainable development were not used as standalone terms, some studies that address sustainability learning under other terminology are not captured, and the corpus should be read as a substantial but not exhaustive sample of the literature published up to June 2026. This limitation will be addressed in a full systematic review with an expanded search vocabulary, which we are planning as follow-up work. Second, the lower bound of the publication window excludes pre-2023 work on generative conversational agents; the absence of eligible 2023 studies suggests this exclusion is unlikely to have removed much, but it cannot be ruled out. Third, seven of the charted variables are reviewer judgements; although each was governed by an explicit decision rule documented in the codebook and calibrated during piloting and applied independently by two reviewers, consistency was established through consensus rather than agreement statistics, interpretation is unavoidable, and the association shown in Figure 4 may partly reflect conceptual overlap between epistemic positioning and normative delegation, so it should be read as exploratory rather than as validation of either construct. Fourth, the corpus is small (n ¼ 25), which precludes subgroup analysis and means that proportions should be read as descriptions of this corpus rather than as population estimates. Fifth, two of the retrieved reports described the same intervention and were grouped as a single study; other such overlaps may exist where the reporting does not make them identifiable.",
+        "figures": [],
+        "fulltext_url": "https://doi.org/10.3389/feduc.2026.1998715",
+        "key_idea": "The finding that 19 of 25 studies invoke no sustainability competency framework, and that only one of the twelve studies targeting GreenComp-related constructs assessed them with a corresponding instrument, is more than a reporting matter. It suggests that research on generative ",
+        "extraction_date": "2026-11-26",
+        "extraction_version": 4,
+        "sections_available": [
+          "methods",
+          "discussion",
+          "limitations"
+        ]
+      },
+      "oa_grobid_checked": "2026-11-26"
     },
     {
       "title": "AI in emerging economy entrepreneurship education",
@@ -114363,6 +114620,40 @@
         "notice": "Structured highlights selected from the source abstract; not an appraisal of the full paper.",
         "research_type": "unclassified",
         "reported_findings": false
+      },
+      "oa_checked": "2026-11-26",
+      "oa_pass_version": 3,
+      "pmc_oai_attempt": {
+        "version": 1,
+        "status": "no_pmc_record",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-24",
+        "attempts": 1
+      },
+      "fulltext_attempt": {
+        "attempts": 1,
+        "last_at": "2026-11-26T12:39:53+00:00",
+        "pipeline_version": 3,
+        "status": "waiting_for_license",
+        "next_at": "2026-12-10T12:39:54+00:00"
+      },
+      "open_access_url": "https://doi.org/10.36550/2415-7988-2026-1-225-72-79",
+      "pdf_fulltext_attempt": {
+        "version": 1,
+        "status": "no_licensed_machine_pdf",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-17",
+        "attempts": 1
+      },
+      "repository_recovery": {
+        "version": 1,
+        "status": "license_unverified",
+        "last_at": "2026-11-26",
+        "next_at": "2026-12-26",
+        "attempts": 1,
+        "providers": [
+          "unpaywall_checked"
+        ]
       }
     },
     {

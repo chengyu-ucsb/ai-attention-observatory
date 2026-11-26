@@ -3,8 +3,8 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-26T11:06:00.197127+00:00",
-  "finished_at": "2026-11-26T11:08:53.433112+00:00",
+  "started_at": "2026-11-26T12:44:01.470946+00:00",
+  "finished_at": "2026-11-26T12:44:17.739949+00:00",
   "publication_window": {
     "from": "2026-11-16",
     "to": "2026-11-22",
@@ -12,12 +12,12 @@
   },
   "bindings": {
     "packet.json": "ff3f259b8e21f34643b38ab07325cc1ebede844cc2f16af6b58f38a35eac6d33",
-    "acquisition.json": "db5077dcf91a9e73399cf9f9a0014d9348d4a59ad61921cfb2c629bd1de1a830",
-    "readings.json": "f2ea92e1218d5d8e7f57905ac7d7287f932ff3a0f12342105d1c19799c4ee838"
+    "acquisition.json": "b8cd5c58606922dd4076dfbfb1b8a2f3e9352fdd3b4e4be5f0332b9e5b84e1e1",
+    "readings.json": "f7398a972bde905eae0957d520cee73bd86ddc95a6d5b0ff9fb6f6f625b5c583"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-26T11:06:00.766397+00:00",
+      "checked_at": "2026-11-26T12:44:01.989861+00:00",
       "selected_records": 159,
       "attempted_records": 12,
       "attempted_stages": 12,
@@ -42,36 +42,30 @@
       "time_budget_seconds": 480,
       "item_time_budget_seconds": 60,
       "max_candidates_per_provider_stage": 8,
-      "active_provider_pauses": {
-        "provider:CORE": "2026-11-26T12:04:48.053546+00:00"
-      },
+      "active_provider_pauses": {},
       "scope": "Selected previous-week records only; not comprehensive web coverage.",
       "model_used": false,
       "publication_or_review_performed": false
     },
     "review": {
-      "attempted": 1,
+      "attempted": 0,
       "documents_retrieved": 0,
       "partial_inputs": 0,
       "summaries_completed": 0,
-      "failed": 1,
-      "failure_reasons": {
-        "acquisition_receipt_content_changed": 1
-      },
-      "failure_stages": {
-        "retrieval": 1
-      },
+      "failed": 0,
+      "failure_reasons": {},
+      "failure_stages": {},
       "article_accounts": 0,
       "evidence_only_readings": 0,
       "source_text_saved": false,
       "skipped_no_model": false,
       "selection": {
         "considered": 8,
-        "eligible": 1,
+        "eligible": 0,
         "deferred_by_limit": 0,
         "skipped": {
           "unverified_venue": 3,
-          "retry_cooldown": 4
+          "retry_cooldown": 5
         }
       }
     },
