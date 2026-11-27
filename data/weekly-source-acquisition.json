@@ -83,30 +83,6 @@
       "kind": "scholarly",
       "published": "2026-11-20",
       "source_url": "https://doi.org/10.55493/5051.v11i2.6370",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
-      "cursor": {
-        "known": 0,
-        "provider": 0,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
-    },
-    "0784c90d5940c6ce8d7d40a900fb7424da19461493c4f8fd0598fc3f0d0c035b": {
-      "fingerprint": "55290dec36bdb1049213031b46e865ff02a519451faa25e17f191bdc7a1181ff",
-      "kind": "scholarly",
-      "published": "2026-11-20",
-      "source_url": "https://doi.org/10.1145/3847401.3857184",
       "status": "pending_routes",
       "complete": false,
       "attempts": 1,
@@ -133,8 +109,32 @@
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
       "last_outcome": "source_unavailable"
+    },
+    "7312995ffe530f1a8c9faf14a225da0a8b977aa5ce8d73269ec1fa25971ddb43": {
+      "fingerprint": "e98cfd9151e342d74b7679b75bc1acb9c2ad13d8065eaabd17a6e40f25ebfcb7",
+      "kind": "scholarly",
+      "published": "2026-11-20",
+      "source_url": "https://doi.org/10.37528/ftte/9788673955247/symopis.2026.abs.en.39",
+      "status": "pending",
+      "complete": false,
+      "attempts": 0,
+      "cursor": {
+        "known": 0,
+        "provider": 0,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [],
+      "source_text_saved": false
     },
     "fc284449436ddbd5c89854ca3d6b5fb32b00e3d519009c272abc423b950dfb9c": {
       "fingerprint": "3938444a604259e160059c47f1e221e9718fa72c7cd1cafeba7e68085e604e80",
@@ -252,7 +252,7 @@
       "source_url": "https://doi.org/10.38124/ijisrt/26oct1098",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -274,13 +274,28 @@
           "provider": "Europe PMC XML",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T12:56:15.674550+00:00",
-      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
-      "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-24T13:57:36.699034+00:00"
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-24T13:57:36.699034+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-27T23:01:25.129467+00:00"
+        }
+      }
     },
     "f94bfd42d7a21e49aae008b4fa74bbefafe460058ad21e90eadbf0e4c975e4b2": {
       "fingerprint": "49d176f21d331dd91fd111beeb59fccd28d0ad97325a55b96a7391d5d173edb8",
@@ -316,17 +331,17 @@
       "last_attempt_at": "2026-11-25T23:25:38.169627+00:00",
       "last_outcome": "source_unavailable"
     },
-    "2aef83fc06bf0bd5abc9b6762a26c49d967ccd4a21d6d7d6bcb4bcfb6cf3b180": {
-      "fingerprint": "29f934f4847dd1b27ed15d3444df1b6ebf65d38ac784f0fa58c9a13d10cb002c",
+    "332efeb064dc98819ea4bca3ff1adbbe259a72f7dd938b6b89713558ca8b47bf": {
+      "fingerprint": "628ddea22bbba55b1e461076e67655e54b12d6da85d5bde43bffcf88e39171fb",
       "kind": "scholarly",
       "published": "2026-11-20",
-      "source_url": "https://doi.org/10.1145/3847401.3857160",
-      "status": "pending_routes",
+      "source_url": "https://doi.org/10.37528/ftte/9788673955247/symopis.2026.abs.en.40",
+      "status": "pending",
       "complete": false,
-      "attempts": 1,
+      "attempts": 0,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 0,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -337,18 +352,8 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T11:28:45.064386+00:00",
-      "last_outcome": "source_unavailable"
+      "diagnostics": [],
+      "source_text_saved": false
     },
     "02e13afadbe368cfafa470f82e24962ef6a27ff1d8cecaf9ed5b48ed48889bc0": {
       "fingerprint": "dfc1fa2d4682a573128700b89efbe5f14ae0f92749afbdcd8dc75960d6b43740",
@@ -519,30 +524,6 @@
       "kind": "scholarly",
       "published": "2026-11-20",
       "source_url": "https://doi.org/10.1186/s40309-026-00308-5",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
-      "cursor": {
-        "known": 0,
-        "provider": 0,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
-    },
-    "db951d281633cf17416f3d988e7467c3983afa81199c38c4ee72070d786cb2b6": {
-      "fingerprint": "3cc690aa0317f3f4e89ad8e6faef190a0f0deac8bb6c16b8f8c86a479a471849",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.5498/wjp.122781",
       "status": "pending_routes",
       "complete": false,
       "attempts": 1,
@@ -569,20 +550,20 @@
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T11:43:28.503972+00:00",
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
       "last_outcome": "source_unavailable"
     },
-    "8e25551e5758a142780da93c391e0b6eed2fe56bddda96ee072133c06ff84ff5": {
-      "fingerprint": "c833ee870d2bb82f7283ccb4c4f003885d09206d5300d7be9519f987d77790d5",
+    "0784c90d5940c6ce8d7d40a900fb7424da19461493c4f8fd0598fc3f0d0c035b": {
+      "fingerprint": "55290dec36bdb1049213031b46e865ff02a519451faa25e17f191bdc7a1181ff",
       "kind": "scholarly",
-      "published": "2026-11-21",
-      "source_url": "https://doi.org/10.14738/abr.1411.12712",
-      "status": "pending",
+      "published": "2026-11-20",
+      "source_url": "https://doi.org/10.1145/3847401.3857184",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -593,8 +574,52 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "8e25551e5758a142780da93c391e0b6eed2fe56bddda96ee072133c06ff84ff5": {
+      "fingerprint": "c833ee870d2bb82f7283ccb4c4f003885d09206d5300d7be9519f987d77790d5",
+      "kind": "scholarly",
+      "published": "2026-11-21",
+      "source_url": "https://doi.org/10.14738/abr.1411.12712",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
+      "last_outcome": "source_unavailable"
     },
     "5f0886a1df2ce03428d90e9069d0c303d26ea118004cecaa1a9e4852f5d9fa4f": {
       "fingerprint": "ebb16ea923bf8bfdfe394103b68dbbc994a79fec97fcb81b921cddcccfdd1d4f",
@@ -713,22 +738,20 @@
       "diagnostics": [],
       "source_text_saved": false
     },
-    "3ccc284769f1ea287b2a3d99ab38a018e0f7a5b49f097ef56e06cac16c0f2240": {
-      "fingerprint": "e58b60e6a05c70d3f4ce88747d5fce8b1fdf31af3ed6bb3c8a1d87c1eb637190",
+    "2aef83fc06bf0bd5abc9b6762a26c49d967ccd4a21d6d7d6bcb4bcfb6cf3b180": {
+      "fingerprint": "29f934f4847dd1b27ed15d3444df1b6ebf65d38ac784f0fa58c9a13d10cb002c",
       "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.5498/wjp.123076",
+      "published": "2026-11-20",
+      "source_url": "https://doi.org/10.1145/3847401.3857160",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 2,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 2,
+        "provider": 1,
         "provider_tried": []
       },
-      "tried_sources": [
-        "5d75503af0d5331ea50a82b66e53122060d9a653c966b85eec688e8bd3348c17"
-      ],
+      "tried_sources": [],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [],
@@ -743,24 +766,10 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
-        },
-        {
-          "status": "candidates",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "OpenAIRE",
-          "candidates": 1
-        },
-        {
-          "status": "host_requires_review",
-          "retryable": false,
-          "stage": "article",
-          "provider": "OpenAIRE",
-          "url": "https://doi.org/10.5498/wjp.123076"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
+      "last_attempt_at": "2026-11-26T11:28:45.064386+00:00",
       "last_outcome": "source_unavailable"
     },
     "27388fc6c9e84961b941f4eaff76e1ff9c9ddd2174af2a579317491e650b6a26": {
@@ -892,17 +901,17 @@
       "diagnostics": [],
       "source_text_saved": false
     },
-    "af1ab9e0a038aea3ed25f8e7e163dc88db8728411c77b2c0f3ef660ede795c82": {
-      "fingerprint": "d4029ff29d6cb776927be460046950e69ce536cfc2413bdc91c543e35d6dbf1d",
+    "db951d281633cf17416f3d988e7467c3983afa81199c38c4ee72070d786cb2b6": {
+      "fingerprint": "3cc690aa0317f3f4e89ad8e6faef190a0f0deac8bb6c16b8f8c86a479a471849",
       "kind": "scholarly",
-      "published": "2026-11-18",
-      "source_url": "https://doi.org/10.1287/isre.2024.0917",
-      "status": "pending",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.5498/wjp.122781",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -913,8 +922,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T11:43:28.503972+00:00",
+      "last_outcome": "source_unavailable"
     },
     "57739d99efdc8fb5340295eed4498f0bae506eca07c29425f0440431962445a6": {
       "fingerprint": "d1b31fa705d03a9b77105bac8cc80b2203b2b65934d289bf15cc463011f02d44",
@@ -3391,42 +3410,54 @@
       },
       "last_outcome": "partial_full_text"
     },
-    "2771b77c70126a15207a6c1ebc385efb27fb2e310c0a113b95fe9ade04ce5897": {
-      "fingerprint": "fc61818b0e7dcd12c65b7fa62a85af444646f6078be6c99367d31b6094d4ec35",
-      "kind": "nonacademic",
-      "published": "2026-11-18",
-      "source_url": "https://www.cpr.org/2026/11/18/students-teachers-navigate-artificial-intelligence-in-education/",
-      "status": "source_unavailable",
-      "complete": true,
-      "attempts": 1,
+    "3ccc284769f1ea287b2a3d99ab38a018e0f7a5b49f097ef56e06cac16c0f2240": {
+      "fingerprint": "e58b60e6a05c70d3f4ce88747d5fce8b1fdf31af3ed6bb3c8a1d87c1eb637190",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.5498/wjp.123076",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 2,
       "cursor": {
-        "known": 1,
-        "provider": 0,
+        "known": 0,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [
-        "851898885930ce5edbe294a2e4d96959ea5523ba6b974add386df577b38ef226"
+        "5d75503af0d5331ea50a82b66e53122060d9a653c966b85eec688e8bd3348c17"
       ],
       "plan": {
         "provider_plan_version": 2,
-        "known_routes": [
-          "29b3a6e6c6eef847b5a80e0ab23b9035f8f59ed3ed56c453c1b6662a2fdb1a5e"
-        ],
+        "known_routes": [],
         "known_sources_only": false,
-        "doi_lookup_permitted": false
+        "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
         {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 1
+        },
+        {
           "status": "host_requires_review",
           "retryable": false,
           "stage": "article",
-          "provider": "original_article",
-          "url": "https://www.cpr.org/2026/11/18/students-teachers-navigate-artificial-intelligence-in-education/"
+          "provider": "OpenAIRE",
+          "url": "https://doi.org/10.5498/wjp.123076"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T11:28:45.064386+00:00",
+      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
       "last_outcome": "source_unavailable"
     },
     "3819c49d0de7b9aab4ce4411dc65df6ff2ab4f3e9b3a4540a986316847ff5c82": {
@@ -3572,1238 +3603,29 @@
       "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
       "last_outcome": "source_unavailable"
     },
-    "2ecbb0cb18ebaf5f5cc8f5a6c95325e7ecf4f96a5948ea00443c80fb262c4832": {
-      "fingerprint": "987fb7323d00d64a5a00a460301736b5d1c8a035465e32277de1d93e79b0cff9",
-      "kind": "nonacademic",
+    "af1ab9e0a038aea3ed25f8e7e163dc88db8728411c77b2c0f3ef660ede795c82": {
+      "fingerprint": "d4029ff29d6cb776927be460046950e69ce536cfc2413bdc91c543e35d6dbf1d",
+      "kind": "scholarly",
       "published": "2026-11-18",
-      "source_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
-      "status": "partial_full_text_not_reviewed",
-      "complete": true,
-      "attempts": 1,
+      "source_url": "https://doi.org/10.1287/isre.2024.0917",
+      "status": "pending",
+      "complete": false,
+      "attempts": 0,
       "cursor": {
-        "known": 1,
+        "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [
-        "17468315cb436a8731c1671a780ea02508e05ed9296cfc4327d52e6864f732f5"
-      ],
+      "tried_sources": [],
       "plan": {
         "provider_plan_version": 2,
-        "known_routes": [
-          "e133f7d49611ccf8bc89d88846c0bc4d6270269a0d5e0eab53b418fd169d95cb"
-        ],
+        "known_routes": [],
         "known_sources_only": false,
-        "doi_lookup_permitted": false
+        "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "partial_full_text",
-          "retryable": false,
-          "stage": "article",
-          "provider": "original_article",
-          "url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
-          "final_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom"
-        },
-        {
-          "status": "candidate_budget_exhausted",
-          "retryable": false,
-          "stage": "retrieval",
-          "candidates_attempted": 1
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T03:35:00.895669+00:00",
-      "document": {
-        "source_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
-        "document_version": "unspecified",
-        "semantic_completeness": "not_verified",
-        "review_status": "not_reviewed",
-        "source_text_saved": false,
-        "redistribution_granted": false,
-        "all_retrieved_text_chunked": true,
-        "chunks_total": 3,
-        "units": [
-          {
-            "unit": 1,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 2,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 3,
-            "characters": 53,
-            "has_text": true
-          },
-          {
-            "unit": 4,
-            "characters": 168,
-            "has_text": true
-          },
-          {
-            "unit": 5,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 6,
-            "characters": 17,
-            "has_text": true
-          },
-          {
-            "unit": 7,
-            "characters": 31,
-            "has_text": true
-          },
-          {
-            "unit": 8,
-            "characters": 264,
-            "has_text": true
-          },
-          {
-            "unit": 9,
-            "characters": 290,
-            "has_text": true
-          },
-          {
-            "unit": 10,
-            "characters": 345,
-            "has_text": true
-          },
-          {
-            "unit": 11,
-            "characters": 486,
-            "has_text": true
-          },
-          {
-            "unit": 12,
-            "characters": 434,
-            "has_text": true
-          },
-          {
-            "unit": 13,
-            "characters": 656,
-            "has_text": true
-          },
-          {
-            "unit": 14,
-            "characters": 21,
-            "has_text": true
-          },
-          {
-            "unit": 15,
-            "characters": 315,
-            "has_text": true
-          },
-          {
-            "unit": 16,
-            "characters": 336,
-            "has_text": true
-          },
-          {
-            "unit": 17,
-            "characters": 304,
-            "has_text": true
-          },
-          {
-            "unit": 18,
-            "characters": 360,
-            "has_text": true
-          },
-          {
-            "unit": 19,
-            "characters": 392,
-            "has_text": true
-          },
-          {
-            "unit": 20,
-            "characters": 240,
-            "has_text": true
-          },
-          {
-            "unit": 21,
-            "characters": 338,
-            "has_text": true
-          },
-          {
-            "unit": 22,
-            "characters": 517,
-            "has_text": true
-          },
-          {
-            "unit": 23,
-            "characters": 224,
-            "has_text": true
-          },
-          {
-            "unit": 24,
-            "characters": 366,
-            "has_text": true
-          },
-          {
-            "unit": 25,
-            "characters": 225,
-            "has_text": true
-          },
-          {
-            "unit": 26,
-            "characters": 160,
-            "has_text": true
-          },
-          {
-            "unit": 27,
-            "characters": 19,
-            "has_text": true
-          },
-          {
-            "unit": 28,
-            "characters": 607,
-            "has_text": true
-          },
-          {
-            "unit": 29,
-            "characters": 598,
-            "has_text": true
-          },
-          {
-            "unit": 30,
-            "characters": 220,
-            "has_text": true
-          },
-          {
-            "unit": 31,
-            "characters": 464,
-            "has_text": true
-          },
-          {
-            "unit": 32,
-            "characters": 589,
-            "has_text": true
-          },
-          {
-            "unit": 33,
-            "characters": 20,
-            "has_text": true
-          },
-          {
-            "unit": 34,
-            "characters": 152,
-            "has_text": true
-          },
-          {
-            "unit": 35,
-            "characters": 489,
-            "has_text": true
-          },
-          {
-            "unit": 36,
-            "characters": 424,
-            "has_text": true
-          },
-          {
-            "unit": 37,
-            "characters": 376,
-            "has_text": true
-          },
-          {
-            "unit": 38,
-            "characters": 376,
-            "has_text": true
-          },
-          {
-            "unit": 39,
-            "characters": 286,
-            "has_text": true
-          },
-          {
-            "unit": 40,
-            "characters": 18,
-            "has_text": true
-          },
-          {
-            "unit": 41,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 42,
-            "characters": 53,
-            "has_text": true
-          },
-          {
-            "unit": 43,
-            "characters": 13,
-            "has_text": true
-          },
-          {
-            "unit": 44,
-            "characters": 8,
-            "has_text": true
-          },
-          {
-            "unit": 45,
-            "characters": 64,
-            "has_text": true
-          },
-          {
-            "unit": 46,
-            "characters": 11,
-            "has_text": true
-          },
-          {
-            "unit": 47,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 48,
-            "characters": 49,
-            "has_text": true
-          },
-          {
-            "unit": 49,
-            "characters": 10,
-            "has_text": true
-          },
-          {
-            "unit": 50,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 51,
-            "characters": 94,
-            "has_text": true
-          },
-          {
-            "unit": 52,
-            "characters": 12,
-            "has_text": true
-          },
-          {
-            "unit": 53,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 54,
-            "characters": 58,
-            "has_text": true
-          },
-          {
-            "unit": 55,
-            "characters": 10,
-            "has_text": true
-          },
-          {
-            "unit": 56,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 57,
-            "characters": 65,
-            "has_text": true
-          },
-          {
-            "unit": 58,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 59,
-            "characters": 18,
-            "has_text": true
-          },
-          {
-            "unit": 60,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 61,
-            "characters": 53,
-            "has_text": true
-          },
-          {
-            "unit": 62,
-            "characters": 13,
-            "has_text": true
-          },
-          {
-            "unit": 63,
-            "characters": 8,
-            "has_text": true
-          },
-          {
-            "unit": 64,
-            "characters": 64,
-            "has_text": true
-          },
-          {
-            "unit": 65,
-            "characters": 11,
-            "has_text": true
-          },
-          {
-            "unit": 66,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 67,
-            "characters": 49,
-            "has_text": true
-          },
-          {
-            "unit": 68,
-            "characters": 10,
-            "has_text": true
-          },
-          {
-            "unit": 69,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 70,
-            "characters": 94,
-            "has_text": true
-          },
-          {
-            "unit": 71,
-            "characters": 12,
-            "has_text": true
-          },
-          {
-            "unit": 72,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 73,
-            "characters": 58,
-            "has_text": true
-          },
-          {
-            "unit": 74,
-            "characters": 10,
-            "has_text": true
-          },
-          {
-            "unit": 75,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 76,
-            "characters": 65,
-            "has_text": true
-          },
-          {
-            "unit": 77,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 78,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 79,
-            "characters": 8,
-            "has_text": true
-          },
-          {
-            "unit": 80,
-            "characters": 104,
-            "has_text": true
-          },
-          {
-            "unit": 81,
-            "characters": 9,
-            "has_text": true
-          },
-          {
-            "unit": 82,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 83,
-            "characters": 14,
-            "has_text": true
-          },
-          {
-            "unit": 84,
-            "characters": 53,
-            "has_text": true
-          },
-          {
-            "unit": 85,
-            "characters": 11,
-            "has_text": true
-          },
-          {
-            "unit": 86,
-            "characters": 7,
-            "has_text": true
-          },
-          {
-            "unit": 87,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 88,
-            "characters": 54,
-            "has_text": true
-          },
-          {
-            "unit": 89,
-            "characters": 15,
-            "has_text": true
-          },
-          {
-            "unit": 90,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 91,
-            "characters": 21,
-            "has_text": true
-          },
-          {
-            "unit": 92,
-            "characters": 65,
-            "has_text": true
-          },
-          {
-            "unit": 93,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 94,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 95,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 96,
-            "characters": 79,
-            "has_text": true
-          },
-          {
-            "unit": 97,
-            "characters": 11,
-            "has_text": true
-          },
-          {
-            "unit": 98,
-            "characters": 16,
-            "has_text": true
-          },
-          {
-            "unit": 99,
-            "characters": 23,
-            "has_text": true
-          },
-          {
-            "unit": 100,
-            "characters": 64,
-            "has_text": true
-          },
-          {
-            "unit": 101,
-            "characters": 14,
-            "has_text": true
-          },
-          {
-            "unit": 102,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 103,
-            "characters": 15,
-            "has_text": true
-          },
-          {
-            "unit": 104,
-            "characters": 56,
-            "has_text": true
-          },
-          {
-            "unit": 105,
-            "characters": 13,
-            "has_text": true
-          },
-          {
-            "unit": 106,
-            "characters": 3,
-            "has_text": true
-          },
-          {
-            "unit": 107,
-            "characters": 14,
-            "has_text": true
-          },
-          {
-            "unit": 108,
-            "characters": 59,
-            "has_text": true
-          },
-          {
-            "unit": 109,
-            "characters": 9,
-            "has_text": true
-          },
-          {
-            "unit": 110,
-            "characters": 4,
-            "has_text": true
-          },
-          {
-            "unit": 111,
-            "characters": 13,
-            "has_text": true
-          },
-          {
-            "unit": 112,
-            "characters": 66,
-            "has_text": true
-          },
-          {
-            "unit": 113,
-            "characters": 10,
-            "has_text": true
-          }
-        ],
-        "chunk_intervals": [
-          {
-            "chunk": "C0001",
-            "ranges": [
-              {
-                "unit": 1,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 2,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 3,
-                "start": 0,
-                "end": 53
-              },
-              {
-                "unit": 4,
-                "start": 0,
-                "end": 168
-              },
-              {
-                "unit": 5,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 6,
-                "start": 0,
-                "end": 17
-              },
-              {
-                "unit": 7,
-                "start": 0,
-                "end": 31
-              },
-              {
-                "unit": 8,
-                "start": 0,
-                "end": 264
-              },
-              {
-                "unit": 9,
-                "start": 0,
-                "end": 290
-              },
-              {
-                "unit": 10,
-                "start": 0,
-                "end": 345
-              },
-              {
-                "unit": 11,
-                "start": 0,
-                "end": 486
-              },
-              {
-                "unit": 12,
-                "start": 0,
-                "end": 434
-              },
-              {
-                "unit": 13,
-                "start": 0,
-                "end": 656
-              },
-              {
-                "unit": 14,
-                "start": 0,
-                "end": 21
-              },
-              {
-                "unit": 15,
-                "start": 0,
-                "end": 315
-              },
-              {
-                "unit": 16,
-                "start": 0,
-                "end": 336
-              },
-              {
-                "unit": 17,
-                "start": 0,
-                "end": 304
-              },
-              {
-                "unit": 18,
-                "start": 0,
-                "end": 360
-              },
-              {
-                "unit": 19,
-                "start": 0,
-                "end": 392
-              },
-              {
-                "unit": 20,
-                "start": 0,
-                "end": 240
-              },
-              {
-                "unit": 21,
-                "start": 0,
-                "end": 338
-              },
-              {
-                "unit": 22,
-                "start": 0,
-                "end": 364
-              },
-              {
-                "unit": 22,
-                "start": 364,
-                "end": 373
-              }
-            ]
-          },
-          {
-            "chunk": "C0002",
-            "ranges": [
-              {
-                "unit": 22,
-                "start": 373,
-                "end": 517
-              },
-              {
-                "unit": 23,
-                "start": 0,
-                "end": 224
-              },
-              {
-                "unit": 24,
-                "start": 0,
-                "end": 366
-              },
-              {
-                "unit": 25,
-                "start": 0,
-                "end": 225
-              },
-              {
-                "unit": 26,
-                "start": 0,
-                "end": 160
-              },
-              {
-                "unit": 27,
-                "start": 0,
-                "end": 19
-              },
-              {
-                "unit": 28,
-                "start": 0,
-                "end": 607
-              },
-              {
-                "unit": 29,
-                "start": 0,
-                "end": 598
-              },
-              {
-                "unit": 30,
-                "start": 0,
-                "end": 220
-              },
-              {
-                "unit": 31,
-                "start": 0,
-                "end": 464
-              },
-              {
-                "unit": 32,
-                "start": 0,
-                "end": 589
-              },
-              {
-                "unit": 33,
-                "start": 0,
-                "end": 20
-              },
-              {
-                "unit": 34,
-                "start": 0,
-                "end": 152
-              },
-              {
-                "unit": 35,
-                "start": 0,
-                "end": 489
-              },
-              {
-                "unit": 36,
-                "start": 0,
-                "end": 424
-              },
-              {
-                "unit": 37,
-                "start": 0,
-                "end": 376
-              },
-              {
-                "unit": 38,
-                "start": 0,
-                "end": 376
-              },
-              {
-                "unit": 39,
-                "start": 0,
-                "end": 30
-              }
-            ]
-          },
-          {
-            "chunk": "C0003",
-            "ranges": [
-              {
-                "unit": 39,
-                "start": 30,
-                "end": 286
-              },
-              {
-                "unit": 40,
-                "start": 0,
-                "end": 18
-              },
-              {
-                "unit": 41,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 42,
-                "start": 0,
-                "end": 53
-              },
-              {
-                "unit": 43,
-                "start": 0,
-                "end": 13
-              },
-              {
-                "unit": 44,
-                "start": 0,
-                "end": 8
-              },
-              {
-                "unit": 45,
-                "start": 0,
-                "end": 64
-              },
-              {
-                "unit": 46,
-                "start": 0,
-                "end": 11
-              },
-              {
-                "unit": 47,
-                "start": 0,
-                "end": 7
-              },
-              {
-                "unit": 48,
-                "start": 0,
-                "end": 49
-              },
-              {
-                "unit": 49,
-                "start": 0,
-                "end": 10
-              },
-              {
-                "unit": 50,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 51,
-                "start": 0,
-                "end": 94
-              },
-              {
-                "unit": 52,
-                "start": 0,
-                "end": 12
-              },
-              {
-                "unit": 53,
-                "start": 0,
-                "end": 7
-              },
-              {
-                "unit": 54,
-                "start": 0,
-                "end": 58
-              },
-              {
-                "unit": 55,
-                "start": 0,
-                "end": 10
-              },
-              {
-                "unit": 56,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 57,
-                "start": 0,
-                "end": 65
-              },
-              {
-                "unit": 58,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 59,
-                "start": 0,
-                "end": 18
-              },
-              {
-                "unit": 60,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 61,
-                "start": 0,
-                "end": 53
-              },
-              {
-                "unit": 62,
-                "start": 0,
-                "end": 13
-              },
-              {
-                "unit": 63,
-                "start": 0,
-                "end": 8
-              },
-              {
-                "unit": 64,
-                "start": 0,
-                "end": 64
-              },
-              {
-                "unit": 65,
-                "start": 0,
-                "end": 11
-              },
-              {
-                "unit": 66,
-                "start": 0,
-                "end": 7
-              },
-              {
-                "unit": 67,
-                "start": 0,
-                "end": 49
-              },
-              {
-                "unit": 68,
-                "start": 0,
-                "end": 10
-              },
-              {
-                "unit": 69,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 70,
-                "start": 0,
-                "end": 94
-              },
-              {
-                "unit": 71,
-                "start": 0,
-                "end": 12
-              },
-              {
-                "unit": 72,
-                "start": 0,
-                "end": 7
-              },
-              {
-                "unit": 73,
-                "start": 0,
-                "end": 58
-              },
-              {
-                "unit": 74,
-                "start": 0,
-                "end": 10
-              },
-              {
-                "unit": 75,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 76,
-                "start": 0,
-                "end": 65
-              },
-              {
-                "unit": 77,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 78,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 79,
-                "start": 0,
-                "end": 8
-              },
-              {
-                "unit": 80,
-                "start": 0,
-                "end": 104
-              },
-              {
-                "unit": 81,
-                "start": 0,
-                "end": 9
-              },
-              {
-                "unit": 82,
-                "start": 0,
-                "end": 7
-              },
-              {
-                "unit": 83,
-                "start": 0,
-                "end": 14
-              },
-              {
-                "unit": 84,
-                "start": 0,
-                "end": 53
-              },
-              {
-                "unit": 85,
-                "start": 0,
-                "end": 11
-              },
-              {
-                "unit": 86,
-                "start": 0,
-                "end": 7
-              },
-              {
-                "unit": 87,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 88,
-                "start": 0,
-                "end": 54
-              },
-              {
-                "unit": 89,
-                "start": 0,
-                "end": 15
-              },
-              {
-                "unit": 90,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 91,
-                "start": 0,
-                "end": 21
-              },
-              {
-                "unit": 92,
-                "start": 0,
-                "end": 65
-              },
-              {
-                "unit": 93,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 94,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 95,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 96,
-                "start": 0,
-                "end": 79
-              },
-              {
-                "unit": 97,
-                "start": 0,
-                "end": 11
-              },
-              {
-                "unit": 98,
-                "start": 0,
-                "end": 16
-              },
-              {
-                "unit": 99,
-                "start": 0,
-                "end": 23
-              },
-              {
-                "unit": 100,
-                "start": 0,
-                "end": 64
-              },
-              {
-                "unit": 101,
-                "start": 0,
-                "end": 14
-              },
-              {
-                "unit": 102,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 103,
-                "start": 0,
-                "end": 15
-              },
-              {
-                "unit": 104,
-                "start": 0,
-                "end": 56
-              },
-              {
-                "unit": 105,
-                "start": 0,
-                "end": 13
-              },
-              {
-                "unit": 106,
-                "start": 0,
-                "end": 3
-              },
-              {
-                "unit": 107,
-                "start": 0,
-                "end": 14
-              },
-              {
-                "unit": 108,
-                "start": 0,
-                "end": 59
-              },
-              {
-                "unit": 109,
-                "start": 0,
-                "end": 9
-              },
-              {
-                "unit": 110,
-                "start": 0,
-                "end": 4
-              },
-              {
-                "unit": 111,
-                "start": 0,
-                "end": 13
-              },
-              {
-                "unit": 112,
-                "start": 0,
-                "end": 66
-              },
-              {
-                "unit": 113,
-                "start": 0,
-                "end": 10
-              }
-            ]
-          }
-        ],
-        "evidence_status": "partial_full_text",
-        "html_completeness": "not_verified",
-        "characters_retrieved": 13346,
-        "units_retrieved": 113,
-        "source_sha256": "f7c1fbb611c39faf58384f18627d55f0f7eb66b11790f5d3b1fe6890315ca3e0",
-        "html_extraction_version": "article-body-v3"
-      },
-      "document_evidence": {
-        "status": "partial_full_text",
-        "retryable": false,
-        "stage": "article",
-        "provider": "original_article",
-        "url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
-        "final_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom"
-      },
-      "last_outcome": "partial_full_text"
+      "diagnostics": [],
+      "source_text_saved": false
     },
     "d98089cf291085f9034fd0a30915df7d5d3797d4bd20c301e63861b87941b1f3": {
       "fingerprint": "7783aa798dd6826e0ad16cb5efa6858b2565503756a2cb15beb4755ec221bd6f",
@@ -7150,38 +5972,42 @@
       },
       "last_outcome": "partial_full_text"
     },
-    "0b756237ec754529ab88fbde7c0021aab323a097b10caafaca8542edc2008cb8": {
-      "fingerprint": "81dac9fb427b68569efe7ddd53bebc30de64b153bb4b839b65faa309a24b6952",
-      "kind": "scholarly",
-      "published": "2026-11-17",
-      "source_url": "https://doi.org/10.3389/fcomm.2026.1989557",
-      "status": "pending_routes",
-      "complete": false,
+    "2771b77c70126a15207a6c1ebc385efb27fb2e310c0a113b95fe9ade04ce5897": {
+      "fingerprint": "fc61818b0e7dcd12c65b7fa62a85af444646f6078be6c99367d31b6094d4ec35",
+      "kind": "nonacademic",
+      "published": "2026-11-18",
+      "source_url": "https://www.cpr.org/2026/11/18/students-teachers-navigate-artificial-intelligence-in-education/",
+      "status": "source_unavailable",
+      "complete": true,
       "attempts": 1,
       "cursor": {
-        "known": 0,
-        "provider": 1,
+        "known": 1,
+        "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "851898885930ce5edbe294a2e4d96959ea5523ba6b974add386df577b38ef226"
+      ],
       "plan": {
         "provider_plan_version": 2,
-        "known_routes": [],
+        "known_routes": [
+          "29b3a6e6c6eef847b5a80e0ab23b9035f8f59ed3ed56c453c1b6662a2fdb1a5e"
+        ],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": false
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
         {
-          "status": "no_exact_match",
+          "status": "host_requires_review",
           "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.cpr.org/2026/11/18/students-teachers-navigate-artificial-intelligence-in-education/"
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
+      "last_attempt_at": "2026-11-26T11:28:45.064386+00:00",
       "last_outcome": "source_unavailable"
     },
     "5a0e2b93901017606270a71eaf1ee9090853ef8a7c0c04559675a5c1d7aacadc": {
@@ -7919,39 +6745,1238 @@
       },
       "last_outcome": "full_document_retrieved"
     },
-    "eaa3e966372873495c7ec0cdd952132753913885a79626bd278ef47caffd82b4": {
-      "fingerprint": "8131bbef17a00c5b0e1e902b271b2270d2b8baf847fdeb7c526b41e154735938",
-      "kind": "scholarly",
-      "published": "2026-11-17",
-      "source_url": "https://doi.org/10.3389/fanim.2026.1980049",
-      "status": "pending_routes",
-      "complete": false,
+    "2ecbb0cb18ebaf5f5cc8f5a6c95325e7ecf4f96a5948ea00443c80fb262c4832": {
+      "fingerprint": "987fb7323d00d64a5a00a460301736b5d1c8a035465e32277de1d93e79b0cff9",
+      "kind": "nonacademic",
+      "published": "2026-11-18",
+      "source_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
+      "status": "partial_full_text_not_reviewed",
+      "complete": true,
       "attempts": 1,
       "cursor": {
-        "known": 0,
-        "provider": 1,
+        "known": 1,
+        "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "17468315cb436a8731c1671a780ea02508e05ed9296cfc4327d52e6864f732f5"
+      ],
       "plan": {
         "provider_plan_version": 2,
-        "known_routes": [],
+        "known_routes": [
+          "e133f7d49611ccf8bc89d88846c0bc4d6270269a0d5e0eab53b418fd169d95cb"
+        ],
         "known_sources_only": false,
-        "doi_lookup_permitted": true
+        "doi_lookup_permitted": false
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
         {
-          "status": "no_exact_match",
+          "status": "partial_full_text",
           "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
+          "final_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom"
+        },
+        {
+          "status": "candidate_budget_exhausted",
+          "retryable": false,
+          "stage": "retrieval",
+          "candidates_attempted": 1
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T23:24:24.813704+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-24T03:35:00.895669+00:00",
+      "document": {
+        "source_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 3,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 53,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 168,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 17,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 31,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 264,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 290,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 345,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 486,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 434,
+            "has_text": true
+          },
+          {
+            "unit": 13,
+            "characters": 656,
+            "has_text": true
+          },
+          {
+            "unit": 14,
+            "characters": 21,
+            "has_text": true
+          },
+          {
+            "unit": 15,
+            "characters": 315,
+            "has_text": true
+          },
+          {
+            "unit": 16,
+            "characters": 336,
+            "has_text": true
+          },
+          {
+            "unit": 17,
+            "characters": 304,
+            "has_text": true
+          },
+          {
+            "unit": 18,
+            "characters": 360,
+            "has_text": true
+          },
+          {
+            "unit": 19,
+            "characters": 392,
+            "has_text": true
+          },
+          {
+            "unit": 20,
+            "characters": 240,
+            "has_text": true
+          },
+          {
+            "unit": 21,
+            "characters": 338,
+            "has_text": true
+          },
+          {
+            "unit": 22,
+            "characters": 517,
+            "has_text": true
+          },
+          {
+            "unit": 23,
+            "characters": 224,
+            "has_text": true
+          },
+          {
+            "unit": 24,
+            "characters": 366,
+            "has_text": true
+          },
+          {
+            "unit": 25,
+            "characters": 225,
+            "has_text": true
+          },
+          {
+            "unit": 26,
+            "characters": 160,
+            "has_text": true
+          },
+          {
+            "unit": 27,
+            "characters": 19,
+            "has_text": true
+          },
+          {
+            "unit": 28,
+            "characters": 607,
+            "has_text": true
+          },
+          {
+            "unit": 29,
+            "characters": 598,
+            "has_text": true
+          },
+          {
+            "unit": 30,
+            "characters": 220,
+            "has_text": true
+          },
+          {
+            "unit": 31,
+            "characters": 464,
+            "has_text": true
+          },
+          {
+            "unit": 32,
+            "characters": 589,
+            "has_text": true
+          },
+          {
+            "unit": 33,
+            "characters": 20,
+            "has_text": true
+          },
+          {
+            "unit": 34,
+            "characters": 152,
+            "has_text": true
+          },
+          {
+            "unit": 35,
+            "characters": 489,
+            "has_text": true
+          },
+          {
+            "unit": 36,
+            "characters": 424,
+            "has_text": true
+          },
+          {
+            "unit": 37,
+            "characters": 376,
+            "has_text": true
+          },
+          {
+            "unit": 38,
+            "characters": 376,
+            "has_text": true
+          },
+          {
+            "unit": 39,
+            "characters": 286,
+            "has_text": true
+          },
+          {
+            "unit": 40,
+            "characters": 18,
+            "has_text": true
+          },
+          {
+            "unit": 41,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 42,
+            "characters": 53,
+            "has_text": true
+          },
+          {
+            "unit": 43,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 44,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 45,
+            "characters": 64,
+            "has_text": true
+          },
+          {
+            "unit": 46,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 47,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 48,
+            "characters": 49,
+            "has_text": true
+          },
+          {
+            "unit": 49,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 50,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 51,
+            "characters": 94,
+            "has_text": true
+          },
+          {
+            "unit": 52,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 53,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 54,
+            "characters": 58,
+            "has_text": true
+          },
+          {
+            "unit": 55,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 56,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 57,
+            "characters": 65,
+            "has_text": true
+          },
+          {
+            "unit": 58,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 59,
+            "characters": 18,
+            "has_text": true
+          },
+          {
+            "unit": 60,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 61,
+            "characters": 53,
+            "has_text": true
+          },
+          {
+            "unit": 62,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 63,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 64,
+            "characters": 64,
+            "has_text": true
+          },
+          {
+            "unit": 65,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 66,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 67,
+            "characters": 49,
+            "has_text": true
+          },
+          {
+            "unit": 68,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 69,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 70,
+            "characters": 94,
+            "has_text": true
+          },
+          {
+            "unit": 71,
+            "characters": 12,
+            "has_text": true
+          },
+          {
+            "unit": 72,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 73,
+            "characters": 58,
+            "has_text": true
+          },
+          {
+            "unit": 74,
+            "characters": 10,
+            "has_text": true
+          },
+          {
+            "unit": 75,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 76,
+            "characters": 65,
+            "has_text": true
+          },
+          {
+            "unit": 77,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 78,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 79,
+            "characters": 8,
+            "has_text": true
+          },
+          {
+            "unit": 80,
+            "characters": 104,
+            "has_text": true
+          },
+          {
+            "unit": 81,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 82,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 83,
+            "characters": 14,
+            "has_text": true
+          },
+          {
+            "unit": 84,
+            "characters": 53,
+            "has_text": true
+          },
+          {
+            "unit": 85,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 86,
+            "characters": 7,
+            "has_text": true
+          },
+          {
+            "unit": 87,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 88,
+            "characters": 54,
+            "has_text": true
+          },
+          {
+            "unit": 89,
+            "characters": 15,
+            "has_text": true
+          },
+          {
+            "unit": 90,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 91,
+            "characters": 21,
+            "has_text": true
+          },
+          {
+            "unit": 92,
+            "characters": 65,
+            "has_text": true
+          },
+          {
+            "unit": 93,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 94,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 95,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 96,
+            "characters": 79,
+            "has_text": true
+          },
+          {
+            "unit": 97,
+            "characters": 11,
+            "has_text": true
+          },
+          {
+            "unit": 98,
+            "characters": 16,
+            "has_text": true
+          },
+          {
+            "unit": 99,
+            "characters": 23,
+            "has_text": true
+          },
+          {
+            "unit": 100,
+            "characters": 64,
+            "has_text": true
+          },
+          {
+            "unit": 101,
+            "characters": 14,
+            "has_text": true
+          },
+          {
+            "unit": 102,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 103,
+            "characters": 15,
+            "has_text": true
+          },
+          {
+            "unit": 104,
+            "characters": 56,
+            "has_text": true
+          },
+          {
+            "unit": 105,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 106,
+            "characters": 3,
+            "has_text": true
+          },
+          {
+            "unit": 107,
+            "characters": 14,
+            "has_text": true
+          },
+          {
+            "unit": 108,
+            "characters": 59,
+            "has_text": true
+          },
+          {
+            "unit": 109,
+            "characters": 9,
+            "has_text": true
+          },
+          {
+            "unit": 110,
+            "characters": 4,
+            "has_text": true
+          },
+          {
+            "unit": 111,
+            "characters": 13,
+            "has_text": true
+          },
+          {
+            "unit": 112,
+            "characters": 66,
+            "has_text": true
+          },
+          {
+            "unit": 113,
+            "characters": 10,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 53
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 168
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 17
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 31
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 264
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 290
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 345
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 486
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 434
+              },
+              {
+                "unit": 13,
+                "start": 0,
+                "end": 656
+              },
+              {
+                "unit": 14,
+                "start": 0,
+                "end": 21
+              },
+              {
+                "unit": 15,
+                "start": 0,
+                "end": 315
+              },
+              {
+                "unit": 16,
+                "start": 0,
+                "end": 336
+              },
+              {
+                "unit": 17,
+                "start": 0,
+                "end": 304
+              },
+              {
+                "unit": 18,
+                "start": 0,
+                "end": 360
+              },
+              {
+                "unit": 19,
+                "start": 0,
+                "end": 392
+              },
+              {
+                "unit": 20,
+                "start": 0,
+                "end": 240
+              },
+              {
+                "unit": 21,
+                "start": 0,
+                "end": 338
+              },
+              {
+                "unit": 22,
+                "start": 0,
+                "end": 364
+              },
+              {
+                "unit": 22,
+                "start": 364,
+                "end": 373
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 22,
+                "start": 373,
+                "end": 517
+              },
+              {
+                "unit": 23,
+                "start": 0,
+                "end": 224
+              },
+              {
+                "unit": 24,
+                "start": 0,
+                "end": 366
+              },
+              {
+                "unit": 25,
+                "start": 0,
+                "end": 225
+              },
+              {
+                "unit": 26,
+                "start": 0,
+                "end": 160
+              },
+              {
+                "unit": 27,
+                "start": 0,
+                "end": 19
+              },
+              {
+                "unit": 28,
+                "start": 0,
+                "end": 607
+              },
+              {
+                "unit": 29,
+                "start": 0,
+                "end": 598
+              },
+              {
+                "unit": 30,
+                "start": 0,
+                "end": 220
+              },
+              {
+                "unit": 31,
+                "start": 0,
+                "end": 464
+              },
+              {
+                "unit": 32,
+                "start": 0,
+                "end": 589
+              },
+              {
+                "unit": 33,
+                "start": 0,
+                "end": 20
+              },
+              {
+                "unit": 34,
+                "start": 0,
+                "end": 152
+              },
+              {
+                "unit": 35,
+                "start": 0,
+                "end": 489
+              },
+              {
+                "unit": 36,
+                "start": 0,
+                "end": 424
+              },
+              {
+                "unit": 37,
+                "start": 0,
+                "end": 376
+              },
+              {
+                "unit": 38,
+                "start": 0,
+                "end": 376
+              },
+              {
+                "unit": 39,
+                "start": 0,
+                "end": 30
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 39,
+                "start": 30,
+                "end": 286
+              },
+              {
+                "unit": 40,
+                "start": 0,
+                "end": 18
+              },
+              {
+                "unit": 41,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 42,
+                "start": 0,
+                "end": 53
+              },
+              {
+                "unit": 43,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 44,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 45,
+                "start": 0,
+                "end": 64
+              },
+              {
+                "unit": 46,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 47,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 48,
+                "start": 0,
+                "end": 49
+              },
+              {
+                "unit": 49,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 50,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 51,
+                "start": 0,
+                "end": 94
+              },
+              {
+                "unit": 52,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 53,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 54,
+                "start": 0,
+                "end": 58
+              },
+              {
+                "unit": 55,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 56,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 57,
+                "start": 0,
+                "end": 65
+              },
+              {
+                "unit": 58,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 59,
+                "start": 0,
+                "end": 18
+              },
+              {
+                "unit": 60,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 61,
+                "start": 0,
+                "end": 53
+              },
+              {
+                "unit": 62,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 63,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 64,
+                "start": 0,
+                "end": 64
+              },
+              {
+                "unit": 65,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 66,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 67,
+                "start": 0,
+                "end": 49
+              },
+              {
+                "unit": 68,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 69,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 70,
+                "start": 0,
+                "end": 94
+              },
+              {
+                "unit": 71,
+                "start": 0,
+                "end": 12
+              },
+              {
+                "unit": 72,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 73,
+                "start": 0,
+                "end": 58
+              },
+              {
+                "unit": 74,
+                "start": 0,
+                "end": 10
+              },
+              {
+                "unit": 75,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 76,
+                "start": 0,
+                "end": 65
+              },
+              {
+                "unit": 77,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 78,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 79,
+                "start": 0,
+                "end": 8
+              },
+              {
+                "unit": 80,
+                "start": 0,
+                "end": 104
+              },
+              {
+                "unit": 81,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 82,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 83,
+                "start": 0,
+                "end": 14
+              },
+              {
+                "unit": 84,
+                "start": 0,
+                "end": 53
+              },
+              {
+                "unit": 85,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 86,
+                "start": 0,
+                "end": 7
+              },
+              {
+                "unit": 87,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 88,
+                "start": 0,
+                "end": 54
+              },
+              {
+                "unit": 89,
+                "start": 0,
+                "end": 15
+              },
+              {
+                "unit": 90,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 91,
+                "start": 0,
+                "end": 21
+              },
+              {
+                "unit": 92,
+                "start": 0,
+                "end": 65
+              },
+              {
+                "unit": 93,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 94,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 95,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 96,
+                "start": 0,
+                "end": 79
+              },
+              {
+                "unit": 97,
+                "start": 0,
+                "end": 11
+              },
+              {
+                "unit": 98,
+                "start": 0,
+                "end": 16
+              },
+              {
+                "unit": 99,
+                "start": 0,
+                "end": 23
+              },
+              {
+                "unit": 100,
+                "start": 0,
+                "end": 64
+              },
+              {
+                "unit": 101,
+                "start": 0,
+                "end": 14
+              },
+              {
+                "unit": 102,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 103,
+                "start": 0,
+                "end": 15
+              },
+              {
+                "unit": 104,
+                "start": 0,
+                "end": 56
+              },
+              {
+                "unit": 105,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 106,
+                "start": 0,
+                "end": 3
+              },
+              {
+                "unit": 107,
+                "start": 0,
+                "end": 14
+              },
+              {
+                "unit": 108,
+                "start": 0,
+                "end": 59
+              },
+              {
+                "unit": 109,
+                "start": 0,
+                "end": 9
+              },
+              {
+                "unit": 110,
+                "start": 0,
+                "end": 4
+              },
+              {
+                "unit": 111,
+                "start": 0,
+                "end": 13
+              },
+              {
+                "unit": 112,
+                "start": 0,
+                "end": 66
+              },
+              {
+                "unit": 113,
+                "start": 0,
+                "end": 10
+              }
+            ]
+          }
+        ],
+        "evidence_status": "partial_full_text",
+        "html_completeness": "not_verified",
+        "characters_retrieved": 13346,
+        "units_retrieved": 113,
+        "source_sha256": "f7c1fbb611c39faf58384f18627d55f0f7eb66b11790f5d3b1fe6890315ca3e0",
+        "html_extraction_version": "article-body-v3"
+      },
+      "document_evidence": {
+        "status": "partial_full_text",
+        "retryable": false,
+        "stage": "article",
+        "provider": "original_article",
+        "url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom",
+        "final_url": "https://www.edsurge.com/news/ai-has-a-place-in-education-just-not-in-my-classroom"
+      },
+      "last_outcome": "partial_full_text"
     },
     "b6cea36ea9d42711cf3a982eaf6f231c6da90670b0ea466a709a91b5adffc26b": {
       "fingerprint": "8267e1b51d0364dadc06fe9873c965c998146a6dd2596290428b3055afa99078",
@@ -11224,49 +11249,39 @@
       "last_attempt_at": "2026-11-26T23:20:11.635108+00:00",
       "last_outcome": "source_unavailable"
     },
-    "14547d59416c782b8f9b593b33b45443d2ec997529a3d453e11b9b7ecdcd8a2a": {
-      "fingerprint": "dffc0eed537a98e6076d068cf57b59b52ef4a889304f185f6c9598770ea1f92c",
+    "0b756237ec754529ab88fbde7c0021aab323a097b10caafaca8542edc2008cb8": {
+      "fingerprint": "81dac9fb427b68569efe7ddd53bebc30de64b153bb4b839b65faa309a24b6952",
       "kind": "scholarly",
-      "published": "2026-11-16",
-      "source_url": "https://doi.org/10.2196/85709",
+      "published": "2026-11-17",
+      "source_url": "https://doi.org/10.3389/fcomm.2026.1989557",
       "status": "pending_routes",
       "complete": false,
       "attempts": 1,
       "cursor": {
-        "known": 1,
-        "provider": 0,
+        "known": 0,
+        "provider": 1,
         "provider_tried": []
       },
-      "tried_sources": [
-        "34b8ec04f8f18cdff7e98b229e318afd4cb51e3c78aa90db8a193618f141c4e0"
-      ],
+      "tried_sources": [],
       "plan": {
         "provider_plan_version": 2,
-        "known_routes": [
-          "bd2d64a587de8085c7286c5acaa60b7b1953bb4bddf91a2120e0ca8b8da013c6"
-        ],
+        "known_routes": [],
         "known_sources_only": false,
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
       "diagnostics": [
         {
-          "status": "access_challenge_not_article",
+          "status": "no_exact_match",
           "retryable": false,
-          "stage": "article",
-          "provider": "existing_source",
-          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13773514/"
-        },
-        {
-          "status": "candidate_budget_exhausted",
-          "retryable": false,
-          "stage": "retrieval",
-          "candidates_attempted": 1
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
       "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
-      "last_outcome": "access_blocked"
+      "last_outcome": "source_unavailable"
     },
     "8c764035fb3efd6ddfba1dd101a16d9271af2b6879ea8391375c7b7fc25d037f": {
       "fingerprint": "a8186ca7e2db44a7220cf8748cff994ad7bd792188451ecc9f485adc9b060f3b",
@@ -11443,11 +11458,11 @@
         }
       }
     },
-    "c4816ec401d0cf89980467ebb64757504ab51871e44ddaeca2790c5322a41a32": {
-      "fingerprint": "58f8d0ecd72d462bba422387eccc9bd3341427e3520b8626b28cfcd43949b447",
+    "eaa3e966372873495c7ec0cdd952132753913885a79626bd278ef47caffd82b4": {
+      "fingerprint": "8131bbef17a00c5b0e1e902b271b2270d2b8baf847fdeb7c526b41e154735938",
       "kind": "scholarly",
-      "published": "2026-11-16",
-      "source_url": "https://doi.org/10.29011/2577-1442.100188",
+      "published": "2026-11-17",
+      "source_url": "https://doi.org/10.3389/fanim.2026.1980049",
       "status": "pending_routes",
       "complete": false,
       "attempts": 1,
@@ -11474,7 +11489,7 @@
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-25T23:24:24.813704+00:00",
       "last_outcome": "source_unavailable"
     },
     "3915dcac1f041adf2ca7092ff958c482ab64206781fb7f9d20b9b39a64073710": {
@@ -12035,11 +12050,11 @@
       "last_attempt_at": "2026-11-27T11:08:22.718160+00:00",
       "last_outcome": "source_unavailable"
     },
-    "5232f93714d2e148bad6329a56f03cfdfcfe5b8804580e3e292a79359736570b": {
-      "fingerprint": "19fe437454e0ab8562654502fcb1bb1a299953fb1e1ef820436dfe9536682785",
+    "1a8efebcd65dfde5273920f70a2bfdaabb86911081fd5049cdbcb481a81d367d": {
+      "fingerprint": "a64a6d10ec33a443d4a6ba1ab49c7b17314b3c87ca3f6699c6aad3f39cd17e10",
       "kind": "scholarly",
       "published": "2026-11-16",
-      "source_url": "https://doi.org/10.3389/fdgth.2026.1987514",
+      "source_url": "https://doi.org/10.1088/1758-5090/aeb728",
       "status": "pending",
       "complete": false,
       "attempts": 0,
@@ -12059,43 +12074,29 @@
       "diagnostics": [],
       "source_text_saved": false
     },
-    "ae5ca98efeb06209e4ab5f8c4e3552fc73d6c78a45592e58016d2803ccc9d89f": {
-      "fingerprint": "ccdb1b515b76ec0292801d367f40408faddac304d36317fe54073b51fd7867a7",
-      "kind": "nonacademic",
+    "325e363cfdf1b4a1592b0e81dee963ef3e8673f0c3bfa52708c294ce89cd1b7c": {
+      "fingerprint": "3472a51ca8e18126488dbd088f64235095539d02876a72283ff81b49cfc7da61",
+      "kind": "scholarly",
       "published": "2026-11-16",
-      "source_url": "https://www.apa.org/pubs/reports/ai-workforce",
-      "status": "source_unavailable",
-      "complete": true,
-      "attempts": 1,
+      "source_url": "https://doi.org/10.1108/jices-08-2025-0229",
+      "status": "pending",
+      "complete": false,
+      "attempts": 0,
       "cursor": {
-        "known": 1,
+        "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [
-        "6959d2e38438a361aa6146a3e10af76474069377a2f7579ae6efd975f58907ab"
-      ],
+      "tried_sources": [],
       "plan": {
         "provider_plan_version": 2,
-        "known_routes": [
-          "3964248643f088127837893a3da3b908568ff6a2a1dafc5270286641bf71e909"
-        ],
+        "known_routes": [],
         "known_sources_only": false,
-        "doi_lookup_permitted": false
+        "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "host_requires_review",
-          "retryable": false,
-          "stage": "article",
-          "provider": "original_article",
-          "url": "https://www.apa.org/pubs/reports/ai-workforce"
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:48:01.620762+00:00",
-      "last_outcome": "source_unavailable"
+      "diagnostics": [],
+      "source_text_saved": false
     },
     "96fea0d206cb1441a82b7e600b9243b894cc591b2fc29c12eb42dced76cccf6c": {
       "fingerprint": "6a3b9e746126aab9a9cb9d57ad7b8500eed3d98a9bf931443a8140274e1b5c05",
@@ -12216,6 +12217,199 @@
       "last_outcome": "temporarily_unavailable",
       "next_retry_at": "2026-11-25T12:37:09.982146+00:00"
     },
+    "5232f93714d2e148bad6329a56f03cfdfcfe5b8804580e3e292a79359736570b": {
+      "fingerprint": "19fe437454e0ab8562654502fcb1bb1a299953fb1e1ef820436dfe9536682785",
+      "kind": "scholarly",
+      "published": "2026-11-16",
+      "source_url": "https://doi.org/10.3389/fdgth.2026.1987514",
+      "status": "pending",
+      "complete": false,
+      "attempts": 0,
+      "cursor": {
+        "known": 0,
+        "provider": 0,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [],
+      "source_text_saved": false
+    },
+    "62c8130ba599d87aa2bdc9b84be28632633076bbcb3a9ca7f8b6706a3477f595": {
+      "fingerprint": "168a0421b20be8ead910f5b6871d69afd627423c9ffe5aa422774275fe9f2b38",
+      "kind": "scholarly",
+      "published": "2026-11-16",
+      "source_url": "https://doi.org/10.3389/frbis.2026.1953438",
+      "status": "pending",
+      "complete": false,
+      "attempts": 0,
+      "cursor": {
+        "known": 0,
+        "provider": 0,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [],
+      "source_text_saved": false
+    },
+    "355c6b49500d2f56dec392d3bb87cbb9995fe36e683948b663ce8658eff45ee8": {
+      "fingerprint": "fe56874c0ce6aad883137703897bade8013af30438dfdc6c0c8dcd1b4f54a17d",
+      "kind": "scholarly",
+      "published": "2026-11-18",
+      "source_url": "https://doi.org/10.34190/icair.7.1.5694",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "3f8aefc8ad869ffa73e5a4c778317dff70250a5d0133d99c4afecf194a7ec3b8": {
+      "fingerprint": "a8d9c35ee44e402265b533211f0466a026bced65aeb37000cf110aa52f102ec5",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.61784/erhd3068",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 2,
+      "cursor": {
+        "known": 0,
+        "provider": 2,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "332738cdf5a44d4ea7f41eb9c8fc683ab4fe96cd9eb4fe999c8dbcdfcaa0244e": {
+      "fingerprint": "bd67e4f2cfd041406b09fb05523c7aa2a8321c3d23452f46f62155d4385a6656",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.38124/ijisrt/26nov493",
+      "status": "temporarily_unavailable",
+      "complete": false,
+      "attempts": 3,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [
+        "bbedddc6712d87d69d9d6671a144212b58e1891b328c2fb7146aea1e319fe72c"
+      ],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        },
+        {
+          "status": "candidates",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Semantic Scholar",
+          "candidates": 1
+        },
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "Semantic Scholar",
+          "url": "https://www.ijisrt.com/assets/upload/files/IJISRT26NOV493.pdf"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
+      "last_outcome": "source_unavailable",
+      "provider_attempted_at": "2026-11-24T03:35:00.895669+00:00",
+      "next_retry_at": "2026-11-24T04:36:33.671381+00:00",
+      "provider_fallbacks": {
+        "3": {
+          "complete": true,
+          "tried_sources": [
+            "bbedddc6712d87d69d9d6671a144212b58e1891b328c2fb7146aea1e319fe72c"
+          ],
+          "status": "exhausted",
+          "attempted_at": "2026-11-26T23:15:50.712820+00:00"
+        }
+      }
+    },
     "6f8b98fed142bad888de7f746fbe1c5fd6971917e87d6e98b081ca0c5072dac6": {
       "fingerprint": "2ff62c5f658e448189b6bd8c5c28658e981a46c2490b74ec944f816199a53b08",
       "kind": "scholarly",
@@ -12267,6 +12461,513 @@
           "attempted_at": "2026-11-27T11:08:22.718160+00:00"
         }
       }
+    },
+    "14547d59416c782b8f9b593b33b45443d2ec997529a3d453e11b9b7ecdcd8a2a": {
+      "fingerprint": "dffc0eed537a98e6076d068cf57b59b52ef4a889304f185f6c9598770ea1f92c",
+      "kind": "scholarly",
+      "published": "2026-11-16",
+      "source_url": "https://doi.org/10.2196/85709",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 1,
+        "provider": 0,
+        "provider_tried": []
+      },
+      "tried_sources": [
+        "34b8ec04f8f18cdff7e98b229e318afd4cb51e3c78aa90db8a193618f141c4e0"
+      ],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [
+          "bd2d64a587de8085c7286c5acaa60b7b1953bb4bddf91a2120e0ca8b8da013c6"
+        ],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "access_challenge_not_article",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13773514/"
+        },
+        {
+          "status": "candidate_budget_exhausted",
+          "retryable": false,
+          "stage": "retrieval",
+          "candidates_attempted": 1
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
+      "last_outcome": "access_blocked"
+    },
+    "a8b6c9b0e7408a6d83cbd7e4f77435acf4d93eaa88834fa13e11434793d39088": {
+      "fingerprint": "75929d5a821c41fc0f380f50afb0ee1b8f1b81ea7d8d2316a3ff8c8be9b89c8e",
+      "kind": "scholarly",
+      "published": "2026-11-18",
+      "source_url": "https://doi.org/10.48175/ijarsct-40829",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "ff1e08a1a1b9436e762a69305fecae22881cdc58082f2c2c5cc0074335892b35": {
+      "fingerprint": "13f66eac8915a26b4b7aa6a4fe565e9ca1c8a2a1255249e233979a78a0d512f5",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.1093/9780197824818.003.0013",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T23:25:38.169627+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "cfa3aa4ae35d26a83c7e79b85771d6edd08e177f2f45e04b7d6b1eb1523e78f8": {
+      "fingerprint": "a52254ada717691108a8415940d2777f37a3f234f92eee4958810895403e595c",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.47191/jefms/v9-i11-33",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T11:35:54.660648+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "0854c183d5874b4aac8c5c22030376d1a3ef74b08a4d54b490245ad18b052944": {
+      "fingerprint": "33c055eef4406a07720ab5181a88430eae2a5cf7f9aa8dabde4b1fb3a5ad01b1",
+      "kind": "scholarly",
+      "published": "2026-11-16",
+      "source_url": "https://doi.org/10.29333/pr/19963",
+      "status": "temporarily_unavailable",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 0,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0,
+          "retry_after_seconds": 3600
+        }
+      ],
+      "source_text_saved": false,
+      "provider_attempted_at": "2026-11-26T11:04:10.959474+00:00",
+      "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "next_retry_at": "2026-11-26T12:04:47.524746+00:00"
+    },
+    "c4816ec401d0cf89980467ebb64757504ab51871e44ddaeca2790c5322a41a32": {
+      "fingerprint": "58f8d0ecd72d462bba422387eccc9bd3341427e3520b8626b28cfcd43949b447",
+      "kind": "scholarly",
+      "published": "2026-11-16",
+      "source_url": "https://doi.org/10.29011/2577-1442.100188",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "e3b0a2361489103238141cbf4cae42ec7b63b49686c878612dc3f77c24987316": {
+      "fingerprint": "c50f8e4e44eb38228570846d7a538abfdc05dead2dcc707e603aac59451f1b5c",
+      "kind": "scholarly",
+      "published": "2026-11-18",
+      "source_url": "https://doi.org/10.1145/3861024",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T23:24:24.813704+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "e77c58c2d3c710a960e4b7e508faa835a1343cc91073a159f65c6fc0ea48e9c9": {
+      "fingerprint": "7cfc8abd453af926bd7ecd908350f1738c4bd98703951b98c0f14963661aecaf",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.1071/ma26067",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T23:24:24.813704+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "c8c00074ad26e3b9bd179b473506daf37ba3f5e3c6a2d2a71bf78d45d8cee52d": {
+      "fingerprint": "6ec02d5fd65b6ab53b767ef7fda9c05644451680454c00762dbd2c132d27727c",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.55041/isjem08759",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T11:35:54.660648+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "d36bda53a8f984adf5ff692d3bbc7ecde0e08699c58ac233b6bb77e7450dab74": {
+      "fingerprint": "d867db34373e57f25be8d30dea69432007e1505ad43f28cc7ffb85019278fdc0",
+      "kind": "scholarly",
+      "published": "2026-11-16",
+      "source_url": "https://doi.org/10.5861/ijrse.2026.26460",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-25T11:43:28.503972+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "ae5ca98efeb06209e4ab5f8c4e3552fc73d6c78a45592e58016d2803ccc9d89f": {
+      "fingerprint": "ccdb1b515b76ec0292801d367f40408faddac304d36317fe54073b51fd7867a7",
+      "kind": "nonacademic",
+      "published": "2026-11-16",
+      "source_url": "https://www.apa.org/pubs/reports/ai-workforce",
+      "status": "source_unavailable",
+      "complete": true,
+      "attempts": 1,
+      "cursor": {
+        "known": 1,
+        "provider": 0,
+        "provider_tried": []
+      },
+      "tried_sources": [
+        "6959d2e38438a361aa6146a3e10af76474069377a2f7579ae6efd975f58907ab"
+      ],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [
+          "3964248643f088127837893a3da3b908568ff6a2a1dafc5270286641bf71e909"
+        ],
+        "known_sources_only": false,
+        "doi_lookup_permitted": false
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "host_requires_review",
+          "retryable": false,
+          "stage": "article",
+          "provider": "original_article",
+          "url": "https://www.apa.org/pubs/reports/ai-workforce"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-24T23:48:01.620762+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "46ec54588323310514bfc2ab7405bf5b9e91d063f60a8b67a4f73cd2d0ea46af": {
+      "fingerprint": "02612f257811fd498e5efacae2c596112086833bcd16c23e8c4f122370fe65ce",
+      "kind": "scholarly",
+      "published": "2026-11-18",
+      "source_url": "https://doi.org/10.32782/tnu-2707-0581/2026.5/08",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 1,
+      "cursor": {
+        "known": 0,
+        "provider": 1,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T23:20:11.635108+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "810dfac3a0ad57820b85649277b2ad2751574ecc707d90514407f3c753debac9": {
+      "fingerprint": "488458f8362fe16d5767649baeb8c70b232cd709c07a06de55ff3983b803371b",
+      "kind": "scholarly",
+      "published": "2026-11-19",
+      "source_url": "https://doi.org/10.1108/imds-05-2026-0991",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 2,
+      "cursor": {
+        "known": 0,
+        "provider": 2,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-27T11:24:59.832044+00:00",
+      "last_outcome": "source_unavailable"
+    },
+    "4c9143ae18fff2c413812f5bc1fffa2ed65bf541e553137eb6ec431b01e36b09": {
+      "fingerprint": "2db119f635ae2fcdcc661ee641362ac4ab4df25aa47d5f1840484398f6219624",
+      "kind": "scholarly",
+      "published": "2026-11-18",
+      "source_url": "https://doi.org/10.1021/acs.jchemed.6c01330",
+      "status": "pending_routes",
+      "complete": false,
+      "attempts": 2,
+      "cursor": {
+        "known": 0,
+        "provider": 2,
+        "provider_tried": []
+      },
+      "tried_sources": [],
+      "plan": {
+        "provider_plan_version": 2,
+        "known_routes": [],
+        "known_sources_only": false,
+        "doi_lookup_permitted": true
+      },
+      "excluded_related_or_outside_window_routes": 0,
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-26T23:20:11.635108+00:00",
+      "last_outcome": "source_unavailable"
     },
     "1f8b60099a5997fc02d5d50a8fa93516a1a38dadc4888feb018f550b47fdf2f9": {
       "fingerprint": "68fd928ccb9cdba45560f62a49a5995a2f1d2374f8331b8faa1d3edbf069248b",
@@ -12629,532 +13330,6 @@
         }
       ]
     },
-    "355c6b49500d2f56dec392d3bb87cbb9995fe36e683948b663ce8658eff45ee8": {
-      "fingerprint": "fe56874c0ce6aad883137703897bade8013af30438dfdc6c0c8dcd1b4f54a17d",
-      "kind": "scholarly",
-      "published": "2026-11-18",
-      "source_url": "https://doi.org/10.34190/icair.7.1.5694",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "3f8aefc8ad869ffa73e5a4c778317dff70250a5d0133d99c4afecf194a7ec3b8": {
-      "fingerprint": "a8d9c35ee44e402265b533211f0466a026bced65aeb37000cf110aa52f102ec5",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.61784/erhd3068",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 2,
-      "cursor": {
-        "known": 0,
-        "provider": 2,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        },
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "OpenAIRE",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "332738cdf5a44d4ea7f41eb9c8fc683ab4fe96cd9eb4fe999c8dbcdfcaa0244e": {
-      "fingerprint": "bd67e4f2cfd041406b09fb05523c7aa2a8321c3d23452f46f62155d4385a6656",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.38124/ijisrt/26nov493",
-      "status": "temporarily_unavailable",
-      "complete": false,
-      "attempts": 3,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [
-        "bbedddc6712d87d69d9d6671a144212b58e1891b328c2fb7146aea1e319fe72c"
-      ],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        },
-        {
-          "status": "TimeoutError",
-          "retryable": true,
-          "stage": "discovery",
-          "provider": "OpenAIRE",
-          "candidates": 0,
-          "retry_after_seconds": 3600
-        },
-        {
-          "status": "candidates",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Semantic Scholar",
-          "candidates": 1
-        },
-        {
-          "status": "host_requires_review",
-          "retryable": false,
-          "stage": "article",
-          "provider": "Semantic Scholar",
-          "url": "https://www.ijisrt.com/assets/upload/files/IJISRT26NOV493.pdf"
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T23:15:50.712820+00:00",
-      "last_outcome": "source_unavailable",
-      "provider_attempted_at": "2026-11-24T03:35:00.895669+00:00",
-      "next_retry_at": "2026-11-24T04:36:33.671381+00:00",
-      "provider_fallbacks": {
-        "3": {
-          "complete": true,
-          "tried_sources": [
-            "bbedddc6712d87d69d9d6671a144212b58e1891b328c2fb7146aea1e319fe72c"
-          ],
-          "status": "exhausted",
-          "attempted_at": "2026-11-26T23:15:50.712820+00:00"
-        }
-      }
-    },
-    "0854c183d5874b4aac8c5c22030376d1a3ef74b08a4d54b490245ad18b052944": {
-      "fingerprint": "33c055eef4406a07720ab5181a88430eae2a5cf7f9aa8dabde4b1fb3a5ad01b1",
-      "kind": "scholarly",
-      "published": "2026-11-16",
-      "source_url": "https://doi.org/10.29333/pr/19963",
-      "status": "temporarily_unavailable",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 0,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "TimeoutError",
-          "retryable": true,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0,
-          "retry_after_seconds": 3600
-        }
-      ],
-      "source_text_saved": false,
-      "provider_attempted_at": "2026-11-26T11:04:10.959474+00:00",
-      "last_attempt_at": "2026-11-26T11:04:10.959474+00:00",
-      "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-26T12:04:47.524746+00:00"
-    },
-    "a8b6c9b0e7408a6d83cbd7e4f77435acf4d93eaa88834fa13e11434793d39088": {
-      "fingerprint": "75929d5a821c41fc0f380f50afb0ee1b8f1b81ea7d8d2316a3ff8c8be9b89c8e",
-      "kind": "scholarly",
-      "published": "2026-11-18",
-      "source_url": "https://doi.org/10.48175/ijarsct-40829",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
-      "cursor": {
-        "known": 0,
-        "provider": 0,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
-    },
-    "ff1e08a1a1b9436e762a69305fecae22881cdc58082f2c2c5cc0074335892b35": {
-      "fingerprint": "13f66eac8915a26b4b7aa6a4fe565e9ca1c8a2a1255249e233979a78a0d512f5",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.1093/9780197824818.003.0013",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T23:25:38.169627+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "cfa3aa4ae35d26a83c7e79b85771d6edd08e177f2f45e04b7d6b1eb1523e78f8": {
-      "fingerprint": "a52254ada717691108a8415940d2777f37a3f234f92eee4958810895403e595c",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.47191/jefms/v9-i11-33",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T11:35:54.660648+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "d36bda53a8f984adf5ff692d3bbc7ecde0e08699c58ac233b6bb77e7450dab74": {
-      "fingerprint": "d867db34373e57f25be8d30dea69432007e1505ad43f28cc7ffb85019278fdc0",
-      "kind": "scholarly",
-      "published": "2026-11-16",
-      "source_url": "https://doi.org/10.5861/ijrse.2026.26460",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T11:43:28.503972+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "e3b0a2361489103238141cbf4cae42ec7b63b49686c878612dc3f77c24987316": {
-      "fingerprint": "c50f8e4e44eb38228570846d7a538abfdc05dead2dcc707e603aac59451f1b5c",
-      "kind": "scholarly",
-      "published": "2026-11-18",
-      "source_url": "https://doi.org/10.1145/3861024",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T23:24:24.813704+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "e77c58c2d3c710a960e4b7e508faa835a1343cc91073a159f65c6fc0ea48e9c9": {
-      "fingerprint": "7cfc8abd453af926bd7ecd908350f1738c4bd98703951b98c0f14963661aecaf",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.1071/ma26067",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T23:24:24.813704+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "c8c00074ad26e3b9bd179b473506daf37ba3f5e3c6a2d2a71bf78d45d8cee52d": {
-      "fingerprint": "6ec02d5fd65b6ab53b767ef7fda9c05644451680454c00762dbd2c132d27727c",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.55041/isjem08759",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T11:35:54.660648+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "46ec54588323310514bfc2ab7405bf5b9e91d063f60a8b67a4f73cd2d0ea46af": {
-      "fingerprint": "02612f257811fd498e5efacae2c596112086833bcd16c23e8c4f122370fe65ce",
-      "kind": "scholarly",
-      "published": "2026-11-18",
-      "source_url": "https://doi.org/10.32782/tnu-2707-0581/2026.5/08",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 1,
-      "cursor": {
-        "known": 0,
-        "provider": 1,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T23:20:11.635108+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "810dfac3a0ad57820b85649277b2ad2751574ecc707d90514407f3c753debac9": {
-      "fingerprint": "488458f8362fe16d5767649baeb8c70b232cd709c07a06de55ff3983b803371b",
-      "kind": "scholarly",
-      "published": "2026-11-19",
-      "source_url": "https://doi.org/10.1108/imds-05-2026-0991",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 2,
-      "cursor": {
-        "known": 0,
-        "provider": 2,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        },
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "OpenAIRE",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-27T11:24:59.832044+00:00",
-      "last_outcome": "source_unavailable"
-    },
-    "4c9143ae18fff2c413812f5bc1fffa2ed65bf541e553137eb6ec431b01e36b09": {
-      "fingerprint": "2db119f635ae2fcdcc661ee641362ac4ab4df25aa47d5f1840484398f6219624",
-      "kind": "scholarly",
-      "published": "2026-11-18",
-      "source_url": "https://doi.org/10.1021/acs.jchemed.6c01330",
-      "status": "pending_routes",
-      "complete": false,
-      "attempts": 2,
-      "cursor": {
-        "known": 0,
-        "provider": 2,
-        "provider_tried": []
-      },
-      "tried_sources": [],
-      "plan": {
-        "provider_plan_version": 2,
-        "known_routes": [],
-        "known_sources_only": false,
-        "doi_lookup_permitted": true
-      },
-      "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "Europe PMC XML",
-          "candidates": 0
-        },
-        {
-          "status": "no_exact_match",
-          "retryable": false,
-          "stage": "discovery",
-          "provider": "OpenAIRE",
-          "candidates": 0
-        }
-      ],
-      "source_text_saved": false,
-      "last_attempt_at": "2026-11-26T23:20:11.635108+00:00",
-      "last_outcome": "source_unavailable"
-    },
     "abe1a862b4219616e6c7cc3fb35b9a73b9d4e557c4a026cb66df39ccdec18448": {
       "fingerprint": "c792df0ee7133b62d8837ca8da37fd7b69abafa7f314c6f5610a1384637b73da",
       "kind": "scholarly",
@@ -13162,10 +13337,10 @@
       "source_url": "https://doi.org/10.34190/icair.7.1.5255",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -13183,10 +13358,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:48:01.620762+00:00",
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
       "last_outcome": "source_unavailable"
     },
     "c334240928e3e67e00f54d0de798665a86324c7adb6be0e980597e26dd01ae22": {
@@ -15571,10 +15753,10 @@
       "source_url": "https://doi.org/10.37120/ijttl.2026.22.1.01",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -15592,10 +15774,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:48:01.620762+00:00",
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
       "last_outcome": "source_unavailable"
     },
     "e9c07792bddd1b1fee003055a4b7a5c962b187041ae15e6704e97178a9790d19": {
@@ -21128,7 +21317,7 @@
       "source_url": "https://doi.org/10.1145/3856802",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -21150,13 +21339,28 @@
           "provider": "Europe PMC XML",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T12:56:15.674550+00:00",
-      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
-      "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-24T13:57:14.170097+00:00"
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-24T13:57:14.170097+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-27T23:01:25.129467+00:00"
+        }
+      }
     },
     "6fd64c5be6f8a2a7d5b02e8422a279a3c3cc892c811362ca2fa9c3484711bbd4": {
       "fingerprint": "c7ed1856bdd36ef43c309ed6a19004b6c0d780e68395ab7ef6747562d617cdb4",
@@ -24740,10 +24944,10 @@
       "source_url": "https://doi.org/10.21203/rs.3.rs-11727541/v1",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -24761,10 +24965,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T12:56:15.674550+00:00",
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
       "last_outcome": "source_unavailable"
     },
     "cb31c609e11ac10d787db987b737e02347e852def2ff519d47ef56d681070aa8": {
@@ -26600,7 +26811,7 @@
       "source_url": "https://doi.org/10.54097/kv51qy58",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -26622,13 +26833,28 @@
           "provider": "Europe PMC XML",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:48:01.620762+00:00",
-      "last_attempt_at": "2026-11-24T23:48:01.620762+00:00",
-      "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:48:40.470108+00:00"
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
+      "last_outcome": "source_unavailable",
+      "next_retry_at": "2026-11-25T00:48:40.470108+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": true,
+          "tried_sources": [],
+          "status": "exhausted",
+          "attempted_at": "2026-11-27T23:01:25.129467+00:00"
+        }
+      }
     },
     "617faa2dfc4a2b2c46df5ea94e9694f6d4d1ab5cb263265282f9c2bf4a67d875": {
       "fingerprint": "2d6d2995516650f8da6afac481c5e2da2cf3dc5e2031de2a95dd86cd0259ceea",
@@ -26910,15 +27136,17 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.3389/fpsyg.2026.1870626",
-      "status": "pending",
-      "complete": false,
-      "attempts": 0,
+      "status": "full_document_retrieved_not_reviewed",
+      "complete": true,
+      "attempts": 1,
       "cursor": {
         "known": 0,
         "provider": 0,
         "provider_tried": []
       },
-      "tried_sources": [],
+      "tried_sources": [
+        "288b5b05d7dc096539043f5a6b48d9df3d4a80d662a76c0d19c293702227ff89"
+      ],
       "plan": {
         "provider_plan_version": 2,
         "known_routes": [
@@ -26928,8 +27156,466 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "full_document_retrieved",
+          "retryable": false,
+          "stage": "article",
+          "provider": "existing_source",
+          "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1870626/full",
+          "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1870626/pdf"
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
+      "document": {
+        "source_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1870626/pdf",
+        "document_version": "unspecified",
+        "semantic_completeness": "not_verified",
+        "review_status": "not_reviewed",
+        "source_text_saved": false,
+        "redistribution_granted": false,
+        "all_retrieved_text_chunked": true,
+        "chunks_total": 12,
+        "units": [
+          {
+            "unit": 1,
+            "characters": 3598,
+            "has_text": true
+          },
+          {
+            "unit": 2,
+            "characters": 6809,
+            "has_text": true
+          },
+          {
+            "unit": 3,
+            "characters": 4455,
+            "has_text": true
+          },
+          {
+            "unit": 4,
+            "characters": 5298,
+            "has_text": true
+          },
+          {
+            "unit": 5,
+            "characters": 6598,
+            "has_text": true
+          },
+          {
+            "unit": 6,
+            "characters": 3232,
+            "has_text": true
+          },
+          {
+            "unit": 7,
+            "characters": 3861,
+            "has_text": true
+          },
+          {
+            "unit": 8,
+            "characters": 4639,
+            "has_text": true
+          },
+          {
+            "unit": 9,
+            "characters": 3586,
+            "has_text": true
+          },
+          {
+            "unit": 10,
+            "characters": 6360,
+            "has_text": true
+          },
+          {
+            "unit": 11,
+            "characters": 5191,
+            "has_text": true
+          },
+          {
+            "unit": 12,
+            "characters": 11162,
+            "has_text": true
+          }
+        ],
+        "chunk_intervals": [
+          {
+            "chunk": "C0001",
+            "ranges": [
+              {
+                "unit": 1,
+                "start": 0,
+                "end": 3598
+              },
+              {
+                "unit": 2,
+                "start": 0,
+                "end": 1864
+              },
+              {
+                "unit": 2,
+                "start": 1864,
+                "end": 1900
+              }
+            ]
+          },
+          {
+            "chunk": "C0002",
+            "ranges": [
+              {
+                "unit": 2,
+                "start": 1900,
+                "end": 6809
+              },
+              {
+                "unit": 3,
+                "start": 0,
+                "end": 581
+              },
+              {
+                "unit": 3,
+                "start": 581,
+                "end": 589
+              }
+            ]
+          },
+          {
+            "chunk": "C0003",
+            "ranges": [
+              {
+                "unit": 3,
+                "start": 589,
+                "end": 1853
+              },
+              {
+                "unit": 3,
+                "start": 1853,
+                "end": 1877
+              },
+              {
+                "unit": 3,
+                "start": 1877,
+                "end": 4455
+              },
+              {
+                "unit": 4,
+                "start": 0,
+                "end": 1626
+              },
+              {
+                "unit": 4,
+                "start": 1626,
+                "end": 1630
+              }
+            ]
+          },
+          {
+            "chunk": "C0004",
+            "ranges": [
+              {
+                "unit": 4,
+                "start": 1630,
+                "end": 5298
+              },
+              {
+                "unit": 5,
+                "start": 0,
+                "end": 1830
+              }
+            ]
+          },
+          {
+            "chunk": "C0005",
+            "ranges": [
+              {
+                "unit": 5,
+                "start": 1830,
+                "end": 6598
+              },
+              {
+                "unit": 6,
+                "start": 0,
+                "end": 81
+              },
+              {
+                "unit": 6,
+                "start": 81,
+                "end": 91
+              },
+              {
+                "unit": 6,
+                "start": 91,
+                "end": 713
+              },
+              {
+                "unit": 6,
+                "start": 713,
+                "end": 728
+              }
+            ]
+          },
+          {
+            "chunk": "C0006",
+            "ranges": [
+              {
+                "unit": 6,
+                "start": 728,
+                "end": 3232
+              },
+              {
+                "unit": 7,
+                "start": 0,
+                "end": 2985
+              },
+              {
+                "unit": 7,
+                "start": 2985,
+                "end": 2994
+              }
+            ]
+          },
+          {
+            "chunk": "C0007",
+            "ranges": [
+              {
+                "unit": 7,
+                "start": 2994,
+                "end": 3861
+              },
+              {
+                "unit": 8,
+                "start": 0,
+                "end": 4573
+              },
+              {
+                "unit": 8,
+                "start": 4573,
+                "end": 4631
+              }
+            ]
+          },
+          {
+            "chunk": "C0008",
+            "ranges": [
+              {
+                "unit": 8,
+                "start": 4631,
+                "end": 4639
+              },
+              {
+                "unit": 9,
+                "start": 0,
+                "end": 1128
+              },
+              {
+                "unit": 9,
+                "start": 1128,
+                "end": 1141
+              },
+              {
+                "unit": 9,
+                "start": 1141,
+                "end": 3586
+              },
+              {
+                "unit": 10,
+                "start": 0,
+                "end": 1858
+              },
+              {
+                "unit": 10,
+                "start": 1858,
+                "end": 1901
+              }
+            ]
+          },
+          {
+            "chunk": "C0009",
+            "ranges": [
+              {
+                "unit": 10,
+                "start": 1901,
+                "end": 3767
+              },
+              {
+                "unit": 10,
+                "start": 3767,
+                "end": 3779
+              },
+              {
+                "unit": 10,
+                "start": 3779,
+                "end": 6360
+              },
+              {
+                "unit": 11,
+                "start": 0,
+                "end": 981
+              },
+              {
+                "unit": 11,
+                "start": 981,
+                "end": 1037
+              }
+            ]
+          },
+          {
+            "chunk": "C0010",
+            "ranges": [
+              {
+                "unit": 11,
+                "start": 1037,
+                "end": 1297
+              },
+              {
+                "unit": 11,
+                "start": 1297,
+                "end": 1325
+              },
+              {
+                "unit": 11,
+                "start": 1325,
+                "end": 1636
+              },
+              {
+                "unit": 11,
+                "start": 1636,
+                "end": 1653
+              },
+              {
+                "unit": 11,
+                "start": 1653,
+                "end": 1975
+              },
+              {
+                "unit": 11,
+                "start": 1975,
+                "end": 1996
+              },
+              {
+                "unit": 11,
+                "start": 1996,
+                "end": 2214
+              },
+              {
+                "unit": 11,
+                "start": 2214,
+                "end": 2222
+              },
+              {
+                "unit": 11,
+                "start": 2222,
+                "end": 2662
+              },
+              {
+                "unit": 11,
+                "start": 2662,
+                "end": 2678
+              },
+              {
+                "unit": 11,
+                "start": 2678,
+                "end": 2753
+              },
+              {
+                "unit": 11,
+                "start": 2753,
+                "end": 2774
+              },
+              {
+                "unit": 11,
+                "start": 2774,
+                "end": 2949
+              },
+              {
+                "unit": 11,
+                "start": 2949,
+                "end": 2973
+              },
+              {
+                "unit": 11,
+                "start": 2973,
+                "end": 3526
+              },
+              {
+                "unit": 11,
+                "start": 3526,
+                "end": 3543
+              },
+              {
+                "unit": 11,
+                "start": 3543,
+                "end": 3894
+              },
+              {
+                "unit": 11,
+                "start": 3894,
+                "end": 3905
+              },
+              {
+                "unit": 11,
+                "start": 3905,
+                "end": 5191
+              },
+              {
+                "unit": 12,
+                "start": 0,
+                "end": 1319
+              },
+              {
+                "unit": 12,
+                "start": 1319,
+                "end": 1326
+              }
+            ]
+          },
+          {
+            "chunk": "C0011",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 1326,
+                "end": 6769
+              },
+              {
+                "unit": 12,
+                "start": 6769,
+                "end": 6825
+              }
+            ]
+          },
+          {
+            "chunk": "C0012",
+            "ranges": [
+              {
+                "unit": 12,
+                "start": 6825,
+                "end": 11162
+              }
+            ]
+          }
+        ],
+        "evidence_status": "full_document_retrieved",
+        "layout_fidelity": "not_verified",
+        "characters_retrieved": 64800,
+        "units_retrieved": 12,
+        "source_byte_count": 528578,
+        "pages_total": 12,
+        "pages_processed": 12,
+        "pages_with_text": 12,
+        "source_sha256": "de723994c6d9d60bf08874c4182af0d5412d713df1da7a08e6cbc30e511f950e",
+        "source_bytes_sha256": "f3af3ae7987e985608434496a6a62c73ecf281e341abeb497228d5bbf38384f9"
+      },
+      "document_evidence": {
+        "status": "full_document_retrieved",
+        "retryable": false,
+        "stage": "article",
+        "provider": "existing_source",
+        "url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1870626/full",
+        "final_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1870626/pdf"
+      },
+      "last_outcome": "full_document_retrieved"
     },
     "330112a06de95e1499ec9aa5a8b4d7460ce8f8ec736407813d3f36a5b18f649e": {
       "fingerprint": "16407649d5e58494f162a2188b634f846d83071aa4a4d442d1ff140989b1b4e6",
@@ -27142,10 +27828,10 @@
       "source_url": "https://doi.org/10.1007/s40998-026-01279-w",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
-        "provider": 1,
+        "provider": 2,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -27163,10 +27849,17 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:48:01.620762+00:00",
+      "last_attempt_at": "2026-11-27T23:01:25.129467+00:00",
       "last_outcome": "source_unavailable"
     },
     "3a997b92a947f27a16c8915a50a290f90e813acc51f749478825ad812367863f": {
@@ -27901,9 +28594,9 @@
       "source_text_saved": false
     }
   },
-  "cursor": 89,
+  "cursor": 108,
   "provider_pauses": {
-    "provider:CORE": "2026-11-27T06:49:48.895366+00:00",
+    "provider:CORE": "2026-11-27T23:57:10.197654+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
   },
   "access_controls": {
@@ -27986,7 +28679,7 @@
     ],
     "denied_providers": [],
     "provider_pauses": {
-      "provider:CORE": "2026-11-27T06:49:48.895366+00:00",
+      "provider:CORE": "2026-11-27T23:57:10.197654+00:00",
       "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
     }
   },
@@ -54359,22 +55052,22 @@
       "observed_at": "2026-11-25T23:24:24.813704+00:00"
     }
   ],
-  "input_fingerprint": "1c451c09fe364994732a5f92710c054df3a9568353cf3349ec6d8cfd9d3d4e67",
-  "state_sha256": "2f1e1c782759f304fd623d81e6d8ebb475a2a626540c82d1153b1d1a50423b2b",
+  "input_fingerprint": "54ca7e5e4c34727413d0d35ed0c68a5f9081f9b7062f525b4ff4e66110935cb8",
+  "state_sha256": "ae3882d2df1b91246cc315d0a794684d029d3ad09ae71909714bdc47ae2631bd",
   "run": {
-    "checked_at": "2026-11-27T11:24:59.832044+00:00",
-    "selected_records": 176,
+    "checked_at": "2026-11-27T23:01:25.129467+00:00",
+    "selected_records": 181,
     "attempted_records": 12,
     "attempted_stages": 12,
-    "completed_records": 21,
-    "pending_records": 155,
+    "completed_records": 22,
+    "pending_records": 159,
     "deferred_retry_records": 43,
     "statuses": {
       "access_blocked": 5,
-      "full_document_retrieved_not_reviewed": 9,
+      "full_document_retrieved_not_reviewed": 10,
       "partial_full_text_not_reviewed": 5,
       "pending": 17,
-      "pending_routes": 95,
+      "pending_routes": 99,
       "source_unavailable": 2,
       "temporarily_unavailable": 43
     },
@@ -54386,7 +55079,9 @@
     "time_budget_seconds": 540.0,
     "item_time_budget_seconds": 60.0,
     "max_candidates_per_provider_stage": 8,
-    "active_provider_pauses": {},
+    "active_provider_pauses": {
+      "provider:CORE": "2026-11-27T23:57:10.197654+00:00"
+    },
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
     "publication_or_review_performed": false
