@@ -3,34 +3,34 @@
   "kind": "preparation_reading_run",
   "phase": "closed",
   "reading_policy_version": 2,
-  "started_at": "2026-11-27T12:28:45.804869+00:00",
-  "finished_at": "2026-11-27T12:29:20.241075+00:00",
+  "started_at": "2026-11-27T22:56:46.191104+00:00",
+  "finished_at": "2026-11-27T22:58:42.936302+00:00",
   "publication_window": {
     "from": "2026-11-16",
     "to": "2026-11-22",
     "timezone": "UTC"
   },
   "bindings": {
-    "packet.json": "1d532e8d45f41ff13b4846f94198c5f705694fba4152de3e72e8160735d82fa6",
-    "acquisition.json": "3d239ec90ed4861f768d917db365a33b23bebfc6d9aa4b2cd7532450ffef578f",
-    "readings.json": "8c2d612766662a676fcdb2ab5612e6b2d3311e4596c164edf345246ba0ed2973"
+    "packet.json": "c5cd7ab2d75c61bfea402b35608f13addb6a77b951ca9b3c65c7933529672e4f",
+    "acquisition.json": "b8b7e00f438241fa63132b4cfb35aa99d76e2f791d27cbcbf3f0db5c5cfe6609",
+    "readings.json": "91a95ada1c8e818e265746d1aaf9686e047d4d669350c26088de1e92da499dbc"
   },
   "stages": {
     "acquire": {
-      "checked_at": "2026-11-27T12:28:46.304703+00:00",
-      "selected_records": 170,
+      "checked_at": "2026-11-27T22:56:46.783053+00:00",
+      "selected_records": 175,
       "attempted_records": 12,
       "attempted_stages": 12,
       "completed_records": 32,
-      "pending_records": 138,
-      "deferred_retry_records": 56,
+      "pending_records": 143,
+      "deferred_retry_records": 57,
       "statuses": {
         "access_blocked": 6,
         "full_document_retrieved_not_reviewed": 4,
         "partial_full_text_not_reviewed": 4,
-        "pending": 9,
-        "pending_routes": 73,
-        "rate_limited": 8,
+        "pending": 12,
+        "pending_routes": 74,
+        "rate_limited": 9,
         "source_unavailable": 18,
         "temporarily_unavailable": 48
       },
@@ -42,7 +42,9 @@
       "time_budget_seconds": 480,
       "item_time_budget_seconds": 60,
       "max_candidates_per_provider_stage": 8,
-      "active_provider_pauses": {},
+      "active_provider_pauses": {
+        "provider:CORE": "2026-11-27T23:57:10.197654+00:00"
+      },
       "scope": "Selected previous-week records only; not comprehensive web coverage.",
       "model_used": false,
       "publication_or_review_performed": false
