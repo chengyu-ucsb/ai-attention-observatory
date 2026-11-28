@@ -6,9 +6,9 @@
     "to": "2026-11-29",
     "timezone": "UTC"
   },
-  "observation_at": "2026-11-27T21:07:59.221383+00:00",
+  "observation_at": "2026-11-28T08:56:22.779873+00:00",
   "packet_sha256": "9d3bf491874102f3790bf8eed78b2732886e37c458e616116e3a6916a478cc7c",
-  "acquisition_state_sha256": "878ec08d2e7d6f29235d40af69a2ca3036719d0b535aa7e13f430cc2d7a608dd",
+  "acquisition_state_sha256": "460e161229a91a8c2262f7e7f09e20e109a14c710ec49ea9a2a90894a2311d69",
   "public_eligible": false,
   "approved": false,
   "source_text_saved": false,
@@ -2314,8 +2314,8 @@
         "complete_reading_attempt": {
           "status": "copied_source_passage",
           "stage": "synthesis",
-          "last_at": "2026-11-26",
-          "next_at": "2026-11-28",
+          "last_at": "2026-11-28",
+          "next_at": "2026-11-30",
           "provider_diagnostics": [
             {
               "stage": "article",
@@ -2379,8 +2379,8 @@
         "complete_reading_attempt": {
           "status": "claim_verification_failed",
           "stage": "synthesis",
-          "last_at": "2026-11-26",
-          "next_at": "2026-11-28",
+          "last_at": "2026-11-28",
+          "next_at": "2026-11-30",
           "provider_diagnostics": [
             {
               "stage": "article",
@@ -2445,25 +2445,30 @@
     }
   },
   "review_run": {
-    "attempted": 0,
-    "documents_retrieved": 0,
-    "partial_inputs": 0,
+    "attempted": 2,
+    "documents_retrieved": 2,
+    "partial_inputs": 2,
     "summaries_completed": 0,
-    "failed": 0,
-    "failure_reasons": {},
-    "failure_stages": {},
+    "failed": 2,
+    "failure_reasons": {
+      "copied_source_passage": 1,
+      "claim_verification_failed": 1
+    },
+    "failure_stages": {
+      "synthesis": 2
+    },
     "article_accounts": 0,
     "evidence_only_readings": 0,
     "source_text_saved": false,
     "skipped_no_model": false,
     "selection": {
       "considered": 3,
-      "eligible": 0,
+      "eligible": 2,
       "deferred_by_limit": 0,
       "skipped": {
-        "retry_cooldown": 3
+        "retry_cooldown": 1
       }
     }
   },
-  "metadata_sha256": "20de4cef2ec8394836f421467533af42d9b7638e98e8509dfb3a3206641a7fb2"
+  "metadata_sha256": "a16c0e2234db757a69f3f6815900670f732620b2659fe0e1ecab72e849b7f85f"
 }
