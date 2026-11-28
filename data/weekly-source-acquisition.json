@@ -12,9 +12,9 @@
       "kind": "scholarly",
       "published": "2026-11-22",
       "source_url": "https://doi.org/10.30971/pje.v42i2.3651",
-      "status": "pending_routes",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 1,
@@ -35,11 +35,21 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "provider_attempted_at": "2026-11-28T10:42:41.310031+00:00",
+      "next_retry_at": "2026-11-28T11:46:47.921721+00:00"
     },
     "d333d7b6d6930af883eee000ac077d86ea4db1a77b675fdbcde20e0685500c6b": {
       "fingerprint": "cd88550add0d5b4db4a2384142c667f9ae01158278fc8052b415abd077229fb0",
@@ -386,10 +396,10 @@
       "source_url": "https://doi.org/10.1186/s40561-026-00477-7",
       "status": "pending_routes",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 1,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [
@@ -417,10 +427,17 @@
           "retryable": false,
           "stage": "retrieval",
           "candidates_attempted": 1
+        },
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-25T11:35:54.660648+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "source_unavailable"
     },
     "b4254962b2107ea319a63ed413ccf8556bf2a9baf3fa3926a206b5a074524b58": {
@@ -3546,9 +3563,9 @@
       "kind": "scholarly",
       "published": "2026-11-20",
       "source_url": "https://doi.org/10.1142/s0218194026500968",
-      "status": "pending_routes",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 1,
@@ -3569,11 +3586,21 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "provider_attempted_at": "2026-11-28T10:42:41.310031+00:00",
+      "next_retry_at": "2026-11-28T11:43:26.925459+00:00"
     },
     "3dc76a96b750e70446353daf055a2bea2727ab49ddb832196366283781425fc7": {
       "fingerprint": "387c6a0ada97d49891dfb7399b8ff65dfe4e92368a971486c15e37644047c6b3",
@@ -3757,12 +3784,12 @@
       "kind": "scholarly",
       "published": "2026-11-21",
       "source_url": "https://doi.org/10.71350/30621925139",
-      "status": "pending",
+      "status": "pending_routes",
       "complete": false,
-      "attempts": 0,
+      "attempts": 1,
       "cursor": {
         "known": 0,
-        "provider": 0,
+        "provider": 1,
         "provider_tried": []
       },
       "tried_sources": [],
@@ -3773,8 +3800,18 @@
         "doi_lookup_permitted": true
       },
       "excluded_related_or_outside_window_routes": 0,
-      "diagnostics": [],
-      "source_text_saved": false
+      "diagnostics": [
+        {
+          "status": "no_exact_match",
+          "retryable": false,
+          "stage": "discovery",
+          "provider": "Europe PMC XML",
+          "candidates": 0
+        }
+      ],
+      "source_text_saved": false,
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
+      "last_outcome": "source_unavailable"
     },
     "0c06037823bac022ae269217cd5901ab772c94cf659b331cc136ce1859157720": {
       "fingerprint": "d72c9a7177db1d22589386d8152dbbdf5960e12cd27b29798f0fbf82e68e7161",
@@ -16028,9 +16065,9 @@
       "kind": "scholarly",
       "published": "2026-11-16",
       "source_url": "https://doi.org/10.29011/2577-1442.100188",
-      "status": "pending_routes",
+      "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 1,
@@ -16051,11 +16088,21 @@
           "stage": "discovery",
           "provider": "Europe PMC XML",
           "candidates": 0
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_outcome": "source_unavailable"
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
+      "last_outcome": "temporarily_unavailable",
+      "provider_attempted_at": "2026-11-28T10:42:41.310031+00:00",
+      "next_retry_at": "2026-11-28T11:46:25.249532+00:00"
     },
     "e3b0a2361489103238141cbf4cae42ec7b63b49686c878612dc3f77c24987316": {
       "fingerprint": "c50f8e4e44eb38228570846d7a538abfdc05dead2dcc707e603aac59451f1b5c",
@@ -16756,7 +16803,7 @@
       "source_url": "https://doi.org/10.1542/hpeds.2026-009673",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -16779,13 +16826,30 @@
           "failure_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:52:19.553962+00:00"
+      "next_retry_at": "2026-11-25T00:52:19.553962+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:45:39.889400+00:00"
+        }
+      }
     },
     "d0b5e633ef6ccf352a1150bb1454a7aa025e65dc4a4ad8d66e7d237c41a316ee": {
       "fingerprint": "01ee448cf00e725384174e232315f747108860d699cbe4d117d23cf22b4cb13b",
@@ -17234,7 +17298,7 @@
       "source_url": "https://doi.org/10.34190/icair.7.1.5462",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -17257,13 +17321,30 @@
           "failure_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:52:17.825140+00:00"
+      "next_retry_at": "2026-11-25T00:52:17.825140+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:44:54.546023+00:00"
+        }
+      }
     },
     "d793a1e29de6f57eed668991bd9fc08095f506bb1994cf57a4428a04ca0145ee": {
       "fingerprint": "2f04a9df127ed4dc0cb4ffe53e73eee2cb11d080eec4d7a6042662b52655000a",
@@ -19874,7 +19955,7 @@
       "source_url": "https://doi.org/10.34190/icair.7.1.5362",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -19897,13 +19978,30 @@
           "failure_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:52:18.707331+00:00"
+      "next_retry_at": "2026-11-25T00:52:18.707331+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:45:17.228198+00:00"
+        }
+      }
     },
     "c467834beb0e13484c311d9f565d3c1abff429f41e6d8f95f56e11c16563daed": {
       "fingerprint": "c73a738ec7d000ddd06f89fa57217a354b2a71e7e911afd4c581069225eeba08",
@@ -19912,7 +20010,7 @@
       "source_url": "https://doi.org/10.1287/isre.2024.1282",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -19935,13 +20033,30 @@
           "failure_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:52:20.435184+00:00"
+      "next_retry_at": "2026-11-25T00:52:20.435184+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:46:02.572422+00:00"
+        }
+      }
     },
     "863bee1d72c3b5e5ceb864931b264f5005a5b227d8ea26d951d520c161c2d3bc": {
       "fingerprint": "eb0b53f9c97880fdf798539a719ce857caa13b6ff66d411a57f93763c4300927",
@@ -24015,7 +24130,7 @@
       "source_url": "https://doi.org/10.6007/ijarbss/v16-i11/29322",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -24037,13 +24152,30 @@
           "provider": "Europe PMC XML",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:51:57.507358+00:00"
+      "next_retry_at": "2026-11-25T00:51:57.507358+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:43:04.245679+00:00"
+        }
+      }
     },
     "3c893f41b067826181a0ee9d9eda042e2d28bb68acae0803635064e4c8b16c17": {
       "fingerprint": "67399e548492505208a3cbb4dd29e4b72caa528d09f2daba9f9b07760e466c61",
@@ -24182,7 +24314,7 @@
       "source_url": "https://doi.org/10.1108/apjml-05-2026-1311",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -24205,13 +24337,30 @@
           "failure_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:52:16.121557+00:00"
+      "next_retry_at": "2026-11-25T00:52:16.121557+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:43:49.604084+00:00"
+        }
+      }
     },
     "d86e6de2230b8081e7b7f7e1c65899144f93eea52ffae31105b5961c046e9fde": {
       "fingerprint": "184072f00bcacbf2c546ed568e6e2f4031417f140d578fb4f3fa7c16da6c2f4d",
@@ -30015,7 +30164,7 @@
       "source_url": "https://doi.org/10.4253/wjge.126153",
       "status": "temporarily_unavailable",
       "complete": false,
-      "attempts": 1,
+      "attempts": 2,
       "cursor": {
         "known": 0,
         "provider": 0,
@@ -30038,13 +30187,30 @@
           "failure_url": "https://www.ebi.ac.uk/europepmc/webservices/rest/search",
           "candidates": 0,
           "retry_after_seconds": 3600
+        },
+        {
+          "status": "TimeoutError",
+          "retryable": true,
+          "stage": "discovery",
+          "provider": "OpenAIRE",
+          "candidates": 0,
+          "retry_after_seconds": 3600
         }
       ],
       "source_text_saved": false,
       "provider_attempted_at": "2026-11-24T23:50:48.252638+00:00",
-      "last_attempt_at": "2026-11-24T23:50:48.252638+00:00",
+      "last_attempt_at": "2026-11-28T10:42:41.310031+00:00",
       "last_outcome": "temporarily_unavailable",
-      "next_retry_at": "2026-11-25T00:52:16.975208+00:00"
+      "next_retry_at": "2026-11-25T00:52:16.975208+00:00",
+      "provider_fallbacks": {
+        "1": {
+          "complete": false,
+          "tried_sources": [],
+          "status": "temporarily_unavailable",
+          "attempted_at": "2026-11-28T10:42:41.310031+00:00",
+          "next_retry_at": "2026-11-28T11:44:12.284838+00:00"
+        }
+      }
     },
     "a65fb5546f2525014a2ba2e11b26119decf88305640009fefa14bd90e616ac08": {
       "fingerprint": "1351c79f49698d4e77272417e9764db0b8e74a75df1a19f0edc9b6a276d4231e",
@@ -30836,9 +31002,9 @@
       "source_text_saved": false
     }
   },
-  "cursor": 121,
+  "cursor": 133,
   "provider_pauses": {
-    "provider:CORE": "2026-11-27T23:57:10.197654+00:00",
+    "provider:CORE": "2026-11-28T11:39:31.388200+00:00",
     "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
   },
   "access_controls": {
@@ -30921,7 +31087,7 @@
     ],
     "denied_providers": [],
     "provider_pauses": {
-      "provider:CORE": "2026-11-27T23:57:10.197654+00:00",
+      "provider:CORE": "2026-11-28T11:39:31.388200+00:00",
       "provider:Semantic Scholar": "2026-11-12T11:21:51.015865+00:00"
     }
   },
@@ -57295,23 +57461,23 @@
     }
   ],
   "input_fingerprint": "54ca7e5e4c34727413d0d35ed0c68a5f9081f9b7062f525b4ff4e66110935cb8",
-  "state_sha256": "be512d8f0602f4a3a32832ef18c2da4b95339cb705d39243760270197111cbd3",
+  "state_sha256": "1053173160823849a39b75e7f4794d563c64c838663fb16437a6de4a15b0baf0",
   "run": {
-    "checked_at": "2026-11-27T23:04:20.502629+00:00",
+    "checked_at": "2026-11-28T10:42:41.310031+00:00",
     "selected_records": 181,
     "attempted_records": 12,
     "attempted_stages": 12,
     "completed_records": 23,
     "pending_records": 158,
-    "deferred_retry_records": 46,
+    "deferred_retry_records": 49,
     "statuses": {
       "access_blocked": 5,
       "full_document_retrieved_not_reviewed": 11,
       "partial_full_text_not_reviewed": 5,
-      "pending": 13,
-      "pending_routes": 99,
+      "pending": 12,
+      "pending_routes": 97,
       "source_unavailable": 2,
-      "temporarily_unavailable": 46
+      "temporarily_unavailable": 49
     },
     "excluded": {},
     "duplicate_records": 0,
@@ -57322,7 +57488,7 @@
     "item_time_budget_seconds": 60.0,
     "max_candidates_per_provider_stage": 8,
     "active_provider_pauses": {
-      "provider:CORE": "2026-11-27T23:57:10.197654+00:00"
+      "provider:CORE": "2026-11-28T11:39:31.388200+00:00"
     },
     "scope": "Selected previous-week records only; not comprehensive web coverage.",
     "model_used": false,
